@@ -22,12 +22,13 @@ package org.xwiki.mail.internal;
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.properties.converter.ConversionException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.RecipientConverter}.
@@ -35,43 +36,40 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1RC1
  */
+@ComponentTest
 public class RecipientConverterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<RecipientConverter> mocker =
-        new MockitoComponentMockingRule<>(RecipientConverter.class);
+    @InjectMockComponents
+    private RecipientConverter converter;
 
     @Test
-    public void convert() throws Exception
+    public void convert()
     {
         assertEquals(Message.RecipientType.TO,
-            this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "to"));
-        assertEquals("To",
-            this.mocker.getComponentUnderTest().convert(String.class, Message.RecipientType.TO));
+            this.converter.convert(Message.RecipientType.class, "to"));
+        assertEquals("To", this.converter.convert(String.class, Message.RecipientType.TO));
 
         assertEquals(Message.RecipientType.CC,
-            this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "cc"));
+            this.converter.convert(Message.RecipientType.class, "cc"));
         assertEquals(Message.RecipientType.BCC,
-            this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "bcc"));
+            this.converter.convert(Message.RecipientType.class, "bcc"));
         assertEquals(MimeMessage.RecipientType.NEWSGROUPS,
-            this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "newsgroups"));
+            this.converter.convert(Message.RecipientType.class, "newsgroups"));
     }
 
     @Test
-    public void convertWhenInvalidType() throws Exception
+    public void convertWhenInvalidType()
     {
-        try {
-            this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "something");
-            fail("Should have thrown an exception here");
-        } catch (ConversionException expected) {
-            assertEquals("Cannot convert [something] to [javax.mail.Message$RecipientType]", expected.getMessage());
-        }
+        Throwable exception = assertThrows(ConversionException.class, () -> {
+            this.converter.convert(Message.RecipientType.class, "something");
+        });
+        assertEquals("Cannot convert [something] to [javax.mail.Message$RecipientType]", exception.getMessage());
     }
 
     @Test
-    public void convertWhenTypeIsAlreadyARecipientType() throws Exception
+    public void convertWhenTypeIsAlreadyARecipientType()
     {
         assertEquals(Message.RecipientType.TO,
-            this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, Message.RecipientType.TO));
+            this.converter.convert(Message.RecipientType.class, Message.RecipientType.TO));
     }
 }

@@ -22,13 +22,22 @@ package org.xwiki.mail.internal.configuration;
 import java.util.Arrays;
 import java.util.Properties;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import javax.inject.Named;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
 
@@ -38,130 +47,127 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
  * @version $Id$
  * @since 6.1M2
  */
+@ComponentTest
 public class DefaultMailSenderConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultMailSenderConfiguration> mocker =
-        new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
+    @RegisterExtension
+    static LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @InjectMockComponents
+    private DefaultMailSenderConfiguration configuration;
+
+    @MockComponent
+    @Named("documents")
+    private ConfigurationSource documentsSource;
+
+    @MockComponent
+    @Named("mailsend")
+    private ConfigurationSource mailConfigDocumentSource;
+
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesSource;
 
     @Test
-    public void getFromAddressWhenNotConfigured() throws Exception
+    public void getFromAddressWhenNotConfigured()
     {
-        assertNull(this.mocker.getComponentUnderTest().getFromAddress());
+        assertNull(this.configuration.getFromAddress());
     }
 
     @Test
-    public void getFromAddressWhenDefinedInXWikiProperties() throws Exception
+    public void getFromAddressWhenDefinedInXWikiProperties()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("admin_email", String.class)).thenReturn(null);
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("from", null)).thenReturn(null);
+        when(this.documentsSource.getProperty("admin_email", String.class)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("from", null)).thenReturn(null);
+        when(this.xwikiPropertiesSource.getProperty("mail.sender.from", String.class)).thenReturn("john@doe.com");
 
-        ConfigurationSource xwikiPropertiesSource =
-            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
-        when(xwikiPropertiesSource.getProperty("mail.sender.from", String.class)).thenReturn("john@doe.com");
-
-        assertEquals("john@doe.com", this.mocker.getComponentUnderTest().getFromAddress());
+        assertEquals("john@doe.com", this.configuration.getFromAddress());
     }
 
     @Test
-    public void getFromAddressWhenDefinedInXWikiPreferences() throws Exception
+    public void getFromAddressWhenDefinedInXWikiPreferences()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("admin_email", String.class)).thenReturn("john@doe.com");
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("from", "john@doe.com")).thenReturn("john@doe.com");
+        when(this.documentsSource.getProperty("admin_email", String.class)).thenReturn("john@doe.com");
+        when(this.mailConfigDocumentSource.getProperty("from", "john@doe.com")).thenReturn("john@doe.com");
 
-        assertEquals("john@doe.com", this.mocker.getComponentUnderTest().getFromAddress());
+        assertEquals("john@doe.com", this.configuration.getFromAddress());
     }
 
     @Test
-    public void getFromAddressWhenDefinedInMailConfig() throws Exception
+    public void getFromAddressWhenDefinedInMailConfig()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("admin_email", String.class)).thenReturn(null);
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("from", (String) null)).thenReturn("john@doe.com");
+        when(this.documentsSource.getProperty("admin_email", String.class)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("from", (String) null)).thenReturn("john@doe.com");
 
-        assertEquals("john@doe.com", this.mocker.getComponentUnderTest().getFromAddress());
+        assertEquals("john@doe.com", this.configuration.getFromAddress());
     }
 
     @Test
-    public void getAdditionalPropertiesFromMailConfigDocument() throws Exception
+    public void getAdditionalPropertiesFromMailConfigDocument()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn("key=value");
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("properties", "key=value")).thenReturn(
+        when(this.documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn("key=value");
+        when(this.mailConfigDocumentSource.getProperty("properties", "key=value")).thenReturn(
             "key1=value1\nkey2=value2");
 
-        Properties properties = this.mocker.getComponentUnderTest().getAdditionalProperties();
+        Properties properties = this.configuration.getAdditionalProperties();
         assertEquals("value1", properties.getProperty("key1"));
         assertEquals("value2", properties.getProperty("key2"));
     }
 
     @Test
-    public void getAdditionalPropertiesFromXWikiPreferences() throws Exception
+    public void getAdditionalPropertiesFromXWikiPreferences()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn("key1=value1\nkey2=value2");
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("properties", "key1=value1\nkey2=value2")).thenReturn(
+        when(this.documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn(
+            "key1=value1\nkey2=value2");
+        when(this.mailConfigDocumentSource.getProperty("properties", "key1=value1\nkey2=value2")).thenReturn(
             "key1=value1\nkey2=value2");
 
-        Properties properties = this.mocker.getComponentUnderTest().getAdditionalProperties();
+        Properties properties = this.configuration.getAdditionalProperties();
         assertEquals("value1", properties.getProperty("key1"));
         assertEquals("value2", properties.getProperty("key2"));
     }
 
     @Test
-    public void getAdditionalPropertiesFromXWikiProperties() throws Exception
+    public void getAdditionalPropertiesFromXWikiProperties()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("javamail_extra_props")).thenReturn(null);
+        when(this.documentsSource.getProperty("javamail_extra_props")).thenReturn(null);
 
-        ConfigurationSource xwikiPropertiesSource =
-            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
         Properties properties = new Properties();
         properties.setProperty("key1", "value1");
         properties.setProperty("key2", "value2");
-        when(xwikiPropertiesSource.getProperty("mail.sender.properties", Properties.class)).thenReturn(properties);
+        when(this.xwikiPropertiesSource.getProperty("mail.sender.properties", Properties.class)).thenReturn(properties);
 
-        Properties returnedProperties = this.mocker.getComponentUnderTest().getAdditionalProperties();
+        Properties returnedProperties = this.configuration.getAdditionalProperties();
         assertEquals("value1", returnedProperties.getProperty("key1"));
         assertEquals("value2", returnedProperties.getProperty("key2"));
     }
 
     @Test
-    public void getAdditionalPropertiesWhenErrorInFormat() throws Exception
+    public void getAdditionalPropertiesWhenErrorInFormat()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn("\\uinvalid");
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("properties", "\\uinvalid")).thenReturn("\\uinvalid");
+        when(this.documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn("\\uinvalid");
+        when(this.mailConfigDocumentSource.getProperty("properties", "\\uinvalid")).thenReturn("\\uinvalid");
 
-        assertTrue(this.mocker.getComponentUnderTest().getAdditionalProperties().isEmpty());
+        assertTrue(this.configuration.getAdditionalProperties().isEmpty());
 
         // Verify the logs
-        verify(this.mocker.getMockedLogger()).warn(
-            "Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
-            "\\uinvalid", "IllegalArgumentException: Malformed \\uxxxx encoding.");
+        assertEquals(1, logCapture.size());
+        assertEquals("Error while parsing mail properties [\\uinvalid]. Root cause [IllegalArgumentException: "
+            + "Malformed \\uxxxx encoding.]. Ignoring configuration...", logCapture.getMessage(0));
     }
 
     @Test
-    public void getAllProperties() throws Exception
+    public void getAllProperties()
     {
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("properties", (String) null)).thenReturn(
+        when(this.mailConfigDocumentSource.getProperty("properties", (String) null)).thenReturn(
             "mail.smtp.starttls.enable=true");
-        when(mailConfigDocumentSource.getProperty("username", (String) null)).thenReturn(null);
-        when(mailConfigDocumentSource.getProperty("password", (String) null)).thenReturn(null);
-        when(mailConfigDocumentSource.getProperty("host", (String) null)).thenReturn("server");
-        when(mailConfigDocumentSource.getProperty("port", Integer.class)).thenReturn(25);
-        when(mailConfigDocumentSource.getProperty("from", (String) null)).thenReturn("john@doe.com");
+        when(this.mailConfigDocumentSource.getProperty("username", (String) null)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("password", (String) null)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("host", (String) null)).thenReturn("server");
+        when(this.mailConfigDocumentSource.getProperty("port", Integer.class)).thenReturn(25);
+        when(this.mailConfigDocumentSource.getProperty("from", (String) null)).thenReturn("john@doe.com");
 
-        Properties returnedProperties = this.mocker.getComponentUnderTest().getAllProperties();
+        Properties returnedProperties = this.configuration.getAllProperties();
 
         assertEquals(5, returnedProperties.size());
         assertEquals("true", returnedProperties.getProperty("mail.smtp.starttls.enable"));
@@ -173,53 +179,46 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void usesAuthenticationWhenNoUserNameAndPassword() throws Exception
+    public void usesAuthenticationWhenNoUserNameAndPassword()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("smtp_server_username", (String) null)).thenReturn(null);
-        when(documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn(null);
+        when(this.documentsSource.getProperty("smtp_server_username", (String) null)).thenReturn(null);
+        when(this.documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn(null);
 
-        assertFalse(this.mocker.getComponentUnderTest().usesAuthentication());
+        assertFalse(this.configuration.usesAuthentication());
     }
 
     @Test
-    public void usesAuthenticationWhenUserNameAndPasswordExist() throws Exception
+    public void usesAuthenticationWhenUserNameAndPasswordExist()
     {
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("username", (String) null)).thenReturn("user");
-        when(mailConfigDocumentSource.getProperty("password", (String) null)).thenReturn("pass");
+        when(this.mailConfigDocumentSource.getProperty("username", (String) null)).thenReturn("user");
+        when(this.mailConfigDocumentSource.getProperty("password", (String) null)).thenReturn("pass");
 
-        assertTrue(this.mocker.getComponentUnderTest().usesAuthentication());
+        assertTrue(this.configuration.usesAuthentication());
     }
 
     @Test
-    public void getPortFromXWikiPreferences() throws Exception
+    public void getPortFromXWikiPreferences()
     {
-        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("smtp_port")).thenReturn("25");
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("port", 25)).thenReturn(25);
+        when(this.documentsSource.getProperty("smtp_port")).thenReturn("25");
+        when(this.mailConfigDocumentSource.getProperty("port", 25)).thenReturn(25);
 
-        assertEquals(25, this.mocker.getComponentUnderTest().getPort());
+        assertEquals(25, this.configuration.getPort());
     }
 
     @Test
-    public void getBCCAddressesFromMailConfig() throws Exception
+    public void getBCCAddressesFromMailConfig()
     {
-        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
-        when(mailConfigDocumentSource.getProperty("bcc", String.class)).thenReturn("john@doe.com, mary@doe.com");
+        when(this.mailConfigDocumentSource.getProperty("bcc", String.class)).thenReturn("john@doe.com, mary@doe.com");
 
         assertThat(Arrays.asList("john@doe.com", "mary@doe.com"),
-            containsInAnyOrder(this.mocker.getComponentUnderTest().getBCCAddresses().toArray()));
+            containsInAnyOrder(this.configuration.getBCCAddresses().toArray()));
     }
 
     @Test
-    public void getPortWhenMailConfigDoesntExist() throws Exception
+    public void getPortWhenMailConfigDoesntExist()
     {
-        ConfigurationSource xwikiPropertiesSource =
-            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
-        when(xwikiPropertiesSource.getProperty("mail.sender.port", 25)).thenReturn(25);
+        when(this.xwikiPropertiesSource.getProperty("mail.sender.port", 25)).thenReturn(25);
 
-        assertEquals(25, this.mocker.getComponentUnderTest().getPort());
+        assertEquals(25, this.configuration.getPort());
     }
 }

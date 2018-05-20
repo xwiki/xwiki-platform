@@ -22,12 +22,14 @@ package org.xwiki.mail.internal;
 import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.properties.converter.ConversionException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link AddressesConverter}.
@@ -35,41 +37,39 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.2M1
  */
+@ComponentTest
 public class AddressConverterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<AddressConverter> mocker =
-        new MockitoComponentMockingRule<>(AddressConverter.class);
+    @InjectMockComponents
+    private AddressConverter addressConverter;
 
     @Test
     public void convert() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
         assertEquals(address,
-            this.mocker.getComponentUnderTest().convert(Address.class, "John Doe(comment) <john1@doe.com>"));
+            this.addressConverter.convert(Address.class, "John Doe(comment) <john1@doe.com>"));
     }
 
     @Test
-    public void convertWhenNull() throws Exception
+    public void convertWhenNull()
     {
-        assertNull(this.mocker.getComponentUnderTest().convert(Address.class, null));
+        assertNull(this.addressConverter.convert(Address.class, null));
     }
 
     @Test
     public void convertWhenTypeIsAlreadyAnAddress() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.mocker.getComponentUnderTest().convert(Address.class, address));
+        assertEquals(address, this.addressConverter.convert(Address.class, address));
     }
 
     @Test
-    public void convertWhenInvalid() throws Exception
+    public void convertWhenInvalid()
     {
-        try {
-            this.mocker.getComponentUnderTest().convert(Address.class, "invalid(");
-            fail("Should have thrown an exception here");
-        } catch (ConversionException expected) {
-            assertEquals("Failed to convert [invalid(] to [javax.mail.Address]", expected.getMessage());
-        }
+        Throwable exception = assertThrows(ConversionException.class, () -> {
+            this.addressConverter.convert(Address.class, "invalid(");
+        });
+        assertEquals("Failed to convert [invalid(] to [javax.mail.Address]", exception.getMessage());
     }
 }

@@ -27,13 +27,13 @@ import javax.mail.Multipart;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -46,8 +46,8 @@ public class ScriptMimeMessageTest
 {
     private ScriptMimeMessage scriptMessage;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void setUp()
     {
         Execution execution = mock(Execution.class);
         ComponentManager componentManager = mock(ComponentManager.class);

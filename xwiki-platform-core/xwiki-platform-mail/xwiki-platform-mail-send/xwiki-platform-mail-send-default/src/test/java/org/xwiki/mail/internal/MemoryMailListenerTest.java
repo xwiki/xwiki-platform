@@ -23,16 +23,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,35 +42,33 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.2M1
  */
+@ComponentTest
 public class MemoryMailListenerTest
 {
     private static final String UNIQUE_MESSAGE_ID1 = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
     private static final String UNIQUE_MESSAGE_ID2 = "6ys1BeC6gnKA7srO/vs06XBZKZM=";
 
-    @Rule
-    public MockitoComponentMockingRule<MemoryMailListener> mocker =
-        new MockitoComponentMockingRule<>(MemoryMailListener.class);
+    @InjectMockComponents
+    private MemoryMailListener listener;
 
     @Test
     public void onErrorAndGetMailStatusResult() throws Exception
     {
-        MemoryMailListener listener = this.mocker.getComponentUnderTest();
-
         String batchId = UUID.randomUUID().toString();
-        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        this.listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
 
         ExtendedMimeMessage message1 = mock(ExtendedMimeMessage.class);
         when(message1.getUniqueMessageId()).thenReturn(UNIQUE_MESSAGE_ID1);
         when(message1.getType()).thenReturn("mailtype1");
-        listener.onPrepareMessageError(message1, new Exception("error1"), Collections.<String, Object>emptyMap());
+        this.listener.onPrepareMessageError(message1, new Exception("error1"), Collections.<String, Object>emptyMap());
 
         ExtendedMimeMessage message2 = mock(ExtendedMimeMessage.class);
         when(message2.getUniqueMessageId()).thenReturn(UNIQUE_MESSAGE_ID2);
         when(message2.getType()).thenReturn("mailtype2");
-        listener.onPrepareMessageError(message2, new Exception("error2"), Collections.<String, Object>emptyMap());
+        this.listener.onPrepareMessageError(message2, new Exception("error2"), Collections.<String, Object>emptyMap());
 
-        Iterator<MailStatus> results = listener.getMailStatusResult().getByState(MailState.PREPARE_ERROR);
-        assertTrue("These should be mails in error!", results.hasNext());
+        Iterator<MailStatus> results = this.listener.getMailStatusResult().getByState(MailState.PREPARE_ERROR);
+        assertTrue(results.hasNext(), "These should be mails in error!");
 
         MailStatus status = results.next();
         assertEquals("Exception: error1", status.getErrorSummary());

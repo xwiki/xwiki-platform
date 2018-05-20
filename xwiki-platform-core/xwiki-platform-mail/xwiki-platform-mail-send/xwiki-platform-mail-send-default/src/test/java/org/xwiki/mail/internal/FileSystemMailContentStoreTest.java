@@ -34,19 +34,22 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.apache.commons.lang3.Validate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailStoreException;
 import org.xwiki.test.annotation.BeforeComponent;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -58,31 +61,28 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4M3
  */
+@ComponentTest
 public class FileSystemMailContentStoreTest
 {
     // Passed at the Maven level in the pom.xml file.
     private static final String TEMPORARY_DIRECTORY =
         System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
 
-    @Rule
-    public MockitoComponentMockingRule<FileSystemMailContentStore> mocker =
-        new MockitoComponentMockingRule<>(FileSystemMailContentStore.class);
+    @InjectMockComponents
+    private FileSystemMailContentStore store;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void deleteMailStore() throws Exception
     {
         // Delete content of the mails store directory
         FileUtils.deleteDirectory(
-            new File(TEMPORARY_DIRECTORY, this.mocker.getComponentUnderTest().ROOT_DIRECTORY));
+            new File(TEMPORARY_DIRECTORY, this.store.ROOT_DIRECTORY));
     }
 
     @BeforeComponent
-    public void registerMockComponents() throws Exception
+    public void registerMockComponents(MockitoComponentManager componentManager) throws Exception
     {
-        Environment environment = this.mocker.registerMockComponent(Environment.class);
+        Environment environment = componentManager.registerMockComponent(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
     }
 
@@ -94,13 +94,12 @@ public class FileSystemMailContentStoreTest
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
 
-        this.mocker.getComponentUnderTest().save(batchId, message);
+        this.store.save(batchId, message);
         String messageId = message.getMessageID();
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
-                URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(message.getUniqueMessageId(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
         String messageContent = IOUtils.toString(in);
@@ -119,15 +118,14 @@ public class FileSystemMailContentStoreTest
         message.setMessageId(mimeMessageId);
         message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
 
-        this.mocker.getComponentUnderTest().save(batchId, message);
+        this.store.save(batchId, message);
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
-                URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(message.getUniqueMessageId(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
-        String messageContent = IOUtils.toString(in);
+        String messageContent = IOUtils.toString(in, "UTF-8");
 
         assertTrue(messageContent.contains("Message-ID: " + mimeMessageId));
         assertTrue(messageContent.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
@@ -143,24 +141,23 @@ public class FileSystemMailContentStoreTest
         message.setHeader("Message-ID", mimeMessageId);
         message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
 
-        this.mocker.getComponentUnderTest().save(batchId, message);
+        this.store.save(batchId, message);
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
-                URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(message.getUniqueMessageId(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
-        String messageContent = IOUtils.toString(in);
+        String messageContent = IOUtils.toString(in, "UTF-8");
 
         assertTrue(messageContent.contains("Message-ID: " + message.getMessageID()));
         assertTrue(messageContent.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
     }
 
     @Test
-    public void saveMessageThrowsMailStoreExceptionWhenError() throws Exception
+    public void saveMessageThrowsMailStoreExceptionWhenError(ComponentManager componentManager) throws Exception
     {
-        Environment environment = this.mocker.getInstance(Environment.class);
+        Environment environment = componentManager.getInstance(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         String batchId = UUID.randomUUID().toString();
@@ -169,13 +166,14 @@ public class FileSystemMailContentStoreTest
         ExtendedMimeMessage message = mock(ExtendedMimeMessage.class);
         when(message.getUniqueMessageId()).thenReturn(messageId);
 
-        this.thrown.expect(MailStoreException.class);
-        this.thrown.expectMessage(
-            "Failed to save message (id [" + messageId + "], batch id [" + batchId + "]) into file");
-
         when(message.getContent()).thenReturn("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
         doThrow(new IOException()).when(message).writeTo(any(OutputStream.class));
-        this.mocker.getComponentUnderTest().save(batchId, message);
+
+        Throwable exception = assertThrows(MailStoreException.class, () -> {
+            this.store.save(batchId, message);
+        });
+        assertTrue(exception.getMessage().startsWith(
+            "Failed to save message (id [" + messageId + "], batch id [" + batchId + "]) into file"));
     }
 
     @Test
@@ -187,49 +185,47 @@ public class FileSystemMailContentStoreTest
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
-                     URLEncoder.encode(batchId,"UTF-8"));
+            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId,"UTF-8"));
         batchDirectory.mkdirs();
         File messageFile = new File(batchDirectory, URLEncoder.encode(messageId,"UTF-8"));
         messageFile.createNewFile();
 
         String newLine = System.getProperty("line.separator");
 
-        FileWriter fileWriter = new FileWriter(messageFile, true);
-        // Unique string is <hashcode>.<id>.<currentTime>.JavaMail.<suffix>
-        fileWriter.append("Message-ID: " + mimeMessageId + newLine);
-        fileWriter.append("MIME-Version: 1.0" + newLine);
-        fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
-        fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine + newLine);
-        fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
-        fileWriter.close();
+        try (FileWriter fileWriter = new FileWriter(messageFile, true)) {
+            // Unique string is <hashcode>.<id>.<currentTime>.JavaMail.<suffix>
+            fileWriter.append("Message-ID: " + mimeMessageId + newLine);
+            fileWriter.append("MIME-Version: 1.0" + newLine);
+            fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
+            fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine + newLine);
+            fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
+        }
 
         Session session = Session.getInstance(new Properties());
-        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchId, messageId);
+        MimeMessage message = this.store.load(session, batchId, messageId);
 
         assertEquals(mimeMessageId, message.getMessageID());
         assertEquals("Lorem ipsum dolor sit amet, consectetur adipiscing elit", message.getContent());
     }
 
     @Test
-    public void loadMessageThrowsMailStoreExceptionWhenError() throws Exception
+    public void loadMessageThrowsMailStoreExceptionWhenError()
     {
         String batchId = UUID.randomUUID().toString();
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
         Session session = Session.getInstance(new Properties());
 
-        this.thrown.expect(MailStoreException.class);
-        this.thrown.expectMessage(
-            "Failed to load message (id [" + messageId + "], batch id [" + batchId + "]) from file");
-
-        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchId, messageId);
-        fail("Should have thrown an exception here");
+        Throwable exception = assertThrows(MailStoreException.class, () -> {
+           this.store.load(session, batchId, messageId);
+        });
+        assertTrue(exception.getMessage().startsWith(
+            "Failed to load message (id [" + messageId + "], batch id [" + batchId + "]) from file"));
     }
 
     @Test
-    public void deleteMessage() throws Exception
+    public void deleteMessage(ComponentManager componentManager) throws Exception
     {
-        Environment environment = this.mocker.getInstance(Environment.class);
+        Environment environment = componentManager.getInstance(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         String batchId = UUID.randomUUID().toString();
@@ -237,12 +233,12 @@ public class FileSystemMailContentStoreTest
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
+            new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         batchDirectory.mkdirs();
         File messageFile = new File(batchDirectory, URLEncoder.encode(messageId, "UTF-8"));
         messageFile.createNewFile();
 
-        this.mocker.getComponentUnderTest().delete(batchId, messageId);
+        this.store.delete(batchId, messageId);
 
         assertTrue(!messageFile.exists());
     }

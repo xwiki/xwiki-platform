@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-crypto</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>10.4</version>
+    <version>10.4.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-crypto-script</artifactId>

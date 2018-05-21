@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.4</version>
+    <version>10.4.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-sharepage</artifactId>
   <name>XWiki Platform - Share Page - Parent POM</name>

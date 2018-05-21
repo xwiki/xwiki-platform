@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-svg</artifactId>
-    <version>10.4</version>
+    <version>10.4.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-svg-rasterizer</artifactId>
   <name>XWiki Platform - SVG Tools - SVG Rasterizer</name>

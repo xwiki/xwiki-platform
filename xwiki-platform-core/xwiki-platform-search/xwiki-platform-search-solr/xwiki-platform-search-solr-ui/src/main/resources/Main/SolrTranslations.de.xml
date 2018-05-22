@@ -42,7 +42,7 @@
   <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
 solr.admin.error.norights=Sie benötigen Adminstratorenrechte, um diesen Abschnitt zu sehen.
 solr.admin.error.notallowed=Sie sind zur Ausführung dieser Aktion nicht berechtigt.
-solr.admin.indexing.action.hint=\ Die Aktion, die auf dem Index ausgeführt werden soll.
+solr.admin.indexing.action.hint=Die Aktion, die auf dem Index ausgeführt werden soll.
 solr.admin.indexing.action.label=Aktion
 solr.admin.indexing.action.select_delete=Aus dem Index löschen
 solr.admin.indexing.action.select_index=Zum Index hinzufügen
@@ -141,7 +141,7 @@ solr.result.language=Sprache
 solr.result.location=Gefunden in {0} » {1} » {2}
 solr.result.mediaType=Dateityp {0}
 solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2}) 
-solr.sortBy=Sortierung\:
+solr.sortBy=Sortierung:
 solr.sortBy.attauthor_display_sort=Hochgeladen von 
 solr.sortBy.attdate_sort=Hochgeladen am
 solr.sortBy.attsize_sort=Dateigröße

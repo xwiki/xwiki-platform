@@ -64,7 +64,7 @@ rendering.macro.documentTree.parameter.openTo.description=L'id du noeud pour ouv
 rendering.macro.documentTree.parameter.openTo.name=Ouvrir à
 rendering.macro.documentTree.parameter.readOnly.description=L'utilisateur doit-il être en mesure de modifier la structure de l'arbre, si il a les droits nécessaires ?
 rendering.macro.documentTree.parameter.readOnly.name=Lecture seule
-rendering.macro.documentTree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié. Le format d'un identificateur de noeud est entityType: EntityReference, où le type d'entité peut être par exemple wiki, espace, document. Par exemple: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié. Le format d'un identificateur de noeud est entityType\: EntityReference, où le type d'entité peut être par exemple wiki, espace, document. Par exemple\: wiki\:xwiki, space\:xwiki\:Main, document\:xwiki\:Main.WebHome
 rendering.macro.documentTree.parameter.root.name=Racine
 rendering.macro.documentTree.parameter.showAttachments.description=Pour afficher les pièces jointes du document ou non
 rendering.macro.documentTree.parameter.showAttachments.name=Montrer les pièces jointes
@@ -88,6 +88,5 @@ rendering.macro.documentTree.parameter.showWikiPrettyName.description=Montre le 
 rendering.macro.documentTree.parameter.showWikiPrettyName.name=Montrer le Pretty Name du wiki
 rendering.macro.documentTree.parameter.showWikis.description=Pour montrer les nœuds de wiki ou non. Cela ne peut être utilisé que sur le wiki principal et si la source de l'arbre a été enregistrée avec des droits de programmation.
 rendering.macro.documentTree.parameter.showWikis.name=Montrer les Wikis
-rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 </content>
 </xwikidoc>

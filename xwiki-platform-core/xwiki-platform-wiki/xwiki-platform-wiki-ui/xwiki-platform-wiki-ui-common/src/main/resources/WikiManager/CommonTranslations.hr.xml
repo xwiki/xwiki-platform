@@ -45,8 +45,8 @@ admin.wikis=Wikiji
 admin.wikis.descriptor=Opisnik
 admin.wikis.descriptor.description=Podesite wiki opisnik
 platform.wiki.admin.wiki.csrfInvalidError=Neispravan sigurnosni (CSRF) token. Molim osvježite stranicu i pokušajte ponovo.
-platform.wiki.admin.wiki.ownerProblemConfirmation=Korisnik novog vlasnika ne postoji ili možda potječe iz nekog drugog wikija.\nJeste li sigurni da želite odabrati tog korisnika i nastaviti s operacijom spremanja?
-platform.wiki.admin.wiki.ownerWarning=Upozorenje\: Jednom kad ovo promijenite, prethodni korisnik će izgubiti svoje vlasničke ovlasti. Ukoliko ste to vi, provjerite da ne ostanete zaključani izvan wikija. Ako se to greškom dogodi, trebat ćete kontaktirati administratore glavnog wikija ili upotrijebiti superadministratorski račun.
+platform.wiki.admin.wiki.ownerProblemConfirmation=Korisnik novog vlasnika ne postoji ili možda potječe iz nekog drugog wikija.\\nJeste li sigurni da želite odabrati tog korisnika i nastaviti s operacijom spremanja?
+platform.wiki.admin.wiki.ownerWarning=Upozorenje: Jednom kad ovo promijenite, prethodni korisnik će izgubiti svoje vlasničke ovlasti. Ukoliko ste to vi, provjerite da ne ostanete zaključani izvan wikija. Ako se to greškom dogodi, trebat ćete kontaktirati administratore glavnog wikija ili upotrijebiti superadministratorski račun.
 platform.wiki.admin.wiki.requiredFieldsError=Polje 'Početna stranica' ne može biti prazno.
 </content>
 </xwikidoc>

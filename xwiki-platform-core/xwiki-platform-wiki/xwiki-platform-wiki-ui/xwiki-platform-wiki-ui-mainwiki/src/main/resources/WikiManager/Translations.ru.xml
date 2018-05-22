@@ -84,7 +84,7 @@ platform.wiki.menu.userwikis=Вики
 ### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 
 ## Create
-### Missing: platform.wiki.create.button=Create Wiki
+platform.wiki.create.button=Создать Вики
 platform.wiki.create.title=Создать новую Вики
 platform.wiki.create.members=УЧАСТНИКИ
 platform.wiki.create.prettyname.empty=Краткое название не может быть пустым
@@ -96,10 +96,10 @@ platform.wiki.create.error.wikiname.empty=Идентификатор не мож
 ## Common errors and messages
 ### Missing: platform.wiki.error.wikidoesnotexist=Wiki [{0}] does not exist
 ### Missing: platform.wiki.error.oneParameterNotSpecified=The ''{0}'' parameter was not specified.
-### Missing: platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
-### Missing: platform.wiki.error.exceptionWithMessage=Exception: {0}
-### Missing: platform.wiki.form.requiredField=Required
-### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
+platform.wiki.error.parameterAcceptsMultipleValues=Принимается несколько значений.
+platform.wiki.error.exceptionWithMessage=Исключение: {0}
+platform.wiki.form.requiredField=Требовать
+platform.wiki.csrf.error=Недопустимый маркер безопасности. Пожалуйста, повторите операцию.
 
 ## Users
 ### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
@@ -121,15 +121,15 @@ platform.wiki.users.join.yes=Да
 platform.wiki.users.join.no=Нет
 ### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
-platform.wiki.users.leave.confirmation=Вы уверены, что хотите покинуть Вики {0}{1}{2}? 
+platform.wiki.users.leave.confirmation=Вы уверены, что хотите покинуть Вики {0}{1}{2}?
 platform.wiki.users.leave.confirmation.yes=Да
 platform.wiki.users.leave.confirmation.no=Нет
 ### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
 platform.wiki.users.join.title=Присоединиться к Вики
 platform.wiki.users.leave.title=Покинуть Вики "{0}"
-platform.wiki.users.leave.empty=
+platform.wiki.users.leave.empty=Покинуть Вики
 platform.wiki.users.delete.title=Удалить Вики "{0}"
-platform.wiki.users.delete.empty=
+platform.wiki.users.delete.empty=Удалить Вики
 ### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
 ### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
 ### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
@@ -299,7 +299,7 @@ platform.wiki.sheet.title.createnewalias=Создать новые альтер�
 #######################################
 ## until 9.5-rc-1
 #######################################
-### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
+platform.wiki.delete.confirmation.yes=Да, пожалуйста, удалите эту Вики!
 ### Missing: platform.wiki.delete.confirmation.no=No, take me back!
 
 ## Used to indicate where deprecated keys end

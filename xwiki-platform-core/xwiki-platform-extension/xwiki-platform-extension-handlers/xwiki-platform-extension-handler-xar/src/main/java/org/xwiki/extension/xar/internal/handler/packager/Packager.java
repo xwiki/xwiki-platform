@@ -39,7 +39,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.xar.XarExtensionExtension;
+import org.xwiki.extension.xar.XarExtensionException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
@@ -404,7 +404,7 @@ public class Packager
      * @since 9.3RC1
      */
     public void reset(DocumentReference reference, DocumentReference authorReference)
-        throws IOException, XarException, XWikiException, XarExtensionExtension
+        throws IOException, XarException, XWikiException, XarExtensionException
     {
         Collection<XarInstalledExtension> installedExtensions =
             getXarInstalledExtensionRepository().getXarInstalledExtensions(reference);
@@ -435,11 +435,11 @@ public class Packager
                 xcontext.getWiki().saveDocument(databaseDocument, "Reset document from extension [" + extension + "]",
                     xcontext);
             } else {
-                throw new XarExtensionExtension("Can't find any document with reference [" + documentReference
+                throw new XarExtensionException("Can't find any document with reference [" + documentReference
                     + "] in extension [" + extension.getId() + "]");
             }
         } else {
-            throw new XarExtensionExtension(
+            throw new XarExtensionException(
                 "Can't find any installed extension associated with the document reference [" + reference + "]");
         }
     }

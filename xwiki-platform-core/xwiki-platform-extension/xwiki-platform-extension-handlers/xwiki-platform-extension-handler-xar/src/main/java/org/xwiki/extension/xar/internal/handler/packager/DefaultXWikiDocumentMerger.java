@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.xar.XWikiDocumentMerger;
 import org.xwiki.extension.xar.XWikiDocumentMergerConfiguration;
-import org.xwiki.extension.xar.XarExtensionExtension;
+import org.xwiki.extension.xar.XarExtensionException;
 import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.job.Job;
@@ -72,7 +72,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
     @Override
     public XWikiDocument merge(XWikiDocument currentDocument, XWikiDocument previousDocument,
-        XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration) throws XarExtensionExtension
+        XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration) throws XarExtensionException
     {
         //////////
         // Upgrade

@@ -152,6 +152,102 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionException",
+                    "package": "org.xwiki.extension.xar",
+                    "classQualifiedName": "org.xwiki.extension.xar.XWikiDocumentMerger",
+                    "classSimpleName": "XWikiDocumentMerger",
+                    "methodName": "merge",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Young API."
+                  },
+                  {
+                    "code": "java.method.exception.checkedRemoved",
+                    "old": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
+                    "package": "org.xwiki.extension.xar",
+                    "classQualifiedName": "org.xwiki.extension.xar.XWikiDocumentMerger",
+                    "classSimpleName": "XWikiDocumentMerger",
+                    "methodName": "merge",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Young API."
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionException",
+                    "package": "org.xwiki.extension.xar.script",
+                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "classSimpleName": "XarExtensionScriptService",
+                    "methodName": "getInstalledExtensionDocument",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                  },
+                  {
+                    "code": "java.method.exception.checkedRemoved",
+                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
+                    "package": "org.xwiki.extension.xar.script",
+                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "classSimpleName": "XarExtensionScriptService",
+                    "methodName": "getInstalledExtensionDocument",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionException",
+                    "package": "org.xwiki.extension.xar.script",
+                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "classSimpleName": "XarExtensionScriptService",
+                    "methodName": "getInstalledExtensionDocument",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                  },
+                  {
+                    "code": "java.method.exception.checkedRemoved",
+                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
+                    "package": "org.xwiki.extension.xar.script",
+                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "classSimpleName": "XarExtensionScriptService",
+                    "methodName": "getInstalledExtensionDocument",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionException",
+                    "package": "org.xwiki.extension.xar.script",
+                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "classSimpleName": "XarExtensionScriptService",
+                    "methodName": "getInstalledExtensionDocument",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                  },
+                  {
+                    "code": "java.method.exception.checkedRemoved",
+                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionExtension",
+                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionException",
+                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
+                    "package": "org.xwiki.extension.xar.script",
+                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "classSimpleName": "XarExtensionScriptService",
+                    "methodName": "getInstalledExtensionDocument",
+                    "elementKind": "method",
+                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                  }
                 ]
               }
             }

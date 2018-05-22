@@ -40,8 +40,8 @@ public interface XWikiDocumentMerger
      * @param nextDocument the new standard version of the document
      * @param configuration the configuration of the merge
      * @return the result of the merge
-     * @throws XarExtensionExtension when failing to execute the merge
+     * @throws XarExtensionException when failing to execute the merge
      */
     XWikiDocument merge(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
-        XWikiDocumentMergerConfiguration configuration) throws XarExtensionExtension;
+        XWikiDocumentMergerConfiguration configuration) throws XarExtensionException;
 }

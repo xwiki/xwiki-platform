@@ -25,11 +25,9 @@ import org.xwiki.extension.ExtensionException;
  * Base exception for all XAR extension handler specific APIs.
  * 
  * @version $Id$
- * @since 9.3rc1
- * @deprecated since 10.5RC1, use {@link XarExtensionException} instead
+ * @since 10.5RC1
  */
-@Deprecated
-public class XarExtensionExtension extends ExtensionException
+public class XarExtensionException extends ExtensionException
 {
     /**
      * Class version.
@@ -40,7 +38,7 @@ public class XarExtensionExtension extends ExtensionException
      * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
      *            method.
      */
-    public XarExtensionExtension(String message)
+    public XarExtensionException(String message)
     {
         super(message);
     }
@@ -49,7 +47,7 @@ public class XarExtensionExtension extends ExtensionException
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
      *            value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
-    public XarExtensionExtension(Throwable cause)
+    public XarExtensionException(Throwable cause)
     {
         super(cause);
     }
@@ -59,7 +57,7 @@ public class XarExtensionExtension extends ExtensionException
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
      *            value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
-    public XarExtensionExtension(String message, Throwable cause)
+    public XarExtensionException(String message, Throwable cause)
     {
         super(message, cause);
     }

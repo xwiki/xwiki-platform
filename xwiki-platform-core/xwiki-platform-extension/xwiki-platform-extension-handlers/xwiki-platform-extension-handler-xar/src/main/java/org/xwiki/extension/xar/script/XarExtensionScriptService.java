@@ -36,7 +36,7 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.extension.version.Version;
-import org.xwiki.extension.xar.XarExtensionExtension;
+import org.xwiki.extension.xar.XarExtensionException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.job.DiffXarJob;
@@ -262,15 +262,15 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
      * @param reference the reference of the document
      * @return a Document instance of passed document when extracted from the standard extension matching this
      *         reference. Null if none could be found.
-     * @throws XarExtensionExtension when failing to get the document
+     * @throws XarExtensionException when failing to get the document
      * @since 9.3RC1
      */
-    public Document getInstalledExtensionDocument(DocumentReference reference) throws XarExtensionExtension
+    public Document getInstalledExtensionDocument(DocumentReference reference) throws XarExtensionException
     {
         try {
             return safe(this.packager.getXWikiDocument(reference));
         } catch (IOException | XarException e) {
-            throw new XarExtensionExtension(String.format("Failed to get standard version of document [%s]", reference),
+            throw new XarExtensionException(String.format("Failed to get standard version of document [%s]", reference),
                 e);
         }
     }
@@ -280,16 +280,16 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
      * @param extensionId the id of the extension from which to get the standard version of the document
      * @return a Document instance of passed document when extracted from the standard extension matching this
      *         reference. Null if none could be found.
-     * @throws XarExtensionExtension when failing to get the document
+     * @throws XarExtensionException when failing to get the document
      * @since 9.3RC1
      */
     public Document getInstalledExtensionDocument(DocumentReference reference, ExtensionId extensionId)
-        throws XarExtensionExtension
+        throws XarExtensionException
     {
         try {
             return safe(this.packager.getXWikiDocument(reference, extensionId));
         } catch (IOException | XarException e) {
-            throw new XarExtensionExtension(
+            throw new XarExtensionException(
                 String.format("Failed to get standard version of document [%s] from extension with id [%s]", reference,
                     extensionId),
                 e);
@@ -301,16 +301,16 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
      * @param extension the extension from which to get the standard version of the document
      * @return a Document instance of passed document when extracted from the standard extension matching this
      *         reference. Null if none could be found.
-     * @throws XarExtensionExtension when failing to get the document
+     * @throws XarExtensionException when failing to get the document
      * @since 9.3RC1
      */
     public Document getInstalledExtensionDocument(DocumentReference reference, XarInstalledExtension extension)
-        throws XarExtensionExtension
+        throws XarExtensionException
     {
         try {
             return safe(this.packager.getXWikiDocument(reference, extension));
         } catch (IOException | XarException e) {
-            throw new XarExtensionExtension(String.format(
+            throw new XarExtensionException(String.format(
                 "Failed to get standard version of document [%s] from extension [%s]", reference, extension), e);
         }
     }

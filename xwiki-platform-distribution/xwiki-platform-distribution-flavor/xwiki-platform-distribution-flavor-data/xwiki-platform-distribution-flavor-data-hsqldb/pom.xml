@@ -43,13 +43,9 @@
       <!-- Step 1: Copy and filter the Hibernate config file which will be used by the packager
            plugin -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-remote-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>xwiki-platform-tool-configuration-resources</id>
-          </execution>
-        </executions>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+        <version>${commons.version}</version>
       </plugin>
       <!-- Step 2: Import the XAR dependencies into the database -->
       <plugin>

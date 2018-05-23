@@ -79,8 +79,9 @@
       </plugin>
       <!-- Prepare configuration -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-remote-resources-plugin</artifactId>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+        <version>${commons.version}</version>
       </plugin>
     </plugins>
     <pluginManagement>

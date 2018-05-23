@@ -80,12 +80,12 @@ tour.upgrade.successList=Les pages suivantes ont été converties avec succès :
 tour.upgrade.successNothing=Aucune page n'a besoin d'être mise à jour !
 tour.upgrade.title=Mise à jour
 # Live table generic keys
-tour.livetable.doc.title=# Clés génériques de la livetable
+tour.livetable.doc.title=Nom de la visite
 TourCode.StepClass_action=Action cible
 TourCode.StepClass_queryString=Chaîne de requête
 tour.steps.save_step=Enregistrer
 # Template
-tour.template.name=# Patron
+tour.template.name=Visite guidée
 tour.template.description=Tour étape par étape
 </content>
 </xwikidoc>

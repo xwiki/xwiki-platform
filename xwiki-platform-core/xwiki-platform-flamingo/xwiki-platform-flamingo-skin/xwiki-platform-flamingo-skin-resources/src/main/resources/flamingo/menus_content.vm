@@ -2,7 +2,12 @@
 ## Globals
 ##
 #set ($canView = !$doc.isNew() && $xwiki.hasAccessLevel('view'))
-## Note: Checking only the view right because $hasCreatePage is not yet reliable.
+## Note: For Copy we would need to check that the user has edit permissions
+## (since there's no create permission) for the *target* location. Since the
+## user selects the target location in the Copy UI, we need to display the
+## copy menu action. Checking if the user (or guest) doesn't have edit
+## permissions on the whole wiki (including subwiki) is costly. Thus FTM we
+## only check for view permissions.
 #set ($canCopy = $canView)
 #set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)

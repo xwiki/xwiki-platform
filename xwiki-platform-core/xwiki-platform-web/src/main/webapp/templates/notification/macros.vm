@@ -34,9 +34,8 @@
       ## * in the title of a document, you cannot add HTML tags or nasty content (HTML macro is not rendered, so HTML
       ##   tags are escaped), so we don't need to use escape tools.
       ##
-      ## * Rendering with HTML is useful if you have non-breaking spaces in the title (example: a page called
-      ##  "SOME      -     EXAMPLE") which are represented with &nbsp; in HTML. With the plain text renderer, the spaces
-      ##   are trimmed.
+      ## * In a page named "SOME      -     EXAMPLE", the white spaces are represented as `&nbsp;` when rendered with
+      ##   the HTML renderer meanwhile they are trimmed when rendered with the plain text renderer.
       ##
       ## * It's consistent with the way the title is displayed in the page itself (using html, see: `titlevars.vm`).
       <a href="$!escapetool.xml($document.getURL())">$document.displayTitle</a>

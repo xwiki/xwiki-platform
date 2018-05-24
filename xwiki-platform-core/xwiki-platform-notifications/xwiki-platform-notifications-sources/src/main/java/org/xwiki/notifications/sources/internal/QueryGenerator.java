@@ -23,15 +23,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -72,15 +71,17 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class QueryGenerator
 {
+    private static final LocalDocumentReference USER_CLASS
+            = new LocalDocumentReference("XWiki", "XWikiUsers");
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     @Inject
     private QueryManager queryManager;
 
     @Inject
     private ExpressionNodeToHQLConverter hqlConverter;
-
-    @Inject
-    @Named("user")
-    private ConfigurationSource userPreferencesSource;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -174,7 +175,7 @@ public class QueryGenerator
         // Other basic filters
         topNode = handleBlackList(parameters, topNode);
         topNode = handleEndDate(parameters, topNode);
-        topNode = handleHiddenEvents(topNode);
+        topNode = handleHiddenEvents(parameters, topNode);
         topNode = handleWiki(parameters, topNode);
         topNode = handleOrder(topNode);
 
@@ -346,10 +347,14 @@ public class QueryGenerator
         );
     }
 
-    private AbstractOperatorNode handleHiddenEvents(AbstractOperatorNode topNode)
+    private AbstractOperatorNode handleHiddenEvents(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
+        final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
+        Object displayHiddenDocuments
+                = documentAccessBridge.getProperty(parameters.user, userClass, "displayHiddenDocuments");
+
         // Don't show hidden events unless the user want to display hidden pages
-        if (userPreferencesSource.getProperty("displayHiddenDocuments", 0) == 0) {
+        if (displayHiddenDocuments == null || Integer.valueOf(0).equals(displayHiddenDocuments)) {
             return topNode.and(
                     new NotEqualsNode(
                             new PropertyValueNode(EventProperty.HIDDEN),

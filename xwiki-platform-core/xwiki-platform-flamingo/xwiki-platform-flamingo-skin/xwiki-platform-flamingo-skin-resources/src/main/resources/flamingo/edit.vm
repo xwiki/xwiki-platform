@@ -61,8 +61,8 @@
     $response.setStatus(423)
     #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
                          + '&amp;force=1')
-    #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
-    #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
+    #set($forceEditURL = $tdoc.getURL($xcontext.getAction(), ${newquerystring}))
+    #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('doclockedby') $xwiki.getUserName($tdoc.getLockingUser())")
     <a href="$forceEditURL">$services.localization.render('forcelock')</a>
     #xwikimessageboxend()
     ##

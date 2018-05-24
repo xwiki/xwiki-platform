@@ -91,7 +91,6 @@ platform.wiki.create.prettyname.empty=Pretty name must not be empty
 platform.wiki.create.error=Wiki \"{0}\" creation failed: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=A database with this identifier already exists
 platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
-platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
 platform.wiki.create.error.wikiname.empty=Identifier can't be empty
 
 ## Common errors and messages

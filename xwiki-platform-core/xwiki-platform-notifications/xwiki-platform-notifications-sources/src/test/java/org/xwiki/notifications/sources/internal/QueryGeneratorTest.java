@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
@@ -78,9 +78,9 @@ public class QueryGeneratorTest
 
     private QueryManager queryManager;
     private EntityReferenceSerializer<String> serializer;
-    private ConfigurationSource userPreferencesSource;
     private WikiDescriptorManager wikiDescriptorManager;
     private NotificationFilterManager notificationFilterManager;
+    private DocumentAccessBridge documentAccessBridge;
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
@@ -94,9 +94,9 @@ public class QueryGeneratorTest
     {
         queryManager = mocker.getInstance(QueryManager.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        userPreferencesSource = mocker.getInstance(ConfigurationSource.class, "user");
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
+        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
 
         startDate = new Date(10);
 
@@ -117,7 +117,9 @@ public class QueryGeneratorTest
         when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class)))
                 .thenReturn(Sets.newSet(fakeFilterPreference));
 
-        when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(0);
+        when(documentAccessBridge.getProperty(userReference,
+                new DocumentReference("xwiki", "XWiki", "XWikiUsers"),
+                "displayHiddenDocuments")).thenReturn(0);
 
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
@@ -162,7 +164,9 @@ public class QueryGeneratorTest
     public void generateQueryWhenHiddenDocsAreEnabled() throws Exception
     {
         // Mock
-        when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(1);
+        when(documentAccessBridge.getProperty(userReference,
+                new DocumentReference("xwiki", "XWiki", "XWikiUsers"),
+                "displayHiddenDocuments")).thenReturn(1);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();

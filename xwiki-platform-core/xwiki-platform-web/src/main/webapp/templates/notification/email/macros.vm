@@ -76,7 +76,9 @@
       #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
     </div>
     #set ($document = $xwiki.getDocument($event.document))
-    #link($document.getURL(), $!escapetool.xml($document.getRenderedTitle('xhtml/1.0')))
+    ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape
+    ## tools to display the title.
+    #link($document.getURL(), $document.displayTitle)
   </div>
 #end
 
@@ -228,7 +230,9 @@
   #macro(displaySortedEventTOC $ev)
     #set ($discard = $displayedDocuments.add($ev.event.document))
     #set ($document = $xwiki.getDocument($ev.event.document))
-    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #ccc;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $escapetool.xml($document.displayTitle))
+    ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape
+    ## tools to display the title.
+    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #ccc;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $document.displayTitle)
       #if ($ev.hasChildren())
         <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;">
         #foreach ($child in $ev.children)

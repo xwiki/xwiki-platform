@@ -24,7 +24,22 @@
   #define($content)
     #set ($document = $xwiki.getDocument($compositeEvent.document))
     <div class="notification-page">
-      <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('html/5.0'))</a>
+      ## Here, we have 2 choices:
+      ## 1 - Render the title with "plain/1.0" syntax, and use $escapetool.xml() to make sure we don't inject HTML tags
+      ## 2 - Render the title with "html" syntax ($document.displayTitle), and don't use $escapetool.xml() (because it
+      ##     would be useless to render HTML tags removed them by escape tools afterwards).
+      ##
+      ## I've played with both, and I have choosen solution 2 for the following reasons:
+      ##
+      ## * in the title of a document, you cannot add html tags or nasty content (html macro is not rendered, so HTML
+      ##   tags are escaped), so you don't need to use escape tools.
+      ##
+      ## * HTML syntax is usefull if you have non-breaking spaces in the title (example: create a page called
+      ##  "SOME      -     EXAMPLE") and if we want to keep them (it's not our role to decide if it's good or not to
+      ##  have such titles).
+      ##
+      ## * It's consistent with the way the title is displayed in the page itself (using html, see: `titlevars.vm`).
+      <a href="$!escapetool.xml($document.getURL())">$document.displayTitle</a>
     </div>
     <div class="notification-description">
       #if ($compositeEvent.users.size() == 1)

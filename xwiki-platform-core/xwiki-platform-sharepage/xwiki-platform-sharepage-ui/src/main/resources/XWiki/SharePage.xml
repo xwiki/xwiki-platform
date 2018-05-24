@@ -339,7 +339,7 @@ $!{escapetool.xml($message)}
 
 &lt;p&gt;To visit this document online, open &lt;a href="${doc.getExternalURL()}"&gt;${doc.getExternalURL()}&lt;/a&gt; in your browser.&lt;/p&gt;
 
-#if ($services.watchlist)
+#if ($services.watchlist &amp;&amp; $services.watchlist.isEnabled())
 &lt;p&gt;Additionally, you can &lt;a href="${doc.getExternalURL('view', "xpage=watch&amp;do=adddocument&amp;xredirect=$escapetool.url($doc.getURL())")}"&gt;add this document to your personal WatchList&lt;/a&gt; and be notified whenever someone modifies it.&lt;/p&gt;
 #end
 
@@ -379,7 +379,7 @@ $!{escapetool.xml($message)}
 
 To visit this document online, open ${doc.getExternalURL()} in your browser.
 
-#if ($services.watchlist)
+#if ($services.watchlist &amp;&amp; $services.watchlist.isEnabled())
 Additionally, you can add this document to your personal WatchList and be notified whenever someone modifies it. To do so, open the following link in your browser: ${doc.getExternalURL('view', "xpage=watch&amp;do=adddocument&amp;xredirect=$escapetool.url($doc.getURL())")}
 #end
 

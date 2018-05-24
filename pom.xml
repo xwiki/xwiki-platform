@@ -49,7 +49,7 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.4.0</hsqldb.version>
+    <hsqldb.version>2.4.1</hsqldb.version>
 
     <!-- Dependencies versions -->
     <ckeditor.version>1.20</ckeditor.version>

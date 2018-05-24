@@ -314,8 +314,9 @@ require(['jquery'], function ($) {
           &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
+            #set ($targetDocument = $xwiki.getDocument($xcontext.userReference))
             #set ($interval = 'daily')
-            #set ($objPref = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+            #set ($objPref = $targetDocument.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
             #if ("$!objPref" != '')
               #set ($objInterval = $objPref.getValue('interval'))
               #if ("$!objInterval" != '')
@@ -330,6 +331,8 @@ require(['jquery'], function ($) {
             &lt;/select&gt;
           &lt;/dd&gt;
         &lt;/dl&gt;
+        #else
+          #set ($targetDocument = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
         #end
         &lt;dl&gt;
           &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType'))&lt;/label&gt;
@@ -337,7 +340,7 @@ require(['jquery'], function ($) {
           &lt;/dt&gt;
           &lt;dd&gt;
             #set ($diffType = $services.notification.preferences.getDiffType())
-            #set ($objPref = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+            #set ($objPref = $targetDocument.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
             #if ("$!objPref" != '')
               #set ($objDiffType = $objPref.getValue('diffType'))
               #if ("$!objDiffType" != '')

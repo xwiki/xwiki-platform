@@ -25,7 +25,7 @@
     $response.setStatus(423)
     #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
                          + '&amp;force=1')
-    #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
+    #set($forceEditURL = $tdoc.getURL($xcontext.getAction(), ${newquerystring}))
     #set($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
     #if ($protectionLevel.name() != 'DENY')
       #set($boxTitle = 'notice')

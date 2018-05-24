@@ -139,7 +139,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public int getPort()
     {
-        Integer port = null;
+        Integer port;
 
         // First, look in the document sources
         String portAsString = this.documentsSource.getProperty("smtp_port");

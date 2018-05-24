@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -62,17 +61,20 @@ public class EventsSorter
         // Group sorted events that concern the same document
         groupEventsWithSameDocument();
 
+        // Here we are going to store only events that have no parent
+        List<SortedEvent> topLevelEvents = new ArrayList<>();
         // Group events so that children are stored in their parent
-        Iterator<SortedEvent> it = sortedEvents.iterator();
-        while (it.hasNext()) {
-            SortedEvent sortedEvent = it.next();
+        for (SortedEvent sortedEvent : sortedEvents) {
             SortedEvent nearestParent = findNearestParent(sortedEvent);
             if (nearestParent != null) {
                 nearestParent.addChild(sortedEvent);
-                // remove from the child from the list so that, at the end, the list only contain top-level events
-                it.remove();
+            } else {
+                topLevelEvents.add(sortedEvent);
             }
         }
+
+        // Replace the inner list by the hierarchy
+        this.sortedEvents = topLevelEvents;
 
         // Create a map of sorted events, grouped by wiki
         Map<String, List<SortedEvent>> sortedEventsByWikis = new HashMap<>();

@@ -42,7 +42,7 @@ public class PropertyPrinter
             if (className != null) {
                 prop.alias = printer.getContext().getAliasGenerator().generate(prop.object.alias + "_" + prop.name);
                 printer.from.append(", ").append(className).append(" as ").append(prop.alias);
-                // Join the property value for lists
+                // Enables to select, order and group the elements of the list
                 if (className.endsWith("DBStringListProperty")) {
                     printer.from.append(" join ").append(prop.alias).append(".").append(prop.getValueField())
                         .append(" ").append(prop.alias + prop.getValueField());
@@ -53,8 +53,9 @@ public class PropertyPrinter
                 // rewrite nodes
                 for (PPath p : prop.locations) {
                     String s = prop.alias + "." + prop.getValueField();
-                    // Use the joined property value only in 'select', 'group by' and 'order by' statements
-                    if (className.endsWith("DBStringListProperty") && (
+                    // Takes the elements of the list instead of the list itself
+                    // Note that we couldn't use 'elements(list)' statement when using 'group by' and 'order by'
+                    if (className.endsWith("DBStringListProperty") && p.parent() != null && (
                         p.parent() instanceof PSelectExpression ||
                         p.parent().parent() instanceof POrderbyItem ||
                         p.parent().parent() instanceof PGroupbyItem)) {

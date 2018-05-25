@@ -20,6 +20,8 @@
 package org.xwiki.query.xwql.internal.hql;
 
 import org.xwiki.query.internal.jpql.node.APath;
+import org.xwiki.query.internal.jpql.node.PGroupbyItem;
+import org.xwiki.query.internal.jpql.node.POrderbyItem;
 import org.xwiki.query.internal.jpql.node.PPath;
 import org.xwiki.query.internal.jpql.node.PSelectExpression;
 import org.xwiki.query.internal.jpql.node.TId;
@@ -40,14 +42,23 @@ public class PropertyPrinter
             if (className != null) {
                 prop.alias = printer.getContext().getAliasGenerator().generate(prop.object.alias + "_" + prop.name);
                 printer.from.append(", ").append(className).append(" as ").append(prop.alias);
+                // Join the property value for lists
+                if (className.endsWith("DBStringListProperty")) {
+                    printer.from.append(" join ").append(prop.alias).append(".").append(prop.getValueField())
+                        .append(" ").append(prop.alias + prop.getValueField());
+                }
                 printer.where.append(" and ").append(prop.alias).append(".id.id=").append(prop.object.alias)
                     .append(".id").append(" and ").append(prop.alias).append(".id.name").append("='").append(prop.name)
                     .append("'");
                 // rewrite nodes
                 for (PPath p : prop.locations) {
                     String s = prop.alias + "." + prop.getValueField();
-                    if (className.endsWith("DBStringListProperty") && p.parent() instanceof PSelectExpression) {
-                        s = "elements(" + s + ")";
+                    // Use the joined property value only in 'select', 'group by' and 'order by' statements
+                    if (className.endsWith("DBStringListProperty") && (
+                        p.parent() instanceof PSelectExpression ||
+                        p.parent().parent() instanceof POrderbyItem ||
+                        p.parent().parent() instanceof PGroupbyItem)) {
+                        s = prop.alias + prop.getValueField();
                     }
                     p.replaceBy(new APath(new TId(s)));
                 }

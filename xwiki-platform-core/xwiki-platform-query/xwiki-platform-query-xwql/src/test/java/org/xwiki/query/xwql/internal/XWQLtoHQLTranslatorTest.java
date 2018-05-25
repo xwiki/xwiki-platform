@@ -249,15 +249,28 @@ public class XWQLtoHQLTranslatorTest
         // DBStringListProperty
         assertTranslate("from doc.object('XWiki.ArticleClass') as a where :cat member of a.category",
             "select doc.fullName from XWikiDocument as doc , BaseObject as a , DBStringListProperty as a_category1" +
-                " where ( :cat in elements( a_category1.list ) ) and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id and a_category1.id.name='category'");
+                " join a_category1.list a_category1list where ( :cat in elements( a_category1.list ) )" +
+                " and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id" +
+                " and a_category1.id.name='category'");
         // StringListProperty
         assertTranslate("from doc.object('XWiki.Class') as c where c.stringlist like '%some%'",
             "select doc.fullName from XWikiDocument as doc , BaseObject as c , StringListProperty as c_stringlist1" +
-                " where ( c_stringlist1.textValue like '%some%' ) and doc.fullName=c.name and c.className='XWiki.Class' and c_stringlist1.id.id=c.id and c_stringlist1.id.name='stringlist'");
+                " where ( c_stringlist1.textValue like '%some%' ) and doc.fullName=c.name" +
+                " and c.className='XWiki.Class' and c_stringlist1.id.id=c.id and c_stringlist1.id.name='stringlist'");
         // return DBStringListProperty
         assertTranslate("select distinct a.category from Document as doc, doc.object('XWiki.ArticleClass') as a",
-            "select distinct elements(a_category1.list) from XWikiDocument as doc , BaseObject as a , DBStringListProperty as a_category1" +
-                " where 1=1 and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id and a_category1.id.name='category'");
+            "select distinct a_category1list from XWikiDocument as doc , BaseObject as a ," +
+                " DBStringListProperty as a_category1 join a_category1.list a_category1list" +
+                " where 1=1 and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id" +
+                " and a_category1.id.name='category'");
+
+        assertTranslate("select a.category from Document as doc, doc.object('XWiki.ArticleClass') as a" +
+            " group by a.category order by a.category",
+            "select a_category1list from XWikiDocument as doc , BaseObject as a ," +
+                " DBStringListProperty as a_category1 join a_category1.list a_category1list" +
+                " where 1=1 and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id" +
+                " and a_category1.id.name='category'" +
+                " group by a_category1list order by a_category1list");
     }
 
     @Test

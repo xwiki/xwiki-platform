@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
@@ -69,7 +70,11 @@ public class WikiObjectComponentManagerEventListenerProxyTest
     @Before
     public void setUp() throws Exception
     {
-        this.componentManager = this.mocker.registerMockComponent(ComponentManager.class);
+        this.componentManager = mock(ComponentManager.class);
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
+                new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(componentManagerProvider.get()).thenReturn(componentManager);
+
         this.wikiComponentManagerEventListenerHelper =
                 this.mocker.registerMockComponent(WikiComponentManagerEventListenerHelper.class);
         this.entityReferenceSerializer =

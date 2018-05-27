@@ -25,20 +25,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,6 +65,8 @@ public class DefaultNotificationPreferenceManagerTest
             new MockitoComponentMockingRule<>(DefaultNotificationPreferenceManager.class);
 
     private ModelBridge modelBridge;
+
+    private ComponentManager componentManager;
 
     private NotificationPreference mockPreference11;
     private NotificationPreference mockPreference12;
@@ -77,11 +87,20 @@ public class DefaultNotificationPreferenceManagerTest
         }
     }
 
+    @BeforeComponent
+    public void overrideComponents() throws Exception
+    {
+        Provider<ComponentManager> componentManagerProvider = mocker.registerMockComponent(
+                new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        componentManager = mock(ComponentManager.class);
+        when(componentManagerProvider.get()).thenReturn(componentManager);
+
+        modelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
+    }
+
     @Before
     public void setUp() throws Exception
     {
-        modelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
-
         Map<NotificationPreferenceProperty, Object> map1 = new HashMap<>();
         map1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         Map<NotificationPreferenceProperty, Object> map2 = new HashMap<>();
@@ -108,11 +127,21 @@ public class DefaultNotificationPreferenceManagerTest
         when(mockPreferenceProvider2.getPreferencesForUser(user))
                 .thenReturn(Arrays.asList(mockPreference21, mockPreference22, mockPreference23));
 
-        mocker.registerComponent(NotificationPreferenceProvider.class, "1", mockPreferenceProvider1);
-        mocker.registerComponent(NotificationPreferenceProvider.class, "2", mockPreferenceProvider2);
+        // As we're using a mocked context ComponentManager accessed through a provider, we can't simply declare
+        // components in the mock.
+        when(componentManager.getInstanceList(NotificationPreferenceProvider.class))
+                .thenReturn(Arrays.asList(mockPreferenceProvider1, mockPreferenceProvider2));
+        when(componentManager.hasComponent(eq(NotificationPreferenceProvider.class), matches("^[12]$")))
+                .thenReturn(true);
+        when(componentManager.getInstance(NotificationPreferenceProvider.class, "1"))
+                .thenReturn(mockPreferenceProvider1);
+        when(componentManager.getInstance(NotificationPreferenceProvider.class, "2"))
+                .thenReturn(mockPreferenceProvider2);
 
         when(mockPreferenceProvider1.getProviderPriority()).thenReturn(100);
         when(mockPreferenceProvider2.getProviderPriority()).thenReturn(200);
+
+
     }
 
     @Test

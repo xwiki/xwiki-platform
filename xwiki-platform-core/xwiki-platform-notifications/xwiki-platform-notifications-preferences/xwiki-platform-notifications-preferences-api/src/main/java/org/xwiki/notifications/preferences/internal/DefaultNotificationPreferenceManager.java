@@ -31,6 +31,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -60,7 +61,8 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
     private ModelBridge cachedModelBridge;
 
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManager;
 
     @Inject
     private Logger logger;
@@ -70,7 +72,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
         try {
             // Get every registered notification provider
             List<NotificationPreferenceProvider> providers =
-                    componentManager.getInstanceList(NotificationPreferenceProvider.class);
+                    contextComponentManager.get().getInstanceList(NotificationPreferenceProvider.class);
 
             // We handle conflicts between similar preferences by sorting the providers by order. Since
             // notificationPreferences is a set, only the first occurrence of a preference is stored.
@@ -149,7 +151,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
         for (NotificationPreference notificationPreference : preferences) {
             // Try to get the corresponding provider, if no provider can be found, discard the save of the preference
             String providerHint = notificationPreference.getProviderHint();
-            if (componentManager.hasComponent(NotificationPreferenceProvider.class, providerHint)) {
+            if (contextComponentManager.get().hasComponent(NotificationPreferenceProvider.class, providerHint)) {
 
                 if (!preferencesMapping.containsKey(providerHint)) {
                     preferencesMapping.put(providerHint, new ArrayList<>());
@@ -163,7 +165,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
         for (String providerHint : preferencesMapping.keySet()) {
             try {
                 NotificationPreferenceProvider provider =
-                        componentManager.getInstance(NotificationPreferenceProvider.class, providerHint);
+                        contextComponentManager.get().getInstance(NotificationPreferenceProvider.class, providerHint);
 
                 provider.savePreferences(preferencesMapping.get(providerHint));
 

@@ -20,7 +20,9 @@
 package org.xwiki.component.wiki.internal.bridge;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -67,6 +69,10 @@ public class WikiObjectComponentManagerEventListenerProxy
     private ComponentManager componentManager;
 
     @Inject
+    @Named("wiki")
+    private ComponentManager wikiComponentManager;
+
+    @Inject
     private WikiComponentManagerEventListenerHelper wikiComponentManagerEventListenerHelper;
 
     @Inject
@@ -93,8 +99,9 @@ public class WikiObjectComponentManagerEventListenerProxy
 
         try {
             // Get a list of WikiObjectComponentBuilder
-            List<WikiObjectComponentBuilder> componentBuilders =
-                    this.componentManager.getInstanceList(WikiObjectComponentBuilder.class);
+            Set<WikiObjectComponentBuilder> componentBuilders =
+                    new HashSet<>(this.componentManager.getInstanceList(WikiObjectComponentBuilder.class));
+            componentBuilders.addAll(this.wikiComponentManager.getInstanceList(WikiObjectComponentBuilder.class));
 
             for (WikiObjectComponentBuilder componentBuilder : componentBuilders) {
                 wikiObjectsList.add(componentBuilder.getClassReference());
@@ -136,8 +143,12 @@ public class WikiObjectComponentManagerEventListenerProxy
                         BaseObjectReference xObjectReference = xObject.getReference();
                         builderHelper = this.entityReferenceSerializer.serialize(xObjectReference.getXClassReference());
 
-                        this.registerObjectComponents(xObjectReference, xObject,
-                                this.componentManager.getInstance(WikiObjectComponentBuilder.class, builderHelper));
+                        WikiObjectComponentBuilder componentBuilder = (this.wikiComponentManager.hasComponent(
+                                WikiObjectComponentBuilder.class, builderHelper))
+                                ? this.wikiComponentManager.getInstance(WikiObjectComponentBuilder.class, builderHelper)
+                                : this.componentManager.getInstance(WikiObjectComponentBuilder.class, builderHelper);
+
+                        this.registerObjectComponents(xObjectReference, xObject, componentBuilder);
                     }
                 }
             } catch (Exception e) {

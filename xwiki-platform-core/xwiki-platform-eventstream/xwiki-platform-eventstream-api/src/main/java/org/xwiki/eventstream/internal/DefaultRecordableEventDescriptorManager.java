@@ -72,8 +72,6 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
 
             // Load the component from the context component manager (root + wiki + user component managers, etc...)
             recordableEventDescriptors.addAll(contextComponentManager.getInstanceList(RecordableEventDescriptor.class));
-            recordableEventDescriptors.addAll(contextComponentManager.getInstanceList(
-                    UntypedRecordableEventDescriptor.class));
 
             // Maybe add components of the other wikis too
             if (allWikis) {

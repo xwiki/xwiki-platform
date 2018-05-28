@@ -39,10 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-administration.templateProvider.creationRestrictions=Restrictions de création
-administration.templateProvider.creationRestrictions.none=Ce modèle peut créer des pages partout
-administration.templateProvider.description=Description
+  <content>administration.templateProvider.description=Description
+### Missing: administration.templateProvider.description.hint=The information to be displayed for template provider when a new page is created.
 administration.templateProvider.icon=icône
+### Missing: administration.templateProvider.icon.hint=The icon to be displayed for template provider when a new page is created. Select one from the {0}full list of icons{1}.
+administration.templateProvider.creationRestrictions=Restrictions de création
+### Missing: administration.templateProvider.creationRestrictions.hint=The list of locations (including their children) where this template is allowed to create pages
+administration.templateProvider.creationRestrictions.none=Ce modèle peut créer des pages partout
+### Missing: administration.templateProvider.creationRestrictionsAreSuggestions=Creation Restrictions as Suggestions
+### Missing: administration.templateProvider.creationRestrictionsAreSuggestions.hint=Allows the user to select any location to create the page with this template, using the first creation restriction as the prefilled default location when the template is selected from the list.
 </content>
 </xwikidoc>

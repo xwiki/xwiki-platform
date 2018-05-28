@@ -39,11 +39,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+  <content>help.syntaxpage.title=XWiki sintakses ceļvedis
+help.syntaxtitle=XWiki sintakse {0}
+help.syntaxall=Visas
 help.changesyntax=Mainīt sintaksi
 help.choose_syntax=Izvēlētā sintakse
-help.syntaxall=Visas
-help.syntaxpage.title=XWiki sintakses ceļvedis
-help.syntaxtitle=XWiki sintakse {0}
 </content>
 </xwikidoc>

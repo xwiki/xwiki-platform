@@ -39,124 +39,153 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-solr.admin.error.norights=Privilégios de administrador sãoo necessários para acessar essa seção.
-solr.admin.error.notallowed=Não é permitido para você executar essa ação.
-solr.admin.indexing.action.hint=A ação para ser realizada no índice.
-solr.admin.indexing.action.label=Ação
-solr.admin.indexing.action.select_delete=Excluir do índice
-solr.admin.indexing.action.select_index=Adicionar ao índice
-solr.admin.indexing.action.select_reindex=Reindexar
-solr.admin.indexing.query.hint=Requisição opcional para limitar os documentos que serão afetados pela ação selecionada no índice.
-solr.admin.indexing.query.label=Requisição personalizada
-solr.admin.indexing.title=Indexando
-solr.admin.indexing.wiki.hint=O wiki cujos documentos serão afetados pela ação selecionada.
-solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.select_farm=Toda a fazenda
-solr.admin.status.queueSize.hint=O número de entidades que deixarão de ser indexadas, reindexadas ou excluídas do índice
-solr.admin.status.queueSize.label=Tamanho da Fila
-solr.admin.status.title=Status
+  <content>solr.admin.title=Administração da Busca Solr
 solr.admin.submit=Aplicar
-solr.admin.title=Administração da Busca Solr
-solr.facet.date.after=Após {0}
-solr.facet.date.any=Qualquer data
-solr.facet.date.applyCustomInterval=Aplicar
-solr.facet.date.before=Antes {0}
-solr.facet.date.between=De {0} até {1}
-solr.facet.date.customInterval=Período específico
-solr.facet.date.end=Fim do Período
-solr.facet.date.last30Days=Últimos 30 dias
-solr.facet.date.last7Days=Últimos 7 dias
-solr.facet.date.olderThan30Days=Maiores de 30 dias
-solr.facet.date.start=Inicio do Período
-solr.facet.date.today=Hoje
-solr.facet.fileType.archive.java-archive=JAR
-solr.facet.fileType.archive.xara=XAR
-solr.facet.fileType.image.icon=Icone
-solr.facet.fileType.other.octet-stream=Arquivo Binário
-solr.facet.fileType.text.java-source=Fonte Java
-solr.facet.fileType.text.javascript=JavaScript
-solr.facet.fileType.text.plain=Arquivo Texto
-solr.facet.fileType.text.sh=Shell Script
-solr.facet.size.any=Qualquer Tamanho
-solr.facet.size.between=Entre {0} e {1}
-solr.facet.size.large=Grande
-solr.facet.size.lessThan=Menor que {0}
-solr.facet.size.medium=Médio
-solr.facet.size.moreThan=Maior que {0}
-solr.facet.size.small=Pequeno
-solr.facet.size.tiny=Muito Pequeno
+solr.admin.error.notallowed=Não é permitido para você executar essa ação.
+solr.admin.error.norights=Privilégios de administrador sãoo necessários para acessar essa seção.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Tamanho da Fila
+solr.admin.status.queueSize.hint=O número de entidades que deixarão de ser indexadas, reindexadas ou excluídas do índice
+
+solr.admin.indexing.title=Indexando
+solr.admin.indexing.action.label=Ação
+solr.admin.indexing.action.hint=A ação para ser realizada no índice.
+solr.admin.indexing.action.select_index=Adicionar ao índice
+solr.admin.indexing.action.select_delete=Excluir do índice
+solr.admin.indexing.action.select_reindex=Reindexar
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=O wiki cujos documentos serão afetados pela ação selecionada.
+solr.admin.indexing.wiki.select_farm=Toda a fazenda
+solr.admin.indexing.query.label=Requisição personalizada
+solr.admin.indexing.query.hint=Requisição opcional para limitar os documentos que serão afetados pela ação selecionada no índice.
+
+solr.sortBy=Ordenado por\:
+solr.sortBy.score=Relevância
+solr.sortBy.title_sort=Título
+solr.sortBy.date=Data
+solr.sortBy.author_display_sort=Último autor
+solr.sortBy.filename_sort=Nome do Arquivo
+solr.sortBy.attsize_sort=Tamanho do Arquivo
+solr.sortBy.attdate_sort=Data de Envio
+solr.sortBy.attauthor_display_sort=Enviado por
+solr.sortOrder.asc=Ascendente
+solr.sortOrder.desc=Descendente
+
+solr.options=Mostrar\:
+solr.options.highlight=Destacar
+### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
+### Missing: solr.options.facet=Facets
+solr.options.facet.title=Permite aplicar mais filtros ao resultado
+
+solr.result.language=Linguagem
+### Missing: solr.result.locatedIn=Located in
+solr.result.author=Modificado por "{0}" em "{1}"
+solr.result.mediaType=Arquivo do tipo "{0}"
+solr.result.uploadedBy=Enviado por {0} em {1} ({2})
+solr.result.highlightAll=Realçar todos encontrados
+
+solr.facets.title=Refine sua busca
+solr.facets.hint=Selecione uma categoria e ative os filtros nos resultados atuais
+solr.facets.resetAll=Reinicie tudo
+solr.facets.expandAll=Expandir tudo
 solr.facets.collapseAll=Destruir tudo
 solr.facets.emptyValue=Valor Vazio
-solr.facets.expandAll=Expandir tudo
-solr.facets.hint=Selecione uma categoria e ative os filtros nos resultados atuais
 solr.facets.moreValues=restantes
-solr.facets.resetAll=Reinicie tudo
-solr.facets.title=Refine sua busca
-solr.field.attauthor=Enviado por
-solr.field.attauthor_display=Enviado por
-solr.field.attcontent=Conteúdo Anexo
-solr.field.attdate=Data Envio
-solr.field.attsize=Tamanho Arquivo
+
+solr.filterBy.type.document=Documento
+solr.filterBy.type.attachment=Anexo
+solr.filterBy.type.object=Objeto
+solr.filterBy.type.object_property=Propriedade do objeto
+
+solr.filterBy.fileType.image=Imagem
+solr.filterBy.fileType.audio=Áudio
+solr.filterBy.fileType.video=Vídeo
+solr.filterBy.fileType.text=Texto
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=Apresentação
+solr.filterBy.fileType.spreadsheet=Planilha
+solr.filterBy.fileType.archive=Arquivo
+solr.filterBy.fileType.font=Fonte
+solr.filterBy.fileType.other=Outro
+solr.facet.fileType.text.plain=Arquivo Texto
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Fonte Java
+solr.facet.fileType.text.sh=Shell Script
+solr.facet.fileType.image.icon=Icone
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Arquivo Binário
+
+solr.facet.date.today=Hoje
+solr.facet.date.last7Days=Últimos 7 dias
+solr.facet.date.last30Days=Últimos 30 dias
+solr.facet.date.olderThan30Days=Maiores de 30 dias
+solr.facet.date.customInterval=Período específico
+solr.facet.date.start=Inicio do Período
+solr.facet.date.end=Fim do Período
+solr.facet.date.applyCustomInterval=Aplicar
+solr.facet.date.between=De {0} até {1}
+solr.facet.date.after=Após {0}
+solr.facet.date.before=Antes {0}
+solr.facet.date.any=Qualquer data
+
+solr.facet.size.tiny=Muito Pequeno
+solr.facet.size.small=Pequeno
+solr.facet.size.medium=Médio
+solr.facet.size.large=Grande
+solr.facet.size.between=Entre {0} e {1}
+solr.facet.size.lessThan=Menor que {0}
+solr.facet.size.moreThan=Maior que {0}
+solr.facet.size.any=Qualquer Tamanho
+
+solr.field.type=Tipo Resultado
+solr.field.locale=Linguagem
+solr.field.locale.emptyValue=Sem Linguagem
+### Missing: solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).
+solr.field.wiki=Wiki
+### Missing: solr.field.spaces=Location
+solr.field.space_exact=Espaço
+### Missing: solr.field.space_facet=Location
+solr.field.name=Página
+solr.field.name_exact=Página
+solr.field.title=Título
 solr.field.author=Último Autor
 solr.field.author_display=Autor
-solr.field.class=Tipo Objeto
-solr.field.class.definedBy=Definido por {0} » {1}
-solr.field.comment=Comentários
-solr.field.creationdate=Data de Criação
 solr.field.creator=Criador
 solr.field.creator_display=Criador
 solr.field.date=Data da Última Modificação
+solr.field.creationdate=Data de Criação
 solr.field.doccontent=Conteúdo do Documento Processado
 solr.field.doccontentraw=Conteúdo do Documento Bruto
-solr.field.filename=Nome do Anexo
-solr.field.locale=Linguagem
-solr.field.locale.emptyValue=Sem Linguagem
-solr.field.mimetype=Tipo Arquivo
-solr.field.name=Página
-solr.field.name_exact=Página
-solr.field.objcontent=Objetos
+solr.field.class=Tipo Objeto
+solr.field.class.definedBy=Definido por {0} » {1}
 solr.field.propertyname=Nome da Propriedade
 solr.field.propertyvalue=Valor da propriedade
-solr.field.space=Espaço
-solr.field.space_exact=Espaço
-solr.field.title=Título
-solr.field.type=Tipo Resultado
-solr.field.wiki=Wiki
-solr.filterBy.fileType.archive=Arquivo
-solr.filterBy.fileType.audio=Áudio
-solr.filterBy.fileType.font=Fonte
-solr.filterBy.fileType.image=Imagem
-solr.filterBy.fileType.office=Office
-solr.filterBy.fileType.other=Outro
-solr.filterBy.fileType.presentation=Apresentação
-solr.filterBy.fileType.spreadsheet=Planilha
-solr.filterBy.fileType.text=Texto
-solr.filterBy.fileType.video=Vídeo
-solr.filterBy.fileType.word=Word
-solr.filterBy.type.attachment=Anexo
-solr.filterBy.type.document=Documento
-solr.filterBy.type.object=Objeto
-solr.filterBy.type.object_property=Propriedade do objeto
-solr.options=Mostrar\:
-solr.options.facet.title=Permite aplicar mais filtros ao resultado
-solr.options.highlight=Destacar
-solr.result.author=Modificado por "{0}" em "{1}"
-solr.result.highlightAll=Realçar todos encontrados
-solr.result.language=Linguagem
+solr.field.filename=Nome do Anexo
+solr.field.attcontent=Conteúdo Anexo
+solr.field.comment=Comentários
+solr.field.objcontent=Objetos
+solr.field.mimetype=Tipo Arquivo
+solr.field.attauthor=Enviado por
+solr.field.attauthor_display=Enviado por
+solr.field.attdate=Data Envio
+solr.field.attsize=Tamanho Arquivo
+
+### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
+### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
 solr.result.location=Localizado em "{0}" &gt;&gt; "{1}" &gt;&gt; "{2}"
-solr.result.mediaType=Arquivo do tipo "{0}"
-solr.result.uploadedBy=Enviado por {0} em {1} ({2})
-solr.sortBy=Ordenado por\:
-solr.sortBy.attauthor_display_sort=Enviado por
-solr.sortBy.attdate_sort=Data de Envio
-solr.sortBy.attsize_sort=Tamanho do Arquivo
-solr.sortBy.author_display_sort=Último autor
-solr.sortBy.date=Data
-solr.sortBy.filename_sort=Nome do Arquivo
-solr.sortBy.score=Relevância
-solr.sortBy.title_sort=Título
-solr.sortOrder.asc=Ascendente
-solr.sortOrder.desc=Descendente
+
+## until 7.2RC1
+solr.field.space=Espaço
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

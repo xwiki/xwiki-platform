@@ -39,14 +39,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-admin.repository=Repositório da extensão
-extension.repository.authors=Autores
-extension.repository.doc.creationDate=Criado em
-extension.repository.doc.date=Última modificação
-extension.repository.emptyvalue=0
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
 extension.repository.name=Nome
 extension.repository.summary=Resumo
 extension.repository.type=Tipo
+### Missing: extension.repository.category=Category
+extension.repository.authors=Autores
+extension.repository.doc.creationDate=Criado em
+extension.repository.doc.date=Última modificação
+### Missing: extension.repository.rating=Rating
+### Missing: extension.repository.installedCount=Installs
+
+## Administration UI
+admin.repository=Repositório da extensão
 </content>
 </xwikidoc>

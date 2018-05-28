@@ -39,12 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language gl generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Nome do espazo
-index.spacesMacro.createSpace.link=Crear un novo espazo
-index.spacesMacro.createSpace.submit=Crear
-index.spacesMacro.spaceAdministration.title=Ver a administración do espazo
+  <content>index.spacesMacro.title=Espazos
 index.spacesMacro.spaceIndex.title=Ver o índice do espazo
-index.spacesMacro.title=Espazos
+### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceAdministration.title=Ver a administración do espazo
+### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.createSpace.link=Crear un novo espazo
+index.spacesMacro.createSpace.defaultSpaceName=Nome do espazo
+index.spacesMacro.createSpace.submit=Crear
 </content>
 </xwikidoc>

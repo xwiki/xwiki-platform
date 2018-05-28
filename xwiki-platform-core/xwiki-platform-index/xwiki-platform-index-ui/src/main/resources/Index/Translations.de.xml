@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Bereichsname
-index.spacesMacro.createSpace.link=Neuen Bereich erstellen
-index.spacesMacro.createSpace.submit=Erstellen
-index.spacesMacro.spaceAdministration.alt=Bereich administrieren
-index.spacesMacro.spaceAdministration.title=Siehe Bereichs-Administration
-index.spacesMacro.spaceIndex.alt=Dokumentenverzeichnis des Bereichs
+  <content>index.spacesMacro.title=Bereiche
 index.spacesMacro.spaceIndex.title=Siehe Dokumentenverzeichnis
-index.spacesMacro.title=Bereiche
+index.spacesMacro.spaceIndex.alt=Dokumentenverzeichnis des Bereichs
+index.spacesMacro.spaceAdministration.title=Siehe Bereichs-Administration
+index.spacesMacro.spaceAdministration.alt=Bereich administrieren
+index.spacesMacro.createSpace.link=Neuen Bereich erstellen
+index.spacesMacro.createSpace.defaultSpaceName=Bereichsname
+index.spacesMacro.createSpace.submit=Erstellen
 </content>
 </xwikidoc>

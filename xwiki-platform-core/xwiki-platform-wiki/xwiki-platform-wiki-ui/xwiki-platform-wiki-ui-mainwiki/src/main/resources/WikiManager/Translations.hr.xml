@@ -39,180 +39,270 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-WikiManager.WikiUserClass_membershipType_invite=Samo netko od administratora može slati pozivnice za pridruživanje wikiju
-WikiManager.WikiUserClass_membershipType_open=Otvoren za pridruživanje bilo kojeg korisnika
-WikiManager.WikiUserClass_membershipType_request=Bilo koji globalni korisnik može zatražiti pridruživanje, ali jedan od administratora mora prihvatiti
-WikiManager.WikiUserClass_userScope_global_only=U wikiju su dostupni samo globalni korisnici
-WikiManager.WikiUserClass_userScope_local_and_global=U wikiju su dostupni i globalni i lokalni korisnici
-WikiManager.WikiUserClass_userScope_local_only=U wikiju su dostupni samo lokalni korisnici
-admin.wikis=Wikiji
-admin.wikis.description=Upravljanje wikijima.
-admin.wikis.rights=Ovlast za izradu
-admin.wikis.template=Wiki predložak
-admin.wikis.templates=Wiki predlošci
-admin.wikis.templates.description=Upravljajte wiki predlošcima
-admin.wikis.templates.hint=Predložak je wiki koji će biti smatran modelom za izradu novih wikija. Kada korisnik odabere predložak za izradu novog wikija, sav sadržaj predloška kopira se u novi wiki.
-platform.wiki.browse=Razgledaj wikije
-platform.wiki.browse._actions=Akcije
-platform.wiki.browse._actions.cancelJoinRequest=Otkaži zahtjev
-platform.wiki.browse._actions.delete=Obriši
-platform.wiki.browse._actions.join=Pridruži se
-platform.wiki.browse._actions.leave=Napusti
-platform.wiki.browse._actions.requestJoin=Zatraži pridruženje
-platform.wiki.browse._actions.viewInvitation=Pregledaj pozivnicu
-platform.wiki.browse.description=Opis
-platform.wiki.browse.doc.creationDate=Datum izrade
-platform.wiki.browse.emptyvalue=-
-platform.wiki.browse.membershipType=Tip članstva
-platform.wiki.browse.owner=Vlasnik
-platform.wiki.browse.wikiprettyname=Ime
-platform.wiki.create.button=Izradi wiki
-platform.wiki.create.error=Izrada wikija "{0}" nije uspjela\: {1}.
-platform.wiki.create.error.wikiname.databasealreadyexists=Baza podataka s ovim identifikatorom već postoji
-platform.wiki.create.error.wikiname.empty=Identifikator ne smije biti prazan
-platform.wiki.create.error.wikiname.wikialreadyexists=Ovaj identifikator se već koristi
-platform.wiki.create.members=ČLANOVI
-platform.wiki.create.prettyname.empty=Prikazno ime ne smije biti prazno
-platform.wiki.create.title=Izradi novi wiki
-platform.wiki.create.wizard.desc.description=Kratki opis wikija i njegove svrhe.
-platform.wiki.create.wizard.desc.members=Korisnici koji mogu sudjelovati u wikiju.
-platform.wiki.create.wizard.desc.newTemplateHint=Predložak za upotrijebiti za ovaj novi wiki (sve stranice bit će klonirane).
-platform.wiki.create.wizard.desc.owner=Korisnik koji će uvijek imati sve ovlasti u wikiju, neovisno o ovlastima podešenima u Upravljanju.
-platform.wiki.create.wizard.desc.wikialias=Ime domene koje će pokazivati na wiki.
-platform.wiki.create.wizard.desc.wikiname=Jedinstveni identifikator novog wikija.
-platform.wiki.create.wizard.desc.wikiprettyname=Prikazno ime wikija.
-platform.wiki.create.wizard.flavortemplate.flavorTab=Aroma
-platform.wiki.create.wizard.flavortemplate.hint=Aroma ili predložak za upotrijebiti kao početni sadržaj novog wikija
-platform.wiki.create.wizard.flavortemplate.label=Aroma / predložak
-platform.wiki.create.wizard.flavortemplate.templateTab=Predložak
-platform.wiki.create.wizard.setAsTemplate.label=Ovaj wiki će biti predložak
-platform.wiki.create.wizard.step.cleaningUp=Čišćenje
-platform.wiki.create.wizard.step.cleaningUp.confirm=Potvrdi
-platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Uskoro ćete obrisati wiki {0}. Molim potvrdite.
-platform.wiki.create.wizard.step.cleaningup.error=Greška, wiki {0} nije obrisan.
-platform.wiki.create.wizard.step.cleaningup.success=Wiki {0} je uspješno obrisan.
-platform.wiki.create.wizard.step.create=Izradi
-platform.wiki.create.wizard.step.creation=Izrada wikija
-platform.wiki.create.wizard.step.creation.complete=Wiki {0} je uspješno izrađen. Sada mu možete pristupiti.
-platform.wiki.create.wizard.step.creation.error=Wiki {0} je izrađen, ali neke stranice nisu instalirane. Posljedično, wiki bi se mogao ponašati pogrešno, tako da biste ga vjerojatno trebali obrisati.
-platform.wiki.create.wizard.step.creation.go=Idite na wiki
-platform.wiki.create.wizard.step.creation.wait=Molim pričekajte dok wiki ne bude izrađen.
-platform.wiki.create.wizard.step.dw=Nakon klikanja na gumb "Izradi" bit će izrađen wiki, a onda će biti pokrenut čarobnjak za distribuciju da inicijalizira vaš wiki. Ako ga preskočite, vaš wiki će biti prazan.
-platform.wiki.create.wizard.step.nameAndType=Korak 1 — Odaberite ime
-platform.wiki.create.wizard.step.nameAndType.shortname=Ime
-platform.wiki.create.wizard.step.next=Idi na sljedeći korak
-platform.wiki.create.wizard.step.previous=Prethodni korak
-platform.wiki.create.wizard.step.provisioning=Sustav priprema wiki.
-platform.wiki.create.wizard.step.provisioning.cleanUp=Očisti i obriši wiki
-platform.wiki.create.wizard.step.provisioning.complete=Wiki je uskoro gotov. Molim kliknite na "Završi" kako biste obavili posljednju operaciju.
-platform.wiki.create.wizard.step.provisioning.error=Wiki {0} je izrađen, ali neke stranice iz predloška nisu kopirane. Vjerojatno biste ga trebali obrisati.
-platform.wiki.create.wizard.step.provisioning.finalize=Završi
-platform.wiki.create.wizard.step.provisioning.wait=Molim pričekajte dok sustav priprema wiki.
-platform.wiki.create.wizard.step.users=Korak 2 — Odaberite članove
-platform.wiki.create.wizard.step.users.shortname=Korisnici
-platform.wiki.create.wizard.template.label=Predložak
-platform.wiki.create.wizard.template.noTemplate=Bez predloška (zadano)
-platform.wiki.create.wizard.userScope.hint=Odaberite koja vrsta korisnika može pristupiti wikiju
-platform.wiki.create.wizard.userScope.label=Doseg korisnika
-platform.wiki.csrf.error=Sigurnosni token nije ispravan. Molim ponovite vašu operaciju.
-platform.wiki.delete.confirmation=Jeste li sigurni da želite obrisati wiki {0}{1}{2}? Ova akcija ne može biti poništena\!
-platform.wiki.delete.confirmation.no=Ne, vrati me natrag\!
-platform.wiki.delete.confirmation.retypeWikiId=Molim ovdje ponovite unos identifikator wikija\:
-platform.wiki.delete.confirmation.yes=Da, molim obriši ovaj wiki\!
-platform.wiki.delete.error.wikiIdDoesNotMatch=Morate unijeti točan identifikator wikija koji bi trebao biti obrisan.
-platform.wiki.delete.success=Korisnik {0}{1}{2} uspješno je obrisao/la wiki ''{3}''.
-platform.wiki.dependencies.applicationmanager.missing=Nije instaliran priključak {0}Upravitelj aplikacija{1}. Molim instalirajte ga i pokušajte ponovo.
-platform.wiki.dependencies.template.missing=Nije instalirana "Wiki Template" Java komponenta. Ova stranica neće ispravno raditi. Provjerite jesu li instalirane ekstenzije "Wiki Template API" i "Wiki Template Script" (koristeći Upravitelj ekstenzija) te jesu li datoteke 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' i 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' prisutne u 'WEB-INF/lib/' direktoriju mrežne aplikacije (u slučaju ručne instalacije).
-platform.wiki.dependencies.user.missing=Nije instalirana "Wiki User" Java komponenta. Ova stranica neće ispravno raditi. Provjerite jesu li instalirane ekstenzije "Wiki User API" i "Wiki User Script" (koristeći Upravitelj ekstenzija) te jesu li datoteke 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' i 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' prisutne u 'WEB-INF/lib/' direktoriju mrežne aplikacije (u slučaju ručne instalacije).
-platform.wiki.dependencies.wiki.missing=Nije instalirana "Wiki" Java komponenta. Ova stranica neće ispravno raditi. Provjerite jesu li instalirane ekstenzije "Wiki API" i "Wiki Script" (koristeći Upravitelj ekstenzija) te jesu li datoteke 'xwiki-platform-wiki-api-&lt;version&gt;.jar' i 'xwiki-platform-wiki-script-&lt;version&gt;.jar' prisutne u  'WEB-INF/lib/' direktoriju mrežne aplikacije (u slučaju ručne instalacije).
-platform.wiki.error.exceptionWithMessage=Iznimka\: {0}
-platform.wiki.error.oneParameterNotSpecified=Nije naznačen parametar ''{0}''.
-platform.wiki.error.parameterAcceptsMultipleValues=Prihvaćaju se višestruke vrijednosti.
-platform.wiki.error.wikidoesnotexist=Wiki [{0}] ne postoji
-platform.wiki.form.requiredField=Obavezno za unos
-platform.wiki.macro.noWikis=Trenutno nema izrađenih wikija (izuzev glavnog).
+  <content>###############################################################################
+# WikiManager Manager translation page
+#
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
+#
+# This contains the translations of the module in the default language
+# (generally English).
+# 
+# Translation key syntax:
+#   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
+#   where:
+#   * &lt;short top level project name&gt; = top level project name without the "xwiki-" prefix,
+#                                     for example: commons, rendering, platform, enterprise, manager, etc
+#   * &lt;short module name&gt; = the name of the Maven module without the &lt;short top level project name&gt; prefix,
+#                           for example: oldcore, scheduler, activitystream, etc
+#   * &lt;propertyName&gt; = the name of the property using camel case,
+#                      for example updateJobClassCommitComment
+#
+# Comments: it's possible to add some detail about a key to make easier to
+#   translate it by adding a comment before it. To make sure a comment is not
+#   assigned to the following key use at least three sharps (###) for the comment
+#   or after it.
+# 
+# Deprecated keys:
+#   * when deleting a key it should be moved to deprecated section at the end
+#     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
+#     first version in which it started to be deprecated
+#   * when renaming a key, it should be moved to the same deprecated section
+#     and a comment should be added with the following syntax:
+#     #@deprecated new.key.name
+#     old.key.name=Some translation
+###############################################################################
+
+## Menus
+platform.wiki.menu.wikiindex=Imenik wikija
 platform.wiki.menu.deletewiki=Obriši wiki
 platform.wiki.menu.userwikis=Wikiji
-platform.wiki.menu.wikiindex=Imenik wikija
-platform.wiki.prop.description=Opis
-platform.wiki.prop.membershipType.hint=Način na koji se korisnici mogu pridružiti ovom wikiju.
-platform.wiki.prop.membershipType.label=Tip članstva
-platform.wiki.prop.owner=Vlasnik
-platform.wiki.prop.wikialias=Alias
-platform.wiki.prop.wikiname=Identifikator wikija
-platform.wiki.prop.wikiprettyname=Prikazno ime
-platform.wiki.sheet.aliases=Alias je drugo ime wikija. Možete dodati aliase kako biste izradili različite URL-ove za wiki.
-platform.wiki.sheet.desc.description=Kratki opis wikija.
-platform.wiki.sheet.desc.homepage=Početna stranica wikija.
-platform.wiki.sheet.desc.iswikitemplate=Naznačite može li ovaj wiki biti upotrijebljen kao predložak kod izrade novog wikija.
-platform.wiki.sheet.desc.owner=Korisnik koji će imati sve ovlasti nad ovim wikijem.
-platform.wiki.sheet.desc.secure=Ako je omogućeno, svi vanjski generirani URL-ovi ovog wikija će započinjati s "https".
-platform.wiki.sheet.desc.server=Alias korišten za pristupanje wikiju.
-platform.wiki.sheet.desc.wikiprettyname=Prikazno ime wikija.
-platform.wiki.sheet.descriptor=Ova stranica definira kako pristupiti wikiju "{0}" i neka svojstva u vezi toga. Za više podešenja molim idite na
-platform.wiki.sheet.descriptor.admin=stranicu za upravljanje wikijem.
-platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias "{0}" već postoji.
-platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias "{0}" ne postoji.
-platform.wiki.sheet.prop.description=Opis
-platform.wiki.sheet.prop.homepage=Početna stranica
-platform.wiki.sheet.prop.iswikitemplate=Wiki predložak
-platform.wiki.sheet.prop.owner=Vlasnik
-platform.wiki.sheet.prop.secure=Sigurno (SSL)
-platform.wiki.sheet.prop.server=Alias
-platform.wiki.sheet.prop.wikiprettyname=Prikazno ime
-platform.wiki.sheet.title=Opisnik wikija "{0}"
-platform.wiki.sheet.title.createnewalias=Izradi novi alias
-platform.wiki.sheet.title.settings=Svojstva wikija
-platform.wiki.sheet.title.viewaliases=Pregledaj aliase
-platform.wiki.users.delete.title=Obrišite wiki "{0}"
-platform.wiki.users.invitation.accept.label=Prihvati
-platform.wiki.users.invitation.message.label=Pozivna poruka
-platform.wiki.users.invitation.postpone.label=Kasnije
-platform.wiki.users.invitation.reject.label=Odbij
-platform.wiki.users.invitation.reply.hint=Odgovor, vidljiv administratoru wikija, u kojem možete obrazložiti vašu odluku.
-platform.wiki.users.invitation.reply.title=Odgovori
-platform.wiki.users.invitation.title=Pozvani ste da se pridružite wikiju {0}{1}{2}.
+
+## Dependencies
+platform.wiki.dependencies.wiki.missing=Nije instalirana "Wiki" Java komponenta. Ova stranica neće ispravno raditi. Provjerite jesu li instalirane ekstenzije "Wiki API" i "Wiki Script" (koristeći Upravitelj ekstenzija) te jesu li datoteke 'xwiki-platform-wiki-api-&lt;version&gt;.jar' i 'xwiki-platform-wiki-script-&lt;version&gt;.jar' prisutne u  'WEB-INF/lib/' direktoriju mrežne aplikacije (u slučaju ručne instalacije).
+platform.wiki.dependencies.template.missing=Nije instalirana "Wiki Template" Java komponenta. Ova stranica neće ispravno raditi. Provjerite jesu li instalirane ekstenzije "Wiki Template API" i "Wiki Template Script" (koristeći Upravitelj ekstenzija) te jesu li datoteke 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' i 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' prisutne u 'WEB-INF/lib/' direktoriju mrežne aplikacije (u slučaju ručne instalacije).
+platform.wiki.dependencies.user.missing=Nije instalirana "Wiki User" Java komponenta. Ova stranica neće ispravno raditi. Provjerite jesu li instalirane ekstenzije "Wiki User API" i "Wiki User Script" (koristeći Upravitelj ekstenzija) te jesu li datoteke 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' i 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' prisutne u 'WEB-INF/lib/' direktoriju mrežne aplikacije (u slučaju ručne instalacije).
+
+## Create
+platform.wiki.create.button=Izradi wiki
+platform.wiki.create.title=Izradi novi wiki
+platform.wiki.create.members=ČLANOVI
+platform.wiki.create.prettyname.empty=Prikazno ime ne smije biti prazno
+platform.wiki.create.error=Izrada wikija "{0}" nije uspjela\: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=Baza podataka s ovim identifikatorom već postoji
+platform.wiki.create.error.wikiname.wikialreadyexists=Ovaj identifikator se već koristi
+platform.wiki.create.error.wikiname.empty=Identifikator ne smije biti prazan
+
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=Wiki [{0}] ne postoji
+platform.wiki.error.oneParameterNotSpecified=Nije naznačen parametar ''{0}''.
+platform.wiki.error.parameterAcceptsMultipleValues=Prihvaćaju se višestruke vrijednosti.
+platform.wiki.error.exceptionWithMessage=Iznimka\: {0}
+platform.wiki.form.requiredField=Obavezno za unos
+platform.wiki.csrf.error=Sigurnosni token nije ispravan. Molim ponovite vašu operaciju.
+
+## Users
+platform.wiki.users.userAlreadyMemberOfWiki=Korisnik {0}{1}{2} već je član wikija {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=Korisnik {0}{1}{2} nije član wikija {3}{4}{5}.
+platform.wiki.users.logInToContinue=Da biste nastavili, najprije se morate {0}prijaviti{1}.
 platform.wiki.users.invitation.userAcceptedNotification=Korisnik ''{0}'' ({1}) je prihvatio/la pozivnicu da se pridruži wikiju ''{2}'' ({3}).
 platform.wiki.users.invitation.userAcceptedSuccess=Korisnik {0}{1}{2} uspješno je prihvatio/la pozivnicu i pridružio/la se wikiju {3}{4}{5}.
 platform.wiki.users.invitation.userRejectedSuccess=Korisnik {0}{1}{2} uspješno je odbio/la pozivnicu da se pridruži wikiju {3}{4}{5}.
-platform.wiki.users.join.confirmation=Jeste li sigurni da se želite pridružiti wikiju {0}{1}{2}?
 platform.wiki.users.join.error.needInvitation=Ovom wikiju moguće je pristupiti jedino s pozivnicom. Kako biste mu se pridružili, trebate primiti pozivnicu od jednoga od njegovih administratora.
-platform.wiki.users.join.no=Ne
-platform.wiki.users.join.request.cancel.label=Natrag
+platform.wiki.users.join.request.pendingRequestExists=Korisnik {0}{1}{2} na čekanju već ima zahtjev da se pridruži wikiju {3}{4}{5}. Molim pričekajte da ga pregleda jedan od administratora wikija.
 platform.wiki.users.join.request.cancelConfirmation=Jeste li sigurni da želite otkazati zahtjev da se pridružite wikiju {0}{1}{2}?
+platform.wiki.users.join.request.cancelYes=Da
 platform.wiki.users.join.request.cancelNo=Ne
 platform.wiki.users.join.request.cancelSuccess=Korisnik {0}{1}{2} uspješno je otkazao/la zahtjev da se pridruži wikiju {3}{4}{5}.
-platform.wiki.users.join.request.cancelYes=Da
+platform.wiki.users.join.request.saveNotification=Korisnik ''{0}'' ({1}) je zatražio/la da se pridruži wikiju ''{2}'' ({3}).
+platform.wiki.users.join.request.success=Korisnik {0}{1}{2} uspješno je poslao/la zahtjev da se pridruži wikiju {3}{4}{5}.
+platform.wiki.users.join.confirmation=Jeste li sigurni da se želite pridružiti wikiju {0}{1}{2}?
+platform.wiki.users.join.yes=Da
+platform.wiki.users.join.no=Ne
+platform.wiki.users.join.success=Korisnik {0}{1}{2} uspješno se pridružio/la wikiju {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=Korisnik {0}{1}{2} je vlasnik wikija {3}{4}{5}. Vlasnik wikija ne smije napustiti wiki osim ako wiki bude obrisan ili se promijeni vlasnik.
+platform.wiki.users.leave.confirmation=Jeste li sigurni da želite napustiti wiki {0}{1}{2}?
+platform.wiki.users.leave.confirmation.yes=Da
+platform.wiki.users.leave.confirmation.no=Ne
+platform.wiki.users.leave.success=Korisnik {0}{1}{2} uspješno je napustio/la wiki {3}{4}{5}.
+platform.wiki.users.join.title=Pridružite se wikiju
+platform.wiki.users.leave.title=Napustite wiki "{0}"
+platform.wiki.users.leave.empty=
+platform.wiki.users.delete.title=Obrišite wiki "{0}"
+platform.wiki.users.delete.empty=
+platform.wiki.users.invitation.reply.hint=Odgovor, vidljiv administratoru wikija, u kojem možete obrazložiti vašu odluku.
 platform.wiki.users.join.request.hint=Da biste se pridružili wikiju {0}{1}{2}, najprije morate izdati zahtjev za pridruživanjem. Nakon toga, jedan od administratora wikija će pregledati vaš zahtjev i razmotriti njegovo prihvaćanje ili odbijanje.
 platform.wiki.users.join.request.message.hint=Poruka, vidljiva administratoru wikija, u kojoj možete obrazložiti vašu odluku.
+platform.wiki.users.invitation.title=Pozvani ste da se pridružite wikiju {0}{1}{2}.
+platform.wiki.users.invitation.message.label=Pozivna poruka
+platform.wiki.users.invitation.reply.title=Odgovori
+platform.wiki.users.invitation.accept.label=Prihvati
+platform.wiki.users.invitation.reject.label=Odbij
+platform.wiki.users.invitation.postpone.label=Kasnije
 platform.wiki.users.join.request.message.label=Poruka
-platform.wiki.users.join.request.pendingRequestExists=Korisnik {0}{1}{2} na čekanju već ima zahtjev da se pridruži wikiju {3}{4}{5}. Molim pričekajte da ga pregleda jedan od administratora wikija.
-platform.wiki.users.join.request.saveNotification=Korisnik ''{0}'' ({1}) je zatražio/la da se pridruži wikiju ''{2}'' ({3}).
 platform.wiki.users.join.request.send.label=Pošalji zahtjev
-platform.wiki.users.join.request.success=Korisnik {0}{1}{2} uspješno je poslao/la zahtjev da se pridruži wikiju {3}{4}{5}.
-platform.wiki.users.join.success=Korisnik {0}{1}{2} uspješno se pridružio/la wikiju {3}{4}{5}.
-platform.wiki.users.join.title=Pridružite se wikiju
-platform.wiki.users.join.yes=Da
-platform.wiki.users.leave.confirmation=Jeste li sigurni da želite napustiti wiki {0}{1}{2}?
-platform.wiki.users.leave.confirmation.no=Ne
-platform.wiki.users.leave.confirmation.yes=Da
-platform.wiki.users.leave.error.userIsOwner=Korisnik {0}{1}{2} je vlasnik wikija {3}{4}{5}. Vlasnik wikija ne smije napustiti wiki osim ako wiki bude obrisan ili se promijeni vlasnik.
-platform.wiki.users.leave.success=Korisnik {0}{1}{2} uspješno je napustio/la wiki {3}{4}{5}.
-platform.wiki.users.leave.title=Napustite wiki "{0}"
-platform.wiki.users.logInToContinue=Da biste nastavili, najprije se morate {0}prijaviti{1}.
-platform.wiki.users.profile.activity.hint=Generira tijek aktivnosti danih wikija.
-platform.wiki.users.profile.activity.multipletitle=Aktivnost wikija {0}
-platform.wiki.users.profile.activity.show=prikaži aktivnost
-platform.wiki.users.profile.activity.title=Aktivnost wikija {0}
+platform.wiki.users.join.request.cancel.label=Natrag
+
+## User profile
 platform.wiki.users.profile.joinedwikis.label=Pridruženi wikiji
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Niste još član nijednog wikija.
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Korisnik nije još član nijednog wikija.
-platform.wiki.users.userAlreadyMemberOfWiki=Korisnik {0}{1}{2} već je član wikija {3}{4}{5}.
-platform.wiki.users.userNotMemberOfWiki=Korisnik {0}{1}{2} nije član wikija {3}{4}{5}.
-rendering.macro.wikis.description=Izlistaj sve wikije
+platform.wiki.users.profile.activity.title=Aktivnost wikija {0}
+platform.wiki.users.profile.activity.hint=Generira tijek aktivnosti danih wikija.
+platform.wiki.users.profile.activity.multipletitle=Aktivnost wikija {0}
+platform.wiki.users.profile.activity.show=prikaži aktivnost
+
+## Wiki Deletion
+platform.wiki.delete.confirmation=Jeste li sigurni da želite obrisati wiki {0}{1}{2}? Ova akcija ne može biti poništena\!
+platform.wiki.delete.confirmation.retypeWikiId=Molim ovdje ponovite unos identifikator wikija\:
+platform.wiki.delete.error.wikiIdDoesNotMatch=Morate unijeti točan identifikator wikija koji bi trebao biti obrisan.
+platform.wiki.delete.success=Korisnik {0}{1}{2} uspješno je obrisao/la wiki ''{3}''.
+
+## Wiki macro
+platform.wiki.macro.noWikis=Trenutno nema izrađenih wikija (izuzev glavnog).
 rendering.macro.wikis.name=Wikiji
-rendering.macro.workspaces.description=Precrtani makro koji ne bi trebao biti korišten, ovdje radi kompatibilnosti. Molim umjesto njega upotrijebite "wikis" makro.
+rendering.macro.wikis.description=Izlistaj sve wikije
+
+## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Radni prostor (naslijeđeno)
+rendering.macro.workspaces.description=Precrtani makro koji ne bi trebao biti korišten, ovdje radi kompatibilnosti. Molim umjesto njega upotrijebite "wikis" makro.
+
+## Browse
+platform.wiki.browse=Razgledaj wikije
+platform.wiki.browse.emptyvalue=-
+platform.wiki.browse.wikiprettyname=Ime
+platform.wiki.browse.description=Opis
+platform.wiki.browse.owner=Vlasnik
+platform.wiki.browse.membershipType=Tip članstva
+platform.wiki.browse.doc.creationDate=Datum izrade
+platform.wiki.browse._actions=Akcije
+platform.wiki.browse._actions.join=Pridruži se
+platform.wiki.browse._actions.requestJoin=Zatraži pridruženje
+platform.wiki.browse._actions.viewInvitation=Pregledaj pozivnicu
+platform.wiki.browse._actions.cancelJoinRequest=Otkaži zahtjev
+platform.wiki.browse._actions.leave=Napusti
+platform.wiki.browse._actions.delete=Obriši
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=Otvoren za pridruživanje bilo kojeg korisnika
+WikiManager.WikiUserClass_membershipType_request=Bilo koji globalni korisnik može zatražiti pridruživanje, ali jedan od administratora mora prihvatiti
+WikiManager.WikiUserClass_membershipType_invite=Samo netko od administratora može slati pozivnice za pridruživanje wikiju
+WikiManager.WikiUserClass_userScope_local_only=U wikiju su dostupni samo lokalni korisnici
+WikiManager.WikiUserClass_userScope_global_only=U wikiju su dostupni samo globalni korisnici
+WikiManager.WikiUserClass_userScope_local_and_global=U wikiju su dostupni i globalni i lokalni korisnici
+platform.wiki.prop.wikiname=Identifikator wikija
+platform.wiki.prop.wikiprettyname=Prikazno ime
+platform.wiki.prop.wikialias=Alias
+platform.wiki.prop.description=Opis
+platform.wiki.prop.owner=Vlasnik
+platform.wiki.prop.membershipType.label=Tip članstva
+platform.wiki.prop.membershipType.hint=Način na koji se korisnici mogu pridružiti ovom wikiju.
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=Jedinstveni identifikator novog wikija.
+platform.wiki.create.wizard.desc.wikiprettyname=Prikazno ime wikija.
+platform.wiki.create.wizard.desc.wikialias=Ime domene koje će pokazivati na wiki.
+platform.wiki.create.wizard.desc.newTemplateHint=Predložak za upotrijebiti za ovaj novi wiki (sve stranice bit će klonirane).
+platform.wiki.create.wizard.desc.description=Kratki opis wikija i njegove svrhe.
+platform.wiki.create.wizard.desc.owner=Korisnik koji će uvijek imati sve ovlasti u wikiju, neovisno o ovlastima podešenima u Upravljanju.
+platform.wiki.create.wizard.desc.members=Korisnici koji mogu sudjelovati u wikiju.
+platform.wiki.create.wizard.step.nameAndType=Korak 1 — Odaberite ime
+platform.wiki.create.wizard.step.nameAndType.shortname=Ime
+platform.wiki.create.wizard.step.users=Korak 2 — Odaberite članove
+platform.wiki.create.wizard.step.users.shortname=Korisnici
+platform.wiki.create.wizard.step.cleaningUp=Čišćenje
+platform.wiki.create.wizard.step.provisioning.cleanUp=Očisti i obriši wiki
+platform.wiki.create.wizard.step.cleaningup.success=Wiki {0} je uspješno obrisan.
+platform.wiki.create.wizard.step.cleaningup.error=Greška, wiki {0} nije obrisan.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Uskoro ćete obrisati wiki {0}. Molim potvrdite.
+platform.wiki.create.wizard.step.cleaningUp.confirm=Potvrdi
+platform.wiki.create.wizard.setAsTemplate.label=Ovaj wiki će biti predložak
+platform.wiki.create.wizard.template.noTemplate=Bez predloška (zadano)
+platform.wiki.create.wizard.userScope.label=Doseg korisnika
+platform.wiki.create.wizard.userScope.hint=Odaberite koja vrsta korisnika može pristupiti wikiju
+platform.wiki.create.wizard.template.label=Predložak
+platform.wiki.create.wizard.flavortemplate.label=Aroma / predložak
+platform.wiki.create.wizard.flavortemplate.hint=Aroma ili predložak za upotrijebiti kao početni sadržaj novog wikija
+platform.wiki.create.wizard.flavortemplate.flavorTab=Aroma
+platform.wiki.create.wizard.flavortemplate.templateTab=Predložak
+platform.wiki.create.wizard.step.dw=Nakon klikanja na gumb "Izradi" bit će izrađen wiki, a onda će biti pokrenut čarobnjak za distribuciju da inicijalizira vaš wiki. Ako ga preskočite, vaš wiki će biti prazan.
+platform.wiki.create.wizard.step.previous=Prethodni korak
+platform.wiki.create.wizard.step.next=Idi na sljedeći korak
+platform.wiki.create.wizard.step.create=Izradi
+
+platform.wiki.create.wizard.step.creation=Izrada wikija
+platform.wiki.create.wizard.step.creation.wait=Molim pričekajte dok wiki ne bude izrađen.
+platform.wiki.create.wizard.step.creation.complete=Wiki {0} je uspješno izrađen. Sada mu možete pristupiti.
+platform.wiki.create.wizard.step.creation.error=Wiki {0} je izrađen, ali neke stranice nisu instalirane. Posljedično, wiki bi se mogao ponašati pogrešno, tako da biste ga vjerojatno trebali obrisati.
+platform.wiki.create.wizard.step.creation.go=Idite na wiki
+
+## Admin
+admin.wikis.description=Upravljanje wikijima.
+admin.wikis.templates=Wiki predlošci
+admin.wikis.templates.description=Upravljajte wiki predlošcima
+admin.wikis.templates.hint=Predložak je wiki koji će biti smatran modelom za izradu novih wikija. Kada korisnik odabere predložak za izradu novog wikija, sav sadržaj predloška kopira se u novi wiki.
+admin.wikis.rights=Ovlast za izradu
+
+## XWikiServer Sheet
+platform.wiki.sheet.title=Opisnik wikija "{0}"
+platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias "{0}" već postoji.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias "{0}" ne postoji.
+platform.wiki.sheet.title.settings=Svojstva wikija
+platform.wiki.sheet.title.createnewalias=Izradi novi alias
+platform.wiki.sheet.title.viewaliases=Pregledaj aliase
+platform.wiki.sheet.desc.wikiprettyname=Prikazno ime wikija.
+platform.wiki.sheet.desc.owner=Korisnik koji će imati sve ovlasti nad ovim wikijem.
+platform.wiki.sheet.desc.secure=Ako je omogućeno, svi vanjski generirani URL-ovi ovog wikija će započinjati s "https".
+platform.wiki.sheet.desc.iswikitemplate=Naznačite može li ovaj wiki biti upotrijebljen kao predložak kod izrade novog wikija.
+platform.wiki.sheet.desc.server=Alias korišten za pristupanje wikiju.
+platform.wiki.sheet.desc.description=Kratki opis wikija.
+platform.wiki.sheet.desc.homepage=Početna stranica wikija.
+platform.wiki.sheet.prop.wikiprettyname=Prikazno ime
+platform.wiki.sheet.prop.owner=Vlasnik
+platform.wiki.sheet.prop.secure=Sigurno (SSL)
+platform.wiki.sheet.prop.description=Opis
+platform.wiki.sheet.prop.server=Alias
+platform.wiki.sheet.prop.homepage=Početna stranica
+platform.wiki.sheet.prop.iswikitemplate=Wiki predložak
+platform.wiki.sheet.descriptor=Ova stranica definira kako pristupiti wikiju "{0}" i neka svojstva u vezi toga. Za više podešenja molim idite na
+platform.wiki.sheet.descriptor.admin=stranicu za upravljanje wikijem.
+platform.wiki.sheet.aliases=Alias je drugo ime wikija. Možete dodati aliase kako biste izradili različite URL-ove za wiki.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.1
+#######################################
+platform.wiki.dependencies.applicationmanager.missing=Nije instaliran priključak {0}Upravitelj aplikacija{1}. Molim instalirajte ga i pokušajte ponovo.
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wikis=Wikiji
+admin.wikis.template=Wiki predložak
+
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=Sustav priprema wiki.
+platform.wiki.create.wizard.step.provisioning.wait=Molim pričekajte dok sustav priprema wiki.
+platform.wiki.create.wizard.step.provisioning.complete=Wiki je uskoro gotov. Molim kliknite na "Završi" kako biste obavili posljednju operaciju.
+platform.wiki.create.wizard.step.provisioning.error=Wiki {0} je izrađen, ali neke stranice iz predloška nisu kopirane. Vjerojatno biste ga trebali obrisati.
+platform.wiki.create.wizard.step.provisioning.finalize=Završi
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=Da, molim obriši ovaj wiki\!
+platform.wiki.delete.confirmation.no=Ne, vrati me natrag\!
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

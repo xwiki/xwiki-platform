@@ -39,14 +39,29 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-admin.wiki=Wiki
-admin.wiki.description=Décrivez votre wiki (pretty name et description) et définissez son propriétaire et sa page d'accueil.
-admin.wikis=Wikis
+  <content>admin.wikis=Wikis
 admin.wikis.descriptor=Description
-platform.wiki.admin.wiki.csrfInvalidError=Clé de sécurité invalide (CSRF). Veuillez rafraîchir la page et essayer à nouveau.
+### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
+admin.wiki.description=Décrivez votre wiki (pretty name et description) et définissez son propriétaire et sa page d'accueil.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Le nouvel utilisateur propriétaire n'existe pas ou peut provenir d'un autre wiki.\\nÊtes-vous certain de vouloir continue en sauvegardant cette opération ?
-platform.wiki.admin.wiki.ownerWarning=Attention : une fois que vous changerez ceci, le précédent propriétaire perdra ses droits de propriétaire. Assurez-vous de ne pas vous bloquer vous-même sur le wiki. Si cela se produit par erreur, vous devrez contacter les administrateurs du wiki principal ou utiliser le compte superadmin.
+platform.wiki.admin.wiki.csrfInvalidError=Clé de sécurité invalide (CSRF). Veuillez rafraîchir la page et essayer à nouveau.
 platform.wiki.admin.wiki.requiredFieldsError=Propriétaire et page d'accueil sont des champs requis.
+platform.wiki.admin.wiki.ownerWarning=Attention : une fois que vous changerez ceci, le précédent propriétaire perdra ses droits de propriétaire. Assurez-vous de ne pas vous bloquer vous-même sur le wiki. Si cela se produit par erreur, vous devrez contacter les administrateurs du wiki principal ou utiliser le compte superadmin.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

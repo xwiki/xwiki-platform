@@ -39,7 +39,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
-help.tipsPanel.title=Consells
+  <content>help.tipsPanel.title=Consells
+### Missing: help.tipsPanel.noTipMessage=No Tip available!
+### Missing: help.tipsPanel.gettingStartedTip=If you're a new XWiki user, check out the [[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
+### Missing: help.tipsPanel.jumpToPageTip=Jump to any page in the wiki with Ctrl+G or Meta+G.\nSee [[more shortcuts&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+### Missing: help.tipsPanel.improveXWikiTip=Did you know that you can improve XWiki? Take 5 minutes to [[fill this survey&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] and help this open source project!
+### Missing: help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
+### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+### Missing: help.macroList.title=Available Macros
+### Missing: help.macroList.id=Id
+### Missing: help.macroList.name=Name
+### Missing: help.macroList.category=Category
+### Missing: help.macroList.description=Description
+### Missing: help.macroList.visibility=Visibility
 </content>
 </xwikidoc>

@@ -39,13 +39,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
-admin.repository=Udvidelsesdepot
-extension.repository.authors=Forfattere
-extension.repository.doc.creationDate=Opretttet
-extension.repository.doc.date=Senest rettet
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
 extension.repository.name=Navn
 extension.repository.summary=Resume
 extension.repository.type=Type
+### Missing: extension.repository.category=Category
+extension.repository.authors=Forfattere
+extension.repository.doc.creationDate=Opretttet
+extension.repository.doc.date=Senest rettet
+### Missing: extension.repository.rating=Rating
+### Missing: extension.repository.installedCount=Installs
+
+## Administration UI
+admin.repository=Udvidelsesdepot
 </content>
 </xwikidoc>

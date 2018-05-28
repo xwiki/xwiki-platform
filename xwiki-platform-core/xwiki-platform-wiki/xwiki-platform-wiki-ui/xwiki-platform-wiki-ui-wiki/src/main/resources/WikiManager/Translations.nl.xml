@@ -39,87 +39,101 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-WikiManager.WikiCandidateMemberClass_status_accepted=Geaccepteerd
-WikiManager.WikiCandidateMemberClass_status_pending=Uitstaand
-WikiManager.WikiCandidateMemberClass_status_rejected=Afgewezen
-WikiManager.WikiCandidateMemberClass_type_invitation=Uitnodiging
-WikiManager.WikiCandidateMemberClass_type_request=Verzoek
-admin.xwiki.manageworkspace.description=Beheer instellingen, zoals de naam van de wiki, omschrijving, eigenaar en het type lidmaatschap
-admin.xwiki.members.title=Huidige leden
-admin.xwiki.usersconfiguration.title=Configuratie
-admin.xwiki.workspaceusers.description=Beheer wiki deelnemers\: toevoegen, verwijderen, uitnodigen, accepteren of afwijzen van wiki leden.
-core.menu.admin.wiki=Beheer wiki
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=Volg deze wiki
 core.menu.watchlist.remove.wiki=Stop volgen wiki
-platform.wiki.currentwiki.candidateAcceptedSuccess=Verzoek succesvol geaccepteerd.
-platform.wiki.currentwiki.candidateHandledComment=Opmerking\:
+core.menu.admin.wiki=Beheer wiki
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Wiki informatie
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Welkom op de {0}{1}{2} wiki.
+platform.wiki.currentwiki.currentUserIsOwner=U bent de eigenaar van deze wiki.
+platform.wiki.currentwiki.currentUserIsAdmin=U bent een administrator van deze wiki.
+platform.wiki.currentwiki.joinNeedToLogin=Om lid te kunnen worden, moet u zijn ingelogd.
+platform.wiki.currentwiki.currentUserNotMember=U bent geen lid van deze wiki.
+platform.wiki.currentwiki.currentuserCanJoin=U kunt {0}lid worden van deze wiki{1}.
+platform.wiki.currentwiki.currentUserIsMember=U bent lid van deze wiki.
+platform.wiki.currentwiki.currentUserCanLeave=U kunt uw {0}lidmaatschap van deze wiki beëindigen{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Om de volledige lijst van wiki gebruikers te zien gebruik de {0}Gebruikers folder{1} pagina.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=U bent uitgenodigd lid te worden van deze wiki
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=U heeft verzocht lid te mogen worden van deze wiki
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Uw verzoek om lid te worden van de wiki ''{0}'' is geaccepteerd.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Uw verzoek om lid te worden van de wiki ''{0}'' is geweigerd.
 platform.wiki.currentwiki.candidateHandledSaveComment=Kandidaat {0} ({1}) afgehandeld
+platform.wiki.currentwiki.candidateHandledComment=Opmerking\:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Verzoek succesvol geaccepteerd.
 platform.wiki.currentwiki.candidateRejectedSuccess=Verzoek succesvol afgewezen.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} is al lid van de wiki.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} heeft al een lopend verzoek. Reageer alstublieft op dat lopende verzoek.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} is al uitgenodigd.
+platform.wiki.currentwiki.inviteSaveComment=Gebruiker ''{0}'' is uitgenodigd lid te worden van de wiki.
+platform.wiki.currentwiki.inviteNotification=U bent uitgenodigd lid te worden van de wiki ''{0}''.
+platform.wiki.currentwiki.inviteSuccess={0} succesvol uitgenodigd.
+platform.wiki.currentwiki.invitationCancelSaveComment=Uitnodiging geannuleerd {0} ({1})
+platform.wiki.currentwiki.invitationCancelNotification=Uw uitnodiging is geannuleerd en is niet langer geldig.
+platform.wiki.currentwiki.invitationCancelSuccess=Uitnodiging succesvol geannuleerd.
+platform.wiki.currentwiki.invitationCancelFailure=Fout, u kunt deze uitnodiging niet annuleren.
 platform.wiki.currentwiki.candidateReviewFailure=Fout, u kunt deze uitnodiging niet annuleren.
-platform.wiki.currentwiki.candidates.accept.label=Accepteren
-platform.wiki.currentwiki.candidates.hint=Gebruikers die hebben verzocht of zijn uitgenodigd om lid te worden van de wiki.
-platform.wiki.currentwiki.candidates.invitation.cancel.label=Uitnodiging annuleren
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Weergavenaam
+platform.wiki.currentwiki.prop.description.label=Omschrijving
+platform.wiki.currentwiki.prop.owner.label=Eigenaar
+platform.wiki.currentwiki.prop.membershipType.label=Type lidmaatschap
+platform.wiki.currentwiki.prop.secure.label=Beveiligd (SSL)
+platform.wiki.currentwiki.member.add=Gebruikers toevoegen of uitnodigen
+platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki informatie
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Top actieve leden
+platform.wiki.currentwiki.panel.information.name.label=Naam
+platform.wiki.currentwiki.panel.information.description.label=Omschrijving
+platform.wiki.currentwiki.panel.information.members.label=Leden
+platform.wiki.currentwiki.invitation.view.label=Bekijk uitnodiging
+platform.wiki.currentwiki.joinrequest.cancel.label=Annuleer verzoek
+platform.wiki.currentwiki.joinreques.request.label=Verzoek lidmaatschap
+platform.wiki.currentwiki.join.label=Lid worden
+platform.wiki.currentwiki.leave.label=Verlaat wiki
+platform.wiki.currentwiki.invite.username.label=Naam gebruiker
+platform.wiki.currentwiki.invite.message.label=Bericht
+platform.wiki.currentwiki.invite.button.label=Uitnodigen
 platform.wiki.currentwiki.candidates.label=Kandidaten
-platform.wiki.currentwiki.candidates.reject.label=Afwijzen
+platform.wiki.currentwiki.candidates.status.label=Status\:
+platform.wiki.currentwiki.candidates.type.label=Type\:
 platform.wiki.currentwiki.candidates.reviewer.label=Admin\:
 platform.wiki.currentwiki.candidates.reviewermessage.label=Admin's bericht\:
 platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privé-opmerking\:
-platform.wiki.currentwiki.candidates.status.label=Status\:
-platform.wiki.currentwiki.candidates.type.label=Type\:
-platform.wiki.currentwiki.currentUserCanLeave=U kunt uw {0}lidmaatschap van deze wiki beëindigen{1}.
-platform.wiki.currentwiki.currentUserIsAdmin=U bent een administrator van deze wiki.
-platform.wiki.currentwiki.currentUserIsMember=U bent lid van deze wiki.
-platform.wiki.currentwiki.currentUserIsOwner=U bent de eigenaar van deze wiki.
-platform.wiki.currentwiki.currentUserNotMember=U bent geen lid van deze wiki.
-platform.wiki.currentwiki.currentuserCanJoin=U kunt {0}lid worden van deze wiki{1}.
-platform.wiki.currentwiki.gadget.topActiveUsers.label=Top actieve leden
-platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki informatie
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Om de volledige lijst van wiki gebruikers te zien gebruik de {0}Gebruikers folder{1} pagina.
-platform.wiki.currentwiki.invitation.view.label=Bekijk uitnodiging
-platform.wiki.currentwiki.invitationCancelFailure=Fout, u kunt deze uitnodiging niet annuleren.
-platform.wiki.currentwiki.invitationCancelNotification=Uw uitnodiging is geannuleerd en is niet langer geldig.
-platform.wiki.currentwiki.invitationCancelSaveComment=Uitnodiging geannuleerd {0} ({1})
-platform.wiki.currentwiki.invitationCancelSuccess=Uitnodiging succesvol geannuleerd.
-platform.wiki.currentwiki.invitationPendingForCurrentWiki=U bent uitgenodigd lid te worden van deze wiki
-platform.wiki.currentwiki.invite.button.label=Uitnodigen
-platform.wiki.currentwiki.invite.message.hint=Het bericht dat aan de gebruiker wordt gestuurd.
-platform.wiki.currentwiki.invite.message.label=Bericht
-platform.wiki.currentwiki.invite.username.hint=De naam van de gebruiker die moet worden toegevoegd aan de wiki.
-platform.wiki.currentwiki.invite.username.label=Naam gebruiker
-platform.wiki.currentwiki.inviteNotification=U bent uitgenodigd lid te worden van de wiki ''{0}''.
-platform.wiki.currentwiki.inviteRequestAlreadyExists={0} heeft al een lopend verzoek. Reageer alstublieft op dat lopende verzoek.
-platform.wiki.currentwiki.inviteSaveComment=Gebruiker ''{0}'' is uitgenodigd lid te worden van de wiki.
-platform.wiki.currentwiki.inviteSuccess={0} succesvol uitgenodigd.
-platform.wiki.currentwiki.inviteUserAlreadyInvited={0} is al uitgenodigd.
-platform.wiki.currentwiki.inviteUserAlreadyMember={0} is al lid van de wiki.
-platform.wiki.currentwiki.join.label=Lid worden
-platform.wiki.currentwiki.joinNeedToLogin=Om lid te kunnen worden, moet u zijn ingelogd.
-platform.wiki.currentwiki.joinRequestAcceptedNotification=Uw verzoek om lid te worden van de wiki ''{0}'' is geaccepteerd.
-platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=U heeft verzocht lid te mogen worden van deze wiki
-platform.wiki.currentwiki.joinRequestRejectedNotification=Uw verzoek om lid te worden van de wiki ''{0}'' is geweigerd.
-platform.wiki.currentwiki.joinreques.request.label=Verzoek lidmaatschap
-platform.wiki.currentwiki.joinrequest.cancel.label=Annuleer verzoek
-platform.wiki.currentwiki.leave.label=Verlaat wiki
-platform.wiki.currentwiki.managewikis.title=Wiki
-platform.wiki.currentwiki.member.add=Gebruikers toevoegen of uitnodigen
-platform.wiki.currentwiki.panel.information.description.label=Omschrijving
-platform.wiki.currentwiki.panel.information.members.label=Leden
-platform.wiki.currentwiki.panel.information.name.label=Naam
-platform.wiki.currentwiki.prop.description.hint=Een korte omschrijving van deze wiki en zijn functie.
-platform.wiki.currentwiki.prop.description.label=Omschrijving
-platform.wiki.currentwiki.prop.membershipType.hint=De wijze waarop gebruikers lid kunnen worden van deze wiki.
-platform.wiki.currentwiki.prop.membershipType.label=Type lidmaatschap
-platform.wiki.currentwiki.prop.owner.hint=Een gebruiker die alle rechten heeft op de wiki.
-platform.wiki.currentwiki.prop.owner.label=Eigenaar
-platform.wiki.currentwiki.prop.secure.hint=Indien geselecteerd zullen alle door deze wiki gegenereerde externe URLs starten met {0}https\://{1}.
-platform.wiki.currentwiki.prop.secure.label=Beveiligd (SSL)
-platform.wiki.currentwiki.prop.wikiprettyname.hint=De weergavenaam van de wiki.
-platform.wiki.currentwiki.prop.wikiprettyname.label=Weergavenaam
-platform.wiki.currentwiki.welcome=Welkom op de {0}{1}{2} wiki.
+platform.wiki.currentwiki.candidates.accept.label=Accepteren
+platform.wiki.currentwiki.candidates.reject.label=Afwijzen
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Uitnodiging annuleren
 platform.wiki.currentwiki.wikiusers.title=Wiki gebruikers
+platform.wiki.currentwiki.managewikis.title=Wiki
+WikiManager.WikiCandidateMemberClass_status_pending=Uitstaand
+WikiManager.WikiCandidateMemberClass_status_accepted=Geaccepteerd
+WikiManager.WikiCandidateMemberClass_status_rejected=Afgewezen
+WikiManager.WikiCandidateMemberClass_type_request=Verzoek
+WikiManager.WikiCandidateMemberClass_type_invitation=Uitnodiging
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=De weergavenaam van de wiki.
+platform.wiki.currentwiki.prop.description.hint=Een korte omschrijving van deze wiki en zijn functie.
+platform.wiki.currentwiki.prop.owner.hint=Een gebruiker die alle rechten heeft op de wiki.
+platform.wiki.currentwiki.prop.membershipType.hint=De wijze waarop gebruikers lid kunnen worden van deze wiki.
+platform.wiki.currentwiki.prop.secure.hint=Indien geselecteerd zullen alle door deze wiki gegenereerde externe URLs starten met {0}https\://{1}.
+platform.wiki.currentwiki.invite.username.hint=De naam van de gebruiker die moet worden toegevoegd aan de wiki.
+platform.wiki.currentwiki.invite.message.hint=Het bericht dat aan de gebruiker wordt gestuurd.
+platform.wiki.currentwiki.candidates.hint=Gebruikers die hebben verzocht of zijn uitgenodigd om lid te worden van de wiki.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=Beheer instellingen, zoals de naam van de wiki, omschrijving, eigenaar en het type lidmaatschap
+admin.xwiki.workspaceusers.description=Beheer wiki deelnemers\: toevoegen, verwijderen, uitnodigen, accepteren of afwijzen van wiki leden.
+admin.xwiki.usersconfiguration.title=Configuratie
+admin.xwiki.members.title=Huidige leden
+    
+# DRAWER ITEM
 platform.wiki.drawer.homeWiki=Home
-platform.wiki.panel.title=Wiki informatie
 </content>
 </xwikidoc>

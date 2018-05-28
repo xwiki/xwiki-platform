@@ -39,7 +39,101 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language zh generated from http://www.l10n.xwiki.org
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
+### Missing: core.menu.type.wiki=Wiki
+### Missing: core.menu.watchlist.add.wiki=Watch Wiki
+### Missing: core.menu.watchlist.remove.wiki=Unwatch Wiki
 core.menu.admin.wiki=管理Wiki
+
+# WIKI INFORMATION PANEL
+### Missing: platform.wiki.panel.title=Wiki information
+
+# MESSAGES
+### Missing: platform.wiki.currentwiki.welcome=Welcome to the {0}{1}{2} wiki.
+### Missing: platform.wiki.currentwiki.currentUserIsOwner=You are the owner of this wiki.
+### Missing: platform.wiki.currentwiki.currentUserIsAdmin=You are an administrator of this wiki.
+### Missing: platform.wiki.currentwiki.joinNeedToLogin=To join this wiki, you need to be logged in.
+### Missing: platform.wiki.currentwiki.currentUserNotMember=You are not a member of this wiki.
+### Missing: platform.wiki.currentwiki.currentuserCanJoin=If you like, you can {0}join this wiki{1}.
+### Missing: platform.wiki.currentwiki.currentUserIsMember=You are a member of this wiki.
+### Missing: platform.wiki.currentwiki.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
+### Missing: platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, see {0}User Directory{1}.
+### Missing: platform.wiki.currentwiki.invitationPendingForCurrentWiki=You have been invited to join this wiki.
+### Missing: platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=You have requested to join this wiki.
+### Missing: platform.wiki.currentwiki.joinRequestAcceptedNotification=Your request to join the wiki ''{0}'' has been accepted.
+### Missing: platform.wiki.currentwiki.joinRequestRejectedNotification=Your request to join the wiki ''{0}'' has been rejected.
+### Missing: platform.wiki.currentwiki.candidateHandledSaveComment=Handled candidate {0} ({1})
+### Missing: platform.wiki.currentwiki.candidateHandledComment=Comment:
+### Missing: platform.wiki.currentwiki.candidateAcceptedSuccess=Request accepted.
+### Missing: platform.wiki.currentwiki.candidateRejectedSuccess=Request rejected.
+### Missing: platform.wiki.currentwiki.inviteUserAlreadyMember={0} is already a member of the wiki.
+### Missing: platform.wiki.currentwiki.inviteRequestAlreadyExists={0} already has a pending request. Please respond to that request instead.
+### Missing: platform.wiki.currentwiki.inviteUserAlreadyInvited={0} already has a pending invitation.
+### Missing: platform.wiki.currentwiki.inviteSaveComment=User ''{0}'' has been invited to join the wiki.
+### Missing: platform.wiki.currentwiki.inviteNotification=You have been invited to join the wiki ''{0}''.
+### Missing: platform.wiki.currentwiki.inviteSuccess={0} invited successfully.
+### Missing: platform.wiki.currentwiki.invitationCancelSaveComment=Cancelled invitation {0} ({1})
+### Missing: platform.wiki.currentwiki.invitationCancelNotification=Your invitation has been cancelled and is no longer valid.
+### Missing: platform.wiki.currentwiki.invitationCancelSuccess=Invitation cancelled successfully.
+### Missing: platform.wiki.currentwiki.invitationCancelFailure=Error, you cannot cancel this invitation.
+### Missing: platform.wiki.currentwiki.candidateReviewFailure=Error, you cannot cancel this invitation.
+
+# LABELS
+### Missing: platform.wiki.currentwiki.prop.wikiprettyname.label=Pretty Name
+### Missing: platform.wiki.currentwiki.prop.description.label=Description
+### Missing: platform.wiki.currentwiki.prop.owner.label=Owner
+### Missing: platform.wiki.currentwiki.prop.membershipType.label=Membership Type
+### Missing: platform.wiki.currentwiki.prop.secure.label=Secure (SSL)
+### Missing: platform.wiki.currentwiki.member.add=Add or invite users to wiki
+### Missing: platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki Information
+### Missing: platform.wiki.currentwiki.gadget.topActiveUsers.label=Top Active Contributors
+### Missing: platform.wiki.currentwiki.panel.information.name.label=Name
+### Missing: platform.wiki.currentwiki.panel.information.description.label=Description
+### Missing: platform.wiki.currentwiki.panel.information.members.label=Members
+### Missing: platform.wiki.currentwiki.invitation.view.label=View Invitation
+### Missing: platform.wiki.currentwiki.joinrequest.cancel.label=Cancel Request
+### Missing: platform.wiki.currentwiki.joinreques.request.label=Request Join
+### Missing: platform.wiki.currentwiki.join.label=Join
+### Missing: platform.wiki.currentwiki.leave.label=Leave Wiki
+### Missing: platform.wiki.currentwiki.invite.username.label=Username
+### Missing: platform.wiki.currentwiki.invite.message.label=Message
+### Missing: platform.wiki.currentwiki.invite.button.label=Invite
+### Missing: platform.wiki.currentwiki.candidates.label=Candidates
+### Missing: platform.wiki.currentwiki.candidates.status.label=Status:
+### Missing: platform.wiki.currentwiki.candidates.type.label=Type:
+### Missing: platform.wiki.currentwiki.candidates.reviewer.label=Admin:
+### Missing: platform.wiki.currentwiki.candidates.reviewermessage.label=Admin's Message:
+### Missing: platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Private Comment:
+### Missing: platform.wiki.currentwiki.candidates.accept.label=Accept
+### Missing: platform.wiki.currentwiki.candidates.reject.label=Reject
+### Missing: platform.wiki.currentwiki.candidates.invitation.cancel.label=Cancel Invitation
+### Missing: platform.wiki.currentwiki.wikiusers.title=Wiki Users
+### Missing: platform.wiki.currentwiki.managewikis.title=Wiki
+### Missing: WikiManager.WikiCandidateMemberClass_status_pending=Pending
+### Missing: WikiManager.WikiCandidateMemberClass_status_accepted=Accepted
+### Missing: WikiManager.WikiCandidateMemberClass_status_rejected=Rejected
+### Missing: WikiManager.WikiCandidateMemberClass_type_request=Request
+### Missing: WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
+
+# HINTS
+### Missing: platform.wiki.currentwiki.prop.wikiprettyname.hint=The display name of the wiki.
+### Missing: platform.wiki.currentwiki.prop.description.hint=A brief description of the wiki and its purpose.
+### Missing: platform.wiki.currentwiki.prop.owner.hint=A user who has all the rights on the wiki.
+### Missing: platform.wiki.currentwiki.prop.membershipType.hint=The way users can join this wiki.
+### Missing: platform.wiki.currentwiki.prop.secure.hint=If enabled, all this wiki''s generated externals URLs will start with {0}https:~/~/{1}.
+### Missing: platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.
+### Missing: platform.wiki.currentwiki.invite.message.hint=The message to send to the user.
+### Missing: platform.wiki.currentwiki.candidates.hint=Users who have requested or been invited to join the wiki.
+
+# ADMIN
+### Missing: admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
+### Missing: admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
+### Missing: admin.xwiki.usersconfiguration.title=Configuration
+### Missing: admin.xwiki.members.title=Current Members
+    
+# DRAWER ITEM
+### Missing: platform.wiki.drawer.homeWiki=Home
 </content>
 </xwikidoc>

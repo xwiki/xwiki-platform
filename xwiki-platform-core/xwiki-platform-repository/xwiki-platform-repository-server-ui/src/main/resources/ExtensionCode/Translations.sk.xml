@@ -39,15 +39,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-admin.repository=Uložisko rozšírení
-extension.repository.authors=Autor
-extension.repository.category=Kategórie
-extension.repository.doc.creationDate=Vytvorené
-extension.repository.doc.date=Posledná modifikácia
-extension.repository.emptyvalue=\ 
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
 extension.repository.name=Názov
 extension.repository.summary=Súhrn
 extension.repository.type=Typ
+extension.repository.category=Kategórie
+extension.repository.authors=Autor
+extension.repository.doc.creationDate=Vytvorené
+extension.repository.doc.date=Posledná modifikácia
+### Missing: extension.repository.rating=Rating
+### Missing: extension.repository.installedCount=Installs
+
+## Administration UI
+admin.repository=Uložisko rozšírení
 </content>
 </xwikidoc>

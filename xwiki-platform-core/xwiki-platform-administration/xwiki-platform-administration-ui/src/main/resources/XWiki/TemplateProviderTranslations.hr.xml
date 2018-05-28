@@ -39,15 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>administration.templateProvider.description=Opis
+administration.templateProvider.description.hint=Informacije za prikaz za opskrbljivač predložaka kada se izradi nova stranica.
+administration.templateProvider.icon=Ikona
+administration.templateProvider.icon.hint=Ikona za prikaz za opskrbljivač predložaka kada se izradi nova stranica. Odaberite jednu iz {0}pune liste ikona{1}.
 administration.templateProvider.creationRestrictions=Restrikcije izrade
 administration.templateProvider.creationRestrictions.hint=Lista lokacija (uključujući njihovu djecu) na kojima je ovom predlošku dozvoljeno izrađivati stranice
 administration.templateProvider.creationRestrictions.none=Ovaj predložak može izrađivati stranice bilo gdje
 administration.templateProvider.creationRestrictionsAreSuggestions=Restrikcije izrade kao prijedlozi
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=Omogućava korisniku odabir bilo koje lokacije za izradu stranice s ovim predloškom, koristeći prvu restrikciju izrade kao predpopunjenu pretpostavljenu lokaciju kada se predložak odabere s liste.
-administration.templateProvider.description=Opis
-administration.templateProvider.description.hint=Informacije za prikaz za opskrbljivač predložaka kada se izradi nova stranica.
-administration.templateProvider.icon=Ikona
-administration.templateProvider.icon.hint=Ikona za prikaz za opskrbljivač predložaka kada se izradi nova stranica. Odaberite jednu iz {0}pune liste ikona{1}.
 </content>
 </xwikidoc>

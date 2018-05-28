@@ -39,33 +39,39 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content># Class fields
 Menu.MenuClass_content1=Struktura izbornika
-menu.livetable._actions=Akcije
-menu.livetable._actions.delete=Obriši
-menu.livetable._actions.edit=Uredi
-menu.livetable._attachments=Privitci
-menu.livetable._avatar=Avatar
-menu.livetable._images=Slike
-menu.livetable.content1=Struktura izbornika
-menu.livetable.doc.author=Posljednji autor
-menu.livetable.doc.creationDate=Datum izrade
-menu.livetable.doc.creator=Tvorac
-menu.livetable.doc.date=Datum ažuriranja
-menu.livetable.doc.fullname=Puno ime stranice
+
+# Live table generic keys
+menu.livetable.doc.title=Naslov stranice
 menu.livetable.doc.name=Ime stranice
 menu.livetable.doc.space=Prostor
-menu.livetable.doc.title=Naslov stranice
+menu.livetable.doc.fullname=Puno ime stranice
+menu.livetable.doc.author=Posljednji autor
+menu.livetable.doc.creator=Tvorac
+menu.livetable.doc.date=Datum ažuriranja
+menu.livetable.doc.creationDate=Datum izrade
+menu.livetable._avatar=Avatar
+menu.livetable._images=Slike
+menu.livetable._attachments=Privitci
+menu.livetable._actions=Akcije
+menu.livetable._actions.edit=Uredi
+menu.livetable._actions.delete=Obriši
 menu.livetable.emptyvalue=-
-menu.uix.content.hint=Ukoliko ovo vidite, to onda vjerojatno znači da vam je onemogućen Javascript. Trebali biste odabrati istu vrijednost kao za lokaciju prikaza izbornika.
-menu.uix.content.label=Sadržaj UI ekstenzije
-menu.uix.extensionPoint.hint=Naznačava gdje prikazati izbornik. Izbornik se prikazuje ili horizontalno ili vertikalno, prema odabranoj lokaciji.
+
+# Live table specific keys
+menu.livetable.content1=Struktura izbornika
+
+# UIX keys
 menu.uix.extensionPoint.label=Lokacija prikaza izbornika
+menu.uix.extensionPoint.hint=Naznačava gdje prikazati izbornik. Izbornik se prikazuje ili horizontalno ili vertikalno, prema odabranoj lokaciji.
 menu.uix.extensionPoint.value.nowhere=Nigdje
-menu.uix.extensionPoint.value.panels.leftPanels=Unutar panela s lijeve strane
-menu.uix.extensionPoint.value.panels.rightPanels=Unutar panela s desne strane
 menu.uix.extensionPoint.value.template.header.after=Nakon zaglavlja stranice
-menu.uix.scope.hint=Naznačava u kojem kontekstu je vidljiv izbornik.
+menu.uix.extensionPoint.value.panels.rightPanels=Unutar panela s desne strane
+menu.uix.extensionPoint.value.panels.leftPanels=Unutar panela s lijeve strane
+menu.uix.content.label=Sadržaj UI ekstenzije
+menu.uix.content.hint=Ukoliko ovo vidite, to onda vjerojatno znači da vam je onemogućen Javascript. Trebali biste odabrati istu vrijednost kao za lokaciju prikaza izbornika.
 menu.uix.scope.label=Doseg vidljivosti izbornika
+menu.uix.scope.hint=Naznačava u kojem kontekstu je vidljiv izbornik.
 </content>
 </xwikidoc>

@@ -39,37 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-Mail.GeneralMailConfigClass_obfuscate=Skryť e-mailové adresy
-Mail.GeneralMailConfigClass_obfuscate.hint=Týka sa len e-mailové adresy uložené v objektoch typu email. Napr.\: a...@domain.org
-Mail.SendMailConfigClass_bcc=BCC email adresy
-Mail.SendMailConfigClass_bcc.hint=Zoznam BCC e-mail adries oddelených čiarkou.
-Mail.SendMailConfigClass_discardSuccessStatuses=Zahodiť úspešné stavy?
-Mail.SendMailConfigClass_discardSuccessStatuses.hint=Uchovávať alebo neuchovávať stavy emailov, ktoré boli úspešne odoslané (základne nastavenie je uchovávať)
-Mail.SendMailConfigClass_from=Email adresa servera
-Mail.SendMailConfigClass_from.hint=Email adresa na posielanie oznámení.
-Mail.SendMailConfigClass_host=Email Server
-Mail.SendMailConfigClass_host.hint=SMTP server, predvolená hodnota je "localhost"
-Mail.SendMailConfigClass_password=Email Server Heslo
-Mail.SendMailConfigClass_password.hint=Heslo pre pripojenie k serveru SMTP, ak je to potrebné.
-Mail.SendMailConfigClass_port=Email Server Port
-Mail.SendMailConfigClass_port.hint=Port SMTP servera. Predvolená hodnota je 25.
-Mail.SendMailConfigClass_properties=Ďalšie možnosti
-Mail.SendMailConfigClass_properties.hint=Zoznam JavaMail nastavení. (napr. "mail.smtp.starttls.enable\=true")
-Mail.SendMailConfigClass_sendWaitTime=Čas čakania
-Mail.SendMailConfigClass_sendWaitTime.hint=Čas čakania v ms. (Predvolená hodnota je 8s) 
-Mail.SendMailConfigClass_username=Email Server Užívateľské meno
-Mail.SendMailConfigClass_username.hint=Užívateľské meno pre pripojenie k serveru SMTP.
-Mail.SendMailStatus_livetable.actions=Akcie
-Mail.SendMailStatus_livetable.batchId=Batch ID
-Mail.SendMailStatus_livetable.date=Dátum
-Mail.SendMailStatus_livetable.error=Chyba
-Mail.SendMailStatus_livetable.recipients=Príjemcovia
-Mail.SendMailStatus_livetable.resend=Znovu poslať
-Mail.SendMailStatus_livetable.state=Stav
-Mail.SendMailStatus_livetable.type=Typ
-Mail.SendMailStatus_livetable.wiki=Wiki
-admin.email=Email
+  <content>admin.email=Email
 admin.email.description=Konfigurovať email (všeobecné nastavenia)
 admin.emailgeneral=Všeobecné
 admin.emailgeneral.description=Konfigurovať všeobecné email parametre.
@@ -77,5 +47,37 @@ admin.emailsend=Odosielanie e-mailov
 admin.emailsend.description=Konfigurovať parametre odosielanej pošty
 admin.emailstatus=Stav odoslaných emailov
 admin.emailstatus.description=Zobraziť stav odoslaných mailov.
+### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
+Mail.GeneralMailConfigClass_obfuscate=Skryť e-mailové adresy
+Mail.GeneralMailConfigClass_obfuscate.hint=Týka sa len e-mailové adresy uložené v objektoch typu email. Napr.\: a...@domain.org
+Mail.SendMailConfigClass_from=Email adresa servera
+Mail.SendMailConfigClass_from.hint=Email adresa na posielanie oznámení.
+Mail.SendMailConfigClass_bcc=BCC email adresy
+Mail.SendMailConfigClass_bcc.hint=Zoznam BCC e-mail adries oddelených čiarkou.
+Mail.SendMailConfigClass_host=Email Server
+Mail.SendMailConfigClass_host.hint=SMTP server, predvolená hodnota je "localhost"
+Mail.SendMailConfigClass_port=Email Server Port
+Mail.SendMailConfigClass_port.hint=Port SMTP servera. Predvolená hodnota je 25.
+Mail.SendMailConfigClass_username=Email Server Užívateľské meno
+Mail.SendMailConfigClass_username.hint=Užívateľské meno pre pripojenie k serveru SMTP.
+Mail.SendMailConfigClass_password=Email Server Heslo
+Mail.SendMailConfigClass_password.hint=Heslo pre pripojenie k serveru SMTP, ak je to potrebné.
+Mail.SendMailConfigClass_properties=Ďalšie možnosti
+Mail.SendMailConfigClass_properties.hint=Zoznam JavaMail nastavení. (napr. "mail.smtp.starttls.enable\=true")
+Mail.SendMailConfigClass_sendWaitTime=Čas čakania
+Mail.SendMailConfigClass_sendWaitTime.hint=Čas čakania v ms. (Predvolená hodnota je 8s) 
+Mail.SendMailConfigClass_discardSuccessStatuses=Zahodiť úspešné stavy?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Uchovávať alebo neuchovávať stavy emailov, ktoré boli úspešne odoslané (základne nastavenie je uchovávať)
+Mail.SendMailStatus_livetable.date=Dátum
+Mail.SendMailStatus_livetable.batchId=Batch ID
+Mail.SendMailStatus_livetable.type=Typ
+Mail.SendMailStatus_livetable.recipients=Príjemcovia
+Mail.SendMailStatus_livetable.state=Stav
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Chyba
+Mail.SendMailStatus_livetable.actions=Akcie
+Mail.SendMailStatus_livetable.resend=Znovu poslať
+### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
+### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.
 </content>
 </xwikidoc>

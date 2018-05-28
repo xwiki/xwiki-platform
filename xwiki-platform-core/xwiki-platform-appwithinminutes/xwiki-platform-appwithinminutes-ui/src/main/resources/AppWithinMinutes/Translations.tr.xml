@@ -39,122 +39,214 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language tr generated from http://www.l10n.xwiki.org
-appWithinMinutes.wizardStep.name.name=Ad
-appWithinMinutes.wizardStep.name.title=başvurunuzu Ad
-appWithinMinutes.wizardStep.presentation.description=uygulamanınana sayfasını kişiselleştirin .
-appWithinMinutes.wizardStep.presentation.name=Sunum
-appWithinMinutes.wizardStep.presentation.title=uygulamanızınana sayfa özelleştirme
-appWithinMinutes.wizardStep.structure.description=o içerecektir alanların ne tür belirterek uygulamanınyapısını oluşturun .
-appWithinMinutes.wizardStep.structure.name=Yapı
-appWithinMinutes.wizardStep.structure.title=uygulamanızınyapısını tanımlayın
-platform.appwithinminutes.appHomePageActionsHeading=Eylemleri
-platform.appwithinminutes.appHomePageAddEntryHint=Yeni girdi ekle
-platform.appwithinminutes.appHomePageAddEntryLabel=Ekle
-platform.appwithinminutes.appHomePageDeleteAppLabel=Uygulamayı Sil
-platform.appwithinminutes.appHomePageEditAppLabel=Uygulamayı Düzenle
-platform.appwithinminutes.appHomePageEntryNameLabel=Girdi adı \:
-platform.appwithinminutes.appHomePageTranslateAppLabel=Uygulamayı Çevir
-platform.appwithinminutes.appLiveTableDeleteEntryActionName=Sil
-platform.appwithinminutes.appLiveTableEditEntryActionName=Düzenleme
-platform.appwithinminutes.appLiveTableHeading=Yazılar
-platform.appwithinminutes.appNameIsUsedWarning=Bu uygulama zaten var . Eğerbir sonraki adıma gidersenizmevcut uygulamayı düzenlerken edilecektir .
-platform.appwithinminutes.appNameLabel=Uygulama Adı
-platform.appwithinminutes.appNamePageTitle=Oluşturma Uygulama
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=Uygulama sınıfı
-platform.appwithinminutes.appNamePreviewDataSpaceLabel=Uygulama veri alanı
-platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Uygulama ana sayfa URL
-platform.appwithinminutes.appPanelCreateEntry=Kendi oluşturun\!
-platform.appwithinminutes.appsLiveTable._actions=Eylemleri
+  <content>### Home page
+### Missing: platform.appwithinminutes.homePageTitle=App Within Minutes
+platform.appwithinminutes.description=XWiki güçlü yapılandırılmış veri yönetim sistemine dayalı dakika içinde ortak web uygulamaları oluşturun .
+platform.appwithinminutes.createAppButtonLabel=Oluşturma Uygulama
+platform.appwithinminutes.appsLiveTableHeading=Uygulamaları
+platform.appwithinminutes.appsLiveTable.doc.space=Uygulama adı
 platform.appwithinminutes.appsLiveTable.doc.author=Son yazar
 platform.appwithinminutes.appsLiveTable.doc.date=Güncelleme tarihi
-platform.appwithinminutes.appsLiveTable.doc.space=Uygulama adı
-platform.appwithinminutes.appsLiveTableHeading=Uygulamaları
-platform.appwithinminutes.classEditorAdvancedCategoryName=İleri
-platform.appwithinminutes.classEditorBindSheetSaveComment=Bind sınıfı levha
-platform.appwithinminutes.classEditorBooleanFieldName=Boolean
-platform.appwithinminutes.classEditorCanvasHint=Sürüklepaletinden alanlar ve bu alanda onları bırakın .
-platform.appwithinminutes.classEditorConfigureFieldLabel=Yapılandırma
-platform.appwithinminutes.classEditorContentFieldName=İçerik
-platform.appwithinminutes.classEditorDBListFieldName=Veritabanı Liste
-platform.appwithinminutes.classEditorDateFieldName=Tarih
-platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Tamam
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Temizle
-platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Bugün
-platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Şimdi
-platform.appwithinminutes.classEditorDeleteFieldLabel=Sil
-platform.appwithinminutes.classEditorDocumentCategoryName=Belge
-platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Varsayılan değer
-platform.appwithinminutes.classEditorGroupsFieldName=Grup
-platform.appwithinminutes.classEditorMoveFieldHint=değiştirmek için sürükle ve bıraksipariş
-platform.appwithinminutes.classEditorMoveFieldLabel=Taşı
-platform.appwithinminutes.classEditorMultipleSheetsWarning=Bu sınıf , birden fazla sayfa var .
-platform.appwithinminutes.classEditorNumberFieldName=Numara
-platform.appwithinminutes.classEditorPaletteHint=formunuzu oluşturmak içinpaletten Sürükle &amp; Bırak alanlar.
-platform.appwithinminutes.classEditorPaletteTitle=Alan Palet
-platform.appwithinminutes.classEditorPickersCategoryName=toplayıcılar
-platform.appwithinminutes.classEditorPreviewFieldHint=gizle yapılandırma paneli ve uygulamak değişiklikler
-platform.appwithinminutes.classEditorPreviewFieldLabel=Önizleme
-platform.appwithinminutes.classEditorSheetSaveComment=Güncelleme sınıf levha
-platform.appwithinminutes.classEditorStandardCategoryName=Standart
-platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ekle
-platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Sil
-platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
-platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Değer
-platform.appwithinminutes.classEditorStaticListFieldName=Statik Listesi
-platform.appwithinminutes.classEditorStringFieldName=Kısa Metin
-platform.appwithinminutes.classEditorTemplateSaveComment=Güncelleme varsayılan değerler
-platform.appwithinminutes.classEditorTextAreaFieldName=Uzun Metin
-platform.appwithinminutes.classEditorTitleFieldName=Başlık
-platform.appwithinminutes.classEditorTranslationsSaveComment=Güncelleme çeviriler
-platform.appwithinminutes.classEditorUpdateSheetHint=Bu sınıfın nesneleri görüntülemek ve düzenlemek için kullanılanlevha yeniden oluşturun ( {0} ) .
-platform.appwithinminutes.classEditorUpdateSheetLabel=Güncelleme sınıf levha
-platform.appwithinminutes.classEditorUpdateTemplateLabel=Güncelleme sınıf şablonu
-platform.appwithinminutes.classEditorUpdateTranslationsHint=alan güzel isimleri ve listesi değerleriçevirisini güncelleyin ( {0} ) .
-platform.appwithinminutes.classEditorUpdateTranslationsLabel=Güncelleme sınıf çeviri bohça
-platform.appwithinminutes.classEditorUsersFieldName=Kullanıcı
-platform.appwithinminutes.createAppButtonLabel=Oluşturma Uygulama
-platform.appwithinminutes.description=XWiki güçlü yapılandırılmış veri yönetim sistemine dayalı dakika içinde ortak web uygulamaları oluşturun .
+platform.appwithinminutes.appsLiveTable._actions=Eylemleri
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Hibe alan yönetim hakları saklıdır.
-platform.appwithinminutes.liveTableEditorActionsColumnDescription=gibi düzenleme olarakuygulama giriş , gerçekleştirilebilir ve silme yapılabilir eylemlerin listesi
-platform.appwithinminutes.liveTableEditorActionsColumnName=Eylemleri
-platform.appwithinminutes.liveTableEditorAddColumnHint=Ekle
-platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Eklentiler
-platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
-platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Sınıf alanlar
-platform.appwithinminutes.liveTableEditorColumnsHint=Eğercanlı tabloya eklemek istediğinizsütunları seçinUygulama ana sayfasında görüntülenir .
-platform.appwithinminutes.liveTableEditorDeleteColumnHint=Sil
-platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=sonuygulama girişi düzenlenebilirkullanıcı
-platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Son Yazar
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Oluşturma tarihi
-platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creator
-platform.appwithinminutes.liveTableEditorDocDateColumnName=Güncelleme tarihi
-platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sayfa tam adı
-platform.appwithinminutes.liveTableEditorDocNameColumnName=Sayfa adı
-platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Uzay
-platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sayfa başlığı
-platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Genel sütunlar
-platform.appwithinminutes.liveTableEditorHelpDescription=Jenerik canlı tablo sütunları uygulama yapısından bağımsızdır . Bunlar uygulama girişleri tutunsayfaları hakkında bilgi vermek .
-platform.appwithinminutes.liveTableEditorHelpTitle=İpucu
-platform.appwithinminutes.liveTableEditorIcon=İkon
-platform.appwithinminutes.liveTableEditorImagesColumnName=Görüntüler
-platform.appwithinminutes.liveTableEditorMoveColumnHint=değiştirmek için sürükle ve bıraksipariş
-platform.appwithinminutes.liveTableEditorSaveComment=Güncelleme LiveTable
-platform.appwithinminutes.wizardStep1Name=Ad
-platform.appwithinminutes.wizardStep1Title=başvurunuzu Ad
-platform.appwithinminutes.wizardStep2Description=o içerecektir alanların ne tür belirterek uygulamanınyapısını oluşturun .
-platform.appwithinminutes.wizardStep2Name=Yapı
-platform.appwithinminutes.wizardStep2Title=uygulamanızınyapısını tanımlayın
-platform.appwithinminutes.wizardStep3Description=uygulamanınana sayfasını kişiselleştirin .
-platform.appwithinminutes.wizardStep3Name=Sunum
-platform.appwithinminutes.wizardStep3Title=uygulamanızınana sayfa özelleştirme
-platform.appwithinminutes.wizardStepFinishButtonLabel=Bitir
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=Kendi oluşturun\!
+
+### Wizard step
 platform.appwithinminutes.wizardStepHeading=Adım {0}  u2014 {1}
-platform.appwithinminutes.wizardStepHelpDescription=Bu sihirbaz uygulama kurma yolunda size rehberlik edecektir . Bu adımlar uygulaması görüntülenir olacakşekilde yapılandırmak ve ne tür bilgiler içerecektir \:
-platform.appwithinminutes.wizardStepHelpTitle=Adımlar
+appWithinMinutes.wizardStep.name.name=Ad
+appWithinMinutes.wizardStep.name.title=başvurunuzu Ad
+### Missing: appWithinMinutes.wizardStep.name.description=Choose the application name
+appWithinMinutes.wizardStep.structure.name=Yapı
+appWithinMinutes.wizardStep.structure.title=uygulamanızınyapısını tanımlayın
+appWithinMinutes.wizardStep.structure.description=o içerecektir alanların ne tür belirterek uygulamanınyapısını oluşturun .
+### Missing: appWithinMinutes.wizardStep.entries.name=Entries
+### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
+### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.presentation.name=Sunum
+appWithinMinutes.wizardStep.presentation.title=uygulamanızınana sayfa özelleştirme
+appWithinMinutes.wizardStep.presentation.description=uygulamanınana sayfasını kişiselleştirin .
 platform.appwithinminutes.wizardStepNextButtonLabel=Sonraki Adım
 platform.appwithinminutes.wizardStepNextButtonTip=sonraki adıma git
+platform.appwithinminutes.wizardStepFinishButtonLabel=Bitir
+### Missing: platform.appwithinminutes.wizardStepFinishButtonTip=Go to the application home page
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Önceki Adım
 platform.appwithinminutes.wizardStepPreviousButtonTip=Önceki adıma git
+platform.appwithinminutes.wizardStepHelpTitle=Adımlar
+platform.appwithinminutes.wizardStepHelpDescription=Bu sihirbaz uygulama kurma yolunda size rehberlik edecektir . Bu adımlar uygulaması görüntülenir olacakşekilde yapılandırmak ve ne tür bilgiler içerecektir \:
+
+### Wizard Step 1: Application Name
+### Missing: appWithinMinutes.createApp.location.label=Location
+### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
+### Missing: appWithinMinutes.createApp.parent.label=Parent
+### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
+### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+### Missing: appWithinMinutes.codeSpace.title=Code
+### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
+### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+platform.appwithinminutes.appNamePageTitle=Oluşturma Uygulama
+platform.appwithinminutes.appNameLabel=Uygulama Adı
+### Missing: platform.appwithinminutes.appNameHint=The application name determines the homepage URL and the location where the application code is stored.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Uygulama ana sayfa URL
+### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
+platform.appwithinminutes.appNameIsUsedWarning=Bu uygulama zaten var . Eğerbir sonraki adıma gidersenizmevcut uygulamayı düzenlerken edilecektir .
+### Missing: platform.appwithinminutes.appNameEmptyError=Please enter the application name.
+
+### Wizard Step 2: Application Structure
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+platform.appwithinminutes.classEditorPaletteTitle=Alan Palet
+platform.appwithinminutes.classEditorPaletteHint=formunuzu oluşturmak içinpaletten Sürükle &amp; Bırak alanlar.
+platform.appwithinminutes.classEditorCanvasHint=Sürüklepaletinden alanlar ve bu alanda onları bırakın .
+
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Güncelleme sınıf şablonu
+### Missing: platform.appwithinminutes.classEditorUpdateTemplateHint=The template ({0}) stores the default field values.
+platform.appwithinminutes.classEditorUpdateSheetLabel=Güncelleme sınıf levha
+platform.appwithinminutes.classEditorUpdateSheetHint=Bu sınıfın nesneleri görüntülemek ve düzenlemek için kullanılanlevha yeniden oluşturun ( {0} ) .
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Güncelleme sınıf çeviri bohça
+platform.appwithinminutes.classEditorUpdateTranslationsHint=alan güzel isimleri ve listesi değerleriçevirisini güncelleyin ( {0} ) .
+
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Bu sınıf , birden fazla sayfa var .
+### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=The class has two fields with the same name: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=Güncelleme varsayılan değerler
+platform.appwithinminutes.classEditorBindSheetSaveComment=Bind sınıfı levha
+platform.appwithinminutes.classEditorSheetSaveComment=Güncelleme sınıf levha
+platform.appwithinminutes.classEditorTranslationsSaveComment=Güncelleme çeviriler
+
+platform.appwithinminutes.classEditorStandardCategoryName=Standart
+platform.appwithinminutes.classEditorPickersCategoryName=toplayıcılar
+platform.appwithinminutes.classEditorDocumentCategoryName=Belge
+platform.appwithinminutes.classEditorAdvancedCategoryName=İleri
+
+platform.appwithinminutes.classEditorDBListFieldName=Veritabanı Liste
+platform.appwithinminutes.classEditorGroupsFieldName=Grup
+platform.appwithinminutes.classEditorUsersFieldName=Kullanıcı
+platform.appwithinminutes.classEditorDateFieldName=Tarih
+platform.appwithinminutes.classEditorStaticListFieldName=Statik Listesi
+platform.appwithinminutes.classEditorBooleanFieldName=Boolean
+platform.appwithinminutes.classEditorNumberFieldName=Numara
+platform.appwithinminutes.classEditorTextAreaFieldName=Uzun Metin
+platform.appwithinminutes.classEditorStringFieldName=Kısa Metin
+platform.appwithinminutes.classEditorContentFieldName=İçerik
+platform.appwithinminutes.classEditorTitleFieldName=Başlık
+
+platform.appwithinminutes.classEditorDeleteFieldLabel=Sil
+platform.appwithinminutes.classEditorConfigureFieldLabel=Yapılandırma
+platform.appwithinminutes.classEditorPreviewFieldLabel=Önizleme
+platform.appwithinminutes.classEditorPreviewFieldHint=gizle yapılandırma paneli ve uygulamak değişiklikler
+platform.appwithinminutes.classEditorMoveFieldLabel=Taşı
+platform.appwithinminutes.classEditorMoveFieldHint=değiştirmek için sürükle ve bıraksipariş
+
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Varsayılan değer
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Tamam
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Temizle
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Şimdi
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Bugün
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Değer
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ekle
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Sil
+
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+
+### Wizard Step 3: Application Presentation
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Sınıf alanlar
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Genel sütunlar
+platform.appwithinminutes.liveTableEditorHelpTitle=İpucu
+platform.appwithinminutes.liveTableEditorHelpDescription=Jenerik canlı tablo sütunları uygulama yapısından bağımsızdır . Bunlar uygulama girişleri tutunsayfaları hakkında bilgi vermek .
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sayfa başlığı
+### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=The title of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Sayfa adı
+### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of the page that contains application data
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Son Yazar
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=sonuygulama girişi düzenlenebilirkullanıcı
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creator
+### Missing: platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=The user who created the application data
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Güncelleme tarihi
+### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnDescription=The date when the application data was last edited
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Oluşturma tarihi
+### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=The date when the application data was created
+platform.appwithinminutes.liveTableEditorActionsColumnName=Eylemleri
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=gibi düzenleme olarakuygulama giriş , gerçekleştirilebilir ve silme yapılabilir eylemlerin listesi
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Eklentiler
+### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=A special column to display links to the attachments of a data page
+platform.appwithinminutes.liveTableEditorImagesColumnName=Görüntüler
+### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
+### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
+platform.appwithinminutes.liveTableEditorColumnsHint=Eğercanlı tabloya eklemek istediğinizsütunları seçinUygulama ana sayfasında görüntülenir .
+platform.appwithinminutes.liveTableEditorSaveComment=Güncelleme LiveTable
+platform.appwithinminutes.liveTableEditorMoveColumnHint=değiştirmek için sürükle ve bıraksipariş
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Sil
+platform.appwithinminutes.liveTableEditorAddColumnHint=Ekle
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=İkon
+### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+
+### Application home page
+platform.appwithinminutes.appLiveTableHeading=Yazılar
+platform.appwithinminutes.appLiveTableEditEntryActionName=Düzenleme
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Sil
+platform.appwithinminutes.appHomePageActionsHeading=Eylemleri
+platform.appwithinminutes.appHomePageAddEntryLabel=Ekle
+platform.appwithinminutes.appHomePageAddEntryHint=Yeni girdi ekle
+platform.appwithinminutes.appHomePageEntryNameLabel=Girdi adı \:
+### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
+platform.appwithinminutes.appHomePageEditAppLabel=Uygulamayı Düzenle
+platform.appwithinminutes.appHomePageTranslateAppLabel=Uygulamayı Çevir
+platform.appwithinminutes.appHomePageDeleteAppLabel=Uygulamayı Sil
+
+### Delete application dialog
+### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
+### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
+### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
+### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
+### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Uygulama sınıfı
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Uygulama veri alanı
+
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Uzay
+### Missing: platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=The name of the space containing the application entry
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sayfa tam adı
+### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=Ad
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=başvurunuzu Ad
+#@deprecated appWithinMinutes.wizardStep.name.description
+### Missing: platform.appwithinminutes.wizardStep1Description=Choose the application name
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=Yapı
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=uygulamanızınyapısını tanımlayın
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=o içerecektir alanların ne tür belirterek uygulamanınyapısını oluşturun .
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=Sunum
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=uygulamanızınana sayfa özelleştirme
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=uygulamanınana sayfasını kişiselleştirin .
 </content>
 </xwikidoc>

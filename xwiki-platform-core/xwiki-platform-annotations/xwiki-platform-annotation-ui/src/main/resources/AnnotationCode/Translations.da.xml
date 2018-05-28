@@ -39,68 +39,82 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
-AnnotationCode.AnnotationConfig_activated=Annotering er aktiv
-AnnotationCode.AnnotationConfig_annotationClass=XWiki-klasse, der definerer annoteringsstruktur
-AnnotationCode.AnnotationConfig_displayHighlight=Vis annoterings-markeringer som standard
-AnnotationCode.AnnotationConfig_displayed=Vis annoteringer som standard
-AnnotationCode.AnnotationConfig_exceptionSpaces=Undtagen de følgende områder
-admin.annotations=Annotationer
-annotations.action.create.cancel.text=Afbryd
-annotations.action.create.error.notarget=Uspecificeret side (dokument) der oprettes annoteringer for.
-annotations.action.create.error.unauthorized=Du har ikke rettigheder til at tilføje annotationer til dette dokument.
-annotations.action.create.error.unauthorizedguest=Du har ikke rettigheder til at tilføje annotationer til dette dokument. Prøv at logge ind først.
-annotations.action.create.error.wrongsyntax=Annotationer er ikke mulige for dokumenter skrevet i XWiki/1.0 syntaks.
-annotations.action.create.form.loaderror=Fejl\:
-annotations.action.create.helpmessage=For at annotere en tekst, fremhæv det og tryk {0}.
-annotations.action.create.loaderror=Fejlede\:
-annotations.action.create.selection.invalid=Vælg en tekst inde i dokumentet.
-annotations.action.create.submit.text=TIlføj annotation
-annotations.action.create.success=Annotationen er tilføjet
-annotations.action.delete.confirm=Er du sikker på du vil fjerne annotationen?
-annotations.action.delete.done=Annotation fjernet
-annotations.action.delete.failed=Kunne ikke fjerne annotation
-annotations.action.delete.inProgress=Fjerner annotation...
-annotations.action.delete.text=[Fjern]
-annotations.action.delete.tooltip=Fjern denne annotation
-annotations.action.edit.cancel.text=Afbryd
-annotations.action.edit.error.notfound=Denne annotation findes ikke længere. Indlæs siden igen for at få opdateret visning.
-annotations.action.edit.loaderror=Fejlede\:
-annotations.action.edit.submit.text=Opdatér
-annotations.action.edit.success=Annotationen er opdateret.
-annotations.action.edit.text=[Ret]
-annotations.action.edit.tooltip=Ret denne annotation
-annotations.action.validate.loaderror=Fejlede\:
-annotations.action.validate.success=Annotation er blevet kontrolleret.
-annotations.action.validate.text=[Kontrollér]
-annotations.action.validate.tooltip=Kontrollerer den automatiske opdatering af den tekst, der er annoteret.
-annotations.action.view.error.notfound=Denne annotation findes ikke længere. Genindlæs side for opdateret visning.
-annotations.action.view.form.loaderror=Fejlede\:
-annotations.action.view.hide.text=gem
-annotations.action.view.thread=Se tråd
-annotations.altered.text=Denne annotation kan ikke vises, fordi den annoterede tekst ikke findes i dokumentet\:
-annotations.annotated.error.noannotatedelement=Annotationer kunne ikke indlæses fordi indholdet ikke er tilgængeligt.
-annotations.annotated.error.wrongsyntax=Annotationer kan ikke anvendes i dokumenter i XWiki/1.0 syntaks.
+  <content>annotations.title=Annotationer
+annotations.menu.loading=Indlæser annotations-indstillinger
+annotations.menu.loaderror=Fejlede\:
+annotations.tab.info.noannotations=Ingen annotationer til dette dokument
+
+annotations.settings.display=Vis annotationer
+annotations.settings.error.wrongsyntax=Annotationer er ikke mulige i dokumenter i XWiki/1.0 syntaks.
+annotations.settings.error.notarget=Ingen dokumenter er angivet for annotations-visning.
+
+annotations.annotated.loading=Indlæsere dokument med annotationer
 annotations.annotated.loaderror=Fejlede\:
 annotations.annotated.loaderror.wrongresponse=Forkert formet på svar fra server
-annotations.annotated.loading=Indlæsere dokument med annotationer
-annotations.config.activate.explanation=De følgende to indstillinger kan du bruge til at angive i hvilke områder annotationer er aktive. Den første indstilling angiver den generelle regel, mens den anden angiver de områder, hvor reglen ikke skal anvendes. F.eks. aktiveret "ja" og undtagelserne "XWiki" og "Main" betyder at annotationer er aktive for alle områder, undtagen "XWiki" og "Main" - mens aktiv "nej" og undtagelsen "Documents" betyder at annotationer kun er aktive for "Documents"-området.
-annotations.config.activate.title=Annotations aktiv-indstillinger
-annotations.config.display.title=Annotations visnings-indstillinger
-annotations.config.title=Konfigurationspanel for Annotationer
-annotations.config.type.explanation=Tilføj egenskaber til denne klasse, hvis du ønsker ekstra egenskaber til dine annotationer.
-annotations.config.type.title=Annotationstype-indstillinger
+annotations.annotated.error.noannotatedelement=Annotationer kunne ikke indlæses fordi indholdet ikke er tilgængeligt.
+annotations.annotated.error.wrongsyntax=Annotationer kan ikke anvendes i dokumenter i XWiki/1.0 syntaks.
+
+annotations.action.edit.text=[Ret]
+annotations.action.edit.tooltip=Ret denne annotation
+annotations.action.edit.submit.text=Opdatér
+annotations.action.edit.cancel.text=Afbryd
+annotations.action.edit.success=Annotationen er opdateret.
+annotations.action.edit.loaderror=Fejlede\:
+annotations.action.edit.error.notfound=Denne annotation findes ikke længere. Indlæs siden igen for at få opdateret visning.
+
+annotations.action.delete.text=[Fjern]
+annotations.action.delete.tooltip=Fjern denne annotation
+annotations.action.delete.confirm=Er du sikker på du vil fjerne annotationen?
+annotations.action.delete.inProgress=Fjerner annotation...
+annotations.action.delete.done=Annotation fjernet
+annotations.action.delete.failed=Kunne ikke fjerne annotation
+
+annotations.action.create.submit.text=TIlføj annotation
+annotations.action.create.cancel.text=Afbryd
+annotations.action.create.selection.invalid=Vælg en tekst inde i dokumentet.
+annotations.action.create.form.loaderror=Fejl\:
+annotations.action.create.success=Annotationen er tilføjet
+annotations.action.create.loaderror=Fejlede\:
+annotations.action.create.error.unauthorized=Du har ikke rettigheder til at tilføje annotationer til dette dokument.
+annotations.action.create.error.unauthorizedguest=Du har ikke rettigheder til at tilføje annotationer til dette dokument. Prøv at logge ind først.
+annotations.action.create.helpmessage=For at annotere en tekst, fremhæv det og tryk {0}.
+annotations.action.create.error.wrongsyntax=Annotationer er ikke mulige for dokumenter skrevet i XWiki/1.0 syntaks.
+annotations.action.create.error.notarget=Uspecificeret side (dokument) der oprettes annoteringer for.
+
+annotations.action.view.hide.text=gem
+annotations.action.view.form.loaderror=Fejlede\:
+annotations.action.view.error.notfound=Denne annotation findes ikke længere. Genindlæs side for opdateret visning.
+annotations.action.view.thread=Se tråd
+
+annotations.altered.text=Denne annotation kan ikke vises, fordi den annoterede tekst ikke findes i dokumentet\:
+annotations.updated.text=Denne annotation var flyttet automatisk efter at dokumentet blev opdateret. Oprindelig\:
+annotations.action.validate.text=[Kontrollér]
+annotations.action.validate.tooltip=Kontrollerer den automatiske opdatering af den tekst, der er annoteret.
+annotations.action.validate.success=Annotation er blevet kontrolleret.
+annotations.action.validate.loaderror=Fejlede\:
+
+annotations.filters.show=Stram visnings-kriterier
+annotations.filters.nooption=Der er ingen værdier for filter "{0}"
 annotations.filters.anyvalue=alle værdier
 annotations.filters.clearvalue=slet
-annotations.filters.nooption=Der er ingen værdier for filter "{0}"
-annotations.filters.show=Stram visnings-kriterier
-annotations.menu.loaderror=Fejlede\:
-annotations.menu.loading=Indlæser annotations-indstillinger
-annotations.settings.display=Vis annotationer
-annotations.settings.error.notarget=Ingen dokumenter er angivet for annotations-visning.
-annotations.settings.error.wrongsyntax=Annotationer er ikke mulige i dokumenter i XWiki/1.0 syntaks.
-annotations.tab.info.noannotations=Ingen annotationer til dette dokument
-annotations.title=Annotationer
-annotations.updated.text=Denne annotation var flyttet automatisk efter at dokumentet blev opdateret. Oprindelig\: 
+
+annotations.config.title=Konfigurationspanel for Annotationer
+annotations.config.display.title=Annotations visnings-indstillinger
+annotations.config.type.title=Annotationstype-indstillinger
+annotations.config.activate.title=Annotations aktiv-indstillinger
+annotations.config.activate.explanation=De følgende to indstillinger kan du bruge til at angive i hvilke områder annotationer er aktive. Den første indstilling angiver den generelle regel, mens den anden angiver de områder, hvor reglen ikke skal anvendes. F.eks. aktiveret "ja" og undtagelserne "XWiki" og "Main" betyder at annotationer er aktive for alle områder, undtagen "XWiki" og "Main" - mens aktiv "nej" og undtagelsen "Documents" betyder at annotationer kun er aktive for "Documents"-området.
+annotations.config.type.explanation=Tilføj egenskaber til denne klasse, hvis du ønsker ekstra egenskaber til dine annotationer.
+admin.annotations=Annotationer
+### Missing: admin.annotations.description=Configure the page annotations
+
+AnnotationCode.AnnotationConfig_activated=Annotering er aktiv
+### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
+AnnotationCode.AnnotationConfig_exceptionSpaces=Undtagen de følgende områder
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
+AnnotationCode.AnnotationConfig_displayed=Vis annoteringer som standard
+### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
+AnnotationCode.AnnotationConfig_displayHighlight=Vis annoterings-markeringer som standard
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+AnnotationCode.AnnotationConfig_annotationClass=XWiki-klasse, der definerer annoteringsstruktur 
 </content>
 </xwikidoc>

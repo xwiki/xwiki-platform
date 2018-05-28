@@ -39,11 +39,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content>help.syntaxpage.title=Guide de syntaxe XWiki
+help.syntaxtitle=Syntaxe XWiki {0}
+help.syntaxall=Tout
 help.changesyntax=Modifier la syntaxe
 help.choose_syntax=Sélectionner la syntaxe
-help.syntaxall=Tout
-help.syntaxpage.title=Guide de syntaxe XWiki
-help.syntaxtitle=Syntaxe XWiki {0}
 </content>
 </xwikidoc>

@@ -39,132 +39,153 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-solr.admin.error.norights=Les droits d'administration sont nécessaires pour accéder à cette section.
-solr.admin.error.notallowed=Vous n'êtes pas autorisé à effectuer cette action.
-solr.admin.indexing.action.hint=L'action à effectuer sur l'index.
-solr.admin.indexing.action.label=Action
-solr.admin.indexing.action.select_delete=Supprimer de l'index
-solr.admin.indexing.action.select_index=Ajouter à l'index
-solr.admin.indexing.action.select_reindex=Réindexer
-solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
-solr.admin.indexing.query.label=Recherche avancée
-solr.admin.indexing.title=Gestion de l'index
-solr.admin.indexing.wiki.hint=Le wiki pour lequel tous les documents seront affectés par l'indexation.
-solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.select_farm=Ferme entière
-solr.admin.status.queueSize.hint=Nombre d'éléments restants à indexer, ré-indexer ou à supprimer de l'index (selon l'action demandée).
-solr.admin.status.queueSize.label=Taille de la file d'attente
-solr.admin.status.title=Statut
+  <content>solr.admin.title=Administration de la recherche Solr
 solr.admin.submit=Appliquer
-solr.admin.title=Administration de la recherche Solr
-solr.facet.date.after=Après le {0} 
-solr.facet.date.any=Toutes les dates
-solr.facet.date.applyCustomInterval=Appliquer
-solr.facet.date.before=Avant le {0} 
-solr.facet.date.between=Entre le {0} et le {1} 
-solr.facet.date.customInterval=Intervalle de date et d'heure personnalisé
-solr.facet.date.end=Date et heure de fin
-solr.facet.date.last30Days=Ces 30 derniers jours
-solr.facet.date.last7Days=Ces 7 derniers jours
-solr.facet.date.olderThan30Days=Plus anciens que 30 jours
-solr.facet.date.start=Date et heure de début
-solr.facet.date.today=Aujourd'hui
-solr.facet.fileType.archive.java-archive=JAR
-solr.facet.fileType.archive.xara=XAR
-solr.facet.fileType.image.icon=Icône
-solr.facet.fileType.other.octet-stream=Binaire
-solr.facet.fileType.text.java-source=Code source Java
-solr.facet.fileType.text.javascript=JavaScript
-solr.facet.fileType.text.plain=Plein texte
-solr.facet.fileType.text.sh=Script  Shell
-solr.facet.size.any=Toutes les tailles
-solr.facet.size.between=Entre {0} et {1} 
-solr.facet.size.large=Gros
-solr.facet.size.lessThan=Moins de {0} 
-solr.facet.size.medium=Moyen
-solr.facet.size.moreThan=Plus de {0} 
-solr.facet.size.small=Petit
-solr.facet.size.tiny=Minuscule
+solr.admin.error.notallowed=Vous n'êtes pas autorisé à effectuer cette action.
+solr.admin.error.norights=Les droits d'administration sont nécessaires pour accéder à cette section.
+
+solr.admin.status.title=Statut
+solr.admin.status.queueSize.label=Taille de la file d'attente
+solr.admin.status.queueSize.hint=Nombre d'éléments restants à indexer, ré-indexer ou à supprimer de l'index (selon l'action demandée).
+
+solr.admin.indexing.title=Gestion de l'index
+solr.admin.indexing.action.label=Action
+solr.admin.indexing.action.hint=L'action à effectuer sur l'index.
+solr.admin.indexing.action.select_index=Ajouter à l'index
+solr.admin.indexing.action.select_delete=Supprimer de l'index
+solr.admin.indexing.action.select_reindex=Réindexer
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=Le wiki pour lequel tous les documents seront affectés par l'indexation.
+solr.admin.indexing.wiki.select_farm=Ferme entière
+solr.admin.indexing.query.label=Recherche avancée
+solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
+
+solr.sortBy=Trier par\:
+solr.sortBy.score=Pertinence
+solr.sortBy.title_sort=Titre
+solr.sortBy.date=Date
+solr.sortBy.author_display_sort=Dernier Auteur
+solr.sortBy.filename_sort=Nom de fichier
+solr.sortBy.attsize_sort=Taille du fichier
+solr.sortBy.attdate_sort=Date d'enregistrement
+solr.sortBy.attauthor_display_sort=Enregistré par
+solr.sortOrder.asc=Ascendant
+solr.sortOrder.desc=Descendant
+
+solr.options=Afficher \:
+solr.options.highlight=Surligner
+solr.options.highlight.title=Afficher un extrait dans chaque résultat
+solr.options.facet=Facettes
+solr.options.facet.title=Autoriser le fitrage dans les résultats
+
+solr.result.language=Langage
+solr.result.locatedIn=Situé dans
+solr.result.author=Mofidié par {0} le {1}
+solr.result.mediaType=Ficher de type {0}
+solr.result.uploadedBy=Enregistré par {0} le {1} ({2}) 
+solr.result.highlightAll=Afficher et surligner toutes les occurrences
+
+solr.facets.title=Affinez votre recherche
+solr.facets.hint=Selectionnez une catégorie et activez les filtres sur les résultats
+solr.facets.resetAll=Tout réinitialiser
+solr.facets.expandAll=Tout étendre
 solr.facets.collapseAll=Tout réduire
 solr.facets.emptyValue=Valeur vide
-solr.facets.expandAll=Tout étendre
-solr.facets.hint=Selectionnez une catégorie et activez les filtres sur les résultats
 solr.facets.moreValues={0} restants
-solr.facets.resetAll=Tout réinitialiser
-solr.facets.title=Affinez votre recherche
-solr.field.attauthor=Enregistré par
-solr.field.attauthor_display=Ajouté par
-solr.field.attcontent=Contenu du fichier joint
-solr.field.attdate=Date d'enregistrement
-solr.field.attsize=Taille de fichier
-solr.field.author=Dernier auteur
-solr.field.author_display=Auteur
-solr.field.class=Type d'objet
-solr.field.class.definedBy=Défini par {0} » {1} 
-solr.field.comment=Commentaires
-solr.field.creationdate=Date de création
-solr.field.creator=Créateur
-solr.field.creator_display=Créateur
-solr.field.date=Date de dernière modification
-solr.field.doccontent=Contenu du document
-solr.field.doccontentraw=Contenu brut du document
-solr.field.filename=Nom du fichier joint
+
+solr.filterBy.type.document=Document
+solr.filterBy.type.attachment=Fichier joint
+solr.filterBy.type.object=Objet
+solr.filterBy.type.object_property=Propriété de l'objet
+
+solr.filterBy.fileType.image=Image
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.video=Vidéo
+solr.filterBy.fileType.text=Texte
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Document Word
+solr.filterBy.fileType.presentation=Présentation
+solr.filterBy.fileType.spreadsheet=Feuille de calcul
+solr.filterBy.fileType.archive=Archive
+solr.filterBy.fileType.font=Police de caractères
+solr.filterBy.fileType.other=Autre
+solr.facet.fileType.text.plain=Plein texte
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Code source Java
+solr.facet.fileType.text.sh=Script  Shell
+solr.facet.fileType.image.icon=Icône
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Binaire
+
+solr.facet.date.today=Aujourd'hui
+solr.facet.date.last7Days=Ces 7 derniers jours
+solr.facet.date.last30Days=Ces 30 derniers jours
+solr.facet.date.olderThan30Days=Plus anciens que 30 jours
+solr.facet.date.customInterval=Intervalle de date et d'heure personnalisé
+solr.facet.date.start=Date et heure de début
+solr.facet.date.end=Date et heure de fin
+solr.facet.date.applyCustomInterval=Appliquer
+solr.facet.date.between=Entre le {0} et le {1} 
+solr.facet.date.after=Après le {0} 
+solr.facet.date.before=Avant le {0} 
+solr.facet.date.any=Toutes les dates
+
+solr.facet.size.tiny=Minuscule
+solr.facet.size.small=Petit
+solr.facet.size.medium=Moyen
+solr.facet.size.large=Gros
+solr.facet.size.between=Entre {0} et {1} 
+solr.facet.size.lessThan=Moins de {0} 
+solr.facet.size.moreThan=Plus de {0} 
+solr.facet.size.any=Toutes les tailles
+
+solr.field.type=Type de résultat
 solr.field.locale=Langage
 solr.field.locale.emptyValue=Sans langue
 solr.field.locale.emptyValue.hint=Certains documents n'ont aucune langue définie parce qu'ils contiennent des scripts (qui ne sont pas rédigés dans une langue naturelle) ou parce qu'ils sont évalués en fonction de la langue de l'utilisateur (comme cette page).
-solr.field.mimetype=Type de fichier
-solr.field.name=Page
-solr.field.name_exact=Page
-solr.field.objcontent=Objet
-solr.field.propertyname=Nom de la propriété
-solr.field.propertyvalue=Valeur de la propriété
-solr.field.space=Espace
+solr.field.wiki=Wiki
+solr.field.spaces=Emplacement
 solr.field.space_exact=Espace
 solr.field.space_facet=Emplacement
-solr.field.spaces=Emplacement
+solr.field.name=Page
+solr.field.name_exact=Page
 solr.field.title=Titre
-solr.field.type=Type de résultat
-solr.field.wiki=Wiki
-solr.filterBy.fileType.archive=Archive
-solr.filterBy.fileType.audio=Audio
-solr.filterBy.fileType.font=Police de caractères
-solr.filterBy.fileType.image=Image
-solr.filterBy.fileType.office=Office
-solr.filterBy.fileType.other=Autre
-solr.filterBy.fileType.presentation=Présentation
-solr.filterBy.fileType.spreadsheet=Feuille de calcul
-solr.filterBy.fileType.text=Texte
-solr.filterBy.fileType.video=Vidéo
-solr.filterBy.fileType.word=Document Word
-solr.filterBy.type.attachment=Fichier joint
-solr.filterBy.type.document=Document
-solr.filterBy.type.object=Objet
-solr.filterBy.type.object_property=Propriété de l'objet
-solr.options=Afficher \:
-solr.options.facet=Facettes
-solr.options.facet.title=Autoriser le fitrage dans les résultats
-solr.options.highlight=Surligner
-solr.options.highlight.title=Afficher un extrait dans chaque résultat
-solr.result.author=Mofidié par {0} le {1}
-solr.result.highlightAll=Afficher et surligner toutes les occurrences
-solr.result.language=Langage
-solr.result.locatedIn=Situé dans
-solr.result.location=Situé dans {0} » {1} » {2}
-solr.result.mediaType=Ficher de type {0}
-solr.result.uploadedBy=Enregistré par {0} le {1} ({2}) 
-solr.sortBy=Trier par\:
-solr.sortBy.attauthor_display_sort=Enregistré par
-solr.sortBy.attdate_sort=Date d'enregistrement
-solr.sortBy.attsize_sort=Taille du fichier
-solr.sortBy.author_display_sort=Dernier Auteur
-solr.sortBy.date=Date
-solr.sortBy.filename_sort=Nom de fichier
-solr.sortBy.score=Pertinence
-solr.sortBy.title_sort=Titre
-solr.sortOrder.asc=Ascendant
-solr.sortOrder.desc=Descendant
-solr.uix.attachmentdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pièces jointes ?
+solr.field.author=Dernier auteur
+solr.field.author_display=Auteur
+solr.field.creator=Créateur
+solr.field.creator_display=Créateur
+solr.field.date=Date de dernière modification
+solr.field.creationdate=Date de création
+solr.field.doccontent=Contenu du document
+solr.field.doccontentraw=Contenu brut du document
+solr.field.class=Type d'objet
+solr.field.class.definedBy=Défini par {0} » {1} 
+solr.field.propertyname=Nom de la propriété
+solr.field.propertyvalue=Valeur de la propriété
+solr.field.filename=Nom du fichier joint
+solr.field.attcontent=Contenu du fichier joint
+solr.field.comment=Commentaires
+solr.field.objcontent=Objet
+solr.field.mimetype=Type de fichier
+solr.field.attauthor=Enregistré par
+solr.field.attauthor_display=Ajouté par
+solr.field.attdate=Date d'enregistrement
+solr.field.attsize=Taille de fichier
+
 solr.uix.docdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pages ?
+solr.uix.attachmentdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pièces jointes ?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location=Situé dans {0} » {1} » {2}
+
+## until 7.2RC1
+solr.field.space=Espace
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

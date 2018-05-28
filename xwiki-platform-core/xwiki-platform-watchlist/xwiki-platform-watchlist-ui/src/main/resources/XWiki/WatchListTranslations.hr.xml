@@ -39,24 +39,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Svaki dan
-XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Svaki sat
-XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Svaki tjedan
-XWiki.WatchListClass_interval_realtime=U stvarnom vremenu
-rendering.macro.watchlist.description=Prikaži sadržaj trenutne liste za promatranje.
+  <content>### Macro "watchlist"
 rendering.macro.watchlist.name=Lista za promatranje
-watchlist.notifications.changeStatusError=Promjena statusa liste za promatranje nije uspjela.
+rendering.macro.watchlist.description=Prikaži sadržaj trenutne liste za promatranje.
+
+### XWiki.WatchListClass
+XWiki.WatchListClass_interval_realtime=U stvarnom vremenu
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Svaki sat
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Svaki dan
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Svaki tjedan
+
+### Notification Icons    
 watchlist.notifications.icons.on=DA
+### Missing: watchlist.notifications.icons.off=OFF
 watchlist.notifications.icons.tooltip.page=Promatraj ovu stranicu
 watchlist.notifications.icons.tooltip.pageAndChildren=Promatraj ovu stranicu i djecu
 watchlist.notifications.icons.tooltip.space=Promatraj roditelja i njegovu djecu
 watchlist.notifications.icons.tooltip.wiki=Promatraj ovaj wiki
+watchlist.notifications.changeStatusError=Promjena statusa liste za promatranje nije uspjela.
 watchlist.settings=Postavke
-watchlist.table.location=Lokacija
-watchlist.table.scope=Doseg
+
+### Watchlist livetable (in the macro)
+watchlist.table.scope.wiki=Sve stranice wikija
 watchlist.table.scope.pageandchildren=Stranica + djeca
 watchlist.table.scope.pageonly=Samo stranica
-watchlist.table.scope.wiki=Sve stranice wikija
+watchlist.table.location=Lokacija
+watchlist.table.scope=Doseg
 </content>
 </xwikidoc>

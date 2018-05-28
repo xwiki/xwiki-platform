@@ -39,58 +39,194 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Dnevno
-XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Svaki sat
-XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Uživo
-XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Tjedno
-XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Isključivo
-XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Uključivo
-notifications.email.seeChanges=Izmjene\: {0}
-notifications.email.subject={0} događaj(a) u wikiju
-notifications.email.title=Događaj(i) u wikiju
+  <content>platform.core.profile.category.notifications=Obavijesti
+notifications.filters.cancel=Otkaži
+notifications.filters.submit=Spremi
+notifications.filters.type.label=Tip filtra\:
+notifications.filters.type.hint=Kako bi se filtar trebao ponašati prema događaju na zadanoj lokaciji
+notifications.filters.location.label=Doseg filtra\:
+notifications.filters.location.hint=Na koji dio wikija bi filtar trebao imati utjecaja?
+
+## Advanced filters options
+notifications.settings.filters.advanced=Napredne opcije filtriranja
+notifications.filters.advanced.toggles.hint=Ovi filtri se pretpostavljeno aktiviraju, možete ih isključiti pomoću gumba uz pojedini filtar.
+notifications.filters.advanced.toggles.table.name=Ime filtra
+notifications.filters.advanced.toggles.table.description=Opis
+notifications.filters.advanced.toggles.table.toggle=Uključi/isključi
+notifications.filters.advanced.modal.close=Zatvori
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=Sistemski filter
+notifications.filters.description.systemUserNotificationFilter=Sakrij obavijesti sistemskog korisnika
+### Missing: notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
+### Missing: notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity
+### Missing: notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
+### Missing: notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
+### Missing: notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
+### Missing: notifications.filters.description.eventReadEmailFilter=Hide notifications that you have marked as read
+### Missing: notifications.filters.name.minorEventAlertNotificationFilter=Minor Event (Alert)
+### Missing: notifications.filters.description.minorEventAlertNotificationFilter=Hide notifications concerning minor changes on pages
+### Missing: notifications.filters.name.minorEventEmailNotificationFilter=Minor Event (Email)
+### Missing: notifications.filters.description.minorEventEmailNotificationFilter=Hide notifications concerning minor changes on pages
+
+## Filter Types
+### Missing: notifications.filters.type.inclusive=Inclusive
+### Missing: notifications.filters.type.exclusive=Exclusive
+
+## Translation keys for the scopeNotificationFilter
+### Missing: notifications.filters.preferences.scopeNotificationFilter.name=Scope Notification Filter
+### Missing: notifications.filters.preferences.scopeNotificationFilter.page=Page only
+### Missing: notifications.filters.preferences.scopeNotificationFilter.space=Page and children
+### Missing: notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+
+### Missing: notifications.filters.preferences.allEvents=-
+
+### Missing: notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
+### Missing: notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
+### Missing: notifications.filters.preferences.addPreference.notificationFormat.label=Notification format
+### Missing: notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
+### Missing: notifications.filters.preferences.addPreference.eventType.label=Event Type
+### Missing: notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?
+### Missing: notifications.filters.preferences.addPreference.location.label=Filter Scope
+### Missing: notifications.filters.preferences.addPreference.location.hint=Which page should be targeted by the filter?
+### Missing: notifications.filters.preferences.delete.inProgress=Deleting...
+### Missing: notifications.filters.preferences.delete.done=Filter preference deleted!
+### Missing: notifications.filters.preferences.delete.error=Failed to delete the filter preference
+### Missing: notifications.filters.preferences.setEnabled.inProgress=Saving...
+### Missing: notifications.filters.preferences.setEnabled.done=Filter preference saved!
+### Missing: notifications.filters.preferences.setEnabled.error=Failed to save the filter preference
+
+## Notifications toggles
+### Missing: notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
+
+## Notifications formats
+### Missing: notifications.format.alert=Alert
+### Missing: notifications.format.email=Email
+
+## Filter preferences settings
+### Missing: notifications.settings.filters.preferences.title=Filters
+### Missing: notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
+### Missing: notifications.settings.filters.preferences.forGuest=Log in or register to handle your notification filters.
+
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.table.name=Name
+### Missing: notifications.settings.filters.preferences.table.filterType=Filter Type
+### Missing: notifications.settings.filters.preferences.table.eventTypes=Events
+### Missing: notifications.settings.filters.preferences.table.notificationFormats=Formats
+### Missing: notifications.settings.filters.preferences.table.isEnabled=Is enabled?
+### Missing: notifications.settings.filters.preferences.table._actions=Actions
+
+notifications.menu.header=Obavijesti
+notifications.menu.header.settings=Postavke
+notifications.menu.clear=Očisti sve
+notifications.menu.clearing=Čišćenje obavijesti
+notifications.menu.cleared=Obavijesti su očišćene
+notifications.menu.nothing=Nema dostupnih obavijesti\!
+notifications.menu.more=Učitaj starije obavijesti
+notifications.menu.details=Detalji ({0})
+notifications.settings.title=Postavke obavijesti
+### Missing: notifications.settings.error.notAdmin=You need to be administrator to see this.
+notifications.settings.menu=Izbornik obavijesti
+### Missing: notifications.settings.menu.hint=The notification menu is located on the top right of the page, and you can see it by clicking on the bell ({0})
+notifications.settings.email=E-pošta
+### Missing: notifications.settings.email.forGuest=Log in or register to handle your notification settings.
+### Missing: notifications.settings.email.disabled=The notifications emails are disabled. Please contact your administrator.
+### Missing: notifications.settings.email.hint=An email is sent to you regularly with a summary of what happened on the wiki
+### Missing: notifications.settings.email.title=Email Preferences
+### Missing: notifications.settings.email.frequency=Email Frequency
+### Missing: notifications.settings.email.frequency.hint=Choose how often you want to receive an email with the summary of what happened on the wiki.
+### Missing: notifications.settings.email.diffType.hint=Select the level of detail you want to receive about all the changes in the email.
+notifications.settings.saving=Vaše postavke se pohranjuju...
+notifications.settings.saved=Spremljeno\!
+notifications.settings.savingfailed=Spremanje vaših postavki nije uspjelo
+notifications.settings.filters=Filtri ({0})
+notifications.settings.addFilter=Dodaj filtar
+notifications.settings.errorFilterWiki=Greška\: morate odabrati wiki, ne stranicu
+### Missing: notifications.settings.preferences=Preferences
+### Missing: notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.
+### Missing: notifications.settings.applications.title=Applications
+### Missing: notifications.settings.applications.hint=This is the list of applications that can send notifications. You can enable or disable any of them.
+### Missing: notifications.settings.applications.forGuest=Log in or register to handle your notification settings.
+### Missing: notifications.settings.applications.appName=Name
+### Missing: notifications.settings.events=Events
+### Missing: notifications.settings.watch.title=Watched Pages
+### Missing: notifications.settings.watch.autowatchmode=Automatic page watching
+### Missing: notifications.settings.watch.autowatchmode.hint=Decide if you wish to watch a page after you have worked on it
 notifications.events.by=Korisnika {0}.
 notifications.events.lastChange=Posljednja izmjena\: {0}.
 notifications.events.lastComment=Posljednji komentar\: {0}.
-notifications.filters.advanced.modal.close=Zatvori
-notifications.filters.advanced.toggles.hint=Ovi filtri se pretpostavljeno aktiviraju, možete ih isključiti pomoću gumba uz pojedini filtar.
-notifications.filters.advanced.toggles.table.description=Opis
-notifications.filters.advanced.toggles.table.name=Ime filtra
-notifications.filters.advanced.toggles.table.toggle=Uključi/isključi
-notifications.filters.cancel=Otkaži
-notifications.filters.description.systemUserNotificationFilter=Sakrij obavijesti sistemskog korisnika
-notifications.filters.location.hint=Na koji dio wikija bi filtar trebao imati utjecaja?
-notifications.filters.location.label=Doseg filtra\:
-notifications.filters.name.systemUserNotificationFilter=Sistemski filter
-notifications.filters.submit=Spremi
-notifications.filters.type.hint=Kako bi se filtar trebao ponašati prema događaju na zadanoj lokaciji
-notifications.filters.type.label=Tip filtra\:
-notifications.menu.clear=Očisti sve
-notifications.menu.cleared=Obavijesti su očišćene
-notifications.menu.clearing=Čišćenje obavijesti
-notifications.menu.details=Detalji ({0})
-notifications.menu.header=Obavijesti
-notifications.menu.header.settings=Postavke
-notifications.menu.more=Učitaj starije obavijesti
-notifications.menu.nothing=Nema dostupnih obavijesti\!
-notifications.preferences.scope.table._actions=Akcije
-notifications.preferences.scope.table.location=Lokacija
 notifications.preferences.scope.table.scope=Doseg
+notifications.preferences.scope.table.location=Lokacija
 notifications.preferences.scope.table.scopeFilterType=Tip filtra
-notifications.rss.feedDescription=Ovaj RSS tijek možete prilagoditi na vašoj profilnoj stranici.
+notifications.preferences.scope.table._actions=Akcije
+notifications.email.title=Događaj(i) u wikiju
+notifications.email.subject={0} događaj(a) u wikiju
+notifications.email.seeChanges=Izmjene\: {0}
+### Missing: notifications.email.linkDetails=See details
 notifications.rss.feedLink=RSS tijek
+### Missing: notifications.rss.feedLinkDescription=Event feed for notifications
 notifications.rss.feedTitle=Obavijesti RSS tijeka
+notifications.rss.feedDescription=Ovaj RSS tijek možete prilagoditi na vašoj profilnoj stranici.
 notifications.rss.seeChanges=Izmjene\: ({0})
-notifications.settings.addFilter=Dodaj filtar
-notifications.settings.email=E-pošta
-notifications.settings.errorFilterWiki=Greška\: morate odabrati wiki, ne stranicu
-notifications.settings.filters=Filtri ({0})
-notifications.settings.filters.advanced=Napredne opcije filtriranja
-notifications.settings.menu=Izbornik obavijesti
-notifications.settings.saved=Spremljeno\!
-notifications.settings.saving=Vaše postavke se pohranjuju...
-notifications.settings.savingfailed=Spremanje vaših postavki nije uspjelo
-notifications.settings.title=Postavke obavijesti
-platform.core.profile.category.notifications=Obavijesti
+### Missing: notifications.globalsettings.email=Notifications Email
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Dnevno
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Svaki sat
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Tjedno
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Uživo
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Details of the changes
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Nothing
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standard
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Uključivo
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Isključivo
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Never
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Every time I make a modification
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Every time I make a major modification
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Only when I create a new page
+
+## User profile
+### Missing: notifications.userprofile.following=Following
+### Missing: notifications.userprofile.notfollowing=Not following
+### Missing: notifications.userprofile.follow=Start following
+### Missing: notifications.userprofile.unfollow=Stop following
+### Missing: notifications.userprofile.done=Done
+### Missing: notifications.userprofile.saving=Saving...
+### Missing: notifications.userprofile.error=Error saving the notification setting
+
+## Macros description
+### Missing: rendering.macro.notificationsApplicationsPreferences.name=Notifications Applications Preferences
+### Missing: rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+
+### Missing: rendering.macro.notifications.name=Notifications
+### Missing: rendering.macro.notifications.description=Display notifications about events happened on the wiki.
+### Missing: rendering.macro.notifications.parameter.count.name=Count
+### Missing: rendering.macro.notifications.parameter.count.description=Maximum number of events to display by default
+### Missing: rendering.macro.notifications.parameter.useUserPreferences.name=Use the preferences of the user
+### Missing: rendering.macro.notifications.parameter.useUserPreferences.description=If true, the preferences of the user about notifications are used
+### Missing: rendering.macro.notifications.parameter.displayOwnEvents.name=Display own events
+### Missing: rendering.macro.notifications.parameter.displayOwnEvents.description=If true, the events of the current user are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.displayMinorEvents.name=Display minor events
+### Missing: rendering.macro.notifications.parameter.displayMinorEvents.description=If true, the events concerning minor revisions of pages are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.displaySystemEvents.name=Display system events
+### Missing: rendering.macro.notifications.parameter.displaySystemEvents.description=If true, the events triggered by the XWiki software are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.displayReadEvents.name=Display read events
+### Missing: rendering.macro.notifications.parameter.displayReadEvents.description=If true, the events that the user have already marked as read are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.wikis.name=Wikis
+### Missing: rendering.macro.notifications.parameter.wikis.description=List of wikis (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.spaces.name=Spaces
+### Missing: rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.pages.name=Pages
+### Missing: rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.displayReadStatus.name=Display "read" status
+### Missing: rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
+### Missing: rendering.macro.notifications.parameter.users.name=Users
+### Missing: rendering.macro.notifications.parameter.users.description=List of users (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display followed users only
+### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Either or not to display only the events done by the given list of users (if empty, the list of followed users of the current user is used)
+
+## Notifications Macro
+### Missing: notifications.macro.noWatchedUsers=You are not following anybody.
+### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
 </content>
 </xwikidoc>

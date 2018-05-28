@@ -39,37 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-Mail.GeneralMailConfigClass_obfuscate=Zatamni adrese e-pošte
-Mail.GeneralMailConfigClass_obfuscate.hint=Ovo zahvaća samo adrese e-pošte pohranjene u objektnim svojstvima tipa Email, sve dok zadani prikazivač svojstava tipa E-pošta ne bude prebrisan. Primjer\: a...@domena.org
-Mail.SendMailConfigClass_bcc=BCC adrese e-pošte
-Mail.SendMailConfigClass_bcc.hint=Zadana lista BCC adresa e-pošte, odvojenih zarezom, za upotrijebiti prilikom slanja e-pošte
-Mail.SendMailConfigClass_discardSuccessStatuses=Zanemariti statuse o uspjehu?
-Mail.SendMailConfigClass_discardSuccessStatuses.hint=Čuvaju li se ili ne statusi uspješno poslane e-pošte (zadano je istinito)
-Mail.SendMailConfigClass_from=Adresa e-pošte s koje se šalje
-Mail.SendMailConfigClass_from.hint=Zadana adresa e-pošte koja se koristi za slanje obavijesne e-pošte
-Mail.SendMailConfigClass_host=Poslužitelj e-pošte
-Mail.SendMailConfigClass_host.hint=SMTP poslužitelj prema kojem slati. Zadano je "localhost".
-Mail.SendMailConfigClass_password=Lozinka na poslužitelju e-pošte
-Mail.SendMailConfigClass_password.hint=Lozinka za povezivanje na SMTP poslužitelj, samo ukoliko je potrebna autentikacija
-Mail.SendMailConfigClass_port=Priključak poslužitelja e-pošte
-Mail.SendMailConfigClass_port.hint=Priključak SMTP poslužitelja kojeg se koristi. Zadano je 25.
-Mail.SendMailConfigClass_properties=Dodatna svojstva
-Mail.SendMailConfigClass_properties.hint=Lista dodatnih JavaMail svojstava (npr. "mail.smtp.starttls.enable\=true" za TLS)
-Mail.SendMailConfigClass_sendWaitTime=Vrijeme čekanja na slanje
-Mail.SendMailConfigClass_sendWaitTime.hint=Vrijeme čekanja između slanja pojedine e-pošte, u milisekundama (zadano je 8 sekundi)
-Mail.SendMailConfigClass_username=Korisničko ime na poslužitelju e-pošte
-Mail.SendMailConfigClass_username.hint=Korisničko ime za povezivanje na SMTP poslužitelj, samo ukoliko je potrebna autentikacija
-Mail.SendMailStatus_livetable.actions=Akcije
-Mail.SendMailStatus_livetable.batchId=Identifikator šarže
-Mail.SendMailStatus_livetable.date=Datum
-Mail.SendMailStatus_livetable.error=Greška
-Mail.SendMailStatus_livetable.recipients=Primatelji
-Mail.SendMailStatus_livetable.resend=Ponovo pošalji
-Mail.SendMailStatus_livetable.state=Status
-Mail.SendMailStatus_livetable.type=Tip
-Mail.SendMailStatus_livetable.wiki=Wiki
-admin.email=E-pošta
+  <content>admin.email=E-pošta
 admin.email.description=Podesite parametre slanja e-pošte i pregledajte statuse e-pošte.
 admin.emailgeneral=Napredno
 admin.emailgeneral.description=Podesite napredne parametre e-pošte poput zatamnjenja adresa e-pošte.
@@ -78,7 +48,36 @@ admin.emailsend.description=Podesite parametre za slanje e-pošte.
 admin.emailstatus=Status slanja e-pošte
 admin.emailstatus.description=Pregledajte statuse poslane e-pošte i ponovo pošaljite e-poštu koja nije uspjela biti poslana.
 admin.emailstatus.hint=Ukoliko ne možete pronaći status e-pošte tada je moguće da funkcionalnost koja je poslala e-poštu nije naznačila da status e-pošte treba biti zadržan.
-mailSender.admin.resendFailure=Ponovno slanje e-pošte nije uspjelo. Kliknite za više detalja.
+Mail.GeneralMailConfigClass_obfuscate=Zatamni adrese e-pošte
+Mail.GeneralMailConfigClass_obfuscate.hint=Ovo zahvaća samo adrese e-pošte pohranjene u objektnim svojstvima tipa Email, sve dok zadani prikazivač svojstava tipa E-pošta ne bude prebrisan. Primjer\: a...@domena.org
+Mail.SendMailConfigClass_from=Adresa e-pošte s koje se šalje
+Mail.SendMailConfigClass_from.hint=Zadana adresa e-pošte koja se koristi za slanje obavijesne e-pošte
+Mail.SendMailConfigClass_bcc=BCC adrese e-pošte
+Mail.SendMailConfigClass_bcc.hint=Zadana lista BCC adresa e-pošte, odvojenih zarezom, za upotrijebiti prilikom slanja e-pošte
+Mail.SendMailConfigClass_host=Poslužitelj e-pošte
+Mail.SendMailConfigClass_host.hint=SMTP poslužitelj prema kojem slati. Zadano je "localhost".
+Mail.SendMailConfigClass_port=Priključak poslužitelja e-pošte
+Mail.SendMailConfigClass_port.hint=Priključak SMTP poslužitelja kojeg se koristi. Zadano je 25.
+Mail.SendMailConfigClass_username=Korisničko ime na poslužitelju e-pošte
+Mail.SendMailConfigClass_username.hint=Korisničko ime za povezivanje na SMTP poslužitelj, samo ukoliko je potrebna autentikacija
+Mail.SendMailConfigClass_password=Lozinka na poslužitelju e-pošte
+Mail.SendMailConfigClass_password.hint=Lozinka za povezivanje na SMTP poslužitelj, samo ukoliko je potrebna autentikacija
+Mail.SendMailConfigClass_properties=Dodatna svojstva
+Mail.SendMailConfigClass_properties.hint=Lista dodatnih JavaMail svojstava (npr. "mail.smtp.starttls.enable\=true" za TLS)
+Mail.SendMailConfigClass_sendWaitTime=Vrijeme čekanja na slanje
+Mail.SendMailConfigClass_sendWaitTime.hint=Vrijeme čekanja između slanja pojedine e-pošte, u milisekundama (zadano je 8 sekundi)
+Mail.SendMailConfigClass_discardSuccessStatuses=Zanemariti statuse o uspjehu?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Čuvaju li se ili ne statusi uspješno poslane e-pošte (zadano je istinito)
+Mail.SendMailStatus_livetable.date=Datum
+Mail.SendMailStatus_livetable.batchId=Identifikator šarže
+Mail.SendMailStatus_livetable.type=Tip
+Mail.SendMailStatus_livetable.recipients=Primatelji
+Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Greška
+Mail.SendMailStatus_livetable.actions=Akcije
+Mail.SendMailStatus_livetable.resend=Ponovo pošalji
 mailSender.admin.resendSuccess=E-pošta je uspješno ponovo poslana
+mailSender.admin.resendFailure=Ponovno slanje e-pošte nije uspjelo. Kliknite za više detalja.
 </content>
 </xwikidoc>

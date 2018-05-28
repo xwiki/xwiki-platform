@@ -39,118 +39,153 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
-solr.admin.error.norights=Sie benötigen Adminstratorenrechte, um diesen Abschnitt zu sehen.
-solr.admin.error.notallowed=Sie sind zur Ausführung dieser Aktion nicht berechtigt.
-solr.admin.indexing.action.hint=Die Aktion, die auf dem Index ausgeführt werden soll.
-solr.admin.indexing.action.label=Aktion
-solr.admin.indexing.action.select_delete=Aus dem Index löschen
-solr.admin.indexing.action.select_index=Zum Index hinzufügen
-solr.admin.indexing.action.select_reindex=Reindexieren
-solr.admin.indexing.query.hint=Optionale Abfrage, welche die gewählte Aktion nur mit den Dokumenten ausführt, die auf die Abfrage passen.
-solr.admin.indexing.query.label=Einschränkende Abfrage
-solr.admin.indexing.title=Indexiere
-solr.admin.indexing.wiki.hint=Das Wiki, auf dessen Dokumente die ausgewählte Aktion ausgeführt wird.
-solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.select_farm=Alle Wikis
-solr.admin.status.queueSize.hint=Die Anzahl der Einträge, die noch  hinzugefügt, reindexiert oder aus dem Index gelöscht werden müssen (je nach gewählter Aktion).
-solr.admin.status.queueSize.label=Länge der Warteschlange
-solr.admin.status.title=Status
+  <content>solr.admin.title=Solr Suche Administration
 solr.admin.submit=Ausführen
-solr.admin.title=Solr Suche Administration
-solr.facet.date.after=Nach {0}
-solr.facet.date.any=Jedes Datum
-solr.facet.date.applyCustomInterval=Anwenden
-solr.facet.date.before=Vor {0}
-solr.facet.date.between=Von {0} bis {1}
-solr.facet.date.customInterval=Frei angebarer Zeitraum
-solr.facet.date.end=Enddatum mit Zeit
-solr.facet.date.last30Days=Letzte 30 Tage
-solr.facet.date.last7Days=Letzte 7 Tage
-solr.facet.date.olderThan30Days=Älter als 30 Tage
-solr.facet.date.start=Startdatum mit Zeit
-solr.facet.date.today=Heute
-solr.facet.fileType.image.icon=Piktogramm
-solr.facet.fileType.other.octet-stream=Binärdaten
-solr.facet.fileType.text.java-source=Java Quelltext
-solr.facet.fileType.text.javascript=JavaScript
-solr.facet.fileType.text.plain=Test
-solr.facet.fileType.text.sh=Shellskript
-solr.facet.size.any=Jede Größe
-solr.facet.size.between=Zwischen {0} und {1}
-solr.facet.size.large=Groß
-solr.facet.size.lessThan=Weniger als {0} 
-solr.facet.size.medium=Mittel
-solr.facet.size.moreThan=Mehr als {0} 
-solr.facet.size.small=Klein
-solr.facet.size.tiny=Winzig
+solr.admin.error.notallowed=Sie sind zur Ausführung dieser Aktion nicht berechtigt.
+solr.admin.error.norights=Sie benötigen Adminstratorenrechte, um diesen Abschnitt zu sehen.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Länge der Warteschlange
+solr.admin.status.queueSize.hint=Die Anzahl der Einträge, die noch  hinzugefügt, reindexiert oder aus dem Index gelöscht werden müssen (je nach gewählter Aktion).
+
+solr.admin.indexing.title=Indexiere
+solr.admin.indexing.action.label=Aktion
+solr.admin.indexing.action.hint=Die Aktion, die auf dem Index ausgeführt werden soll.
+solr.admin.indexing.action.select_index=Zum Index hinzufügen
+solr.admin.indexing.action.select_delete=Aus dem Index löschen
+solr.admin.indexing.action.select_reindex=Reindexieren
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=Das Wiki, auf dessen Dokumente die ausgewählte Aktion ausgeführt wird.
+solr.admin.indexing.wiki.select_farm=Alle Wikis
+solr.admin.indexing.query.label=Einschränkende Abfrage
+solr.admin.indexing.query.hint=Optionale Abfrage, welche die gewählte Aktion nur mit den Dokumenten ausführt, die auf die Abfrage passen.
+
+solr.sortBy=Sortierung:
+solr.sortBy.score=Relevanz
+solr.sortBy.title_sort=Titel
+solr.sortBy.date=Datum
+solr.sortBy.author_display_sort=Letzter Autor
+solr.sortBy.filename_sort=Dateiname
+solr.sortBy.attsize_sort=Dateigröße
+solr.sortBy.attdate_sort=Hochgeladen am
+solr.sortBy.attauthor_display_sort=Hochgeladen von 
+solr.sortOrder.asc=Aufsteigend
+solr.sortOrder.desc=Absteigend
+
+### Missing: solr.options=Show:
+### Missing: solr.options.highlight=Highlighting
+### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
+### Missing: solr.options.facet=Facets
+### Missing: solr.options.facet.title=Allow extra filtering of the result
+
+solr.result.language=Sprache
+### Missing: solr.result.locatedIn=Located in
+solr.result.author=Geändert von {0} am {1}
+solr.result.mediaType=Dateityp {0}
+solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2}) 
+solr.result.highlightAll=Alle Vorkommen anzeigen
+
+solr.facets.title=Suche verfeinern
+solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen.
+solr.facets.resetAll=Zurücksetzen
+solr.facets.expandAll=Alles aufklappen
 solr.facets.collapseAll=Alles zuklappen
 solr.facets.emptyValue=-/-
-solr.facets.expandAll=Alles aufklappen
-solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen.
 solr.facets.moreValues={0} weitere
-solr.facets.resetAll=Zurücksetzen
-solr.facets.title=Suche verfeinern
-solr.field.attauthor=Hochgeladen von
-solr.field.attauthor_display=Hochgeladen von
-solr.field.attcontent=Dateiinhalt
-solr.field.attdate=Hochgeladen am
-solr.field.attsize=Dateigröße
-solr.field.author=Letzter Autor
-solr.field.author_display=Autor
-solr.field.class=Objekttyp
-solr.field.class.definedBy=Definiert durch {0} » {1} 
-solr.field.comment=Kommentare
-solr.field.creationdate=Erstelldatum
-solr.field.creator=Ersteller
-solr.field.creator_display=Ersteller
-solr.field.date=Letzte Änderung
-solr.field.doccontent=Angezeiger Inhalt des Dokuments
-solr.field.doccontentraw=Quelltext des Dokuments
-solr.field.filename=Dateiname
+
+solr.filterBy.type.document=Dokument
+solr.filterBy.type.attachment=Anhang
+solr.filterBy.type.object=Objekt
+solr.filterBy.type.object_property=Objekteigenschaft
+
+solr.filterBy.fileType.image=Bild
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Text
+### Missing: solr.filterBy.fileType.office=Office
+### Missing: solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=Präsentation
+solr.filterBy.fileType.spreadsheet=Tabellenkalkulation
+solr.filterBy.fileType.archive=Archiv
+solr.filterBy.fileType.font=Schrittyp
+solr.filterBy.fileType.other=Anders
+solr.facet.fileType.text.plain=Test
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Java Quelltext
+solr.facet.fileType.text.sh=Shellskript
+solr.facet.fileType.image.icon=Piktogramm
+### Missing: solr.facet.fileType.archive.java-archive=JAR
+### Missing: solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Binärdaten
+
+solr.facet.date.today=Heute
+solr.facet.date.last7Days=Letzte 7 Tage
+solr.facet.date.last30Days=Letzte 30 Tage
+solr.facet.date.olderThan30Days=Älter als 30 Tage
+solr.facet.date.customInterval=Frei angebarer Zeitraum
+solr.facet.date.start=Startdatum mit Zeit
+solr.facet.date.end=Enddatum mit Zeit
+solr.facet.date.applyCustomInterval=Anwenden
+solr.facet.date.between=Von {0} bis {1}
+solr.facet.date.after=Nach {0}
+solr.facet.date.before=Vor {0}
+solr.facet.date.any=Jedes Datum
+
+solr.facet.size.tiny=Winzig
+solr.facet.size.small=Klein
+solr.facet.size.medium=Mittel
+solr.facet.size.large=Groß
+solr.facet.size.between=Zwischen {0} und {1}
+solr.facet.size.lessThan=Weniger als {0} 
+solr.facet.size.moreThan=Mehr als {0} 
+solr.facet.size.any=Jede Größe
+
+solr.field.type=Ergebnistyp
 solr.field.locale=Sprache
 solr.field.locale.emptyValue=Ohne Sprachangabe
 solr.field.locale.emptyValue.hint=Einige Dokumente sind mit keiner Sprache assoziiert, weil sie entweder Programmcode enthalten (welcher keiner natürlichen Spache entspricht) oder weil sie eine Benutzerschnittstelle sind (wie diese Seite).
-solr.field.mimetype=Dateityp
+solr.field.wiki=Wiki
+### Missing: solr.field.spaces=Location
+solr.field.space_exact=Bereich
+### Missing: solr.field.space_facet=Location
 solr.field.name=Dokument
 solr.field.name_exact=Dokument
-solr.field.objcontent=Objekte
+solr.field.title=Titel
+solr.field.author=Letzter Autor
+solr.field.author_display=Autor
+solr.field.creator=Ersteller
+solr.field.creator_display=Ersteller
+solr.field.date=Letzte Änderung
+solr.field.creationdate=Erstelldatum
+solr.field.doccontent=Angezeiger Inhalt des Dokuments
+solr.field.doccontentraw=Quelltext des Dokuments
+solr.field.class=Objekttyp
+solr.field.class.definedBy=Definiert durch {0} » {1} 
 solr.field.propertyname=Eigenschaftsname
 solr.field.propertyvalue=Eigenschaftswert
-solr.field.space=Bereich
-solr.field.space_exact=Bereich
-solr.field.title=Titel
-solr.field.type=Ergebnistyp
-solr.field.wiki=Wiki
-solr.filterBy.fileType.archive=Archiv
-solr.filterBy.fileType.audio=Audio
-solr.filterBy.fileType.font=Schrittyp
-solr.filterBy.fileType.image=Bild
-solr.filterBy.fileType.other=Anders
-solr.filterBy.fileType.presentation=Präsentation
-solr.filterBy.fileType.spreadsheet=Tabellenkalkulation
-solr.filterBy.fileType.text=Text
-solr.filterBy.fileType.video=Video
-solr.filterBy.type.attachment=Anhang
-solr.filterBy.type.document=Dokument
-solr.filterBy.type.object=Objekt
-solr.filterBy.type.object_property=Objekteigenschaft
-solr.result.author=Geändert von {0} am {1}
-solr.result.highlightAll=Alle Vorkommen anzeigen
-solr.result.language=Sprache
+solr.field.filename=Dateiname
+solr.field.attcontent=Dateiinhalt
+solr.field.comment=Kommentare
+solr.field.objcontent=Objekte
+solr.field.mimetype=Dateityp
+solr.field.attauthor=Hochgeladen von
+solr.field.attauthor_display=Hochgeladen von
+solr.field.attdate=Hochgeladen am
+solr.field.attsize=Dateigröße
+
+### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
+### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
 solr.result.location=Gefunden in {0} » {1} » {2}
-solr.result.mediaType=Dateityp {0}
-solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2}) 
-solr.sortBy=Sortierung:
-solr.sortBy.attauthor_display_sort=Hochgeladen von 
-solr.sortBy.attdate_sort=Hochgeladen am
-solr.sortBy.attsize_sort=Dateigröße
-solr.sortBy.author_display_sort=Letzter Autor
-solr.sortBy.date=Datum
-solr.sortBy.filename_sort=Dateiname
-solr.sortBy.score=Relevanz
-solr.sortBy.title_sort=Titel
-solr.sortOrder.asc=Aufsteigend
-solr.sortOrder.desc=Absteigend
+
+## until 7.2RC1
+solr.field.space=Bereich
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

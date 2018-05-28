@@ -39,175 +39,214 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-appWithinMinutes.classEditor.title={0} Structure
-appWithinMinutes.codeSpace.description=L'emplacement où le code de l'application est situé.
-appWithinMinutes.codeSpace.hiddenPagesInfo=Les pages cachées sont également listées ici. Cela va à l'encontre de vos préférences utilisateur, mais sans cela aucune page de code ne serait visible puisqu'elles sont toutes cachées par défaut.
-appWithinMinutes.codeSpace.title=Code
-appWithinMinutes.createApp.location.hint=L'emplacement dans la hiérarchie des pages où l'application sera créée.
-appWithinMinutes.createApp.location.label=Emplacement
-appWithinMinutes.createApp.parent.hint=La page parente de la nouvelle application. Laisser vide si vous souhaitez créer une application de premier niveau.
-appWithinMinutes.createApp.parent.label=Page parente
-appWithinMinutes.createApp.parent.placeholder=Emplacent.Du.Parent
-appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Si aucun emplacement n’est sélectionné, les éléments peuvent être créées partout dans le wiki.
-appWithinMinutes.templateProviderEditor.creationRestrictions.name=Emplacement de création des entrées
-appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Permet de n’utiliser les emplacements précisés précédemment que comme des suggestions. L’utilisateur pourra donc modifier l’emplacement d’un élément lors de sa création.
-appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Désactiver les restrictions d’emplacement des éléments
-appWithinMinutes.templateProviderEditor.description.hint=Courte description d’un élément de l’application.
-appWithinMinutes.templateProviderEditor.hint=Les éléments d’une application sont des pages wiki contenant des données structurées.
-appWithinMinutes.templateProviderEditor.icon.hint=Icône associée à chaque élément de l’application.
-appWithinMinutes.templateProviderEditor.terminal.hint=Détermine si les éléments de l’application doivent être contenus dans des pages terminales.
-appWithinMinutes.templateProviderEditor.title={0} éléments
-appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Si aucun emplacement n’est sélectionné, les entrées peuvent être créées depuis n’importe quelle page.
-appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Espace à partir duquel des entrées peuvent être créées
-appWithinMinutes.wizardStep.entries.description=Choisissez où stocker les éléments de votre application
-appWithinMinutes.wizardStep.entries.name=Eléments
-appWithinMinutes.wizardStep.entries.title=Localisez vos entrées
-appWithinMinutes.wizardStep.name.description=Choisissez un nom pour l'application
-appWithinMinutes.wizardStep.name.name=Nom
-appWithinMinutes.wizardStep.name.title=Donnez un nom à votre application
-appWithinMinutes.wizardStep.presentation.description=Personnalisez la page d'accueil de votre application
-appWithinMinutes.wizardStep.presentation.name=Présentation
-appWithinMinutes.wizardStep.presentation.title=Personnalisez la page d'accueil de votre application
-appWithinMinutes.wizardStep.structure.description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
-appWithinMinutes.wizardStep.structure.name=Structure
-appWithinMinutes.wizardStep.structure.title=Définissez la structure de votre application
-platform.appwithinminutes.appHomePageActionsHeading=Actions
-platform.appwithinminutes.appHomePageAddEntryHint=Ajouter une nouvelle entrée
-platform.appwithinminutes.appHomePageAddEntryLabel=Ajouter
-platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
-platform.appwithinminutes.appHomePageDeleteEntriesLabel=Supprimer toutes les entrées
-platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
-platform.appwithinminutes.appHomePageEntryNameLabel=Nom de l'entrée\:
-platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
-platform.appwithinminutes.appLiveTableDeleteEntryActionName=Supprimer
-platform.appwithinminutes.appLiveTableEditEntryActionName=Modifier
-platform.appwithinminutes.appLiveTableHeading=Entrées
-platform.appwithinminutes.appNameEmptyError=Entrez le nom de l'application
-platform.appwithinminutes.appNameHint=Le nom de l'application détermine l'URL de la page d'accueil de l'application, l'espace dans lequel les données seront stockées ainsi que le nom de la classe qui décrira la structure de l'application.
-platform.appwithinminutes.appNameIsUsedWarning=Cette application existe déjà. Si vous continuez, vous allez modifier l'application existante.
-platform.appwithinminutes.appNameLabel=Nom de l'application
-platform.appwithinminutes.appNamePageTitle=Création de l'application
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=Nom de la classe de l'application
-platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Espace du code de l'application
-platform.appwithinminutes.appNamePreviewDataSpaceLabel=Espace des données de l'application
-platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL de la page d'accueil de l'application
-platform.appwithinminutes.appPanelCreateEntry=Créez votre propre application\!
-platform.appwithinminutes.appsLiveTable._actions=Actions
+  <content>### Home page
+platform.appwithinminutes.homePageTitle=App Within Minutes
+platform.appwithinminutes.description=Créez des applications web puissantes en quelques minutes.
+platform.appwithinminutes.createAppButtonLabel=Créer une application
+platform.appwithinminutes.appsLiveTableHeading=Applications
+platform.appwithinminutes.appsLiveTable.doc.space=Nom de l'application
 platform.appwithinminutes.appsLiveTable.doc.author=Dernier auteur
 platform.appwithinminutes.appsLiveTable.doc.date=Date de mise à jour
-platform.appwithinminutes.appsLiveTable.doc.space=Nom de l'application
-platform.appwithinminutes.appsLiveTableHeading=Applications
-platform.appwithinminutes.classEditorAdvancedCategoryName=Avancé
-platform.appwithinminutes.classEditorBindSheetSaveComment=Liaison de la sheet à la classe
-platform.appwithinminutes.classEditorBooleanFieldName=Booléen
-platform.appwithinminutes.classEditorCanvasHint=Glissez-déposez les champs de la palette dans cette zone
-platform.appwithinminutes.classEditorConfigureFieldLabel=Configurer
-platform.appwithinminutes.classEditorContentFieldName=Contenu
-platform.appwithinminutes.classEditorDBListFieldName=Liste en base de données
-platform.appwithinminutes.classEditorDateFieldName=Date
-platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Effacer
-platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Aujourd'hui
-platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Maintenant
-platform.appwithinminutes.classEditorDeleteFieldLabel=Supprimer
-platform.appwithinminutes.classEditorDocumentCategoryName=Document
-platform.appwithinminutes.classEditorDuplicateFieldNameError=La classe a deux champs qui portent le même nom\: {0} 
-platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valeur par défaut
-platform.appwithinminutes.classEditorGroupsFieldName=Groupe
-platform.appwithinminutes.classEditorMoveFieldHint=Glissez-Déposez pour changer l'odre
-platform.appwithinminutes.classEditorMoveFieldLabel=Déplacer
-platform.appwithinminutes.classEditorMultipleSheetsWarning=La classe a plusieurs sheets
-platform.appwithinminutes.classEditorNumberFieldName=Nombre
-platform.appwithinminutes.classEditorPaletteHint=Glissez-Déposez des champs de la palette pour créer votre formulaire
-platform.appwithinminutes.classEditorPaletteTitle=Palette de champs
-platform.appwithinminutes.classEditorPickersCategoryName=Sélecteurs
-platform.appwithinminutes.classEditorPreviewFieldHint=Masquer le panneau de configuration et appliquer les changements
-platform.appwithinminutes.classEditorPreviewFieldLabel=Prévisualiser
-platform.appwithinminutes.classEditorSheetSaveComment=Mise à jour de la sheet de la classe
-platform.appwithinminutes.classEditorStandardCategoryName=Standard
-platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ajouter
-platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Supprimer
-platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
-platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Valeur
-platform.appwithinminutes.classEditorStaticListFieldName=Liste statique
-platform.appwithinminutes.classEditorStringFieldName=Texte court
-platform.appwithinminutes.classEditorTemplateSaveComment=Mettre à jour les valeurs par défaut
-platform.appwithinminutes.classEditorTextAreaFieldName=Texte long
-platform.appwithinminutes.classEditorTitleFieldName=Titre
-platform.appwithinminutes.classEditorTranslationsSaveComment=Mettre à jour les traductions
-platform.appwithinminutes.classEditorUpdateSheetHint=Recréer le formulaire utilisé pour afficher et modifier les objets de cette classe ({0}).
-platform.appwithinminutes.classEditorUpdateSheetLabel=Mettre à jour la sheet de la classe
-platform.appwithinminutes.classEditorUpdateTemplateHint=Sauvegarder les valeurs par défaut dans le template de la classe ({0}). 
-platform.appwithinminutes.classEditorUpdateTemplateLabel=Mettre à jour le template de la classe
-platform.appwithinminutes.classEditorUpdateTranslationsHint=Mettre à jour la traduction pour le nom d''affichage des champs et afficher les valeurs ({0}).
-platform.appwithinminutes.classEditorUpdateTranslationsLabel=Mettre à jour le paquet de traduction de la classe
-platform.appwithinminutes.classEditorUsersFieldName=Utilisateur
-platform.appwithinminutes.createAppButtonLabel=Créer une application
-platform.appwithinminutes.deleteAppConfirmation=L''application {0} et TOUS SES DOCUMENTS vont être détruits. Etes-vous certain de vouloir continuer ?
-platform.appwithinminutes.deleteAppDoesNotExistError=L'application indiquée n'existe pas.
-platform.appwithinminutes.deleteAppEntriesConfirmation=TOUS LES DOCUMENTS de l''application {0} vont être détruits. Etes-vous certain de vouloir continuer ?
-platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas une application App Within Minutes valide
-platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a été indiqué.
-platform.appwithinminutes.description=Créez des applications web puissantes en quelques minutes.
+platform.appwithinminutes.appsLiveTable._actions=Actions
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Donner des droits d'administration sur l'espace
-platform.appwithinminutes.homePageTitle=App Within Minutes
-platform.appwithinminutes.liveTableEditorActionsColumnDescription=Une liste d'actions qui peuvent être exécutées sur une entrée de l'application, comme "Supprimer" ou "Modifier"
-platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
-platform.appwithinminutes.liveTableEditorAddColumnHint=Ajouter
-platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Une colonne qui affiche les liens vers les fichiers attachées à la page de cette entrée.
-platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Pièces jointes
-platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Une colonne qui affiche l'image de profil (Avatar) de l'utilisateur. Cette-ci ne fonctionne qu'avec des tables liées à la classe XWiki.XWikiUsers
-platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
-platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Champs de la classe
-platform.appwithinminutes.liveTableEditorColumnsHint=Choisissez les colonnes que vous souhaitez ajouter au tableau dynamique affiché dans la page d'accueil de votre application.
-platform.appwithinminutes.liveTableEditorDeleteColumnHint=Supprimer
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce les champs correspondant ont été supprimés. Souhaitez-vous les effacer ? &lt;a href\=""&gt;Oui&lt;/a&gt; / &lt;a href\=""&gt;Non&lt;/a&gt; 
-platform.appwithinminutes.liveTableEditorDescriptionHint=La description contient un résumé des fonctionnalités de l'application et du type de données qu'elle gère.
-platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Le nom du dernier utilisateur qui a modifié une entrée donnée
-platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Dernier auteur
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=La date à laquelle une entrée donnée a été créée
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Date de création
-platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=L'utilisateur qui a créé une entrée donnée
-platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Créateur
-platform.appwithinminutes.liveTableEditorDocDateColumnDescription=La date à laquelle une entrée donnée a été éditée
-platform.appwithinminutes.liveTableEditorDocDateColumnName=Date de dernière mise à jour
-platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Le nom de la page qui contient l'entrée, préfixée par le nom de l'espace.
-platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nom complet de la page
-platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Emplacement de la page contenant les données de l’application
-platform.appwithinminutes.liveTableEditorDocLocationColumnName=Emplacement
-platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Le nom de la page qui contient l'entrée de l'application
-platform.appwithinminutes.liveTableEditorDocNameColumnName=Nom de la page
-platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Le nom de l'espace qui contient l'entrée de l'application
-platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Espace
-platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Le titre de la page qui contient l'entrée de l'application
-platform.appwithinminutes.liveTableEditorDocTitleColumnName=Titre de la page
-platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Colonnes génériques
-platform.appwithinminutes.liveTableEditorHelpDescription=Les colonnes génériques sont indépendantes de la structure de votre application. Elles donnent des informations sur les pages qui contiennent les entrées de votre application.
-platform.appwithinminutes.liveTableEditorHelpTitle=Aide
-platform.appwithinminutes.liveTableEditorIcon=Icône
-platform.appwithinminutes.liveTableEditorIconHintWithPicker=Une référence à une icône. Cele peut être n'importe quelle image dans le wiki mais également une icône affichée dans le sélecteur d'icônes lorsque celui-ci est actif.
-platform.appwithinminutes.liveTableEditorImagesColumnDescription=Une colonne spéciale qui affiche les images attachées à la page de l'entrée
-platform.appwithinminutes.liveTableEditorImagesColumnName=Images
-platform.appwithinminutes.liveTableEditorMoveColumnHint=Glissez-Déposez pour modifier l'ordre
-platform.appwithinminutes.liveTableEditorSaveComment=Mettre à jour le tableau dynamique
-platform.appwithinminutes.wizardStep1Description=Choisissez un nom pour l'application
-platform.appwithinminutes.wizardStep1Name=Nom
-platform.appwithinminutes.wizardStep1Title=Donnez un nom à votre application
-platform.appwithinminutes.wizardStep2Description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
-platform.appwithinminutes.wizardStep2Name=Structure
-platform.appwithinminutes.wizardStep2Title=Définissez la structure de votre application
-platform.appwithinminutes.wizardStep3Description=Personnalisez la page d'accueil de votre application
-platform.appwithinminutes.wizardStep3Name=Présentation
-platform.appwithinminutes.wizardStep3Title=Personnalisez la page d'accueil de votre application
-platform.appwithinminutes.wizardStepFinishButtonLabel=Terminer
-platform.appwithinminutes.wizardStepFinishButtonTip=Accéder à la page d'accueil de l'application
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=Créez votre propre application\!
+
+### Wizard step
 platform.appwithinminutes.wizardStepHeading=Étape {0} — {1} 
-platform.appwithinminutes.wizardStepHelpDescription=Cet assistant vous guidera pas à pas dans la création de votre application. A travers les différentes étapes vous pourrez configurer l'affichage de votre application et le type d'information qu'elle contiendra \:
-platform.appwithinminutes.wizardStepHelpTitle=Étapes
+appWithinMinutes.wizardStep.name.name=Nom
+appWithinMinutes.wizardStep.name.title=Donnez un nom à votre application
+appWithinMinutes.wizardStep.name.description=Choisissez un nom pour l'application
+appWithinMinutes.wizardStep.structure.name=Structure
+appWithinMinutes.wizardStep.structure.title=Définissez la structure de votre application
+appWithinMinutes.wizardStep.structure.description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
+appWithinMinutes.wizardStep.entries.name=Eléments
+appWithinMinutes.wizardStep.entries.title=Localisez vos entrées
+appWithinMinutes.wizardStep.entries.description=Choisissez où stocker les éléments de votre application
+appWithinMinutes.wizardStep.presentation.name=Présentation
+appWithinMinutes.wizardStep.presentation.title=Personnalisez la page d'accueil de votre application
+appWithinMinutes.wizardStep.presentation.description=Personnalisez la page d'accueil de votre application
 platform.appwithinminutes.wizardStepNextButtonLabel=Passer à l'étape suivante
 platform.appwithinminutes.wizardStepNextButtonTip=Étape suivante
+platform.appwithinminutes.wizardStepFinishButtonLabel=Terminer
+platform.appwithinminutes.wizardStepFinishButtonTip=Accéder à la page d'accueil de l'application
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Revenir à l'étape précédente
 platform.appwithinminutes.wizardStepPreviousButtonTip=Étape précédente
+platform.appwithinminutes.wizardStepHelpTitle=Étapes
+platform.appwithinminutes.wizardStepHelpDescription=Cet assistant vous guidera pas à pas dans la création de votre application. A travers les différentes étapes vous pourrez configurer l'affichage de votre application et le type d'information qu'elle contiendra \:
+
+### Wizard Step 1: Application Name
+appWithinMinutes.createApp.location.label=Emplacement
+appWithinMinutes.createApp.location.hint=L'emplacement dans la hiérarchie des pages où l'application sera créée.
+appWithinMinutes.createApp.parent.label=Page parente
+appWithinMinutes.createApp.parent.hint=La page parente de la nouvelle application. Laisser vide si vous souhaitez créer une application de premier niveau.
+appWithinMinutes.createApp.parent.placeholder=Emplacent.Du.Parent
+appWithinMinutes.codeSpace.title=Code
+appWithinMinutes.codeSpace.description=L'emplacement où le code de l'application est situé.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Les pages cachées sont également listées ici. Cela va à l'encontre de vos préférences utilisateur, mais sans cela aucune page de code ne serait visible puisqu'elles sont toutes cachées par défaut.
+platform.appwithinminutes.appNamePageTitle=Création de l'application
+platform.appwithinminutes.appNameLabel=Nom de l'application
+platform.appwithinminutes.appNameHint=Le nom de l'application détermine l'URL de la page d'accueil de l'application, l'espace dans lequel les données seront stockées ainsi que le nom de la classe qui décrira la structure de l'application.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL de la page d'accueil de l'application
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Espace du code de l'application
+platform.appwithinminutes.appNameIsUsedWarning=Cette application existe déjà. Si vous continuez, vous allez modifier l'application existante.
+platform.appwithinminutes.appNameEmptyError=Entrez le nom de l'application
+
+### Wizard Step 2: Application Structure
+appWithinMinutes.classEditor.title={0} Structure
+platform.appwithinminutes.classEditorPaletteTitle=Palette de champs
+platform.appwithinminutes.classEditorPaletteHint=Glissez-Déposez des champs de la palette pour créer votre formulaire
+platform.appwithinminutes.classEditorCanvasHint=Glissez-déposez les champs de la palette dans cette zone
+
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Mettre à jour le template de la classe
+platform.appwithinminutes.classEditorUpdateTemplateHint=Sauvegarder les valeurs par défaut dans le template de la classe ({0}). 
+platform.appwithinminutes.classEditorUpdateSheetLabel=Mettre à jour la sheet de la classe
+platform.appwithinminutes.classEditorUpdateSheetHint=Recréer le formulaire utilisé pour afficher et modifier les objets de cette classe ({0}).
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Mettre à jour le paquet de traduction de la classe
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Mettre à jour la traduction pour le nom d''affichage des champs et afficher les valeurs ({0}).
+
+platform.appwithinminutes.classEditorMultipleSheetsWarning=La classe a plusieurs sheets
+platform.appwithinminutes.classEditorDuplicateFieldNameError=La classe a deux champs qui portent le même nom\: {0} 
+platform.appwithinminutes.classEditorTemplateSaveComment=Mettre à jour les valeurs par défaut
+platform.appwithinminutes.classEditorBindSheetSaveComment=Liaison de la sheet à la classe
+platform.appwithinminutes.classEditorSheetSaveComment=Mise à jour de la sheet de la classe
+platform.appwithinminutes.classEditorTranslationsSaveComment=Mettre à jour les traductions
+
+platform.appwithinminutes.classEditorStandardCategoryName=Standard
+platform.appwithinminutes.classEditorPickersCategoryName=Sélecteurs
+platform.appwithinminutes.classEditorDocumentCategoryName=Document
+platform.appwithinminutes.classEditorAdvancedCategoryName=Avancé
+
+platform.appwithinminutes.classEditorDBListFieldName=Liste en base de données
+platform.appwithinminutes.classEditorGroupsFieldName=Groupe
+platform.appwithinminutes.classEditorUsersFieldName=Utilisateur
+platform.appwithinminutes.classEditorDateFieldName=Date
+platform.appwithinminutes.classEditorStaticListFieldName=Liste statique
+platform.appwithinminutes.classEditorBooleanFieldName=Booléen
+platform.appwithinminutes.classEditorNumberFieldName=Nombre
+platform.appwithinminutes.classEditorTextAreaFieldName=Texte long
+platform.appwithinminutes.classEditorStringFieldName=Texte court
+platform.appwithinminutes.classEditorContentFieldName=Contenu
+platform.appwithinminutes.classEditorTitleFieldName=Titre
+
+platform.appwithinminutes.classEditorDeleteFieldLabel=Supprimer
+platform.appwithinminutes.classEditorConfigureFieldLabel=Configurer
+platform.appwithinminutes.classEditorPreviewFieldLabel=Prévisualiser
+platform.appwithinminutes.classEditorPreviewFieldHint=Masquer le panneau de configuration et appliquer les changements
+platform.appwithinminutes.classEditorMoveFieldLabel=Déplacer
+platform.appwithinminutes.classEditorMoveFieldHint=Glissez-Déposez pour changer l'odre
+
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valeur par défaut
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Effacer
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Maintenant
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Aujourd'hui
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Valeur
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ajouter
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Supprimer
+
+appWithinMinutes.templateProviderEditor.title={0} éléments
+appWithinMinutes.templateProviderEditor.hint=Les éléments d’une application sont des pages wiki contenant des données structurées.
+appWithinMinutes.templateProviderEditor.icon.hint=Icône associée à chaque élément de l’application.
+appWithinMinutes.templateProviderEditor.description.hint=Courte description d’un élément de l’application.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Espace à partir duquel des entrées peuvent être créées
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Si aucun emplacement n’est sélectionné, les entrées peuvent être créées depuis n’importe quelle page.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Emplacement de création des entrées
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Si aucun emplacement n’est sélectionné, les éléments peuvent être créées partout dans le wiki.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Désactiver les restrictions d’emplacement des éléments
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Permet de n’utiliser les emplacements précisés précédemment que comme des suggestions. L’utilisateur pourra donc modifier l’emplacement d’un élément lors de sa création.
+appWithinMinutes.templateProviderEditor.terminal.hint=Détermine si les éléments de l’application doivent être contenus dans des pages terminales.
+
+### Wizard Step 3: Application Presentation
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Champs de la classe
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Colonnes génériques
+platform.appwithinminutes.liveTableEditorHelpTitle=Aide
+platform.appwithinminutes.liveTableEditorHelpDescription=Les colonnes génériques sont indépendantes de la structure de votre application. Elles donnent des informations sur les pages qui contiennent les entrées de votre application.
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Titre de la page
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Le titre de la page qui contient l'entrée de l'application
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Nom de la page
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Le nom de la page qui contient l'entrée de l'application
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Emplacement
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Emplacement de la page contenant les données de l’application
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Dernier auteur
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Le nom du dernier utilisateur qui a modifié une entrée donnée
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Créateur
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=L'utilisateur qui a créé une entrée donnée
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Date de dernière mise à jour
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=La date à laquelle une entrée donnée a été éditée
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Date de création
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=La date à laquelle une entrée donnée a été créée
+platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=Une liste d'actions qui peuvent être exécutées sur une entrée de l'application, comme "Supprimer" ou "Modifier"
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Pièces jointes
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Une colonne qui affiche les liens vers les fichiers attachées à la page de cette entrée.
+platform.appwithinminutes.liveTableEditorImagesColumnName=Images
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Une colonne spéciale qui affiche les images attachées à la page de l'entrée
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Une colonne qui affiche l'image de profil (Avatar) de l'utilisateur. Cette-ci ne fonctionne qu'avec des tables liées à la classe XWiki.XWikiUsers
+platform.appwithinminutes.liveTableEditorDescriptionHint=La description contient un résumé des fonctionnalités de l'application et du type de données qu'elle gère.
+platform.appwithinminutes.liveTableEditorColumnsHint=Choisissez les colonnes que vous souhaitez ajouter au tableau dynamique affiché dans la page d'accueil de votre application.
+platform.appwithinminutes.liveTableEditorSaveComment=Mettre à jour le tableau dynamique
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Glissez-Déposez pour modifier l'ordre
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Supprimer
+platform.appwithinminutes.liveTableEditorAddColumnHint=Ajouter
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce les champs correspondant ont été supprimés. Souhaitez-vous les effacer ? &lt;a href\=""&gt;Oui&lt;/a&gt; / &lt;a href\=""&gt;Non&lt;/a&gt; 
+platform.appwithinminutes.liveTableEditorIcon=Icône
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=Une référence à une icône. Cele peut être n'importe quelle image dans le wiki mais également une icône affichée dans le sélecteur d'icônes lorsque celui-ci est actif.
+
+### Application home page
+platform.appwithinminutes.appLiveTableHeading=Entrées
+platform.appwithinminutes.appLiveTableEditEntryActionName=Modifier
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Supprimer
+platform.appwithinminutes.appHomePageActionsHeading=Actions
+platform.appwithinminutes.appHomePageAddEntryLabel=Ajouter
+platform.appwithinminutes.appHomePageAddEntryHint=Ajouter une nouvelle entrée
+platform.appwithinminutes.appHomePageEntryNameLabel=Nom de l'entrée\:
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=Supprimer toutes les entrées
+platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
+platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
+platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
+
+### Delete application dialog
+platform.appwithinminutes.deleteAppConfirmation=L''application {0} et TOUS SES DOCUMENTS vont être détruits. Etes-vous certain de vouloir continuer ?
+platform.appwithinminutes.deleteAppEntriesConfirmation=TOUS LES DOCUMENTS de l''application {0} vont être détruits. Etes-vous certain de vouloir continuer ?
+platform.appwithinminutes.deleteAppDoesNotExistError=L'application indiquée n'existe pas.
+platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas une application App Within Minutes valide
+platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a été indiqué.
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Nom de la classe de l'application
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Espace des données de l'application
+
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Espace
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Le nom de l'espace qui contient l'entrée de l'application
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nom complet de la page
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Le nom de la page qui contient l'entrée, préfixée par le nom de l'espace.
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=Nom
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=Donnez un nom à votre application
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=Choisissez un nom pour l'application
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=Structure
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=Définissez la structure de votre application
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=Présentation
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=Personnalisez la page d'accueil de votre application
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=Personnalisez la page d'accueil de votre application
 </content>
 </xwikidoc>

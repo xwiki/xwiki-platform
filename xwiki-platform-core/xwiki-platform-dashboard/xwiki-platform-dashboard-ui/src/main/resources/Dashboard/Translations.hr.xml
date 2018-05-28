@@ -39,7 +39,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-dashboard.templateProvider.description=Prilagodljive spravice
+  <content>dashboard.templateProvider.description=Prilagodljive spravice
+
+### Missing: dashboard.gadgetSelector.title=Select Gadget
+### Missing: dashboard.gadgetEditor.title=Edit Gadget
+### Missing: dashboard.gadgetEditor.changeGadget.label=Change Gadget
+### Missing: dashboard.gadgetEditor.gadgetTitle.label=Gadget Title
+### Missing: dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget appears at the top of the gadget panel on the dashboard (may contain velocity code).
 </content>
 </xwikidoc>

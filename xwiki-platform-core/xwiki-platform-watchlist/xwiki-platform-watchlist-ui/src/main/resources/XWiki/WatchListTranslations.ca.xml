@@ -39,8 +39,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
+  <content>### Macro "watchlist"
 rendering.macro.watchlist.name=Llista Seguiment
+### Missing: rendering.macro.watchlist.description=Show the content of your current watchlist.
+
+### XWiki.WatchListClass
+### Missing: XWiki.WatchListClass_interval_realtime=Realtime
+### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Hourly
+### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Daily
+### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly
+
+### Notification Icons    
+### Missing: watchlist.notifications.icons.on=ON
+### Missing: watchlist.notifications.icons.off=OFF
+### Missing: watchlist.notifications.icons.tooltip.page=Watch this page
+### Missing: watchlist.notifications.icons.tooltip.pageAndChildren=Watch this page and its children
+### Missing: watchlist.notifications.icons.tooltip.space=Watch the parent page and its children
+### Missing: watchlist.notifications.icons.tooltip.wiki=Watch this wiki
+### Missing: watchlist.notifications.changeStatusError=Failed to change the status of the WatchList.
 watchlist.settings=Preferències
+
+### Watchlist livetable (in the macro)
+### Missing: watchlist.table.scope.wiki=All pages of the wiki
+### Missing: watchlist.table.scope.pageandchildren=Page + Children
+### Missing: watchlist.table.scope.pageonly=Page Only
+### Missing: watchlist.table.location=Location
+### Missing: watchlist.table.scope=Scope
 </content>
 </xwikidoc>

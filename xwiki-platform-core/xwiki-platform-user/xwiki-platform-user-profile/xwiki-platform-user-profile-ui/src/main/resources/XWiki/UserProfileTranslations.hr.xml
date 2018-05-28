@@ -39,13 +39,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Wiki sadr\\u017Ei dokumente koji se zadano ne prikazuju. Ovi skriveni dokumenti predstavljaju tehni\\u010Dki sadr\\u017Eaj poput aplikacijskih klasa, konfiguracijskih stranica, makroa, stilova, skripti itd.
 XWiki.XWikiUsers_accessibility.hint=Dodatne mogućnosti pristupa omogućavaju razna vizualna poboljšanja poput većih fontova, podcrtanih poveznica itd.
-XWiki.XWikiUsers_displayHiddenDocuments.hint=Wiki sadr\\u017Ei dokumente koji se zadano ne prikazuju. Ovi skriveni dokumenti predstavljaju tehni\\u010Dki sadr\\u017Eaj poput aplikacijskih klasa, konfiguracijskih stranica, makroa, stilova, skripti itd.
-XWiki.XWikiUsers_editor.hint=Odaberite koji uređivač će biti zadani, poništavajući time globalno postavljeni uređivač. Ukoliko nije definiran, odabire se zadani uređivač ovisno o tome što se uređuje.
-XWiki.XWikiUsers_extensionConflictSetup.hint=Naznačite želite li da Upravitelj ekstenzija od vas zatraži da potvrdite zadana pravila za rješavanje konflikata (na primjer, recite Upravitelju ekstenzija da vas upita što učiniti ukoliko je dokument koji se nadograđuje uklonjen iz wikija).
 XWiki.XWikiUsers_timezone.hint=Upotrijebite određenu vremensku zonu kako bi se vaša trenutna lokacija odražavala na datume.
+XWiki.XWikiUsers_editor.hint=Odaberite koji uređivač će biti zadani, poništavajući time globalno postavljeni uređivač. Ukoliko nije definiran, odabire se zadani uređivač ovisno o tome što se uređuje.
 XWiki.XWikiUsers_usertype.hint=Odaberite koji će biti zadani tip korisnika. Napredni korisnici imaju pristup višestrukim mogućnostima uređivanja, izradi terminalnih stranica itd.
+XWiki.XWikiUsers_extensionConflictSetup.hint=Naznačite želite li da Upravitelj ekstenzija od vas zatraži da potvrdite zadana pravila za rješavanje konflikata (na primjer, recite Upravitelju ekstenzija da vas upita što učiniti ukoliko je dokument koji se nadograđuje uklonjen iz wikija).
 userprofile.default=Zadano
 </content>
 </xwikidoc>

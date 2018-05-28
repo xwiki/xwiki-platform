@@ -39,13 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>invitation.applicationsPanelEntryLabel=Pozivnice
+
+# Invitation Administration Section
 Invitation.WebHome_from_address.hint=Adresa e-pošte s koje se e-poštom šalju pozivnice.
-Invitation.WebHome_javamail_extra_props.hint=Lista dodatnih Java Mail svojstava za koristiti.
-Invitation.WebHome_smtp_port.hint=Priključak SMTP poslužitelja za koristiti.
-Invitation.WebHome_smtp_server.hint=SMTP poslužitelj na koji slati.
 Invitation.WebHome_smtp_server_password.hint=Lozinka za povezivanje sa SMTP poslužiteljem, samo kada je potrebna autentikacija.
 Invitation.WebHome_smtp_server_username.hint=Korisničko ime za povezivanje na SMTP poslužitelj, samo kada je potrebna autentikacija.
-invitation.applicationsPanelEntryLabel=Pozivnice
+Invitation.WebHome_smtp_port.hint=Priključak SMTP poslužitelja za koristiti.
+Invitation.WebHome_smtp_server.hint=SMTP poslužitelj na koji slati.
+Invitation.WebHome_javamail_extra_props.hint=Lista dodatnih Java Mail svojstava za koristiti.
 </content>
 </xwikidoc>

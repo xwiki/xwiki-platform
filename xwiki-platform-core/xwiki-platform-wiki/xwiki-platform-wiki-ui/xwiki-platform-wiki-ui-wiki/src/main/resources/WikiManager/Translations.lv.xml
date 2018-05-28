@@ -39,86 +39,101 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-WikiManager.WikiCandidateMemberClass_status_accepted=Pieņemts
-WikiManager.WikiCandidateMemberClass_status_pending=Neizlemts
-WikiManager.WikiCandidateMemberClass_status_rejected=Noraidīts
-WikiManager.WikiCandidateMemberClass_type_invitation=Uzaicinājums
-WikiManager.WikiCandidateMemberClass_type_request=Pieprasījums
-admin.xwiki.manageworkspace.description=Pārvaldīt iestatījumus kā, piemēram, viki nosaukums, apraksts, īpašnieks un dalības veids.
-admin.xwiki.members.title=Tekošie dalībnieki
-admin.xwiki.usersconfiguration.title=Iestatījumi
-admin.xwiki.workspaceusers.description=Pārvaldīt viki dalībniekus\: pievienot, dzēst, uzaicināt, pieņemt vai noraidīt viki dalībnieku pieprasījumus.
-core.menu.admin.wiki=Pārvaldīt viki
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
 core.menu.type.wiki=Viki
 core.menu.watchlist.add.wiki=Vērot viki
 core.menu.watchlist.remove.wiki=Nevērot viki
-platform.wiki.currentwiki.candidateAcceptedSuccess=Pieprasījums veiksmīgi apstiprināts.
-platform.wiki.currentwiki.candidateHandledComment=Piezīmes\:
+core.menu.admin.wiki=Pārvaldīt viki
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Viki informācija
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Sveicināti {0}{1}{2} viki.
+platform.wiki.currentwiki.currentUserIsOwner=Jūs esat šī viki īpašnieks.
+platform.wiki.currentwiki.currentUserIsAdmin=Jūs esat šī viki administrators.
+platform.wiki.currentwiki.joinNeedToLogin=Lai pievienotos šim viki, jums ir jābūt pieteikušamies.
+platform.wiki.currentwiki.currentUserNotMember=Jūs neesat šī viki dalībnieks.
+platform.wiki.currentwiki.currentuserCanJoin=Ja vēlaties, jūs varat {0}pievienoties šim wiki{1}.
+platform.wiki.currentwiki.currentUserIsMember=Jūs esat šī viki dalībnieks.
+platform.wiki.currentwiki.currentUserCanLeave=Ja vēlaties jūs varat {0}atstāt šo viki{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Lai apskatītu visus viki dalībniekus, jūs varat lietot {0}Lietotāju saraksta{1} lapu
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Jūs esat uzaicināts piedalīties šajā viki
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Jūs esat pierpasījis pievienoties šim viki
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Jūsu pieprasījums pievienoties viki ''{0}'' ir apstiprināts.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Jūsu pieprasījums pievienoties viki ''{0}'' ir noraidīts.
 platform.wiki.currentwiki.candidateHandledSaveComment=Apstrādāts kandidāts {0} (no {1})
+platform.wiki.currentwiki.candidateHandledComment=Piezīmes\:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Pieprasījums veiksmīgi apstiprināts.
 platform.wiki.currentwiki.candidateRejectedSuccess=Pieprasījums veiksmīgi noraidīts.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} jau ir viki dalībnieks.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} jau ir neizlemts uzaicinājums. Lūdzu atbildiet uz šo uzaicinājumu.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} jau ir gaidošs uzaicinājums
+platform.wiki.currentwiki.inviteSaveComment=Lietotājs ''{0}'' ir uzaicināts pievienoties viki.
+platform.wiki.currentwiki.inviteNotification=Jūs esat uzaicināts pievienoties viki "{0}".
+platform.wiki.currentwiki.inviteSuccess={0} uzaicināts veiksmīgi.
+platform.wiki.currentwiki.invitationCancelSaveComment=Atcelts uzaicinājums {0} (no {1})
+platform.wiki.currentwiki.invitationCancelNotification=Jūsu uzaicinājums ir atcelts un vairs nav spēkā.
+platform.wiki.currentwiki.invitationCancelSuccess=Uzaicinājums sekmīgi atcelts.
+platform.wiki.currentwiki.invitationCancelFailure=Kļūda. Jūs nevarat atcelt šo uzaicinājumu.
 platform.wiki.currentwiki.candidateReviewFailure=Kļūda\: Jūs nevarat atcelt šo uzaicinājumu.
-platform.wiki.currentwiki.candidates.accept.label=Pieņemt
-platform.wiki.currentwiki.candidates.hint=Lietotāji, kuri ir uzaicināti vai ir pieprasījuši pievienoties viki.
-platform.wiki.currentwiki.candidates.invitation.cancel.label=Noraidīt uzaicinājumu
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Skaistais nosaukums
+platform.wiki.currentwiki.prop.description.label=Apraksts
+platform.wiki.currentwiki.prop.owner.label=Īpašnieks
+platform.wiki.currentwiki.prop.membershipType.label=Dalības veids
+platform.wiki.currentwiki.prop.secure.label=Drošs (SSL) savienojums
+platform.wiki.currentwiki.member.add=Pievienot vai uzaicināt lietotājus viki
+platform.wiki.currentwiki.gadget.wikiInformation.label=Viki informācija
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Aktīvākie dalībnieki
+platform.wiki.currentwiki.panel.information.name.label=Nosaukums
+platform.wiki.currentwiki.panel.information.description.label=Aprakts
+platform.wiki.currentwiki.panel.information.members.label=Dalībnieki
+platform.wiki.currentwiki.invitation.view.label=Skatīt uzaicinājumu
+platform.wiki.currentwiki.joinrequest.cancel.label=Atcelt pieprasījumu
+platform.wiki.currentwiki.joinreques.request.label=Pieprasīt pievienošanu
+platform.wiki.currentwiki.join.label=Pievienoties
+platform.wiki.currentwiki.leave.label=Pamest viki
+platform.wiki.currentwiki.invite.username.label=Lietotāja vārds
+platform.wiki.currentwiki.invite.message.label=Ziņojums
+platform.wiki.currentwiki.invite.button.label=Uzaicināt
 platform.wiki.currentwiki.candidates.label=Kandidāti
-platform.wiki.currentwiki.candidates.reject.label=Noraidīt
+platform.wiki.currentwiki.candidates.status.label=Statuss
+platform.wiki.currentwiki.candidates.type.label=Veids\:
 platform.wiki.currentwiki.candidates.reviewer.label=Admins\:
 platform.wiki.currentwiki.candidates.reviewermessage.label=Admina ziņa\:
 platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privāts komentārs\:
-platform.wiki.currentwiki.candidates.status.label=Statuss
-platform.wiki.currentwiki.candidates.type.label=Veids\:
-platform.wiki.currentwiki.currentUserCanLeave=Ja vēlaties jūs varat {0}atstāt šo viki{1}.
-platform.wiki.currentwiki.currentUserIsAdmin=Jūs esat šī viki administrators.
-platform.wiki.currentwiki.currentUserIsMember=Jūs esat šī viki dalībnieks.
-platform.wiki.currentwiki.currentUserIsOwner=Jūs esat šī viki īpašnieks.
-platform.wiki.currentwiki.currentUserNotMember=Jūs neesat šī viki dalībnieks.
-platform.wiki.currentwiki.currentuserCanJoin=Ja vēlaties, jūs varat {0}pievienoties šim wiki{1}.
-platform.wiki.currentwiki.gadget.topActiveUsers.label=Aktīvākie dalībnieki
-platform.wiki.currentwiki.gadget.wikiInformation.label=Viki informācija
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Lai apskatītu visus viki dalībniekus, jūs varat lietot {0}Lietotāju saraksta{1} lapu
-platform.wiki.currentwiki.invitation.view.label=Skatīt uzaicinājumu
-platform.wiki.currentwiki.invitationCancelFailure=Kļūda. Jūs nevarat atcelt šo uzaicinājumu.
-platform.wiki.currentwiki.invitationCancelNotification=Jūsu uzaicinājums ir atcelts un vairs nav spēkā.
-platform.wiki.currentwiki.invitationCancelSaveComment=Atcelts uzaicinājums {0} (no {1})
-platform.wiki.currentwiki.invitationCancelSuccess=Uzaicinājums sekmīgi atcelts.
-platform.wiki.currentwiki.invitationPendingForCurrentWiki=Jūs esat uzaicināts piedalīties šajā viki
-platform.wiki.currentwiki.invite.button.label=Uzaicināt
-platform.wiki.currentwiki.invite.message.hint=Lietotājam nosūtītais ziņojums
-platform.wiki.currentwiki.invite.message.label=Ziņojums
-platform.wiki.currentwiki.invite.username.hint=Viki pievienojamā lietotāja vārds
-platform.wiki.currentwiki.invite.username.label=Lietotāja vārds
-platform.wiki.currentwiki.inviteNotification=Jūs esat uzaicināts pievienoties viki "{0}".
-platform.wiki.currentwiki.inviteRequestAlreadyExists={0} jau ir neizlemts uzaicinājums. Lūdzu atbildiet uz šo uzaicinājumu.
-platform.wiki.currentwiki.inviteSaveComment=Lietotājs ''{0}'' ir uzaicināts pievienoties viki.
-platform.wiki.currentwiki.inviteSuccess={0} uzaicināts veiksmīgi.
-platform.wiki.currentwiki.inviteUserAlreadyInvited={0} jau ir gaidošs uzaicinājums
-platform.wiki.currentwiki.inviteUserAlreadyMember={0} jau ir viki dalībnieks.
-platform.wiki.currentwiki.join.label=Pievienoties
-platform.wiki.currentwiki.joinNeedToLogin=Lai pievienotos šim viki, jums ir jābūt pieteikušamies.
-platform.wiki.currentwiki.joinRequestAcceptedNotification=Jūsu pieprasījums pievienoties viki ''{0}'' ir apstiprināts.
-platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Jūs esat pierpasījis pievienoties šim viki
-platform.wiki.currentwiki.joinRequestRejectedNotification=Jūsu pieprasījums pievienoties viki ''{0}'' ir noraidīts.
-platform.wiki.currentwiki.joinreques.request.label=Pieprasīt pievienošanu
-platform.wiki.currentwiki.joinrequest.cancel.label=Atcelt pieprasījumu
-platform.wiki.currentwiki.leave.label=Pamest viki
-platform.wiki.currentwiki.managewikis.title=Viki
-platform.wiki.currentwiki.member.add=Pievienot vai uzaicināt lietotājus viki
-platform.wiki.currentwiki.panel.information.description.label=Aprakts
-platform.wiki.currentwiki.panel.information.members.label=Dalībnieki
-platform.wiki.currentwiki.panel.information.name.label=Nosaukums
-platform.wiki.currentwiki.prop.description.hint=Īss viki apraksts un tā mērķis
-platform.wiki.currentwiki.prop.description.label=Apraksts
-platform.wiki.currentwiki.prop.membershipType.hint=Veids, kā lietotāji var pievienoties viki.
-platform.wiki.currentwiki.prop.membershipType.label=Dalības veids
-platform.wiki.currentwiki.prop.owner.hint=Lietotājs, kuram šajā viki būs visas tiesības.
-platform.wiki.currentwiki.prop.owner.label=Īpašnieks
-platform.wiki.currentwiki.prop.secure.hint=Ja ieslēgts visas saites, kas norādīs uz ārējiem resursiem, sāksies ar {0}https\:~/~/{1}.
-platform.wiki.currentwiki.prop.secure.label=Drošs (SSL) savienojums
-platform.wiki.currentwiki.prop.wikiprettyname.hint=Viki attēlojamais nosaukums.
-platform.wiki.currentwiki.prop.wikiprettyname.label=Skaistais nosaukums
-platform.wiki.currentwiki.welcome=Sveicināti {0}{1}{2} viki.
+platform.wiki.currentwiki.candidates.accept.label=Pieņemt
+platform.wiki.currentwiki.candidates.reject.label=Noraidīt
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Noraidīt uzaicinājumu
 platform.wiki.currentwiki.wikiusers.title=Viki lietotāji
-platform.wiki.panel.title=Viki informācija
+platform.wiki.currentwiki.managewikis.title=Viki
+WikiManager.WikiCandidateMemberClass_status_pending=Neizlemts
+WikiManager.WikiCandidateMemberClass_status_accepted=Pieņemts
+WikiManager.WikiCandidateMemberClass_status_rejected=Noraidīts
+WikiManager.WikiCandidateMemberClass_type_request=Pieprasījums
+WikiManager.WikiCandidateMemberClass_type_invitation=Uzaicinājums
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Viki attēlojamais nosaukums.
+platform.wiki.currentwiki.prop.description.hint=Īss viki apraksts un tā mērķis
+platform.wiki.currentwiki.prop.owner.hint=Lietotājs, kuram šajā viki būs visas tiesības.
+platform.wiki.currentwiki.prop.membershipType.hint=Veids, kā lietotāji var pievienoties viki.
+platform.wiki.currentwiki.prop.secure.hint=Ja ieslēgts visas saites, kas norādīs uz ārējiem resursiem, sāksies ar {0}https\:~/~/{1}.
+platform.wiki.currentwiki.invite.username.hint=Viki pievienojamā lietotāja vārds
+platform.wiki.currentwiki.invite.message.hint=Lietotājam nosūtītais ziņojums
+platform.wiki.currentwiki.candidates.hint=Lietotāji, kuri ir uzaicināti vai ir pieprasījuši pievienoties viki.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=Pārvaldīt iestatījumus kā, piemēram, viki nosaukums, apraksts, īpašnieks un dalības veids.
+admin.xwiki.workspaceusers.description=Pārvaldīt viki dalībniekus\: pievienot, dzēst, uzaicināt, pieņemt vai noraidīt viki dalībnieku pieprasījumus.
+admin.xwiki.usersconfiguration.title=Iestatījumi
+admin.xwiki.members.title=Tekošie dalībnieki
+    
+# DRAWER ITEM
+### Missing: platform.wiki.drawer.homeWiki=Home
 </content>
 </xwikidoc>

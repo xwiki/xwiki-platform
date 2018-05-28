@@ -39,18 +39,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-admin.ratings=Ocjene
+  <content>admin.ratings=Ocjene
 admin.ratings.activateratings=U ovom wikiju uključite ocjene
 admin.ratings.activateratingsinfo=Aktivacijom ocjena u ovom wikiju bit će prikazana prosječna ocjena (koja se sastoji od zvjezdica) u gornjem desnom uglu svakog dokumenta ovog wikija (izuzev onih u *XWiki* prostoru). Autenticirani korisnici moći će ocjenjivati dokumente klikanjem po zvjezdicama. Alternativno se može koristiti panel za ocjene, npr. za uključivanje ocjenjivanja samo u željenim prostorima. Za upotrebu panela za ocjene molim posjetite upravljačku sekciju Čarobnjak panela.
-admin.ratings.illegalrequest=Nevaljani zahtjev
-admin.ratings.ratingsactivated=Ocjene su uključene
-admin.ratings.ratingsdeactivated=Ocjene su isključene
 admin.ratings.resetratings=Ponovo postavljanje svih ocjena u ovom wikiju učinit će da svi dokumenti krenu iznova bez glasova. Imajte na umu da je ova akcija ireverzibilna, izuzev vraćanja verzije dokument po dokument. Ponovno postavljanje svih ocjena može potrajati ukoliko wiki već ima značajnu količinu ocijenjenih dokumenata.
 admin.ratings.uninstallratings=Deinstalacija aplikacije Ocjene obrisat će dokumente koji čine aplikaciju, ali *bit će zadržani svi glasovi ocijenjenih dokumenata*. Ako kasnije ponovno instalirate aplikaciju, dokumenti će nanovo krenuti sa spremljenom prosječnom ocjenom koju su imali prije deinstalacije aplikacije. Naposljetku, deinstalacija aplikacije Ocjene *uklonit će kategoriju Ocjene* iz upravljanja wikijem.
-rating.logintorate=Prijavite se za ocjenjivanje
-rating.novotes=Još nema glasova
+admin.ratings.ratingsactivated=Ocjene su uključene
+admin.ratings.ratingsdeactivated=Ocjene su isključene
+admin.ratings.illegalrequest=Nevaljani zahtjev
 rating.rate=Ocijenite\!
 rating.yourvote=Vaš glas
+rating.logintorate=Prijavite se za ocjenjivanje
+rating.novotes=Još nema glasova
 </content>
 </xwikidoc>

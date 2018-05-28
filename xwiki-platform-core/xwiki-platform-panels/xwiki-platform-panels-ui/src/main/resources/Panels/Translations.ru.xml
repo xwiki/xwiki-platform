@@ -39,14 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language ru generated from http://www.l10n.xwiki.org
-panels._actions=Действия
-panels.available=Доступные Панели
-panels.category=Категория
-panels.children.title=Дочерние Страницы
-panels.description=Описание
+  <content>panels.available=Доступные Панели
 panels.name=Название
-panels.siblings.title=Родственные Страницы
+panels.description=Описание
 panels.type=Тип
+panels.category=Категория
+panels._actions=Действия
+panels.emptyvalue=
+panels.children.title=Дочерние Страницы
+panels.siblings.title=Родственные Страницы
+### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
 </content>
 </xwikidoc>

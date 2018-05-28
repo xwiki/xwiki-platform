@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language ru generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Имя раздела
-index.spacesMacro.createSpace.link=Создать новый раздел
-index.spacesMacro.createSpace.submit=Создать
-index.spacesMacro.spaceAdministration.alt=Администрирование раздела
-index.spacesMacro.spaceAdministration.title=Управление разделом
-index.spacesMacro.spaceIndex.alt=Индекс раздела
+  <content>index.spacesMacro.title=Разделы
 index.spacesMacro.spaceIndex.title=Смотреть индекс раздела
-index.spacesMacro.title=Разделы
+index.spacesMacro.spaceIndex.alt=Индекс раздела
+index.spacesMacro.spaceAdministration.title=Управление разделом
+index.spacesMacro.spaceAdministration.alt=Администрирование раздела
+index.spacesMacro.createSpace.link=Создать новый раздел
+index.spacesMacro.createSpace.defaultSpaceName=Имя раздела
+index.spacesMacro.createSpace.submit=Создать
 </content>
 </xwikidoc>

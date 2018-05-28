@@ -125,7 +125,7 @@
       <disabled>0</disabled>
       <displayType>input</displayType>
       <hint/>
-      <multiSelect>0</multiSelect>
+      <multiSelect>1</multiSelect>
       <name>repositories</name>
       <number>6</number>
       <picker>0</picker>

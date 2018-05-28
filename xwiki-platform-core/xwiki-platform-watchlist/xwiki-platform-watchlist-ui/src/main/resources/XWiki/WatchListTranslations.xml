@@ -51,7 +51,7 @@ XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly
 
 ### Notification Icons    
 watchlist.notifications.icons.on=ON
-watchlist.notifications.icons.on=OFF
+watchlist.notifications.icons.off=OFF
 watchlist.notifications.icons.tooltip.page=Watch this page
 watchlist.notifications.icons.tooltip.pageAndChildren=Watch this page and its children
 watchlist.notifications.icons.tooltip.space=Watch the parent page and its children

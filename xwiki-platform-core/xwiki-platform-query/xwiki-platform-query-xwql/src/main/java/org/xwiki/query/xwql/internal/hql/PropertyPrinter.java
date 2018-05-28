@@ -20,6 +20,8 @@
 package org.xwiki.query.xwql.internal.hql;
 
 import org.xwiki.query.internal.jpql.node.APath;
+import org.xwiki.query.internal.jpql.node.PGroupbyItem;
+import org.xwiki.query.internal.jpql.node.POrderbyItem;
 import org.xwiki.query.internal.jpql.node.PPath;
 import org.xwiki.query.internal.jpql.node.PSelectExpression;
 import org.xwiki.query.internal.jpql.node.TId;
@@ -40,14 +42,24 @@ public class PropertyPrinter
             if (className != null) {
                 prop.alias = printer.getContext().getAliasGenerator().generate(prop.object.alias + "_" + prop.name);
                 printer.from.append(", ").append(className).append(" as ").append(prop.alias);
+                // Enables to select, order and group the elements of the list
+                if (className.endsWith("DBStringListProperty")) {
+                    printer.from.append(" join ").append(prop.alias).append(".").append(prop.getValueField())
+                        .append(" ").append(prop.alias + prop.getValueField());
+                }
                 printer.where.append(" and ").append(prop.alias).append(".id.id=").append(prop.object.alias)
                     .append(".id").append(" and ").append(prop.alias).append(".id.name").append("='").append(prop.name)
                     .append("'");
                 // rewrite nodes
                 for (PPath p : prop.locations) {
                     String s = prop.alias + "." + prop.getValueField();
-                    if (className.endsWith("DBStringListProperty") && p.parent() instanceof PSelectExpression) {
-                        s = "elements(" + s + ")";
+                    // Takes the elements of the list instead of the list itself
+                    // Note that we couldn't use 'elements(list)' statement when using 'group by' and 'order by'
+                    if (className.endsWith("DBStringListProperty") && p.parent() != null && (
+                        p.parent() instanceof PSelectExpression ||
+                        p.parent().parent() instanceof POrderbyItem ||
+                        p.parent().parent() instanceof PGroupbyItem)) {
+                        s = prop.alias + prop.getValueField();
                     }
                     p.replaceBy(new APath(new TId(s)));
                 }

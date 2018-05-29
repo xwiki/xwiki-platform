@@ -57,7 +57,7 @@ En syntaxe XWiki 1.0, il n'y avait pas de possibilité de passer des paramètres
 
 === 2.0 Parameters ===
 
-En syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}, il est possible de passer des paramètres aux divers éléments de syntaxe et aussi aux blocs de texte. Vous pouvez utiliser ces paramètres par exemple pour créer des styl. Il est possible de choisir n'importe quelle paire clé/valeur. Le moteur de rendu XHTML va passer ces paramètres en tant que XHTML attributs à la représentation XHTML sous-jacente des éléments de syntaxe. 
+En syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}, il est possible de passer des paramètres aux divers éléments de syntaxe et aussi aux blocs de texte. Vous pouvez utiliser ces paramètres par exemple pour créer des styles. Il est possible de choisir n'importe quelle paire clé/valeur. Le moteur de rendu XHTML va passer ces paramètres en tant que XHTML attributs à la représentation XHTML sous-jacente des éléments de syntaxe. 
 
 |=(% style="width="60%" %)Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=XHTML généré
 |((({{{

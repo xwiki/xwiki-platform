@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>9.11.5</version>
+    <version>9.11.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-job</artifactId>
   <name>XWiki Platform - Job - Parent POM</name>

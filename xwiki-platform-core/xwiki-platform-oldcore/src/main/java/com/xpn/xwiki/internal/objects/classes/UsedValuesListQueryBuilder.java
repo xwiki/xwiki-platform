@@ -130,7 +130,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
 
     private void bindParameterValues(Query query, ListClass listClass)
     {
-        String className = listClass.getClassName();
+        String className = listClass.getObject().getName();
         query.bindValue("className", className);
         query.bindValue("propertyName", listClass.getName());
         query.bindValue("templateName", getTemplateName(className));

@@ -54,7 +54,7 @@
     #else
       #if ($toIndex > 0)
         #set($fromIndex = $toIndex - 1)
-      #elseif ($toIndex + 1 < $validVersions.size())
+      #elseif ($toIndex + 1 < $validVersions.size() && $toIndex > 0)
         #set($fromIndex = $toIndex - 1)
       #else
         #set($fromIndex = 0)

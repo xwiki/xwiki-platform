@@ -19,25 +19,28 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.web.Utils;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,27 +51,31 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.8RC1
  */
+@ComponentTest
 public class UsedValuesListQueryBuilderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryBuilder<ListClass>> mocker =
-        new MockitoComponentMockingRule<QueryBuilder<ListClass>>(UsedValuesListQueryBuilder.class);
-
+    @MockComponent
     private QueryManager queryManager;
 
+    @MockComponent
     private ContextualAuthorizationManager authorization;
 
+    @MockComponent
+    @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @MockComponent
+    @Named("local")
+    EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     private ListClass listClass;
 
-    @Before
-    public void configure() throws Exception
-    {
-        this.queryManager = this.mocker.getInstance(QueryManager.class);
-        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
-        this.documentReferenceResolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+    @InjectMockComponents
+    private UsedValuesListQueryBuilder usedValuesListQueryBuilder;
 
+    @BeforeEach
+    public void before(MockitoComponentManager componentManager) throws Exception
+    {
         DocumentReference oneReference = new DocumentReference("wiki", "Page", "one");
         when(this.documentReferenceResolver.resolve("alice")).thenReturn(oneReference);
         when(this.authorization.hasAccess(Right.VIEW, oneReference)).thenReturn(false);
@@ -80,10 +87,9 @@ public class UsedValuesListQueryBuilderTest
         BaseClass xclass = new BaseClass();
         xclass.setDocumentReference(new DocumentReference("apps", "Blog", "BlogPostClass"));
 
-        Utils.setComponentManager(this.mocker);
-        EntityReferenceSerializer<String> localEntityReferenceSerializer =
-            this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localEntityReferenceSerializer.serialize(xclass.getDocumentReference())).thenReturn("Blog.BlogPostClass");
+        Utils.setComponentManager(componentManager);
+        when(this.localEntityReferenceSerializer.serialize(xclass.getDocumentReference()))
+            .thenReturn("Blog.BlogPostClass");
 
         this.listClass = new DBListClass();
         this.listClass.setName("category");
@@ -103,7 +109,7 @@ public class UsedValuesListQueryBuilderTest
                 + "order by count(*) desc",
             Query.HQL)).thenReturn(query);
 
-        assertSame(query, this.mocker.getComponentUnderTest().build(listClass));
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
 
         verify(query).bindValue("className", "Blog.BlogPostClass");
         verify(query).bindValue("propertyName", "category");
@@ -124,7 +130,7 @@ public class UsedValuesListQueryBuilderTest
             + " and prop.id.id = obj.id and prop.id.name = :propertyName " + "group by listItem "
             + "order by count(*) desc", Query.HQL)).thenReturn(query);
 
-        assertSame(query, this.mocker.getComponentUnderTest().build(listClass));
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
     }
 
     @Test
@@ -141,6 +147,6 @@ public class UsedValuesListQueryBuilderTest
                 + "order by count(*) desc",
             Query.HQL)).thenReturn(query);
 
-        assertSame(query, this.mocker.getComponentUnderTest().build(listClass));
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
     }
 }

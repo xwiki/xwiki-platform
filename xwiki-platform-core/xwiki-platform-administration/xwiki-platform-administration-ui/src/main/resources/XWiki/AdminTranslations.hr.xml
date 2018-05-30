@@ -39,73 +39,87 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-XWiki.Registration_defaultRedirect.hint=Ovo je URL na koji će korisnik biti preusmjeren nakon pritiska gumba za prijavu ukoliko nije naznačen xredirect parametar. Može se uporijebiti Velocity kôd.
-XWiki.Registration_heading.hint=Linija na vrhu stranice koja se prikazuje korisnicima čija registracija je u tijeku i onima koji su se netom registrirali. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
-XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Živa validacija prikazuje poruku kao znak korisnicima da su zadovoljavajuće ispunili polje. Ovo je poruka koju će primiti ukoliko ona za neko konkretno polje nije nadjačana. Može se uporijebiti Velocity kôd.
-XWiki.Registration_liveValidation_enabled.hint=Onemogućite ovo da biste onemogućili živi kôd Javascript validacije (polja će i dalje biti validirana na strani poslužitelja).
-XWiki.Registration_loginButton_autoLogin_enabled.hint=Ukoliko je omogućen gumb za prijavu, onda možete imati djelić Javascript kôda koji će umjesto korisnika pritisnuti gumb za prijavu.
-XWiki.Registration_loginButton_enabled.hint=Kada se korisnik registrira bit će mu pružen gumb koji će njegovo korisničko ime i lozinku poslati akciji za prijavu te ih odmah prijaviti u sustav. Ovo međutim uzrokuje to da korisničko ime i lozinka budu vraćeni natrag u HTML-u, što može biti neprihvatljivo ovisno o vašim sigurnosnim potrebama.
-XWiki.Registration_registrationSuccessMessage.hint=Ovo se prikazuje korisniku kada se uspješno registrira. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
-XWiki.Registration_requireCaptcha.hint=Omogućite ovo kako biste učinili obaveznim da korisnik riješi CAPTCHA-u da bi se registrirao.
-XWiki.Registration_welcomeMessage.hint=Ovo se prikazuje jedino onda kada korisnici ispunjavaju obrazac. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
-XWiki.XWikiPreferences_auth_active_check.hint=Ako je postavljeno na "Da", korisnicima će zapriječiti prijavu bez unosa tokena prethodno poslanog e-poštom.
-XWiki.XWikiPreferences_colorTheme.hint=Naznačite zadano korištenu temu za boje.
-XWiki.XWikiPreferences_confirmation_email_content.hint=Preložak e-pošte koji odgovara e-pošti koja se šalje nakon što korisnik validira svoj račun klikanjem na poveznicu za validaciju iz prve zaprimljene e-pošte.
-XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Zadana "markup" sintaksa sadržaja kod izrade nove stranice.
-XWiki.XWikiPreferences_dateformat.hint=Naznačite format za prikaz datuma (npr. datuma izrade stranice)
-XWiki.XWikiPreferences_default_language.hint=Odaberite zadani jezik wikija
-XWiki.XWikiPreferences_editcomment.hint=Omogućite unos poruke kod izrade nove verzije stranice.
-XWiki.XWikiPreferences_editcomment_mandatory.hint=Za svaku napravljenu izmjenu stranica neće biti spremljena dok ne bude unesen sažetak verzije.
-XWiki.XWikiPreferences_editor.hint=Odaberite zadani korišteni tip uređivača sadržaja stranice.
-XWiki.XWikiPreferences_iconTheme.hint=Naznačite zadano korištenu temu za ikone.
-XWiki.XWikiPreferences_invitation_email_content.hint=Predložak e-pošte koji će biti poslan korisnicima pozvanima da se registriraju.
-XWiki.XWikiPreferences_languages.hint=Odaberite jezike koji će biti dostupni za sučelje. Korisnici će moći prevoditi stranice vašeg wikija na bilo koji od ovih jezika (ukoliko je omogućen višejezični način rada).
-XWiki.XWikiPreferences_meta.hint=Definirajte metapodatke dodane svakoj stranici, koji naznačuju opis stranice, autora, ključne riječi itd.
-XWiki.XWikiPreferences_minoredit.hint=Dozvolite stranicama da imaju glavne verzije (x.1) i manje (1.x) verzije. Manje verzije mogu se pregledavati putem "Prikaži manje izmjene" gumba u povijesti stranice.
-XWiki.XWikiPreferences_multilingual.hint=Omogućite višejezični način rada ako vaš wiki ima sadržaj na više jezika. Ovo će vašim korisnicima omogućiti prevođenje wiki stranica te da im se korisničko sučelje prikazuje na njihovom preferiranom jeziku.
-XWiki.XWikiPreferences_showannotations.hint=U razmještaju stranice prikaži rubriku anotacija.
-XWiki.XWikiPreferences_showattachments.hint=U razmještaju stranice prikaži rubriku privitaka.
-XWiki.XWikiPreferences_showcomments.hint=U razmještaju stranice prikaži rubriku komentara.
-XWiki.XWikiPreferences_showhistory.hint=U razmještaju stranice prikaži rubriku povijesti.
-XWiki.XWikiPreferences_showinformation.hint=U razmještaju stranice prikaži rubriku informacija.
-XWiki.XWikiPreferences_skin.hint=Naznačite zadano korištenu kožu. To može biti koža iz datotečnog sustava, na primjer "flamingo", ili korisnički prilagođena koža stranica, na primjer "XWiki.DefaultSkin"
-XWiki.XWikiPreferences_timezone.hint=Globalno postavite vremensku zonu za sve datume
-XWiki.XWikiPreferences_title.hint=Definirajte format naslova stranice onako kako ga vide preglednici.
-XWiki.XWikiPreferences_use_email_verification.hint=Ako je postavljeno na "Da", na adresu e-pošte zadanu prilikom popunjavanja registracijskog obrasca bit će poslana e-pošta.
-XWiki.XWikiPreferences_validation_email_content.hint=Predložak e-pošte koji će korisnicima biti poslan radi validacije njihove adrese e-pošte.
-XWiki.XWikiPreferences_version.hint=Definirajte informacije koje se prikazuju u rubrici verzije u podnožju.
-XWiki.XWikiPreferences_webcopyright.hint=Definirajte informacije koje se prikazuju u rubrici autorskog prava u podnožju.
-XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Zapriječi korisnicima izradu wiki stranica s praznim naslovom.
-admin.colorthemes.global=Globalno
-admin.colorthemes.local=Lokalno
-admin.edit=Uređivanje
-admin.edit.description=Podesite način uređivanja, WYSIWYG uređivač i dostupne sintakse.
-admin.other=Ostalo
-admin.other.description=Razna podešenja za ekstenzije.
-admin.themes=Teme
-admin.themes.description=Prilagodi teme za boje i ikone.
-admin.title=Naslov
-admin.wysiwyg.description=Odaberite i podesite zadani WYSIWYG uređivač.
-administration.menu.search.hint=Pretraga...
-administration.menu.search.noResults=Nema rezultata.
-administration.section.analytics.status=Status
-administration.section.analytics.status.hint=Odredite je li Google Analytics™ praćenje aktivno ili ne
-administration.section.export.author.hint=Autor paketa.
-administration.section.export.backupPack.hint=Naznačite hoće li paket biti korišten kao rezervna kopija. Ova opcija ne utječe na izvezeni sadržaj. Jedini učinak je taj da će kod uvoza paketa biti predodabrana opcija "Uvezi kao paket rezervne kopije". Razlika između paketa rezervne kopije i običnog paketa je ta da se u prvom slučaju prilikom uvoza čuva posljednji autor stranice, dok u drugom slučaju posljednji autor svake uvezene stranice postaje onaj korisnik koji obavlja uvoz.
-administration.section.export.description.hint=Opis paketa koji se prikazuje kod njegovog uvoza.
-administration.section.export.licence.hint=Licenca za sadržaj. Npr.\: LGPL, GPLV2, itd.
-administration.section.export.packageName.hint=Ime datoteke koje se koristi prilikom generiranja arhiva s izvezenim sadržajem.
-administration.section.export.version.hint=Verzija paketa.
-administration.section.export.withHistory.hint=U izvoz uključi povijest stranice. U protivnome će biti izvezena samo najnovija verzija stranice.
-administration.section.import.hint=Započnite otpremanjem novog paketa ili odabirom jednog iz liste dostupnih paketa. Sadržaj odabranog paketa bit će prikazan na desnoj strani zajedno s opcijama za uvoz.
-administration.sectionTitle=Upravljanje\: {0}
-administration.sectionTitle.global=Globalno upravljanje\: {0}
-administration.sectionTitle.page=Upravljanje stranicom\: {0}
-administration.sectionTitle.wiki=Upravljanje wikijem\: {0}
-administration.title=Upravljanje
-administration.title.global=Globalno upravljanje
+  <content>administration.title=Upravljanje
 administration.title.page=Upravljanje stranicom
 administration.title.wiki=Upravljanje wikijem
+administration.title.global=Globalno upravljanje
+administration.sectionTitle=Upravljanje\: {0}
+administration.sectionTitle.page=Upravljanje stranicom\: {0}
+administration.sectionTitle.wiki=Upravljanje wikijem\: {0}
+administration.sectionTitle.global=Globalno upravljanje\: {0}
+administration.menu.search.hint=Pretraga...
+administration.menu.search.noResults=Nema rezultata.
+
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=Ako je postavljeno na "Da", na adresu e-pošte zadanu prilikom popunjavanja registracijskog obrasca bit će poslana e-pošta.
+XWiki.XWikiPreferences_auth_active_check.hint=Ako je postavljeno na "Da", korisnicima će zapriječiti prijavu bez unosa tokena prethodno poslanog e-poštom.
+XWiki.XWikiPreferences_validation_email_content.hint=Predložak e-pošte koji će korisnicima biti poslan radi validacije njihove adrese e-pošte.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Preložak e-pošte koji odgovara e-pošti koja se šalje nakon što korisnik validira svoj račun klikanjem na poveznicu za validaciju iz prve zaprimljene e-pošte.
+XWiki.XWikiPreferences_invitation_email_content.hint=Predložak e-pošte koji će biti poslan korisnicima pozvanima da se registriraju.
+
+XWiki.Registration_heading.hint=Linija na vrhu stranice koja se prikazuje korisnicima čija registracija je u tijeku i onima koji su se netom registrirali. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
+XWiki.Registration_welcomeMessage.hint=Ovo se prikazuje jedino onda kada korisnici ispunjavaju obrazac. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
+XWiki.Registration_liveValidation_enabled.hint=Onemogućite ovo da biste onemogućili živi kôd Javascript validacije (polja će i dalje biti validirana na strani poslužitelja).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Živa validacija prikazuje poruku kao znak korisnicima da su zadovoljavajuće ispunili polje. Ovo je poruka koju će primiti ukoliko ona za neko konkretno polje nije nadjačana. Može se uporijebiti Velocity kôd.
+XWiki.Registration_loginButton_enabled.hint=Kada se korisnik registrira bit će mu pružen gumb koji će njegovo korisničko ime i lozinku poslati akciji za prijavu te ih odmah prijaviti u sustav. Ovo međutim uzrokuje to da korisničko ime i lozinka budu vraćeni natrag u HTML-u, što može biti neprihvatljivo ovisno o vašim sigurnosnim potrebama.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Ukoliko je omogućen gumb za prijavu, onda možete imati djelić Javascript kôda koji će umjesto korisnika pritisnuti gumb za prijavu.
+XWiki.Registration_defaultRedirect.hint=Ovo je URL na koji će korisnik biti preusmjeren nakon pritiska gumba za prijavu ukoliko nije naznačen xredirect parametar. Može se uporijebiti Velocity kôd.
+XWiki.Registration_requireCaptcha.hint=Omogućite ovo kako biste učinili obaveznim da korisnik riješi CAPTCHA-u da bi se registrirao.
+XWiki.Registration_registrationSuccessMessage.hint=Ovo se prikazuje korisniku kada se uspješno registrira. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
+
+# Look &amp; Feel Sections
+admin.themes=Teme
+admin.themes.description=Prilagodi teme za boje i ikone.
+admin.colorthemes.local=Lokalno
+admin.colorthemes.global=Globalno
+XWiki.XWikiPreferences_showannotations.hint=U razmještaju stranice prikaži rubriku anotacija.
+XWiki.XWikiPreferences_showcomments.hint=U razmještaju stranice prikaži rubriku komentara.
+XWiki.XWikiPreferences_showattachments.hint=U razmještaju stranice prikaži rubriku privitaka.
+XWiki.XWikiPreferences_showhistory.hint=U razmještaju stranice prikaži rubriku povijesti.
+XWiki.XWikiPreferences_showinformation.hint=U razmještaju stranice prikaži rubriku informacija.
+XWiki.XWikiPreferences_title.hint=Definirajte format naslova stranice onako kako ga vide preglednici.
+XWiki.XWikiPreferences_meta.hint=Definirajte metapodatke dodane svakoj stranici, koji naznačuju opis stranice, autora, ključne riječi itd.
+XWiki.XWikiPreferences_webcopyright.hint=Definirajte informacije koje se prikazuju u rubrici autorskog prava u podnožju.
+XWiki.XWikiPreferences_version.hint=Definirajte informacije koje se prikazuju u rubrici verzije u podnožju.
+XWiki.XWikiPreferences_skin.hint=Naznačite zadano korištenu kožu. To može biti koža iz datotečnog sustava, na primjer "flamingo", ili korisnički prilagođena koža stranica, na primjer "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Naznačite zadano korištenu temu za ikone.
+XWiki.XWikiPreferences_colorTheme.hint=Naznačite zadano korištenu temu za boje.
+
+# Editing Sections
+admin.edit=Uređivanje
+admin.edit.description=Podesite način uređivanja, WYSIWYG uređivač i dostupne sintakse.
+admin.title=Naslov
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Zapriječi korisnicima izradu wiki stranica s praznim naslovom.
+XWiki.XWikiPreferences_editor.hint=Odaberite zadani korišteni tip uređivača sadržaja stranice.
+XWiki.XWikiPreferences_editcomment.hint=Omogućite unos poruke kod izrade nove verzije stranice.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Za svaku napravljenu izmjenu stranica neće biti spremljena dok ne bude unesen sažetak verzije.
+XWiki.XWikiPreferences_minoredit.hint=Dozvolite stranicama da imaju glavne verzije (x.1) i manje (1.x) verzije. Manje verzije mogu se pregledavati putem "Prikaži manje izmjene" gumba u povijesti stranice.
+admin.wysiwyg.description=Odaberite i podesite zadani WYSIWYG uređivač.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Zadana "markup" sintaksa sadržaja kod izrade nove stranice.
+
+# Localization Section
+XWiki.XWikiPreferences_multilingual.hint=Omogućite višejezični način rada ako vaš wiki ima sadržaj na više jezika. Ovo će vašim korisnicima omogućiti prevođenje wiki stranica te da im se korisničko sučelje prikazuje na njihovom preferiranom jeziku.
+XWiki.XWikiPreferences_languages.hint=Odaberite jezike koji će biti dostupni za sučelje. Korisnici će moći prevoditi stranice vašeg wikija na bilo koji od ovih jezika (ukoliko je omogućen višejezični način rada).
+XWiki.XWikiPreferences_default_language.hint=Odaberite zadani jezik wikija
+XWiki.XWikiPreferences_dateformat.hint=Naznačite format za prikaz datuma (npr. datuma izrade stranice)
+XWiki.XWikiPreferences_timezone.hint=Globalno postavite vremensku zonu za sve datume
+
+# Import Section
+administration.section.import.hint=Započnite otpremanjem novog paketa ili odabirom jednog iz liste dostupnih paketa. Sadržaj odabranog paketa bit će prikazan na desnoj strani zajedno s opcijama za uvoz.
+
+# Export Section
+administration.section.export.packageName.hint=Ime datoteke koje se koristi prilikom generiranja arhiva s izvezenim sadržajem.
+administration.section.export.description.hint=Opis paketa koji se prikazuje kod njegovog uvoza.
+administration.section.export.licence.hint=Licenca za sadržaj. Npr.\: LGPL, GPLV2, itd.
+administration.section.export.author.hint=Autor paketa.
+administration.section.export.version.hint=Verzija paketa.
+administration.section.export.withHistory.hint=U izvoz uključi povijest stranice. U protivnome će biti izvezena samo najnovija verzija stranice.
+administration.section.export.backupPack.hint=Naznačite hoće li paket biti korišten kao rezervna kopija. Ova opcija ne utječe na izvezeni sadržaj. Jedini učinak je taj da će kod uvoza paketa biti predodabrana opcija "Uvezi kao paket rezervne kopije". Razlika između paketa rezervne kopije i običnog paketa je ta da se u prvom slučaju prilikom uvoza čuva posljednji autor stranice, dok u drugom slučaju posljednji autor svake uvezene stranice postaje onaj korisnik koji obavlja uvoz.
+
+# Other Category
+admin.other=Ostalo
+admin.other.description=Razna podešenja za ekstenzije.
+administration.section.analytics.status=Status
+administration.section.analytics.status.hint=Odredite je li Google Analytics™ praćenje aktivno ili ne
 </content>
 </xwikidoc>

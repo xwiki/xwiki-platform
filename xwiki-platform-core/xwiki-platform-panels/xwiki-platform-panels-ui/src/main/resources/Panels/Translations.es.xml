@@ -39,7 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
+  <content>### Missing: panels.available=Available Panels
+### Missing: panels.name=Name
+### Missing: panels.description=Description
+### Missing: panels.type=Type
+### Missing: panels.category=Category
 panels._actions=Acciones
+panels.emptyvalue=
+### Missing: panels.children.title=Child Pages
+### Missing: panels.siblings.title=Sibling Pages
+### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
 </content>
 </xwikidoc>

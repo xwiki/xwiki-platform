@@ -39,11 +39,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-help.tipsPanel.gettingStartedTip=Se você está iniciando com XWiki, veja o [[Guia para Iniciantes&gt;&gt;http\://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.improveXWikiTip=Você sabia que pode melhorar o XWiki? Tire 5 minutos para [[preencher esta avaliação&gt;&gt;http\://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] e ajude este projeto de código aberto
-help.tipsPanel.jumpToPageTip=Vá para qualquer página dentro do wiki com Ctrl+G ou Meta+G.\nVeja [[mais atalhos&gt;&gt;http\://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+  <content>help.tipsPanel.title=Dicas
 help.tipsPanel.noTipMessage=Sem dicas disponíveis
-help.tipsPanel.title=Dicas
+help.tipsPanel.gettingStartedTip=Se você está iniciando com XWiki, veja o [[Guia para Iniciantes&gt;&gt;http\://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Vá para qualquer página dentro do wiki com Ctrl+G ou Meta+G.\nVeja [[mais atalhos&gt;&gt;http\://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Você sabia que pode melhorar o XWiki? Tire 5 minutos para [[preencher esta avaliação&gt;&gt;http\://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] e ajude este projeto de código aberto
+### Missing: help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
+### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+### Missing: help.macroList.title=Available Macros
+### Missing: help.macroList.id=Id
+### Missing: help.macroList.name=Name
+### Missing: help.macroList.category=Category
+### Missing: help.macroList.description=Description
+### Missing: help.macroList.visibility=Visibility
 </content>
 </xwikidoc>

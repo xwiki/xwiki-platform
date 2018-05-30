@@ -39,14 +39,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-admin.repository=Paplašinājumu krātuve
-extension.repository.authors=Autori
-extension.repository.category=Kategorija
-extension.repository.doc.creationDate=Izviedots
-extension.repository.doc.date=Mainīts
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
 extension.repository.name=Nosaukums
 extension.repository.summary=Apraksts
 extension.repository.type=Veids
+extension.repository.category=Kategorija
+extension.repository.authors=Autori
+extension.repository.doc.creationDate=Izviedots
+extension.repository.doc.date=Mainīts
+### Missing: extension.repository.rating=Rating
+### Missing: extension.repository.installedCount=Installs
+
+## Administration UI
+admin.repository=Paplašinājumu krātuve
 </content>
 </xwikidoc>

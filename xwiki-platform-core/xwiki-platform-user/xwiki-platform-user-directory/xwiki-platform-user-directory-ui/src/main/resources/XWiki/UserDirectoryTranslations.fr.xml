@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-platform.userdirectory.configSheetApplyOnConfiguration=Cette sheet doit être appliquée sur le document de configuration de l'annuaire utilisateur.
-platform.userdirectory.configSheetTitle=Sheet de configuration de l'annuaire utilisateur.
-platform.userdirectory.configTitle=Configuration de l'annuaire utilisateur
-platform.userdirectory.customizeNotAllowed=Vous n'êtes pas autorisé à personnaliser cet annuaire utilisateur.
-userdirectory.userScopeFilter=Portée des utilisateurs
-userdirectory.userScopeFilter.global=Les utilisateurs globaux membres de ce wiki
+  <content>userdirectory.userScopeFilter=Portée des utilisateurs
 userdirectory.userScopeFilter.hint=Choisissez le type d'utilisateurs que vous souhaitez afficher.
 userdirectory.userScopeFilter.local=Les utilisateurs locaux
+userdirectory.userScopeFilter.global=Les utilisateurs globaux membres de ce wiki
+platform.userdirectory.customizeNotAllowed=Vous n'êtes pas autorisé à personnaliser cet annuaire utilisateur.
+platform.userdirectory.configTitle=Configuration de l'annuaire utilisateur
+platform.userdirectory.configSheetTitle=Sheet de configuration de l'annuaire utilisateur.
+platform.userdirectory.configSheetApplyOnConfiguration=Cette sheet doit être appliquée sur le document de configuration de l'annuaire utilisateur.
 </content>
 </xwikidoc>

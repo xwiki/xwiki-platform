@@ -39,54 +39,60 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>rendering.macro.documentTree.name=Stablo stranica
+rendering.macro.documentTree.description=Prikazuje stablo XWiki stranica.
+rendering.macro.documentTree.parameter.readOnly.name=Samo čitanje
+rendering.macro.documentTree.parameter.readOnly.description=Bi li korisnik trebao moći mijenjati strukturu stabla, pod uvjetom da ima potrebna prava?
+rendering.macro.documentTree.parameter.showWikis.name=Prikaži wikije
+rendering.macro.documentTree.parameter.showWikis.description=Prikazati čvorove wikija ili ne. Ovo se može koristiti samo u glavnom wikiju i ukoliko je izvor stabla spremljen s ovlastima za programiranje.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Prikaži zgodno ime wikija
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Kod prikaza wiki čvora prikaži zgodno ime wikija umjesto identifikatora wikija.
+rendering.macro.documentTree.parameter.showSpaces.name=Prikaži prostore
+rendering.macro.documentTree.parameter.showSpaces.description=Prikazati čvorove prostora ili ne. Stranice se grupiraju prema prostoru ako se prikazuju čvorovi prostora.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Prikaži naslov stranice
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Kod prikaza čvora stranice prikazati naslov stranice umjesto imena stranice.
+rendering.macro.documentTree.parameter.showTranslations.name=Prikaži prijevode
+rendering.macro.documentTree.parameter.showTranslations.description=Prikazati prijevode stranice ili ne.
+rendering.macro.documentTree.parameter.showAttachments.name=Prikaži privitke
+rendering.macro.documentTree.parameter.showAttachments.description=Prikazati privitke stranice ili ne.
+rendering.macro.documentTree.parameter.showObjects.name=Prikaži objekte
+rendering.macro.documentTree.parameter.showObjects.description=Prikazati objekte stranice ili ne.
+rendering.macro.documentTree.parameter.showClassProperties.name=Prikaži svojstva klase
+rendering.macro.documentTree.parameter.showClassProperties.description=Prikazati svojstva klase stranica koje definiraju klase.
+rendering.macro.documentTree.parameter.root.name=Korijen
+rendering.macro.documentTree.parameter.root.description=Identifikator korijenskog čvora. Ovo je korisno ako želite prikazati samo potomke danog čvora (koji je odabrani čvor). Stablo prikazuje djecu korijenskog čvora na prvoj razini, tako da se korijenski čvor zapravo ne prikazuje. Ukoliko nije naznačen korijenski čvor, prikazuje se čitavo stablo. Format identifikatora čvora je tipEntiteta\:referencaNaEntitet, gdje tip entiteta može biti na primjer wiki, prostor, dokument. Npr.\: wiki\:xwiki, space\:xwiki\:Main, document\:xwiki\:Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=Prikaži korijen
+rendering.macro.documentTree.parameter.showRoot.description=Prikazati korijenski čvor ili ne. Korijenski čvor se pretpostavljeno ne prikazuje jer se obično implicira iz konteksta gdje se prikazuje stablo (npr. oznaka prije stabla). Međutim postoje neki slučajevi u kojima ćete htjeti prikazati korijenski čvor\: da biste mogli izraditi novi čvor ispod korijena.
+rendering.macro.documentTree.parameter.compact.name=Kompaktno
+rendering.macro.documentTree.parameter.compact.description=Ako na raspolaganju imate ograničen horizontalni prostor, onda biste vjerojatno ovo trebali postaviti na istinito. Efekt je takav da će ikone čvorova i rubovi koji ih povezuju biti skriveni. Također će biti primijenjeni neki posebni stilovi kako bi se osiguralo da stablo zauzme manje horizontalnog prostora, istovremeno čuvajući oznake čvorova potpuno vidljivima.
+rendering.macro.documentTree.parameter.links.name=Poveznice
+rendering.macro.documentTree.parameter.links.description=Naznačava bi li oznake čvorova trebale izgledati i ponašati se kao poveznice (kotve).
+rendering.macro.documentTree.parameter.checkboxes.name=Kućice
+rendering.macro.documentTree.parameter.checkboxes.description=Prikazati kućicu ispred pojedinog čvora stabla kako bi se korisniku omogućio odabir više čvorova stabla.
+rendering.macro.documentTree.parameter.openTo.name=Otvori
+rendering.macro.documentTree.parameter.openTo.description=Identifikator čvora u kojem rastvoriti stablo. Svi pretci naznačenog čvora, do korijena stabla, će također biti rastvoreni. Format identifikatora čvora je onaj koji se koristi za korijenski parametar.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Prikaži samo pregledljive
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Prikaži samo čvorove wikija, prostora i stranica nad kojima trenutni korisnik ima ovlast za pregledavanje. Ukoliko je ovo postavljeno na neistinito, tada se oni čvorovi wikija, prostora i stranica, koji nisu vidljivi trenutnom korisniku, navode u stablu koristeći njihov naziv. Međutim, korisnik neće moći vidjeti njihov sadržaj slijedeći poveznice prema njima (korisnik će samo biti svjestan njihovog postojanja).
+rendering.macro.documentTree.parameter.filterByClass.name=Filtriraj po klasi
+rendering.macro.documentTree.parameter.filterByClass.description=Prikaži samo stranice koje imaju objekt naznačenog tipa. Vrijednost ovog parametra je puni naziv XWiki stranice koja drži definiciju klase. Na primjer, 'Blog.CategoryClass' može se koristiti za prikaz samo onih stranica koje predstavljaju blog kategorije. Ostavite ovaj parametar praznim ukoliko ne želite ograničiti tip stranica koje se prikazuju u stablu.
+rendering.macro.documentTree.parameter.finder.name=Nalaznik
+rendering.macro.documentTree.parameter.finder.description=Prikaži tekstualni unos koji se može koristiti za pronalazak čvorova stabla. Unos se prikazuje poviše stabla i dok pišete nudi prijedloge sukladno sadržaju stable. Kada se odabere prijedlog, stablo se rastvori do odgovarajućeg čvora.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Način rada hijerarhije stranica
+rendering.macro.documentTree.parameter.hierarchyMode.description=Naznačava hijerarhiju za korištenje između stranica. Moguće vrijednosti su "reference" (pretpostavljeno) i "parentchild". Ako se koristi "reference" tada se hijerarhija stranica definira koristeći samo referencu na stranicu, naročito komponentu ugniježdenih prostora reference na stranicu. Ukoliko se koristi "parentchild" tada se hijerarhija temelji na roditelj/dijete odnosu definiranom straničnim poljem "roditelj" iz baze podataka.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filtriraj skrivene dokumente
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Ovaj parametar postavite na neistinito ukoliko u stablo želite uključiti skrivene dokumente. U protivnome, ako je vrijednost istinita, skriveni dokumenti se isključuju ili uključuju sukladno postavkama trenutnog korisnika.
+rendering.macro.documentTree.parameter.limit.name=Ograničenje
+rendering.macro.documentTree.parameter.limit.description=Najveći broj čvorova djece za prikazati kod prvog proširenja čvora roditelja. Ostatku čvorova djece može se pristupiti  putem "još..." poveznice. Ovaj parametar se u principu koristi za straničenje čvorova djece i time pomaže kod skaliranja stabla kada je broj čvorova djece velik.
+### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
+### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+
 index.documentTree.empty=Nisu pronađene stranice
 index.documentTree.more=Još {0}...
-rendering.macro.documentTree.description=Prikazuje stablo XWiki stranica.
-rendering.macro.documentTree.name=Stablo stranica
-rendering.macro.documentTree.parameter.checkboxes.description=Prikazati kućicu ispred pojedinog čvora stabla kako bi se korisniku omogućio odabir više čvorova stabla.
-rendering.macro.documentTree.parameter.checkboxes.name=Kućice
-rendering.macro.documentTree.parameter.compact.description=Ako na raspolaganju imate ograničen horizontalni prostor, onda biste vjerojatno ovo trebali postaviti na istinito. Efekt je takav da će ikone čvorova i rubovi koji ih povezuju biti skriveni. Također će biti primijenjeni neki posebni stilovi kako bi se osiguralo da stablo zauzme manje horizontalnog prostora, istovremeno čuvajući oznake čvorova potpuno vidljivima.
-rendering.macro.documentTree.parameter.compact.name=Kompaktno
-rendering.macro.documentTree.parameter.filterByClass.description=Prikaži samo stranice koje imaju objekt naznačenog tipa. Vrijednost ovog parametra je puni naziv XWiki stranice koja drži definiciju klase. Na primjer, 'Blog.CategoryClass' može se koristiti za prikaz samo onih stranica koje predstavljaju blog kategorije. Ostavite ovaj parametar praznim ukoliko ne želite ograničiti tip stranica koje se prikazuju u stablu.
-rendering.macro.documentTree.parameter.filterByClass.name=Filtriraj po klasi
-rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Ovaj parametar postavite na neistinito ukoliko u stablo želite uključiti skrivene dokumente. U protivnome, ako je vrijednost istinita, skriveni dokumenti se isključuju ili uključuju sukladno postavkama trenutnog korisnika.
-rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filtriraj skrivene dokumente
-rendering.macro.documentTree.parameter.finder.description=Prikaži tekstualni unos koji se može koristiti za pronalazak čvorova stabla. Unos se prikazuje poviše stabla i dok pišete nudi prijedloge sukladno sadržaju stable. Kada se odabere prijedlog, stablo se rastvori do odgovarajućeg čvora.
-rendering.macro.documentTree.parameter.finder.name=Nalaznik
-rendering.macro.documentTree.parameter.hierarchyMode.description=Naznačava hijerarhiju za korištenje između stranica. Moguće vrijednosti su "reference" (pretpostavljeno) i "parentchild". Ako se koristi "reference" tada se hijerarhija stranica definira koristeći samo referencu na stranicu, naročito komponentu ugniježdenih prostora reference na stranicu. Ukoliko se koristi "parentchild" tada se hijerarhija temelji na roditelj/dijete odnosu definiranom straničnim poljem "roditelj" iz baze podataka.
-rendering.macro.documentTree.parameter.hierarchyMode.name=Način rada hijerarhije stranica
-rendering.macro.documentTree.parameter.limit.description=Najveći broj čvorova djece za prikazati kod prvog proširenja čvora roditelja. Ostatku čvorova djece može se pristupiti  putem "još..." poveznice. Ovaj parametar se u principu koristi za straničenje čvorova djece i time pomaže kod skaliranja stabla kada je broj čvorova djece velik.
-rendering.macro.documentTree.parameter.limit.name=Ograničenje
-rendering.macro.documentTree.parameter.links.description=Naznačava bi li oznake čvorova trebale izgledati i ponašati se kao poveznice (kotve).
-rendering.macro.documentTree.parameter.links.name=Poveznice
-rendering.macro.documentTree.parameter.openTo.description=Identifikator čvora u kojem rastvoriti stablo. Svi pretci naznačenog čvora, do korijena stabla, će također biti rastvoreni. Format identifikatora čvora je onaj koji se koristi za korijenski parametar.
-rendering.macro.documentTree.parameter.openTo.name=Otvori
-rendering.macro.documentTree.parameter.readOnly.description=Bi li korisnik trebao moći mijenjati strukturu stabla, pod uvjetom da ima potrebna prava?
-rendering.macro.documentTree.parameter.readOnly.name=Samo čitanje
-rendering.macro.documentTree.parameter.root.description=Identifikator korijenskog čvora. Ovo je korisno ako želite prikazati samo potomke danog čvora (koji je odabrani čvor). Stablo prikazuje djecu korijenskog čvora na prvoj razini, tako da se korijenski čvor zapravo ne prikazuje. Ukoliko nije naznačen korijenski čvor, prikazuje se čitavo stablo. Format identifikatora čvora je tipEntiteta\:referencaNaEntitet, gdje tip entiteta može biti na primjer wiki, prostor, dokument. Npr.\: wiki\:xwiki, space\:xwiki\:Main, document\:xwiki\:Main.WebHome
-rendering.macro.documentTree.parameter.root.name=Korijen
-rendering.macro.documentTree.parameter.showAttachments.description=Prikazati privitke stranice ili ne.
-rendering.macro.documentTree.parameter.showAttachments.name=Prikaži privitke
-rendering.macro.documentTree.parameter.showChildDocuments.description=Prikazati dokumente djecu prema polju dokumenta roditelja.
+
+## Deprecated translation keys
+
+## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Prikaži dokumente djecu
-rendering.macro.documentTree.parameter.showClassProperties.description=Prikazati svojstva klase stranica koje definiraju klase.
-rendering.macro.documentTree.parameter.showClassProperties.name=Prikaži svojstva klase
-rendering.macro.documentTree.parameter.showDocumentTitle.description=Kod prikaza čvora stranice prikazati naslov stranice umjesto imena stranice.
-rendering.macro.documentTree.parameter.showDocumentTitle.name=Prikaži naslov stranice
-rendering.macro.documentTree.parameter.showObjects.description=Prikazati objekte stranice ili ne.
-rendering.macro.documentTree.parameter.showObjects.name=Prikaži objekte
-rendering.macro.documentTree.parameter.showOnlyViewable.description=Prikaži samo čvorove wikija, prostora i stranica nad kojima trenutni korisnik ima ovlast za pregledavanje. Ukoliko je ovo postavljeno na neistinito, tada se oni čvorovi wikija, prostora i stranica, koji nisu vidljivi trenutnom korisniku, navode u stablu koristeći njihov naziv. Međutim, korisnik neće moći vidjeti njihov sadržaj slijedeći poveznice prema njima (korisnik će samo biti svjestan njihovog postojanja).
-rendering.macro.documentTree.parameter.showOnlyViewable.name=Prikaži samo pregledljive
-rendering.macro.documentTree.parameter.showRoot.description=Prikazati korijenski čvor ili ne. Korijenski čvor se pretpostavljeno ne prikazuje jer se obično implicira iz konteksta gdje se prikazuje stablo (npr. oznaka prije stabla). Međutim postoje neki slučajevi u kojima ćete htjeti prikazati korijenski čvor\: da biste mogli izraditi novi čvor ispod korijena.
-rendering.macro.documentTree.parameter.showRoot.name=Prikaži korijen
-rendering.macro.documentTree.parameter.showSpaces.description=Prikazati čvorove prostora ili ne. Stranice se grupiraju prema prostoru ako se prikazuju čvorovi prostora.
-rendering.macro.documentTree.parameter.showSpaces.name=Prikaži prostore
-rendering.macro.documentTree.parameter.showTranslations.description=Prikazati prijevode stranice ili ne.
-rendering.macro.documentTree.parameter.showTranslations.name=Prikaži prijevode
-rendering.macro.documentTree.parameter.showWikiPrettyName.description=Kod prikaza wiki čvora prikaži zgodno ime wikija umjesto identifikatora wikija.
-rendering.macro.documentTree.parameter.showWikiPrettyName.name=Prikaži zgodno ime wikija
-rendering.macro.documentTree.parameter.showWikis.description=Prikazati čvorove wikija ili ne. Ovo se može koristiti samo u glavnom wikiju i ukoliko je izvor stabla spremljen s ovlastima za programiranje.
-rendering.macro.documentTree.parameter.showWikis.name=Prikaži wikije
+rendering.macro.documentTree.parameter.showChildDocuments.description=Prikazati dokumente djecu prema polju dokumenta roditelja.
 </content>
 </xwikidoc>

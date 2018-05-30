@@ -39,55 +39,60 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content>rendering.macro.documentTree.name=Arborescence
+rendering.macro.documentTree.description=Affiche l'arborescence des documents XWiki
+rendering.macro.documentTree.parameter.readOnly.name=Lecture seule
+rendering.macro.documentTree.parameter.readOnly.description=L'utilisateur doit-il être en mesure de modifier la structure de l'arbre, si il a les droits nécessaires ?
+rendering.macro.documentTree.parameter.showWikis.name=Montrer les Wikis
+rendering.macro.documentTree.parameter.showWikis.description=Pour montrer les nœuds de wiki ou non. Cela ne peut être utilisé que sur le wiki principal et si la source de l'arbre a été enregistrée avec des droits de programmation.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Montrer le Pretty Name du wiki
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Montre le pretty name du wiki au lieu de l'id du wiki quand il affiche un noeud de wiki.
+rendering.macro.documentTree.parameter.showSpaces.name=Montrer les Espaces
+rendering.macro.documentTree.parameter.showSpaces.description=Pour montrer les noeuds des espaces ou non. Les documents sont regroupés par espace si les noeuds de l'espace sont affichés.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Montrer le titre du document
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Pour afficher le titre de document au lieu du nom du document lors de l'affichage d'un noeud de document.
+rendering.macro.documentTree.parameter.showTranslations.name=Montrer les traductions
+rendering.macro.documentTree.parameter.showTranslations.description=Pour montrer les traductions de documents ou non.
+rendering.macro.documentTree.parameter.showAttachments.name=Montrer les pièces jointes
+rendering.macro.documentTree.parameter.showAttachments.description=Pour afficher les pièces jointes du document ou non
+rendering.macro.documentTree.parameter.showObjects.name=Montrer les Objects
+rendering.macro.documentTree.parameter.showObjects.description=Pour montrer les objets de document ou non.
+rendering.macro.documentTree.parameter.showClassProperties.name=Montrer les propriétés de Class
+rendering.macro.documentTree.parameter.showClassProperties.description=Pour montrer les propriétés de classe pour les documents qui définissent les classes.
+rendering.macro.documentTree.parameter.root.name=Racine
+rendering.macro.documentTree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié. Le format d'un identificateur de noeud est entityType: EntityReference, où le type d'entité peut être par exemple wiki, espace, document. Par exemple: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=Afficher la racine
+rendering.macro.documentTree.parameter.showRoot.description=Affiche ou non la racine. Par défaut la racine est masquée car le contexte dans lequel est affichée l’arborescence donne suffisamment d'indications (par exemple présence d'un titre au dessus de l’arborescence).
+rendering.macro.documentTree.parameter.compact.name=Compact
+rendering.macro.documentTree.parameter.compact.description=Si vous avez une espace horizontal disponible limité, alors vous devriez probablement le paramétrer à true. L'effet est que les icônes de noeuds et les branches qui les relient seront cachés. Certains styles spéciaux seront également appliqués pour assurer que l'arbre prenne moins d'espace horizontal tout en maintenant les labels des noeuds entièrement visible. 
+rendering.macro.documentTree.parameter.links.name=Liens
+rendering.macro.documentTree.parameter.links.description=Indique si les labels de noeud doivent ressembler ou se comporter comme des liens (ancres).
+rendering.macro.documentTree.parameter.checkboxes.name=Cases à cocher
+rendering.macro.documentTree.parameter.checkboxes.description=Pour afficher une case à cocher en face de chaque noeud de l'arbre afin de permettre à l'utilisateur de sélectionner plusieurs noeuds de l'arbre.
+rendering.macro.documentTree.parameter.openTo.name=Ouvrir à
+rendering.macro.documentTree.parameter.openTo.description=L'id du noeud pour ouvrir l'arbre. Tous les ancêtres du noeud spécifié, jusqu'à la racine de l'arbre, seront ouverts également. Le format de l'identifiant de noeud est celui utilisé pour le paramètre de la racine.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Montrer seulement ce qui est visible
+rendering.macro.documentTree.parameter.showOnlyViewable.description=N'afficher que le wiki, espace et nœuds de documents pour lesquels l'utilisateur a le droit de "voir". Si c'est la valeur false, le wiki, espace et nœuds de documents qui ne sont pas visibles par l'utilisateur actuel sont répertoriés dans l'arbre en utilisant leurs noms. L'utilisateur ne sera pas en mesure de voir leur contenu en suivant leurs liens (l'utilisateur sera seulement au courant de leur existence).
+rendering.macro.documentTree.parameter.filterByClass.name=Filtrer par Class
+rendering.macro.documentTree.parameter.filterByClass.description=Afficher uniquement les documents qui ont un objet du type spécifié. La valeur de ce paramètre est le nom complet d'un document XWiki qui détient une définition de classe. Par exemple, 'Blog.CategoryClass' peut être utilisé pour afficher uniquement les documents qui représentent les catégories de blog. Laissez ce paramètre vide si vous ne souhaitez pas restreindre le type de documents présentés dans l'arbre.
+rendering.macro.documentTree.parameter.finder.name=Filtre
+rendering.macro.documentTree.parameter.finder.description=Affiche une entrée texte qui peut être utilisée pour trouver des noeuds de l'arbre. L'entrée est affichée au-dessus de l'arbre et offre des Suggestions automatiques basées sur le contenu de l'arbre pendant que vous tapez. Quand une suggestion est sélectionnée, l'arbre est étendu jusqu'au noeud correspondant.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Mode de hiérarchie de la page
+rendering.macro.documentTree.parameter.hierarchyMode.description=Détermine quelle type de hiérarchie doit être utilisée entre les pages. Les valeurs possibles sont "reference" (qui est le mode par défaut et conseillé) et "parentchild". Si "reference" est utilisé, alors la hiérarchie est définie selon les éléments contenus dans la référence de la page, et en particulier les espaces imbriquées. Si "parentchild" est utilisé, alors la hiérarchie est basée sur la relation mère/fille définie par le champ "parent" dans chaque page.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filtre Documents Cachés
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description="FALSE" permet de forcer l'affichage des documents cachés dans l'arbre. "TRUE" (défaut) permet l'affichage des documents cachés en fonction du paramètre du profil utilisateur.
+rendering.macro.documentTree.parameter.limit.name=Limite
+rendering.macro.documentTree.parameter.limit.description=Le nombre maximum de nœuds fils à afficher lorsqu'un nœud père est déplié pour la première fois. Les autres nœuds sont accessibles grâce au lien "Plus...". Ce paramètre sert essentiellement à définir la pagination afin d'améliorer les performances lorsque les nœuds fils sont nombreux.
+rendering.macro.documentTree.parameter.exclusions.name=Exclusions
+### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+
 index.documentTree.empty=Aucune page trouvée
 index.documentTree.more={0} autres... 
-rendering.macro.documentTree.description=Affiche l'arborescence des documents XWiki
-rendering.macro.documentTree.name=Arborescence
-rendering.macro.documentTree.parameter.checkboxes.description=Pour afficher une case à cocher en face de chaque noeud de l'arbre afin de permettre à l'utilisateur de sélectionner plusieurs noeuds de l'arbre.
-rendering.macro.documentTree.parameter.checkboxes.name=Cases à cocher
-rendering.macro.documentTree.parameter.compact.description=Si vous avez une espace horizontal disponible limité, alors vous devriez probablement le paramétrer à true. L'effet est que les icônes de noeuds et les branches qui les relient seront cachés. Certains styles spéciaux seront également appliqués pour assurer que l'arbre prenne moins d'espace horizontal tout en maintenant les labels des noeuds entièrement visible. 
-rendering.macro.documentTree.parameter.compact.name=Compact
-rendering.macro.documentTree.parameter.filterByClass.description=Afficher uniquement les documents qui ont un objet du type spécifié. La valeur de ce paramètre est le nom complet d'un document XWiki qui détient une définition de classe. Par exemple, 'Blog.CategoryClass' peut être utilisé pour afficher uniquement les documents qui représentent les catégories de blog. Laissez ce paramètre vide si vous ne souhaitez pas restreindre le type de documents présentés dans l'arbre.
-rendering.macro.documentTree.parameter.filterByClass.name=Filtrer par Class
-rendering.macro.documentTree.parameter.filterHiddenDocuments.description="FALSE" permet de forcer l'affichage des documents cachés dans l'arbre. "TRUE" (défaut) permet l'affichage des documents cachés en fonction du paramètre du profil utilisateur.
-rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filtre Documents Cachés
-rendering.macro.documentTree.parameter.finder.description=Affiche une entrée texte qui peut être utilisée pour trouver des noeuds de l'arbre. L'entrée est affichée au-dessus de l'arbre et offre des Suggestions automatiques basées sur le contenu de l'arbre pendant que vous tapez. Quand une suggestion est sélectionnée, l'arbre est étendu jusqu'au noeud correspondant.
-rendering.macro.documentTree.parameter.finder.name=Filtre
-rendering.macro.documentTree.parameter.hierarchyMode.description=Détermine quelle type de hiérarchie doit être utilisée entre les pages. Les valeurs possibles sont "reference" (qui est le mode par défaut et conseillé) et "parentchild". Si "reference" est utilisé, alors la hiérarchie est définie selon les éléments contenus dans la référence de la page, et en particulier les espaces imbriquées. Si "parentchild" est utilisé, alors la hiérarchie est basée sur la relation mère/fille définie par le champ "parent" dans chaque page.
-rendering.macro.documentTree.parameter.hierarchyMode.name=Mode de hiérarchie de la page
-rendering.macro.documentTree.parameter.limit.description=Le nombre maximum de nœuds fils à afficher lorsqu'un nœud père est déplié pour la première fois. Les autres nœuds sont accessibles grâce au lien "Plus...". Ce paramètre sert essentiellement à définir la pagination afin d'améliorer les performances lorsque les nœuds fils sont nombreux.
-rendering.macro.documentTree.parameter.limit.name=Limite
-rendering.macro.documentTree.parameter.links.description=Indique si les labels de noeud doivent ressembler ou se comporter comme des liens (ancres).
-rendering.macro.documentTree.parameter.links.name=Liens
-rendering.macro.documentTree.parameter.openTo.description=L'id du noeud pour ouvrir l'arbre. Tous les ancêtres du noeud spécifié, jusqu'à la racine de l'arbre, seront ouverts également. Le format de l'identifiant de noeud est celui utilisé pour le paramètre de la racine.
-rendering.macro.documentTree.parameter.openTo.name=Ouvrir à
-rendering.macro.documentTree.parameter.readOnly.description=L'utilisateur doit-il être en mesure de modifier la structure de l'arbre, si il a les droits nécessaires ?
-rendering.macro.documentTree.parameter.readOnly.name=Lecture seule
-rendering.macro.documentTree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié. Le format d'un identificateur de noeud est entityType: EntityReference, où le type d'entité peut être par exemple wiki, espace, document. Par exemple: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
-rendering.macro.documentTree.parameter.root.name=Racine
-rendering.macro.documentTree.parameter.showAttachments.description=Pour afficher les pièces jointes du document ou non
-rendering.macro.documentTree.parameter.showAttachments.name=Montrer les pièces jointes
-rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.
+
+## Deprecated translation keys
+
+## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Montrer les documents enfants
-rendering.macro.documentTree.parameter.showClassProperties.description=Pour montrer les propriétés de classe pour les documents qui définissent les classes.
-rendering.macro.documentTree.parameter.showClassProperties.name=Montrer les propriétés de Class
-rendering.macro.documentTree.parameter.showDocumentTitle.description=Pour afficher le titre de document au lieu du nom du document lors de l'affichage d'un noeud de document.
-rendering.macro.documentTree.parameter.showDocumentTitle.name=Montrer le titre du document
-rendering.macro.documentTree.parameter.showObjects.description=Pour montrer les objets de document ou non.
-rendering.macro.documentTree.parameter.showObjects.name=Montrer les Objects
-rendering.macro.documentTree.parameter.showOnlyViewable.description=N'afficher que le wiki, espace et nœuds de documents pour lesquels l'utilisateur a le droit de "voir". Si c'est la valeur false, le wiki, espace et nœuds de documents qui ne sont pas visibles par l'utilisateur actuel sont répertoriés dans l'arbre en utilisant leurs noms. L'utilisateur ne sera pas en mesure de voir leur contenu en suivant leurs liens (l'utilisateur sera seulement au courant de leur existence).
-rendering.macro.documentTree.parameter.showOnlyViewable.name=Montrer seulement ce qui est visible
-rendering.macro.documentTree.parameter.showRoot.description=Affiche ou non la racine. Par défaut la racine est masquée car le contexte dans lequel est affichée l’arborescence donne suffisamment d'indications (par exemple présence d'un titre au dessus de l’arborescence).
-rendering.macro.documentTree.parameter.showRoot.name=Afficher la racine
-rendering.macro.documentTree.parameter.showSpaces.description=Pour montrer les noeuds des espaces ou non. Les documents sont regroupés par espace si les noeuds de l'espace sont affichés.
-rendering.macro.documentTree.parameter.showSpaces.name=Montrer les Espaces
-rendering.macro.documentTree.parameter.showTranslations.description=Pour montrer les traductions de documents ou non.
-rendering.macro.documentTree.parameter.showTranslations.name=Montrer les traductions
-rendering.macro.documentTree.parameter.showWikiPrettyName.description=Montre le pretty name du wiki au lieu de l'id du wiki quand il affiche un noeud de wiki.
-rendering.macro.documentTree.parameter.showWikiPrettyName.name=Montrer le Pretty Name du wiki
-rendering.macro.documentTree.parameter.showWikis.description=Pour montrer les nœuds de wiki ou non. Cela ne peut être utilisé que sur le wiki principal et si la source de l'arbre a été enregistrée avec des droits de programmation.
-rendering.macro.documentTree.parameter.showWikis.name=Montrer les Wikis
-rendering.macro.documentTree.parameter.exclusions.name=Exclusions
+rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.
 </content>
 </xwikidoc>

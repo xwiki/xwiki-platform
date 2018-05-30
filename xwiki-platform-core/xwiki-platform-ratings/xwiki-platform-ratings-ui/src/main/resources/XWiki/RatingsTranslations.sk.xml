@@ -39,10 +39,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-admin.ratings=Hodnotenia
+  <content>admin.ratings=Hodnotenia
 admin.ratings.activateratings=Aktivovať hodnotenia na tejto wiki.
-rating.novotes=Zatiaľ nehodnotené
+### Missing: admin.ratings.activateratingsinfo=Activating the ratings on this wiki will display a visual average rating (composed of stars) at the top right corner of each document of this wiki (except the ones in the *XWiki* space). Authenticated users will be able to rate documents by clicking on the stars. An alternative to this is to use the *Ratings Panel*, for example to only enable ratings in the desired spaces. To use the Ratings Panel, please visit the *Panel Wizard* administration section.
+### Missing: admin.ratings.resetratings=Reset all the ratings on this wiki. This will make all documents start over with no vote. Be aware that this operation is irreversible, besides on a document-per-document rollback basis. Resetting all ratings can take a while if the wiki has a large amount of documents already rated.
+### Missing: admin.ratings.uninstallratings=Uninstalling the ratings application will delete the documents that compose the application, but *all votes on rated document will be preserved*. If you reinstall the application later on, the documents will start over with the saved average rating they had before uninstalling the application. Finally, uninstalling the ratings application will *remove the ratings category* from the wiki administration.
+### Missing: admin.ratings.ratingsactivated=Ratings have been activated
+### Missing: admin.ratings.ratingsdeactivated=Ratings have been deactivated
+### Missing: admin.ratings.illegalrequest=Illegal request
 rating.rate=Hodnotiť
+### Missing: rating.yourvote=Your vote
+### Missing: rating.logintorate=Login to rate
+rating.novotes=Zatiaľ nehodnotené
 </content>
 </xwikidoc>

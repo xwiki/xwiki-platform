@@ -39,13 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+  <content>platform.icon.picker.preview=Náhľad s\:
 platform.icon.picker.loading=Načítava sa
-platform.icon.picker.preview=Náhľad s\:
-rendering.macro.iconPicker.description=Vyberte si ikonu.
+
 rendering.macro.iconPicker.name=Icon Picker
-rendering.macro.iconPicker.parameter.class.name=Trieda
+rendering.macro.iconPicker.description=Vyberte si ikonu.
 rendering.macro.iconPicker.parameter.id.name=Id
+### Missing: rendering.macro.iconPicker.parameter.id.description=DOM id of the input field where the picker will apply to
+rendering.macro.iconPicker.parameter.class.name=Trieda
+### Missing: rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply to
 rendering.macro.iconPicker.parameter.prefix.name=Prefix
+### Missing: rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")
 </content>
 </xwikidoc>

@@ -39,11 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
-activity.rss.feed.description=RSS-flöde för dokumentändringar
-activity.rss.feed.spaces.description=RSS-flöde för dokument i rummet/rummen "{0}"
-activity.rss.feed.tags.description=RSS-flöde för dokument taggade med "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS-flöde för dokument taggade med "{0}" i rummet/rummen "{1}"
+  <content>### Missing: activity.page.link.title=Located in {0}
 activity.rss.pages.modified=Ändrade sidor RSS-flöde
+activity.rss.feed.description=RSS-flöde för dokumentändringar
+activity.rss.feed.tags.description=RSS-flöde för dokument taggade med "{0}"
+activity.rss.feed.spaces.description=RSS-flöde för dokument i rummet/rummen "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS-flöde för dokument taggade med "{0}" i rummet/rummen "{1}"
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.3M1
+### Missing: activity.link.title=Located in {0} » {1} » {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

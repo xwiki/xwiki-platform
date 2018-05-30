@@ -39,8 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language tr generated from http://www.l10n.xwiki.org
-activity.rss.feed.tagsAndSpaces.description=RSS ile etiketlendi belgeler için besleme " {0} " Uzayda ( ler ) " {1} "
+  <content>### Missing: activity.page.link.title=Located in {0}
 activity.rss.pages.modified=Değiştirilmiş Sayfa RSS Feed
+### Missing: activity.rss.feed.description=RSS feed for document changes
+### Missing: activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
+### Missing: activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS ile etiketlendi belgeler için besleme " {0} " Uzayda ( ler ) " {1} "
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.3M1
+### Missing: activity.link.title=Located in {0} » {1} » {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Navn på område
-index.spacesMacro.createSpace.link=Opret nyt område
-index.spacesMacro.createSpace.submit=Opret
-index.spacesMacro.spaceAdministration.alt=Administrer område
-index.spacesMacro.spaceAdministration.title=Se område-administration
-index.spacesMacro.spaceIndex.alt=Indholdsfortegnelse
+  <content>index.spacesMacro.title=Områder
 index.spacesMacro.spaceIndex.title=Se områdeindhold
-index.spacesMacro.title=Områder
+index.spacesMacro.spaceIndex.alt=Indholdsfortegnelse
+index.spacesMacro.spaceAdministration.title=Se område-administration
+index.spacesMacro.spaceAdministration.alt=Administrer område
+index.spacesMacro.createSpace.link=Opret nyt område
+index.spacesMacro.createSpace.defaultSpaceName=Navn på område
+index.spacesMacro.createSpace.submit=Opret
 </content>
 </xwikidoc>

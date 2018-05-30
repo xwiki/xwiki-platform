@@ -39,12 +39,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pl generated from http://www.l10n.xwiki.org
-dashboard.gadgetEditor.changeGadget.label=Zmień gadżet
-dashboard.gadgetEditor.gadgetTitle.hint=Tytuł tego gadżetu pojawia się w górnej części panelu gadżetów.
-dashboard.gadgetEditor.gadgetTitle.label=Tytuł gadżetu
-dashboard.gadgetEditor.title=Edytuj gadżet
+  <content>dashboard.templateProvider.description=Gadżety konfigurowalne
+
 dashboard.gadgetSelector.title=Wybierz gadżet
-dashboard.templateProvider.description=Gadżety konfigurowalne
+dashboard.gadgetEditor.title=Edytuj gadżet
+dashboard.gadgetEditor.changeGadget.label=Zmień gadżet
+dashboard.gadgetEditor.gadgetTitle.label=Tytuł gadżetu
+dashboard.gadgetEditor.gadgetTitle.hint=Tytuł tego gadżetu pojawia się w górnej części panelu gadżetów.
 </content>
 </xwikidoc>

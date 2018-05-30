@@ -39,12 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language ro generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Nume spațiu
-index.spacesMacro.createSpace.link=Creează un spațiu nou
-index.spacesMacro.createSpace.submit=Creează
-index.spacesMacro.spaceAdministration.title=Vezi administrarea spațiului
+  <content>index.spacesMacro.title=Spații
 index.spacesMacro.spaceIndex.title=Vezi indexul spațiului
-index.spacesMacro.title=Spații
+### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceAdministration.title=Vezi administrarea spațiului
+### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.createSpace.link=Creează un spațiu nou
+index.spacesMacro.createSpace.defaultSpaceName=Nume spațiu
+index.spacesMacro.createSpace.submit=Creează
 </content>
 </xwikidoc>

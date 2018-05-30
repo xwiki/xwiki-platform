@@ -39,13 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-panels._actions=Akcie
-panels.available=Dostupné panely
-panels.category=Kategórie
-panels.description=Popis
-panels.emptyvalue=\ 
+  <content>panels.available=Dostupné panely
 panels.name=Názov
+panels.description=Popis
 panels.type=Typ
+panels.category=Kategórie
+panels._actions=Akcie
+panels.emptyvalue=
+### Missing: panels.children.title=Child Pages
+### Missing: panels.siblings.title=Sibling Pages
+### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
 </content>
 </xwikidoc>

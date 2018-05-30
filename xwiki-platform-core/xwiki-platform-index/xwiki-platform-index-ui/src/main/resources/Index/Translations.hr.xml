@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Ime prostora
-index.spacesMacro.createSpace.link=Izradi novi prostor
-index.spacesMacro.createSpace.submit=Izradi
-index.spacesMacro.spaceAdministration.alt=Upravljaj prostorom
-index.spacesMacro.spaceAdministration.title=Vidi upravljanje prostorom
-index.spacesMacro.spaceIndex.alt=Imenik prostora
+  <content>index.spacesMacro.title=Prostori
 index.spacesMacro.spaceIndex.title=Vidi imenik prostora
-index.spacesMacro.title=Prostori
+index.spacesMacro.spaceIndex.alt=Imenik prostora
+index.spacesMacro.spaceAdministration.title=Vidi upravljanje prostorom
+index.spacesMacro.spaceAdministration.alt=Upravljaj prostorom
+index.spacesMacro.createSpace.link=Izradi novi prostor
+index.spacesMacro.createSpace.defaultSpaceName=Ime prostora
+index.spacesMacro.createSpace.submit=Izradi
 </content>
 </xwikidoc>

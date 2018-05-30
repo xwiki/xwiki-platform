@@ -39,16 +39,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-admin.repository=Repozitorij ekstenzija
-extension.repository.authors=Autori
-extension.repository.category=Kategorija
-extension.repository.doc.creationDate=Izrađeno
-extension.repository.doc.date=Datum zadnje izmjene
-extension.repository.installedCount=Broj instalacija
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
 extension.repository.name=Ime
-extension.repository.rating=Ocjena
 extension.repository.summary=Sažetak
 extension.repository.type=Tip
+extension.repository.category=Kategorija
+extension.repository.authors=Autori
+extension.repository.doc.creationDate=Izrađeno
+extension.repository.doc.date=Datum zadnje izmjene
+extension.repository.rating=Ocjena
+extension.repository.installedCount=Broj instalacija
+
+## Administration UI
+admin.repository=Repozitorij ekstenzija
 </content>
 </xwikidoc>

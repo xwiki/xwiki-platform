@@ -39,11 +39,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>help.syntaxpage.title=Vodič XWiki sintaksi
+help.syntaxtitle=XWiki sintaksa {0}
+help.syntaxall=Sve
 help.changesyntax=Promijeni sintaksu
 help.choose_syntax=Odaberi sintaksu
-help.syntaxall=Sve
-help.syntaxpage.title=Vodič XWiki sintaksi
-help.syntaxtitle=XWiki sintaksa {0}
 </content>
 </xwikidoc>

@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language tr generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Uzay isim
-index.spacesMacro.createSpace.link=yeni bir alan oluşturma
-index.spacesMacro.createSpace.submit=Oluştur
-index.spacesMacro.spaceAdministration.alt=Yönet alanı
-index.spacesMacro.spaceAdministration.title=See alan yönetim
-index.spacesMacro.spaceIndex.alt=Uzay indeksi
+  <content>index.spacesMacro.title=Spaces
 index.spacesMacro.spaceIndex.title=See alan indeksi
-index.spacesMacro.title=Spaces
+index.spacesMacro.spaceIndex.alt=Uzay indeksi
+index.spacesMacro.spaceAdministration.title=See alan yönetim
+index.spacesMacro.spaceAdministration.alt=Yönet alanı
+index.spacesMacro.createSpace.link=yeni bir alan oluşturma
+index.spacesMacro.createSpace.defaultSpaceName=Uzay isim
+index.spacesMacro.createSpace.submit=Oluştur
 </content>
 </xwikidoc>

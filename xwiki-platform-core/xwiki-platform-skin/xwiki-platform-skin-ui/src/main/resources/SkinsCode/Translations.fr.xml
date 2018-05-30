@@ -39,24 +39,40 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-skin.sheet.add=Ajouter
-skin.sheet.addTemplate=Ajouter un template
+  <content>skin.sheet.title=Thème
+skin.sheet.properties=Propriétés du thème
 skin.sheet.deprecatedProperties=Propriétés obsolètes
+skin.sheet.overriddenTemplates=Templates de replacement
+skin.sheet.addTemplate=Ajouter un template
+skin.sheet.add=Ajouter
+skin.sheet.overrideTemplateWarning=Cette section vous permet de remplacer un template de la skin. C'est une opération techniquement avancée qui peut avoir de mauvaises conséquences pour les utilisateurs.
 skin.sheet.deprecatedPropertiesWarning=Cette section est ici uniquement pour assurer la compatibilité avec d'anciennes versions d'XWiki. Vous devriez plutôt utiliser le mécanisme "templates de replacement", plus haut.
-skin.sheet.js.adding=Ajout...
-skin.sheet.js.addingDone=Le modèle a été ajouté
-skin.sheet.js.deleteConfirmationNo=Non, annuler
-skin.sheet.js.deleteConfirmationText=Êtes-vous certain de vouloir supprimer ce modèle ? 
-skin.sheet.js.deleteConfirmationYes=Oui, le supprimer
+skin.sheet.nojs=Sans JavaScript, vous ne pouvez pas utiliser cette section. Mais vous pouvez utiliser {0}l''éditeur d''objets{1} et ajouter manuellement des objets {2}.
+
 skin.sheet.js.deleting=Suppression...
 skin.sheet.js.deletingDone=Le modèle a été supprimé
 skin.sheet.js.error.csrf=La validation CSRF a échoué lors de l'enregistrement de la skin. Rafraîchissez la page avant de réessayer.
 skin.sheet.js.error.rights=Impossible d'enregistrer le thème, vous ne disposez pas de droits suffisants.
-skin.sheet.nojs=Sans JavaScript, vous ne pouvez pas utiliser cette section. Mais vous pouvez utiliser {0}l''éditeur d''objets{1} et ajouter manuellement des objets {2}.
-skin.sheet.overriddenTemplates=Templates de replacement
-skin.sheet.overrideTemplateWarning=Cette section vous permet de remplacer un template de la skin. C'est une opération techniquement avancée qui peut avoir de mauvaises conséquences pour les utilisateurs.
-skin.sheet.properties=Propriétés du thème
-skin.sheet.title=Thème
+skin.sheet.js.deleteConfirmationText=Êtes-vous certain de vouloir supprimer ce modèle ? 
+skin.sheet.js.deleteConfirmationYes=Oui, le supprimer
+skin.sheet.js.deleteConfirmationNo=Non, annuler
+skin.sheet.js.adding=Ajout...
+skin.sheet.js.addingDone=Le modèle a été ajouté
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.1M1
+#######################################
+### Missing: skin.sheet.overridedTemplates=Overridden templates
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

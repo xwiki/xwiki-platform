@@ -39,15 +39,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-admin.panels.applications=Panel aplikácií
-platform.panels.applications.ajax.csrf=Validácia CSRF zlyhala. Skúste znova načítať stránku.
-platform.panels.applications.ajax.error=Nepodarilo sa uložiť nastavenia.
-platform.panels.applications.ajax.noright=Nemáte právo na editovanie PanelsCode.ApplicationsPanelConfiguration.
-platform.panels.applications.ajax.success=Konfigurácia bola uložená.
-platform.panels.applications.blacklistedapps=Aplikácie, ktoré nie sú na paneli
+  <content>### Missing: platform.panels.applications.helper=Here, you can select which applications are displayed in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. You can also re-order the applications as you want. Don't forget to save your changes!
 platform.panels.applications.displayedapps=Aplikácie na paneli
-platform.panels.applications.revert=Vrátiť
+platform.panels.applications.blacklistedapps=Aplikácie, ktoré nie sú na paneli
 platform.panels.applications.save=Uložiť
+platform.panels.applications.revert=Vrátiť
+platform.panels.applications.ajax.success=Konfigurácia bola uložená.
+platform.panels.applications.ajax.csrf=Validácia CSRF zlyhala. Skúste znova načítať stránku.
+platform.panels.applications.ajax.noright=Nemáte právo na editovanie PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Nepodarilo sa uložiť nastavenia.
+admin.panels.applications=Panel aplikácií
+### Missing: admin.panels.applications.description=Manage what applications are displayed in the Applications Panel.
+
+### Missing: admin.panels.navigation=Navigation Panel
+### Missing: admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
+### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
+### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
+### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
+### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
+### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
 </content>
 </xwikidoc>

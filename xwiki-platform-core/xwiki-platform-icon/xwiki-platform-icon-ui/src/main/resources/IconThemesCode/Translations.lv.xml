@@ -39,16 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+  <content>platform.icon.picker.preview=Priekšskatīt ar\:
 platform.icon.picker.loading=Ielādē
-platform.icon.picker.preview=Priekšskatīt ar\:
-rendering.macro.iconPicker.description=Izvēlieties ikonu no XWiki ikonu krājuma.
+
 rendering.macro.iconPicker.name=Ikonu izvēle
-rendering.macro.iconPicker.parameter.class.description=Ievadlauka CSS klase, kurai tiks piemērota izvēlne
-rendering.macro.iconPicker.parameter.class.name=Klase
-rendering.macro.iconPicker.parameter.id.description=Ievadlauku DOM identifikators, kuram tiks piemērota izvēlne
+rendering.macro.iconPicker.description=Izvēlieties ikonu no XWiki ikonu krājuma.
 rendering.macro.iconPicker.parameter.id.name=Id
-rendering.macro.iconPicker.parameter.prefix.description=Ievadlauka ikonas nosaukuma priedēklis (noklusētais\: "image\:icon\:")
+rendering.macro.iconPicker.parameter.id.description=Ievadlauku DOM identifikators, kuram tiks piemērota izvēlne
+rendering.macro.iconPicker.parameter.class.name=Klase
+rendering.macro.iconPicker.parameter.class.description=Ievadlauka CSS klase, kurai tiks piemērota izvēlne
 rendering.macro.iconPicker.parameter.prefix.name=Priedēklis
+rendering.macro.iconPicker.parameter.prefix.description=Ievadlauka ikonas nosaukuma priedēklis (noklusētais\: "image\:icon\:")
 </content>
 </xwikidoc>

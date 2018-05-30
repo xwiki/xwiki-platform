@@ -39,16 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content>platform.icon.picker.preview=Prévisualiser avec \:
 platform.icon.picker.loading=Chargement en cours
-platform.icon.picker.preview=Prévisualiser avec \:
-rendering.macro.iconPicker.description=Sélectionnez une icône dans le set d'icônes XWiki.
+
 rendering.macro.iconPicker.name=Sélecteur d'icônes
-rendering.macro.iconPicker.parameter.class.description=Classe CSS des entrées où le sélecteur s'appliquera
-rendering.macro.iconPicker.parameter.class.name=Class
-rendering.macro.iconPicker.parameter.id.description=DOM Id du champ d'entrée où le sélecteur s'appliquera
+rendering.macro.iconPicker.description=Sélectionnez une icône dans le set d'icônes XWiki.
 rendering.macro.iconPicker.parameter.id.name=Id
-rendering.macro.iconPicker.parameter.prefix.description=Préfixe à ajouter avant le nom de l'icône dans le champ de saisie (par défaut\: "image\:icon\:")
+rendering.macro.iconPicker.parameter.id.description=DOM Id du champ d'entrée où le sélecteur s'appliquera
+rendering.macro.iconPicker.parameter.class.name=Class
+rendering.macro.iconPicker.parameter.class.description=Classe CSS des entrées où le sélecteur s'appliquera
 rendering.macro.iconPicker.parameter.prefix.name=Prefix
+rendering.macro.iconPicker.parameter.prefix.description=Préfixe à ajouter avant le nom de l'icône dans le champ de saisie (par défaut\: "image\:icon\:")
 </content>
 </xwikidoc>

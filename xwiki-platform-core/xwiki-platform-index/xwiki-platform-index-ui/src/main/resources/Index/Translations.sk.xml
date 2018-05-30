@@ -39,13 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Názov priestoru
-index.spacesMacro.createSpace.link=Vytvoriť nový priestor
-index.spacesMacro.createSpace.submit=Vytvoriť
-index.spacesMacro.spaceAdministration.title=Pozri v správe priestoru
-index.spacesMacro.spaceIndex.alt=Index priestoru
+  <content>index.spacesMacro.title=Priestory
 index.spacesMacro.spaceIndex.title=Pozri index priestoru
-index.spacesMacro.title=Priestory
+index.spacesMacro.spaceIndex.alt=Index priestoru
+index.spacesMacro.spaceAdministration.title=Pozri v správe priestoru
+### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.createSpace.link=Vytvoriť nový priestor
+index.spacesMacro.createSpace.defaultSpaceName=Názov priestoru
+index.spacesMacro.createSpace.submit=Vytvoriť
 </content>
 </xwikidoc>

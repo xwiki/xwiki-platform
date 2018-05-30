@@ -39,121 +39,153 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
-solr.admin.error.norights=Administrationsrättigheter krävs för tillgång till denna sektion.
-solr.admin.error.notallowed=Du har ej rättigheter att genomföra denna operation.
-solr.admin.indexing.action.hint=Operation att utföra på indexet.
-solr.admin.indexing.action.label=Operation
-solr.admin.indexing.action.select_delete=Ta bort från index
-solr.admin.indexing.action.select_index=Lägg till i index
-solr.admin.indexing.action.select_reindex=Indexera om
-solr.admin.indexing.query.hint=Sökutryck för att begränsa de dokument i indexet som påverkas av vald operation.  Detta kan utelämnas.
-solr.admin.indexing.query.label=Anpassat sökutryck
-solr.admin.indexing.title=Indexerar
-solr.admin.indexing.wiki.hint=Winin för vilket vald operation skall genomföras.
-solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.select_farm=Hela farmen
-solr.admin.status.queueSize.hint=Antal entiteter som återstår att indexera, omindexera eller ta bort från indexet (beroende på aktuell operation).
-solr.admin.status.queueSize.label=Köstorlek
-solr.admin.status.title=Status
+  <content>solr.admin.title=Solr sökadministration
 solr.admin.submit=Utför
-solr.admin.title=Solr sökadministration
-solr.facet.date.after=Efter {0}
-solr.facet.date.any=Alla datum
-solr.facet.date.applyCustomInterval=Applicera
-solr.facet.date.before=Före {0}
-solr.facet.date.between=Från {0} till {1}
-solr.facet.date.customInterval=Anpassat datum och tidsintervall
-solr.facet.date.end=Slutdatum och tid
-solr.facet.date.last30Days=Senaste 30 dagarna
-solr.facet.date.last7Days=Senaste sju dagarna
-solr.facet.date.olderThan30Days=Äldre än 30 dagar
-solr.facet.date.start=Startdatum och tid
-solr.facet.date.today=Idag
-solr.facet.fileType.archive.java-archive=JAR
-solr.facet.fileType.archive.xara=XAR
-solr.facet.fileType.image.icon=Ikon
-solr.facet.fileType.other.octet-stream=Binärdata
-solr.facet.fileType.text.java-source=Javakällkod
-solr.facet.fileType.text.javascript=Javascript
-solr.facet.fileType.text.plain=Text
-solr.facet.fileType.text.sh=Skript (bourne shell)
-solr.facet.size.any=Alla storlekar
-solr.facet.size.between=Mellan {0} och {1}
-solr.facet.size.large=Stora
-solr.facet.size.lessThan=Mindre än {0}
-solr.facet.size.medium=Medium
-solr.facet.size.moreThan=Mer än {0}
-solr.facet.size.small=Små
-solr.facet.size.tiny=Pyttesmå
+solr.admin.error.notallowed=Du har ej rättigheter att genomföra denna operation.
+solr.admin.error.norights=Administrationsrättigheter krävs för tillgång till denna sektion.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Köstorlek
+solr.admin.status.queueSize.hint=Antal entiteter som återstår att indexera, omindexera eller ta bort från indexet (beroende på aktuell operation).
+
+solr.admin.indexing.title=Indexerar
+solr.admin.indexing.action.label=Operation
+solr.admin.indexing.action.hint=Operation att utföra på indexet.
+solr.admin.indexing.action.select_index=Lägg till i index
+solr.admin.indexing.action.select_delete=Ta bort från index
+solr.admin.indexing.action.select_reindex=Indexera om
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=Winin för vilket vald operation skall genomföras.
+solr.admin.indexing.wiki.select_farm=Hela farmen
+solr.admin.indexing.query.label=Anpassat sökutryck
+solr.admin.indexing.query.hint=Sökutryck för att begränsa de dokument i indexet som påverkas av vald operation.  Detta kan utelämnas.
+
+solr.sortBy=Sortera efter\:
+solr.sortBy.score=Relevans
+solr.sortBy.title_sort=Titel
+solr.sortBy.date=Datum
+solr.sortBy.author_display_sort=Senaste författare
+solr.sortBy.filename_sort=Filnamn
+solr.sortBy.attsize_sort=Filstorlek
+solr.sortBy.attdate_sort=Uppladdningsdatum
+solr.sortBy.attauthor_display_sort=Uppladdad av
+solr.sortOrder.asc=Stigande
+solr.sortOrder.desc=Fallande
+
+### Missing: solr.options=Show:
+### Missing: solr.options.highlight=Highlighting
+### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
+### Missing: solr.options.facet=Facets
+### Missing: solr.options.facet.title=Allow extra filtering of the result
+
+solr.result.language=Språk
+### Missing: solr.result.locatedIn=Located in
+solr.result.author=Ändrad av {0} {1}
+solr.result.mediaType=Filtyp {0}
+solr.result.uploadedBy=Uppladad av {0} {1} ({2})
+solr.result.highlightAll=Markera alla matchningar
+
+solr.facets.title=Filtrera
+solr.facets.hint=Välj en kategori och aktivera filter på nuvarande sökresultat
+solr.facets.resetAll=Återställ alla
+solr.facets.expandAll=Expandera alla
 solr.facets.collapseAll=Kollapsa alla
 solr.facets.emptyValue=Inget värde
-solr.facets.expandAll=Expandera alla
-solr.facets.hint=Välj en kategori och aktivera filter på nuvarande sökresultat
 solr.facets.moreValues={0} fler
-solr.facets.resetAll=Återställ alla
-solr.facets.title=Filtrera
-solr.field.attauthor=Uppladdad av
-solr.field.attcontent=Bilageinnehåll
-solr.field.attdate=Uppladdningsdatum
-solr.field.attsize=Filstorlek
-solr.field.author=Senaste författare
-solr.field.author_display=Författare
-solr.field.class=Objekttyp
-solr.field.class.definedBy=Definierad av {0} » {1}
-solr.field.comment=Kommentarer
-solr.field.creationdate=Datum skapad
-solr.field.creator=Skapare
-solr.field.creator_display=Ursprunglig författare
-solr.field.date=Senast ändrad
-solr.field.doccontent=Renderat dokumentinnehåll
-solr.field.doccontentraw=Dokumentets wikitext
-solr.field.filename=Bilagenamn
+
+solr.filterBy.type.document=Dokument
+solr.filterBy.type.attachment=Bilaga
+solr.filterBy.type.object=Objekt
+solr.filterBy.type.object_property=Objektegenskap
+
+solr.filterBy.fileType.image=Bild
+solr.filterBy.fileType.audio=Ljud
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Text
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=Presentation
+solr.filterBy.fileType.spreadsheet=Kalkylark
+solr.filterBy.fileType.archive=Arkiv
+solr.filterBy.fileType.font=Font
+solr.filterBy.fileType.other=Annan
+solr.facet.fileType.text.plain=Text
+solr.facet.fileType.text.javascript=Javascript
+solr.facet.fileType.text.java-source=Javakällkod
+solr.facet.fileType.text.sh=Skript (bourne shell)
+solr.facet.fileType.image.icon=Ikon
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Binärdata
+
+solr.facet.date.today=Idag
+solr.facet.date.last7Days=Senaste sju dagarna
+solr.facet.date.last30Days=Senaste 30 dagarna
+solr.facet.date.olderThan30Days=Äldre än 30 dagar
+solr.facet.date.customInterval=Anpassat datum och tidsintervall
+solr.facet.date.start=Startdatum och tid
+solr.facet.date.end=Slutdatum och tid
+solr.facet.date.applyCustomInterval=Applicera
+solr.facet.date.between=Från {0} till {1}
+solr.facet.date.after=Efter {0}
+solr.facet.date.before=Före {0}
+solr.facet.date.any=Alla datum
+
+solr.facet.size.tiny=Pyttesmå
+solr.facet.size.small=Små
+solr.facet.size.medium=Medium
+solr.facet.size.large=Stora
+solr.facet.size.between=Mellan {0} och {1}
+solr.facet.size.lessThan=Mindre än {0}
+solr.facet.size.moreThan=Mer än {0}
+solr.facet.size.any=Alla storlekar
+
+solr.field.type=Resultattyp
 solr.field.locale=Språk
 solr.field.locale.emptyValue=Inget språk
 solr.field.locale.emptyValue.hint=Vissa dokument har inget språk angivet eftersom de innehåller skript (skrivna på något maskinspråk) eller innehåler delar av användargränssnittet som visas på aktuellt språk (såsom denna sida).
-solr.field.mimetype=Filtyp
+solr.field.wiki=Wiki
+### Missing: solr.field.spaces=Location
+solr.field.space_exact=Rum
+### Missing: solr.field.space_facet=Location
 solr.field.name=Sida
 solr.field.name_exact=Sida
-solr.field.objcontent=Objekt
+solr.field.title=Titel
+solr.field.author=Senaste författare
+solr.field.author_display=Författare
+solr.field.creator=Skapare
+solr.field.creator_display=Ursprunglig författare
+solr.field.date=Senast ändrad
+solr.field.creationdate=Datum skapad
+solr.field.doccontent=Renderat dokumentinnehåll
+solr.field.doccontentraw=Dokumentets wikitext
+solr.field.class=Objekttyp
+solr.field.class.definedBy=Definierad av {0} » {1}
 solr.field.propertyname=Egenskapsnamn
 solr.field.propertyvalue=Egenskapsvärde
-solr.field.space=Rum
-solr.field.space_exact=Rum
-solr.field.title=Titel
-solr.field.type=Resultattyp
-solr.field.wiki=Wiki
-solr.filterBy.fileType.archive=Arkiv
-solr.filterBy.fileType.audio=Ljud
-solr.filterBy.fileType.font=Font
-solr.filterBy.fileType.image=Bild
-solr.filterBy.fileType.office=Office
-solr.filterBy.fileType.other=Annan
-solr.filterBy.fileType.presentation=Presentation
-solr.filterBy.fileType.spreadsheet=Kalkylark
-solr.filterBy.fileType.text=Text
-solr.filterBy.fileType.video=Video
-solr.filterBy.fileType.word=Word
-solr.filterBy.type.attachment=Bilaga
-solr.filterBy.type.document=Dokument
-solr.filterBy.type.object=Objekt
-solr.filterBy.type.object_property=Objektegenskap
-solr.result.author=Ändrad av {0} {1}
-solr.result.highlightAll=Markera alla matchningar
-solr.result.language=Språk
+solr.field.filename=Bilagenamn
+solr.field.attcontent=Bilageinnehåll
+solr.field.comment=Kommentarer
+solr.field.objcontent=Objekt
+solr.field.mimetype=Filtyp
+solr.field.attauthor=Uppladdad av
+### Missing: solr.field.attauthor_display=Uploaded By
+solr.field.attdate=Uppladdningsdatum
+solr.field.attsize=Filstorlek
+
+### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
+### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
 solr.result.location=Hittat i {0} » {1} » {2}
-solr.result.mediaType=Filtyp {0}
-solr.result.uploadedBy=Uppladad av {0} {1} ({2})
-solr.sortBy=Sortera efter\:
-solr.sortBy.attauthor_display_sort=Uppladdad av
-solr.sortBy.attdate_sort=Uppladdningsdatum
-solr.sortBy.attsize_sort=Filstorlek
-solr.sortBy.author_display_sort=Senaste författare
-solr.sortBy.date=Datum
-solr.sortBy.filename_sort=Filnamn
-solr.sortBy.score=Relevans
-solr.sortBy.title_sort=Titel
-solr.sortOrder.asc=Stigande
-solr.sortOrder.desc=Fallande
+
+## until 7.2RC1
+solr.field.space=Rum
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

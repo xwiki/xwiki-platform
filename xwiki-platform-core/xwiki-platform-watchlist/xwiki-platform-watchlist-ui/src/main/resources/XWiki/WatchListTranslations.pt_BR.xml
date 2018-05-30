@@ -39,16 +39,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Diário
-XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=A cada Hora
-XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Semanal
-XWiki.WatchListClass_interval_realtime=Em tempo real
-rendering.macro.watchlist.description=Apresenta o conteúdo dos itens acompanhados.
+  <content>### Macro "watchlist"
 rendering.macro.watchlist.name=Lista de Acompanhamentos
+rendering.macro.watchlist.description=Apresenta o conteúdo dos itens acompanhados.
+
+### XWiki.WatchListClass
+XWiki.WatchListClass_interval_realtime=Em tempo real
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=A cada Hora
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Diário
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Semanal
+
+### Notification Icons    
+### Missing: watchlist.notifications.icons.on=ON
+### Missing: watchlist.notifications.icons.off=OFF
 watchlist.notifications.icons.tooltip.page=Seguir esta página
 watchlist.notifications.icons.tooltip.pageAndChildren=Seguir esta página e filhas
 watchlist.notifications.icons.tooltip.space=Seguir a página pai e suas filhas
 watchlist.notifications.icons.tooltip.wiki=Seguir esta wiki
+### Missing: watchlist.notifications.changeStatusError=Failed to change the status of the WatchList.
+### Missing: watchlist.settings=Settings
+
+### Watchlist livetable (in the macro)
+### Missing: watchlist.table.scope.wiki=All pages of the wiki
+### Missing: watchlist.table.scope.pageandchildren=Page + Children
+### Missing: watchlist.table.scope.pageonly=Page Only
+### Missing: watchlist.table.location=Location
+### Missing: watchlist.table.scope=Scope
 </content>
 </xwikidoc>

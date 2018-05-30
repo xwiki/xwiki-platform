@@ -39,11 +39,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+  <content>help.syntaxpage.title=XWiki Syntax Sprievodca
+help.syntaxtitle=XWiki Syntax {0}
+help.syntaxall=Všetky
 help.changesyntax=Zmeniť Syntax
 help.choose_syntax=Vybrať Syntax
-help.syntaxall=Všetky
-help.syntaxpage.title=XWiki Syntax Sprievodca
-help.syntaxtitle=XWiki Syntax {0}
 </content>
 </xwikidoc>

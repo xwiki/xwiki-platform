@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language it generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Nome spazio
-index.spacesMacro.createSpace.link=Crea un nuovo spazio
-index.spacesMacro.createSpace.submit=Crea
-index.spacesMacro.spaceAdministration.alt=Amministrazione spazio
-index.spacesMacro.spaceAdministration.title=Vedi amministrazione spazio
-index.spacesMacro.spaceIndex.alt=Indice dello spazio
+  <content>index.spacesMacro.title=Spazi
 index.spacesMacro.spaceIndex.title=Vedi indice spazio
-index.spacesMacro.title=Spazi
+index.spacesMacro.spaceIndex.alt=Indice dello spazio
+index.spacesMacro.spaceAdministration.title=Vedi amministrazione spazio
+index.spacesMacro.spaceAdministration.alt=Amministrazione spazio
+index.spacesMacro.createSpace.link=Crea un nuovo spazio
+index.spacesMacro.createSpace.defaultSpaceName=Nome spazio
+index.spacesMacro.createSpace.submit=Crea
 </content>
 </xwikidoc>

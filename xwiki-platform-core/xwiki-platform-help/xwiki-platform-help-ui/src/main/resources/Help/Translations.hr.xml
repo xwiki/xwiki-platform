@@ -39,18 +39,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-help.macroList.category=Kategorija
-help.macroList.description=Opis
+  <content>help.tipsPanel.title=Savjeti
+help.tipsPanel.noTipMessage=Nema dostupnih savjeta\!
+help.tipsPanel.gettingStartedTip=Ako započinjete s XWikijem, pregledajte [[Vodič za započinjanje&gt;&gt;http\://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Idite na bilo koju stranicu u wikiju s Ctrl+G ili Meta+G.\nPogledajte [[još kratica&gt;&gt;http\://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Jeste li znali da možete poboljšati XWiki? Odvojite 5 minuta kako biste [[ispunili ovu anketu&gt;&gt;http\://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] i pomogli ovom projektu otvorenog koda\!
+help.tipsPanel.breadcrumbsTip=Možete kliknuti na strelice pored elemenata mrvica kako biste brzo navigirali do stranica srodnika i djece.
+### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+help.macroList.title=Dostupni makroi
 help.macroList.id=Identifikator
 help.macroList.name=Ime
-help.macroList.title=Dostupni makroi
+help.macroList.category=Kategorija
+help.macroList.description=Opis
 help.macroList.visibility=Vidljivost
-help.tipsPanel.breadcrumbsTip=Možete kliknuti na strelice pored elemenata mrvica kako biste brzo navigirali do stranica srodnika i djece.
-help.tipsPanel.gettingStartedTip=Ako započinjete s XWikijem, pregledajte [[Vodič za započinjanje&gt;&gt;http\://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.improveXWikiTip=Jeste li znali da možete poboljšati XWiki? Odvojite 5 minuta kako biste [[ispunili ovu anketu&gt;&gt;http\://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] i pomogli ovom projektu otvorenog koda\!
-help.tipsPanel.jumpToPageTip=Idite na bilo koju stranicu u wikiju s Ctrl+G ili Meta+G.\nPogledajte [[još kratica&gt;&gt;http\://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
-help.tipsPanel.noTipMessage=Nema dostupnih savjeta\!
-help.tipsPanel.title=Savjeti
 </content>
 </xwikidoc>

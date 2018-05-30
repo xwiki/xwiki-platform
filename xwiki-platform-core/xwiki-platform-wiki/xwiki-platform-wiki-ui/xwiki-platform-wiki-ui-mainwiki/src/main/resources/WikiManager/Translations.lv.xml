@@ -39,165 +39,270 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-WikiManager.WikiUserClass_membershipType_invite=Lai pievienotos šim viki, uzaicinājumu var izsūtīt tikai administrators
-WikiManager.WikiUserClass_membershipType_open=Atvērts visiem lietotājiem, kas vēlas pievienoties
-WikiManager.WikiUserClass_membershipType_request=Jebkurš globāls lietotājs var pieprasīt pievienoties, bet administratoram ir jāapstiprina
-WikiManager.WikiUserClass_userScope_global_only=Viki var izmantot tikai globālie lietotāji
-WikiManager.WikiUserClass_userScope_local_and_global=Šajā viki var izmantot gan lokālos, gan globālos lietotājus
-WikiManager.WikiUserClass_userScope_local_only=Viki var izmantot tikai lokālie lietotāji
-admin.wikis.description=Viki pārvaldība.
-admin.wikis.rights=Izveides tiesības
-admin.wikis.templates=Veidnes
-platform.wiki.browse=Pārlūkot viki
-platform.wiki.browse._actions=Darbības
-platform.wiki.browse._actions.cancelJoinRequest=Atcelt pieprasījumu
-platform.wiki.browse._actions.delete=Dzēst
-platform.wiki.browse._actions.join=Pievienoties
-platform.wiki.browse._actions.leave=Pamest
-platform.wiki.browse._actions.requestJoin=Pieprasīt pievienošanos
-platform.wiki.browse._actions.viewInvitation=Skatīt uzaicinājumu
-platform.wiki.browse.description=Apraksts
-platform.wiki.browse.doc.creationDate=Izveides laiks
-platform.wiki.browse.emptyvalue=–
-platform.wiki.browse.membershipType=Dalības veids
-platform.wiki.browse.owner=Īpašnieks
-platform.wiki.browse.wikiprettyname=Nosaukums
-platform.wiki.create.error=Viki "{0}" izveide neizdevās: {1}. 
-platform.wiki.create.error.wikiname.databasealreadyexists=Datubāze ar šo nosaukumu jau pastāv
-platform.wiki.create.error.wikiname.empty=Identifikators nedrīkst būt tukšs
-platform.wiki.create.error.wikiname.wikialreadyexists=Šis identifikators ir jau izmantots
-platform.wiki.create.members=Dalībnieki
-platform.wiki.create.prettyname.empty=Skaistais nosaukums nedrīkst būt tukšs
-platform.wiki.create.title=Izveidot jaunu viki
-platform.wiki.create.wizard.desc.description=Īss viki un tā idejas apraksts.
-platform.wiki.create.wizard.desc.members=Lietotāji, kuri var piedalīties šajā viki
-platform.wiki.create.wizard.desc.newTemplateHint=Šī viki izveidei pielietojamā veidne (tiks nokopēti visi dokumenti).
-platform.wiki.create.wizard.desc.owner=Lietotājs, kuram vienmēr būs visas tiesības, neatkarīgi no tā, kādas tiesības ir iestatītas viki pārvaldībā.
-platform.wiki.create.wizard.desc.wikialias=Domēna nosaukums, kurā atrodas attiecīgais viki.
-platform.wiki.create.wizard.desc.wikiname=Jaunā viki unikāls identifikators
-platform.wiki.create.wizard.desc.wikiprettyname=Viki attēlojamais nosaukums.
-platform.wiki.create.wizard.setAsTemplate.label=Šis viki būs veidne
-platform.wiki.create.wizard.step.cleaningUp=Sakopj
-platform.wiki.create.wizard.step.cleaningUp.confirm=Apstiprināt
-platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Jūs vēlaties izdzēst viki {0}. Lūdzu apstipriniet.
-platform.wiki.create.wizard.step.cleaningup.error=Kļūda, viki {0} netika izdzēsts.
-platform.wiki.create.wizard.step.cleaningup.success=Viki {0} ir veiksmīgi izdzēsts.
-platform.wiki.create.wizard.step.create=Izveidot
-platform.wiki.create.wizard.step.creation=Viki izveide
-platform.wiki.create.wizard.step.creation.complete=Viki {0} ir veiksmīgi izveidots. Tagad jūs to varat izmantot.
-platform.wiki.create.wizard.step.creation.error=Viki {0} ir izveidots, tomēr daži dokumenti nav izveidoti. Attiecīgi viki uzvedībā var būt kļūdas un, iespējams, jums to būtu jāizdzēš.
-platform.wiki.create.wizard.step.creation.go=Doties uz viki
-platform.wiki.create.wizard.step.creation.wait=Uzgaidtiet, kamēr viki tiek izveidots.
-platform.wiki.create.wizard.step.dw=Pēc klikšķa uz "Izveidot" pogas, tiks izveidots viki un Distribūcijas vednis sāks inicializēt to. Ja jūs to izlaidīsiet, jūsu viki būs tukšs.
-platform.wiki.create.wizard.step.nameAndType=1. solis — izvēlieties nosaukumu
-platform.wiki.create.wizard.step.nameAndType.shortname=Nosaukums
-platform.wiki.create.wizard.step.next=Doties uz nākamo soli
-platform.wiki.create.wizard.step.previous=Iepriekšējais solis
-platform.wiki.create.wizard.step.provisioning.cleanUp=Iztīrīt un izdzēst viki
-platform.wiki.create.wizard.step.users=2. solis — izvēlieties dalībniekus
-platform.wiki.create.wizard.step.users.shortname=Lietotāji
-platform.wiki.create.wizard.template.label=Veidne
-platform.wiki.create.wizard.template.noTemplate=Bez veidnes (noklusētais)
-platform.wiki.create.wizard.userScope.hint=Izvēlieties, kādi lietotāju veidi varēs piekļūt viki
-platform.wiki.create.wizard.userScope.label=Lietotāju apgabals
-platform.wiki.csrf.error=Drošības marķieris ir nepareizs. Lūdzu atkārtojiet savu darbību.
-platform.wiki.delete.confirmation=Vai tiešām vēlaties dzēst viki {0}{1}{2}? Šo darbību nevarēs atcelt!
-platform.wiki.delete.confirmation.no=Nē, vediet mani atpakaļ!
-platform.wiki.delete.confirmation.retypeWikiId=Lūdzu ievadiet šeit viki identifikatoru:
-platform.wiki.delete.confirmation.yes=Jā, lūdzu izdzēsiet šo viki!
-platform.wiki.delete.error.wikiIdDoesNotMatch=Jums ir jāievada precīzs dzēšamā viki nosaukums.
-platform.wiki.delete.success=Lietotājs {0}{1}{2} veiksmīgi izdzēsa viki "{3}".
-platform.wiki.dependencies.template.missing=Nav uzstādīta "Wiki Template" Java komponente. Šī lapa nestrādās korekti. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti paplašinājumi "Wiki Template API" un "Wiki Template Script" , vai arī, ka faili 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija). 
-platform.wiki.dependencies.user.missing=Nav uzstādīta "Wiki User" Java komponente. Šī lapa nedarbosies pareizi. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti "Wiki User API" un "Wiki User Script" paplašinājumi, vai arī, ka faili 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
-platform.wiki.dependencies.wiki.missing=Nav uzstādīta "Wiki" Java komponente. Šī lapa nedarbosies pareizi. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti "Wiki API" un "Wiki Script" paplašinājumi, vai arī, ka faili 'xwiki-platform-wiki-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
-platform.wiki.error.exceptionWithMessage=Izņēmums: {0}
-platform.wiki.error.oneParameterNotSpecified=Nav norādīts "{0}" parametrs.
-platform.wiki.error.parameterAcceptsMultipleValues=Saņemtas vairākas vērtības.
-platform.wiki.error.wikidoesnotexist=Viki [{0}] nepastāv
-platform.wiki.form.requiredField=Obligāts
-platform.wiki.macro.noWikis=Šobrīd nav izveidots neviens viki, (izņemot galveno).
+  <content>###############################################################################
+# WikiManager Manager translation page
+#
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
+#
+# This contains the translations of the module in the default language
+# (generally English).
+# 
+# Translation key syntax:
+#   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
+#   where:
+#   * &lt;short top level project name&gt; = top level project name without the "xwiki-" prefix,
+#                                     for example: commons, rendering, platform, enterprise, manager, etc
+#   * &lt;short module name&gt; = the name of the Maven module without the &lt;short top level project name&gt; prefix,
+#                           for example: oldcore, scheduler, activitystream, etc
+#   * &lt;propertyName&gt; = the name of the property using camel case,
+#                      for example updateJobClassCommitComment
+#
+# Comments: it's possible to add some detail about a key to make easier to
+#   translate it by adding a comment before it. To make sure a comment is not
+#   assigned to the following key use at least three sharps (###) for the comment
+#   or after it.
+# 
+# Deprecated keys:
+#   * when deleting a key it should be moved to deprecated section at the end
+#     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
+#     first version in which it started to be deprecated
+#   * when renaming a key, it should be moved to the same deprecated section
+#     and a comment should be added with the following syntax:
+#     #@deprecated new.key.name
+#     old.key.name=Some translation
+###############################################################################
+
+## Menus
+platform.wiki.menu.wikiindex=Viki indekss
 platform.wiki.menu.deletewiki=Dzēst
 platform.wiki.menu.userwikis=Viki
-platform.wiki.menu.wikiindex=Viki indekss
-platform.wiki.prop.description=Apraksts
-platform.wiki.prop.membershipType.hint=Vieds, kā lietotāji var pieslēgties viki.
-platform.wiki.prop.membershipType.label=Dalības veids.
-platform.wiki.prop.owner=Īpašnieks
-platform.wiki.prop.wikialias=sinonīms
-platform.wiki.prop.wikiname=viki identifikators
-platform.wiki.prop.wikiprettyname=Detalizētais nosaukums
-platform.wiki.sheet.aliases=Sinonīms ir cits viki nosaukums. Jūs varat izmantot sinonīmus, lai tam pašam viki piekļūtu ar dažādiem vietrāžiem (adresēm).
-platform.wiki.sheet.desc.description=Īss viki apraksts
-platform.wiki.sheet.desc.homepage=Viki sākuma lapa.
-platform.wiki.sheet.desc.iswikitemplate=Norādiet, vai šo viki izmantosiet kā veidni citu viki izveidei.
-platform.wiki.sheet.desc.owner=Globāls lietotājs, kuram šajā viki būs visas piekļuves tiesības.
-platform.wiki.sheet.desc.secure=Ja ieslēgts, visi viki ģenerētie vietrāži (adreses) sāksies ar "https".
-platform.wiki.sheet.desc.server=Viki piekļuvei izmantotie sinonīmi
-platform.wiki.sheet.desc.wikiprettyname=Viki attēlojamais nosaukums.
-platform.wiki.sheet.descriptor=Šī lapa nosaka, kā piekļūt "{0}" viki un dažas tā īpašības. Lai iestatītu vairāk, dodieties uz
-platform.wiki.sheet.descriptor.admin=viki pārvaldības lapu.
-platform.wiki.sheet.erroraliasalreadynotexists=Viki sinonīms "{0}" jau pastāv.
-platform.wiki.sheet.erroraliasdoesnotexists=Viki sinonīms "{0}" nepastāv.
-platform.wiki.sheet.prop.description=Apraksts
-platform.wiki.sheet.prop.homepage=Sākuma lapa
-platform.wiki.sheet.prop.iswikitemplate=Viki veidne
-platform.wiki.sheet.prop.owner=Īpašnieks
-platform.wiki.sheet.prop.secure=Drošs (SSL)
-platform.wiki.sheet.prop.server=Sinonīms
-platform.wiki.sheet.prop.wikiprettyname=Skaistais nosaukums
-platform.wiki.sheet.title=Viki "{0}" apraksts
-platform.wiki.sheet.title.createnewalias=Izveidot jaunu sinonīmu
-platform.wiki.sheet.title.settings=Viki īpašības
-platform.wiki.sheet.title.viewaliases=Skatīt sinonīmus
-platform.wiki.users.delete.title=Dzēst viki "{0}"
-platform.wiki.users.invitation.accept.label=Pieņemt
-platform.wiki.users.invitation.message.label=Uzaicinājuma ziņojums
-platform.wiki.users.invitation.postpone.label=Vēlāk
-platform.wiki.users.invitation.reject.label=Noraidīt
-platform.wiki.users.invitation.reply.hint=Nosūtāmais atbildes ziņojums, kuru redzēs viki administrators un kurā varat pamatot savu lēmumu.
-platform.wiki.users.invitation.reply.title=Atbildēt
-platform.wiki.users.invitation.title=Jūs esat uzaicināts pievienoties viki {0}{1}{2}.
+
+## Dependencies
+platform.wiki.dependencies.wiki.missing=Nav uzstādīta "Wiki" Java komponente. Šī lapa nedarbosies pareizi. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti "Wiki API" un "Wiki Script" paplašinājumi, vai arī, ka faili 'xwiki-platform-wiki-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
+platform.wiki.dependencies.template.missing=Nav uzstādīta "Wiki Template" Java komponente. Šī lapa nestrādās korekti. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti paplašinājumi "Wiki Template API" un "Wiki Template Script" , vai arī, ka faili 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija). 
+platform.wiki.dependencies.user.missing=Nav uzstādīta "Wiki User" Java komponente. Šī lapa nedarbosies pareizi. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti "Wiki User API" un "Wiki User Script" paplašinājumi, vai arī, ka faili 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
+
+## Create
+### Missing: platform.wiki.create.button=Create Wiki
+platform.wiki.create.title=Izveidot jaunu viki
+platform.wiki.create.members=Dalībnieki
+platform.wiki.create.prettyname.empty=Skaistais nosaukums nedrīkst būt tukšs
+platform.wiki.create.error=Viki "{0}" izveide neizdevās: {1}. 
+platform.wiki.create.error.wikiname.databasealreadyexists=Datubāze ar šo nosaukumu jau pastāv
+platform.wiki.create.error.wikiname.wikialreadyexists=Šis identifikators ir jau izmantots
+platform.wiki.create.error.wikiname.empty=Identifikators nedrīkst būt tukšs
+
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=Viki [{0}] nepastāv
+platform.wiki.error.oneParameterNotSpecified=Nav norādīts "{0}" parametrs.
+platform.wiki.error.parameterAcceptsMultipleValues=Saņemtas vairākas vērtības.
+platform.wiki.error.exceptionWithMessage=Izņēmums: {0}
+platform.wiki.form.requiredField=Obligāts
+platform.wiki.csrf.error=Drošības marķieris ir nepareizs. Lūdzu atkārtojiet savu darbību.
+
+## Users
+platform.wiki.users.userAlreadyMemberOfWiki=Lietotājs {0}{1}{2} jau ir viki {3}{4}{5} dalībnieks.
+platform.wiki.users.userNotMemberOfWiki=Lietotājs {0}{1}{2} nav viki {3}{4}{5} dalībnieks. 
+platform.wiki.users.logInToContinue=Lai turpinātu, jums vispirms ir {0}jāpiesakās{1}.
 platform.wiki.users.invitation.userAcceptedNotification=Lietotājs ''{0}'' ({1}) ir pieņēmis uzaicinājumu pievienoties viki ''{2}'' ({3}). 
 platform.wiki.users.invitation.userAcceptedSuccess=Lietotājs {0}{1}{2} veiksmīgi apstiprināja uzaicinājumu un pievienojās viki {3}{4}{5}. 
 platform.wiki.users.invitation.userRejectedSuccess=Lietotājs {0}{1}{2} veiksmīgi noraidīja uzaicinājumu pievienoties viki {3}{4}{5}. 
-platform.wiki.users.join.confirmation=Vai tiešām vēlaties pievienoties viki {0}{1}{2}?
 platform.wiki.users.join.error.needInvitation=Šajā viki var pievienoties tikai ar uzaicinājumu. Lai tam pievienotos, jums ir jāsaņem uzaicinājums no viki administratora.
-platform.wiki.users.join.no=Nē
-platform.wiki.users.join.request.cancel.label=Atpakaļ
+platform.wiki.users.join.request.pendingRequestExists=Lietotājam {0}{1}{2} jau ir izdots pieprasījums uzaicināt pievienoties viki {3}{4}{5}. Lūdzu gaidiet, kad šo pieprasījumu izskatīs viki administrators. 
 platform.wiki.users.join.request.cancelConfirmation=Vai tiešām vēlaties noraidīt uzaicinājumu pievienoties viki {0}{1}{2}?
+platform.wiki.users.join.request.cancelYes=Jā
 platform.wiki.users.join.request.cancelNo=Nē
 platform.wiki.users.join.request.cancelSuccess=Lietotājs {0}{1}{2} veiksmīgi noraidīja uzaicinājumu pievienoties viki {3}{4}{5}.
-platform.wiki.users.join.request.cancelYes=Jā
+platform.wiki.users.join.request.saveNotification=Lietotājs ''{0}'' ({1}) ir pieprasījis viņa pievienošanu viki ''{2}'' ({3}). 
+platform.wiki.users.join.request.success=Lietotājs {0}{1}{2} sekmīgi nosūtīja pieprasījumu pievienoties viki {3}{4}{5}. 
+platform.wiki.users.join.confirmation=Vai tiešām vēlaties pievienoties viki {0}{1}{2}?
+platform.wiki.users.join.yes=Jā
+platform.wiki.users.join.no=Nē
+platform.wiki.users.join.success=Lietotājs {0}{1}{2} veiksmīgi pievienojās viki {3}{4}{5}. 
+platform.wiki.users.leave.error.userIsOwner=Lietotājs {0}{1}{2} ir viki {3}{4}{5} īpašnieks. Viki īpašnieks nevar pamest viki līdz viki nav izdzēsts vai arī īpašnieks nav nomainīts uz citu lietotāju. 
+platform.wiki.users.leave.confirmation=Vai tiešām vēlaties pamest viki {0}{1}{2}?
+platform.wiki.users.leave.confirmation.yes=Jā
+platform.wiki.users.leave.confirmation.no=Nē
+platform.wiki.users.leave.success=Lietotājs {0}{1}{2} veiksmīgi pameta viki {3}{4}{5}. 
+platform.wiki.users.join.title=Pievienoties viki
+platform.wiki.users.leave.title=Pamest viki "{0}"
+platform.wiki.users.leave.empty=
+platform.wiki.users.delete.title=Dzēst viki "{0}"
+platform.wiki.users.delete.empty=
+platform.wiki.users.invitation.reply.hint=Nosūtāmais atbildes ziņojums, kuru redzēs viki administrators un kurā varat pamatot savu lēmumu.
 platform.wiki.users.join.request.hint=Lai pievienotos viki {0}{1}{2}, jums vispirms ir jāizveido uzaicināšanas pieprasījums. Pēc tam administratori izskatīs jūsu pieprasījumu un izlems, vai apstiprināt, vai noraidīt to.
 platform.wiki.users.join.request.message.hint=Nosūtāmais ziņojums viki administratoriem, kurā jūs varat pamatot savu pieprasījumu.
+platform.wiki.users.invitation.title=Jūs esat uzaicināts pievienoties viki {0}{1}{2}.
+platform.wiki.users.invitation.message.label=Uzaicinājuma ziņojums
+platform.wiki.users.invitation.reply.title=Atbildēt
+platform.wiki.users.invitation.accept.label=Pieņemt
+platform.wiki.users.invitation.reject.label=Noraidīt
+platform.wiki.users.invitation.postpone.label=Vēlāk
 platform.wiki.users.join.request.message.label=Ziņojums
-platform.wiki.users.join.request.pendingRequestExists=Lietotājam {0}{1}{2} jau ir izdots pieprasījums uzaicināt pievienoties viki {3}{4}{5}. Lūdzu gaidiet, kad šo pieprasījumu izskatīs viki administrators. 
-platform.wiki.users.join.request.saveNotification=Lietotājs ''{0}'' ({1}) ir pieprasījis viņa pievienošanu viki ''{2}'' ({3}). 
 platform.wiki.users.join.request.send.label=Nosūtīt pieprasījumu
-platform.wiki.users.join.request.success=Lietotājs {0}{1}{2} sekmīgi nosūtīja pieprasījumu pievienoties viki {3}{4}{5}. 
-platform.wiki.users.join.success=Lietotājs {0}{1}{2} veiksmīgi pievienojās viki {3}{4}{5}. 
-platform.wiki.users.join.title=Pievienoties viki
-platform.wiki.users.join.yes=Jā
-platform.wiki.users.leave.confirmation=Vai tiešām vēlaties pamest viki {0}{1}{2}?
-platform.wiki.users.leave.confirmation.no=Nē
-platform.wiki.users.leave.confirmation.yes=Jā
-platform.wiki.users.leave.error.userIsOwner=Lietotājs {0}{1}{2} ir viki {3}{4}{5} īpašnieks. Viki īpašnieks nevar pamest viki līdz viki nav izdzēsts vai arī īpašnieks nav nomainīts uz citu lietotāju. 
-platform.wiki.users.leave.success=Lietotājs {0}{1}{2} veiksmīgi pameta viki {3}{4}{5}. 
-platform.wiki.users.leave.title=Pamest viki "{0}"
-platform.wiki.users.logInToContinue=Lai turpinātu, jums vispirms ir {0}jāpiesakās{1}.
-platform.wiki.users.profile.activity.hint=Izveido izvēlēto viki darbību straumi.
-platform.wiki.users.profile.activity.multipletitle=Viki {0} darbības
-platform.wiki.users.profile.activity.show=rādīt darbības
-platform.wiki.users.profile.activity.title=Viki {0} darbības
+platform.wiki.users.join.request.cancel.label=Atpakaļ
+
+## User profile
 platform.wiki.users.profile.joinedwikis.label=Pievienotie viki
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Jūs pagaidām neesat neviena viki dalībnieks.
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Lietotājs nav neviena viki dalībnieks.
-platform.wiki.users.userAlreadyMemberOfWiki=Lietotājs {0}{1}{2} jau ir viki {3}{4}{5} dalībnieks.
-platform.wiki.users.userNotMemberOfWiki=Lietotājs {0}{1}{2} nav viki {3}{4}{5} dalībnieks. 
-rendering.macro.wikis.description=Rādīt visus viki
+platform.wiki.users.profile.activity.title=Viki {0} darbības
+platform.wiki.users.profile.activity.hint=Izveido izvēlēto viki darbību straumi.
+platform.wiki.users.profile.activity.multipletitle=Viki {0} darbības
+platform.wiki.users.profile.activity.show=rādīt darbības
+
+## Wiki Deletion
+platform.wiki.delete.confirmation=Vai tiešām vēlaties dzēst viki {0}{1}{2}? Šo darbību nevarēs atcelt!
+platform.wiki.delete.confirmation.retypeWikiId=Lūdzu ievadiet šeit viki identifikatoru:
+platform.wiki.delete.error.wikiIdDoesNotMatch=Jums ir jāievada precīzs dzēšamā viki nosaukums.
+platform.wiki.delete.success=Lietotājs {0}{1}{2} veiksmīgi izdzēsa viki "{3}".
+
+## Wiki macro
+platform.wiki.macro.noWikis=Šobrīd nav izveidots neviens viki, (izņemot galveno).
 rendering.macro.wikis.name=Viki
-rendering.macro.workspaces.description=Novecojis makross, kuru nevajadzētu izmantot, kas ir atstāts tikai savietojamībai. Lūdzu tā vietā lietojiet "wikis" makrosu.
+rendering.macro.wikis.description=Rādīt visus viki
+
+## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Darbavirsmas (novecojis)
+rendering.macro.workspaces.description=Novecojis makross, kuru nevajadzētu izmantot, kas ir atstāts tikai savietojamībai. Lūdzu tā vietā lietojiet "wikis" makrosu.
+
+## Browse
+platform.wiki.browse=Pārlūkot viki
+platform.wiki.browse.emptyvalue=–
+platform.wiki.browse.wikiprettyname=Nosaukums
+platform.wiki.browse.description=Apraksts
+platform.wiki.browse.owner=Īpašnieks
+platform.wiki.browse.membershipType=Dalības veids
+platform.wiki.browse.doc.creationDate=Izveides laiks
+platform.wiki.browse._actions=Darbības
+platform.wiki.browse._actions.join=Pievienoties
+platform.wiki.browse._actions.requestJoin=Pieprasīt pievienošanos
+platform.wiki.browse._actions.viewInvitation=Skatīt uzaicinājumu
+platform.wiki.browse._actions.cancelJoinRequest=Atcelt pieprasījumu
+platform.wiki.browse._actions.leave=Pamest
+platform.wiki.browse._actions.delete=Dzēst
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=Atvērts visiem lietotājiem, kas vēlas pievienoties
+WikiManager.WikiUserClass_membershipType_request=Jebkurš globāls lietotājs var pieprasīt pievienoties, bet administratoram ir jāapstiprina
+WikiManager.WikiUserClass_membershipType_invite=Lai pievienotos šim viki, uzaicinājumu var izsūtīt tikai administrators
+WikiManager.WikiUserClass_userScope_local_only=Viki var izmantot tikai lokālie lietotāji
+WikiManager.WikiUserClass_userScope_global_only=Viki var izmantot tikai globālie lietotāji
+WikiManager.WikiUserClass_userScope_local_and_global=Šajā viki var izmantot gan lokālos, gan globālos lietotājus
+platform.wiki.prop.wikiname=viki identifikators
+platform.wiki.prop.wikiprettyname=Detalizētais nosaukums
+platform.wiki.prop.wikialias=sinonīms
+platform.wiki.prop.description=Apraksts
+platform.wiki.prop.owner=Īpašnieks
+platform.wiki.prop.membershipType.label=Dalības veids.
+platform.wiki.prop.membershipType.hint=Vieds, kā lietotāji var pieslēgties viki.
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=Jaunā viki unikāls identifikators
+platform.wiki.create.wizard.desc.wikiprettyname=Viki attēlojamais nosaukums.
+platform.wiki.create.wizard.desc.wikialias=Domēna nosaukums, kurā atrodas attiecīgais viki.
+platform.wiki.create.wizard.desc.newTemplateHint=Šī viki izveidei pielietojamā veidne (tiks nokopēti visi dokumenti).
+platform.wiki.create.wizard.desc.description=Īss viki un tā idejas apraksts.
+platform.wiki.create.wizard.desc.owner=Lietotājs, kuram vienmēr būs visas tiesības, neatkarīgi no tā, kādas tiesības ir iestatītas viki pārvaldībā.
+platform.wiki.create.wizard.desc.members=Lietotāji, kuri var piedalīties šajā viki
+platform.wiki.create.wizard.step.nameAndType=1. solis — izvēlieties nosaukumu
+platform.wiki.create.wizard.step.nameAndType.shortname=Nosaukums
+platform.wiki.create.wizard.step.users=2. solis — izvēlieties dalībniekus
+platform.wiki.create.wizard.step.users.shortname=Lietotāji
+platform.wiki.create.wizard.step.cleaningUp=Sakopj
+platform.wiki.create.wizard.step.provisioning.cleanUp=Iztīrīt un izdzēst viki
+platform.wiki.create.wizard.step.cleaningup.success=Viki {0} ir veiksmīgi izdzēsts.
+platform.wiki.create.wizard.step.cleaningup.error=Kļūda, viki {0} netika izdzēsts.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Jūs vēlaties izdzēst viki {0}. Lūdzu apstipriniet.
+platform.wiki.create.wizard.step.cleaningUp.confirm=Apstiprināt
+platform.wiki.create.wizard.setAsTemplate.label=Šis viki būs veidne
+platform.wiki.create.wizard.template.noTemplate=Bez veidnes (noklusētais)
+platform.wiki.create.wizard.userScope.label=Lietotāju apgabals
+platform.wiki.create.wizard.userScope.hint=Izvēlieties, kādi lietotāju veidi varēs piekļūt viki
+platform.wiki.create.wizard.template.label=Veidne
+### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
+### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
+### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
+### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
+platform.wiki.create.wizard.step.dw=Pēc klikšķa uz "Izveidot" pogas, tiks izveidots viki un Distribūcijas vednis sāks inicializēt to. Ja jūs to izlaidīsiet, jūsu viki būs tukšs.
+platform.wiki.create.wizard.step.previous=Iepriekšējais solis
+platform.wiki.create.wizard.step.next=Doties uz nākamo soli
+platform.wiki.create.wizard.step.create=Izveidot
+
+platform.wiki.create.wizard.step.creation=Viki izveide
+platform.wiki.create.wizard.step.creation.wait=Uzgaidtiet, kamēr viki tiek izveidots.
+platform.wiki.create.wizard.step.creation.complete=Viki {0} ir veiksmīgi izveidots. Tagad jūs to varat izmantot.
+platform.wiki.create.wizard.step.creation.error=Viki {0} ir izveidots, tomēr daži dokumenti nav izveidoti. Attiecīgi viki uzvedībā var būt kļūdas un, iespējams, jums to būtu jāizdzēš.
+platform.wiki.create.wizard.step.creation.go=Doties uz viki
+
+## Admin
+admin.wikis.description=Viki pārvaldība.
+admin.wikis.templates=Veidnes
+### Missing: admin.wikis.templates.description=Manage the wiki templates
+### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
+admin.wikis.rights=Izveides tiesības
+
+## XWikiServer Sheet
+platform.wiki.sheet.title=Viki "{0}" apraksts
+platform.wiki.sheet.erroraliasalreadynotexists=Viki sinonīms "{0}" jau pastāv.
+platform.wiki.sheet.erroraliasdoesnotexists=Viki sinonīms "{0}" nepastāv.
+platform.wiki.sheet.title.settings=Viki īpašības
+platform.wiki.sheet.title.createnewalias=Izveidot jaunu sinonīmu
+platform.wiki.sheet.title.viewaliases=Skatīt sinonīmus
+platform.wiki.sheet.desc.wikiprettyname=Viki attēlojamais nosaukums.
+platform.wiki.sheet.desc.owner=Globāls lietotājs, kuram šajā viki būs visas piekļuves tiesības.
+platform.wiki.sheet.desc.secure=Ja ieslēgts, visi viki ģenerētie vietrāži (adreses) sāksies ar "https".
+platform.wiki.sheet.desc.iswikitemplate=Norādiet, vai šo viki izmantosiet kā veidni citu viki izveidei.
+platform.wiki.sheet.desc.server=Viki piekļuvei izmantotie sinonīmi
+platform.wiki.sheet.desc.description=Īss viki apraksts
+platform.wiki.sheet.desc.homepage=Viki sākuma lapa.
+platform.wiki.sheet.prop.wikiprettyname=Skaistais nosaukums
+platform.wiki.sheet.prop.owner=Īpašnieks
+platform.wiki.sheet.prop.secure=Drošs (SSL)
+platform.wiki.sheet.prop.description=Apraksts
+platform.wiki.sheet.prop.server=Sinonīms
+platform.wiki.sheet.prop.homepage=Sākuma lapa
+platform.wiki.sheet.prop.iswikitemplate=Viki veidne
+platform.wiki.sheet.descriptor=Šī lapa nosaka, kā piekļūt "{0}" viki un dažas tā īpašības. Lai iestatītu vairāk, dodieties uz
+platform.wiki.sheet.descriptor.admin=viki pārvaldības lapu.
+platform.wiki.sheet.aliases=Sinonīms ir cits viki nosaukums. Jūs varat izmantot sinonīmus, lai tam pašam viki piekļūtu ar dažādiem vietrāžiem (adresēm).
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.1
+#######################################
+### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wikis=Wikis
+### Missing: admin.wikis.template=Wiki Template
+
+#######################################
+## until 7.0M2
+#######################################
+### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
+### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
+### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
+### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=Jā, lūdzu izdzēsiet šo viki!
+platform.wiki.delete.confirmation.no=Nē, vediet mani atpakaļ!
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

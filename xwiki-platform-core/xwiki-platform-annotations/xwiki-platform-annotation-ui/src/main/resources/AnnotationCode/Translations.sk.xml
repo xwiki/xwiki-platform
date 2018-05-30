@@ -39,40 +39,82 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-AnnotationCode.AnnotationConfig_activated=Anotácie sú aktivované
-AnnotationCode.AnnotationConfig_annotationClass=XWiki trieda definujúca štruktúru anotácií
-AnnotationCode.AnnotationConfig_displayed=Zobraziť anotácie implicitne
-AnnotationCode.AnnotationConfig_exceptionSpaces=Okrem priestorov
-admin.annotations=Anotácie
-annotations.action.create.cancel.text=Zrušiť
-annotations.action.create.error.wrongsyntax=Anotácie nie sú dostupné pre stránky v XWiki/1.0 syntaxe.
-annotations.action.create.form.loaderror=Nepodarilo sa\:
-annotations.action.create.helpmessage=Ak chcete komentovať kus textu, označte to a stlačte {0}.
-annotations.action.create.loaderror=Nepodarilo sa\:
-annotations.action.create.submit.text=Pridať anotáciu
-annotations.action.delete.confirm=Chcete zmazať anotáciu?
-annotations.action.delete.done=Odstrániť anotáciu
-annotations.action.delete.text=[Odstrániť]
-annotations.action.delete.tooltip=Odstrániť anotáciu
-annotations.action.edit.cancel.text=Zrušiť
-annotations.action.edit.loaderror=Nepodarilo sa\:
-annotations.action.edit.submit.text=Aktualizovať
+  <content>annotations.title=Anotácie
+### Missing: annotations.menu.loading=Loading annotation settings
+### Missing: annotations.menu.loaderror=Failed:
+### Missing: annotations.tab.info.noannotations=No annotations on this page
+
+annotations.settings.display=Zobraziť anotácie
+### Missing: annotations.settings.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
+### Missing: annotations.settings.error.notarget=No page specified to get annotations settings for.
+
+### Missing: annotations.annotated.loading=Loading annotated page
+annotations.annotated.loaderror=Nepodarilo sa\:
+### Missing: annotations.annotated.loaderror.wrongresponse=Wrongly formatted server response
+### Missing: annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
+### Missing: annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
+
 annotations.action.edit.text=[Editovať]
 annotations.action.edit.tooltip=Editovať anotáciu
-annotations.action.validate.loaderror=Nepodarilo sa\:
-annotations.action.validate.text=[Validovať]
-annotations.action.view.form.loaderror=Nepodarilo sa\:
+annotations.action.edit.submit.text=Aktualizovať
+annotations.action.edit.cancel.text=Zrušiť
+### Missing: annotations.action.edit.success=Annotation updated.
+annotations.action.edit.loaderror=Nepodarilo sa\:
+### Missing: annotations.action.edit.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
+
+annotations.action.delete.text=[Odstrániť]
+annotations.action.delete.tooltip=Odstrániť anotáciu
+annotations.action.delete.confirm=Chcete zmazať anotáciu?
+### Missing: annotations.action.delete.inProgress=Deleting annotation...
+annotations.action.delete.done=Odstrániť anotáciu
+### Missing: annotations.action.delete.failed=Failed to delete annotation:
+
+annotations.action.create.submit.text=Pridať anotáciu
+annotations.action.create.cancel.text=Zrušiť
+### Missing: annotations.action.create.selection.invalid=Please select a non-empty text in the page content.
+annotations.action.create.form.loaderror=Nepodarilo sa\:
+### Missing: annotations.action.create.success=Annotation added.
+annotations.action.create.loaderror=Nepodarilo sa\:
+### Missing: annotations.action.create.error.unauthorized=You are not authorized to add annotations on this page.
+### Missing: annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this page. Try to login first.
+annotations.action.create.helpmessage=Ak chcete komentovať kus textu, označte to a stlačte {0}.
+annotations.action.create.error.wrongsyntax=Anotácie nie sú dostupné pre stránky v XWiki/1.0 syntaxe.
+### Missing: annotations.action.create.error.notarget=Unspecified target (page) to create annotations for.
+
 annotations.action.view.hide.text=skryť
+annotations.action.view.form.loaderror=Nepodarilo sa\:
+### Missing: annotations.action.view.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
 annotations.action.view.thread=Ukázať vlákno
-annotations.annotated.loaderror=Nepodarilo sa\:
-annotations.config.activate.explanation=Nasledujúce nastavenia umožnujú nastaviť, kde budú anotácie aktívne. 1. nastavenie určuje všeobecné pravidlo, 2. špecifikuje priestory (výnimky).
-annotations.config.activate.title=Nastavenia
-annotations.config.type.explanation=Pridať ďalšie vlastnosti anotácie.
-annotations.config.type.title=Nastavenia anotácie
+
+### Missing: annotations.altered.text=This annotation could not be displayed because the annotated text was not found in the page:
+### Missing: annotations.updated.text=This annotation was automatically repositioned after a page update. Originally:
+annotations.action.validate.text=[Validovať]
+### Missing: annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
+### Missing: annotations.action.validate.success=Annotation validated.
+annotations.action.validate.loaderror=Nepodarilo sa\:
+
+### Missing: annotations.filters.show=Filter
+### Missing: annotations.filters.nooption=There are no values to filter for "{0}"
 annotations.filters.anyvalue=akákoľvek hodnota
 annotations.filters.clearvalue=vymazať
-annotations.settings.display=Zobraziť anotácie
-annotations.title=Anotácie
+
+### Missing: annotations.config.title=Annotations configuration panel
+### Missing: annotations.config.display.title=Annotation display
+annotations.config.type.title=Nastavenia anotácie
+annotations.config.activate.title=Nastavenia
+annotations.config.activate.explanation=Nasledujúce nastavenia umožnujú nastaviť, kde budú anotácie aktívne. 1. nastavenie určuje všeobecné pravidlo, 2. špecifikuje priestory (výnimky).
+annotations.config.type.explanation=Pridať ďalšie vlastnosti anotácie.
+admin.annotations=Anotácie
+### Missing: admin.annotations.description=Configure the page annotations
+
+AnnotationCode.AnnotationConfig_activated=Anotácie sú aktivované
+### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
+AnnotationCode.AnnotationConfig_exceptionSpaces=Okrem priestorov
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
+AnnotationCode.AnnotationConfig_displayed=Zobraziť anotácie implicitne
+### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+AnnotationCode.AnnotationConfig_annotationClass=XWiki trieda definujúca štruktúru anotácií
 </content>
 </xwikidoc>

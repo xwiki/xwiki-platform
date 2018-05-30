@@ -39,139 +39,270 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-WikiManager.WikiUserClass_membershipType_invite=Alleen een beheerder kan uitnodigingen versturen voor deelname aan deze wiki
-WikiManager.WikiUserClass_membershipType_open=Elke gebruiker kan deelnemer worden
-WikiManager.WikiUserClass_membershipType_request=Elke gebruiker kan verzoeken deelnemer te worden, maar een beheerder moet het verzoek accepteren
-WikiManager.WikiUserClass_userScope_global_only=Alleen globale gebruikers kunnen deze wiki gebruiken
-WikiManager.WikiUserClass_userScope_local_and_global=Zowel globale als lokale gebruikers kunnen deze wiki gebruiken
-WikiManager.WikiUserClass_userScope_local_only=Alleen lokale gebruikers kunnen deze wiki gebruiken
-admin.wikis.description=Wiki-beheer
-admin.wikis.rights=Aanmaak-rechten
-admin.wikis.templates=Sjablonen
-platform.wiki.browse=Wiki's bekijken
-platform.wiki.browse._actions=Acties
-platform.wiki.browse._actions.cancelJoinRequest=Annuleer verzoek
-platform.wiki.browse._actions.delete=Verwijderen
-platform.wiki.browse._actions.join=Deelnemen
-platform.wiki.browse._actions.leave=Verlaten
-platform.wiki.browse._actions.requestJoin=Verzoek om deelname
-platform.wiki.browse._actions.viewInvitation=Bekijk uitnodiging
-platform.wiki.browse.description=Omschrijving
-platform.wiki.browse.doc.creationDate=Datum gemaakt
-platform.wiki.browse.emptyvalue=-
-platform.wiki.browse.membershipType=Type deelname
-platform.wiki.browse.owner=Eigenaar
-platform.wiki.browse.wikiprettyname=Weergavenaam
-platform.wiki.create.error=Creatie van wiki "{0}" mislukt: {1}.
-platform.wiki.create.error.wikiname.databasealreadyexists=Er bestaat al een database met deze identifier
-platform.wiki.create.error.wikiname.empty=Identifier van de wiki mag niet leeg zijn
-platform.wiki.create.error.wikiname.wikialreadyexists=Deze identifier is al in gebruik
-platform.wiki.create.members=Deelnemers
-platform.wiki.create.prettyname.empty=Weergavenaam mag niet leeg zijn
-platform.wiki.create.title=Maak een nieuwe wiki
-platform.wiki.create.wizard.desc.description=Een korte beschrijving van de wiki en zijn functie/doel.
-platform.wiki.create.wizard.desc.members=De gebruikers die kunnen deelnemen aan deze wiki.
-platform.wiki.create.wizard.desc.newTemplateHint=Sjabloon dat moet worden gebruikt voor deze wiki (alle pagina's uit het sjabloon worden gekloond).
-platform.wiki.create.wizard.desc.owner=Gebruiker die altijd alle rechten heeft op deze wiki, ongeacht de ingestelde rechten in de beheeromgeving van de wiki.
-platform.wiki.create.wizard.desc.wikialias=De domeinnaam die naar deze wiki verwijst.
-platform.wiki.create.wizard.desc.wikiname=Unieke identifier van deze wiki.
-platform.wiki.create.wizard.desc.wikiprettyname=Weergavenaam van deze wiki.
-platform.wiki.create.wizard.flavortemplate.flavorTab=Model
-platform.wiki.create.wizard.flavortemplate.hint=Model of Sjabloon dat wordt gebruikt voor de eerste inrichting van de nieuwe wiki.
-platform.wiki.create.wizard.flavortemplate.label=Model / Sjabloon
-platform.wiki.create.wizard.flavortemplate.templateTab=Sjabloon
-platform.wiki.create.wizard.setAsTemplate.label=Deze wiki fungeert als Sjabloon.
-platform.wiki.create.wizard.step.cleaningUp=Opruimen
-platform.wiki.create.wizard.step.cleaningUp.confirm=Bevestigen
-platform.wiki.create.wizard.step.cleaningUp.confirmmessage=U staat op het punt de wiki {0} te verwijderen. Bevestig de verwijdering alstublieft.
-platform.wiki.create.wizard.step.cleaningup.error=Fout: de wiki {0} is niet verwijderd.
-platform.wiki.create.wizard.step.cleaningup.success=De wiki {0} is succesvol verwijderd.
-platform.wiki.create.wizard.step.create=Aanmaken
-platform.wiki.create.wizard.step.creation=Wiki aanmaken
-platform.wiki.create.wizard.step.creation.complete=De wiki {0} is succesvol aangemaakt. U kunt de wiki nu gebruiken.
-platform.wiki.create.wizard.step.creation.error=De wiki {0} is aangemaakt, maar de installatie van een aantal pagina''s is mislukt. Het is mogelijk dat de wiki hierdoor niet goed functioneert; u kunt de wiki het best verwijderen.
-platform.wiki.create.wizard.step.creation.go=Ga naar de wiki
-platform.wiki.create.wizard.step.creation.wait=Een ogenblik geduld, de wiki wordt aangemaakt.
-platform.wiki.create.wizard.step.nameAndType=Stap 1 - Kies een naam
-platform.wiki.create.wizard.step.nameAndType.shortname=Naam
-platform.wiki.create.wizard.step.next=Volgende stap
-platform.wiki.create.wizard.step.previous=Vorige stap
-platform.wiki.create.wizard.step.provisioning.cleanUp=Verwijder de wiki
-platform.wiki.create.wizard.step.users=Stap 2 - Kies de mogelijke deelnemers
-platform.wiki.create.wizard.step.users.shortname=Gebruikers
-platform.wiki.create.wizard.template.label=Sjabloon
-platform.wiki.create.wizard.template.noTemplate=Geen sjabloon (standaard)
-platform.wiki.create.wizard.userScope.hint=Kies welke soort(en) gebruikers toegang hebben tot de wiki
-platform.wiki.create.wizard.userScope.label=Soort(en) gebruikers
-platform.wiki.csrf.error=Het beveiligings-token is ongeldig. Probeer het opnieuw alstublieft.
-platform.wiki.delete.confirmation.no=Nee, ik wil terug!
-platform.wiki.delete.confirmation.retypeWikiId=Herhaal alstublieft de identifier van de wiki:
-platform.wiki.delete.confirmation.yes=Ja, verwijder deze wiki alstublieft!
-platform.wiki.error.exceptionWithMessage=Uitzondering: {0}
-platform.wiki.error.oneParameterNotSpecified=De "{0}"-parameter is niet opgegeven.
-platform.wiki.error.parameterAcceptsMultipleValues=Meerdere waarden worden geaccepteerd.
-platform.wiki.error.wikidoesnotexist=Wiki [{0}] bestaat niet.
-platform.wiki.form.requiredField=Verplicht
+  <content>###############################################################################
+# WikiManager Manager translation page
+#
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
+#
+# This contains the translations of the module in the default language
+# (generally English).
+# 
+# Translation key syntax:
+#   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
+#   where:
+#   * &lt;short top level project name&gt; = top level project name without the "xwiki-" prefix,
+#                                     for example: commons, rendering, platform, enterprise, manager, etc
+#   * &lt;short module name&gt; = the name of the Maven module without the &lt;short top level project name&gt; prefix,
+#                           for example: oldcore, scheduler, activitystream, etc
+#   * &lt;propertyName&gt; = the name of the property using camel case,
+#                      for example updateJobClassCommitComment
+#
+# Comments: it's possible to add some detail about a key to make easier to
+#   translate it by adding a comment before it. To make sure a comment is not
+#   assigned to the following key use at least three sharps (###) for the comment
+#   or after it.
+# 
+# Deprecated keys:
+#   * when deleting a key it should be moved to deprecated section at the end
+#     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
+#     first version in which it started to be deprecated
+#   * when renaming a key, it should be moved to the same deprecated section
+#     and a comment should be added with the following syntax:
+#     #@deprecated new.key.name
+#     old.key.name=Some translation
+###############################################################################
+
+## Menus
+platform.wiki.menu.wikiindex=Wiki-overzicht
 platform.wiki.menu.deletewiki=Verwijderen
 platform.wiki.menu.userwikis=Wiki's
-platform.wiki.menu.wikiindex=Wiki-overzicht
-platform.wiki.prop.description=Omschrijving
-platform.wiki.prop.membershipType.hint=De manier waarop gebruikers kunnen deelnemen aan deze wiki.
-platform.wiki.prop.membershipType.label=Type deelnemers
-platform.wiki.prop.owner=Eigenaar
-platform.wiki.prop.wikialias=Alias
-platform.wiki.prop.wikiname=Wiki Identifier
-platform.wiki.prop.wikiprettyname=Weergavenaam
-platform.wiki.sheet.desc.description=Een korte omschrijving van de wiki.
-platform.wiki.sheet.desc.homepage=De homepage van de wiki.
-platform.wiki.sheet.desc.owner=Gebruiker die beschikt over alle rechten over deze wiki.
-platform.wiki.sheet.desc.server=Het alias dat wordt gebruikt voor toegang tot deze wiki.
-platform.wiki.sheet.desc.wikiprettyname=De weergavenaam van deze wiki.
-platform.wiki.sheet.descriptor.admin=Beheerpagina van de wiki.
-platform.wiki.sheet.erroraliasalreadynotexists=Wiki-alias "{0}" bestaat al.
-platform.wiki.sheet.erroraliasdoesnotexists=Wiki-alias "{0}" bestaat niet.
-platform.wiki.sheet.prop.description=Omschrijving
-platform.wiki.sheet.prop.homepage=Homepage
-platform.wiki.sheet.prop.iswikitemplate=Sjabloon
-platform.wiki.sheet.prop.owner=Eigenaar
-platform.wiki.sheet.prop.secure=Beveiligd (SSL)
-platform.wiki.sheet.prop.server=Alias
-platform.wiki.sheet.prop.wikiprettyname=Weergavenaam
-platform.wiki.sheet.title=Beschrijving van de wiki "{0}"
-platform.wiki.sheet.title.createnewalias=Maak nieuwe alias
-platform.wiki.sheet.title.settings=Wiki-eigenschappen
-platform.wiki.sheet.title.viewaliases=Aliassen bekijken
-platform.wiki.users.delete.empty=-
-platform.wiki.users.delete.title=Wiki "{0}" verwijderen
-platform.wiki.users.invitation.accept.label=Accepteren
-platform.wiki.users.invitation.message.label=Uitnodiging
-platform.wiki.users.invitation.postpone.label=Later
-platform.wiki.users.invitation.reject.label=Afwijzen
-platform.wiki.users.invitation.reply.title=Antwoord
-platform.wiki.users.invitation.title=U bent uitgenodigd deel te nemen aan de wiki {0}{1}{2}.
-platform.wiki.users.join.confirmation=Weet u zeker dat u wilt deelnemen aan de wiki {0}{1}{2}?
-platform.wiki.users.join.no=Nee
-platform.wiki.users.join.request.cancel.label=Terug
-platform.wiki.users.join.request.cancelNo=Nee
+
+## Dependencies
+### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+
+## Create
+### Missing: platform.wiki.create.button=Create Wiki
+platform.wiki.create.title=Maak een nieuwe wiki
+platform.wiki.create.members=Deelnemers
+platform.wiki.create.prettyname.empty=Weergavenaam mag niet leeg zijn
+platform.wiki.create.error=Creatie van wiki "{0}" mislukt: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=Er bestaat al een database met deze identifier
+platform.wiki.create.error.wikiname.wikialreadyexists=Deze identifier is al in gebruik
+platform.wiki.create.error.wikiname.empty=Identifier van de wiki mag niet leeg zijn
+
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=Wiki [{0}] bestaat niet.
+platform.wiki.error.oneParameterNotSpecified=De "{0}"-parameter is niet opgegeven.
+platform.wiki.error.parameterAcceptsMultipleValues=Meerdere waarden worden geaccepteerd.
+platform.wiki.error.exceptionWithMessage=Uitzondering: {0}
+platform.wiki.form.requiredField=Verplicht
+platform.wiki.csrf.error=Het beveiligings-token is ongeldig. Probeer het opnieuw alstublieft.
+
+## Users
+### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
+### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
+### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
+### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
+### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
+### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
+### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.
+### Missing: platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
+### Missing: platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
 platform.wiki.users.join.request.cancelYes=Ja
+platform.wiki.users.join.request.cancelNo=Nee
+### Missing: platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
+### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
+### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
+platform.wiki.users.join.confirmation=Weet u zeker dat u wilt deelnemen aan de wiki {0}{1}{2}?
+platform.wiki.users.join.yes=Ja
+platform.wiki.users.join.no=Nee
+### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
+### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
+platform.wiki.users.leave.confirmation=Weet u zeker dat u de wiki {0}{1}{2} wilt verlaten?
+platform.wiki.users.leave.confirmation.yes=Ja
+platform.wiki.users.leave.confirmation.no=Nee
+### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
+platform.wiki.users.join.title=Deelnemen
+platform.wiki.users.leave.title=Wiki "{0}" verlaten
+platform.wiki.users.leave.empty=
+platform.wiki.users.delete.title=Wiki "{0}" verwijderen
+platform.wiki.users.delete.empty=
+### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
+### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
+### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
+platform.wiki.users.invitation.title=U bent uitgenodigd deel te nemen aan de wiki {0}{1}{2}.
+platform.wiki.users.invitation.message.label=Uitnodiging
+platform.wiki.users.invitation.reply.title=Antwoord
+platform.wiki.users.invitation.accept.label=Accepteren
+platform.wiki.users.invitation.reject.label=Afwijzen
+platform.wiki.users.invitation.postpone.label=Later
 platform.wiki.users.join.request.message.label=Bericht
 platform.wiki.users.join.request.send.label=Verzoek verzenden
-platform.wiki.users.join.title=Deelnemen
-platform.wiki.users.join.yes=Ja
-platform.wiki.users.leave.confirmation=Weet u zeker dat u de wiki {0}{1}{2} wilt verlaten?
-platform.wiki.users.leave.confirmation.no=Nee
-platform.wiki.users.leave.confirmation.yes=Ja
-platform.wiki.users.leave.empty=-
-platform.wiki.users.leave.title=Wiki "{0}" verlaten
-platform.wiki.users.profile.activity.multipletitle=Activiteiten van wiki''s {0}
-platform.wiki.users.profile.activity.show=Toon activiteiten
-platform.wiki.users.profile.activity.title=Activiteiten van wiki {0}
+platform.wiki.users.join.request.cancel.label=Terug
+
+## User profile
 platform.wiki.users.profile.joinedwikis.label=Deelnemer aan wiki's
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=U bent nog geen deelnemer aan een wiki.
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=De gebruiker is nog geen deelnemer aan een wiki.
-rendering.macro.wikis.description=Toon alle wiki's
+platform.wiki.users.profile.activity.title=Activiteiten van wiki {0}
+### Missing: platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
+platform.wiki.users.profile.activity.multipletitle=Activiteiten van wiki''s {0}
+platform.wiki.users.profile.activity.show=Toon activiteiten
+
+## Wiki Deletion
+### Missing: platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
+platform.wiki.delete.confirmation.retypeWikiId=Herhaal alstublieft de identifier van de wiki:
+### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
+### Missing: platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
+
+## Wiki macro
+### Missing: platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
 rendering.macro.wikis.name=Wiki's
+rendering.macro.wikis.description=Toon alle wiki's
+
+## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Werkruimten (Legacy)
+### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
+
+## Browse
+platform.wiki.browse=Wiki's bekijken
+platform.wiki.browse.emptyvalue=-
+platform.wiki.browse.wikiprettyname=Weergavenaam
+platform.wiki.browse.description=Omschrijving
+platform.wiki.browse.owner=Eigenaar
+platform.wiki.browse.membershipType=Type deelname
+platform.wiki.browse.doc.creationDate=Datum gemaakt
+platform.wiki.browse._actions=Acties
+platform.wiki.browse._actions.join=Deelnemen
+platform.wiki.browse._actions.requestJoin=Verzoek om deelname
+platform.wiki.browse._actions.viewInvitation=Bekijk uitnodiging
+platform.wiki.browse._actions.cancelJoinRequest=Annuleer verzoek
+platform.wiki.browse._actions.leave=Verlaten
+platform.wiki.browse._actions.delete=Verwijderen
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=Elke gebruiker kan deelnemer worden
+WikiManager.WikiUserClass_membershipType_request=Elke gebruiker kan verzoeken deelnemer te worden, maar een beheerder moet het verzoek accepteren
+WikiManager.WikiUserClass_membershipType_invite=Alleen een beheerder kan uitnodigingen versturen voor deelname aan deze wiki
+WikiManager.WikiUserClass_userScope_local_only=Alleen lokale gebruikers kunnen deze wiki gebruiken
+WikiManager.WikiUserClass_userScope_global_only=Alleen globale gebruikers kunnen deze wiki gebruiken
+WikiManager.WikiUserClass_userScope_local_and_global=Zowel globale als lokale gebruikers kunnen deze wiki gebruiken
+platform.wiki.prop.wikiname=Wiki Identifier
+platform.wiki.prop.wikiprettyname=Weergavenaam
+platform.wiki.prop.wikialias=Alias
+platform.wiki.prop.description=Omschrijving
+platform.wiki.prop.owner=Eigenaar
+platform.wiki.prop.membershipType.label=Type deelnemers
+platform.wiki.prop.membershipType.hint=De manier waarop gebruikers kunnen deelnemen aan deze wiki.
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=Unieke identifier van deze wiki.
+platform.wiki.create.wizard.desc.wikiprettyname=Weergavenaam van deze wiki.
+platform.wiki.create.wizard.desc.wikialias=De domeinnaam die naar deze wiki verwijst.
+platform.wiki.create.wizard.desc.newTemplateHint=Sjabloon dat moet worden gebruikt voor deze wiki (alle pagina's uit het sjabloon worden gekloond).
+platform.wiki.create.wizard.desc.description=Een korte beschrijving van de wiki en zijn functie/doel.
+platform.wiki.create.wizard.desc.owner=Gebruiker die altijd alle rechten heeft op deze wiki, ongeacht de ingestelde rechten in de beheeromgeving van de wiki.
+platform.wiki.create.wizard.desc.members=De gebruikers die kunnen deelnemen aan deze wiki.
+platform.wiki.create.wizard.step.nameAndType=Stap 1 - Kies een naam
+platform.wiki.create.wizard.step.nameAndType.shortname=Naam
+platform.wiki.create.wizard.step.users=Stap 2 - Kies de mogelijke deelnemers
+platform.wiki.create.wizard.step.users.shortname=Gebruikers
+platform.wiki.create.wizard.step.cleaningUp=Opruimen
+platform.wiki.create.wizard.step.provisioning.cleanUp=Verwijder de wiki
+platform.wiki.create.wizard.step.cleaningup.success=De wiki {0} is succesvol verwijderd.
+platform.wiki.create.wizard.step.cleaningup.error=Fout: de wiki {0} is niet verwijderd.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=U staat op het punt de wiki {0} te verwijderen. Bevestig de verwijdering alstublieft.
+platform.wiki.create.wizard.step.cleaningUp.confirm=Bevestigen
+platform.wiki.create.wizard.setAsTemplate.label=Deze wiki fungeert als Sjabloon.
+platform.wiki.create.wizard.template.noTemplate=Geen sjabloon (standaard)
+platform.wiki.create.wizard.userScope.label=Soort(en) gebruikers
+platform.wiki.create.wizard.userScope.hint=Kies welke soort(en) gebruikers toegang hebben tot de wiki
+platform.wiki.create.wizard.template.label=Sjabloon
+platform.wiki.create.wizard.flavortemplate.label=Model / Sjabloon
+platform.wiki.create.wizard.flavortemplate.hint=Model of Sjabloon dat wordt gebruikt voor de eerste inrichting van de nieuwe wiki.
+platform.wiki.create.wizard.flavortemplate.flavorTab=Model
+platform.wiki.create.wizard.flavortemplate.templateTab=Sjabloon
+### Missing: platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started in order to help you initialize your wiki. If you skip the wizard, your wiki will be empty.
+platform.wiki.create.wizard.step.previous=Vorige stap
+platform.wiki.create.wizard.step.next=Volgende stap
+platform.wiki.create.wizard.step.create=Aanmaken
+
+platform.wiki.create.wizard.step.creation=Wiki aanmaken
+platform.wiki.create.wizard.step.creation.wait=Een ogenblik geduld, de wiki wordt aangemaakt.
+platform.wiki.create.wizard.step.creation.complete=De wiki {0} is succesvol aangemaakt. U kunt de wiki nu gebruiken.
+platform.wiki.create.wizard.step.creation.error=De wiki {0} is aangemaakt, maar de installatie van een aantal pagina''s is mislukt. Het is mogelijk dat de wiki hierdoor niet goed functioneert; u kunt de wiki het best verwijderen.
+platform.wiki.create.wizard.step.creation.go=Ga naar de wiki
+
+## Admin
+admin.wikis.description=Wiki-beheer
+admin.wikis.templates=Sjablonen
+### Missing: admin.wikis.templates.description=Manage the wiki templates
+### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
+admin.wikis.rights=Aanmaak-rechten
+
+## XWikiServer Sheet
+platform.wiki.sheet.title=Beschrijving van de wiki "{0}"
+platform.wiki.sheet.erroraliasalreadynotexists=Wiki-alias "{0}" bestaat al.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki-alias "{0}" bestaat niet.
+platform.wiki.sheet.title.settings=Wiki-eigenschappen
+platform.wiki.sheet.title.createnewalias=Maak nieuwe alias
+platform.wiki.sheet.title.viewaliases=Aliassen bekijken
+platform.wiki.sheet.desc.wikiprettyname=De weergavenaam van deze wiki.
+platform.wiki.sheet.desc.owner=Gebruiker die beschikt over alle rechten over deze wiki.
+### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
+### Missing: platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
+platform.wiki.sheet.desc.server=Het alias dat wordt gebruikt voor toegang tot deze wiki.
+platform.wiki.sheet.desc.description=Een korte omschrijving van de wiki.
+platform.wiki.sheet.desc.homepage=De homepage van de wiki.
+platform.wiki.sheet.prop.wikiprettyname=Weergavenaam
+platform.wiki.sheet.prop.owner=Eigenaar
+platform.wiki.sheet.prop.secure=Beveiligd (SSL)
+platform.wiki.sheet.prop.description=Omschrijving
+platform.wiki.sheet.prop.server=Alias
+platform.wiki.sheet.prop.homepage=Homepage
+platform.wiki.sheet.prop.iswikitemplate=Sjabloon
+### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
+platform.wiki.sheet.descriptor.admin=Beheerpagina van de wiki.
+### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.1
+#######################################
+### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wikis=Wikis
+### Missing: admin.wikis.template=Wiki Template
+
+#######################################
+## until 7.0M2
+#######################################
+### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
+### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
+### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
+### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=Ja, verwijder deze wiki alstublieft!
+platform.wiki.delete.confirmation.no=Nee, ik wil terug!
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

@@ -39,15 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-panels._actions=Akcije
-panels.available=Dostupni paneli
-panels.category=Kategorija
-panels.children.title=Stranice djeca
-panels.description=Opis
-panels.documentInformation.configureSyntaxes=Podesite još sintaksi
+  <content>panels.available=Dostupni paneli
 panels.name=Ime
-panels.siblings.title=Stranice srodnici
+panels.description=Opis
 panels.type=Tip
+panels.category=Kategorija
+panels._actions=Akcije
+panels.emptyvalue=
+panels.children.title=Stranice djeca
+panels.siblings.title=Stranice srodnici
+panels.documentInformation.configureSyntaxes=Podesite još sintaksi
 </content>
 </xwikidoc>

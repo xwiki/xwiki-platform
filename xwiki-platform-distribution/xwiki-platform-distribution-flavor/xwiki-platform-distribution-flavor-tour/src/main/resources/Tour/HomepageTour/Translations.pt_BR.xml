@@ -39,29 +39,29 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-tour.homepageTour.breadcrumbs.contentA=Os breadcrumbs permitem a identificação da localização das páginas e sua hierarquia de navegação.
-tour.homepageTour.breadcrumbs.contentB=O botão {0} sempre irá levar você para a página inicial do seu wiki.
-tour.homepageTour.breadcrumbs.title=Breadcrumbs
-tour.homepageTour.header.contentA=Você pode Buscar por conteúdo, Monitorar mudanças de páginas ou acessar o seu Perfil de Usuário.
-tour.homepageTour.header.contentB=O botão {0} abre a Gaveta, da qual contem ações relacionadas ao wiki, como Administração e Índices.
-tour.homepageTour.header.title=Cabeçalho
-tour.homepageTour.pageContent.contentA=Este é um local aonde todo o conteúdo da página atual é exibido.
-tour.homepageTour.pageContent.contentB=Edite esta página para adicionar tabelas, listas, macros e estruturas com o fim de organizar seu conhecimento.
-tour.homepageTour.pageContent.title=Conteúdo das Páginas
-tour.homepageTour.pageMenu.contentA=Este Menu contem ações relacionadas as páginas. Com as permissões necessárias, você poderá editar, criar, administrar ou excluir páginas.
-tour.homepageTour.pageMenu.contentB=O botão {0} mostra as seguintes ações\: Exportar, Imprimir, Compartilhar, etc.
-tour.homepageTour.pageMenu.title=Página do Menu
-tour.homepageTour.pageTabs.contentA=Comentários são uma ótima forma de usuários discutirem o conteúdo das páginas.
-tour.homepageTour.pageTabs.contentB=Você pode também anexar arquivos, comparar versões ou ver informações sobre as páginas.
-tour.homepageTour.pageTabs.title=Tabelas de Páginas
+  <content>## Homepage Tour (by steps order)
+tour.homepageTour.welcome.title=Bem-vindo ao XWiki
+tour.homepageTour.welcome.content=Nos próximos minutos você irá descobrir a interface e funcionalidades básicas do seu wiki.
+tour.homepageTour.panels.title=Painéis
 tour.homepageTour.panels.contentA=O painel atual permite o acesso as aplicações e p[páginas do seu wiki.
 tour.homepageTour.panels.contentB=Administradores podem customizar elas e decidir quais painéis são demonstrados.
-tour.homepageTour.panels.title=Painéis
+tour.homepageTour.breadcrumbs.title=Breadcrumbs
+tour.homepageTour.breadcrumbs.contentA=Os breadcrumbs permitem a identificação da localização das páginas e sua hierarquia de navegação.
+tour.homepageTour.breadcrumbs.contentB=O botão {0} sempre irá levar você para a página inicial do seu wiki.
+tour.homepageTour.pageContent.title=Conteúdo das Páginas
+tour.homepageTour.pageContent.contentA=Este é um local aonde todo o conteúdo da página atual é exibido.
+tour.homepageTour.pageContent.contentB=Edite esta página para adicionar tabelas, listas, macros e estruturas com o fim de organizar seu conhecimento.
+tour.homepageTour.pageMenu.title=Página do Menu
+tour.homepageTour.pageMenu.contentA=Este Menu contem ações relacionadas as páginas. Com as permissões necessárias, você poderá editar, criar, administrar ou excluir páginas.
+tour.homepageTour.pageMenu.contentB=O botão {0} mostra as seguintes ações\: Exportar, Imprimir, Compartilhar, etc.
+tour.homepageTour.pageTabs.title=Tabelas de Páginas
+tour.homepageTour.pageTabs.contentA=Comentários são uma ótima forma de usuários discutirem o conteúdo das páginas.
+tour.homepageTour.pageTabs.contentB=Você pode também anexar arquivos, comparar versões ou ver informações sobre as páginas.
+tour.homepageTour.header.title=Cabeçalho
+tour.homepageTour.header.contentA=Você pode Buscar por conteúdo, Monitorar mudanças de páginas ou acessar o seu Perfil de Usuário.
+tour.homepageTour.header.contentB=O botão {0} abre a Gaveta, da qual contem ações relacionadas ao wiki, como Administração e Índices.
+tour.homepageTour.tourComplete.title=Tour Completo
 tour.homepageTour.tourComplete.contentA=Isto completa o seu tour na interface e funcionalidades básicas do XWiki.
 tour.homepageTour.tourComplete.contentB=Para mais detalhes em cada funcionalidade, acesse a {0}documentação{1}.
-tour.homepageTour.tourComplete.title=Tour Completo
-tour.homepageTour.welcome.content=Nos próximos minutos você irá descobrir a interface e funcionalidades básicas do seu wiki.
-tour.homepageTour.welcome.title=Bem-vindo ao XWiki
 </content>
 </xwikidoc>

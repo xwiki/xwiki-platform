@@ -39,17 +39,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content>platform.panels.applications.helper=Vous pouvez définir quelles sont les applications affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toutes les nouvelles applications sont affichées dans cette barre. Si vous souhaitez en supprimer certaines, il suffit de cliquer/glisser l'icône d'un pavé à l'autre. N'oubliez pas d'enregistrer vos modifications.
+platform.panels.applications.displayedapps=Applications présentes dans la barre
+platform.panels.applications.blacklistedapps=Applications absentes de la barre
+platform.panels.applications.save=Enregistrer
+platform.panels.applications.revert=Annuler
+platform.panels.applications.ajax.success=La configuration a été enregistrée.
+platform.panels.applications.ajax.csrf=La validation CSRF a échoué. Merci de recharger la page.
+platform.panels.applications.ajax.noright=Vous n'êtes pas autorisés à modifier PanelsCode.ApplicationsPanelConfiguration. 
+platform.panels.applications.ajax.error=Enregistrement impossible.
 admin.panels.applications=Panel d'applications
 admin.panels.applications.description=Gérer quelles sont les applications à afficher dans le panneau des applications.
-platform.panels.applications.ajax.csrf=La validation CSRF a échoué. Merci de recharger la page.
-platform.panels.applications.ajax.error=Enregistrement impossible.
-platform.panels.applications.ajax.noright=Vous n'êtes pas autorisés à modifier PanelsCode.ApplicationsPanelConfiguration. 
-platform.panels.applications.ajax.success=La configuration a été enregistrée.
-platform.panels.applications.blacklistedapps=Applications absentes de la barre
-platform.panels.applications.displayedapps=Applications présentes dans la barre
-platform.panels.applications.helper=Vous pouvez définir quelles sont les applications affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toutes les nouvelles applications sont affichées dans cette barre. Si vous souhaitez en supprimer certaines, il suffit de cliquer/glisser l'icône d'un pavé à l'autre. N'oubliez pas d'enregistrer vos modifications.
-platform.panels.applications.revert=Annuler
-platform.panels.applications.save=Enregistrer
+
+### Missing: admin.panels.navigation=Navigation Panel
+### Missing: admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
+### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
+### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
+### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
+### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
+### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
 </content>
 </xwikidoc>

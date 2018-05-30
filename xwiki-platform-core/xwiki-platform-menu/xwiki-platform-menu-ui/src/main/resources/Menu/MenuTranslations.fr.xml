@@ -39,33 +39,39 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content># Class fields
 Menu.MenuClass_content1=Structure du menu
-menu.livetable._actions=Actions
-menu.livetable._actions.delete=Supprimer
-menu.livetable._actions.edit=Modifier
-menu.livetable._attachments=Fichiers joints
-menu.livetable._avatar=Avatar
-menu.livetable._images=Images
-menu.livetable.content1=Structure du menu
-menu.livetable.doc.author=Dernier auteur
-menu.livetable.doc.creationDate=Date de création
-menu.livetable.doc.creator=Créateur
-menu.livetable.doc.date=Dernière modification
-menu.livetable.doc.fullname=Nom complet de la page
+
+# Live table generic keys
+menu.livetable.doc.title=Titre de la page
 menu.livetable.doc.name=Nom de la page
 menu.livetable.doc.space=Espace
-menu.livetable.doc.title=Titre de la page
+menu.livetable.doc.fullname=Nom complet de la page
+menu.livetable.doc.author=Dernier auteur
+menu.livetable.doc.creator=Créateur
+menu.livetable.doc.date=Dernière modification
+menu.livetable.doc.creationDate=Date de création
+menu.livetable._avatar=Avatar
+menu.livetable._images=Images
+menu.livetable._attachments=Fichiers joints
+menu.livetable._actions=Actions
+menu.livetable._actions.edit=Modifier
+menu.livetable._actions.delete=Supprimer
 menu.livetable.emptyvalue=-
-menu.uix.content.hint=Si vous lisez ceci, le JavaScript de votre navigateur est probablement désactivé.\nVous devriez donc choisir la même valeur que celle renseignée dans le champ ci-dessus \:  Emplacement du menu
-menu.uix.content.label=Emplacement de l'interface utilisateur
-menu.uix.extensionPoint.hint=Choix de l'emplacement du menu. Selon votre choix, il sera affiché soit horizontalement, soit verticalement.
+
+# Live table specific keys
+menu.livetable.content1=Structure du menu
+
+# UIX keys
 menu.uix.extensionPoint.label=Emplacement du menu
+menu.uix.extensionPoint.hint=Choix de l'emplacement du menu. Selon votre choix, il sera affiché soit horizontalement, soit verticalement.
 menu.uix.extensionPoint.value.nowhere=Ne pas afficher le menu
-menu.uix.extensionPoint.value.panels.leftPanels=Dans un panel gauche
-menu.uix.extensionPoint.value.panels.rightPanels=Dans un panel droit
 menu.uix.extensionPoint.value.template.header.after=Après l'en-tête du wiki
-menu.uix.scope.hint=Choix du contexte d'affichage du menu.
+menu.uix.extensionPoint.value.panels.rightPanels=Dans un panel droit
+menu.uix.extensionPoint.value.panels.leftPanels=Dans un panel gauche
+menu.uix.content.label=Emplacement de l'interface utilisateur
+menu.uix.content.hint=Si vous lisez ceci, le JavaScript de votre navigateur est probablement désactivé.\nVous devriez donc choisir la même valeur que celle renseignée dans le champ ci-dessus \:  Emplacement du menu
 menu.uix.scope.label=Contexte de visibilité du menu
+menu.uix.scope.hint=Choix du contexte d'affichage du menu.
 </content>
 </xwikidoc>

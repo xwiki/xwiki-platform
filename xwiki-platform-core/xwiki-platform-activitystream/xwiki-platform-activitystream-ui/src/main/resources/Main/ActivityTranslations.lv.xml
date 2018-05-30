@@ -39,12 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-activity.link.title=Atrodas {0} » {1} » {2}
-activity.rss.feed.description=Dokumentu izmaiņu RSS barotne
-activity.rss.feed.spaces.description=RSS barotne vietas dokumentiem ir "{0}"
-activity.rss.feed.tags.description=RSS barotne dokumentiem  ar tagu ir "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS barotne ar tagu "{0}" vietā(s) "{1}" 
+  <content>### Missing: activity.page.link.title=Located in {0}
 activity.rss.pages.modified=Mainīto lapu RSS barotne
+activity.rss.feed.description=Dokumentu izmaiņu RSS barotne
+activity.rss.feed.tags.description=RSS barotne dokumentiem  ar tagu ir "{0}"
+activity.rss.feed.spaces.description=RSS barotne vietas dokumentiem ir "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS barotne ar tagu "{0}" vietā(s) "{1}" 
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.3M1
+activity.link.title=Atrodas {0} » {1} » {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

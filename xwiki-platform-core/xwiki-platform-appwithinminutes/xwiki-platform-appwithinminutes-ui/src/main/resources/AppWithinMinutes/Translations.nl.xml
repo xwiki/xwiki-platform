@@ -39,150 +39,214 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-appWithinMinutes.wizardStep.name.description=Geef de applicatienaam op.
-appWithinMinutes.wizardStep.name.name=Naam
-appWithinMinutes.wizardStep.name.title=Geef uw applicatie een naam
-appWithinMinutes.wizardStep.presentation.description=Personaliseer de homepage van uw applicatie.
-appWithinMinutes.wizardStep.presentation.name=Presentatie
-appWithinMinutes.wizardStep.presentation.title=Pas de homepage van uw applicatie aan
-appWithinMinutes.wizardStep.structure.description=Genereer de structuur van uw applicatie door op te geven welke soorten velden de applicatie zal bevatten.
-appWithinMinutes.wizardStep.structure.name=Structureren
-appWithinMinutes.wizardStep.structure.title=Bepaal de structuur van uw applicatie
-platform.appwithinminutes.appHomePageActionsHeading=Acties
-platform.appwithinminutes.appHomePageAddEntryHint=Nieuwe gegevens toevoegen
-platform.appwithinminutes.appHomePageAddEntryLabel=Toevoegen
-platform.appwithinminutes.appHomePageDeleteAppLabel=Applicatie verwijderen
-platform.appwithinminutes.appHomePageDeleteEntriesLabel=Alle gegevens verwijderen
-platform.appwithinminutes.appHomePageEditAppLabel=Applicatie wijzigen
-platform.appwithinminutes.appHomePageEntryNameLabel=Naam\:
-platform.appwithinminutes.appHomePageTranslateAppLabel=Applicatie vertalen
-platform.appwithinminutes.appLiveTableDeleteEntryActionName=Verwijderen
-platform.appwithinminutes.appLiveTableEditEntryActionName=Wijzigen
-platform.appwithinminutes.appLiveTableHeading=Gegevens
-platform.appwithinminutes.appNameEmptyError=Geef alstublieft de applicatienaam op.
-platform.appwithinminutes.appNameHint=De naam van de applicatie bepaalt de URL van de homepage van de applicatie, de paginaruimte waarin de gegevens van de applicatie worden opgeslagen en ook de naam van de Class die de applicatiestructuur definieert.
-platform.appwithinminutes.appNameIsUsedWarning=Deze applicatie bestaat al. Als u naar de volgende stap gaat, zult u de bestaande applicatie aanpassen.
-platform.appwithinminutes.appNameLabel=Naam Applicatie
-platform.appwithinminutes.appNamePageTitle=Applicatie Maken
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=Applicatie Class
-platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Paginaruimte voor Applicatie-code
-platform.appwithinminutes.appNamePreviewDataSpaceLabel=Paginaruimte voor Applicatie-gegevens
-platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL van de homepage van de applicatie
-platform.appwithinminutes.appPanelCreateEntry=Maak er zelf een\!
-platform.appwithinminutes.appsLiveTable._actions=Acties
+  <content>### Home page
+platform.appwithinminutes.homePageTitle=App Binnen Minuten
+platform.appwithinminutes.description=Maak binnen enkele minuten webapplicaties, op basis van XWiki's krachtige beheersysteem voor gestructureerde gegevens.
+platform.appwithinminutes.createAppButtonLabel=Maak Applicatie
+platform.appwithinminutes.appsLiveTableHeading=Applicaties
+platform.appwithinminutes.appsLiveTable.doc.space=Applicatienaam
 platform.appwithinminutes.appsLiveTable.doc.author=Laatste auteur
 platform.appwithinminutes.appsLiveTable.doc.date=Datum gewijzigd
-platform.appwithinminutes.appsLiveTable.doc.space=Applicatienaam
-platform.appwithinminutes.appsLiveTableHeading=Applicaties
-platform.appwithinminutes.classEditorAdvancedCategoryName=Gevorderd
-platform.appwithinminutes.classEditorBindSheetSaveComment=Class sheet binden
-platform.appwithinminutes.classEditorBooleanFieldName=Boolean
-platform.appwithinminutes.classEditorCanvasHint=Sleep velden uit de kiezer en laat ze in dit gebied vallen.
-platform.appwithinminutes.classEditorConfigureFieldLabel=Configureren
-platform.appwithinminutes.classEditorContentFieldName=Inhoud
-platform.appwithinminutes.classEditorDBListFieldName=Database Lijst
-platform.appwithinminutes.classEditorDateFieldName=Datum
-platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Wissen
-platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Vandaag
-platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Nu
-platform.appwithinminutes.classEditorDeleteFieldLabel=Verwijderen
-platform.appwithinminutes.classEditorDocumentCategoryName=Document
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Deze Class heeft twee velden met dezelfde naam\: {0}
-platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Standaardwaarde
-platform.appwithinminutes.classEditorGroupsFieldName=Groep
-platform.appwithinminutes.classEditorMoveFieldHint=Sleep en laat vallen om de volgorde te wijzigen
-platform.appwithinminutes.classEditorMoveFieldLabel=Verplaatsen
-platform.appwithinminutes.classEditorMultipleSheetsWarning=Deze Class heeft meerdere sheets.
-platform.appwithinminutes.classEditorNumberFieldName=Getal
-platform.appwithinminutes.classEditorPaletteHint=Sleep velden uit de kiezer en laat ze vallen op uw formulier om uw formulier op te bouwen.
-platform.appwithinminutes.classEditorPaletteTitle=Veldenkiezer
-platform.appwithinminutes.classEditorPickersCategoryName=Kiezers
-platform.appwithinminutes.classEditorPreviewFieldHint=Verberg configuratiepaneel en pas wijzigingen toe
-platform.appwithinminutes.classEditorPreviewFieldLabel=Voorbeeld
-platform.appwithinminutes.classEditorSheetSaveComment=Class sheet bijwerken
-platform.appwithinminutes.classEditorStandardCategoryName=Standaard
-platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Toevoegen
-platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Verwijderen
-platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
-platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Waarde
-platform.appwithinminutes.classEditorStaticListFieldName=Statische Lijst
-platform.appwithinminutes.classEditorStringFieldName=Korte Tekst
-platform.appwithinminutes.classEditorTemplateSaveComment=Standaardwaarden bijwerken
-platform.appwithinminutes.classEditorTextAreaFieldName=Lange Tekst
-platform.appwithinminutes.classEditorTitleFieldName=Titel
-platform.appwithinminutes.classEditorTranslationsSaveComment=Vertalingen bijwerken
-platform.appwithinminutes.classEditorUpdateSheetHint=Maak de sheet die wordt gebruikt voor het tonen en wijzigen van objecten van deze Class ({0}).
-platform.appwithinminutes.classEditorUpdateSheetLabel=Class sheet bijwerken
-platform.appwithinminutes.classEditorUpdateTemplateHint=Bewaar de standaardwaarden voor velden in het Class sjabloon ({0}).
-platform.appwithinminutes.classEditorUpdateTemplateLabel=Class sjabloon bijwerken
-platform.appwithinminutes.classEditorUpdateTranslationsHint=Werk de vertalingen van de weergavenamen van velden en lijstwaarden bij ({0}).
-platform.appwithinminutes.classEditorUpdateTranslationsLabel=Vertaalbundel van de Class bijwerken
-platform.appwithinminutes.classEditorUsersFieldName=Gebruiker
-platform.appwithinminutes.createAppButtonLabel=Maak Applicatie
-platform.appwithinminutes.deleteAppConfirmation=De applicatie {0} al zijn gegevens worden verwijderd. Weet u zeker dat u wilt doorgaan?
-platform.appwithinminutes.deleteAppDoesNotExistError=De opgegeven applicatie bestaat niet.
-platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE gegevens van applicatie {0} worden verwijderd. Weet u zeker dat u wilt doorgaan?
-platform.appwithinminutes.deleteAppInvalidAppError=De opgegeven naam is geen geldige App Binnen Minuten applicatie.
-platform.appwithinminutes.deleteAppNotSpecifiedError=Er is geen applicatienaam opgegeven.
-platform.appwithinminutes.description=Maak binnen enkele minuten webapplicaties, op basis van XWiki's krachtige beheersysteem voor gestructureerde gegevens.
+platform.appwithinminutes.appsLiveTable._actions=Acties
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Geef paginaruimte-administratie-rechten.
-platform.appwithinminutes.homePageTitle=App Binnen Minuten
-platform.appwithinminutes.liveTableEditorActionsColumnDescription=Een lijst met acties die kunnen worden uitgevoerd op de applicatiegegevens, zoals wijzigen en verwijderen
-platform.appwithinminutes.liveTableEditorActionsColumnName=Acties
-platform.appwithinminutes.liveTableEditorAddColumnHint=Toevoegen
-platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Een speciale kolom met links naar de bijlagen van de gegevenspagina
-platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Bijlagen
-platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Een speciale kolom voor het tonen van de avatar van de gebruiker. Werkt alleen voor een tabel die aan de XWiki.XWikiUsers Class is gebonden.
-platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
-platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Class velden
-platform.appwithinminutes.liveTableEditorColumnsHint=Selecteer de kolommen die u wilt opnemen in de live table die wordt weergegeven op de homepage van de applicatie.
-platform.appwithinminutes.liveTableEditorDeleteColumnHint=Verwijderen
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Een aantal kolommen zijn niet meer actueel, waarschijnlijk omdat de overeenkomstige Class velden verwijderd zijn. Wilt u deze verwijderen? &lt;a href\=""&gt;Ja&lt;/a&gt; / &lt;a href\=""&gt;Nee&lt;/a&gt;
-platform.appwithinminutes.liveTableEditorDescriptionHint=De omschrijving geeft een korte samenvatting van wat de applicatie doet en welke gegevens ermee beheerd worden.
-platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=De gebruiker die het laatst de applicatiegegevens wijzigde
-platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Laatste auteur
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=De datum waarop de applicatiegegevens gemaakt zijn
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Datum gemaakt
-platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=De gebruiker die de applicatiegegevens maakte
-platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Maker
-platform.appwithinminutes.liveTableEditorDocDateColumnDescription=De datum waarop de applicatiegegevens het laatst gewijzigd zijn
-platform.appwithinminutes.liveTableEditorDocDateColumnName=Datum gewijzigd
-platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=De naam van de pagina met applicatiegegevens, voorafgegaan door de paginaruimte
-platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Volledige naam pagina
-platform.appwithinminutes.liveTableEditorDocNameColumnDescription=De naam van de pagina met applicatiegegevens
-platform.appwithinminutes.liveTableEditorDocNameColumnName=Paginanaam
-platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=De naam van de paginaruimte waarin de applicatiegegevens zijn opgeslagen
-platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Paginaruimte
-platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=De titel van de pagina met applicatiegegevens
-platform.appwithinminutes.liveTableEditorDocTitleColumnName=Paginatitel
-platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generieke kolommen
-platform.appwithinminutes.liveTableEditorHelpDescription=Generieke live table kolommen zijn niet afhankelijk van uw applicatiestructuur. Ze geven informatie over de pagina's waarin uw applicatiegegevens zijn opgeslagen.
-platform.appwithinminutes.liveTableEditorHelpTitle=Tip
-platform.appwithinminutes.liveTableEditorIcon=Pictogram
-platform.appwithinminutes.liveTableEditorIconHintWithPicker=Een referentie naar een pictogram. Dit kan elke afbeelding zijn die is opgeslagen in de wiki, maar u kunt ook een pictogram kiezen via de Kiezer die verschijnt als het veld is geselecteerd.
-platform.appwithinminutes.liveTableEditorImagesColumnDescription=Een speciale kolom met afbeeldingen die bij de gegevenspagina zijn gevoegd 
-platform.appwithinminutes.liveTableEditorImagesColumnName=Afbeeldingen
-platform.appwithinminutes.liveTableEditorMoveColumnHint=Sleep en laat vallen om de volgorde te wijzigen
-platform.appwithinminutes.liveTableEditorSaveComment=LiveTable bijwerken
-platform.appwithinminutes.wizardStep1Description=Geef de applicatienaam op.
-platform.appwithinminutes.wizardStep1Name=Naam
-platform.appwithinminutes.wizardStep1Title=Geef uw applicatie een naam
-platform.appwithinminutes.wizardStep2Description=Genereer de structuur van uw applicatie door op te geven welke soorten velden de applicatie zal bevatten.
-platform.appwithinminutes.wizardStep2Name=Structureren
-platform.appwithinminutes.wizardStep2Title=Bepaal de structuur van uw applicatie
-platform.appwithinminutes.wizardStep3Description=Personaliseer de homepage van uw applicatie.
-platform.appwithinminutes.wizardStep3Name=Presentatie
-platform.appwithinminutes.wizardStep3Title=Pas de homepage van uw applicatie aan
-platform.appwithinminutes.wizardStepFinishButtonLabel=Voltooien
-platform.appwithinminutes.wizardStepFinishButtonTip=Ga naar de homepage van de applicatie
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=Maak er zelf een\!
+
+### Wizard step
 platform.appwithinminutes.wizardStepHeading=Stap {0} — {1}
-platform.appwithinminutes.wizardStepHelpDescription=Deze wizard helpt u uw eigen applicatie te bouwen. Deze stappen configureren de wijze waarop uw applicatie wordt weergegeven en welke informatie de applicatie omvat\:
-platform.appwithinminutes.wizardStepHelpTitle=Stappen
+appWithinMinutes.wizardStep.name.name=Naam
+appWithinMinutes.wizardStep.name.title=Geef uw applicatie een naam
+appWithinMinutes.wizardStep.name.description=Geef de applicatienaam op.
+appWithinMinutes.wizardStep.structure.name=Structureren
+appWithinMinutes.wizardStep.structure.title=Bepaal de structuur van uw applicatie
+appWithinMinutes.wizardStep.structure.description=Genereer de structuur van uw applicatie door op te geven welke soorten velden de applicatie zal bevatten.
+### Missing: appWithinMinutes.wizardStep.entries.name=Entries
+### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
+### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.presentation.name=Presentatie
+appWithinMinutes.wizardStep.presentation.title=Pas de homepage van uw applicatie aan
+appWithinMinutes.wizardStep.presentation.description=Personaliseer de homepage van uw applicatie.
 platform.appwithinminutes.wizardStepNextButtonLabel=Volgende Stap
 platform.appwithinminutes.wizardStepNextButtonTip=Ga naar de volgende stap
+platform.appwithinminutes.wizardStepFinishButtonLabel=Voltooien
+platform.appwithinminutes.wizardStepFinishButtonTip=Ga naar de homepage van de applicatie
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Vorige Stap
 platform.appwithinminutes.wizardStepPreviousButtonTip=Ga naar de vorige stap
+platform.appwithinminutes.wizardStepHelpTitle=Stappen
+platform.appwithinminutes.wizardStepHelpDescription=Deze wizard helpt u uw eigen applicatie te bouwen. Deze stappen configureren de wijze waarop uw applicatie wordt weergegeven en welke informatie de applicatie omvat\:
+
+### Wizard Step 1: Application Name
+### Missing: appWithinMinutes.createApp.location.label=Location
+### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
+### Missing: appWithinMinutes.createApp.parent.label=Parent
+### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
+### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+### Missing: appWithinMinutes.codeSpace.title=Code
+### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
+### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+platform.appwithinminutes.appNamePageTitle=Applicatie Maken
+platform.appwithinminutes.appNameLabel=Naam Applicatie
+platform.appwithinminutes.appNameHint=De naam van de applicatie bepaalt de URL van de homepage van de applicatie, de paginaruimte waarin de gegevens van de applicatie worden opgeslagen en ook de naam van de Class die de applicatiestructuur definieert.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL van de homepage van de applicatie
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Paginaruimte voor Applicatie-code
+platform.appwithinminutes.appNameIsUsedWarning=Deze applicatie bestaat al. Als u naar de volgende stap gaat, zult u de bestaande applicatie aanpassen.
+platform.appwithinminutes.appNameEmptyError=Geef alstublieft de applicatienaam op.
+
+### Wizard Step 2: Application Structure
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+platform.appwithinminutes.classEditorPaletteTitle=Veldenkiezer
+platform.appwithinminutes.classEditorPaletteHint=Sleep velden uit de kiezer en laat ze vallen op uw formulier om uw formulier op te bouwen.
+platform.appwithinminutes.classEditorCanvasHint=Sleep velden uit de kiezer en laat ze in dit gebied vallen.
+
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Class sjabloon bijwerken
+platform.appwithinminutes.classEditorUpdateTemplateHint=Bewaar de standaardwaarden voor velden in het Class sjabloon ({0}).
+platform.appwithinminutes.classEditorUpdateSheetLabel=Class sheet bijwerken
+platform.appwithinminutes.classEditorUpdateSheetHint=Maak de sheet die wordt gebruikt voor het tonen en wijzigen van objecten van deze Class ({0}).
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Vertaalbundel van de Class bijwerken
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Werk de vertalingen van de weergavenamen van velden en lijstwaarden bij ({0}).
+
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Deze Class heeft meerdere sheets.
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Deze Class heeft twee velden met dezelfde naam\: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=Standaardwaarden bijwerken
+platform.appwithinminutes.classEditorBindSheetSaveComment=Class sheet binden
+platform.appwithinminutes.classEditorSheetSaveComment=Class sheet bijwerken
+platform.appwithinminutes.classEditorTranslationsSaveComment=Vertalingen bijwerken
+
+platform.appwithinminutes.classEditorStandardCategoryName=Standaard
+platform.appwithinminutes.classEditorPickersCategoryName=Kiezers
+platform.appwithinminutes.classEditorDocumentCategoryName=Document
+platform.appwithinminutes.classEditorAdvancedCategoryName=Gevorderd
+
+platform.appwithinminutes.classEditorDBListFieldName=Database Lijst
+platform.appwithinminutes.classEditorGroupsFieldName=Groep
+platform.appwithinminutes.classEditorUsersFieldName=Gebruiker
+platform.appwithinminutes.classEditorDateFieldName=Datum
+platform.appwithinminutes.classEditorStaticListFieldName=Statische Lijst
+platform.appwithinminutes.classEditorBooleanFieldName=Boolean
+platform.appwithinminutes.classEditorNumberFieldName=Getal
+platform.appwithinminutes.classEditorTextAreaFieldName=Lange Tekst
+platform.appwithinminutes.classEditorStringFieldName=Korte Tekst
+platform.appwithinminutes.classEditorContentFieldName=Inhoud
+platform.appwithinminutes.classEditorTitleFieldName=Titel
+
+platform.appwithinminutes.classEditorDeleteFieldLabel=Verwijderen
+platform.appwithinminutes.classEditorConfigureFieldLabel=Configureren
+platform.appwithinminutes.classEditorPreviewFieldLabel=Voorbeeld
+platform.appwithinminutes.classEditorPreviewFieldHint=Verberg configuratiepaneel en pas wijzigingen toe
+platform.appwithinminutes.classEditorMoveFieldLabel=Verplaatsen
+platform.appwithinminutes.classEditorMoveFieldHint=Sleep en laat vallen om de volgorde te wijzigen
+
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Standaardwaarde
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Wissen
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Nu
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Vandaag
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Waarde
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Toevoegen
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Verwijderen
+
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+
+### Wizard Step 3: Application Presentation
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Class velden
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generieke kolommen
+platform.appwithinminutes.liveTableEditorHelpTitle=Tip
+platform.appwithinminutes.liveTableEditorHelpDescription=Generieke live table kolommen zijn niet afhankelijk van uw applicatiestructuur. Ze geven informatie over de pagina's waarin uw applicatiegegevens zijn opgeslagen.
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Paginatitel
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=De titel van de pagina met applicatiegegevens
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Paginanaam
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=De naam van de pagina met applicatiegegevens
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Laatste auteur
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=De gebruiker die het laatst de applicatiegegevens wijzigde
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Maker
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=De gebruiker die de applicatiegegevens maakte
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Datum gewijzigd
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=De datum waarop de applicatiegegevens het laatst gewijzigd zijn
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Datum gemaakt
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=De datum waarop de applicatiegegevens gemaakt zijn
+platform.appwithinminutes.liveTableEditorActionsColumnName=Acties
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=Een lijst met acties die kunnen worden uitgevoerd op de applicatiegegevens, zoals wijzigen en verwijderen
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Bijlagen
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Een speciale kolom met links naar de bijlagen van de gegevenspagina
+platform.appwithinminutes.liveTableEditorImagesColumnName=Afbeeldingen
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Een speciale kolom met afbeeldingen die bij de gegevenspagina zijn gevoegd 
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Een speciale kolom voor het tonen van de avatar van de gebruiker. Werkt alleen voor een tabel die aan de XWiki.XWikiUsers Class is gebonden.
+platform.appwithinminutes.liveTableEditorDescriptionHint=De omschrijving geeft een korte samenvatting van wat de applicatie doet en welke gegevens ermee beheerd worden.
+platform.appwithinminutes.liveTableEditorColumnsHint=Selecteer de kolommen die u wilt opnemen in de live table die wordt weergegeven op de homepage van de applicatie.
+platform.appwithinminutes.liveTableEditorSaveComment=LiveTable bijwerken
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Sleep en laat vallen om de volgorde te wijzigen
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Verwijderen
+platform.appwithinminutes.liveTableEditorAddColumnHint=Toevoegen
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Een aantal kolommen zijn niet meer actueel, waarschijnlijk omdat de overeenkomstige Class velden verwijderd zijn. Wilt u deze verwijderen? &lt;a href\=""&gt;Ja&lt;/a&gt; / &lt;a href\=""&gt;Nee&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=Pictogram
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=Een referentie naar een pictogram. Dit kan elke afbeelding zijn die is opgeslagen in de wiki, maar u kunt ook een pictogram kiezen via de Kiezer die verschijnt als het veld is geselecteerd.
+
+### Application home page
+platform.appwithinminutes.appLiveTableHeading=Gegevens
+platform.appwithinminutes.appLiveTableEditEntryActionName=Wijzigen
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Verwijderen
+platform.appwithinminutes.appHomePageActionsHeading=Acties
+platform.appwithinminutes.appHomePageAddEntryLabel=Toevoegen
+platform.appwithinminutes.appHomePageAddEntryHint=Nieuwe gegevens toevoegen
+platform.appwithinminutes.appHomePageEntryNameLabel=Naam\:
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=Alle gegevens verwijderen
+platform.appwithinminutes.appHomePageEditAppLabel=Applicatie wijzigen
+platform.appwithinminutes.appHomePageTranslateAppLabel=Applicatie vertalen
+platform.appwithinminutes.appHomePageDeleteAppLabel=Applicatie verwijderen
+
+### Delete application dialog
+platform.appwithinminutes.deleteAppConfirmation=De applicatie {0} al zijn gegevens worden verwijderd. Weet u zeker dat u wilt doorgaan?
+platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE gegevens van applicatie {0} worden verwijderd. Weet u zeker dat u wilt doorgaan?
+platform.appwithinminutes.deleteAppDoesNotExistError=De opgegeven applicatie bestaat niet.
+platform.appwithinminutes.deleteAppInvalidAppError=De opgegeven naam is geen geldige App Binnen Minuten applicatie.
+platform.appwithinminutes.deleteAppNotSpecifiedError=Er is geen applicatienaam opgegeven.
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Applicatie Class
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Paginaruimte voor Applicatie-gegevens
+
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Paginaruimte
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=De naam van de paginaruimte waarin de applicatiegegevens zijn opgeslagen
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Volledige naam pagina
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=De naam van de pagina met applicatiegegevens, voorafgegaan door de paginaruimte
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=Naam
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=Geef uw applicatie een naam
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=Geef de applicatienaam op.
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=Structureren
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=Bepaal de structuur van uw applicatie
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=Genereer de structuur van uw applicatie door op te geven welke soorten velden de applicatie zal bevatten.
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=Presentatie
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=Pas de homepage van uw applicatie aan
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=Personaliseer de homepage van uw applicatie.
 </content>
 </xwikidoc>

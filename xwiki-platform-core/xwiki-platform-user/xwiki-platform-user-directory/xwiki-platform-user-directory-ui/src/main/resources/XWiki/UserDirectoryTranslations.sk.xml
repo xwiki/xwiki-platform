@@ -39,11 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-platform.userdirectory.configSheetTitle=Konfigurácia užívateľského adresára
-platform.userdirectory.configTitle=Konfigurácia užívateľského adresára
-platform.userdirectory.customizeNotAllowed=Nemáte právo upravovať tento adresár.
-userdirectory.userScopeFilter.global=Užívatelia, ktorí sú členmi tejto wiki.
+  <content>### Missing: userdirectory.userScopeFilter=User scope:
+### Missing: userdirectory.userScopeFilter.hint=Select the category of users you want to display.
 userdirectory.userScopeFilter.local=Lokálne užívatelia
+userdirectory.userScopeFilter.global=Užívatelia, ktorí sú členmi tejto wiki.
+platform.userdirectory.customizeNotAllowed=Nemáte právo upravovať tento adresár.
+platform.userdirectory.configTitle=Konfigurácia užívateľského adresára
+platform.userdirectory.configSheetTitle=Konfigurácia užívateľského adresára
+### Missing: platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.
 </content>
 </xwikidoc>

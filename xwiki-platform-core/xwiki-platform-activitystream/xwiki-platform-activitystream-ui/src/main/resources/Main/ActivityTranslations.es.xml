@@ -39,8 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
-activity.rss.feed.description=Subscripción RSS a los cambios del documento
+  <content>### Missing: activity.page.link.title=Located in {0}
 activity.rss.pages.modified=Subscripciones de las páginas modificadas
+activity.rss.feed.description=Subscripción RSS a los cambios del documento
+### Missing: activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
+### Missing: activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"
+### Missing: activity.rss.feed.tagsAndSpaces.description=RSS feed for documents tagged with "{0}" in space(s) "{1}"
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.3M1
+### Missing: activity.link.title=Located in {0} » {1} » {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

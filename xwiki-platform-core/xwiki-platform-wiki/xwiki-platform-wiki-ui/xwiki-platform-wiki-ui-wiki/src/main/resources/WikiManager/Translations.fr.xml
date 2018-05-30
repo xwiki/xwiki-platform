@@ -39,87 +39,101 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-WikiManager.WikiCandidateMemberClass_status_accepted=Accepter
-WikiManager.WikiCandidateMemberClass_status_pending=En attente
-WikiManager.WikiCandidateMemberClass_status_rejected=Rejeter
-WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
-WikiManager.WikiCandidateMemberClass_type_request=Demande
-admin.xwiki.manageworkspace.description=Gérer les paramètres comme le nom du wiki, sa description, son propriétaire et le type de ses membres.
-admin.xwiki.members.title=Membres actuels
-admin.xwiki.usersconfiguration.title=Configuration
-admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki\: ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
-core.menu.admin.wiki=Administrer le wiki
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=Ajouter le wiki aux favoris
 core.menu.watchlist.remove.wiki=Retirer le wiki des favoris
-platform.wiki.currentwiki.candidateAcceptedSuccess=La demande a été acceptée.
-platform.wiki.currentwiki.candidateHandledComment=Commentaire \:
+core.menu.admin.wiki=Administrer le wiki
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Informations sur le wiki
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Bienvenue sur le Wiki {0}{1}{2}.
+platform.wiki.currentwiki.currentUserIsOwner=Vous êtes le propriétaire de ce wiki.
+platform.wiki.currentwiki.currentUserIsAdmin=Vous êtes administrateur de ce wiki.
+platform.wiki.currentwiki.joinNeedToLogin=Afin de rejoindre ce wiki vous devez vous identifier.
+platform.wiki.currentwiki.currentUserNotMember=Vous n'êtes pas membre de ce wiki.
+platform.wiki.currentwiki.currentuserCanJoin=Si vous le souhaitez, vous pouvez {0}rejoindre ce wiki{1}.
+platform.wiki.currentwiki.currentUserIsMember=Vous êtes membre de ce wiki.
+platform.wiki.currentwiki.currentUserCanLeave=Si vous le souhaitez, vous pouvez {0}quitter ce wiki{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Pour visualiser la liste complète des membres de ce wiki, allez à la page {0}Annuaire des utilisateurs{1}.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Vous avez été invité à rejoindre ce wiki.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Vous avez demandé à rejoindre ce wiki.
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Votre demande de rejoindre le wiki "{0}" a été acceptée.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Votre demande de rejoindre le wiki "{0}" a été rejetée.
 platform.wiki.currentwiki.candidateHandledSaveComment=Candidat traité {0} ({1})
+platform.wiki.currentwiki.candidateHandledComment=Commentaire \:
+platform.wiki.currentwiki.candidateAcceptedSuccess=La demande a été acceptée.
 platform.wiki.currentwiki.candidateRejectedSuccess=Demande rejetée avec succès.
+platform.wiki.currentwiki.inviteUserAlreadyMember=L''utilisateur {0} est déjà membre du wiki.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} a déjà une demande en attente. Veuillez répondre à cette demande de rejoindre.
+platform.wiki.currentwiki.inviteUserAlreadyInvited=L''utilisateur {0} a déjà une invitation en attente.
+platform.wiki.currentwiki.inviteSaveComment=L''utilisateur "{0}" a été invité à rejoindre le wiki.
+platform.wiki.currentwiki.inviteNotification=Vous avez été invité à rejoindre le wiki ''{0}''. 
+platform.wiki.currentwiki.inviteSuccess=L''utilisateur {0} a été invité avec succès.
+platform.wiki.currentwiki.invitationCancelSaveComment=Annuler l''invitation {0} ({1}) 
+platform.wiki.currentwiki.invitationCancelNotification=Votre invitation a été annulée et n'est plus valide.
+platform.wiki.currentwiki.invitationCancelSuccess=Invitation annulée avec succès.
+platform.wiki.currentwiki.invitationCancelFailure=Erreur \: impossible d'annuler l'invitation.
 platform.wiki.currentwiki.candidateReviewFailure=Erreur, vous ne pouvez pas annuler l'invitation.
-platform.wiki.currentwiki.candidates.accept.label=Accepter
-platform.wiki.currentwiki.candidates.hint=Utilisateurs qui ont demandé ou qui ont été invités à rejoindre ce wiki.
-platform.wiki.currentwiki.candidates.invitation.cancel.label=Annuler l'invitation
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Nom d'affichage
+platform.wiki.currentwiki.prop.description.label=Description
+platform.wiki.currentwiki.prop.owner.label=Gestionnaire
+platform.wiki.currentwiki.prop.membershipType.label=Type d'adhésion
+platform.wiki.currentwiki.prop.secure.label=Sécurisé (SSL)
+platform.wiki.currentwiki.member.add=Ajouter ou inviter un utilisateur dans le wiki
+platform.wiki.currentwiki.gadget.wikiInformation.label=Informations sur le wiki
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Les membres les plus actifs
+platform.wiki.currentwiki.panel.information.name.label=Nom
+platform.wiki.currentwiki.panel.information.description.label=Description
+platform.wiki.currentwiki.panel.information.members.label=Membres
+platform.wiki.currentwiki.invitation.view.label=Visualiser l'invitation
+platform.wiki.currentwiki.joinrequest.cancel.label=Annuler la demande
+platform.wiki.currentwiki.joinreques.request.label=Demander à rejoindre
+platform.wiki.currentwiki.join.label=Rejoindre
+platform.wiki.currentwiki.leave.label=Quitter le Wiki
+platform.wiki.currentwiki.invite.username.label=Nom d'utilisateur
+platform.wiki.currentwiki.invite.message.label=Message
+platform.wiki.currentwiki.invite.button.label=Inviter
 platform.wiki.currentwiki.candidates.label=Candidats
-platform.wiki.currentwiki.candidates.reject.label=Rejeter
+platform.wiki.currentwiki.candidates.status.label=Statut\:
+platform.wiki.currentwiki.candidates.type.label=Type \:
 platform.wiki.currentwiki.candidates.reviewer.label=Admin \:
 platform.wiki.currentwiki.candidates.reviewermessage.label=Message de l'administrateur \:
 platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Message privé \:
-platform.wiki.currentwiki.candidates.status.label=Statut\:
-platform.wiki.currentwiki.candidates.type.label=Type \:
-platform.wiki.currentwiki.currentUserCanLeave=Si vous le souhaitez, vous pouvez {0}quitter ce wiki{1}.
-platform.wiki.currentwiki.currentUserIsAdmin=Vous êtes administrateur de ce wiki.
-platform.wiki.currentwiki.currentUserIsMember=Vous êtes membre de ce wiki.
-platform.wiki.currentwiki.currentUserIsOwner=Vous êtes le propriétaire de ce wiki.
-platform.wiki.currentwiki.currentUserNotMember=Vous n'êtes pas membre de ce wiki.
-platform.wiki.currentwiki.currentuserCanJoin=Si vous le souhaitez, vous pouvez {0}rejoindre ce wiki{1}.
-platform.wiki.currentwiki.gadget.topActiveUsers.label=Les membres les plus actifs
-platform.wiki.currentwiki.gadget.wikiInformation.label=Informations sur le wiki
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Pour visualiser la liste complète des membres de ce wiki, allez à la page {0}Annuaire des utilisateurs{1}.
-platform.wiki.currentwiki.invitation.view.label=Visualiser l'invitation
-platform.wiki.currentwiki.invitationCancelFailure=Erreur \: impossible d'annuler l'invitation.
-platform.wiki.currentwiki.invitationCancelNotification=Votre invitation a été annulée et n'est plus valide.
-platform.wiki.currentwiki.invitationCancelSaveComment=Annuler l''invitation {0} ({1}) 
-platform.wiki.currentwiki.invitationCancelSuccess=Invitation annulée avec succès.
-platform.wiki.currentwiki.invitationPendingForCurrentWiki=Vous avez été invité à rejoindre ce wiki.
-platform.wiki.currentwiki.invite.button.label=Inviter
-platform.wiki.currentwiki.invite.message.hint=Message à envoyer à l'utilisateur.
-platform.wiki.currentwiki.invite.message.label=Message
-platform.wiki.currentwiki.invite.username.hint=Le nom de l'utilisateur à ajouter au wiki.
-platform.wiki.currentwiki.invite.username.label=Nom d'utilisateur
-platform.wiki.currentwiki.inviteNotification=Vous avez été invité à rejoindre le wiki ''{0}''. 
-platform.wiki.currentwiki.inviteRequestAlreadyExists={0} a déjà une demande en attente. Veuillez répondre à cette demande de rejoindre.
-platform.wiki.currentwiki.inviteSaveComment=L''utilisateur "{0}" a été invité à rejoindre le wiki.
-platform.wiki.currentwiki.inviteSuccess=L''utilisateur {0} a été invité avec succès.
-platform.wiki.currentwiki.inviteUserAlreadyInvited=L''utilisateur {0} a déjà une invitation en attente.
-platform.wiki.currentwiki.inviteUserAlreadyMember=L''utilisateur {0} est déjà membre du wiki.
-platform.wiki.currentwiki.join.label=Rejoindre
-platform.wiki.currentwiki.joinNeedToLogin=Afin de rejoindre ce wiki vous devez vous identifier.
-platform.wiki.currentwiki.joinRequestAcceptedNotification=Votre demande de rejoindre le wiki "{0}" a été acceptée.
-platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Vous avez demandé à rejoindre ce wiki.
-platform.wiki.currentwiki.joinRequestRejectedNotification=Votre demande de rejoindre le wiki "{0}" a été rejetée.
-platform.wiki.currentwiki.joinreques.request.label=Demander à rejoindre
-platform.wiki.currentwiki.joinrequest.cancel.label=Annuler la demande
-platform.wiki.currentwiki.leave.label=Quitter le Wiki
-platform.wiki.currentwiki.managewikis.title=Wiki
-platform.wiki.currentwiki.member.add=Ajouter ou inviter un utilisateur dans le wiki
-platform.wiki.currentwiki.panel.information.description.label=Description
-platform.wiki.currentwiki.panel.information.members.label=Membres
-platform.wiki.currentwiki.panel.information.name.label=Nom
-platform.wiki.currentwiki.prop.description.hint=Une courte description du wiki et de son usage.
-platform.wiki.currentwiki.prop.description.label=Description
-platform.wiki.currentwiki.prop.membershipType.hint=La manière dont les utilisateurs peuvent rejoindre ce wiki.
-platform.wiki.currentwiki.prop.membershipType.label=Type d'adhésion
-platform.wiki.currentwiki.prop.owner.hint=L'utilisateur qui est le gestionnaire du wiki.
-platform.wiki.currentwiki.prop.owner.label=Gestionnaire
-platform.wiki.currentwiki.prop.secure.hint=Si cette case est cochée, toutes les URLs externes générées par ce wiki débuteront par {0}https\:~/~/{1}.
-platform.wiki.currentwiki.prop.secure.label=Sécurisé (SSL)
-platform.wiki.currentwiki.prop.wikiprettyname.hint=Le nom d'affichage du wiki.
-platform.wiki.currentwiki.prop.wikiprettyname.label=Nom d'affichage
-platform.wiki.currentwiki.welcome=Bienvenue sur le Wiki {0}{1}{2}.
+platform.wiki.currentwiki.candidates.accept.label=Accepter
+platform.wiki.currentwiki.candidates.reject.label=Rejeter
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Annuler l'invitation
 platform.wiki.currentwiki.wikiusers.title=Membres du wiki
+platform.wiki.currentwiki.managewikis.title=Wiki
+WikiManager.WikiCandidateMemberClass_status_pending=En attente
+WikiManager.WikiCandidateMemberClass_status_accepted=Accepter
+WikiManager.WikiCandidateMemberClass_status_rejected=Rejeter
+WikiManager.WikiCandidateMemberClass_type_request=Demande
+WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Le nom d'affichage du wiki.
+platform.wiki.currentwiki.prop.description.hint=Une courte description du wiki et de son usage.
+platform.wiki.currentwiki.prop.owner.hint=L'utilisateur qui est le gestionnaire du wiki.
+platform.wiki.currentwiki.prop.membershipType.hint=La manière dont les utilisateurs peuvent rejoindre ce wiki.
+platform.wiki.currentwiki.prop.secure.hint=Si cette case est cochée, toutes les URLs externes générées par ce wiki débuteront par {0}https\:~/~/{1}.
+platform.wiki.currentwiki.invite.username.hint=Le nom de l'utilisateur à ajouter au wiki.
+platform.wiki.currentwiki.invite.message.hint=Message à envoyer à l'utilisateur.
+platform.wiki.currentwiki.candidates.hint=Utilisateurs qui ont demandé ou qui ont été invités à rejoindre ce wiki.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=Gérer les paramètres comme le nom du wiki, sa description, son propriétaire et le type de ses membres.
+admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki\: ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
+admin.xwiki.usersconfiguration.title=Configuration
+admin.xwiki.members.title=Membres actuels
+    
+# DRAWER ITEM
 platform.wiki.drawer.homeWiki=Accueil
-platform.wiki.panel.title=Informations sur le wiki
 </content>
 </xwikidoc>

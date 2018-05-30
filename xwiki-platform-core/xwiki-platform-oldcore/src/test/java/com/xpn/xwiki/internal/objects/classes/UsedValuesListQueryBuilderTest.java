@@ -24,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryManager;
@@ -34,10 +35,12 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link UsedValuesListQueryBuilder}.
@@ -77,13 +80,14 @@ public class UsedValuesListQueryBuilderTest
         BaseClass xclass = new BaseClass();
         xclass.setDocumentReference(new DocumentReference("apps", "Blog", "BlogPostClass"));
 
-        PropertyMetaClass metaClass = mock(PropertyMetaClass.class);
-        when(metaClass.getName()).thenReturn("Blog.BlogPostClass");
+        Utils.setComponentManager(this.mocker);
+        EntityReferenceSerializer<String> localEntityReferenceSerializer =
+            this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(localEntityReferenceSerializer.serialize(xclass.getDocumentReference())).thenReturn("Blog.BlogPostClass");
 
         this.listClass = new DBListClass();
         this.listClass.setName("category");
         this.listClass.setObject(xclass);
-        this.listClass.setxWikiClass(metaClass);
     }
 
     @Test

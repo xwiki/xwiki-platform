@@ -137,9 +137,11 @@
     </dependency>
 
     <!-- Used by parse groovy from page -->
+    <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
+         xwiki-commons-groovy which has dependencies on all the various groovy jars and thus they'll be bundled -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy</artifactId>
     </dependency>
 
     <!-- Storage -->

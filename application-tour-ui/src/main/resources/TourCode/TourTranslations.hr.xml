@@ -39,51 +39,65 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-TourCode.StepClass_action=Odredišna akcija
-TourCode.StepClass_backdrop=Kulisa
-TourCode.StepClass_content=Sadržaj
-TourCode.StepClass_element=Element (CSS odabirač koji identificira element)
-TourCode.StepClass_order=Poredak
-TourCode.StepClass_placement=Smještaj
-TourCode.StepClass_queryString=Niz znakova za upit
-TourCode.StepClass_targetPage=Odredišna stranica
-TourCode.StepClass_title=Naslov
+  <content># App name
+tour.app.name=Obilazak
+
+# Class fields
 TourCode.TourClass_description=Opis
 TourCode.TourClass_isActive=Aktivno
 TourCode.TourClass_targetPage=Odredišna stranica
-tour.app.name=Obilazak
-tour.livetable._actions=Akcije
-tour.livetable._actions.delete=Obriši
-tour.livetable._actions.edit=Uredi
-tour.livetable._actions.launch=Pokreni
-tour.livetable.description=Opis
+
+# Live table generic keys
 tour.livetable.doc.title=Ime obilaska
+tour.livetable._actions=Akcije
+tour.livetable._actions.edit=Uredi
+tour.livetable._actions.delete=Obriši
+tour.livetable._actions.launch=Pokreni
 tour.livetable.emptyvalue=-
+
+# Live table specific keys
+tour.livetable.description=Opis
 tour.livetable.isActive=Aktivno
-tour.livetable.targetClass=Odredišna klasa
 tour.livetable.targetPage=Odredišna stranica
-tour.popover.end=Završi obilazak
-tour.popover.next=Sljedeće »
+tour.livetable.targetClass=Odredišna klasa
+
+# Tour popover
 tour.popover.previous=« Prethodno
+tour.popover.next=Sljedeće »
+tour.popover.end=Završi obilazak
 tour.popover.show=Prikaži obilazak
 tour.popover.show.hint=U bilo kojem trenutku možete klikanjem na ovaj gumb ponovo pokrenuti obilazak
+
+# Steps
+TourCode.StepClass_order=Poredak
+TourCode.StepClass_element=Element (CSS odabirač koji identificira element)
+TourCode.StepClass_title=Naslov
+TourCode.StepClass_content=Sadržaj
+TourCode.StepClass_backdrop=Kulisa
+TourCode.StepClass_placement=Smještaj
+TourCode.StepClass_targetPage=Odredišna stranica
+TourCode.StepClass_action=Odredišna akcija
+TourCode.StepClass_queryString=Niz znakova za upit
 tour.steps=Koraci
+tour.steps.new_step=Novi korak
 tour.steps.add_step=Dodaj korak
-tour.steps.delete=Obriši
+tour.steps.edit_step=Uredi korak
+tour.steps.save_step=Spremi
 tour.steps.delete_confirm=Jeste li sigurni da želite obrisati korak?
 tour.steps.delete_done=Brisanje koraka obavljeno\!
 tour.steps.deleting=Brisanje koraka...
-tour.steps.edit=Uredi
-tour.steps.edit_step=Uredi korak
-tour.steps.new_step=Novi korak
-tour.steps.no=Ne
-tour.steps.save_step=Spremi
 tour.steps.yes=Da
-tour.template.description=Obilazak korak po korak
+tour.steps.no=Ne
+tour.steps.edit=Uredi
+tour.steps.delete=Obriši
+
+# Upgrade
+tour.upgrade.title = Nadogradnja
+tour.upgrade.successList = Uspješno su pretvorene sljedeće stranice\:
+tour.upgrade.successNothing = Nema ničega za nadograditi\!
+
+# Template
 tour.template.name=Obilazak
-tour.upgrade.successList=Uspješno su pretvorene sljedeće stranice\:
-tour.upgrade.successNothing=Nema ničega za nadograditi\!
-tour.upgrade.title=Nadogradnja
+tour.template.description=Obilazak korak po korak
 </content>
 </xwikidoc>

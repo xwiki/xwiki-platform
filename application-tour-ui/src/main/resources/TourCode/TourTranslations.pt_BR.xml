@@ -39,40 +39,65 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-TourCode.StepClass_content=Conteúdo
-TourCode.StepClass_title=Título
+  <content># App name
+tour.app.name=Tour
+
+# Class fields
 TourCode.TourClass_description=Descrição
 TourCode.TourClass_isActive=Ativo
 TourCode.TourClass_targetPage=Página de destino
-tour.app.name=Tour
-tour.livetable._actions=Ações
-tour.livetable._actions.delete=Deletar
-tour.livetable._actions.edit=Editar
-tour.livetable.description=Descrição
+
+# Live table generic keys
 tour.livetable.doc.title=Nome do Tour
+tour.livetable._actions=Ações
+tour.livetable._actions.edit=Editar
+tour.livetable._actions.delete=Deletar
+### Missing: tour.livetable._actions.launch=Launch
 tour.livetable.emptyvalue=-
+
+# Live table specific keys
+tour.livetable.description=Descrição
 tour.livetable.isActive=Ativo
-tour.livetable.targetClass=Classe de destino
 tour.livetable.targetPage=Página de destino
-tour.popover.end=Finalizar tour
-tour.popover.next=Próximo &gt;&gt;
+tour.livetable.targetClass=Classe de destino
+
+# Tour popover
 tour.popover.previous=&lt;&lt; Anterior
+tour.popover.next=Próximo &gt;&gt;
+tour.popover.end=Finalizar tour
 tour.popover.show=Mostrar Tour
 tour.popover.show.hint=Você pode recomeçar o tour clicando neste botão a qualquer momento
+
+# Steps
+### Missing: TourCode.StepClass_order=Order
+### Missing: TourCode.StepClass_element=Element (CSS selector that identify an element)
+TourCode.StepClass_title=Título
+TourCode.StepClass_content=Conteúdo
+### Missing: TourCode.StepClass_backdrop=Backdrop
+### Missing: TourCode.StepClass_placement=Placement
+### Missing: TourCode.StepClass_targetPage=Target Page
+### Missing: TourCode.StepClass_action=Target Action
+### Missing: TourCode.StepClass_queryString=Query String
 tour.steps=Passos
+tour.steps.new_step=Novo Passo
 tour.steps.add_step=Adicionar Passo
-tour.steps.delete=Deletar
+tour.steps.edit_step=Editar passo
+### Missing: tour.steps.save_step=Save
 tour.steps.delete_confirm=Você tem certeza que deseja deletar este passo?
 tour.steps.delete_done=Remoção do passo concluida
 tour.steps.deleting=Deletando passo...
-tour.steps.edit=Editar
-tour.steps.edit_step=Editar passo
-tour.steps.new_step=Novo Passo
-tour.steps.no=Não
 tour.steps.yes=Sim
-tour.upgrade.successList=As seguintes páginas foram convertidas com sucesso
-tour.upgrade.successNothing=Nada você para atualizar.
-tour.upgrade.title=Atualizar
+tour.steps.no=Não
+tour.steps.edit=Editar
+tour.steps.delete=Deletar
+
+# Upgrade
+tour.upgrade.title = Atualizar
+tour.upgrade.successList = As seguintes páginas foram convertidas com sucesso
+tour.upgrade.successNothing = Nada você para atualizar.
+
+# Template
+### Missing: tour.template.name=Tour
+### Missing: tour.template.description=Step by step tour
 </content>
 </xwikidoc>

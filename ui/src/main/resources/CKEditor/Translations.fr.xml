@@ -39,66 +39,56 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-CKEditor.ConfigClass_advanced=Configuration avancée
-CKEditor.ConfigClass_advanced.hint=Vous pouvez écrire un snippet Javascript pour modifier directement l''objet configuration. Cf. à la documentation{1} de {0}CKEditor  pour la list des propriétés de configuration disponibles.
-CKEditor.ConfigClass_linkShowAdvancedTab=Lien \: Afficher l'onglet Avancé
-CKEditor.ConfigClass_linkShowAdvancedTab.hint=Vous permet de définir les attributs du lien comme son nom, son id, sa classe ou son style.
-CKEditor.ConfigClass_linkShowTargetTab=Lien \: Afficher l'onglet Destination
-CKEditor.ConfigClass_linkShowTargetTab.hint=Vous permet de définir l'attribut target du lien, par exemple pour ouvrir le lien dans un nouvel onglet.
+  <content>CKEditor.ConfigClass_removePlugins=Plugins désactivés
+CKEditor.ConfigClass_removePlugins.hint=La liste des plugins qui ont été désactivés
 CKEditor.ConfigClass_removeButtons=Fonctions désactivées dans la barre d'outils
 CKEditor.ConfigClass_removeButtons.hint=La liste des fonctionnalités désactivées dans la barre d'outils.
-CKEditor.ConfigClass_removePlugins=Plugins désactivés
-CKEditor.ConfigClass_removePlugins.hint=La liste des plugins qui ont été désactivés
-ckeditor.admin.reset=Réinitialiser
-ckeditor.admin.reset.confirmation=Êtes-vous certain de vouloir rétablir la configuration par défaut ? Toutes vos modifications seront perdues.
-ckeditor.admin.reset.hint=Rétablir la configuration par défaut
+CKEditor.ConfigClass_linkShowAdvancedTab=Lien : Afficher l'onglet Avancé
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Vous permet de définir les attributs du lien comme son nom, son id, sa classe ou son style.
+CKEditor.ConfigClass_linkShowTargetTab=Lien : Afficher l'onglet Destination
+CKEditor.ConfigClass_linkShowTargetTab.hint=Vous permet de définir l'attribut target du lien, par exemple pour ouvrir le lien dans un nouvel onglet.
+CKEditor.ConfigClass_advanced=Configuration avancée
+CKEditor.ConfigClass_advanced.hint=Vous pouvez écrire un snippet Javascript pour modifier directement l''objet configuration. Cf. à la documentation{1} de {0}CKEditor  pour la list des propriétés de configuration disponibles.
+
 ckeditor.admin.saveComment=La configuration CKEditor a été mise à jour depuis l'Administration 
+ckeditor.admin.reset=Réinitialiser
+ckeditor.admin.reset.hint=Rétablir la configuration par défaut
+ckeditor.admin.reset.confirmation=Êtes-vous certain de vouloir rétablir la configuration par défaut ? Toutes vos modifications seront perdues.
+
+ckeditor.plugin.link.options=Options
 ckeditor.plugin.link.anchor=Ancre
+ckeditor.plugin.link.queryString=Paramètres d'URL
 ckeditor.plugin.link.defaultLabel=Saisir le label du lien
 ckeditor.plugin.link.openInNewTab=Ouvrir le lien dans un nouvel onglet
-ckeditor.plugin.link.options=Options
-ckeditor.plugin.link.queryString=Paramètres d'URL
+
+ckeditor.plugin.macro.placeholder=macro : {0} 
 ckeditor.plugin.macro.buttonHint=Macro XWiki
-ckeditor.plugin.macro.dedicatedInsertButtonHint=Insérer macro {0}
-ckeditor.plugin.macro.placeholder=macro \: {0} 
 ckeditor.plugin.macro.refreshFailed=La réactualisation du contenu édité a échoué.
-ckeditor.plugin.office.importer.done=Fichier Office importé avec succès.
-ckeditor.plugin.office.importer.fail=L'import Office a échoué.
-ckeditor.plugin.office.importer.failedToLoadForm=Erreur au chargement du formulaire.
-ckeditor.plugin.office.importer.filePath=Chemin du fichier
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Insérer macro {0}
+
+ckeditor.plugin.office.importer.title=Importer un document Office
+ckeditor.plugin.office.importer.filePath=Emplacement du fichier
 ckeditor.plugin.office.importer.filePath.hint=Sélectionnez le fichier Office à importer. Ce fichier sera téléchargé, attaché à la page et son contenu ajouté comme contenu à la page.
 ckeditor.plugin.office.importer.filterStyles=Filtrer les styles
-ckeditor.plugin.office.importer.import=Importer
-ckeditor.plugin.office.importer.inProgress=Import du fichier Office en cours...
-ckeditor.plugin.office.importer.noUploadURL=L'url de téléchargement de fichier n'est pas configurée.
-ckeditor.plugin.office.importer.required=Obligatoire
-ckeditor.plugin.office.importer.title=Importer un fichier Office
+### Missing: ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
 ckeditor.plugin.office.importer.useOfficeViewer=Utiliser le visualiseur Office
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+ckeditor.plugin.office.importer.required=Obligatoire
+ckeditor.plugin.office.importer.import=Importer
+ckeditor.plugin.office.importer.inProgress=Import en cours...
+ckeditor.plugin.office.importer.done=Document Office importé avec succès.
+ckeditor.plugin.office.importer.fail=Erreur lors de l'import du document Office.
+ckeditor.plugin.office.importer.noUploadURL=L'URL d'import du fichier n'est pas configurée.
+ckeditor.plugin.office.importer.failedToLoadForm=Impossible d'afficher le formulaire.
+
 ckeditor.plugin.resource.notSpecified=Le {0} n''est pas renseigné.
-ckeditor.plugin.save.leaveConfirmationMessage=Il y a des modifications non sauvegardées. Voulez-vous les abandonner?
+ckeditor.plugin.save.leaveConfirmationMessage=Il y a des modifications non sauvegardées. Voulez-vous les abandonner ?
 ckeditor.plugin.source.conversionFailed=La conversion a échoué.
-entityResourcePicker.attach.title=Sélectionner la pièce jointe
-entityResourcePicker.doc.title=Sélectionner la Page
-entityResourcePicker.select=Sélectionner
-entityResourceSuggester.attach.placeholder=Trouver une pièce jointe...
-entityResourceSuggester.doc.placeholder=Trouver une page...
-macroEditor.changeMacro=Modifier Macro
-macroEditor.content=Contenu
-macroEditor.descriptorRequestFailed=La reherche du descripteur de la macro {0} a échoué.
-macroEditor.more=Plus
-macroEditor.noParameters=Cette macro n'a aucun paramètres.
-macroEditor.submit=Envoyer
-macroEditor.title=Editer Macro
-macroSelector.failedToRetrieveMacros=Lister toutes les macros disponibles a échoué.
-macroSelector.filter.category.all=Toutes les macros
-macroSelector.filter.category.other=Autre
-macroSelector.filter.text.placeholder=Saisir le filtre
-macroSelector.select=Sélectionner
-macroSelector.title=Sélectionner la Macro
+
+modal.ok=OK
 modal.cancel=Annuler
 modal.close=Fermer
-modal.ok=OK
+
 resource.attach.label=Pièce jointe
 resource.attach.placeholder=Emplacement.De.La.Page@PieceJointe.png
 resource.data.label=URI des données
@@ -113,8 +103,30 @@ resource.unc.label=Chemin UNC
 resource.unc.placeholder=//serveur/partage/chemin/du/fichier
 resource.unknown.label=Inconnu
 resource.url.label=URL
-resource.url.placeholder=http\://www.example.org/image.png 
+resource.url.placeholder=http://www.example.org/image.png 
 resource.user.label=Utilisateur
 resource.user.placeholder=alias
+
+entityResourceSuggester.doc.placeholder=Trouver une page...
+entityResourceSuggester.attach.placeholder=Trouver une pièce jointe...
+
+entityResourcePicker.select=Sélectionner
+entityResourcePicker.doc.title=Sélectionner la Page
+entityResourcePicker.attach.title=Sélectionner la pièce jointe
+
+macroSelector.title=Sélectionner la Macro
+macroSelector.filter.text.placeholder=Saisir le filtre
+macroSelector.filter.category.all=Toutes les macros
+macroSelector.filter.category.other=Autre
+macroSelector.failedToRetrieveMacros=Lister toutes les macros disponibles a échoué.
+macroSelector.select=Sélectionner
+
+macroEditor.title=Editer Macro
+macroEditor.more=Plus
+macroEditor.changeMacro=Modifier Macro
+macroEditor.submit=Envoyer
+macroEditor.content=Contenu
+macroEditor.noParameters=Cette macro n'a aucun paramètres.
+macroEditor.descriptorRequestFailed=La reherche du descripteur de la macro {0} a échoué.
 </content>
 </xwikidoc>

@@ -39,54 +39,56 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-CKEditor.ConfigClass_advanced=Napredna konfiguracija
-CKEditor.ConfigClass_advanced.hint=Možete napisati isječak JavaScript kôda za izravnu izmjenu konfiguracijskog objekta. Provjerite {0}CKEditor dokumentaciju{1} za listu dostupnih konfiguracijskih svojstava.
+  <content>CKEditor.ConfigClass_removePlugins=Onemogućeni priključci
+CKEditor.ConfigClass_removePlugins.hint=Lista onemogućenih priključaka.
+CKEditor.ConfigClass_removeButtons=Onemogućene značajke alatne trake
+CKEditor.ConfigClass_removeButtons.hint=Lista onemogućenih značajki alatne trake.
 CKEditor.ConfigClass_linkShowAdvancedTab=Poveznica\: Prikaži karticu Napredno
 CKEditor.ConfigClass_linkShowAdvancedTab.hint=Omogućava postavljanje atributa poveznica poput identifikatora, imena, klase ilil stila.
 CKEditor.ConfigClass_linkShowTargetTab=Poveznica\: Prikaži karticu Odredište
 CKEditor.ConfigClass_linkShowTargetTab.hint=Omogućava postavljanje atributa za odredište poveznice (npr. za otvaranje poveznice u novoj kartici).
-CKEditor.ConfigClass_removeButtons=Onemogućene značajke alatne trake
-CKEditor.ConfigClass_removeButtons.hint=Lista onemogućenih značajki alatne trake.
-CKEditor.ConfigClass_removePlugins=Onemogućeni priključci
-CKEditor.ConfigClass_removePlugins.hint=Lista onemogućenih priključaka.
-ckeditor.admin.reset=Ponovo postavi
-ckeditor.admin.reset.confirmation=Jeste li sigurni da želite obnoviti zadanu konfiguraciju? Sve vaše izmjene bit će izgubljene.
-ckeditor.admin.reset.hint=Obnovi zadanu konfiguraciju
+CKEditor.ConfigClass_advanced=Napredna konfiguracija
+CKEditor.ConfigClass_advanced.hint=Možete napisati isječak JavaScript kôda za izravnu izmjenu konfiguracijskog objekta. Provjerite {0}CKEditor dokumentaciju{1} za listu dostupnih konfiguracijskih svojstava.
+
 ckeditor.admin.saveComment=CKEditor konfiguracija ažurirana iz Upravljanja
+ckeditor.admin.reset=Ponovo postavi
+ckeditor.admin.reset.hint=Obnovi zadanu konfiguraciju
+ckeditor.admin.reset.confirmation=Jeste li sigurni da želite obnoviti zadanu konfiguraciju? Sve vaše izmjene bit će izgubljene.
+
+ckeditor.plugin.link.options=Opcije
 ckeditor.plugin.link.anchor=Sidro
+ckeditor.plugin.link.queryString=Niz znakova za upit
 ckeditor.plugin.link.defaultLabel=unesite labelu poveznice
 ckeditor.plugin.link.openInNewTab=Otvori poveznicu u novoj kartici
-ckeditor.plugin.link.options=Opcije
-ckeditor.plugin.link.queryString=Niz znakova za upit
-ckeditor.plugin.macro.buttonHint=XWiki makro
-ckeditor.plugin.macro.dedicatedInsertButtonHint=Umetni makro {0}
+
 ckeditor.plugin.macro.placeholder=makro\:{0}
+ckeditor.plugin.macro.buttonHint=XWiki makro
 ckeditor.plugin.macro.refreshFailed=Osvježavanje uređenog sadržaja nije uspjelo.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Umetni makro {0}
+
+### Missing: ckeditor.plugin.office.importer.title=Import Office File
+### Missing: ckeditor.plugin.office.importer.filePath=File Path
+### Missing: ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+### Missing: ckeditor.plugin.office.importer.filterStyles=Filter Styles
+### Missing: ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+### Missing: ckeditor.plugin.office.importer.required=Required
+### Missing: ckeditor.plugin.office.importer.import=Import
+### Missing: ckeditor.plugin.office.importer.inProgress=Importing office file...
+### Missing: ckeditor.plugin.office.importer.done=Office file successfully imported.
+### Missing: ckeditor.plugin.office.importer.fail=Office import failed.
+### Missing: ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
+### Missing: ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
+
 ckeditor.plugin.resource.notSpecified={0} nije naznačeno.
 ckeditor.plugin.save.leaveConfirmationMessage=Ima nespremljenih izmjena. Želite li ih zanemariti?
 ckeditor.plugin.source.conversionFailed=Konverzija nije uspjela.
-entityResourcePicker.attach.title=Odaberi privitak
-entityResourcePicker.doc.title=Odaberite stranicu
-entityResourcePicker.select=Odaberi
-entityResourceSuggester.attach.placeholder=Pronađi privitak...
-entityResourceSuggester.doc.placeholder=Pronađi stranicu...
-macroEditor.changeMacro=Promijeni makro
-macroEditor.content=Sadržaj
-macroEditor.descriptorRequestFailed=Dohvat macro opisnika {0} nije uspio.
-macroEditor.more=Još
-macroEditor.noParameters=Ovaj makro nema parametara.
-macroEditor.submit=Podnesi
-macroEditor.title=Uredi makro
-macroSelector.failedToRetrieveMacros=Dohvat liste dostupnih makroa nije uspio.
-macroSelector.filter.category.all=Svi makroi
-macroSelector.filter.category.other=Ostalo
-macroSelector.filter.text.placeholder=Unesi za filtriranje
-macroSelector.select=Odaberi
-macroSelector.title=Odaberi makro
+
+modal.ok=OK
 modal.cancel=Otkaži
 modal.close=Zatvori
-modal.ok=OK
+
 resource.attach.label=Privitak
 resource.attach.placeholder=Putanja.Prema.Stranici@privitak.png
 resource.data.label=Podatkovni URI
@@ -104,5 +106,27 @@ resource.url.label=URL
 resource.url.placeholder=http\://www.primjer.org/slika.png
 resource.user.label=Korisnik
 resource.user.placeholder=alias
+
+entityResourceSuggester.doc.placeholder=Pronađi stranicu...
+entityResourceSuggester.attach.placeholder=Pronađi privitak...
+
+entityResourcePicker.select=Odaberi
+entityResourcePicker.doc.title=Odaberite stranicu
+entityResourcePicker.attach.title=Odaberi privitak
+
+macroSelector.title=Odaberi makro
+macroSelector.filter.text.placeholder=Unesi za filtriranje
+macroSelector.filter.category.all=Svi makroi
+macroSelector.filter.category.other=Ostalo
+macroSelector.failedToRetrieveMacros=Dohvat liste dostupnih makroa nije uspio.
+macroSelector.select=Odaberi
+
+macroEditor.title=Uredi makro
+macroEditor.more=Još
+macroEditor.changeMacro=Promijeni makro
+macroEditor.submit=Podnesi
+macroEditor.content=Sadržaj
+macroEditor.noParameters=Ovaj makro nema parametara.
+macroEditor.descriptorRequestFailed=Dohvat macro opisnika {0} nije uspio.
 </content>
 </xwikidoc>

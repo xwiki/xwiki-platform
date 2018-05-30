@@ -40,28 +40,85 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>administration.title=Администрирование
+### Missing: administration.title.page=Page Administration
 administration.title.wiki=Администрирование Wiki
 administration.title.global=Глобальное администрирование
+### Missing: administration.sectionTitle=Administration: {0}
+### Missing: administration.sectionTitle.page=Page Administration: {0}
+### Missing: administration.sectionTitle.wiki=Wiki Administration: {0}
+### Missing: administration.sectionTitle.global=Global Administration: {0}
 administration.menu.search.hint=Искать...
 administration.menu.search.noResults=Ничего не найдено.
+
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Если установлено значение "да", то письмо будет отправлено на адрес электронной почты, указанный при заполнении регистрационной формы.
 XWiki.XWikiPreferences_auth_active_check.hint=Если задано значение "да", пользователи не смогут войти в систему без ввода маркера, который ранее был отправлен по электронной почте.
 XWiki.XWikiPreferences_validation_email_content.hint=Шаблон электронной почты, который будет отправлен пользователям для проверки их адреса электронной почты.
 XWiki.XWikiPreferences_confirmation_email_content.hint=Шаблон сообщения электронной почты, соответствующий сообщению электронной почты, отправленному после проверки учетной записи пользователя, щелкнув ссылку подтверждения в первом полученном им электронном письме.
 XWiki.XWikiPreferences_invitation_email_content.hint=Шаблон электронной почты, который будет отправлен пользователям, приглашенным для регистрации.
+
 XWiki.Registration_heading.hint=Это строка в верхней части страницы, которая показывается людям, которые регистрируются и когда они только что зарегистрировались. Velocity and wiki syntax may be used.
+### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
 XWiki.Registration_liveValidation_enabled.hint=Установите значение false, чтобы отключить код JavaScript для динамической проверки (поля будут по-прежнему проверяться на стороне сервера).
+### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
+### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
+### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
+### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
+### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
+### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
+
+# Look &amp; Feel Sections
+### Missing: admin.themes=Themes
+### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
+### Missing: admin.colorthemes.local=Local
+### Missing: admin.colorthemes.global=Global
+### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
+### Missing: XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
+### Missing: XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
+### Missing: XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
+### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
+### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
+### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
+### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
+### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
+### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
+### Missing: XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
+### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+
+# Editing Sections
+### Missing: admin.edit=Editing
+### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
+### Missing: admin.title=Title
+### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
+### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
 XWiki.XWikiPreferences_editcomment.hint=Разрешить ввод сообщения при создании новой версии страницы.
+### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
+### Missing: XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
 admin.wysiwyg.description=Выберите редактор WYSIWYG по умолчанию и настройте его.
+### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+
+# Localization Section
+### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
+### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
 XWiki.XWikiPreferences_default_language.hint=Выберите язык wiki по умолчанию
+### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
 XWiki.XWikiPreferences_timezone.hint=Глобально установить часовой пояс для дат
+
+# Import Section
+### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+
+# Export Section
+### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported content.
 administration.section.export.description.hint=Описание пакета, отображаемое при импорте пакета.
+### Missing: administration.section.export.licence.hint=The content licence. E.g.: LGPL, GPLV2, etc.
 administration.section.export.author.hint=Автор пакета.
 administration.section.export.version.hint=Версия пакета.
 administration.section.export.withHistory.hint=Включить историю страниц в экспорт. В противном случае экспортируется только последняя версия страницы.
+### Missing: administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.
+
 # Other Category
 admin.other=Прочее
 admin.other.description=Различные конфигурации для расширений.
-administration.section.analytics.status=Статус</content>
+administration.section.analytics.status=Статус
+### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
 </xwikidoc>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>application-ckeditor-pom</artifactId>
-    <version>1.21-SNAPSHOT</version>
+    <version>1.21</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>application-ckeditor-plugins</artifactId>

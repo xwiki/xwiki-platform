@@ -389,16 +389,20 @@ document.observe("xwiki:actions:preview", updateForShortcut);
 
 require(['jquery'], function ($) {
   var $container = $('.bottombuttons');
-  var $buttons = $container.find('.buttons');
-  var $window = $(window);
+  // Use the placeholder to get the initial container position
+  var $placeholder = $('<span></span>');
+  $placeholder.insertBefore($container);
 
-  $window.on("scroll resize load click", function() {
-    var position = $container.offset().top + $buttons.height() - $window.scrollTop();
+  $(window).on("scroll resize load click", function() {
+    var isFullScreen = $('.fullScreenWrapper').length > 0
+    var position = $placeholder.offset().top;
 
-    if (position > $window.height()) {
-      $buttons.addClass('buttons-fixed');
+    if (!isFullScreen && $(window).height() + $(window).scrollTop() < position) {
+      $container.addClass('bottombuttons-fixed');
+      $container.innerWidth($container.parent().width());
     } else {
-      $buttons.removeClass('buttons-fixed');
+      $container.removeClass('bottombuttons-fixed');
+      $container.innerWidth('');
     }
   });
 });

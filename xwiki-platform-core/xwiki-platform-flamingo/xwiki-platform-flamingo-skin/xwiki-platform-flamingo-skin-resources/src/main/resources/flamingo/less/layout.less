@@ -233,11 +233,18 @@
 
 #xwikieditor .main {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @xwiki-border-color;
+  box-shadow: 0 1px 2px @input-border;
 }
 
 #xwikieditcontent .main {
   background-color: @xwiki-page-content-bg;
+}
+
+#xwikieditcontent #content {
+  vertical-align: bottom;
+  border-radius: 0;
+  border-color: @input-border;
+  resize: vertical;
 }
 
 .main,

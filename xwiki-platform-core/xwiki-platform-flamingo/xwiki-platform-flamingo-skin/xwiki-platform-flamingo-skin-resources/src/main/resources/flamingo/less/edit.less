@@ -2,25 +2,34 @@
 // Edit
 // --------------------------------------------------
 
-#editcolumn, #inline {
-  .bottombuttons {
-    .buttons {
-      margin: 10px 0;
-      
-      &.buttons-fixed {
-        z-index: 1030;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: 0;
-        padding: 1em;
-        background-color: white;
-        box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
-      }
-    }
+
+.bottombuttons {
+  background-color: @xwiki-page-content-bg;
+  .buttons {
+    margin: 0;
+    padding: 1em;
   }
 
+  &.bottombuttons-fixed {
+    z-index: 100;
+    position: fixed;
+    bottom: 0;
+    background-color: @breadcrumb-bg;
+  }
+}
+
+.bottom-editor {
+  border: 1px solid @input-border;
+  border-top: 0;
+  .bottombuttons {
+    background-color: @xwiki-background-secondary-color;
+    &.bottombuttons-fixed {
+      border-top: 1px solid @input-border;
+    }
+  }
+}
+
+#editcolumn, #inline {
   .edit-meta-tools {
     .pull-right();
     margin: @breadcrumb-padding-vertical @breadcrumb-padding-horizontal 0 0;

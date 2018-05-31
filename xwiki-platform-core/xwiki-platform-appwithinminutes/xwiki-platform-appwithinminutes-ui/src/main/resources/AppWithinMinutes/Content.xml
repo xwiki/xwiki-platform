@@ -80,7 +80,8 @@
   {{/html}}
 #elseif ("$!type" != '')
   ## Include the content of the current document.
-  {{include reference=""/}}
+  ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
+  {{html}}$tdoc.getRenderedContent($tdoc.content, $tdoc.syntax.toIdString()).replace('{{', '&amp;amp;#123;&amp;amp;#123;'){{/html}}
 #else
   The display mode is not specified!
 #end

@@ -95,4 +95,14 @@ public interface RecordableEventDescriptor
         // Should be reimplemented
         return getApplicationIcon();
     }
+
+    /**
+     * @param wikiId id of the wiki
+     * @return either or not the descriptor is enabled in the given wiki
+     * @since 10.5RC1
+     * @since 9.11.6
+     */
+    default boolean isEnabled(String wikiId) {
+        return true;
+    }
 }

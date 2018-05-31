@@ -1,2 +1,8 @@
 org.xwiki.messagestream.internal.DefaultMessageStream
+org.xwiki.messagestream.internal.DefaultMessageStreamConfiguration
+org.xwiki.messagestream.internal.MessageStreamNotificationFilter
 org.xwiki.messagestream.script.MessageStreamScriptService
+org.xwiki.messagestream.DirectMessageDescriptor
+org.xwiki.messagestream.GroupMessageDescriptor
+org.xwiki.messagestream.PersonalMessageDescriptor
+org.xwiki.messagestream.PublicMessageDescriptor

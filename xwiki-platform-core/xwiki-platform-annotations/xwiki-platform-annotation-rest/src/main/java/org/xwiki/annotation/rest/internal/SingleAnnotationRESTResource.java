@@ -19,7 +19,6 @@
  */
 package org.xwiki.annotation.rest.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
@@ -37,7 +36,6 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationUpdateRequest;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.XWikiRestException;
 
 import com.xpn.xwiki.XWikiException;
@@ -54,12 +52,6 @@ import com.xpn.xwiki.XWikiException;
 @Singleton
 public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 {
-    /**
-     * Entity reference serializer used to get reference to the document to perform annotation operation on.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> referenceSerializer;
-
     /**
      * Deletes the specified annotation.
      *

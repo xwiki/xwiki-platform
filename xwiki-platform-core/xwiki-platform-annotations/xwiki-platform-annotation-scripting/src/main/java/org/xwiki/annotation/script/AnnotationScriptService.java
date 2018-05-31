@@ -374,7 +374,7 @@ public class AnnotationScriptService implements ScriptService
      */
     private String getCurrentUser()
     {
-        return getXWikiContext().getUser();
+        return this.serializer.serialize(getXWikiContext().getUserReference());
     }
 
     /**

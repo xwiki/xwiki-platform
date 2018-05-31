@@ -38,8 +38,6 @@ import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.internal.jmx.JMXVelocityEngine;
-import org.xwiki.velocity.internal.jmx.JMXVelocityEngineMBean;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -315,11 +313,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         VelocityFactory velocityFactory = getComponentManager().getInstance(VelocityFactory.class);
         VelocityEngine vengine = velocityFactory.createVelocityEngine("default", new Properties());
-        // Save the number of cached macro templates in the Velocity engine so that we can compare after the
-        // document is rendered.
-        JMXVelocityEngineMBean mbean = new JMXVelocityEngine(vengine);
-        int cachedMacroNamespaceSize = mbean.getTemplates().values().size();
-        assertTrue(cachedMacroNamespaceSize > 0);
 
         mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(vengine));
         mockVelocityManager.stubs().method("evaluate").will(new CustomStub("evaluate")
@@ -339,10 +332,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         // Verify that the macro located inside the TextArea has been taken into account when executing the doc's
         // content.
         assertEquals("<p>ok</p>", this.document.getRenderedContent(getContext()));
-
-        // Now verify that the Velocity Engine doesn't contain any more cached macro namespace to prove that
-        // getRenderedContent has correctly cleaned the Velocity macro cache.
-        assertEquals(cachedMacroNamespaceSize, mbean.getTemplates().values().size());
     }
 
     @Test

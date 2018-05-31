@@ -181,10 +181,6 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         this.reservedBindings.add("macro");
         // Foreach directive
         this.reservedBindings.add("foreach");
-        this.reservedBindings.add(this.velocityConfiguration.getProperties().getProperty(RuntimeConstants.COUNTER_NAME,
-            RuntimeSingleton.getString(RuntimeConstants.COUNTER_NAME)));
-        this.reservedBindings.add(this.velocityConfiguration.getProperties().getProperty(RuntimeConstants.HAS_NEXT_NAME,
-            RuntimeSingleton.getString(RuntimeConstants.HAS_NEXT_NAME)));
         // Evaluate directive
         this.reservedBindings.add("evaluate");
         // TryCatch directive

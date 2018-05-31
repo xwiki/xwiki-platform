@@ -893,7 +893,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private VelocityContext createVelocityContext()
     {
-        Properties properties = new Properties();
+        Map<String, Object> properties = new HashMap<>();
         properties.putAll(getDefaultConfigurationProperties());
         final Properties projectProperties = this.project.getProperties();
         for (Object key : projectProperties.keySet()) {
@@ -920,35 +920,35 @@ public class PackageMojo extends AbstractOldCoreMojo
         return context;
     }
 
-    private Properties getDefaultConfigurationProperties()
+    private Map<String, Object> getDefaultConfigurationProperties()
     {
-        Properties props = new Properties();
+        Map<String, Object> props = new HashMap<>();
 
         // Default configuration data for hibernate.cfg.xml
-        props.setProperty("xwikiDbConnectionUrl",
+        props.put("xwikiDbConnectionUrl",
             "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true");
-        props.setProperty("xwikiDbConnectionUsername", "sa");
-        props.setProperty("xwikiDbConnectionPassword", "");
-        props.setProperty("xwikiDbConnectionDriverClass", "org.hsqldb.jdbcDriver");
-        props.setProperty("xwikiDbDialect", "org.hibernate.dialect.HSQLDialect");
-        props.setProperty("xwikiDbHbmXwiki", "xwiki.hbm.xml");
-        props.setProperty("xwikiDbHbmFeeds", "feeds.hbm.xml");
+        props.put("xwikiDbConnectionUsername", "sa");
+        props.put("xwikiDbConnectionPassword", "");
+        props.put("xwikiDbConnectionDriverClass", "org.hsqldb.jdbcDriver");
+        props.put("xwikiDbDialect", "org.hibernate.dialect.HSQLDialect");
+        props.put("xwikiDbHbmXwiki", "xwiki.hbm.xml");
+        props.put("xwikiDbHbmFeeds", "feeds.hbm.xml");
 
         // Default configuration data for xwiki.cfg
-        props.setProperty("xwikiCfgPlugins",
+        props.put("xwikiCfgPlugins",
             "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
-        props.setProperty("xwikiCfgVirtualUsepath", "1");
-        props.setProperty("xwikiCfgEditCommentMandatory", "0");
-        props.setProperty("xwikiCfgDefaultSkin", "flamingo");
-        props.setProperty("xwikiCfgDefaultBaseSkin", "flamingo");
-        props.setProperty("xwikiCfgEncoding", "UTF-8");
+        props.put("xwikiCfgVirtualUsepath", "1");
+        props.put("xwikiCfgEditCommentMandatory", "0");
+        props.put("xwikiCfgDefaultSkin", "flamingo");
+        props.put("xwikiCfgDefaultBaseSkin", "flamingo");
+        props.put("xwikiCfgEncoding", "UTF-8");
 
         // Other default configuration properties
-        props.setProperty("xwikiDataDir", "data");
+        props.put("xwikiDataDir", "data");
 
         return props;
     }

@@ -301,18 +301,18 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# velocity.tools = <name under which it'll be available in the context> = <class name>
 #-# Default values (no need to add them)
 #-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool
-#-#   velocity.tools = numbertool = org.apache.velocity.tools.generic.NumberTool
-#-#   velocity.tools = datetool = org.apache.velocity.tools.generic.ComparisonDateTool
-#-#   velocity.tools = mathtool = org.apache.velocity.tools.generic.MathTool
+#-#   velocity.tools = numbertool = org.xwiki.velocity.internal.XWikiNumberTool
+#-#   velocity.tools = datetool = org.xwiki.velocity.internal.XWikiDateTool
+#-#   velocity.tools = mathtool = org.xwiki.velocity.internal.XWikiMathTool
 #-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
 #-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
 #-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool
-#-#   velocity.tools = stringtool = org.apache.commons.lang3.StringUtils
+#-#   velocity.tools = stringtool = org.xwiki.text.StringUtils
 #-#   velocity.tools = jsontool = org.xwiki.velocity.tools.JSONTool
 #-#   velocity.tools = urltool = org.xwiki.velocity.tools.URLTool
-#-#   velocity.tools = cookietool = org.apache.velocity.tools.view.CookieTool
 #-#   velocity.tools = exceptiontool = org.apache.commons.lang3.exception.ExceptionUtils
+#-#   velocity.tools = niotool = org.xwiki.velocity.tools.nio.NIOTool
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is
@@ -322,9 +322,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = directive.set.null.allowed = true
 #-#   velocity.properties = webapp.resource.loader.class = org.apache.velocity.tools.view.servlet.WebappLoader
 #-#   velocity.properties = velocimacro.messages.on = false
+#-#   velocity.properties = velocimacro.max.depth = 100
+#-#   velocity.properties = template.provide.scope.control = true
+#-#   velocity.properties = macro.provide.scope.control= true
 #-#   velocity.properties = resource.manager.logwhenfound = false
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
-#-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.xwiki.velocity.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy

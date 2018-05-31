@@ -101,7 +101,7 @@ public class ScriptVelocityContext extends VelocityContext
     }
 
     @Override
-    public Object internalRemove(Object key)
+    public Object internalRemove(String key)
     {
         try {
             return super.internalRemove(key);

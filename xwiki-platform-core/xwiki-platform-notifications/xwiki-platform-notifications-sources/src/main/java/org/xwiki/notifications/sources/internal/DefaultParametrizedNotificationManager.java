@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
@@ -77,6 +78,9 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     @Inject
     @Named(EventReadEmailFilter.FILTER_NAME)
     private NotificationFilter eventReadEmailFilter;
+
+    @Inject
+    private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
 
     @Override
     public List<CompositeEvent> getEvents(NotificationParameters parameters)
@@ -141,11 +145,16 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         }
     }
 
-    private boolean filterEvent(Event event, NotificationParameters parameters)
+    private boolean filterEvent(Event event, NotificationParameters parameters) throws EventStreamException
     {
         // Don't record events that have a target that don't include the current user
         if (!event.getTarget().isEmpty()
             && (parameters.user == null || !event.getTarget().contains(serializer.serialize(parameters.user)))) {
+            return true;
+        }
+
+        // Don't record events that concern an event type for which we don't have a descriptor
+        if (!recordableEventDescriptorHelper.hasDescriptor(event.getType(), parameters.user)) {
             return true;
         }
 

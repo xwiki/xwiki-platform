@@ -28,8 +28,11 @@ import org.xwiki.messagestream.MessageStreamConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
+ * Default implementation of {@link MessageStreamConfiguration}.
+ *
  * @version $Id$
- * @since
+ * @since 10.5RC1
+ * @since 9.11.6
  */
 @Component
 @Singleton
@@ -39,7 +42,7 @@ public class DefaultMessageStreamConfiguration implements MessageStreamConfigura
     private DocumentAccessBridge documentAccessBridge;
 
     @Override
-    public boolean isEnabled(String wikiId)
+    public boolean isActive(String wikiId)
     {
         DocumentReference configPage = new DocumentReference(wikiId, "XWiki", "MessageStreamConfig");
         return Integer.valueOf(1).equals(documentAccessBridge.getProperty(configPage, configPage, "active"));

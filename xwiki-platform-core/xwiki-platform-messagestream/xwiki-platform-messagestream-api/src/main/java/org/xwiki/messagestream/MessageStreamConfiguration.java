@@ -22,11 +22,18 @@ package org.xwiki.messagestream;
 import org.xwiki.component.annotation.Role;
 
 /**
+ * Configuration for the Message Stream application.
+ *
  * @version $Id$
- * @since
+ * @since 10.5RC1
+ * @since 9.11.6
  */
 @Role
 public interface MessageStreamConfiguration
 {
-    boolean isEnabled(String wikiId);
+    /**
+     * @param wikiId the id of a wiki
+     * @return either or not the message stream uis active on the given wiki
+     */
+    boolean isActive(String wikiId);
 }

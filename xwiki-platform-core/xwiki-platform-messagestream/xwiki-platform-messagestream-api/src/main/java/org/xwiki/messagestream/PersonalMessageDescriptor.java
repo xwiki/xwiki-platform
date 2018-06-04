@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
 
 /**
+ * Descriptor for the personal messages (to the followers).
+ *
  * @version $Id$
  * @since 10.5RC1
  * @since 9.11.6
@@ -35,6 +37,9 @@ import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
 @Singleton
 public class PersonalMessageDescriptor extends AbstractMessageDescriptor
 {
+    /**
+     * Event type described by this descriptor.
+     */
     public static final String EVENT_TYPE = "personalMessage";
 
     /**

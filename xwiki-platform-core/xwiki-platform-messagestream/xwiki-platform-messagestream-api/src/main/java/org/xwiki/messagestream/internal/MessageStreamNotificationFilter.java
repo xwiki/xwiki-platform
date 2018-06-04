@@ -43,8 +43,11 @@ import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
+ * Filter that make sure a message from the message stream is visible by the current user.
+ *
  * @version $Id$
- * @since
+ * @since 10.5RC1
+ * @since 9.11.6
  */
 @Component
 @Singleton
@@ -61,7 +64,10 @@ public class MessageStreamNotificationFilter implements NotificationFilter
         if (DirectMessageDescriptor.EVENT_TYPE.equals(event.getType()) && !user.equals(event.getUser())) {
             return FilterPolicy.FILTER;
         }
-        
+        // TODO
+        // Messages to the followers.
+        // Case 1: the sender of the message is followed by the current user
+        // Case 2: the notifications macro is used to displayed all events of the sender of this message
 
         return FilterPolicy.NO_EFFECT;
     }

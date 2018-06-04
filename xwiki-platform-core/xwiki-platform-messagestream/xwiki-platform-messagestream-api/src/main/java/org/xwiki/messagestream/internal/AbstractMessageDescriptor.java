@@ -59,6 +59,6 @@ public abstract class AbstractMessageDescriptor extends AbstractRecordableEventD
     @Override
     public boolean isEnabled(String wikiId)
     {
-        return messageStreamConfiguration.isEnabled(wikiId);
+        return messageStreamConfiguration.isActive(wikiId);
     }
 }

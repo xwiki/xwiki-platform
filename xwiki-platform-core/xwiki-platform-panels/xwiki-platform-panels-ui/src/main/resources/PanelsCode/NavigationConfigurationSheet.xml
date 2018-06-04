@@ -491,6 +491,19 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     }
     excludedPagesPane.removeClass('dropTarget');
   });
+
+  // Prevent drag &amp; drop for tree nodes that are not on the top level.
+  $('.navigationPanelConfiguration .xtree').on('model.jstree', function(event, data) {
+    if (data.parent !== '#') {
+      let tree = data.instance;
+      $.each(data.nodes, function(index, nodeId) {
+        let node = tree.get_node(nodeId);
+        if (node &amp;&amp; node.data) {
+          node.data.draggable = false;
+        }
+      });
+    }
+  })
 });</code>
     </property>
     <property>

@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.inject.Inject;
 
@@ -43,6 +42,7 @@ import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
 import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.XWikiResource;
 
 import com.xpn.xwiki.XWiki;
@@ -82,6 +82,12 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      */
     @Inject
     protected Execution execution;
+    
+    /**
+     * Entity reference serializer used to get reference to the document to perform annotation operation on.
+     */
+    @Inject
+    protected EntityReferenceSerializer<String> referenceSerializer;
 
     /**
      * Builds an annotation response containing the annotated content along with the annotation stubs, according to the
@@ -300,7 +306,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      */
     protected String getXWikiUser()
     {
-        return this.xcontextProvider.get().getUser();
+        return this.referenceSerializer.serialize(this.xcontextProvider.get().getUserReference());
     }
 
     /**

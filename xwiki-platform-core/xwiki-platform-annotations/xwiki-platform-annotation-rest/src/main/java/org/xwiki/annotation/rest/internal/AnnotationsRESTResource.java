@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -48,7 +47,6 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationRequest;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.XWikiRestException;
 
 import com.xpn.xwiki.XWikiException;
@@ -73,12 +71,6 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      */
 
     private static final String ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX = "filter_";
-
-    /**
-     * Entity reference serializer used to get reference to the document to perform annotation operation on.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> referenceSerializer;
 
     /**
      * @param wiki the wiki of the document to get annotations for

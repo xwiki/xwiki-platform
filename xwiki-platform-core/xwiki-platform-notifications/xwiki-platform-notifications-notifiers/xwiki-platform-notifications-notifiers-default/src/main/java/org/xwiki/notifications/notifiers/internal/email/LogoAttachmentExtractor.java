@@ -28,16 +28,18 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.environment.Environment;
+import org.xwiki.filter.input.InputSource;
+import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.skin.Resource;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,13 +56,6 @@ public class LogoAttachmentExtractor
     private static final String LOGO = "logo";
 
     private static final String SVG_EXTENSION = ".svg";
-
-    /**
-     * Used to get file resources.
-     */
-    @Inject
-    private Environment environment;
-
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
@@ -94,8 +89,8 @@ public class LogoAttachmentExtractor
             }
             if (isLogoAttachementValid(doc, logo)) {
                 XWikiAttachment attachment = doc.getAttachment(logo);
-                attachment.setFilename(LOGO);
-                return new Attachment(new Document(doc, context), attachment, context);
+
+                return toLogoAttachment(attachment, context);
             }
         }
 
@@ -107,18 +102,52 @@ public class LogoAttachmentExtractor
             String logo = doc.getStringValue(LOGO);
             if (isLogoAttachementValid(doc, logo)) {
                 XWikiAttachment attachment = doc.getAttachment(logo);
-                attachment.setFilename(LOGO);
-                return new Attachment(new Document(doc, context), attachment, context);
+
+                return toLogoAttachment(attachment, context);
             }
         }
 
-        XWikiAttachment fakeAttachment = new XWikiAttachment();
-        Resource sourceImageIS = internalSkinManager.getCurrentSkin(true).getResource("logo.png");
-        InputStream inputStream = environment.getResourceAsStream(sourceImageIS.getPath());
-        fakeAttachment.setAttachment_content(new XWikiAttachmentContent());
-        fakeAttachment.getAttachment_content().setContent(inputStream);
-        fakeAttachment.setFilename(LOGO);
-        return new Attachment(null, fakeAttachment, context);
+        return newLogoAttachment("image/png", this.internalSkinManager.getCurrentSkin(true).getResource("logo.png"),
+            context);
+    }
+
+    private Attachment toLogoAttachment(XWikiAttachment attachment, XWikiContext xcontext) throws XWikiException
+    {
+        // Make sure attachment content is loaded
+        attachment.loadAttachmentContent(xcontext);
+
+        // Make sure the attachment have the right name
+        if (!attachment.getFilename().equals(LOGO)) {
+            return newLogoAttachment(attachment.getMimeType(xcontext), attachment.getAttachment_content(), xcontext);
+        } else {
+            return new Attachment(attachment.getDoc().newDocument(xcontext), attachment, xcontext);
+        }
+    }
+
+    private Attachment newLogoAttachment(String mimeType, XWikiAttachmentContent content, XWikiContext xcontext)
+    {
+        XWikiAttachment attachment = new XWikiAttachment(null, LOGO);
+        attachment.setAttachment_content(content);
+        attachment.setMimeType(mimeType);
+
+        return new Attachment(null, attachment, xcontext);
+    }
+
+    private Attachment newLogoAttachment(String mimeType, Resource sourceImageIS, XWikiContext xcontext)
+        throws Exception
+    {
+        InputSource inputSource = sourceImageIS.getInputSource();
+
+        if (inputSource instanceof InputStreamInputSource) {
+            try (InputStream inputStream = ((InputStreamInputSource) inputSource).getInputStream()) {
+                XWikiAttachmentContent content = new XWikiAttachmentContent();
+                content.setContent(inputStream);
+
+                return newLogoAttachment(mimeType, content, xcontext);
+            }
+        }
+
+        throw new NotificationException("Unsupported logo input source [" + inputSource + "]");
     }
 
     private boolean isLogoAttachementValid(XWikiDocument doc, String logo)

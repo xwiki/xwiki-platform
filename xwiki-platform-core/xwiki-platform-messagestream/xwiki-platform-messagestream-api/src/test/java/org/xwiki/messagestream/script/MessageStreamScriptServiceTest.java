@@ -22,20 +22,20 @@ package org.xwiki.messagestream.script;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.messagestream.MessageStream;
+import org.xwiki.messagestream.MessageStreamConfiguration;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link MessageStreamScriptService}.
@@ -54,6 +54,10 @@ public class MessageStreamScriptServiceTest
 
     private MessageStreamScriptService streamService;
 
+    private DocumentAccessBridge documentAccessBridge;
+
+    private MessageStreamConfiguration messageStreamConfiguration;
+
     private ExecutionContext executionContext;
 
     @Before
@@ -64,6 +68,9 @@ public class MessageStreamScriptServiceTest
         Execution execution = this.mocker.getInstance(Execution.class);
         this.executionContext = new ExecutionContext();
         when(execution.getContext()).thenReturn(this.executionContext);
+
+        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
+        messageStreamConfiguration = mocker.getInstance(MessageStreamConfiguration.class);
     }
 
     @Test
@@ -163,20 +170,14 @@ public class MessageStreamScriptServiceTest
     @Test
     public void isActive() throws Exception
     {
-        XWikiContext xcontext = mock(XWikiContext.class);
-        this.executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(
+                new DocumentReference("wikiA", "Space", "Page"),
+                new DocumentReference("wikiB", "Space", "Page"));
+        when(messageStreamConfiguration.isActive("wikiA")).thenReturn(true);
+        when(messageStreamConfiguration.isActive("wikiB")).thenReturn(false);
 
-        XWiki xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(xwiki.getDocument(any(EntityReference.class), any(XWikiContext.class))).thenReturn(document);
-
-        BaseObject object = mock(BaseObject.class);
-        when(document.getXObject(any(EntityReference.class))).thenReturn(object);
-
-        when(object.getIntValue("active")).thenReturn(1);
-
-        assertTrue(this.streamService.isActive());
+        // Test
+        assertTrue(mocker.getComponentUnderTest().isActive());
+        assertFalse(mocker.getComponentUnderTest().isActive());
     }
 }

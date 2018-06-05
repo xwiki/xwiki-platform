@@ -21,7 +21,9 @@ package org.xwiki.notifications.filters.expression.generics;
 
 import java.util.Date;
 
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.filters.expression.DateValueNode;
+import org.xwiki.notifications.filters.expression.EntityReferenceNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
@@ -74,6 +76,20 @@ public final class ExpressionBuilder
     public static DateValueNode value(Date value)
     {
         return new DateValueNode(value);
+    }
+
+    /**
+     * Instantiate a new {@link EntityReferenceNode} using the given value.
+     *
+     * @param value the value of the node
+     * @return the generated {@link EntityReferenceNode}
+     *
+     * @since 10.5RC1
+     * @since 9.11.6
+     */
+    public static EntityReferenceNode value(EntityReference value)
+    {
+        return new EntityReferenceNode(value);
     }
 
     /**

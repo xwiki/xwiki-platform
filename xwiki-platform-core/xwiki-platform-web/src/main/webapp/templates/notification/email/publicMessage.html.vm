@@ -1,0 +1,8 @@
+###
+### Include some macros
+###
+#template('notification/email/macros.vm')
+###
+### Display the event
+###
+#displayNotificationSkeleton("#displayNotificationLeftCell($event)", "#displayMessageNotificationRightCell($event, 'messagestream.notification.publicMessage.description')")

@@ -136,6 +136,7 @@
           #end
           &lt;li class="empty"&gt;
             $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.empty'))
+            &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_exclusions" value="" /&gt;
           &lt;/li&gt;
         &lt;/ul&gt;
       &lt;/div&gt;
@@ -470,8 +471,21 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     excludedPagesPane.removeClass('dropTarget');
   });
 
+  // Fix the empty tree.
+  $('.navigationPanelConfiguration .xtree').on('ready.jstree', function(event, data) {
+    let tree = data.instance;
+    let emptyNode = tree.get_node('empty');
+    if (emptyNode) {
+      // Delete the empty node.
+      emptyNode.data.canDelete = true;
+      tree.delete_node(emptyNode);
+      // Make sure the root node accepts document nodes as children.
+      let root = tree.get_node(emptyNode.parent);
+      root.data.validChildren = ['document'];
+    }
+
   // Prevent drag &amp; drop for tree nodes that are not on the top level.
-  $('.navigationPanelConfiguration .xtree').on('model.jstree', function(event, data) {
+  }).on('model.jstree', function(event, data) {
     if (data.parent !== '#') {
       let tree = data.instance;
       $.each(data.nodes, function(index, nodeId) {

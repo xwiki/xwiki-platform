@@ -228,11 +228,20 @@
    * Display a line of the table of content and its children if any
    *#
   #macro(displaySortedEventTOC $ev)
-    #set ($discard = $displayedDocuments.add($ev.event.document))
-    #set ($document = $xwiki.getDocument($ev.event.document))
-    ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape
-    ## tools to display the title.
-    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #ccc;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $document.displayTitle)
+    #if ($ev.event.events.get(0).application == 'MessageStream')
+      #define ($user)
+        #set ($userRef = $ev.event.events.get(0).user)
+        #displayUserAvatar($userRef) $xwiki.getPlainUserName($userRef)
+      #end
+      #set ($title = $services.localization.render('messagestream.notification.email.tocItem', [$user]))
+    #else
+      #set ($discard = $displayedDocuments.add($ev.event.document))
+      #set ($document = $xwiki.getDocument($ev.event.document))
+      ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape
+      ## tools to display the title.
+      #set ($title = $document.displayTitle)
+    #end
+    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #ccc;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $title)
       #if ($ev.hasChildren())
         <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;">
         #foreach ($child in $ev.children)
@@ -287,4 +296,35 @@
   #foreach ($ev in $sortedEvent.children)
     #displaySortedEvent($ev)
   #end
+#end
+
+#**
+ * Display the right cell of a message notification
+ * TODO: find a way to move it to the "message stream" module
+ * @since 10.5RC1
+ * @since 9.11.6
+ *#
+#macro(displayMessageNotificationRightCell $event $translationKey)
+  #set ($messageEvent = $event.events[0])
+  ###
+  ### Description, users and date
+  ###
+  $services.localization.render($translationKey, ["#displayEmailNotificationEventUser($messageEvent.user, false)"])
+  <blockquote style="padding: 0 1em; margin: 0.5em 0; border-left: 5px solid #ddd;">
+    $messageEvent.body
+  </blockquote>
+  #displayNotificationDate($event)
+#end
+
+#**
+ * Display the plain text version of a message notification
+ *#
+#macro(displayPlainMessageNotification $compositeEvent $translationKey)
+#set ($messageEvent = $compositeEvent.events[0])
+$services.localization.render('messagestream.descriptors.applicationName'):
+  $services.localization.render($translationKey, [$xwiki.getPlainUserName($messageEvent.user)])
+  ---
+  $messageEvent.body
+  ---
+  $compositeEvent.dates.get(0)
 #end

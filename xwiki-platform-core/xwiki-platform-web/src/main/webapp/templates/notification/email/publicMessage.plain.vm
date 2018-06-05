@@ -1,0 +1,9 @@
+### TODO: find a way to move it to the "message stream" module
+###
+### Include some macros
+###
+#template('notification/email/macros.vm')
+###
+### Display the event
+###
+#displayPlainMessageNotification($event, 'messagestream.notification.publicMessage.description')

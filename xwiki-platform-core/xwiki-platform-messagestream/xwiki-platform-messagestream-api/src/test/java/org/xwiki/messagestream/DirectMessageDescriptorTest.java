@@ -56,7 +56,7 @@ public class DirectMessageDescriptorTest
     @Test
     public void getApplicationIcon() throws Exception
     {
-        assertEquals("envelope", mocker.getComponentUnderTest().getApplicationIcon());
+        assertEquals("comment", mocker.getComponentUnderTest().getApplicationIcon());
     }
 
     @Test

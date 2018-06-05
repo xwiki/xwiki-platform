@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
 
 /**
+ * Descriptor for the messages sent to a group.
+ *
  * @version $Id$
  * @since 10.5RC1
  * @since 9.11.6
@@ -53,5 +55,13 @@ public class GroupMessageDescriptor extends AbstractMessageDescriptor
     public String getEventTypeIcon()
     {
         return "group";
+    }
+
+    @Override
+    public boolean isEnabled(String wikiId)
+    {
+        // TODO: enable this descriptor and add a notification filter so users only get messages that are sent to a
+        // group they belong to.
+        return false;
     }
 }

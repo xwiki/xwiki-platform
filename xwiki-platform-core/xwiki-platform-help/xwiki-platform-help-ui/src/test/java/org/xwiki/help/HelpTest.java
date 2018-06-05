@@ -21,7 +21,7 @@ package org.xwiki.help;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -31,8 +31,8 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XHTML10ComponentList;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for testing the {@code XWiki.XWikiSyntax} wiki page.
@@ -66,15 +66,16 @@ public class HelpTest extends PageTest
         // Register query script service since it's not registered by default and it's used in XWiki.XWikiSyntax to
         // find all syntax pages.
         QueryManagerScriptService qss = mock(QueryManagerScriptService.class);
-        mocker.registerComponent(ScriptService.class, "query", qss);
+        componentManager.registerComponent(ScriptService.class, "query", qss);
         ScriptQuery sq = mock(ScriptQuery.class);
         when(qss.xwql(contains("from doc.object(XWiki.XWikiSyntaxClass)"))).thenReturn(sq);
         when(sq.addFilter((String)any())).thenReturn(sq);
         when(sq.execute()).thenReturn(Arrays.asList("XWiki.XWikiSyntaxLinks"));
 
         String result = renderPage(new DocumentReference("xwiki", "XWiki", "XWikiSyntax"));
-        assertTrue("$subHeading should have been evaluated and replaced by '==='", result.contains(
-            "<h3 id=\"HXWikiSyntax2.1LinkSpecification\""));
-        assertTrue("$subHeading should have been evaluated and replaced by '==='", !result.contains("$subHeading"));
+        assertTrue(result.contains("<h3 id=\"HXWikiSyntax2.1LinkSpecification\""),
+            "$subHeading should have been evaluated and replaced by '==='");
+        assertTrue(!result.contains("$subHeading"),
+            "$subHeading should have been evaluated and replaced by '==='");
     }
 }

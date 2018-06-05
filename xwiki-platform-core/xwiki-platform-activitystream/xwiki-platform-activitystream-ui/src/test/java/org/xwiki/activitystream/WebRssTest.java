@@ -21,8 +21,8 @@ package org.xwiki.activitystream;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -35,8 +35,8 @@ import org.xwiki.test.page.XWikiSyntax20ComponentList;
 import com.xpn.xwiki.plugin.feed.FeedPlugin;
 import com.xpn.xwiki.plugin.feed.FeedPluginApi;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for testing the {@code Main.WebRss} wiki page.
@@ -50,7 +50,7 @@ public class WebRssTest extends PageTest
 {
     private ScriptQuery query;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         setOutputSyntax(Syntax.PLAIN_1_0);

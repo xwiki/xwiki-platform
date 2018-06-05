@@ -89,19 +89,6 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
         ExtensionContext.Namespace.create(MockitoOldCoreExtension.class);
 
     @Override
-    public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception
-    {
-        super.postProcessTestInstance(testInstance, context);
-
-        // Inject the MockitoOldcore instance in all fields annotated with @InjectMockitoOldcore
-        for (Field field : testInstance.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(InjectMockitoOldcore.class)) {
-                ReflectionUtils.setFieldValue(testInstance, field.getName(), loadMockitoOldcore(context));
-            }
-        }
-    }
-
-    @Override
     protected void initializeMockitoComponentManager(Object testInstance, MockitoComponentManager mcm,
         ExtensionContext context) throws Exception
     {
@@ -109,6 +96,15 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
         removeMockitoOldcore(context);
         MockitoOldcore oldcore = new MockitoOldcore(mcm);
         saveMockitoOldcore(context, oldcore);
+
+        // Inject the MockitoOldcore instance in all fields annotated with @InjectMockitoOldcore
+        // Note: we inject the field before the CM init in case there's a @BeforeComponent method that wants to use
+        // the @InjectMockitoOldcore field.
+        for (Field field : ReflectionUtils.getAllFields(testInstance.getClass())) {
+            if (field.isAnnotationPresent(InjectMockitoOldcore.class)) {
+                ReflectionUtils.setFieldValue(testInstance, field.getName(), loadMockitoOldcore(context));
+            }
+        }
 
         // Initialize the CM
         mcm.initializeTest(testInstance, mcm, oldcore);

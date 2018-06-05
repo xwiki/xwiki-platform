@@ -25,6 +25,8 @@ import org.xwiki.eventstream.AbstractRecordableEventDescriptor;
 import org.xwiki.messagestream.MessageStreamConfiguration;
 
 /**
+ * Common code for all message's descriptors.
+ *
  * @version $Id$
  * @since 10.5RC1
  * @since 9.11.6
@@ -47,7 +49,7 @@ public abstract class AbstractMessageDescriptor extends AbstractRecordableEventD
     @Override
     public String getApplicationIcon()
     {
-        return "envelope";
+        return "comment";
     }
 
     @Override

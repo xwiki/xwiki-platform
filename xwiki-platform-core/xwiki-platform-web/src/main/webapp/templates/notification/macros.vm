@@ -166,3 +166,20 @@ $xwiki.getPlainUserName($user)##
 #end
 #end##
 #end##
+#**
+ * Display a notification for a message sent through the Message Stream.
+ * TODO: find a way to move it to the "message stream" module
+ * @since 10.5RC1
+ * @since 9.11.6
+ *#
+#macro(displayMessageNotification $compositeEvent $translationKey $icon)
+  #define($content)
+    #set ($messageEvent = $event.events[0])
+    <p>$services.localization.render($translationKey, ["#displayNotificationEventUser($messageEvent.user, false)"])</p>
+    <blockquote>
+     $messageEvent.body
+    </blockquote>
+    <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
+  #end
+  #displayNotificationEventSkeleton($icon, 'comment', $content, '')
+#end

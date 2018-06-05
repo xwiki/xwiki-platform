@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
 
 /**
+ * Descriptor for the public messages.
+ *
  * @version $Id$
  * @since 10.5RC1
  * @since 9.11.6

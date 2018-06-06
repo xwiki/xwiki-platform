@@ -50,7 +50,8 @@
     #set($classFullName = $liveTableObj.getProperty('class').value)
     #set($className = $stringtool.removeEnd($classFullName, 'Class'))
     #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
-    #set ($creationRestrictions = $xwiki.getDocument($templateProviderReference).getValue('creationRestrictions'))
+    #set ($templateProvider = $xwiki.getDocument($templateProviderReference))
+    #set ($creationRestrictions = $templateProvider.getValue('creationRestrictions'))
     #if ($creationRestrictions)
       #if ($creationRestrictions.size() &gt; 0)
         #set ($dataSpaceRef = $services.model.resolveSpace($creationRestrictions.get(0)))
@@ -81,7 +82,12 @@
         = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
         #if($hasCreateData)
           * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
-            #set($entryDoc = $services.model.resolveDocument('__entryName__', 'explicit', $dataSpaceRef))
+            #if ("$!templateProvider.getValue('terminal')" == '1')
+              #set ($entryReference = $services.model.createDocumentReference('__entryName__', $dataSpaceRef))
+            #else
+              #set ($entryReference = $services.model.resolveDocument('', 'default',
+                $services.model.createSpaceReference('__entryName__', $dataSpaceRef)))
+            #end
             ## We need to set the title if we want to be able to sort or filter the doc.title live table column.
             #set ($params = {
               'template': "${className}Template",
@@ -100,7 +106,7 @@
                 'form_token': $services.csrf.token
               }))
             #end
-            {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, $action, $escapetool.url($params))" /&gt;{{/html}}
+            {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryReference, $action, $escapetool.url($params))" /&gt;{{/html}}
         #end
         #if($hasEditApplication)
           #set ($queryString = $escapetool.url({

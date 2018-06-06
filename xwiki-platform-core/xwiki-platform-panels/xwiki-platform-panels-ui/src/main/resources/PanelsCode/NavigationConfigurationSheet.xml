@@ -136,6 +136,7 @@
           #end
           &lt;li class="empty"&gt;
             $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.empty'))
+            &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_exclusions" value="" /&gt;
           &lt;/li&gt;
         &lt;/ul&gt;
       &lt;/div&gt;
@@ -345,12 +346,17 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     });
   };
 
-  let createNode = function(tree, page) {
-    let index = Math.max(0, parseInt(page.data('index')));
-    if (!isFinite(index)) {
-      index = 'last';
+  let showOrCreateNode = function(tree, page) {
+    let node = tree.get_node('document:' + page.data('reference'));
+    if (node) {
+      tree.show_node(node.id);
+    } else {
+      let index = Math.max(0, parseInt(page.data('index')));
+      if (!isFinite(index)) {
+        index = 'last';
+      }
+      tree.create_node(null, getNodeData(page), index);
     }
-    tree.create_node(null, getNodeData(page), index);
   };
 
   let onDropPage = function(tree) {
@@ -361,7 +367,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     includeTopLevelExtensionPage(reference);
     includeOtherPage(reference);
     // Add the corresponding node to the navigation tree.
-    tree &amp;&amp; createNode(tree, page);
+    tree &amp;&amp; showOrCreateNode(tree, page);
   };
 
   // Drop excluded page over the Navigation Panel.
@@ -387,12 +393,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   let excludeTopLevelExtensionPages = function() {
     let tree = $('.navigationPanelConfiguration .jstree').jstree(true);
     tree &amp;&amp; $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
-      let page = $(this);
-      let node = tree.get_node('document:' + page.data('reference'));
-      if (node) {
-        page.attr(getPageDataAttributes(tree, node));
-        scheduleDeleteNode(tree, node);
-      }
+      tree.hide_node('document:' + $(this).data('reference'));
     });
   };
 
@@ -404,7 +405,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         return $(this).data('reference') === page.data('reference');
       });
       if (otherExclusionsForThisPage.length === 0) {
-        createNode(tree, page);
+        showOrCreateNode(tree, page);
       }
     });
   };
@@ -423,22 +424,13 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   // Drag from the Navigation Panel and drop over the Excluded Pages.
   //
 
-  let getPageDataAttributes = function(tree, node) {
-    return {
-      'data-reference': node.data.id,
-      'data-index': $.inArray(node.id, tree.get_node(node.parent).children),
-      'data-children': !node.state.loaded || node.children.length &gt; 0
-    };
-  };
-
   let excludeTopLevelExtensionPage = function(tree, node) {
     let excluded = false;
     if (topLevelExtensionPagesFilterToggle.prop('checked')) {
       $('.exclusion-filter.topLevelExtensionPages .page.included').each(function() {
         let page = $(this);
         if (page.data('reference') === node.data.id) {
-          page.removeClass('included').attr(getPageDataAttributes(tree, node))
-            .draggable('enable').find('input').remove();
+          page.removeClass('included').draggable('enable').find('input').remove();
           excluded = true;
         }
       });
@@ -447,7 +439,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   };
 
   let excludeOtherPage = function(tree, node) {
-    let page = $('&lt;li class="page"/&gt;').attr(getPageDataAttributes(tree, node))
+    let page = $('&lt;li class="page"/&gt;').attr('data-reference', node.data.id)
       .append($('&lt;a/&gt;').attr('href', node.a_attr.href).text(node.text))
       .append($('&lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_exclusions"/&gt;')
         .val(getLocalDocumentReference(node.data.id)));
@@ -459,21 +451,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     let node = tree.get_node(nodeId);
     if (node &amp;&amp; node.data &amp;&amp; node.data.type === 'document') {
       excludeTopLevelExtensionPage(tree, node) || excludeOtherPage(tree, node);
-      scheduleDeleteNode(tree, node);
+      tree.hide_node(nodeId);
     }
-  };
-
-  let deleteNode = function(tree, node) {
-    // Make sure the tree doesn't attempt to delete the page on the server.
-    delete node.data.id;
-    tree.delete_node(node.id);
-  };
-
-  // Delete the node after we process all the excluded pages, in order to save the right node index.
-  let scheduleDeleteNode = function(tree, node) {
-    setTimeout(function() {
-      deleteNode(tree, node);
-    }, 0);
   };
 
   let excludedPagesPane = $('.navigationPanelConfiguration .panel.panel-info').first();
@@ -491,6 +470,32 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     }
     excludedPagesPane.removeClass('dropTarget');
   });
+
+  // Fix the empty tree.
+  $('.navigationPanelConfiguration .xtree').on('ready.jstree', function(event, data) {
+    let tree = data.instance;
+    let emptyNode = tree.get_node('empty');
+    if (emptyNode) {
+      // Delete the empty node.
+      emptyNode.data.canDelete = true;
+      tree.delete_node(emptyNode);
+      // Make sure the root node accepts document nodes as children.
+      let root = tree.get_node(emptyNode.parent);
+      root.data.validChildren = ['document'];
+    }
+
+  // Prevent drag &amp; drop for tree nodes that are not on the top level.
+  }).on('model.jstree', function(event, data) {
+    if (data.parent !== '#') {
+      let tree = data.instance;
+      $.each(data.nodes, function(index, nodeId) {
+        let node = tree.get_node(nodeId);
+        if (node &amp;&amp; node.data) {
+          node.data.draggable = false;
+        }
+      });
+    }
+  })
 });</code>
     </property>
     <property>

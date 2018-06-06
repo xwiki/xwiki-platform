@@ -26,8 +26,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
@@ -43,7 +43,7 @@ import org.xwiki.velocity.tools.RegexTool;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.tag.TagPluginApi;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -61,7 +61,7 @@ public class LiveTableResultsTest extends PageTest
 
     private Map<String, Object> results;
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("deprecation")
     public void setUp() throws Exception
     {

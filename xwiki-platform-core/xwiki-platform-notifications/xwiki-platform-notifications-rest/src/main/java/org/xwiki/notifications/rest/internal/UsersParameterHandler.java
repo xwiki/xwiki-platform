@@ -20,7 +20,9 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,8 +33,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.text.StringUtils;
+
+import com.google.common.collect.Sets;
 
 /**
  *  Handle the "users" parameters of the REST API.
@@ -82,6 +90,22 @@ public class UsersParameterHandler
                 }
             }
             parameters.filters.add(new FollowedUserOnlyEventFilter(entityReferenceSerializer, userList));
+
+            addFilterPreference(parameters, userList);
         }
+    }
+
+    private void addFilterPreference(NotificationParameters parameters, List<String> userList)
+    {
+        DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference("userRestFilters");
+        pref.setFilterType(NotificationFilterType.INCLUSIVE);
+        pref.setEnabled(true);
+        pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.ALERT));
+
+        Map<NotificationFilterProperty, List<String>> properties = new HashMap<>();
+        properties.put(NotificationFilterProperty.USER, userList);
+        pref.setPreferenceProperties(properties);
+
+        parameters.filterPreferences.add(pref);
     }
 }

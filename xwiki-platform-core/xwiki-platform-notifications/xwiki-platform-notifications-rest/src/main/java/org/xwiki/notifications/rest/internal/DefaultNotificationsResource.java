@@ -174,10 +174,12 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     private void useUserPreferences(NotificationParameters parameters) throws NotificationException
     {
-        parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
-                parameters.format);
-        parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
-        parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
+        if (parameters.user != null) {
+            parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
+                    parameters.format);
+            parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
+            parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
+        }
     }
 
     private List<Notification> getAndRenderNotifications(String userId, NotificationParameters

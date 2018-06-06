@@ -61,6 +61,11 @@ public class PersonalMessageStreamNotificationFilter implements NotificationFilt
     public FilterPolicy filterEvent(Event event, DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
+        // Don't handle events that are not personal messages!
+        if (!PersonalMessageDescriptor.EVENT_TYPE.equals(event.getType())) {
+            return FilterPolicy.NO_EFFECT;
+        }
+
         String sender = serializer.serialize(event.getUser());
         return preferencesGetter.isUsedFollowed(sender, filterPreferences, format) ? FilterPolicy.KEEP
                 : FilterPolicy.FILTER;

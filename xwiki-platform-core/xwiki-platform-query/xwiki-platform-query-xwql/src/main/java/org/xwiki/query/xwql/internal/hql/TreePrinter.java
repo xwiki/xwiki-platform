@@ -132,10 +132,9 @@ public class TreePrinter extends DepthFirstAdapter
     @Override
     public void caseACollectionMemberExpression(ACollectionMemberExpression node)
     {
-        // "member of" fails on HQL, so use "="
-        // this works only for a property of DBStringListProperty (relational storage)
-        builder.append(" = ");
+        // "member of" fails on HQL, so use "in elements()"
+        builder.append(" in elements(");
         node.getPath().apply(this);
-        builder.append(" ");
+        builder.append(" )");
     }
 }

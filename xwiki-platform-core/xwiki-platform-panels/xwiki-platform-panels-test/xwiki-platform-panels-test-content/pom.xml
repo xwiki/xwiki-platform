@@ -24,25 +24,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-panels</artifactId>
+    <artifactId>xwiki-platform-panels-test</artifactId>
     <version>10.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-panels-test</artifactId>
-  <name>XWiki Platform - Panels - Tests - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Panels - Tests - Parent POM</description>
-  <properties>
-    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
-         runtime code -->
-    <xwiki.clover.skip>true</xwiki.clover.skip>
-  </properties>
-  <modules>
-    <module>xwiki-platform-panels-test-content</module>
-    <module>xwiki-platform-panels-test-pageobjects</module>
-    <module>xwiki-platform-panels-test-tests</module>
-  </modules>
+  <artifactId>xwiki-platform-panels-test-content</artifactId>
+  <name>XWiki Platform - Panels - Tests - Content</name>
+  <packaging>xar</packaging>
+  <description>XWiki Platform - Panels - Tests - Content</description>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <entries>
+            <entry>
+              <document>Alice.WebHome</document>
+              <type>demo</type>
+            </entry>
+          </entries>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

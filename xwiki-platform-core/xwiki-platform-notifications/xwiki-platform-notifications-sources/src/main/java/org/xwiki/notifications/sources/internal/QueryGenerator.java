@@ -372,24 +372,33 @@ public class QueryGenerator
 
     private AbstractOperatorNode handleHiddenEvents(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
+        if (parameters.user == null) {
+            return excludeHiddenEvents(topNode);
+        }
+
         final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
         Object displayHiddenDocuments
                 = documentAccessBridge.getProperty(parameters.user, userClass, "displayHiddenDocuments");
 
         // Don't show hidden events unless the user want to display hidden pages
         if (displayHiddenDocuments == null || Integer.valueOf(0).equals(displayHiddenDocuments)) {
-            AbstractOperatorNode node = new NotEqualsNode(
-                    new PropertyValueNode(EventProperty.HIDDEN),
-                    new BooleanValueNode(true)
-            );
-
-            if (topNode != null) {
-                return topNode.and(node);
-            } else {
-                return node;
-            }
+            return excludeHiddenEvents(topNode);
         }
 
         return topNode;
+    }
+
+    private AbstractOperatorNode excludeHiddenEvents(AbstractOperatorNode topNode)
+    {
+        AbstractOperatorNode node = new NotEqualsNode(
+                new PropertyValueNode(EventProperty.HIDDEN),
+                new BooleanValueNode(true)
+        );
+
+        if (topNode != null) {
+            return topNode.and(node);
+        } else {
+            return node;
+        }
     }
 }

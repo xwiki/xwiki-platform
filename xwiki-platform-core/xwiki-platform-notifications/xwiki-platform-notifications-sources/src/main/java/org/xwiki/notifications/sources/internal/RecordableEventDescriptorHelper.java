@@ -58,7 +58,8 @@ public class RecordableEventDescriptorHelper
 
     private boolean isGlobalUser(DocumentReference user)
     {
-        return wikiDescriptorManager.getMainWikiId().equals(user.getWikiReference().getName());
+        return user != null ? wikiDescriptorManager.getMainWikiId().equals(user.getWikiReference().getName())
+                : false;
     }
 
     /**

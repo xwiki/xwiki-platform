@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: activity.page.link.title=Located in {0}
+  <content>activity.page.link.title=Находится в {0}
 activity.rss.pages.modified=RSS-лента измененных страниц
 activity.rss.feed.description=RSS-лента изменений документа
 ### Missing: activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"

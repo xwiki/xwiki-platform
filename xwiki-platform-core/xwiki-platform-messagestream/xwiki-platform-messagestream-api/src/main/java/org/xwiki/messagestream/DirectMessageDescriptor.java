@@ -22,7 +22,7 @@ package org.xwiki.messagestream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.springframework.stereotype.Component;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
 
 /**

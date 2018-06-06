@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.springframework.stereotype.Component;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.messagestream.DirectMessageDescriptor;
 import org.xwiki.model.reference.DocumentReference;

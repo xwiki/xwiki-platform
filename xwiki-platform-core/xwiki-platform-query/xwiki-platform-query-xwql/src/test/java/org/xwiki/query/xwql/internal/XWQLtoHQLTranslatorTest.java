@@ -249,7 +249,7 @@ public class XWQLtoHQLTranslatorTest
         // DBStringListProperty
         assertTranslate("from doc.object('XWiki.ArticleClass') as a where :cat member of a.category",
             "select doc.fullName from XWikiDocument as doc , BaseObject as a , DBStringListProperty as a_category1" +
-                " join a_category1.list a_category1list where ( :cat = a_category1list )" +
+                " join a_category1.list a_category1list where ( :cat in elements( a_category1.list ) )" +
                 " and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id" +
                 " and a_category1.id.name='category'");
         // StringListProperty

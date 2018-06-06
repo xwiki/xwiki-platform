@@ -20,10 +20,7 @@
 package org.xwiki.query.xwql.internal.hql;
 
 import org.xwiki.query.internal.jpql.node.APath;
-import org.xwiki.query.internal.jpql.node.PGroupbyItem;
-import org.xwiki.query.internal.jpql.node.POrderbyItem;
 import org.xwiki.query.internal.jpql.node.PPath;
-import org.xwiki.query.internal.jpql.node.PSelectExpression;
 import org.xwiki.query.internal.jpql.node.TId;
 import org.xwiki.query.xwql.internal.QueryContext.PropertyInfo;
 
@@ -55,10 +52,7 @@ public class PropertyPrinter
                     String s = prop.alias + "." + prop.getValueField();
                     // Takes the elements of the list instead of the list itself
                     // Note that we couldn't use 'elements(list)' statement when using 'group by' and 'order by'
-                    if (className.endsWith("DBStringListProperty") && p.parent() != null && (
-                        p.parent() instanceof PSelectExpression ||
-                        p.parent().parent() instanceof POrderbyItem ||
-                        p.parent().parent() instanceof PGroupbyItem)) {
+                    if (className.endsWith("DBStringListProperty")) {
                         s = prop.alias + prop.getValueField();
                     }
                     p.replaceBy(new APath(new TId(s)));

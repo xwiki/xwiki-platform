@@ -60,8 +60,17 @@ public class DirectMessageStreamNotificationFilter implements NotificationFilter
     public FilterPolicy filterEvent(Event event, DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
-        String userId = serializer.serialize(user);
-        return userId.equals(event.getStream()) ? FilterPolicy.KEEP : FilterPolicy.FILTER;
+        // Don't handle events that are not direct messages!
+        if (!DirectMessageDescriptor.EVENT_TYPE.equals(event.getType())) {
+            return FilterPolicy.NO_EFFECT;
+        }
+
+        if (user != null) {
+            String userId = serializer.serialize(user);
+            return userId.equals(event.getStream()) ? FilterPolicy.KEEP : FilterPolicy.FILTER;
+        } else {
+            return FilterPolicy.FILTER;
+        }
     }
 
     @Override
@@ -74,6 +83,9 @@ public class DirectMessageStreamNotificationFilter implements NotificationFilter
     public ExpressionNode filterExpression(DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
     {
+        if (user == null) {
+            return null;
+        }
         return value(EventProperty.STREAM).eq(value(user));
     }
 

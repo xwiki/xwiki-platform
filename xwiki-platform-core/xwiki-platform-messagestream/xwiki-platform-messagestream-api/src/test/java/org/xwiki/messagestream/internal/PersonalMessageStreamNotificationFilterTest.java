@@ -71,8 +71,13 @@ public class PersonalMessageStreamNotificationFilterTest
 
         Event event1 = mock(Event.class);
         Event event2 = mock(Event.class);
+        Event event3 = mock(Event.class);
         when(event1.getUser()).thenReturn(user1);
         when(event2.getUser()).thenReturn(user2);
+        when(event3.getUser()).thenReturn(user2);
+        when(event1.getType()).thenReturn("personalMessage");
+        when(event2.getType()).thenReturn("personalMessage");
+        when(event3.getType()).thenReturn("otherType");
         when(preferencesGetter.isUsedFollowed("xwiki:XWiki.User1", null, NotificationFormat.ALERT))
                 .thenReturn(true);
         when(preferencesGetter.isUsedFollowed("xwiki:XWiki.User2", null, NotificationFormat.ALERT))
@@ -82,6 +87,8 @@ public class PersonalMessageStreamNotificationFilterTest
                 mocker.getComponentUnderTest().filterEvent(event1, null, null, NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
                 mocker.getComponentUnderTest().filterEvent(event2, null, null, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event3, null, null, NotificationFormat.ALERT));
     }
 
     @Test

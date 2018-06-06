@@ -118,7 +118,8 @@ public class LogoAttachmentExtractor
 
         // Make sure the attachment have the right name
         if (!attachment.getFilename().equals(LOGO)) {
-            return newLogoAttachment(attachment.getMimeType(xcontext), attachment.getAttachment_content(), xcontext);
+            return newLogoAttachment(attachment.getMimeType(xcontext),
+                (XWikiAttachmentContent) attachment.getAttachment_content().clone(), xcontext);
         } else {
             return new Attachment(attachment.getDoc().newDocument(xcontext), attachment, xcontext);
         }

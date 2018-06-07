@@ -1328,7 +1328,7 @@ public class XWikiAttachment implements Cloneable
             if (!this.archiveStoreSet) {
                 this.archiveStoreInstance = xcontext.getWiki().getDefaultAttachmentArchiveStore();
 
-                setContentStore(this.archiveStoreInstance.getHint());
+                setArchiveStore(this.archiveStoreInstance.getHint());
             } else {
                 String hint = getArchiveStore();
 

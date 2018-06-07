@@ -135,8 +135,7 @@ public class StoreConfiguration
      */
     public XWikiAttachmentStoreInterface getXWikiAttachmentStore() throws ComponentLookupException
     {
-        return getStore(XWikiAttachmentStoreInterface.class, "xwiki.store.attachment.hint",
-            XWikiHibernateBaseStore.HINT);
+        return getStore(XWikiAttachmentStoreInterface.class, "xwiki.store.attachment.hint", FILE);
     }
 
     /**

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -65,11 +66,21 @@ public class NavigationPanelAdministrationPage extends ViewPage
             .map(element -> element.getText()).collect(Collectors.toList());
     }
 
-    public void exclude(String page)
+    public void exclude(String... pages)
     {
-        WebElement source = getDriver().findElementWithoutWaiting(this.treeElement,
-            By.xpath(".//*[@class = 'jstree-anchor' and . = '" + page + "']"));
-        new Actions(getDriver()).dragAndDrop(source, this.excludedPagesPane).build().perform();
+        WebElement source = null;
+        for (String page : pages) {
+            source = getDriver().findElementWithoutWaiting(this.treeElement,
+                By.xpath(".//*[@class = 'jstree-anchor' and . = '" + page + "']"));
+            // If there is more than one page to include we need to select all of them first.
+            if (pages.length > 1) {
+                new Actions(getDriver()).keyDown(Keys.LEFT_CONTROL).click(source).keyUp(Keys.LEFT_CONTROL).build()
+                    .perform();
+            }
+        }
+        if (source != null) {
+            new Actions(getDriver()).dragAndDrop(source, this.excludedPagesPane).build().perform();
+        }
     }
 
     public List<String> getInclusions()
@@ -78,11 +89,22 @@ public class NavigationPanelAdministrationPage extends ViewPage
             .map(element -> element.getText()).collect(Collectors.toList());
     }
 
-    public void include(String page)
+    public void include(String... pages)
     {
-        WebElement source = getDriver().findElementWithoutWaiting(this.excludedPagesPane,
-            By.xpath(".//li[contains(@class, 'page')]/a[. = '" + page + "']"));
-        new Actions(getDriver()).dragAndDrop(source, this.treeElement).build().perform();
+        WebElement source = null;
+        for (String page : pages) {
+            // We need to get the last occurrence because the page can be in both "Top Level Extension Pages" and "Other
+            // Pages", the later being always visible.
+            source = getDriver().findElementWithoutWaiting(this.excludedPagesPane,
+                By.xpath("(.//li[contains(@class, 'page')]/a[. = '" + page + "'])[last()]"));
+            // If there is more than one page to include we need to select all of them first.
+            if (pages.length > 1) {
+                source.click();
+            }
+        }
+        if (source != null) {
+            new Actions(getDriver()).dragAndDrop(source, this.treeElement).build().perform();
+        }
     }
 
     public boolean isExcludingTopLevelExtensionPages()

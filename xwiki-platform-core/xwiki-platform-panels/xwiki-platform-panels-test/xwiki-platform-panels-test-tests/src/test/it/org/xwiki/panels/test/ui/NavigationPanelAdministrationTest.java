@@ -110,6 +110,27 @@ public class NavigationPanelAdministrationTest extends AbstractTest
 
         saveAndReload(navPanelAdminPage);
         assertEquals(Arrays.asList("Alice", "Bob", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+
+        // Verify multiple selection.
+        navPanelAdminPage.exclude("Bob", "Denis");
+        assertEquals(Collections.singletonList("Alice"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+
+        // Enable Top Level Extension Pages filter to check what happens when Bob is duplicated (explicit exclude in
+        // "Other Pages" and implicit exclude by the dynamic Top Level Extension Pages filter).
+        navPanelAdminPage.excludeTopLevelExtensionPages(true);
+
+        assertEquals(Collections.singletonList("Alice"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
+        assertEquals(Collections.emptyList(), navPanelAdminPage.getInclusions());
+        assertEquals(Arrays.asList("Bob", "Denis"), navPanelAdminPage.getExclusions());
+
+        // Verify multiple selection and also the fact that Bob is removed from explicit exclusions.
+        navPanelAdminPage.include("Denis", "Bob");
+
+        assertEquals(Arrays.asList("Alice", "Bob", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
+        assertEquals(Collections.singletonList("Bob"), navPanelAdminPage.getInclusions());
+        assertEquals(Collections.emptyList(), navPanelAdminPage.getExclusions());
     }
 
     private NavigationPanelAdministrationPage saveAndReload(NavigationPanelAdministrationPage navPanelAdminPage)

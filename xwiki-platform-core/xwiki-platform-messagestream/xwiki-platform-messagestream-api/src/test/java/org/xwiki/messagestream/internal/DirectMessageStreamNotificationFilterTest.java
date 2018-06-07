@@ -35,6 +35,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -103,6 +104,18 @@ public class DirectMessageStreamNotificationFilterTest
     public void getName() throws Exception
     {
         assertEquals("Direct Message Stream Notification Filter", mocker.getComponentUnderTest().getName());
+    }
+
+    @Test
+    public void filterExpression() throws Exception
+    {
+        // Test 1
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        assertEquals("STREAM = \"xwiki:XWiki.User\"",
+                mocker.getComponentUnderTest().filterExpression(user, null, null).toString());
+
+        // Test 2
+        assertNull(mocker.getComponentUnderTest().filterExpression(null, null, null));
     }
 
 }

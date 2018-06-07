@@ -364,32 +364,17 @@ function init() {
   return true;
 }
 
-// When the document is loaded, install action buttons
-(XWiki.domIsLoaded && init())
-|| document.observe('xwiki:dom:loaded', init );
+// When the document is loaded, install action buttons.
+(XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
 
-function updateForShortcut() {
-  if (typeof(Wysiwyg) == 'undefined') {
-    return;
-  }
-  var editors = Wysiwyg.getInstances();
-  for(var hookId in editors) {
-    var editor = editors[hookId];
-    var plainTextArea = editor.getPlainTextArea();
-    if(plainTextArea && !plainTextArea.disabled) {
-      $(hookId).value = plainTextArea.value;
-    } else {
-      editor.getCommandManager().execute('submit');
-    }
-  }
-}
-document.observe("xwiki:actions:save", updateForShortcut);
-document.observe("xwiki:actions:preview", updateForShortcut);
 // End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
 
+// Make sure the action buttons are visible at the bottom of the window.
 require(['jquery'], function ($) {
   var $container = $('.bottombuttons');
-  // Use the placeholder to get the initial container position
+  // Use the placeholder to get the initial container position.
   var $placeholder = $('<span></span>');
   $placeholder.insertBefore($container);
 
@@ -406,6 +391,3 @@ require(['jquery'], function ($) {
     }
   });
 });
-
-return XWiki;
-}(XWiki || {}));

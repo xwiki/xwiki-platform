@@ -72,6 +72,19 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
+    public void moveToTheSameLocation() throws Exception
+    {
+        SpaceReference spaceReference =
+            new SpaceReference("Entity", new SpaceReference("Model", new WikiReference("code")));
+
+        run(createRequest(spaceReference, spaceReference.getParent()));
+        verify(this.mocker.getMockedLogger()).error("Cannot move [{}] into [{}], it's already there.", spaceReference,
+            spaceReference.getParent());
+
+        verifyNoMove();
+    }
+
+    @Test
     public void moveUnsupportedEntity() throws Exception
     {
         run(createRequest(new WikiReference("from"), new WikiReference("to")));

@@ -467,7 +467,7 @@
     #set($tableName = 'DateProperty')
   #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
     #set($tableName = 'LargeStringProperty')
-  #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass﻿' || $propType == 'PageClass')
+  #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass' || $propType == 'PageClass')
     #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
     #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
     #if($multiSelect == 1)

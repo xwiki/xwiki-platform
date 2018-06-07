@@ -121,10 +121,9 @@ div.resultContainer div.sourceName {
 .horizontalLayout div.resultContainer div.sourceName {
   float:left;
   width:150px;
-  margin-right:3px;
-  padding-right:20px;
+  padding-right:23px;
   text-align:right;
-  background-position:right center;
+  background-position:right 3px center;
 }
 
 .horizontalLayout div.resultContainer div.xitemcontainer {

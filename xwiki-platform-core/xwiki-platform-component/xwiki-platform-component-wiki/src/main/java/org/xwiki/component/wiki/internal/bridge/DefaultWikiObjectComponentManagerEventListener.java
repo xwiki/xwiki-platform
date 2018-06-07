@@ -65,6 +65,7 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
     public static final String EVENT_LISTENER_NAME = "defaultWikiObjectComponentManagerEventListener";
 
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject

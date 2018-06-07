@@ -10,7 +10,7 @@ div.suggestItems.searchSuggest {
 }
 
 .xlist .xitem .xitemcontainer:hover {
-  background-color: inherit;
+  background-color: transparent;
 }
 
 ul.xlist li.showAllResults {

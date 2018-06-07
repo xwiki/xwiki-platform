@@ -41,6 +41,7 @@ import org.xwiki.extension.handler.ExtensionHandler;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
@@ -100,8 +101,8 @@ public class WikiEventListener extends AbstractEventListener
 
     private void onWikiCopied(WikiCopiedEvent event)
     {
-        String sourceNamespace = "wiki:" + event.getSourceWikiId();
-        String targetNamespace = "wiki:" + event.getTargetWikiId();
+        String sourceNamespace = new WikiNamespace(event.getSourceWikiId()).serialize();
+        String targetNamespace = new WikiNamespace(event.getTargetWikiId()).serialize();
 
         Collection<InstalledExtension> installedExtensions =
             this.installedRepository.getInstalledExtensions(sourceNamespace);
@@ -145,7 +146,7 @@ public class WikiEventListener extends AbstractEventListener
 
     private void onWikiDeleted(WikiDeletedEvent event)
     {
-        String namespace = "wiki:" + event.getWikiId();
+        String namespace = new WikiNamespace(event.getWikiId()).serialize();
 
         Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions(namespace);
 
@@ -163,7 +164,7 @@ public class WikiEventListener extends AbstractEventListener
 
     private void onWikiCreated(WikiCreatedEvent event, XWikiContext context)
     {
-        String namespace = "wiki:" + event.getWikiId();
+        String namespace = new WikiNamespace(event.getWikiId()).serialize();
 
         Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions(null);
 

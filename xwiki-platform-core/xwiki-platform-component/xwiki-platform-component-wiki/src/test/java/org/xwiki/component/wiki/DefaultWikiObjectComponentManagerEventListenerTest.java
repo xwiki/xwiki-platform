@@ -45,9 +45,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectEvent;
-import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
@@ -84,12 +81,12 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     public void setUp() throws Exception
     {
         this.wikiObjectComponentManagerEventListenerProxy =
-                this.mocker.registerMockComponent(WikiObjectComponentManagerEventListenerProxy.class);
+            this.mocker.registerMockComponent(WikiObjectComponentManagerEventListenerProxy.class);
         this.localEntityReferenceSerializer =
-                this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+            this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
         this.defaultEntityReferenceSerializer =
-                this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        this.componentManager = this.mocker.registerMockComponent(ComponentManager.class);
+            this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+        this.componentManager = this.mocker.getInstance(ComponentManager.class, "context");
 
         xClassReferences = Arrays.asList(
                 new DocumentReference("wiki1", "space1","xClass1"),

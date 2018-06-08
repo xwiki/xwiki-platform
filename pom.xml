@@ -230,19 +230,6 @@
         <version>${ckeditor.version}</version>
         <type>xar</type>
       </dependency>
-      <!-- Used at least in Solr Search and in Infinispan Cache -->
-      <dependency>
-        <groupId>org.codehaus.woodstox</groupId>
-        <artifactId>woodstox-core-asl</artifactId>
-        <version>4.4.1</version>
-        <exclusions>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>stax-api</artifactId>
-            <groupId>javax.xml.stream</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
         <groupId>org.jfree</groupId>

@@ -35,6 +35,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -64,14 +65,21 @@ public class DirectMessageStreamNotificationFilterTest
         when(serializer.serialize(user)).thenReturn("xwiki:XWiki.User");
 
         Event event1 = mock(Event.class);
+        when(event1.getType()).thenReturn("directMessage");
         when(event1.getStream()).thenReturn("xwiki:XWiki.User");
         Event event2 = mock(Event.class);
+        when(event2.getType()).thenReturn("directMessage");
         when(event2.getStream()).thenReturn("xwiki:XWiki.OtherUser");
+        Event event3 = mock(Event.class);
+        when(event3.getType()).thenReturn("someType");
+        when(event3.getStream()).thenReturn("xwiki:XWiki.OtherUser");
 
         assertEquals(NotificationFilter.FilterPolicy.KEEP,
                 mocker.getComponentUnderTest().filterEvent(event1, user, null, null));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
                 mocker.getComponentUnderTest().filterEvent(event2, user, null, null));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event3, user, null, null));
     }
 
     @Test
@@ -96,6 +104,18 @@ public class DirectMessageStreamNotificationFilterTest
     public void getName() throws Exception
     {
         assertEquals("Direct Message Stream Notification Filter", mocker.getComponentUnderTest().getName());
+    }
+
+    @Test
+    public void filterExpression() throws Exception
+    {
+        // Test 1
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        assertEquals("STREAM = \"xwiki:XWiki.User\"",
+                mocker.getComponentUnderTest().filterExpression(user, null, null).toString());
+
+        // Test 2
+        assertNull(mocker.getComponentUnderTest().filterExpression(null, null, null));
     }
 
 }

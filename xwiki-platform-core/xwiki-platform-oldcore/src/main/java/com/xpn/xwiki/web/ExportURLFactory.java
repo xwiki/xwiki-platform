@@ -397,7 +397,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     // Extract the first path as the wiki page
                     int pos = filename.indexOf('/', 0);
                     String page = filename.substring(0, pos);
-                    renderSkinFile("resource/" + filename, "resources", page, context.getDatabase(), targetFile,
+                    renderSkinFile("resource/" + filename, "resources", page, context.getWikiId(), targetFile,
                         StringUtils.countMatches(filename, "/") + 1, context);
                 } else {
                     try (

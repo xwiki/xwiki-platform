@@ -51,6 +51,12 @@
 #macro (displayEdit $configObj)
   #set ($discard = $xwiki.ssx.use('PanelsCode.NavigationConfigurationSheet'))
   #set ($discard = $xwiki.jsx.use('PanelsCode.NavigationConfigurationSheet'))
+  {{html clean="false"}}
+  &lt;div class="hidden"&gt;
+    &lt;input type="hidden" name="xhidden" value="1" /&gt;
+    &lt;input type="hidden" name="objectPolicy" value="updateOrCreate" /&gt;
+  &lt;/div&gt;
+  {{/html}}
   (% class="row" %)(((
     (% class="col-sm-6" %)(((
       #displayNavigationPanel
@@ -255,9 +261,9 @@
   }
 });
 require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
-  let getLocalDocumentReference = function(absoluteDocumentReference) {
-    let documentReference = XWiki.Model.resolve(absoluteDocumentReference, XWiki.EntityType.DOCUMENT);
-    let localDocumentReference = documentReference.relativeTo(new XWiki.WikiReference(XWiki.currentWiki));
+  var getLocalDocumentReference = function(absoluteDocumentReference) {
+    var documentReference = XWiki.Model.resolve(absoluteDocumentReference, XWiki.EntityType.DOCUMENT);
+    var localDocumentReference = documentReference.relativeTo(new XWiki.WikiReference(XWiki.currentWiki));
     return XWiki.Model.serialize(localDocumentReference);
   };
 
@@ -268,7 +274,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   $('.navigationPanelConfiguration').on('click', '.exclusion-filter-pages a', function(event) {
     event.preventDefault();
   }).on('click', '.exclusion-filter-pages .page', function(event) {
-    let page = $(this);
+    var page = $(this);
     if (page.hasClass('included')) {
       page.removeClass('selected');
     } else {
@@ -276,20 +282,20 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     }
   });
 
-  let getExcludedPageDragHelper = function() {
-    let draggedPage = $(this);
-    let selectedPages = $('.navigationPanelConfiguration .page.selected');
+  var getExcludedPageDragHelper = function() {
+    var draggedPage = $(this);
+    var selectedPages = $('.navigationPanelConfiguration .page.selected');
     if (draggedPage.hasClass('selected') &amp;&amp; selectedPages.length &gt; 1) {
       return $('&lt;span/&gt;').text(selectedPages.length + ' pages')[0];
     } else {
       selectedPages.removeClass('selected');
-      let isTopLevelExtensionPage = draggedPage.closest('.topLevelExtensionPages').size() &gt; 0;
+      var isTopLevelExtensionPage = draggedPage.closest('.topLevelExtensionPages').size() &gt; 0;
       return (isTopLevelExtensionPage ? draggedPage.clone() : draggedPage)[0];
     }
   };
 
-  let makeExcludedPageDraggable = function() {
-    let page = $(this);
+  var makeExcludedPageDraggable = function() {
+    var page = $(this);
     page.draggable({
       disabled: page.hasClass('included'),
       helper: getExcludedPageDragHelper,
@@ -300,8 +306,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
 
   $('.navigationPanelConfiguration .exclusion-filter-pages .page').each(makeExcludedPageDraggable);
 
-  let getNodeData = function(exclusion) {
-    let documentReference = exclusion.data('reference');
+  var getNodeData = function(exclusion) {
+    var documentReference = exclusion.data('reference');
     return {
       id: 'document:' + documentReference,
       text: exclusion.text(),
@@ -320,13 +326,13 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     };
   };
 
-  let includeTopLevelExtensionPage = function(reference) {
+  var includeTopLevelExtensionPage = function(reference) {
     $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
-      let page = $(this);
+      var page = $(this);
       // Verify that the page is a draggable instance in order to avoid processing the drag helper (when the helper is a
       // clone of the page element).
       if (page.draggable('instance') &amp;&amp; page.data('reference') === reference) {
-        let input = $('&lt;input type="hidden"/&gt;').attr({
+        var input = $('&lt;input type="hidden"/&gt;').attr({
           name: 'PanelsCode.NavigationConfigurationClass_0_inclusions',
           value: getLocalDocumentReference(reference)
         });
@@ -335,9 +341,9 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     });
   };
 
-  let includeOtherPage = function(reference) {
+  var includeOtherPage = function(reference) {
     $('.exclusion-filter.otherPages .page').each(function() {
-      let page = $(this);
+      var page = $(this);
       // Verify that the page is a draggable instance in order to avoid processing the drag helper (when the helper is a
       // clone of the page element).
       if (page.draggable('instance') &amp;&amp; page.data('reference') === reference) {
@@ -346,12 +352,12 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     });
   };
 
-  let showOrCreateNode = function(tree, page) {
-    let node = tree.get_node('document:' + page.data('reference'));
+  var showOrCreateNode = function(tree, page) {
+    var node = tree.get_node('document:' + page.data('reference'));
     if (node) {
       tree.show_node(node.id);
     } else {
-      let index = Math.max(0, parseInt(page.data('index')));
+      var index = Math.max(0, parseInt(page.data('index')));
       if (!isFinite(index)) {
         index = 'last';
       }
@@ -359,9 +365,9 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     }
   };
 
-  let onDropPage = function(tree) {
-    let page = $(this);
-    let reference = page.data('reference');
+  var onDropPage = function(tree) {
+    var page = $(this);
+    var reference = page.data('reference');
     // We don't act directly on the given page element because the corresponding page might be excluded by multiple
     // filters.
     includeTopLevelExtensionPage(reference);
@@ -370,18 +376,42 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     tree &amp;&amp; showOrCreateNode(tree, page);
   };
 
+  var maybeToggleEmptyNode = function(tree) {
+    var visibleTopLevelNodes = tree.get_node('#').children.filter(function(nodeId) {
+      return nodeId !== 'empty' &amp;&amp; !tree.get_node(nodeId).state.hidden;
+    });
+    if (visibleTopLevelNodes.length === 0) {
+      var emptyNode = tree.get_node('empty');
+      if (!emptyNode) {
+        tree.create_node(null, {
+          'id': 'empty',
+          'text': $jsontool.serialize($services.localization.render('index.documentTree.empty')),
+          'children': false,
+          'data': {
+            'type': 'empty',
+            'validChildren': []
+          }
+        }, 'first');
+      }
+      tree.show_node('empty');
+    } else {
+      tree.hide_node('empty');
+    }
+  };
+
   // Drop excluded page over the Navigation Panel.
   $('.navigationPanelConfiguration .panel.expanded').droppable({
     accept: '.page',
     activeClass: 'ui-droppable-active',
     hoverClass: 'ui-droppable-hover',
     drop: function(event, ui) {
-      let tree = $(this).find('.jstree').jstree(true);
-      let selectedPages = $('.navigationPanelConfiguration .page.selected');
-      let droppedPages = selectedPages.length &gt; 0 ? selectedPages : ui.draggable;
+      var tree = $(this).find('.jstree').jstree(true);
+      var selectedPages = $('.navigationPanelConfiguration .page.selected');
+      var droppedPages = selectedPages.length &gt; 0 ? selectedPages : ui.draggable;
       droppedPages.each(function() {
         onDropPage.call(this, tree);
       });
+      maybeToggleEmptyNode(tree);
       selectedPages.removeClass('selected');
     }
   });
@@ -390,18 +420,16 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   // Toggle top level extension pages filter
   //
 
-  let excludeTopLevelExtensionPages = function() {
-    let tree = $('.navigationPanelConfiguration .jstree').jstree(true);
+  var excludeTopLevelExtensionPages = function(tree) {
     tree &amp;&amp; $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
       tree.hide_node('document:' + $(this).data('reference'));
     });
   };
 
-  let includeTopLevelExtensionPages = function() {
-    let tree = $('.navigationPanelConfiguration .jstree').jstree(true);
+  var includeTopLevelExtensionPages = function(tree) {
     tree &amp;&amp; $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
-      let page = $(this);
-      let otherExclusionsForThisPage = $('.exclusion-filter.otherPages .page').filter(function() {
+      var page = $(this);
+      var otherExclusionsForThisPage = $('.exclusion-filter.otherPages .page').filter(function() {
         return $(this).data('reference') === page.data('reference');
       });
       if (otherExclusionsForThisPage.length === 0) {
@@ -410,25 +438,27 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     });
   };
 
-  let topLevelExtensionPagesFilterToggle = $('.exclusion-filter.topLevelExtensionPages input[type="checkbox"]');
+  var topLevelExtensionPagesFilterToggle = $('.exclusion-filter.topLevelExtensionPages input[type="checkbox"]');
   topLevelExtensionPagesFilterToggle.click(function() {
     $('.exclusion-filter.topLevelExtensionPages .exclusion-filter-pages').toggleClass('hidden');
+    var tree = $('.navigationPanelConfiguration .jstree').jstree(true);
     if ($(this).prop('checked')) {
-      excludeTopLevelExtensionPages();
+      excludeTopLevelExtensionPages(tree);
     } else {
-      includeTopLevelExtensionPages();
+      includeTopLevelExtensionPages(tree);
     }
+    maybeToggleEmptyNode(tree);
   });
 
   //
   // Drag from the Navigation Panel and drop over the Excluded Pages.
   //
 
-  let excludeTopLevelExtensionPage = function(tree, node) {
-    let excluded = false;
+  var excludeTopLevelExtensionPage = function(tree, node) {
+    var excluded = false;
     if (topLevelExtensionPagesFilterToggle.prop('checked')) {
       $('.exclusion-filter.topLevelExtensionPages .page.included').each(function() {
-        let page = $(this);
+        var page = $(this);
         if (page.data('reference') === node.data.id) {
           page.removeClass('included').draggable('enable').find('input').remove();
           excluded = true;
@@ -438,8 +468,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     return excluded;
   };
 
-  let excludeOtherPage = function(tree, node) {
-    let page = $('&lt;li class="page"/&gt;').attr('data-reference', node.data.id)
+  var excludeOtherPage = function(tree, node) {
+    var page = $('&lt;li class="page"/&gt;').attr('data-reference', node.data.id)
       .append($('&lt;a/&gt;').attr('href', node.a_attr.href).text(node.text))
       .append($('&lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_exclusions"/&gt;')
         .val(getLocalDocumentReference(node.data.id)));
@@ -447,15 +477,15 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     makeExcludedPageDraggable.call(page);
   };
 
-  let excludeNode = function(tree, nodeId) {
-    let node = tree.get_node(nodeId);
+  var excludeNode = function(tree, nodeId) {
+    var node = tree.get_node(nodeId);
     if (node &amp;&amp; node.data &amp;&amp; node.data.type === 'document') {
       excludeTopLevelExtensionPage(tree, node) || excludeOtherPage(tree, node);
       tree.hide_node(nodeId);
     }
   };
 
-  let excludedPagesPane = $('.navigationPanelConfiguration .panel.panel-info').first();
+  var excludedPagesPane = $('.navigationPanelConfiguration .panel.panel-info').first();
 
   $(document).on('dnd_start.vakata', function(event, data) {
     excludedPagesPane.addClass('dropTarget');
@@ -464,32 +494,27 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   // Drop tree node over the Excluded Pages pane.
   $(document).on('dnd_stop.vakata', function(event, data) {
     if ($.contains(excludedPagesPane[0], data.event.target)) {
+      var tree = data.data.origin;
       data.data.nodes.forEach(function(nodeId) {
-        excludeNode(data.data.origin, nodeId);
+        excludeNode(tree, nodeId);
       });
+      maybeToggleEmptyNode(tree);
     }
     excludedPagesPane.removeClass('dropTarget');
   });
 
-  // Fix the empty tree.
+  // Make sure the root node accepts known node types as children.
   $('.navigationPanelConfiguration .xtree').on('ready.jstree', function(event, data) {
-    let tree = data.instance;
-    let emptyNode = tree.get_node('empty');
-    if (emptyNode) {
-      // Delete the empty node.
-      emptyNode.data.canDelete = true;
-      tree.delete_node(emptyNode);
-      // Make sure the root node accepts document nodes as children.
-      let root = tree.get_node(emptyNode.parent);
-      root.data.validChildren = ['document'];
-    }
+    var tree = data.instance;
+    var root = tree.get_node('#');
+    root.data.validChildren = ['document', 'pagination', 'empty'];
 
   // Prevent drag &amp; drop for tree nodes that are not on the top level.
   }).on('model.jstree', function(event, data) {
     if (data.parent !== '#') {
-      let tree = data.instance;
+      var tree = data.instance;
       $.each(data.nodes, function(index, nodeId) {
-        let node = tree.get_node(nodeId);
+        var node = tree.get_node(nodeId);
         if (node &amp;&amp; node.data) {
           node.data.draggable = false;
         }

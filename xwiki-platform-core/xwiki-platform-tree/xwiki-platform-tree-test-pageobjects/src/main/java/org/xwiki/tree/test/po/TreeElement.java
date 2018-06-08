@@ -22,6 +22,7 @@ package org.xwiki.tree.test.po;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -182,5 +183,17 @@ public class TreeElement extends BaseElement
         }
 
         return new ArrayList<String>();
+    }
+
+    /**
+     * @return the list of top level nodes
+     */
+    public List<TreeNodeElement> getTopLevelNodes()
+    {
+        return getDriver()
+            .findElementsWithoutWaiting(this.element,
+                By.cssSelector(".jstree-node[aria-level=\"1\"]:not(.jstree-hidden)"))
+            .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
+            .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).collect(Collectors.toList());
     }
 }

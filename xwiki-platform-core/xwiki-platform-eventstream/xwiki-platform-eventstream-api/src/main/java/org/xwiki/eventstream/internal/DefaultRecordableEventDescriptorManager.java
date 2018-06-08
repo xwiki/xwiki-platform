@@ -80,7 +80,7 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
             Iterator<RecordableEventDescriptor> iterator = recordableEventDescriptors.iterator();
             while (iterator.hasNext()) {
                 RecordableEventDescriptor descriptor = iterator.next();
-                if (!descriptor.isEnabled(wikiDescriptorManager.getMainWikiId())) {
+                if (!descriptor.isEnabled(wikiDescriptorManager.getCurrentWikiId())) {
                     iterator.remove();
                 }
             }

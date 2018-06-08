@@ -93,20 +93,17 @@ xwiki.tags=1
 #-# other than 'default') and put its hint here.
 #
 #-# Stores with both "hibernate" and "file" support in XWiki Standard.
+#-# [Since 10.5RC1] The default is "file" for all of them.
 #-# 
 #-# [Since 9.0RC1] The default document content recycle bin storage.
 #-# This property is only taken into account when deleting a document and has no effect on already deleted documents.
-#-# [Since 10.3] default is file.
 # xwiki.store.recyclebin.content.hint=file
 #-# The attachment storage.
-#-# [Since 10.3] default is file.
 # xwiki.store.attachment.hint=file
 #-# The attachment versioning storage. Use 'void' to disable attachment versioning.
-#-# [Since 10.3] default is file.
 # xwiki.store.attachment.versioning.hint=file
 #-# [Since 9.9RC1] The default attachment content recycle bin storage.
 #-# This property is only taken into account when deleting an attachment and has no effect on already deleted documents.
-#-# [Since 10.3] default is file.
 # xwiki.store.attachment.recyclebin.content.hint=file
 #-# 
 #-# Stores with only "hibernate" support by default

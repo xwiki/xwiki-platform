@@ -21,14 +21,10 @@ package org.xwiki.component.wiki;
 
 import java.util.Arrays;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
@@ -37,7 +33,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
@@ -70,10 +65,7 @@ public class WikiObjectComponentManagerEventListenerProxyTest
     @Before
     public void setUp() throws Exception
     {
-        this.componentManager = mock(ComponentManager.class);
-        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
-                new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(componentManager);
+        this.componentManager = this.mocker.getInstance(ComponentManager.class, "context");
 
         this.wikiComponentManagerEventListenerHelper =
                 this.mocker.registerMockComponent(WikiComponentManagerEventListenerHelper.class);

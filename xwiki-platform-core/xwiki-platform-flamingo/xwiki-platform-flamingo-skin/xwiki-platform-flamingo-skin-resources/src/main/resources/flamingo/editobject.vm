@@ -314,6 +314,6 @@
   #end
     </div>## xwikiobjects
   </div>## xwikieditcontent
-  <div class="bottombuttons">#template("editactions.vm")</div>
+  <div class="bottombuttons stickybuttons">#template("editactions.vm")</div>
   </form>
 #end ## request.xaction

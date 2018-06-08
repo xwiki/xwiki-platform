@@ -40,7 +40,7 @@
   </div>
   #set ($editactions = 'bottom')
   <div class="bottom-editor">
-    <div class="bottombuttons">#template('editactions.vm')</div>
+    <div class="bottombuttons stickybuttons">#template('editactions.vm')</div>
   </div>
 #else
   $response.sendRedirect($doc.getURL('edit', 'editor=wiki'))

@@ -4,7 +4,7 @@
 #template("hierarchy.vm")
 #template("contentview.vm")
 <hr />
-<div class="bottombuttons">#template("previewactions.vm")</div>
+<div class="bottombuttons stickybuttons">#template("previewactions.vm")</div>
 </div> ## mainContentArea
 </div> ## main
 #template("endpage.vm")

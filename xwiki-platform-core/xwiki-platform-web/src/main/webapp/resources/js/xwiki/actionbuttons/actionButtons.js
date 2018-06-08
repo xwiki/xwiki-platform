@@ -373,20 +373,21 @@ return XWiki;
 
 // Make sure the action buttons are visible at the bottom of the window.
 require(['jquery'], function ($) {
-  var $container = $('.bottombuttons');
-  // Use the placeholder to get the initial container position.
+  var $container = $('.stickybuttons');
+  if ($container.length == 0) return;
+  // Use the placeholder to get the initial container position
   var $placeholder = $('<span></span>');
   $placeholder.insertBefore($container);
 
-  $(window).on("scroll resize load click", function() {
+  $(window).on("scroll resize load click xwiki:profile:switchedCategory", function() {
     var isFullScreen = $('.fullScreenWrapper').length > 0
     var position = $placeholder.offset().top;
 
     if (!isFullScreen && $(window).height() + $(window).scrollTop() < position) {
-      $container.addClass('bottombuttons-fixed');
+      $container.addClass('stickybuttons-fixed');
       $container.innerWidth($container.parent().width());
     } else {
-      $container.removeClass('bottombuttons-fixed');
+      $container.removeClass('stickybuttons-fixed');
       $container.innerWidth('');
     }
   });

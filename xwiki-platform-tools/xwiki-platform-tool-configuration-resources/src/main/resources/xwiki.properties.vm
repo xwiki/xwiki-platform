@@ -318,15 +318,15 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Velocity configuration properties. The format is
 #-# velocity.properties = <Velocity property name> = <value>
 #-# Default values (no need to add them)
-#-#   velocity.properties = resource.loader = webapp
 #-#   velocity.properties = directive.set.null.allowed = true
-#-#   velocity.properties = webapp.resource.loader.class = org.apache.velocity.tools.view.servlet.WebappLoader
 #-#   velocity.properties = velocimacro.messages.on = false
 #-#   velocity.properties = velocimacro.max.depth = 100
-#-#   velocity.properties = template.provide.scope.control = true
-#-#   velocity.properties = macro.provide.scope.control= true
 #-#   velocity.properties = resource.manager.logwhenfound = false
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
+#-#   velocity.properties = template.provide.scope.control = true
+#-#   velocity.properties = macro.provide.scope.control = true
+#-#   velocity.properties = directive.if.emptycheck = false
+#-#   velocity.properties = space.gobbling = bc
 #-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 
 #-------------------------------------------------------------------------------------

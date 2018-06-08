@@ -158,7 +158,9 @@ import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -423,6 +425,8 @@ public class XWiki implements EventListener
     private WikiSkinUtils wikiSkinUtils;
 
     private DocumentRevisionProvider documentRevisionProvider;
+
+    private VelocityContextFactory velocityContextFactory;
 
     /**
      * List of top level space names that can be used in the fake context document created when accessing a resource
@@ -706,6 +710,15 @@ public class XWiki implements EventListener
         }
 
         return this.documentRevisionProvider;
+    }
+
+    private VelocityContextFactory getVelocityContextFactory()
+    {
+        if (this.velocityContextFactory == null) {
+            this.velocityContextFactory = Utils.getComponent(VelocityContextFactory.class);
+        }
+
+        return this.velocityContextFactory;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -5455,7 +5468,15 @@ public class XWiki implements EventListener
                     text = userdoc.getDocumentReference().getName();
                 }
             } else {
-                VelocityContext vcontext = new VelocityContext();
+                VelocityContext vcontext;
+                try {
+                    vcontext = getVelocityContextFactory().createContext();
+                } catch (XWikiVelocityException e) {
+                    LOGGER.error("Failed to create standard VelocityContext", e);
+
+                    vcontext = new VelocityContext();
+                }
+
                 for (String propname : userobj.getPropertyList()) {
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }

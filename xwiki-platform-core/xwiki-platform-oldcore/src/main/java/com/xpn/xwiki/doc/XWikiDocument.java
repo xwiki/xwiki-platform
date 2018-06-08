@@ -143,7 +143,9 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.XMLUtils;
 
@@ -557,6 +559,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private ContextualLocalizationManager localization;
 
+    private VelocityContextFactory velocityContextFactory;
+
     /**
      * The document structure expressed as a tree of Block objects. We store it for performance reasons since parsing is
      * a costly operation that we don't want to repeat whenever some code ask for the XDOM information.
@@ -734,6 +738,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return this.progress;
+    }
+
+    private VelocityContextFactory getVelocityContextFactory()
+    {
+        if (this.velocityContextFactory == null) {
+            this.velocityContextFactory = Utils.getComponent(VelocityContextFactory.class);
+        }
+
+        return this.velocityContextFactory;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -3376,7 +3389,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         StringBuilder result = new StringBuilder();
-        VelocityContext vcontext = new VelocityContext();
+        VelocityContext vcontext;
+        try {
+            vcontext = getVelocityContextFactory().createContext();
+        } catch (XWikiVelocityException e) {
+            LOGGER.error("Failed to create a standard VelocityContext", e);
+
+            vcontext = new VelocityContext();
+        }
+
         for (String propertyName : bclass.getPropertyList()) {
             PropertyClass pclass = (PropertyClass) bclass.getField(propertyName);
             vcontext.put(pclass.getName(), pclass.getPrettyName());

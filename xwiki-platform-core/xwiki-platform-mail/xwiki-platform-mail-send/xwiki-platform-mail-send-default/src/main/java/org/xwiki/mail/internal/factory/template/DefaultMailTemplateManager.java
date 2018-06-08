@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import javax.mail.MessagingException;
 
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
@@ -38,7 +39,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -80,7 +83,13 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     private VelocityEvaluator velocityEvaluator;
 
     @Inject
+    private VelocityContextFactory velocityContextFactory;
+
+    @Inject
     private Provider<XWikiContext> xwikiContextProvider;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables,
@@ -197,7 +206,13 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         if (existingVelocityContext != null) {
             velocityContext = new VelocityContext(existingVelocityContext);
         } else {
-            velocityContext = new VelocityContext();
+            try {
+                velocityContext = this.velocityContextFactory.createContext();
+            } catch (XWikiVelocityException e) {
+                this.logger.error("Failed to create standard VelocityContext", e);
+
+                velocityContext = new VelocityContext();
+            }
         }
         if (velocityVariables != null) {
             for (Map.Entry<String, Object> velocityVariable : velocityVariables.entrySet()) {

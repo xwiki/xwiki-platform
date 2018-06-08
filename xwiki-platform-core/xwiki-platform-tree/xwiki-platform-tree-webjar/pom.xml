@@ -34,7 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tree Widget</xwiki.extension.name>
-    <jstree.version>3.3.3</jstree.version>
+    <jstree.version>3.3.5</jstree.version>
   </properties>
   <dependencies>
     <dependency>

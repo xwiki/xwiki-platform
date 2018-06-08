@@ -39,16 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>platform.icon.picker.preview=Pretpregledajte s\:
 platform.icon.picker.loading=Učitavanje
-platform.icon.picker.preview=Pretpregledajte s\:
-rendering.macro.iconPicker.description=Odaberite ikonu iz skupa XWiki ikona.
+
 rendering.macro.iconPicker.name=Odabirač ikona
-rendering.macro.iconPicker.parameter.class.description=CSS klasa ulaza gdje će odabirač primjenjivati
-rendering.macro.iconPicker.parameter.class.name=Klasa
-rendering.macro.iconPicker.parameter.id.description=DOM identifikator ulaznog polja gdje će odabirač primjenjivati
+rendering.macro.iconPicker.description=Odaberite ikonu iz skupa XWiki ikona.
 rendering.macro.iconPicker.parameter.id.name=Identifikator
-rendering.macro.iconPicker.parameter.prefix.description=Prefiks za dodavanje prije imena ikone u ulaznom polju (pretpostavljeno\: "image\:icon")
+rendering.macro.iconPicker.parameter.id.description=DOM identifikator ulaznog polja gdje će odabirač primjenjivati
+rendering.macro.iconPicker.parameter.class.name=Klasa
+rendering.macro.iconPicker.parameter.class.description=CSS klasa ulaza gdje će odabirač primjenjivati
 rendering.macro.iconPicker.parameter.prefix.name=Prefiks
+rendering.macro.iconPicker.parameter.prefix.description=Prefiks za dodavanje prije imena ikone u ulaznom polju (pretpostavljeno\: "image\:icon")
 </content>
 </xwikidoc>

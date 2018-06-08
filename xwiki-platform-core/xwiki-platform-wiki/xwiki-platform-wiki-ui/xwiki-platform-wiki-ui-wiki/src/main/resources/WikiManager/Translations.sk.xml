@@ -39,45 +39,101 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-WikiManager.WikiCandidateMemberClass_status_accepted=Akceptovaný
-WikiManager.WikiCandidateMemberClass_status_pending=Čakajúci
-WikiManager.WikiCandidateMemberClass_status_rejected=Odmietnuté
-WikiManager.WikiCandidateMemberClass_type_invitation=Pozvánka
-WikiManager.WikiCandidateMemberClass_type_request=Žiadost
-admin.xwiki.usersconfiguration.title=Konfigurácia
-core.menu.admin.wiki=Spravovať wiki
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=Sledovať wiki
 core.menu.watchlist.remove.wiki=Nesledovať 
-platform.wiki.currentwiki.candidateAcceptedSuccess=Žiadosti bol akceptovaný
-platform.wiki.currentwiki.candidateHandledComment=Komentáre\:
-platform.wiki.currentwiki.candidateReviewFailure=Chyba, nemôžete zrušiť pozvanie.
-platform.wiki.currentwiki.candidates.accept.label=Akceptovať
-platform.wiki.currentwiki.candidates.invitation.cancel.label=Zrušiť pozvánku
-platform.wiki.currentwiki.candidates.reject.label=Odmietnuť
-platform.wiki.currentwiki.candidates.reviewer.label=Admin\:
-platform.wiki.currentwiki.candidates.status.label=Stav\:
-platform.wiki.currentwiki.candidates.type.label=Typ\:
-platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki Informácie
+core.menu.admin.wiki=Spravovať wiki
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Wiki informácie
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Vitaj vo wiki {0}{1}{2}.
+### Missing: platform.wiki.currentwiki.currentUserIsOwner=You are the owner of this wiki.
+### Missing: platform.wiki.currentwiki.currentUserIsAdmin=You are an administrator of this wiki.
+### Missing: platform.wiki.currentwiki.joinNeedToLogin=To join this wiki, you need to be logged in.
+### Missing: platform.wiki.currentwiki.currentUserNotMember=You are not a member of this wiki.
+### Missing: platform.wiki.currentwiki.currentuserCanJoin=If you like, you can {0}join this wiki{1}.
+### Missing: platform.wiki.currentwiki.currentUserIsMember=You are a member of this wiki.
+### Missing: platform.wiki.currentwiki.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
 platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Pre zobrazenie zoznamu wiki používateľov môžete použiť stránku {0}Užívateľský adresár{1}.
+### Missing: platform.wiki.currentwiki.invitationPendingForCurrentWiki=You have been invited to join this wiki.
+### Missing: platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=You have requested to join this wiki.
+### Missing: platform.wiki.currentwiki.joinRequestAcceptedNotification=Your request to join the wiki ''{0}'' has been accepted.
+### Missing: platform.wiki.currentwiki.joinRequestRejectedNotification=Your request to join the wiki ''{0}'' has been rejected.
+### Missing: platform.wiki.currentwiki.candidateHandledSaveComment=Handled candidate {0} ({1})
+platform.wiki.currentwiki.candidateHandledComment=Komentáre\:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Žiadosti bol akceptovaný
+### Missing: platform.wiki.currentwiki.candidateRejectedSuccess=Request rejected.
+### Missing: platform.wiki.currentwiki.inviteUserAlreadyMember={0} is already a member of the wiki.
+### Missing: platform.wiki.currentwiki.inviteRequestAlreadyExists={0} already has a pending request. Please respond to that request instead.
+### Missing: platform.wiki.currentwiki.inviteUserAlreadyInvited={0} already has a pending invitation.
+### Missing: platform.wiki.currentwiki.inviteSaveComment=User ''{0}'' has been invited to join the wiki.
+### Missing: platform.wiki.currentwiki.inviteNotification=You have been invited to join the wiki ''{0}''.
+### Missing: platform.wiki.currentwiki.inviteSuccess={0} invited successfully.
+### Missing: platform.wiki.currentwiki.invitationCancelSaveComment=Cancelled invitation {0} ({1})
+### Missing: platform.wiki.currentwiki.invitationCancelNotification=Your invitation has been cancelled and is no longer valid.
+### Missing: platform.wiki.currentwiki.invitationCancelSuccess=Invitation cancelled successfully.
 platform.wiki.currentwiki.invitationCancelFailure=Chyba, nemôžete zrušiť pozvanie.
-platform.wiki.currentwiki.invite.button.label=Pozvať
-platform.wiki.currentwiki.invite.message.label=Správa
-platform.wiki.currentwiki.invite.username.label=Užívateľské meno
-platform.wiki.currentwiki.joinrequest.cancel.label=Zrušiť žiadosť
-platform.wiki.currentwiki.managewikis.title=Wiki
+platform.wiki.currentwiki.candidateReviewFailure=Chyba, nemôžete zrušiť pozvanie.
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Pekný názov
+platform.wiki.currentwiki.prop.description.label=Popis
+platform.wiki.currentwiki.prop.owner.label=Vlastník
+platform.wiki.currentwiki.prop.membershipType.label=Typ členstva
+### Missing: platform.wiki.currentwiki.prop.secure.label=Secure (SSL)
 platform.wiki.currentwiki.member.add=Pridať/pozvať používateľov
+platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki Informácie
+### Missing: platform.wiki.currentwiki.gadget.topActiveUsers.label=Top Active Contributors
+platform.wiki.currentwiki.panel.information.name.label=Názov
 platform.wiki.currentwiki.panel.information.description.label=Popis
 platform.wiki.currentwiki.panel.information.members.label=Členovia
-platform.wiki.currentwiki.panel.information.name.label=Názov
-platform.wiki.currentwiki.prop.description.label=Popis
-platform.wiki.currentwiki.prop.membershipType.label=Typ členstva
-platform.wiki.currentwiki.prop.owner.label=Vlastník
-platform.wiki.currentwiki.prop.wikiprettyname.hint=Zobrazovaný názov Wiki.
-platform.wiki.currentwiki.prop.wikiprettyname.label=Pekný názov
-platform.wiki.currentwiki.welcome=Vitaj vo wiki {0}{1}{2}.
+### Missing: platform.wiki.currentwiki.invitation.view.label=View Invitation
+platform.wiki.currentwiki.joinrequest.cancel.label=Zrušiť žiadosť
+### Missing: platform.wiki.currentwiki.joinreques.request.label=Request Join
+### Missing: platform.wiki.currentwiki.join.label=Join
+### Missing: platform.wiki.currentwiki.leave.label=Leave Wiki
+platform.wiki.currentwiki.invite.username.label=Užívateľské meno
+platform.wiki.currentwiki.invite.message.label=Správa
+platform.wiki.currentwiki.invite.button.label=Pozvať
+### Missing: platform.wiki.currentwiki.candidates.label=Candidates
+platform.wiki.currentwiki.candidates.status.label=Stav\:
+platform.wiki.currentwiki.candidates.type.label=Typ\:
+platform.wiki.currentwiki.candidates.reviewer.label=Admin\:
+### Missing: platform.wiki.currentwiki.candidates.reviewermessage.label=Admin's Message:
+### Missing: platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Private Comment:
+platform.wiki.currentwiki.candidates.accept.label=Akceptovať
+platform.wiki.currentwiki.candidates.reject.label=Odmietnuť
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Zrušiť pozvánku
 platform.wiki.currentwiki.wikiusers.title=Wiki užívatelia
-platform.wiki.panel.title=Wiki informácie
+platform.wiki.currentwiki.managewikis.title=Wiki
+WikiManager.WikiCandidateMemberClass_status_pending=Čakajúci
+WikiManager.WikiCandidateMemberClass_status_accepted=Akceptovaný
+WikiManager.WikiCandidateMemberClass_status_rejected=Odmietnuté
+WikiManager.WikiCandidateMemberClass_type_request=Žiadost
+WikiManager.WikiCandidateMemberClass_type_invitation=Pozvánka
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Zobrazovaný názov Wiki.
+### Missing: platform.wiki.currentwiki.prop.description.hint=A brief description of the wiki and its purpose.
+### Missing: platform.wiki.currentwiki.prop.owner.hint=A user who has all the rights on the wiki.
+### Missing: platform.wiki.currentwiki.prop.membershipType.hint=The way users can join this wiki.
+### Missing: platform.wiki.currentwiki.prop.secure.hint=If enabled, all this wiki''s generated externals URLs will start with {0}https:~/~/{1}.
+### Missing: platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.
+### Missing: platform.wiki.currentwiki.invite.message.hint=The message to send to the user.
+### Missing: platform.wiki.currentwiki.candidates.hint=Users who have requested or been invited to join the wiki.
+
+# ADMIN
+### Missing: admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
+### Missing: admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
+admin.xwiki.usersconfiguration.title=Konfigurácia
+### Missing: admin.xwiki.members.title=Current Members
+    
+# DRAWER ITEM
+### Missing: platform.wiki.drawer.homeWiki=Home
 </content>
 </xwikidoc>

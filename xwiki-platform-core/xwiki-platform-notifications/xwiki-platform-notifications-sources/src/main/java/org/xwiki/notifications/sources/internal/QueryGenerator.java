@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -89,14 +90,18 @@ public class QueryGenerator
     @Inject
     private NotificationFilterManager notificationFilterManager;
 
+    @Inject
+    private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
+
     /**
      * Generate the query.
      *
      * @param parameters parameters to use
      * @return the query to execute
      * @throws QueryException if error happens
+     * @throws EventStreamException if error happens
      */
-    public Query generateQuery(NotificationParameters parameters) throws QueryException
+    public Query generateQuery(NotificationParameters parameters) throws QueryException, EventStreamException
     {
         ExpressionNodeToHQLConverter.HQLQuery result = hqlConverter.parse(generateQueryExpression(parameters));
         if (result.getQuery().isEmpty()) {
@@ -119,7 +124,7 @@ public class QueryGenerator
      *
      * @since 9.8RC12x
      */
-    public ExpressionNode generateQueryExpression(NotificationParameters parameters)
+    public ExpressionNode generateQueryExpression(NotificationParameters parameters) throws EventStreamException
     {
         // First: get the active preferences of the given user
         Collection<NotificationPreference> preferences = parameters.preferences;
@@ -143,12 +148,10 @@ public class QueryGenerator
         // Condition 2: handle other preferences
         AbstractOperatorNode preferencesNode = handleEventPreferences(parameters);
 
-        // Condition 3: handle exclusive global notification filters
-        AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(parameters);
-        if (globalExclusiveFiltersNode != null) {
-            if (preferencesNode == null) {
-                preferencesNode = globalExclusiveFiltersNode;
-            } else {
+        // Condition 3: handle exclusive global notification filters (only if some preferences were enabled)
+        if (preferencesNode != null) {
+            AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(parameters);
+            if (globalExclusiveFiltersNode != null) {
                 preferencesNode = preferencesNode.and(globalExclusiveFiltersNode);
             }
         }
@@ -191,7 +194,7 @@ public class QueryGenerator
      * @param parameters parameters
      * @return a list of maps that contains query parameters
      */
-    private AbstractOperatorNode handleEventPreferences(NotificationParameters parameters)
+    private AbstractOperatorNode handleEventPreferences(NotificationParameters parameters) throws EventStreamException
     {
         AbstractOperatorNode preferencesNode = null;
 
@@ -201,6 +204,13 @@ public class QueryGenerator
 
         while (it.hasNext()) {
             NotificationPreference preference = it.next();
+
+            if (!recordableEventDescriptorHelper.hasDescriptor(
+                    (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE),
+                    parameters.user
+            )) {
+                continue;
+            }
 
             AbstractOperatorNode preferenceTypeNode = new AndNode(
                     new EqualsNode(
@@ -311,14 +321,18 @@ public class QueryGenerator
                 values.add(new StringValueNode(value));
             }
 
-            return topNode.and(
-                    new NotNode(
-                            new InNode(
-                                    new PropertyValueNode(EventProperty.ID),
-                                    values
-                            )
+            AbstractOperatorNode node = new NotNode(
+                    new InNode(
+                            new PropertyValueNode(EventProperty.ID),
+                            values
                     )
             );
+
+            if (topNode != null) {
+                return topNode.and(node);
+            } else {
+                return node;
+            }
         }
         return topNode;
     }
@@ -328,40 +342,63 @@ public class QueryGenerator
         // If the user is a local user
         if (parameters.user != null
                 && !parameters.user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
-            return topNode.and(
-                    new EqualsNode(
-                            new PropertyValueNode(EventProperty.WIKI),
-                            new EntityReferenceNode(parameters.user.getWikiReference())
-                    )
+
+            AbstractOperatorNode node = new EqualsNode(
+                    new PropertyValueNode(EventProperty.WIKI),
+                    new EntityReferenceNode(parameters.user.getWikiReference())
             );
+
+            if (topNode != null) {
+                return topNode.and(node);
+            } else {
+                return node;
+            }
         }
         return topNode;
     }
 
     private AbstractOperatorNode handleOrder(AbstractOperatorNode topNode)
     {
-        return new OrderByNode(
-                topNode,
-                new PropertyValueNode(EventProperty.DATE),
-                OrderByNode.Order.DESC
-        );
+        if (topNode != null) {
+            return new OrderByNode(
+                    topNode,
+                    new PropertyValueNode(EventProperty.DATE),
+                    OrderByNode.Order.DESC
+            );
+        } else {
+            return null;
+        }
     }
 
     private AbstractOperatorNode handleHiddenEvents(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
+        if (parameters.user == null) {
+            return excludeHiddenEvents(topNode);
+        }
+
         final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
         Object displayHiddenDocuments
                 = documentAccessBridge.getProperty(parameters.user, userClass, "displayHiddenDocuments");
 
         // Don't show hidden events unless the user want to display hidden pages
         if (displayHiddenDocuments == null || Integer.valueOf(0).equals(displayHiddenDocuments)) {
-            return topNode.and(
-                    new NotEqualsNode(
-                            new PropertyValueNode(EventProperty.HIDDEN),
-                            new BooleanValueNode(true)
-                    )
-            );
+            return excludeHiddenEvents(topNode);
         }
+
         return topNode;
+    }
+
+    private AbstractOperatorNode excludeHiddenEvents(AbstractOperatorNode topNode)
+    {
+        AbstractOperatorNode node = new NotEqualsNode(
+                new PropertyValueNode(EventProperty.HIDDEN),
+                new BooleanValueNode(true)
+        );
+
+        if (topNode != null) {
+            return topNode.and(node);
+        } else {
+            return node;
+        }
     }
 }

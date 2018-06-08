@@ -97,6 +97,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated use {@link VelocityManager#getVelocityContext()} instead
      */
+    @Deprecated
     public static final String KEY_LEGACY_VELOCITYCONTEXT = "vcontext";
 
     /** Logging helper object. */

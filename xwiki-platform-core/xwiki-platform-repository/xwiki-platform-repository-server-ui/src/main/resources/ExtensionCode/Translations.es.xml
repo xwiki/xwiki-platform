@@ -39,10 +39,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
-extension.repository.authors=Autores
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
 extension.repository.name=Nombre
 extension.repository.summary=Resumen
 extension.repository.type=Tipo
+### Missing: extension.repository.category=Category
+extension.repository.authors=Autores
+### Missing: extension.repository.doc.creationDate=Created On
+### Missing: extension.repository.doc.date=Last Modified
+### Missing: extension.repository.rating=Rating
+### Missing: extension.repository.installedCount=Installs
+
+## Administration UI
+### Missing: admin.repository=Extension Repository
 </content>
 </xwikidoc>

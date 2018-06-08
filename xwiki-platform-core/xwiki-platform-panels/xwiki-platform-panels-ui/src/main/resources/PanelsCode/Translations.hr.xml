@@ -39,17 +39,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>platform.panels.applications.helper=Ovdje možete odabrati koje aplikacije su dostupne u traci aplikacija (zadano na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako neke od njih želite ukloniti, samo trebate povući i ispustiti ikonu iz prve kućice u drugu. Također možete po vašoj želji promijeniti poredak aplikacija. Ne zaboravite spremiti vaše izmjene\!
+platform.panels.applications.displayedapps=Aplikacije u traci
+platform.panels.applications.blacklistedapps=Aplikacije koje nisu u traci
+platform.panels.applications.save=Spremi
+platform.panels.applications.revert=Ponovo postavi
+platform.panels.applications.ajax.success=Konfiguracija je spremljena.
+platform.panels.applications.ajax.csrf=CSRF validacija nije uspjela. Pokušajte ponovo učitati stranicu.
+platform.panels.applications.ajax.noright=Nemate ovlast za uređivanje PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Spremanje vaše izmjene nije uspjelo.
 admin.panels.applications=Panel aplikacija
 admin.panels.applications.description=Upravljajte s prikazom aplikacija u panelu aplikacija.
-platform.panels.applications.ajax.csrf=CSRF validacija nije uspjela. Pokušajte ponovo učitati stranicu.
-platform.panels.applications.ajax.error=Spremanje vaše izmjene nije uspjelo.
-platform.panels.applications.ajax.noright=Nemate ovlast za uređivanje PanelsCode.ApplicationsPanelConfiguration.
-platform.panels.applications.ajax.success=Konfiguracija je spremljena.
-platform.panels.applications.blacklistedapps=Aplikacije koje nisu u traci
-platform.panels.applications.displayedapps=Aplikacije u traci
-platform.panels.applications.helper=Ovdje možete odabrati koje aplikacije su dostupne u traci aplikacija (zadano na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako neke od njih želite ukloniti, samo trebate povući i ispustiti ikonu iz prve kućice u drugu. Također možete po vašoj želji promijeniti poredak aplikacija. Ne zaboravite spremiti vaše izmjene\!
-platform.panels.applications.revert=Ponovo postavi
-platform.panels.applications.save=Spremi
+
+### Missing: admin.panels.navigation=Navigation Panel
+### Missing: admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
+### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
+### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
+### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
+### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
+### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
 </content>
 </xwikidoc>

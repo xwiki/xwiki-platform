@@ -39,87 +39,101 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-WikiManager.WikiCandidateMemberClass_status_accepted=Prihvaćeno
-WikiManager.WikiCandidateMemberClass_status_pending=Na čekanju
-WikiManager.WikiCandidateMemberClass_status_rejected=Odbijeno
-WikiManager.WikiCandidateMemberClass_type_invitation=Pozivnica
-WikiManager.WikiCandidateMemberClass_type_request=Zahtjev
-admin.xwiki.manageworkspace.description=Upravljajte postavkama kao što su ime wikija, opis, vlasnik i tip članstva.
-admin.xwiki.members.title=Trenutni članovi
-admin.xwiki.usersconfiguration.title=Konfiguracija
-admin.xwiki.workspaceusers.description=Upravljajte članovima wikija\: dodajte, uklonite, pozovite, prihvatite ili odbijte članove wikija.
-core.menu.admin.wiki=Upravljanje wikijem
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=Promatraj wiki
 core.menu.watchlist.remove.wiki=Prestani promatrati wiki
-platform.wiki.currentwiki.candidateAcceptedSuccess=Zahtjev uspješno prihvaćen.
-platform.wiki.currentwiki.candidateHandledComment=Komentar\:
+core.menu.admin.wiki=Upravljanje wikijem
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Informacije o wikiju
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Dobrodošli u wiki {0}{1}{2}.
+platform.wiki.currentwiki.currentUserIsOwner=Vi ste vlasnik ovog wikija.
+platform.wiki.currentwiki.currentUserIsAdmin=Vi ste administrator ovog wikija.
+platform.wiki.currentwiki.joinNeedToLogin=Da biste se pridružili ovom wikiju morate biti prijavljeni.
+platform.wiki.currentwiki.currentUserNotMember=Niste član ovog wikija.
+platform.wiki.currentwiki.currentuserCanJoin=Ukoliko želite, možete se {0}pridružiti ovom wikiju{1}.
+platform.wiki.currentwiki.currentUserIsMember=Vi ste član ovog wikija.
+platform.wiki.currentwiki.currentUserCanLeave=Ukoliko želite, možete {0}napustiti ovaj wiki{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Da biste vidjeli cijelu listu članova wikija, možete upotrijebiti stranicu {0}Imenik korisnika{1}.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Pozvani ste da se pridružite ovom wikiju
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Zatražili ste da se pridružite ovom wikiju
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Vaš zahtjev da se pridružite wikiju ''{0}'' je prihvaćen.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Vaš zahtjev da se pridružite wikiju ''{0}'' je odbijen.
 platform.wiki.currentwiki.candidateHandledSaveComment=Obrađeni kandidat {0} ({1})
+platform.wiki.currentwiki.candidateHandledComment=Komentar\:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Zahtjev uspješno prihvaćen.
 platform.wiki.currentwiki.candidateRejectedSuccess=Zahtjev uspješno odbijen.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} je već član wikija.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} već ima zahtjev na čekanju. Molim odgovorite na taj zahtjev umjesto na ovaj.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} već ima pozivnicu na čekanju.
+platform.wiki.currentwiki.inviteSaveComment=Korisnik ''{0}'' je pozvan da se pridruži wikiju.
+platform.wiki.currentwiki.inviteNotification=Pozvani ste da se pridružite wikiju ''{0}''.
+platform.wiki.currentwiki.inviteSuccess={0} uspješno pozvan/a.
+platform.wiki.currentwiki.invitationCancelSaveComment=Otkazana pozivnica {0} ({1})
+platform.wiki.currentwiki.invitationCancelNotification=Vaša pozivnica je otkazana i više nije valjana.
+platform.wiki.currentwiki.invitationCancelSuccess=Pozivnica uspješno otkazana.
+platform.wiki.currentwiki.invitationCancelFailure=Greška, ne možete otkazati ovu pozivnicu.
 platform.wiki.currentwiki.candidateReviewFailure=Greška, ne možete otkazati ovu pozivnicu.
-platform.wiki.currentwiki.candidates.accept.label=Prihvati
-platform.wiki.currentwiki.candidates.hint=Korisnici koji su zatražili ili koji su pozvani da se pridruže wikiju.
-platform.wiki.currentwiki.candidates.invitation.cancel.label=Otkaži pozivnicu
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Prikazno ime
+platform.wiki.currentwiki.prop.description.label=Opis
+platform.wiki.currentwiki.prop.owner.label=Vlasnik
+platform.wiki.currentwiki.prop.membershipType.label=Tip članstva
+platform.wiki.currentwiki.prop.secure.label=Sigurno (SSL)
+platform.wiki.currentwiki.member.add=Dodaj ili pozovi korisnike u wiki
+platform.wiki.currentwiki.gadget.wikiInformation.label=Informacije o wikiju
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Glavni aktivni doprinositelji
+platform.wiki.currentwiki.panel.information.name.label=Ime
+platform.wiki.currentwiki.panel.information.description.label=Opis
+platform.wiki.currentwiki.panel.information.members.label=Članovi
+platform.wiki.currentwiki.invitation.view.label=Vidi pozivnicu
+platform.wiki.currentwiki.joinrequest.cancel.label=Otkaži zahtjev
+platform.wiki.currentwiki.joinreques.request.label=Zatraži pridruživanje
+platform.wiki.currentwiki.join.label=Pridruži se
+platform.wiki.currentwiki.leave.label=Napusti wiki
+platform.wiki.currentwiki.invite.username.label=Korisničko ime
+platform.wiki.currentwiki.invite.message.label=Poruka
+platform.wiki.currentwiki.invite.button.label=Pozovi
 platform.wiki.currentwiki.candidates.label=Kandidati
-platform.wiki.currentwiki.candidates.reject.label=Odbij
+platform.wiki.currentwiki.candidates.status.label=Status\:
+platform.wiki.currentwiki.candidates.type.label=Tip\:
 platform.wiki.currentwiki.candidates.reviewer.label=Administrator\:
 platform.wiki.currentwiki.candidates.reviewermessage.label=Administratorova poruka\:
 platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privatni komentar\:
-platform.wiki.currentwiki.candidates.status.label=Status\:
-platform.wiki.currentwiki.candidates.type.label=Tip\:
-platform.wiki.currentwiki.currentUserCanLeave=Ukoliko želite, možete {0}napustiti ovaj wiki{1}.
-platform.wiki.currentwiki.currentUserIsAdmin=Vi ste administrator ovog wikija.
-platform.wiki.currentwiki.currentUserIsMember=Vi ste član ovog wikija.
-platform.wiki.currentwiki.currentUserIsOwner=Vi ste vlasnik ovog wikija.
-platform.wiki.currentwiki.currentUserNotMember=Niste član ovog wikija.
-platform.wiki.currentwiki.currentuserCanJoin=Ukoliko želite, možete se {0}pridružiti ovom wikiju{1}.
-platform.wiki.currentwiki.gadget.topActiveUsers.label=Glavni aktivni doprinositelji
-platform.wiki.currentwiki.gadget.wikiInformation.label=Informacije o wikiju
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Da biste vidjeli cijelu listu članova wikija, možete upotrijebiti stranicu {0}Imenik korisnika{1}.
-platform.wiki.currentwiki.invitation.view.label=Vidi pozivnicu
-platform.wiki.currentwiki.invitationCancelFailure=Greška, ne možete otkazati ovu pozivnicu.
-platform.wiki.currentwiki.invitationCancelNotification=Vaša pozivnica je otkazana i više nije valjana.
-platform.wiki.currentwiki.invitationCancelSaveComment=Otkazana pozivnica {0} ({1})
-platform.wiki.currentwiki.invitationCancelSuccess=Pozivnica uspješno otkazana.
-platform.wiki.currentwiki.invitationPendingForCurrentWiki=Pozvani ste da se pridružite ovom wikiju
-platform.wiki.currentwiki.invite.button.label=Pozovi
-platform.wiki.currentwiki.invite.message.hint=Poruka za poslati korisniku.
-platform.wiki.currentwiki.invite.message.label=Poruka
-platform.wiki.currentwiki.invite.username.hint=Ime korisnika za dodati wikiju.
-platform.wiki.currentwiki.invite.username.label=Korisničko ime
-platform.wiki.currentwiki.inviteNotification=Pozvani ste da se pridružite wikiju ''{0}''.
-platform.wiki.currentwiki.inviteRequestAlreadyExists={0} već ima zahtjev na čekanju. Molim odgovorite na taj zahtjev umjesto na ovaj.
-platform.wiki.currentwiki.inviteSaveComment=Korisnik ''{0}'' je pozvan da se pridruži wikiju.
-platform.wiki.currentwiki.inviteSuccess={0} uspješno pozvan/a.
-platform.wiki.currentwiki.inviteUserAlreadyInvited={0} već ima pozivnicu na čekanju.
-platform.wiki.currentwiki.inviteUserAlreadyMember={0} je već član wikija.
-platform.wiki.currentwiki.join.label=Pridruži se
-platform.wiki.currentwiki.joinNeedToLogin=Da biste se pridružili ovom wikiju morate biti prijavljeni.
-platform.wiki.currentwiki.joinRequestAcceptedNotification=Vaš zahtjev da se pridružite wikiju ''{0}'' je prihvaćen.
-platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Zatražili ste da se pridružite ovom wikiju
-platform.wiki.currentwiki.joinRequestRejectedNotification=Vaš zahtjev da se pridružite wikiju ''{0}'' je odbijen.
-platform.wiki.currentwiki.joinreques.request.label=Zatraži pridruživanje
-platform.wiki.currentwiki.joinrequest.cancel.label=Otkaži zahtjev
-platform.wiki.currentwiki.leave.label=Napusti wiki
-platform.wiki.currentwiki.managewikis.title=Wiki
-platform.wiki.currentwiki.member.add=Dodaj ili pozovi korisnike u wiki
-platform.wiki.currentwiki.panel.information.description.label=Opis
-platform.wiki.currentwiki.panel.information.members.label=Članovi
-platform.wiki.currentwiki.panel.information.name.label=Ime
-platform.wiki.currentwiki.prop.description.hint=Kratki opis wikija i njegove svrhe.
-platform.wiki.currentwiki.prop.description.label=Opis
-platform.wiki.currentwiki.prop.membershipType.hint=Način na koji se korisnici mogu pridružiti wikiju.
-platform.wiki.currentwiki.prop.membershipType.label=Tip članstva
-platform.wiki.currentwiki.prop.owner.hint=Korisnik koji će imati sve ovlasti nad wikijem.
-platform.wiki.currentwiki.prop.owner.label=Vlasnik
-platform.wiki.currentwiki.prop.secure.hint=Ukoliko je omogućeno, svi generirani vanjski URL-ovi ovog wikija će započinjati s {0}https\:~/~/{1}.
-platform.wiki.currentwiki.prop.secure.label=Sigurno (SSL)
-platform.wiki.currentwiki.prop.wikiprettyname.hint=Prikazno ime wikija.
-platform.wiki.currentwiki.prop.wikiprettyname.label=Prikazno ime
-platform.wiki.currentwiki.welcome=Dobrodošli u wiki {0}{1}{2}.
+platform.wiki.currentwiki.candidates.accept.label=Prihvati
+platform.wiki.currentwiki.candidates.reject.label=Odbij
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Otkaži pozivnicu
 platform.wiki.currentwiki.wikiusers.title=Korisnici wikija
+platform.wiki.currentwiki.managewikis.title=Wiki
+WikiManager.WikiCandidateMemberClass_status_pending=Na čekanju
+WikiManager.WikiCandidateMemberClass_status_accepted=Prihvaćeno
+WikiManager.WikiCandidateMemberClass_status_rejected=Odbijeno
+WikiManager.WikiCandidateMemberClass_type_request=Zahtjev
+WikiManager.WikiCandidateMemberClass_type_invitation=Pozivnica
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Prikazno ime wikija.
+platform.wiki.currentwiki.prop.description.hint=Kratki opis wikija i njegove svrhe.
+platform.wiki.currentwiki.prop.owner.hint=Korisnik koji će imati sve ovlasti nad wikijem.
+platform.wiki.currentwiki.prop.membershipType.hint=Način na koji se korisnici mogu pridružiti wikiju.
+platform.wiki.currentwiki.prop.secure.hint=Ukoliko je omogućeno, svi generirani vanjski URL-ovi ovog wikija će započinjati s {0}https\:~/~/{1}.
+platform.wiki.currentwiki.invite.username.hint=Ime korisnika za dodati wikiju.
+platform.wiki.currentwiki.invite.message.hint=Poruka za poslati korisniku.
+platform.wiki.currentwiki.candidates.hint=Korisnici koji su zatražili ili koji su pozvani da se pridruže wikiju.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=Upravljajte postavkama kao što su ime wikija, opis, vlasnik i tip članstva.
+admin.xwiki.workspaceusers.description=Upravljajte članovima wikija\: dodajte, uklonite, pozovite, prihvatite ili odbijte članove wikija.
+admin.xwiki.usersconfiguration.title=Konfiguracija
+admin.xwiki.members.title=Trenutni članovi
+    
+# DRAWER ITEM
 platform.wiki.drawer.homeWiki=Početni wiki
-platform.wiki.panel.title=Informacije o wikiju
 </content>
 </xwikidoc>

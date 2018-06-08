@@ -816,52 +816,82 @@ public class XWikiAttachment implements Cloneable
     /**
      * Retrieve the content of this attachment as a byte array.
      *
-     * @param context current XWikiContext
+     * @param xcontext current XWikiContext
      * @return a byte array containing the binary data content of the attachment
      * @throws XWikiException when an error occurs during wiki operation
      * @deprecated use {@link #getContentInputStream(XWikiContext)} instead
      */
     @Deprecated
-    public byte[] getContent(XWikiContext context) throws XWikiException
+    public byte[] getContent(XWikiContext xcontext) throws XWikiException
     {
-        if (this.content == null && context != null) {
-            loadAttachmentContent(context);
+        InputStream inputStream = getContentInputStream(xcontext);
+
+        if (inputStream != null) {
+            try {
+                return IOUtils.toByteArray(inputStream);
+            } catch (IOException e) {
+                throw new XWikiException("Failed to read attachment content", e);
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Failed to close attachment content input stream: {}",
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
         }
 
-        return this.content.getContent();
+        return null;
     }
 
     /**
      * Retrieve the content of this attachment as an input stream.
      *
-     * @param context current XWikiContext
+     * @param xcontext current XWikiContext
      * @return an InputStream to consume for receiving the content of this attachment
      * @throws XWikiException when an error occurs during wiki operation
      * @since 2.3M2
      */
-    public InputStream getContentInputStream(XWikiContext context) throws XWikiException
+    public InputStream getContentInputStream(XWikiContext xcontext) throws XWikiException
     {
-        if (this.content == null && context != null) {
-            if (Objects.equals(getVersion(), getLatestStoredVersion(context))) {
-                // Load the attachment content from the xwikiattachment_content table.
-                loadAttachmentContent(context);
-            } else {
-                // Load the attachment content from the xwikiattachment_archive table.
-                // We don't use #getAttachmentRevision() because it checks if the requested version equals the version
-                // of the target attachment (XWIKI-1938).
-                XWikiAttachment archivedVersion = loadArchive(context).getRevision(this, getVersion(), context);
-                XWikiAttachmentContent archivedContent =
-                    archivedVersion != null ? archivedVersion.getAttachment_content() : null;
-                if (archivedContent != null) {
-                    setAttachment_content(archivedContent);
-                } else {
-                    // Fall back on the version of the content stored in the xwikiattachment_content table.
-                    loadAttachmentContent(context);
-                }
+        if (this.content == null && xcontext != null) {
+            reloadAttachmentContent(xcontext);
+        } else {
+            try {
+                return getContentInputStream();
+            } catch (Exception e) {
+                // Bulletproofing: if the content object is corrupted for some reason try to reload it
+                reloadAttachmentContent(xcontext);
             }
         }
 
+        return getContentInputStream();
+    }
+
+    private InputStream getContentInputStream()
+    {
         return this.content != null ? this.content.getContentInputStream() : null;
+    }
+
+    private void reloadAttachmentContent(XWikiContext xcontext) throws XWikiException
+    {
+        if (Objects.equals(getVersion(), getLatestStoredVersion(xcontext))) {
+            // Load the attachment content from the xwikiattachment_content table.
+            loadAttachmentContent(xcontext);
+        } else {
+            // Load the attachment content from the xwikiattachment_archive table.
+            // We don't use #getAttachmentRevision() because it checks if the requested version equals the version
+            // of the target attachment (XWIKI-1938).
+            XWikiAttachment archivedVersion = loadArchive(xcontext).getRevision(this, getVersion(), xcontext);
+            XWikiAttachmentContent archivedContent =
+                archivedVersion != null ? archivedVersion.getAttachment_content() : null;
+            if (archivedContent != null) {
+                setAttachment_content(archivedContent);
+            } else {
+                // Fall back on the version of the content stored in the xwikiattachment_content table.
+                loadAttachmentContent(xcontext);
+            }
+        }
     }
 
     /**
@@ -1337,7 +1367,7 @@ public class XWikiAttachment implements Cloneable
             if (!this.archiveStoreSet) {
                 this.archiveStoreInstance = xcontext.getWiki().getDefaultAttachmentArchiveStore();
 
-                setContentStore(this.archiveStoreInstance.getHint());
+                setArchiveStore(this.archiveStoreInstance.getHint());
             } else {
                 String hint = getArchiveStore();
 

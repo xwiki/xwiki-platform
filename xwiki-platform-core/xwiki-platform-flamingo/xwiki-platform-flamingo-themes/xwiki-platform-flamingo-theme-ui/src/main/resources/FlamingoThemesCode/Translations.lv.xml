@@ -39,38 +39,54 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-platform.flamingo.themes.autorefresh=Atjaunot automātiski
-platform.flamingo.themes.category.advanced=Padziļināti
-platform.flamingo.themes.category.base-colors=Pamatkrāsas
-platform.flamingo.themes.category.breadcrumb=Navigācijas pēdas
-platform.flamingo.themes.category.buttons=Pogas
-platform.flamingo.themes.category.dropdowns=Izvēlnes
-platform.flamingo.themes.category.forms=Formas
-platform.flamingo.themes.category.logos=Logo
-platform.flamingo.themes.category.navbar=Navigācijas josla
-platform.flamingo.themes.category.panels=Paneļi
-platform.flamingo.themes.category.typography=Burtu izskats
-platform.flamingo.themes.defaultvalue=Noklusētais
-platform.flamingo.themes.home.create=Izveidot jaunu tēmu
-platform.flamingo.themes.home.create.confirm=Apstiprināt
-platform.flamingo.themes.home.create.csrf=Drošības nolūkos lūdzam apstiprināt, ka vēlaties izveidot tēmu ar nosaukumu  "{0}".
-platform.flamingo.themes.home.create.invalid=Nepareizs tēmas nosaukums\!
+  <content>platform.flamingo.themes.home.title=Flamingo tēmas
 platform.flamingo.themes.home.currenttheme=Pašreizējā tēma
-platform.flamingo.themes.home.newThemeName=Tēmas nosaukums...
 platform.flamingo.themes.home.otherthemes=Citas pieejamās tēmas
-platform.flamingo.themes.home.set.success=Tēma iestatīta uz  "{0}".
-platform.flamingo.themes.home.title=Flamingo tēmas
-platform.flamingo.themes.home.useThisTheme=Lietot šo tēmu
-platform.flamingo.themes.home.warningCurrentOldColorTheme=Pašreiz tiek izmantota Colibri krāsu tēma, kura nav piemērota izmantošanai ar Flamingo apdari. Mēs esam darījuši visu iespējamo, lai tā nebūtu, tomēr rezultāts var nebūt pietiekami labs.
 platform.flamingo.themes.home.warningOldColorThemeInstalled=Ar šo lietotni varat pārvalīdīt Flamingo tēmas. Flamingo tēma ir pielāgojama Flamingo apdare. Ja vēlaties mainīt krāsas Colibri-bāzētai apdarei, jums ir jāizmanto {0}Colibri krāsu tēmu lietotne{1}. 
-platform.flamingo.themes.incompatiblebrowser=Piedodiet, bet tēmas priešskatīšana nedarbojas ar šo Internet Explorer versiju. Jums ir jāizmanto pārlūkprogrammas modernāka versija.
-platform.flamingo.themes.lessCode.description=Šajā laukā varat tieši ierakstīt LESS kodu, kurš tiks pievienots apdarei.
-platform.flamingo.themes.lessCode.warning=Diemžēl šī lauka vērtība priekšskatījumā netiek ņemta vērā.
-platform.flamingo.themes.loading=Ielādē...
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Pašreiz tiek izmantota Colibri krāsu tēma, kura nav piemērota izmantošanai ar Flamingo apdari. Mēs esam darījuši visu iespējamo, lai tā nebūtu, tomēr rezultāts var nebūt pietiekami labs.
+platform.flamingo.themes.home.useThisTheme=Lietot šo tēmu
+platform.flamingo.themes.home.newThemeName=Tēmas nosaukums...
+platform.flamingo.themes.home.create=Izveidot jaunu tēmu
+platform.flamingo.themes.home.create.invalid=Nepareizs tēmas nosaukums\!
+platform.flamingo.themes.home.create.csrf=Drošības nolūkos lūdzam apstiprināt, ka vēlaties izveidot tēmu ar nosaukumu  "{0}".
+platform.flamingo.themes.home.create.confirm=Apstiprināt
+platform.flamingo.themes.home.set.success=Tēma iestatīta uz  "{0}".
+platform.flamingo.themes.title.variables=Mainīgie
+platform.flamingo.themes.title.preview=Priekšskatīt
+platform.flamingo.themes.autorefresh=Atjaunot automātiski
 platform.flamingo.themes.refresh=Atjaunot
 platform.flamingo.themes.refreshwarning=Atjaunošana prasīs vairākas sekundes un priešskats var nebūt 100% pareizs.
-platform.flamingo.themes.title.preview=Priekšskatīt
-platform.flamingo.themes.title.variables=Mainīgie
+platform.flamingo.themes.loading=Ielādē...
+platform.flamingo.themes.category.logos=Logo
+platform.flamingo.themes.category.base-colors=Pamatkrāsas
+platform.flamingo.themes.category.typography=Burtu izskats
+platform.flamingo.themes.category.forms=Formas
+platform.flamingo.themes.category.buttons=Pogas
+### Missing: platform.flamingo.themes.category.tables=Tables
+platform.flamingo.themes.category.navbar=Navigācijas josla
+platform.flamingo.themes.category.dropdowns=Izvēlnes
+platform.flamingo.themes.category.panels=Paneļi
+platform.flamingo.themes.category.breadcrumb=Navigācijas pēdas
+platform.flamingo.themes.category.advanced=Padziļināti
+platform.flamingo.themes.defaultvalue=Noklusētais
+platform.flamingo.themes.lessCode.description=Šajā laukā varat tieši ierakstīt LESS kodu, kurš tiks pievienots apdarei.
+platform.flamingo.themes.incompatiblebrowser=Piedodiet, bet tēmas priešskatīšana nedarbojas ar šo Internet Explorer versiju. Jums ir jāizmanto pārlūkprogrammas modernāka versija.
+### Missing: platform.flamingo.themes.local=Local
+### Missing: platform.flamingo.themes.global=Global
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=Diemžēl šī lauka vērtība priekšskatījumā netiek ņemta vērā.
+
+#@deprecatedend
 </content>
 </xwikidoc>

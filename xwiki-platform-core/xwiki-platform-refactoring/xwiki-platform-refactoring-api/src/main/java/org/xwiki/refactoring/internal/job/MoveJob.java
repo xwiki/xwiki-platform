@@ -93,6 +93,11 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
             return;
         }
 
+        if (source.getParent() != null && source.getParent().equals(destination)) {
+            this.logger.error("Cannot move [{}] into [{}], it's already there.", source, destination);
+            return;
+        }
+
         // Dispatch the move operation based on the source entity type.
 
         switch (source.getType()) {

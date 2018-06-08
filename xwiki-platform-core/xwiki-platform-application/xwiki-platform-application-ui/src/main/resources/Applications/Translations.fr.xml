@@ -39,8 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content>application.index.title=Liste des applications
 application.index.drawer=Liste des applications
-application.index.title=Liste des applications
 </content>
 </xwikidoc>

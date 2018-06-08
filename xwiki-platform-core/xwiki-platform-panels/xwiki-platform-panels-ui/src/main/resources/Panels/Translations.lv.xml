@@ -39,12 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-panels._actions=Darbības
-panels.available=Pieejamie paneļi
-panels.category=Kategorija
-panels.description=Apraksts
+  <content>panels.available=Pieejamie paneļi
 panels.name=Nosaukums
+panels.description=Apraksts
 panels.type=Veids
+panels.category=Kategorija
+panels._actions=Darbības
+panels.emptyvalue=
+### Missing: panels.children.title=Child Pages
+### Missing: panels.siblings.title=Sibling Pages
+### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
 </content>
 </xwikidoc>

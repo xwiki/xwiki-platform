@@ -2,17 +2,11 @@
 	.jstree-node,
 	.jstree-icon { background-repeat:no-repeat; background-color:transparent; }
 	.jstree-anchor,
+	.jstree-animated,
 	.jstree-wholerow { transition:background-color 0.15s, box-shadow 0.15s; }
-  .jstree-hovered {
-    background: @hovered-bg-color;
-    border-radius: 2px;
-    box-shadow: inset 0 0 1px @hovered-shadow-color;
-  }
-  .jstree-clicked {
-    background: @clicked-bg-color;
-    border-radius: 2px;
-    box-shadow: inset 0 0 1px @clicked-shadow-color;
-  }
+	.jstree-hovered { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
+	.jstree-context { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
+	.jstree-clicked { background:@clicked-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @clicked-shadow-color; }
 	.jstree-no-icons .jstree-anchor > .jstree-themeicon { display:none; }
 	.jstree-disabled {
 		background:transparent; color:@disabled-color;
@@ -36,7 +30,7 @@
 		}
 	}
 	// stripes
-	> .jstree-striped { background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAkCAMAAAB/qqA+AAAABlBMVEUAAAAAAAClZ7nPAAAAAnRSTlMNAMM9s3UAAAAXSURBVHjajcEBAQAAAIKg/H/aCQZ70AUBjAATb6YPDgAAAABJRU5ErkJggg==") left top repeat; }
+	> .jstree-striped { min-width:100%; display:inline-block; background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAkCAMAAAB/qqA+AAAABlBMVEUAAAAAAAClZ7nPAAAAAnRSTlMNAMM9s3UAAAAXSURBVHjajcEBAQAAAIKg/H/aCQZ70AUBjAATb6YPDgAAAABJRU5ErkJggg==") left top repeat; }
 	// wholerow
 	> .jstree-wholerow-ul .jstree-hovered,
 	> .jstree-wholerow-ul .jstree-clicked { background:transparent; box-shadow:none; border-radius:0; }

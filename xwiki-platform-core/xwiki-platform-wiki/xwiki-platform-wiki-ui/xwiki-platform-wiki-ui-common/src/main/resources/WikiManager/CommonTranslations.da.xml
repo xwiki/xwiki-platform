@@ -39,14 +39,29 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
-admin.wiki=Wiki
-admin.wiki.description=Beskriv din wiki (navn og beskrivelse) og indstil ejer og hjemmeside.
-admin.wikis=Wikier
+  <content>admin.wikis=Wikier
 admin.wikis.descriptor=Beskrivelser
-platform.wiki.admin.wiki.csrfInvalidError=Sikkerhedsnøgle (CSRF) ikke korrekt. Prøv at genindlæse siden og prøv igen.
+### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
+admin.wiki.description=Beskriv din wiki (navn og beskrivelse) og indstil ejer og hjemmeside.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Den nye ejers bruger-id findes ikke eller er i en anden wiki.\\nEr du sikker på du vil bruge den og fortsætte med at gemme?
-platform.wiki.admin.wiki.ownerWarning=Advarsel\: Når du ændrer dette vil den forrige ejer miste ejer-rettigheder. Hvis den bruger er dig, pas på at du ikke låser sig selv ude af wikien. Hvis det sker, må du tage fat i hoved-wikiens administrator eller bruge super-administrator login.
+platform.wiki.admin.wiki.csrfInvalidError=Sikkerhedsnøgle (CSRF) ikke korrekt. Prøv at genindlæse siden og prøv igen.
 platform.wiki.admin.wiki.requiredFieldsError=Ejer og hjemmeside skal angives.
+platform.wiki.admin.wiki.ownerWarning=Advarsel\: Når du ændrer dette vil den forrige ejer miste ejer-rettigheder. Hvis den bruger er dig, pas på at du ikke låser sig selv ude af wikien. Hvis det sker, må du tage fat i hoved-wikiens administrator eller bruge super-administrator login.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

@@ -39,13 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content>invitation.applicationsPanelEntryLabel=Invitation
+
+# Invitation Administration Section
 Invitation.WebHome_from_address.hint=Adresse de l'émetteur des mails d'invitation.
-Invitation.WebHome_javamail_extra_props.hint=Liste des propriétés JavaMail supplémentaires à utiliser
-Invitation.WebHome_smtp_port.hint=Port SMTP à utiliser.
-Invitation.WebHome_smtp_server.hint=Serveur SMTP à utiliser.
 Invitation.WebHome_smtp_server_password.hint=Mot de passe de connexion SMTP (en cas d'authentification).
 Invitation.WebHome_smtp_server_username.hint=Utilisateur de connexion SMTP (en cas d'authentification).
-invitation.applicationsPanelEntryLabel=Invitation
+Invitation.WebHome_smtp_port.hint=Port SMTP à utiliser.
+Invitation.WebHome_smtp_server.hint=Serveur SMTP à utiliser.
+Invitation.WebHome_javamail_extra_props.hint=Liste des propriétés JavaMail supplémentaires à utiliser
 </content>
 </xwikidoc>

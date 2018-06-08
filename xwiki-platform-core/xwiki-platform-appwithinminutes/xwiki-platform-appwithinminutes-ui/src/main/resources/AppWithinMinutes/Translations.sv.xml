@@ -39,140 +39,214 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
-appWithinMinutes.wizardStep.name.description=Mata in applikationens namn.
-appWithinMinutes.wizardStep.name.name=Namn
-appWithinMinutes.wizardStep.name.title=Namnge din applikation
-appWithinMinutes.wizardStep.presentation.description=Anpassa din applikations hemsida
-appWithinMinutes.wizardStep.presentation.name=Presentation
-appWithinMinutes.wizardStep.presentation.title=Anpassa din applikations hemsida
-appWithinMinutes.wizardStep.structure.description=Ange strukturen på din applikation genom att specificera vilka typer av fält den skall innehålla
-appWithinMinutes.wizardStep.structure.name=Struktur
-appWithinMinutes.wizardStep.structure.title=Definiera strukturen på din applikation
-platform.appwithinminutes.appHomePageActionsHeading=Operationer
-platform.appwithinminutes.appHomePageAddEntryHint=Lägg till ny post
-platform.appwithinminutes.appHomePageAddEntryLabel=Lägg till
-platform.appwithinminutes.appHomePageDeleteAppLabel=Ta bort applikation
-platform.appwithinminutes.appHomePageEditAppLabel=Redigera applikation
-platform.appwithinminutes.appHomePageEntryNameLabel=Postnamn\:
-platform.appwithinminutes.appHomePageTranslateAppLabel=Översätt applikation
-platform.appwithinminutes.appLiveTableDeleteEntryActionName=Radera
-platform.appwithinminutes.appLiveTableEditEntryActionName=Redigera
-platform.appwithinminutes.appLiveTableHeading=Poster
-platform.appwithinminutes.appNameEmptyError=Mata in applikationens namn.
-platform.appwithinminutes.appNameHint=Namnet på applikationen avgör URL\:en till applikationens hemsida, i vilket rum applikationens data skall lagras och namnet på klassen som beskriver applikationens struktur.
-platform.appwithinminutes.appNameIsUsedWarning=Den här applikationen finns redan.  Om du går vidare till nästa steg kommer du att redigera den existerande applikationen.
-platform.appwithinminutes.appNameLabel=Applikationsnamn
-platform.appwithinminutes.appNamePageTitle=Skapa applikation
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=Applikationsklass
-platform.appwithinminutes.appNamePreviewDataSpaceLabel=Rum för applikationsdata
-platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL till applikationens hemsida
-platform.appwithinminutes.appPanelCreateEntry=Skapa din egen\!
-platform.appwithinminutes.appsLiveTable._actions=Operationer
+  <content>### Home page
+platform.appwithinminutes.homePageTitle=Applikation på minuten
+platform.appwithinminutes.description=Skapa webbapplikationer för att samarbeta på bara några minuter med hjälp av XWikis kraftfulla system för att hantera strukturerad data.
+platform.appwithinminutes.createAppButtonLabel=Skapa applikation
+platform.appwithinminutes.appsLiveTableHeading=Applikationer
+platform.appwithinminutes.appsLiveTable.doc.space=Applikationsnamn
 platform.appwithinminutes.appsLiveTable.doc.author=Senaste författare
 platform.appwithinminutes.appsLiveTable.doc.date=Uppdaterad
-platform.appwithinminutes.appsLiveTable.doc.space=Applikationsnamn
-platform.appwithinminutes.appsLiveTableHeading=Applikationer
-platform.appwithinminutes.classEditorAdvancedCategoryName=Avancerat
-platform.appwithinminutes.classEditorBindSheetSaveComment=Bind klassens presentationsmall
-platform.appwithinminutes.classEditorBooleanFieldName=Boolsk
-platform.appwithinminutes.classEditorCanvasHint=Dra fält från palleten och släpp dem i detta utrymme.
-platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurera
-platform.appwithinminutes.classEditorContentFieldName=Innehåll
-platform.appwithinminutes.classEditorDBListFieldName=Databaslista
-platform.appwithinminutes.classEditorDateFieldName=Datum
-platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Rensa
-platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Idag
-platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Nu
-platform.appwithinminutes.classEditorDeleteFieldLabel=Radera
-platform.appwithinminutes.classEditorDocumentCategoryName=Dokument
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har två fält med samma namn\: {0}
-platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Värde, om inget annat anges
-platform.appwithinminutes.classEditorGroupsFieldName=Grupp
-platform.appwithinminutes.classEditorMoveFieldHint=Dra och släpp för att ändra ordning
-platform.appwithinminutes.classEditorMoveFieldLabel=Flytta
-platform.appwithinminutes.classEditorMultipleSheetsWarning=Den här klassen har flera presentationsmallar
-platform.appwithinminutes.classEditorNumberFieldName=Nummer
-platform.appwithinminutes.classEditorPaletteHint=Dra och släpp fält från paletten för att skapa formuläret.
-platform.appwithinminutes.classEditorPaletteTitle=Fältpalett
-platform.appwithinminutes.classEditorPickersCategoryName=Väljare
-platform.appwithinminutes.classEditorPreviewFieldHint=Dölj konfigurationspanelen och verkställ ändringarF
-platform.appwithinminutes.classEditorPreviewFieldLabel=Förhandsgranska
-platform.appwithinminutes.classEditorSheetSaveComment=Uppdatera klassens presentationsmall
-platform.appwithinminutes.classEditorStandardCategoryName=Standard
-platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Lägg till
-platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Ta bort
-platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
-platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Värde
-platform.appwithinminutes.classEditorStaticListFieldName=Statisk lista
-platform.appwithinminutes.classEditorStringFieldName=Kort text
-platform.appwithinminutes.classEditorTemplateSaveComment=Uppdatera default-värden
-platform.appwithinminutes.classEditorTextAreaFieldName=Lång text
-platform.appwithinminutes.classEditorTitleFieldName=Titel
-platform.appwithinminutes.classEditorTranslationsSaveComment=Uppdatera översättningar
-platform.appwithinminutes.classEditorUpdateSheetHint=Återskapa presentationsmallar för att visa och redigera objekt av denna klass ({0}).
-platform.appwithinminutes.classEditorUpdateSheetLabel=Uppdatera klassens presentationsmall
-platform.appwithinminutes.classEditorUpdateTemplateHint=Spara de värden som skall användas för fält då inget specifikt värde angivits i klassens dokumentmall ({0}).
-platform.appwithinminutes.classEditorUpdateTemplateLabel=Uppdatera klassens dokumentmall
-platform.appwithinminutes.classEditorUsersFieldName=Användare
-platform.appwithinminutes.createAppButtonLabel=Skapa applikation
-platform.appwithinminutes.description=Skapa webbapplikationer för att samarbeta på bara några minuter med hjälp av XWikis kraftfulla system för att hantera strukturerad data.
+platform.appwithinminutes.appsLiveTable._actions=Operationer
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Bevilja administrationsrättigheter på rummet.
-platform.appwithinminutes.homePageTitle=Applikation på minuten
-platform.appwithinminutes.liveTableEditorActionsColumnDescription=En lista med operationer som kan utföras på applikationsposten så som redigera och radera.
-platform.appwithinminutes.liveTableEditorActionsColumnName=Operationer
-platform.appwithinminutes.liveTableEditorAddColumnHint=Lägg till
-platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=En speciell kolumn för att visa länkar till bilagor till postens sida.
-platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Bilagor
-platform.appwithinminutes.liveTableEditorAvatarColumnDescription=En speciell kolumn för att visa användarens avatar. Detta fungerar endast för en tabell som bundits till klassen XWiki.XWikiUsers.
-platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
-platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Klassfält
-platform.appwithinminutes.liveTableEditorColumnsHint=Välj de kolumner som skall visas i live-tabellen på applikationens hemsida.
-platform.appwithinminutes.liveTableEditorDeleteColumnHint=Ta bort
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Vissa kolumner är föråldrade, antagligen på grund av att motsvarande klassfält har tagits bort.  Vill du ta bort dem? &lt;a href\=""&gt;Ja&lt;/a&gt;/&lt;a href\=""&gt;Nej&lt;/a&gt;
-platform.appwithinminutes.liveTableEditorDescriptionHint=Beskrivningen innehåller en kort sammanfattning av vad applikationen gör och vilken data den hanterar.
-platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Användaren som senast redigerade denna applikationspost
-platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Senaste författare
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Det datum då applikationsposten skapades
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Skapad den
-platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Användare som skapade applikationsposten
-platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Ursprunglig författare
-platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Det datum då applikationsposten senast redigerades
-platform.appwithinminutes.liveTableEditorDocDateColumnName=Uppdaterad den
-platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Namnet på den sida som innehåller aplikationsposten, med rumnsnamnet som prefix.
-platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sidans fullständiga namn
-platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Namnet på sidan som innehåller applikationsposten
-platform.appwithinminutes.liveTableEditorDocNameColumnName=Sidnamn
-platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Namnet på rummet som innehåller applikationsposten
-platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Rum
-platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Titeln på sidan som innehåller applikationsposten
-platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sidtitel
-platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Allmänna kolumner
-platform.appwithinminutes.liveTableEditorHelpDescription=Allmänna kolumner i live-tabeller är oberoende av strukturen på din applikation. De visar information om de sidor som innehåller posterna till din applikation.
-platform.appwithinminutes.liveTableEditorHelpTitle=Tips
-platform.appwithinminutes.liveTableEditorIcon=Ikon
-platform.appwithinminutes.liveTableEditorImagesColumnDescription=En specialiserad kolumn för att visa bilder som finns som bilagor till postsidan
-platform.appwithinminutes.liveTableEditorImagesColumnName=Biler
-platform.appwithinminutes.liveTableEditorMoveColumnHint=Dra och släpp för att ändra ordning
-platform.appwithinminutes.liveTableEditorSaveComment=Uppdatera live-tabell
-platform.appwithinminutes.wizardStep1Description=Mata in applikationens namn.
-platform.appwithinminutes.wizardStep1Name=Namn
-platform.appwithinminutes.wizardStep1Title=Namnge din applikation
-platform.appwithinminutes.wizardStep2Description=Ange strukturen på din applikation genom att specificera vilka typer av fält den skall innehålla
-platform.appwithinminutes.wizardStep2Name=Struktur
-platform.appwithinminutes.wizardStep2Title=Definiera strukturen på din applikation
-platform.appwithinminutes.wizardStep3Description=Anpassa din applikations hemsida
-platform.appwithinminutes.wizardStep3Name=Presentation
-platform.appwithinminutes.wizardStep3Title=Anpassa din applikations hemsida
-platform.appwithinminutes.wizardStepFinishButtonLabel=Avsluta
-platform.appwithinminutes.wizardStepFinishButtonTip=Gå till applikationens hemsida
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=Skapa din egen\!
+
+### Wizard step
 platform.appwithinminutes.wizardStepHeading=Steg {0} - {1}
-platform.appwithinminutes.wizardStepHelpDescription=Denna guide hjälper dig att bygga din applikation.  I dessa steg konfigureras det sätt som din applikation kommer att visas på och vilken information den kommer att hantera\:
-platform.appwithinminutes.wizardStepHelpTitle=Steg
+appWithinMinutes.wizardStep.name.name=Namn
+appWithinMinutes.wizardStep.name.title=Namnge din applikation
+appWithinMinutes.wizardStep.name.description=Mata in applikationens namn.
+appWithinMinutes.wizardStep.structure.name=Struktur
+appWithinMinutes.wizardStep.structure.title=Definiera strukturen på din applikation
+appWithinMinutes.wizardStep.structure.description=Ange strukturen på din applikation genom att specificera vilka typer av fält den skall innehålla
+### Missing: appWithinMinutes.wizardStep.entries.name=Entries
+### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
+### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.presentation.name=Presentation
+appWithinMinutes.wizardStep.presentation.title=Anpassa din applikations hemsida
+appWithinMinutes.wizardStep.presentation.description=Anpassa din applikations hemsida
 platform.appwithinminutes.wizardStepNextButtonLabel=Nästa steg
 platform.appwithinminutes.wizardStepNextButtonTip=Gå till nästa steg
+platform.appwithinminutes.wizardStepFinishButtonLabel=Avsluta
+platform.appwithinminutes.wizardStepFinishButtonTip=Gå till applikationens hemsida
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Föregående steg
 platform.appwithinminutes.wizardStepPreviousButtonTip=Gå till föregående steg
+platform.appwithinminutes.wizardStepHelpTitle=Steg
+platform.appwithinminutes.wizardStepHelpDescription=Denna guide hjälper dig att bygga din applikation.  I dessa steg konfigureras det sätt som din applikation kommer att visas på och vilken information den kommer att hantera\:
+
+### Wizard Step 1: Application Name
+### Missing: appWithinMinutes.createApp.location.label=Location
+### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
+### Missing: appWithinMinutes.createApp.parent.label=Parent
+### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
+### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+### Missing: appWithinMinutes.codeSpace.title=Code
+### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
+### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+platform.appwithinminutes.appNamePageTitle=Skapa applikation
+platform.appwithinminutes.appNameLabel=Applikationsnamn
+platform.appwithinminutes.appNameHint=Namnet på applikationen avgör URL\:en till applikationens hemsida, i vilket rum applikationens data skall lagras och namnet på klassen som beskriver applikationens struktur.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL till applikationens hemsida
+### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
+platform.appwithinminutes.appNameIsUsedWarning=Den här applikationen finns redan.  Om du går vidare till nästa steg kommer du att redigera den existerande applikationen.
+platform.appwithinminutes.appNameEmptyError=Mata in applikationens namn.
+
+### Wizard Step 2: Application Structure
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+platform.appwithinminutes.classEditorPaletteTitle=Fältpalett
+platform.appwithinminutes.classEditorPaletteHint=Dra och släpp fält från paletten för att skapa formuläret.
+platform.appwithinminutes.classEditorCanvasHint=Dra fält från palleten och släpp dem i detta utrymme.
+
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Uppdatera klassens dokumentmall
+platform.appwithinminutes.classEditorUpdateTemplateHint=Spara de värden som skall användas för fält då inget specifikt värde angivits i klassens dokumentmall ({0}).
+platform.appwithinminutes.classEditorUpdateSheetLabel=Uppdatera klassens presentationsmall
+platform.appwithinminutes.classEditorUpdateSheetHint=Återskapa presentationsmallar för att visa och redigera objekt av denna klass ({0}).
+### Missing: platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
+### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
+
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Den här klassen har flera presentationsmallar
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har två fält med samma namn\: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=Uppdatera default-värden
+platform.appwithinminutes.classEditorBindSheetSaveComment=Bind klassens presentationsmall
+platform.appwithinminutes.classEditorSheetSaveComment=Uppdatera klassens presentationsmall
+platform.appwithinminutes.classEditorTranslationsSaveComment=Uppdatera översättningar
+
+platform.appwithinminutes.classEditorStandardCategoryName=Standard
+platform.appwithinminutes.classEditorPickersCategoryName=Väljare
+platform.appwithinminutes.classEditorDocumentCategoryName=Dokument
+platform.appwithinminutes.classEditorAdvancedCategoryName=Avancerat
+
+platform.appwithinminutes.classEditorDBListFieldName=Databaslista
+platform.appwithinminutes.classEditorGroupsFieldName=Grupp
+platform.appwithinminutes.classEditorUsersFieldName=Användare
+platform.appwithinminutes.classEditorDateFieldName=Datum
+platform.appwithinminutes.classEditorStaticListFieldName=Statisk lista
+platform.appwithinminutes.classEditorBooleanFieldName=Boolsk
+platform.appwithinminutes.classEditorNumberFieldName=Nummer
+platform.appwithinminutes.classEditorTextAreaFieldName=Lång text
+platform.appwithinminutes.classEditorStringFieldName=Kort text
+platform.appwithinminutes.classEditorContentFieldName=Innehåll
+platform.appwithinminutes.classEditorTitleFieldName=Titel
+
+platform.appwithinminutes.classEditorDeleteFieldLabel=Radera
+platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurera
+platform.appwithinminutes.classEditorPreviewFieldLabel=Förhandsgranska
+platform.appwithinminutes.classEditorPreviewFieldHint=Dölj konfigurationspanelen och verkställ ändringarF
+platform.appwithinminutes.classEditorMoveFieldLabel=Flytta
+platform.appwithinminutes.classEditorMoveFieldHint=Dra och släpp för att ändra ordning
+
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Värde, om inget annat anges
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Rensa
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Nu
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Idag
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Värde
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Lägg till
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Ta bort
+
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
+### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
+### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+
+### Wizard Step 3: Application Presentation
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Klassfält
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Allmänna kolumner
+platform.appwithinminutes.liveTableEditorHelpTitle=Tips
+platform.appwithinminutes.liveTableEditorHelpDescription=Allmänna kolumner i live-tabeller är oberoende av strukturen på din applikation. De visar information om de sidor som innehåller posterna till din applikation.
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sidtitel
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Titeln på sidan som innehåller applikationsposten
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Sidnamn
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Namnet på sidan som innehåller applikationsposten
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
+### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Senaste författare
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Användaren som senast redigerade denna applikationspost
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Ursprunglig författare
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Användare som skapade applikationsposten
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Uppdaterad den
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Det datum då applikationsposten senast redigerades
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Skapad den
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Det datum då applikationsposten skapades
+platform.appwithinminutes.liveTableEditorActionsColumnName=Operationer
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=En lista med operationer som kan utföras på applikationsposten så som redigera och radera.
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Bilagor
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=En speciell kolumn för att visa länkar till bilagor till postens sida.
+platform.appwithinminutes.liveTableEditorImagesColumnName=Biler
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=En specialiserad kolumn för att visa bilder som finns som bilagor till postsidan
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=En speciell kolumn för att visa användarens avatar. Detta fungerar endast för en tabell som bundits till klassen XWiki.XWikiUsers.
+platform.appwithinminutes.liveTableEditorDescriptionHint=Beskrivningen innehåller en kort sammanfattning av vad applikationen gör och vilken data den hanterar.
+platform.appwithinminutes.liveTableEditorColumnsHint=Välj de kolumner som skall visas i live-tabellen på applikationens hemsida.
+platform.appwithinminutes.liveTableEditorSaveComment=Uppdatera live-tabell
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Dra och släpp för att ändra ordning
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Ta bort
+platform.appwithinminutes.liveTableEditorAddColumnHint=Lägg till
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Vissa kolumner är föråldrade, antagligen på grund av att motsvarande klassfält har tagits bort.  Vill du ta bort dem? &lt;a href\=""&gt;Ja&lt;/a&gt;/&lt;a href\=""&gt;Nej&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=Ikon
+### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+
+### Application home page
+platform.appwithinminutes.appLiveTableHeading=Poster
+platform.appwithinminutes.appLiveTableEditEntryActionName=Redigera
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Radera
+platform.appwithinminutes.appHomePageActionsHeading=Operationer
+platform.appwithinminutes.appHomePageAddEntryLabel=Lägg till
+platform.appwithinminutes.appHomePageAddEntryHint=Lägg till ny post
+platform.appwithinminutes.appHomePageEntryNameLabel=Postnamn\:
+### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
+platform.appwithinminutes.appHomePageEditAppLabel=Redigera applikation
+platform.appwithinminutes.appHomePageTranslateAppLabel=Översätt applikation
+platform.appwithinminutes.appHomePageDeleteAppLabel=Ta bort applikation
+
+### Delete application dialog
+### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
+### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
+### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
+### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
+### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Applikationsklass
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Rum för applikationsdata
+
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Rum
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Namnet på rummet som innehåller applikationsposten
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sidans fullständiga namn
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Namnet på den sida som innehåller aplikationsposten, med rumnsnamnet som prefix.
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=Namn
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=Namnge din applikation
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=Mata in applikationens namn.
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=Struktur
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=Definiera strukturen på din applikation
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=Ange strukturen på din applikation genom att specificera vilka typer av fält den skall innehålla
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=Presentation
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=Anpassa din applikations hemsida
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=Anpassa din applikations hemsida
 </content>
 </xwikidoc>

@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Rumsnamn
-index.spacesMacro.createSpace.link=Skapa ett nytt rum
-index.spacesMacro.createSpace.submit=Skapa
-index.spacesMacro.spaceAdministration.alt=Administrera rum
-index.spacesMacro.spaceAdministration.title=Visa rumsadministrering
-index.spacesMacro.spaceIndex.alt=Rumsindex
+  <content>index.spacesMacro.title=Rum
 index.spacesMacro.spaceIndex.title=Visa rumsindex
-index.spacesMacro.title=Rum
+index.spacesMacro.spaceIndex.alt=Rumsindex
+index.spacesMacro.spaceAdministration.title=Visa rumsadministrering
+index.spacesMacro.spaceAdministration.alt=Administrera rum
+index.spacesMacro.createSpace.link=Skapa ett nytt rum
+index.spacesMacro.createSpace.defaultSpaceName=Rumsnamn
+index.spacesMacro.createSpace.submit=Skapa
 </content>
 </xwikidoc>

@@ -39,12 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-activity.page.link.title=Na lokaciji {0}
-activity.rss.feed.description=RSS tijek izmjena dokumenata
-activity.rss.feed.spaces.description=RSS tijek za dokumente u prostoru(ima) "{0}"
-activity.rss.feed.tags.description=RSS tijek za dokumente označene s "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS tijek za dokumente označene s "{0}" u prostoru(ima) "{1}"
+  <content>activity.page.link.title=Na lokaciji {0}
 activity.rss.pages.modified=RSS tijek izmijenjenih stranica
+activity.rss.feed.description=RSS tijek izmjena dokumenata
+activity.rss.feed.tags.description=RSS tijek za dokumente označene s "{0}"
+activity.rss.feed.spaces.description=RSS tijek za dokumente u prostoru(ima) "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS tijek za dokumente označene s "{0}" u prostoru(ima) "{1}"
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.3M1
+### Missing: activity.link.title=Located in {0} » {1} » {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

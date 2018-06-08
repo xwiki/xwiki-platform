@@ -39,8 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>application.index.title=Imenik aplikacija
 application.index.drawer=Imenik aplikacija
-application.index.title=Imenik aplikacija
 </content>
 </xwikidoc>

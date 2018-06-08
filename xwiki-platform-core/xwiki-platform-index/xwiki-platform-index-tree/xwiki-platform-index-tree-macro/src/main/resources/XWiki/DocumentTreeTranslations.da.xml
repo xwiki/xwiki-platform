@@ -39,46 +39,60 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
+  <content>rendering.macro.documentTree.name=Dokument Træ
 rendering.macro.documentTree.description=Træ-visning af XWiki-dokumenter
-rendering.macro.documentTree.name=Dokument Træ
-rendering.macro.documentTree.parameter.checkboxes.description=Om der skal sættes en check-boks ved gren i træet så man kan vælge flere dokumenter samtidig.
-rendering.macro.documentTree.parameter.checkboxes.name=Check-bokse
-rendering.macro.documentTree.parameter.compact.description=Hvis du har begrænset plads vandret, bør du sætte denne. Det betyder at træets gren-ikoner og grene ikke vises. Desuden anves special styling, som sikrer mindst mulig pladsforbrug vandret - samtidig med at gren-ikonerne er fuldt synlige.
-rendering.macro.documentTree.parameter.compact.name=Komprimér
-rendering.macro.documentTree.parameter.filterByClass.description=Vis kun dokumenter, der har et objekt af den angivne type. Værdien er det fulde navn for et XWiki-dokument der indeholder klasse-definitionen. F.eks. 'Blog.CategoryClass' vil kun vise dokumenter, der repræsenterer blog-kategorier. Lad det være blankt, hvis du ikke ønsker at begrænse dokument-typer, der vises i træet.
-rendering.macro.documentTree.parameter.filterByClass.name=Filtrér efter klasse
-rendering.macro.documentTree.parameter.finder.description=Vis tekstfelt, der kan bruges til at søge efter dokumenter i træet. Feltet vises over træet, og foreslår søgninger baseret på indholdet i træet. Når et foreslag vælges, åbnes træet til det tilsvarende dokument.
-rendering.macro.documentTree.parameter.finder.name=Vælger
-rendering.macro.documentTree.parameter.hierarchyMode.description=Angiver hvilket hieraki, der skal bruges mellem dokumenter. Mulige værdier er "reference" (standard) og "parentchild". "reference" betyder sortering efter område-angivelse i dokumentet, mens "parentchild" bruger "parent"-attributten på dokumentet. 
-rendering.macro.documentTree.parameter.hierarchyMode.name=Dokumenthieraki
-rendering.macro.documentTree.parameter.links.description=Angiver om grenene i træet skal opføre sig som henvisninger (ankre)
-rendering.macro.documentTree.parameter.links.name=Henvisninger
-rendering.macro.documentTree.parameter.openTo.description=ID for grenen, som træet skal åbnes med. Alle grene op til roden af grenen åbes også. Gren-formatet er den som er angivet for roden.
-rendering.macro.documentTree.parameter.openTo.name=Åben 
-rendering.macro.documentTree.parameter.readOnly.description=Skal brugeren kunne modificere træ-strukturen hvis vedkommende har rettighederne?
 rendering.macro.documentTree.parameter.readOnly.name=Kun visning
-rendering.macro.documentTree.parameter.root.description=Rodens ID Anvendes, hvis du kun vil vise undertræet for en given gren (som så er roden). Træet vises med undertræets gren på først niveau, så roden vises ikke. Hele træet vises, hvis rod-ID ikke angives. Formatet for rod-ID er entitetstype\:entitetsreference, hvor entitetstype kan f.eks. være wiki, område, dokument, dvs.\: wiki\:xwiki, space\:xwiki\:Main eller document\:xwiki\:WebHome
-rendering.macro.documentTree.parameter.root.name=Rod-ID
-rendering.macro.documentTree.parameter.showAttachments.description=Om bilag til dokumenter skal vises eller ej.
-rendering.macro.documentTree.parameter.showAttachments.name=VIs bilag
-rendering.macro.documentTree.parameter.showChildDocuments.description=Om underdokumenter ("child") skal vises, baseret på dokumentets "parent"-felt.
-rendering.macro.documentTree.parameter.showChildDocuments.name=Vis underdokumenter
-rendering.macro.documentTree.parameter.showClassProperties.description=Om klasse-egenskaber skal vises for dokumenter, som definerer klasser
-rendering.macro.documentTree.parameter.showClassProperties.name=Vis klasse-egenskaber
-rendering.macro.documentTree.parameter.showDocumentTitle.description=Om dokument-titel skal vises i stedet for dokument-navn, når det vises i træet.
-rendering.macro.documentTree.parameter.showDocumentTitle.name=Vis dokument-titel
-rendering.macro.documentTree.parameter.showObjects.description=Om dokument-objekter skal vises eller ej.
-rendering.macro.documentTree.parameter.showObjects.name=Vis objekter
-rendering.macro.documentTree.parameter.showOnlyViewable.description=Vis kun wiki, området og dokumenter i træet, som bruger har rettigheder til at se. Hvis ikke sat, vil bruger kunne se dokumenternes navne, men vil ikke være i stand til at se indhold. (Dog vil bruger så vide, at de eksisterer).
-rendering.macro.documentTree.parameter.showOnlyViewable.name=Vis kun læsbare
-rendering.macro.documentTree.parameter.showSpaces.description=Om område-grene skal vises eller ej. Hvis de skal, grupperes der efter område.
-rendering.macro.documentTree.parameter.showSpaces.name=Vis områder
-rendering.macro.documentTree.parameter.showTranslations.description=Om dokument-oversættelser skal vises eller ej.
-rendering.macro.documentTree.parameter.showTranslations.name=Vis oversættelser
-rendering.macro.documentTree.parameter.showWikiPrettyName.description=Vis wiki-navn istedet for wiki-id, når wikier vises i træet.
-rendering.macro.documentTree.parameter.showWikiPrettyName.name=Vis wiki-navn
-rendering.macro.documentTree.parameter.showWikis.description=Om wiki-grene skal vises eller ej. Det virker kun på Hoved-wiki og hvis kilde-træet er gemt med programmeringsrettigheder.
+rendering.macro.documentTree.parameter.readOnly.description=Skal brugeren kunne modificere træ-strukturen hvis vedkommende har rettighederne?
 rendering.macro.documentTree.parameter.showWikis.name=Vis wikier
+rendering.macro.documentTree.parameter.showWikis.description=Om wiki-grene skal vises eller ej. Det virker kun på Hoved-wiki og hvis kilde-træet er gemt med programmeringsrettigheder.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Vis wiki-navn
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Vis wiki-navn istedet for wiki-id, når wikier vises i træet.
+rendering.macro.documentTree.parameter.showSpaces.name=Vis områder
+rendering.macro.documentTree.parameter.showSpaces.description=Om område-grene skal vises eller ej. Hvis de skal, grupperes der efter område.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Vis dokument-titel
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Om dokument-titel skal vises i stedet for dokument-navn, når det vises i træet.
+rendering.macro.documentTree.parameter.showTranslations.name=Vis oversættelser
+rendering.macro.documentTree.parameter.showTranslations.description=Om dokument-oversættelser skal vises eller ej.
+rendering.macro.documentTree.parameter.showAttachments.name=VIs bilag
+rendering.macro.documentTree.parameter.showAttachments.description=Om bilag til dokumenter skal vises eller ej.
+rendering.macro.documentTree.parameter.showObjects.name=Vis objekter
+rendering.macro.documentTree.parameter.showObjects.description=Om dokument-objekter skal vises eller ej.
+rendering.macro.documentTree.parameter.showClassProperties.name=Vis klasse-egenskaber
+rendering.macro.documentTree.parameter.showClassProperties.description=Om klasse-egenskaber skal vises for dokumenter, som definerer klasser
+rendering.macro.documentTree.parameter.root.name=Rod-ID
+rendering.macro.documentTree.parameter.root.description=Rodens ID Anvendes, hvis du kun vil vise undertræet for en given gren (som så er roden). Træet vises med undertræets gren på først niveau, så roden vises ikke. Hele træet vises, hvis rod-ID ikke angives. Formatet for rod-ID er entitetstype\:entitetsreference, hvor entitetstype kan f.eks. være wiki, område, dokument, dvs.\: wiki\:xwiki, space\:xwiki\:Main eller document\:xwiki\:WebHome
+### Missing: rendering.macro.documentTree.parameter.showRoot.name=Show Root
+### Missing: rendering.macro.documentTree.parameter.showRoot.description=Whether to show the root node or not. The root node is not shown by default because it is usually implied from the context where the tree is displayed (e.g. a label before the tree). There are some cases though when you may want to display the root node: to be able to create a new node under the root.
+rendering.macro.documentTree.parameter.compact.name=Komprimér
+rendering.macro.documentTree.parameter.compact.description=Hvis du har begrænset plads vandret, bør du sætte denne. Det betyder at træets gren-ikoner og grene ikke vises. Desuden anves special styling, som sikrer mindst mulig pladsforbrug vandret - samtidig med at gren-ikonerne er fuldt synlige.
+rendering.macro.documentTree.parameter.links.name=Henvisninger
+rendering.macro.documentTree.parameter.links.description=Angiver om grenene i træet skal opføre sig som henvisninger (ankre)
+rendering.macro.documentTree.parameter.checkboxes.name=Check-bokse
+rendering.macro.documentTree.parameter.checkboxes.description=Om der skal sættes en check-boks ved gren i træet så man kan vælge flere dokumenter samtidig.
+rendering.macro.documentTree.parameter.openTo.name=Åben 
+rendering.macro.documentTree.parameter.openTo.description=ID for grenen, som træet skal åbnes med. Alle grene op til roden af grenen åbes også. Gren-formatet er den som er angivet for roden.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Vis kun læsbare
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Vis kun wiki, området og dokumenter i træet, som bruger har rettigheder til at se. Hvis ikke sat, vil bruger kunne se dokumenternes navne, men vil ikke være i stand til at se indhold. (Dog vil bruger så vide, at de eksisterer).
+rendering.macro.documentTree.parameter.filterByClass.name=Filtrér efter klasse
+rendering.macro.documentTree.parameter.filterByClass.description=Vis kun dokumenter, der har et objekt af den angivne type. Værdien er det fulde navn for et XWiki-dokument der indeholder klasse-definitionen. F.eks. 'Blog.CategoryClass' vil kun vise dokumenter, der repræsenterer blog-kategorier. Lad det være blankt, hvis du ikke ønsker at begrænse dokument-typer, der vises i træet.
+rendering.macro.documentTree.parameter.finder.name=Vælger
+rendering.macro.documentTree.parameter.finder.description=Vis tekstfelt, der kan bruges til at søge efter dokumenter i træet. Feltet vises over træet, og foreslår søgninger baseret på indholdet i træet. Når et foreslag vælges, åbnes træet til det tilsvarende dokument.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Dokumenthieraki
+rendering.macro.documentTree.parameter.hierarchyMode.description=Angiver hvilket hieraki, der skal bruges mellem dokumenter. Mulige værdier er "reference" (standard) og "parentchild". "reference" betyder sortering efter område-angivelse i dokumentet, mens "parentchild" bruger "parent"-attributten på dokumentet. 
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden Documents
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
+### Missing: rendering.macro.documentTree.parameter.limit.name=Limit
+### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
+### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
+### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+
+### Missing: index.documentTree.empty=No pages found
+### Missing: index.documentTree.more={0} more ...
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=Vis underdokumenter
+rendering.macro.documentTree.parameter.showChildDocuments.description=Om underdokumenter ("child") skal vises, baseret på dokumentets "parent"-felt.
 </content>
 </xwikidoc>

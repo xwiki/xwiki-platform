@@ -39,12 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-activity.link.title=Nachádza sa v {0} » {1} » {2}
-activity.rss.feed.description=RSS kanál zmien dokumentov
-activity.rss.feed.spaces.description=RSS kanál pre dokumenty v priestore "{0}"
-activity.rss.feed.tags.description=RSS kanál pre dokumenty ktoré obsahujú tag "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS kanál pre dokumenty ktoré obsahujú tag "{0}" v priestore "{1}"
+  <content>### Missing: activity.page.link.title=Located in {0}
 activity.rss.pages.modified=RSS kanál zmenených stránok
+activity.rss.feed.description=RSS kanál zmien dokumentov
+activity.rss.feed.tags.description=RSS kanál pre dokumenty ktoré obsahujú tag "{0}"
+activity.rss.feed.spaces.description=RSS kanál pre dokumenty v priestore "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS kanál pre dokumenty ktoré obsahujú tag "{0}" v priestore "{1}"
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.3M1
+activity.link.title=Nachádza sa v {0} » {1} » {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

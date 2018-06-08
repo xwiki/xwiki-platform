@@ -39,13 +39,29 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-admin.wiki.description=Popíšte wiki (názov a popis) a zadajte vlastníka a domovskú stránku.
-admin.wikis=Wiki
+  <content>admin.wikis=Wiki
 admin.wikis.descriptor=Informácie
-platform.wiki.admin.wiki.csrfInvalidError=Neplatný bezpečnostný (CSRF) kľúč. Obnovte stránku a skúste ešte raz.
+### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
+admin.wiki.description=Popíšte wiki (názov a popis) a zadajte vlastníka a domovskú stránku.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Nový majiteľ neexistuje. \\nNaozaj chcete uložiť?
-platform.wiki.admin.wiki.ownerWarning=Upozornenie\: Ak zmeníte vlastníka Wiki, predošlý vlastník stratí všetky práva. 
+platform.wiki.admin.wiki.csrfInvalidError=Neplatný bezpečnostný (CSRF) kľúč. Obnovte stránku a skúste ešte raz.
 platform.wiki.admin.wiki.requiredFieldsError=Vlastník, a domovská stránka sú povinné parametre.
+platform.wiki.admin.wiki.ownerWarning=Upozornenie\: Ak zmeníte vlastníka Wiki, predošlý vlastník stratí všetky práva. 
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

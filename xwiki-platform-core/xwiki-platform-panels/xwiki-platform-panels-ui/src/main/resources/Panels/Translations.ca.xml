@@ -39,9 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
+  <content>### Missing: panels.available=Available Panels
+### Missing: panels.name=Name
+### Missing: panels.description=Description
+### Missing: panels.type=Type
+### Missing: panels.category=Category
 panels._actions=Accions
+panels.emptyvalue=
 panels.children.title=Pàgines Filles
 panels.siblings.title=Pàgines Germanes
+### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
 </content>
 </xwikidoc>

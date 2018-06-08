@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Vietas nosaukums
-index.spacesMacro.createSpace.link=Izveidot jaunu vietu
-index.spacesMacro.createSpace.submit=Izveidot
-index.spacesMacro.spaceAdministration.alt=Pārvaldīt vietu
-index.spacesMacro.spaceAdministration.title=Skatīt vietu pārvaldību
-index.spacesMacro.spaceIndex.alt=Vietas saturs
+  <content>index.spacesMacro.title=Vietas
 index.spacesMacro.spaceIndex.title=Skatīt vietu rādītāju
-index.spacesMacro.title=Vietas
+index.spacesMacro.spaceIndex.alt=Vietas saturs
+index.spacesMacro.spaceAdministration.title=Skatīt vietu pārvaldību
+index.spacesMacro.spaceAdministration.alt=Pārvaldīt vietu
+index.spacesMacro.createSpace.link=Izveidot jaunu vietu
+index.spacesMacro.createSpace.defaultSpaceName=Vietas nosaukums
+index.spacesMacro.createSpace.submit=Izveidot
 </content>
 </xwikidoc>

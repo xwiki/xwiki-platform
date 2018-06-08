@@ -39,17 +39,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-admin.repository=Référentiel d'extensions
-extension.repository.authors=Auteurs
-extension.repository.category=Catégorie
-extension.repository.doc.creationDate=Créé le
-extension.repository.doc.date=Modifié le
-extension.repository.emptyvalue=\ 
-extension.repository.installedCount=Installations
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
 extension.repository.name=Nom
-extension.repository.rating=Evalutations
 extension.repository.summary=Résumé
 extension.repository.type=Type
+extension.repository.category=Catégorie
+extension.repository.authors=Auteurs
+extension.repository.doc.creationDate=Créé le
+extension.repository.doc.date=Modifié le
+extension.repository.rating=Evalutations
+extension.repository.installedCount=Installations
+
+## Administration UI
+admin.repository=Référentiel d'extensions
 </content>
 </xwikidoc>

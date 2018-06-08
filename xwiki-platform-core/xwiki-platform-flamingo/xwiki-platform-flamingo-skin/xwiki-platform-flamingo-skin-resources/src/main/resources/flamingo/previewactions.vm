@@ -23,19 +23,21 @@
       #end
     #end
   #end
-<form id="backtoedit" action="$!{escapetool.xml($editorUrl)}" method="post">
+<form id="backtoedit" class="buttons" action="$!{escapetool.xml($editorUrl)}" method="post">
   <div>
-  #foreach($param in $request.getParameterNames())
-    #if(!$param.startsWith('action_'))
-      #foreach($value in $request.getParameterValues($param))
-        <input type="hidden" name="$!{escapetool.xml($param)}" value="$!{escapetool.xml($value)}"/>
+    #foreach($param in $request.getParameterNames())
+      #if(!$param.startsWith('action_'))
+        #foreach($value in $request.getParameterValues($param))
+          <input type="hidden" name="$!{escapetool.xml($param)}" value="$!{escapetool.xml($value)}"/>
+        #end
       #end
     #end
-  #end
-  #editActionButton("$!{escapetool.xml($backToEditAction)}", 'backtoedit', 'btn-info')
-  #editActionButton('saveandcontinue', 'saveandcontinue', 'btn-primary')
-  #editActionButton('save', 'saveandview', 'btn-success')
-  #editActionButton('cancel', 'cancel', 'btn-default')
+    #editActionButton("$!{escapetool.xml($backToEditAction)}", 'backtoedit', 'btn-default')
+    <div class="btn-group">
+      #editActionButton('save', 'saveandview', 'btn-primary')
+      #editActionButton('saveandcontinue', 'save', 'btn-default')
+    </div>
+    #editActionButton('cancel', 'cancel', 'btn-default')
   </div>
 </form>
 #end ## showactions

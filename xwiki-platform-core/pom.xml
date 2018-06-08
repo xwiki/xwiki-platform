@@ -186,7 +186,7 @@
                     "classSimpleName": "XarExtensionScriptService",
                     "methodName": "getInstalledExtensionDocument",
                     "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                    "justification": "Fixed a typo. Should not have any impact on scripts"
                   },
                   {
                     "code": "java.method.exception.checkedRemoved",
@@ -198,7 +198,7 @@
                     "classSimpleName": "XarExtensionScriptService",
                     "methodName": "getInstalledExtensionDocument",
                     "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                    "justification": "Fixed a typo. Should not have any impact on scripts"
                   },
                   {
                     "code": "java.method.exception.checkedAdded",
@@ -210,7 +210,7 @@
                     "classSimpleName": "XarExtensionScriptService",
                     "methodName": "getInstalledExtensionDocument",
                     "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                    "justification": "Fixed a typo. Should not have any impact on scripts"
                   },
                   {
                     "code": "java.method.exception.checkedRemoved",
@@ -222,7 +222,7 @@
                     "classSimpleName": "XarExtensionScriptService",
                     "methodName": "getInstalledExtensionDocument",
                     "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                    "justification": "Fixed a typo. Should not have any impact on scripts"
                   },
                   {
                     "code": "java.method.exception.checkedAdded",
@@ -234,7 +234,7 @@
                     "classSimpleName": "XarExtensionScriptService",
                     "methodName": "getInstalledExtensionDocument",
                     "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                    "justification": "Fixed a typo. Should not have any impact on scripts"
                   },
                   {
                     "code": "java.method.exception.checkedRemoved",
@@ -246,7 +246,7 @@
                     "classSimpleName": "XarExtensionScriptService",
                     "methodName": "getInstalledExtensionDocument",
                     "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact of scripts"
+                    "justification": "Fixed a typo. Should not have any impact on scripts"
                   }
                 ]
               }

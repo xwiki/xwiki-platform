@@ -39,9 +39,82 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-admin.annotations=Notities
+  <content>annotations.title=Notities
+### Missing: annotations.menu.loading=Loading annotation settings
+### Missing: annotations.menu.loaderror=Failed:
+### Missing: annotations.tab.info.noannotations=No annotations on this page
+
+### Missing: annotations.settings.display=Show annotations
+### Missing: annotations.settings.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
+### Missing: annotations.settings.error.notarget=No page specified to get annotations settings for.
+
+### Missing: annotations.annotated.loading=Loading annotated page
+### Missing: annotations.annotated.loaderror=Failed:
+### Missing: annotations.annotated.loaderror.wrongresponse=Wrongly formatted server response
+### Missing: annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
+### Missing: annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
+
+### Missing: annotations.action.edit.text=[Edit]
+### Missing: annotations.action.edit.tooltip=Edit annotation
+### Missing: annotations.action.edit.submit.text=Update
+### Missing: annotations.action.edit.cancel.text=Cancel
+### Missing: annotations.action.edit.success=Annotation updated.
+### Missing: annotations.action.edit.loaderror=Failed:
+### Missing: annotations.action.edit.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
+
+### Missing: annotations.action.delete.text=[Delete]
+### Missing: annotations.action.delete.tooltip=Delete annotation
+### Missing: annotations.action.delete.confirm=Are you sure you want to delete this annotation?
+### Missing: annotations.action.delete.inProgress=Deleting annotation...
+### Missing: annotations.action.delete.done=Annotation deleted
+### Missing: annotations.action.delete.failed=Failed to delete annotation:
+
+### Missing: annotations.action.create.submit.text=Add annotation
+### Missing: annotations.action.create.cancel.text=Cancel
+### Missing: annotations.action.create.selection.invalid=Please select a non-empty text in the page content.
+### Missing: annotations.action.create.form.loaderror=Failed:
+### Missing: annotations.action.create.success=Annotation added.
+### Missing: annotations.action.create.loaderror=Failed:
+### Missing: annotations.action.create.error.unauthorized=You are not authorized to add annotations on this page.
+### Missing: annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this page. Try to login first.
 annotations.action.create.helpmessage=Om een notitie bij een tekst te zetten, selecteer de tekst en druk op {0}.
-annotations.title=Notities
+### Missing: annotations.action.create.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
+### Missing: annotations.action.create.error.notarget=Unspecified target (page) to create annotations for.
+
+### Missing: annotations.action.view.hide.text=hide
+### Missing: annotations.action.view.form.loaderror=Failed:
+### Missing: annotations.action.view.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
+### Missing: annotations.action.view.thread=View thread
+
+### Missing: annotations.altered.text=This annotation could not be displayed because the annotated text was not found in the page:
+### Missing: annotations.updated.text=This annotation was automatically repositioned after a page update. Originally:
+### Missing: annotations.action.validate.text=[Validate]
+### Missing: annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
+### Missing: annotations.action.validate.success=Annotation validated.
+### Missing: annotations.action.validate.loaderror=Failed:
+
+### Missing: annotations.filters.show=Filter
+### Missing: annotations.filters.nooption=There are no values to filter for "{0}"
+### Missing: annotations.filters.anyvalue=any value
+### Missing: annotations.filters.clearvalue=clear
+
+### Missing: annotations.config.title=Annotations configuration panel
+### Missing: annotations.config.display.title=Annotation display
+### Missing: annotations.config.type.title=Annotation type
+### Missing: annotations.config.activate.title=Annotation activation
+### Missing: annotations.config.activate.explanation=The following two settings allow you to configure which locations annotations are active in. The first setting specifies the general rule, while the second list specifies the locations for which the rule shouldn't apply. For example, activated "yes" and exception locations "XWiki" and "Main" means that annotations will be active on all locations except for "XWiki" and "Main". As an opposite example, using activated "no" and exception locations "Documents" means that annotations will be active only for the "Documents" location.
+### Missing: annotations.config.type.explanation=Add properties to this class if you want extra properties for your annotations.
+admin.annotations=Notities
+### Missing: admin.annotations.description=Configure the page annotations
+
+### Missing: AnnotationCode.AnnotationConfig_activated=Annotations are activated
+### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locations
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
+### Missing: AnnotationCode.AnnotationConfig_displayed=Display annotations by default
+### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure
 </content>
 </xwikidoc>

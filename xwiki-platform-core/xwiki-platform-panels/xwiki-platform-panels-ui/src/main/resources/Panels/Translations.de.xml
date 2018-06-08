@@ -39,12 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
-panels._actions=Aktionen
-panels.available=Verfügbare Menüleisten
-panels.category=Kategorie
-panels.description=Beschreibung
+  <content>panels.available=Verfügbare Menüleisten
 panels.name=Name
+panels.description=Beschreibung
 panels.type=Typ
+panels.category=Kategorie
+panels._actions=Aktionen
+panels.emptyvalue=
+### Missing: panels.children.title=Child Pages
+### Missing: panels.siblings.title=Sibling Pages
+### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
 </content>
 </xwikidoc>

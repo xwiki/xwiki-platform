@@ -39,14 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>office.createForm.type.name=Stranica iz Officea
+office.createForm.type.description=Uvezite Office dokumente u wiki stranice
+office.form.error.noDocument=Morate upotrijebiti {0}akciju izrade{1} za uvesti Office dokument.
+office.form.append.hint=Dokument već postoji\! Dodajte rezultat postojećoj wiki stranici.
+
+office.config.serverType.hint=Tip Office poslužitelja. Može biti interno upravljani (lokalni) ili vanjski (udaljeni).
+office.config.serverPort.hint=Broj priključka za spajanje na instancu Office poslužitelja
 office.config.autoStart.hint=Naznačite bi li Office poslužitelj trebao biti pokrenut / automatski povezan pri pokretanju XWikija
 office.config.serverPath.hint=Putanja prema Office instalaciji
-office.config.serverPort.hint=Broj priključka za spajanje na instancu Office poslužitelja
-office.config.serverType.hint=Tip Office poslužitelja. Može biti interno upravljani (lokalni) ili vanjski (udaljeni).
-office.createForm.type.description=Uvezite Office dokumente u wiki stranice
-office.createForm.type.name=Stranica iz Officea
-office.form.append.hint=Dokument već postoji\! Dodajte rezultat postojećoj wiki stranici.
-office.form.error.noDocument=Morate upotrijebiti {0}akciju izrade{1} za uvesti Office dokument.
 </content>
 </xwikidoc>

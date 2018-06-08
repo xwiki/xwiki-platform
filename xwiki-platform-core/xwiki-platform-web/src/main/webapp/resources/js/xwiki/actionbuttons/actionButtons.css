@@ -1,11 +1,8 @@
 #template('colorThemeInit.vm')
 .meta-versionSummary label {
-  color: $theme.textSecondaryColor;
-  font-size: .85em;
-  font-weight: 700;
-  margin: 10px 0 4px !important; /* !important overrides Toucan rules */
+  font-weight: 400;
+  margin: 10px 1em 4px 0 !important; /* !important overrides Toucan rules */
   text-align: left !important; /* !important overrides Toucan rules */
-  text-transform: uppercase;
 }
 .skin-colibri .meta-versionSummary label {
   display: block;
@@ -14,16 +11,7 @@
   text-transform: none;
   font-weight: 400;
 }
-.meta-minorEdit {
-  float: right;
-}
-.meta-minorEdit label {
-  margin: 0 !important;
-}
-.meta-minorEdit * {
-  vertical-align: text-bottom;
-}
 
 #commentinput {
-  width: 99.7%; /* 100% - 2px border; FIXME when calc() becomes standard */
+  width: inherit;
 }

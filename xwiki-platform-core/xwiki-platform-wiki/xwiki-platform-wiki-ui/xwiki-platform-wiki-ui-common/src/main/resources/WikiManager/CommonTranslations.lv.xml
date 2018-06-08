@@ -39,13 +39,29 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-admin.wiki.description=Aprakstiet savu viki (skaistu nosaukumu un aprakstu) un norādiet tā īpašnieku un sākuma lapu.
-admin.wikis=Visi viki
+  <content>admin.wikis=Visi viki
 admin.wikis.descriptor=Apraksts
-platform.wiki.admin.wiki.csrfInvalidError=Nepareizs CSRF drošības marķieris. Lūdzu atjaunojiet lapas saturu un mēģiniet vēlreiz.
+### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
+admin.wiki.description=Aprakstiet savu viki (skaistu nosaukumu un aprakstu) un norādiet tā īpašnieku un sākuma lapu.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Jaunais īpašnieks nepastāv vai arī ir reģistrēts citā viki.\\nVai tiešām vēlaties turpināt saglabāšanu?
-platform.wiki.admin.wiki.ownerWarning=Brīdinājums\: Kad jūs apstiprināsiet izmaiņas, iepriekšējais viki īpašnieks zaudēs savas tiesības. Ja tas esat jūs, pārliecinieties, ka neizslēgsit sevi no šī viki. Ja tā tomēr gadīsies, jums būs jāsazinās ar viki galveno superadministratoru, kurš pārvalda visus viki.
+platform.wiki.admin.wiki.csrfInvalidError=Nepareizs CSRF drošības marķieris. Lūdzu atjaunojiet lapas saturu un mēģiniet vēlreiz.
 platform.wiki.admin.wiki.requiredFieldsError=Īpašnieks un mājas lapa ir obligāti lauki
+platform.wiki.admin.wiki.ownerWarning=Brīdinājums\: Kad jūs apstiprināsiet izmaiņas, iepriekšējais viki īpašnieks zaudēs savas tiesības. Ja tas esat jūs, pārliecinieties, ka neizslēgsit sevi no šī viki. Ja tā tomēr gadīsies, jums būs jāsazinās ar viki galveno superadministratoru, kurš pārvalda visus viki.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

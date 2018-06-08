@@ -65,7 +65,7 @@ public class WikiObjectComponentManagerEventListenerProxy
 
     @Inject
     @Named("context")
-    private Provider<ComponentManager> contextComponentManager;
+    private ComponentManager contextComponent;
 
     @Inject
     private WikiComponentManagerEventListenerHelper wikiComponentManagerEventListenerHelper;
@@ -95,7 +95,7 @@ public class WikiObjectComponentManagerEventListenerProxy
         try {
             // Get a list of WikiObjectComponentBuilder
             List<WikiObjectComponentBuilder> componentBuilders =
-                    contextComponentManager.get().getInstanceList(WikiObjectComponentBuilder.class);
+                this.contextComponent.getInstanceList(WikiObjectComponentBuilder.class);
 
             for (WikiObjectComponentBuilder componentBuilder : componentBuilders) {
                 wikiObjectsList.add(componentBuilder.getClassReference());
@@ -138,8 +138,7 @@ public class WikiObjectComponentManagerEventListenerProxy
                         builderHelper = this.entityReferenceSerializer.serialize(xObjectReference.getXClassReference());
 
                         this.registerObjectComponents(xObjectReference, xObject,
-                                contextComponentManager.get().getInstance(
-                                        WikiObjectComponentBuilder.class, builderHelper));
+                            this.contextComponent.getInstance(WikiObjectComponentBuilder.class, builderHelper));
                     }
                 }
             } catch (Exception e) {

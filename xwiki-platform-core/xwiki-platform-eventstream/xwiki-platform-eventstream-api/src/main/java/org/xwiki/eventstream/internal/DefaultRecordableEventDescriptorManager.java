@@ -22,6 +22,7 @@ package org.xwiki.eventstream.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -75,6 +76,15 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
             recordableEventDescriptors.addAll(contextComponentManager.getInstanceList(
                     UntypedRecordableEventDescriptor.class));
 
+            // Remove disabled components
+            Iterator<RecordableEventDescriptor> iterator = recordableEventDescriptors.iterator();
+            while (iterator.hasNext()) {
+                RecordableEventDescriptor descriptor = iterator.next();
+                if (!descriptor.isEnabled(wikiDescriptorManager.getCurrentWikiId())) {
+                    iterator.remove();
+                }
+            }
+
             // Maybe add components of the other wikis too
             if (allWikis) {
                 for (String wikiId : wikiDescriptorManager.getAllIds()) {
@@ -110,6 +120,16 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
         List<RecordableEventDescriptor> descriptors = new ArrayList<>();
         descriptors.addAll(wikiComponentManager.getInstanceList(RecordableEventDescriptor.class));
         descriptors.addAll(wikiComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class));
+
+        // Remove disabled components
+        Iterator<RecordableEventDescriptor> iterator = descriptors.iterator();
+        while (iterator.hasNext()) {
+            RecordableEventDescriptor descriptor = iterator.next();
+            if (!descriptor.isEnabled(wikiId)) {
+                iterator.remove();
+            }
+        }
+
         return descriptors;
     }
 }

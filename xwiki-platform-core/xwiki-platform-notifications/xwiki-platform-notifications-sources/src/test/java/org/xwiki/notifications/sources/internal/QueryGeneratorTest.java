@@ -37,13 +37,9 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EmptyNode;
-import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
-import org.xwiki.notifications.filters.expression.PropertyValueNode;
-import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -61,6 +57,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * @version $Id$
@@ -81,6 +78,7 @@ public class QueryGeneratorTest
     private WikiDescriptorManager wikiDescriptorManager;
     private NotificationFilterManager notificationFilterManager;
     private DocumentAccessBridge documentAccessBridge;
+    private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
@@ -97,6 +95,7 @@ public class QueryGeneratorTest
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
+        recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
 
         startDate = new Date(10);
 
@@ -122,6 +121,8 @@ public class QueryGeneratorTest
                 "displayHiddenDocuments")).thenReturn(0);
 
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+
+        when(recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class))).thenReturn(true);
     }
 
     @Test
@@ -326,25 +327,11 @@ public class QueryGeneratorTest
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
                 any(NotificationPreference.class)))
-                .thenReturn(
-                        new AndNode(
-                                new EqualsNode(
-                                        new PropertyValueNode(EventProperty.PAGE),
-                                        new StringValueNode("someValue1")),
-                                new EqualsNode(
-                                        new StringValueNode("1"),
-                                        new StringValueNode("1"))));
+                .thenReturn(value(EventProperty.PAGE).eq(value("someValue1")).and(value("1").eq(value("1"))));
 
         when(notificationFilter2.filterExpression(any(DocumentReference.class), any(Collection.class),
                 any(NotificationPreference.class)))
-                .thenReturn(
-                        new AndNode(
-                                new EqualsNode(
-                                        new PropertyValueNode(EventProperty.TYPE),
-                                        new StringValueNode("someValue2")),
-                                new EqualsNode(
-                                        new StringValueNode("2"),
-                                        new StringValueNode("2"))));
+                .thenReturn(value(EventProperty.TYPE).eq(value("someValue2")).and(value("2").eq(value("2"))));
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
         when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
@@ -403,6 +390,39 @@ public class QueryGeneratorTest
                 "ORDER BY DATE DESC",
                 node.toString()
         );
+    }
+
+    @Test
+    public void generateQueryWithEventTypesThatHasNoDescriptor() throws Exception
+    {
+        // Mocks
+        NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
+
+        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
+                any(NotificationPreference.class)))
+                .thenReturn(value(EventProperty.PAGE).eq(value("someValue1")).and(value("1").eq(value("1"))));
+
+        when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
+        when(notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
+                any(NotificationPreference.class))).thenAnswer(
+                invocationOnMock -> ((Collection)invocationOnMock.getArgument(0)).stream());
+
+        // No matching descriptor
+        when(recordableEventDescriptorHelper.hasDescriptor("create", userReference)).thenReturn(false);
+
+        // Test
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = userReference;
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        parameters.filters = Arrays.asList(notificationFilter1);
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+
+        // Expectation: no filters on "create" event type because it has no descriptor
+        assertEquals("(DATE >= \"Thu Jan 01 01:00:00 CET 1970\" AND HIDDEN <> true) ORDER BY DATE DESC",
+                node.toString());
     }
 
 }

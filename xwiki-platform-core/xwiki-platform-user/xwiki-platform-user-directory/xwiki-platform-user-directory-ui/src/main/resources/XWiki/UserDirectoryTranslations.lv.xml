@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-platform.userdirectory.configSheetApplyOnConfiguration=Šī izklājlapa ir jāpielieto Lietotāju saraksta pārvaldības dokumentam.
-platform.userdirectory.configSheetTitle=Lietotāju saraksta pārvaldības izklājlapa
-platform.userdirectory.configTitle=Lietotāju saraksta pārvaldība
-platform.userdirectory.customizeNotAllowed=Jums nav tiesību pielāgot šo lietotāju sarakstu.
-userdirectory.userScopeFilter=Lietotāju apgabals\:
-userdirectory.userScopeFilter.global=Globālie lietotāji, kas ir šī viki dalībnieki
+  <content>userdirectory.userScopeFilter=Lietotāju apgabals\:
 userdirectory.userScopeFilter.hint=Izvēlieties lietotāju kategoriju, kuru vēlaties parādīt.
 userdirectory.userScopeFilter.local=Lokālie lietotāji
+userdirectory.userScopeFilter.global=Globālie lietotāji, kas ir šī viki dalībnieki
+platform.userdirectory.customizeNotAllowed=Jums nav tiesību pielāgot šo lietotāju sarakstu.
+platform.userdirectory.configTitle=Lietotāju saraksta pārvaldība
+platform.userdirectory.configSheetTitle=Lietotāju saraksta pārvaldības izklājlapa
+platform.userdirectory.configSheetApplyOnConfiguration=Šī izklājlapa ir jāpielieto Lietotāju saraksta pārvaldības dokumentam.
 </content>
 </xwikidoc>

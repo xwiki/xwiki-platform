@@ -39,132 +39,153 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-solr.admin.error.norights=Za pristup ovoj rubrici potrebne su administratorske ovlasti.
-solr.admin.error.notallowed=Nije vam dozvoljeno obavljanje ove akcije.
-solr.admin.indexing.action.hint=Akcija za izvršiti nad indeksom.
-solr.admin.indexing.action.label=Akcija
-solr.admin.indexing.action.select_delete=Obriši iz indeksa
-solr.admin.indexing.action.select_index=Dodaj indeksu
-solr.admin.indexing.action.select_reindex=Ponovno indeksiraj
-solr.admin.indexing.query.hint=Neobavezni upit za ograničavanje dokumenata na koje će odabrana akcija nad indeksom imati utjecaj.
-solr.admin.indexing.query.label=Korisnički upit
-solr.admin.indexing.title=Indeksiranje
-solr.admin.indexing.wiki.hint=Wiki na čije sve dokumente će odabrana akcija imati utjecaj.
-solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.select_farm=Cijela farma
-solr.admin.status.queueSize.hint=Broj preostalih entiteta za indeksiranje, ponovno indeksiranje ili brisanje iz indeksa (ovisno o izvršenoj akciji).
-solr.admin.status.queueSize.label=Veličina reda čekanja
-solr.admin.status.title=Status
+  <content>solr.admin.title=Upravljanje Solr pretragom
 solr.admin.submit=Primijeni
-solr.admin.title=Upravljanje Solr pretragom
-solr.facet.date.after=Nakon {0}
-solr.facet.date.any=Bilo koji datum
-solr.facet.date.applyCustomInterval=Primijeni
-solr.facet.date.before=Prije {0}
-solr.facet.date.between=Od {0} do {1}
-solr.facet.date.customInterval=Korisnički interval datuma i vremena
-solr.facet.date.end=Datum i vrijeme završetka
-solr.facet.date.last30Days=Posljednjih 30 dana
-solr.facet.date.last7Days=Posljednjih 7 dana
-solr.facet.date.olderThan30Days=Starije od 30 dana
-solr.facet.date.start=Datum i vrijeme početka
-solr.facet.date.today=Danas
-solr.facet.fileType.archive.java-archive=JAR
-solr.facet.fileType.archive.xara=XAR
-solr.facet.fileType.image.icon=Ikona
-solr.facet.fileType.other.octet-stream=Binarni podatci
-solr.facet.fileType.text.java-source=Java izvorni kôd
-solr.facet.fileType.text.javascript=JavaScript kôd
-solr.facet.fileType.text.plain=Obični tekst
-solr.facet.fileType.text.sh=Skripta ljuske
-solr.facet.size.any=Bilo koja veličina
-solr.facet.size.between=Između {0} i {1}
-solr.facet.size.large=Veliko
-solr.facet.size.lessThan=Manje od {0}
-solr.facet.size.medium=Srednje
-solr.facet.size.moreThan=Više od {0}
-solr.facet.size.small=Malo
-solr.facet.size.tiny=Sitno
+solr.admin.error.notallowed=Nije vam dozvoljeno obavljanje ove akcije.
+solr.admin.error.norights=Za pristup ovoj rubrici potrebne su administratorske ovlasti.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Veličina reda čekanja
+solr.admin.status.queueSize.hint=Broj preostalih entiteta za indeksiranje, ponovno indeksiranje ili brisanje iz indeksa (ovisno o izvršenoj akciji).
+
+solr.admin.indexing.title=Indeksiranje
+solr.admin.indexing.action.label=Akcija
+solr.admin.indexing.action.hint=Akcija za izvršiti nad indeksom.
+solr.admin.indexing.action.select_index=Dodaj indeksu
+solr.admin.indexing.action.select_delete=Obriši iz indeksa
+solr.admin.indexing.action.select_reindex=Ponovno indeksiraj
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=Wiki na čije sve dokumente će odabrana akcija imati utjecaj.
+solr.admin.indexing.wiki.select_farm=Cijela farma
+solr.admin.indexing.query.label=Korisnički upit
+solr.admin.indexing.query.hint=Neobavezni upit za ograničavanje dokumenata na koje će odabrana akcija nad indeksom imati utjecaj.
+
+solr.sortBy=Poredaj po\:
+solr.sortBy.score=Relevantnosti
+solr.sortBy.title_sort=Naslovu
+solr.sortBy.date=Datumu posljednje izmjene
+solr.sortBy.author_display_sort=Posljednjem autoru
+solr.sortBy.filename_sort=Imenu datoteke
+solr.sortBy.attsize_sort=Veličini datoteke
+solr.sortBy.attdate_sort=Datumu otpreme
+solr.sortBy.attauthor_display_sort=Otpremitelju
+solr.sortOrder.asc=Uzlazno
+solr.sortOrder.desc=Silazno
+
+solr.options=Prikaži\:
+solr.options.highlight=Označavanje
+solr.options.highlight.title=Prikaži ekstrakt podudaranja u svakom rezultatu
+solr.options.facet=Facete
+solr.options.facet.title=Omogući dodatno filtriranje rezultata
+
+solr.result.language=Jezik
+solr.result.locatedIn=Na lokaciji
+solr.result.author=Izmijenio/la {0} {1}
+solr.result.mediaType=Datoteka tipa {0}
+solr.result.uploadedBy=Otpremio/la {0} {1} ({2})
+solr.result.highlightAll=Označi sva podudaranja
+
+solr.facets.title=Razradite vašu pretragu
+solr.facets.hint=Odaberite kategoriju i aktivirajte filtre na trenutnim rezultatima
+solr.facets.resetAll=Ponovo postavi sve
+solr.facets.expandAll=Raširi sve
 solr.facets.collapseAll=Sažmi sve
 solr.facets.emptyValue=Prazna vrijednost
-solr.facets.expandAll=Raširi sve
-solr.facets.hint=Odaberite kategoriju i aktivirajte filtre na trenutnim rezultatima
 solr.facets.moreValues=još {0}
-solr.facets.resetAll=Ponovo postavi sve
-solr.facets.title=Razradite vašu pretragu
-solr.field.attauthor=Otpremio/la
-solr.field.attauthor_display=Otpremio/la
-solr.field.attcontent=Sadržaj privitka
-solr.field.attdate=Datum otpreme
-solr.field.attsize=Veličina datoteke
-solr.field.author=Posljednji autor
-solr.field.author_display=Posljednji autor
-solr.field.class=Tip objekta
-solr.field.class.definedBy=Definirao/la {0} » {1}
-solr.field.comment=Komentari
-solr.field.creationdate=Datum izrade
-solr.field.creator=Tvorac
-solr.field.creator_display=Tvorac
-solr.field.date=Datum posljednje izmjene
-solr.field.doccontent=Interpretirani sadržaj dokumenta
-solr.field.doccontentraw=Sirovi sadržaj dokumenta
-solr.field.filename=Ime privitka
+
+solr.filterBy.type.document=Dokument
+solr.filterBy.type.attachment=Privitak
+solr.filterBy.type.object=Objekt
+solr.filterBy.type.object_property=Svojstvo objekta
+
+solr.filterBy.fileType.image=Slika
+solr.filterBy.fileType.audio=Zvuk
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Tekst
+solr.filterBy.fileType.office=Office datoteka
+solr.filterBy.fileType.word=Word datoteka
+solr.filterBy.fileType.presentation=Prezentacija
+solr.filterBy.fileType.spreadsheet=Proračunska tablica
+solr.filterBy.fileType.archive=Arhiv
+solr.filterBy.fileType.font=Font
+solr.filterBy.fileType.other=Ostalo
+solr.facet.fileType.text.plain=Obični tekst
+solr.facet.fileType.text.javascript=JavaScript kôd
+solr.facet.fileType.text.java-source=Java izvorni kôd
+solr.facet.fileType.text.sh=Skripta ljuske
+solr.facet.fileType.image.icon=Ikona
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Binarni podatci
+
+solr.facet.date.today=Danas
+solr.facet.date.last7Days=Posljednjih 7 dana
+solr.facet.date.last30Days=Posljednjih 30 dana
+solr.facet.date.olderThan30Days=Starije od 30 dana
+solr.facet.date.customInterval=Korisnički interval datuma i vremena
+solr.facet.date.start=Datum i vrijeme početka
+solr.facet.date.end=Datum i vrijeme završetka
+solr.facet.date.applyCustomInterval=Primijeni
+solr.facet.date.between=Od {0} do {1}
+solr.facet.date.after=Nakon {0}
+solr.facet.date.before=Prije {0}
+solr.facet.date.any=Bilo koji datum
+
+solr.facet.size.tiny=Sitno
+solr.facet.size.small=Malo
+solr.facet.size.medium=Srednje
+solr.facet.size.large=Veliko
+solr.facet.size.between=Između {0} i {1}
+solr.facet.size.lessThan=Manje od {0}
+solr.facet.size.moreThan=Više od {0}
+solr.facet.size.any=Bilo koja veličina
+
+solr.field.type=Tip rezultata
 solr.field.locale=Jezik
 solr.field.locale.emptyValue=Nema jezika
 solr.field.locale.emptyValue.hint=Neki dokumenti nemaju postavljen jezik zato što sadrže skripte (koje nisu pisane prirodnim jezikom) ili dotjeruju korisničko sučelje koje se prikazuje na trenutnom jeziku (poput ove stranice).
-solr.field.mimetype=Tip datoteke
-solr.field.name=Stranica
-solr.field.name_exact=Stranica
-solr.field.objcontent=Objekti
-solr.field.propertyname=Ime svojstva
-solr.field.propertyvalue=Vrijednost svojstva
-solr.field.space=Lokacija
+solr.field.wiki=Wiki
+solr.field.spaces=Lokacija
 solr.field.space_exact=Lokacija
 solr.field.space_facet=Lokacija
-solr.field.spaces=Lokacija
+solr.field.name=Stranica
+solr.field.name_exact=Stranica
 solr.field.title=Naslov
-solr.field.type=Tip rezultata
-solr.field.wiki=Wiki
-solr.filterBy.fileType.archive=Arhiv
-solr.filterBy.fileType.audio=Zvuk
-solr.filterBy.fileType.font=Font
-solr.filterBy.fileType.image=Slika
-solr.filterBy.fileType.office=Office datoteka
-solr.filterBy.fileType.other=Ostalo
-solr.filterBy.fileType.presentation=Prezentacija
-solr.filterBy.fileType.spreadsheet=Proračunska tablica
-solr.filterBy.fileType.text=Tekst
-solr.filterBy.fileType.video=Video
-solr.filterBy.fileType.word=Word datoteka
-solr.filterBy.type.attachment=Privitak
-solr.filterBy.type.document=Dokument
-solr.filterBy.type.object=Objekt
-solr.filterBy.type.object_property=Svojstvo objekta
-solr.options=Prikaži\:
-solr.options.facet=Facete
-solr.options.facet.title=Omogući dodatno filtriranje rezultata
-solr.options.highlight=Označavanje
-solr.options.highlight.title=Prikaži ekstrakt podudaranja u svakom rezultatu
-solr.result.author=Izmijenio/la {0} {1}
-solr.result.highlightAll=Označi sva podudaranja
-solr.result.language=Jezik
-solr.result.locatedIn=Na lokaciji
-solr.result.location=Na lokaciji {0} » {1} » {2}
-solr.result.mediaType=Datoteka tipa {0}
-solr.result.uploadedBy=Otpremio/la {0} {1} ({2})
-solr.sortBy=Poredaj po\:
-solr.sortBy.attauthor_display_sort=Otpremitelju
-solr.sortBy.attdate_sort=Datumu otpreme
-solr.sortBy.attsize_sort=Veličini datoteke
-solr.sortBy.author_display_sort=Posljednjem autoru
-solr.sortBy.date=Datumu posljednje izmjene
-solr.sortBy.filename_sort=Imenu datoteke
-solr.sortBy.score=Relevantnosti
-solr.sortBy.title_sort=Naslovu
-solr.sortOrder.asc=Uzlazno
-solr.sortOrder.desc=Silazno
-solr.uix.attachmentdoesnotexist.title=Jeste li umjesto tog tražili jedan od sljedećih privitaka?
+solr.field.author=Posljednji autor
+solr.field.author_display=Posljednji autor
+solr.field.creator=Tvorac
+solr.field.creator_display=Tvorac
+solr.field.date=Datum posljednje izmjene
+solr.field.creationdate=Datum izrade
+solr.field.doccontent=Interpretirani sadržaj dokumenta
+solr.field.doccontentraw=Sirovi sadržaj dokumenta
+solr.field.class=Tip objekta
+solr.field.class.definedBy=Definirao/la {0} » {1}
+solr.field.propertyname=Ime svojstva
+solr.field.propertyvalue=Vrijednost svojstva
+solr.field.filename=Ime privitka
+solr.field.attcontent=Sadržaj privitka
+solr.field.comment=Komentari
+solr.field.objcontent=Objekti
+solr.field.mimetype=Tip datoteke
+solr.field.attauthor=Otpremio/la
+solr.field.attauthor_display=Otpremio/la
+solr.field.attdate=Datum otpreme
+solr.field.attsize=Veličina datoteke
+
 solr.uix.docdoesnotexist.title=Jeste li umjesto te tražili jednu od sljedećih stranica?
+solr.uix.attachmentdoesnotexist.title=Jeste li umjesto tog tražili jedan od sljedećih privitaka?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location=Na lokaciji {0} » {1} » {2}
+
+## until 7.2RC1
+solr.field.space=Lokacija
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

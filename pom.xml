@@ -52,9 +52,9 @@
     <hsqldb.version>2.4.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.20</ckeditor.version>
+    <ckeditor.version>1.21</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
-    <batik.version>1.9</batik.version>
+    <batik.version>1.10</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.18</tika.version>
     <pdfbox.version>2.0.9</pdfbox.version>
@@ -230,19 +230,6 @@
         <version>${ckeditor.version}</version>
         <type>xar</type>
       </dependency>
-      <!-- Used at least in Solr Search and in Infinispan Cache -->
-      <dependency>
-        <groupId>org.codehaus.woodstox</groupId>
-        <artifactId>woodstox-core-asl</artifactId>
-        <version>4.4.1</version>
-        <exclusions>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>stax-api</artifactId>
-            <groupId>javax.xml.stream</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
         <groupId>org.jfree</groupId>
@@ -253,7 +240,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.9.9</version>
+        <version>2.10</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -386,7 +373,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -398,7 +385,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>

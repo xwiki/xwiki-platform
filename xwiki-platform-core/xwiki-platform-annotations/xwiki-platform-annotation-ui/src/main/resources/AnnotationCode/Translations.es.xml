@@ -39,61 +39,82 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
-admin.annotations=Anotaciones
-annotations.action.create.cancel.text=Cancelar
-annotations.action.create.error.notarget=No se ha especificado el documento destino para el que se crearán las anotaciones.
-annotations.action.create.error.unauthorized=No está autorizado a añadir anotaciones a este documento.
-annotations.action.create.error.unauthorizedguest=No está autorizado a añadir anotaciones a este docimento. Pruebe primero a autenticarse.
-annotations.action.create.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
-annotations.action.create.form.loaderror=Falló\:
-annotations.action.create.helpmessage=Para anotar un trozo de texto, seleccionelo y pinche {0}.
-annotations.action.create.loaderror=Falló\:
-annotations.action.create.submit.text=Añadir anotación
-annotations.action.create.success=La anotación ha sido añadida con éxito
-annotations.action.delete.confirm=¿Está seguro de que quiere borrar esta anotación?
-annotations.action.delete.done=Anotación borrada
-annotations.action.delete.failed=Fallo al borrar la anotación\:
-annotations.action.delete.inProgress=Borrando anotación...
-annotations.action.delete.text=[Borrar]
-annotations.action.delete.tooltip=Borrar esta anotación
-annotations.action.edit.cancel.text=Cancelar
-annotations.action.edit.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
-annotations.action.edit.loaderror=Falló\:
-annotations.action.edit.submit.text=Actualizar
-annotations.action.edit.success=La anotación se ha actualizado con éxito.
-annotations.action.edit.text=[Editar]
-annotations.action.edit.tooltip=Editar esta anotación
-annotations.action.validate.loaderror=Falló\:
-annotations.action.validate.success=La anotación ha sido validada con éxito.
-annotations.action.validate.text=[Validar]
-annotations.action.validate.tooltip=Validar la actualización automática del texto seleccionado de esta anotación
-annotations.action.view.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
-annotations.action.view.form.loaderror=Falló\:
-annotations.action.view.hide.text=ocultar
-annotations.altered.text=Esta anotación no pudo mostrarse porque el texto anotado no se encontró en el documento.
-annotations.annotated.error.noannotatedelement=Las anotaciones no ha podido cargarse porque el contenido no está disponible.
-annotations.annotated.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
+  <content>annotations.title=Anotaciones
+annotations.menu.loading=Cargando ajustes de anotaciones
+annotations.menu.loaderror=Falló\:
+annotations.tab.info.noannotations=Este documento no tiene anotaciones
+
+annotations.settings.display=Mostrar anotaciones
+annotations.settings.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
+annotations.settings.error.notarget=No se ha especificado el documento para el que se quieren obtener las opciones de anotaciones.
+
+annotations.annotated.loading=Cargando documento anotado
 annotations.annotated.loaderror=Falló\:
 annotations.annotated.loaderror.wrongresponse=Respuesta del servidor mal formateada
-annotations.annotated.loading=Cargando documento anotado
-annotations.config.activate.explanation=Los siguientes dos ajustes le permiten configurar en que espacios están activas las anotaciones. El primer ajuste indica la regla general, mientras la segunda lista indica para cuales espacios no debe aplicarse. Por ejemplo, activado "yes" y espacios excluidos "XWiki" y "Main" significa que las anotaciones estarán activas en todos los espacios a excepción de "XWiki" y "Main", mientras que activado "no" y espacios excluidos "Documents" significa que las anotaciones sólo estarán activas en el espacio "Documents".
-annotations.config.activate.title=Ajustes de activación de anotaciones
-annotations.config.display.title=Ajustes de presentación de anotaciones
-annotations.config.title=Panel de configuración de anotaciones
-annotations.config.type.explanation=Añada propiedades a esta clase si quiere propiedades adicionales para sus anotaciones.
-annotations.config.type.title=Ajustes de tipo de anotación
+annotations.annotated.error.noannotatedelement=Las anotaciones no ha podido cargarse porque el contenido no está disponible.
+annotations.annotated.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
+
+annotations.action.edit.text=[Editar]
+annotations.action.edit.tooltip=Editar esta anotación
+annotations.action.edit.submit.text=Actualizar
+annotations.action.edit.cancel.text=Cancelar
+annotations.action.edit.success=La anotación se ha actualizado con éxito.
+annotations.action.edit.loaderror=Falló\:
+annotations.action.edit.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
+
+annotations.action.delete.text=[Borrar]
+annotations.action.delete.tooltip=Borrar esta anotación
+annotations.action.delete.confirm=¿Está seguro de que quiere borrar esta anotación?
+annotations.action.delete.inProgress=Borrando anotación...
+annotations.action.delete.done=Anotación borrada
+annotations.action.delete.failed=Fallo al borrar la anotación\:
+
+annotations.action.create.submit.text=Añadir anotación
+annotations.action.create.cancel.text=Cancelar
+### Missing: annotations.action.create.selection.invalid=Please select a non-empty text in the page content.
+annotations.action.create.form.loaderror=Falló\:
+annotations.action.create.success=La anotación ha sido añadida con éxito
+annotations.action.create.loaderror=Falló\:
+annotations.action.create.error.unauthorized=No está autorizado a añadir anotaciones a este documento.
+annotations.action.create.error.unauthorizedguest=No está autorizado a añadir anotaciones a este docimento. Pruebe primero a autenticarse.
+annotations.action.create.helpmessage=Para anotar un trozo de texto, seleccionelo y pinche {0}.
+annotations.action.create.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
+annotations.action.create.error.notarget=No se ha especificado el documento destino para el que se crearán las anotaciones.
+
+annotations.action.view.hide.text=ocultar
+annotations.action.view.form.loaderror=Falló\:
+annotations.action.view.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
+### Missing: annotations.action.view.thread=View thread
+
+annotations.altered.text=Esta anotación no pudo mostrarse porque el texto anotado no se encontró en el documento.
+annotations.updated.text=Esta anotación fue reposicionada automáticamente después de una actualización del documento. Originalmente\:
+annotations.action.validate.text=[Validar]
+annotations.action.validate.tooltip=Validar la actualización automática del texto seleccionado de esta anotación
+annotations.action.validate.success=La anotación ha sido validada con éxito.
+annotations.action.validate.loaderror=Falló\:
+
+annotations.filters.show=Refine el criterio de presentación
+annotations.filters.nooption=No hay valores que filtrar para "{0}"
 annotations.filters.anyvalue=cualquier valor
 annotations.filters.clearvalue=limpiar
-annotations.filters.nooption=No hay valores que filtrar para "{0}"
-annotations.filters.show=Refine el criterio de presentación
-annotations.menu.loaderror=Falló\:
-annotations.menu.loading=Cargando ajustes de anotaciones
-annotations.settings.display=Mostrar anotaciones
-annotations.settings.error.notarget=No se ha especificado el documento para el que se quieren obtener las opciones de anotaciones.
-annotations.settings.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
-annotations.tab.info.noannotations=Este documento no tiene anotaciones
-annotations.title=Anotaciones
-annotations.updated.text=Esta anotación fue reposicionada automáticamente después de una actualización del documento. Originalmente\:
+
+annotations.config.title=Panel de configuración de anotaciones
+annotations.config.display.title=Ajustes de presentación de anotaciones
+annotations.config.type.title=Ajustes de tipo de anotación
+annotations.config.activate.title=Ajustes de activación de anotaciones
+annotations.config.activate.explanation=Los siguientes dos ajustes le permiten configurar en que espacios están activas las anotaciones. El primer ajuste indica la regla general, mientras la segunda lista indica para cuales espacios no debe aplicarse. Por ejemplo, activado "yes" y espacios excluidos "XWiki" y "Main" significa que las anotaciones estarán activas en todos los espacios a excepción de "XWiki" y "Main", mientras que activado "no" y espacios excluidos "Documents" significa que las anotaciones sólo estarán activas en el espacio "Documents".
+annotations.config.type.explanation=Añada propiedades a esta clase si quiere propiedades adicionales para sus anotaciones.
+admin.annotations=Anotaciones
+### Missing: admin.annotations.description=Configure the page annotations
+
+### Missing: AnnotationCode.AnnotationConfig_activated=Annotations are activated
+### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locations
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
+### Missing: AnnotationCode.AnnotationConfig_displayed=Display annotations by default
+### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure
 </content>
 </xwikidoc>

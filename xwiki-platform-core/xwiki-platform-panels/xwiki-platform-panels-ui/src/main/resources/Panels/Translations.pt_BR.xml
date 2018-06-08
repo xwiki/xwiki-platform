@@ -39,15 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-panels._actions=Ações
-panels.available=Painéis Disponíveis
-panels.category=Categoria
-panels.children.title=Subpáginas
-panels.description=Descrição
-panels.documentInformation.configureSyntaxes=Configurar mais sintaxes
+  <content>panels.available=Painéis Disponíveis
 panels.name=Nome
-panels.siblings.title=Páginas do Nível
+panels.description=Descrição
 panels.type=Tipo
+panels.category=Categoria
+panels._actions=Ações
+panels.emptyvalue=
+panels.children.title=Subpáginas
+panels.siblings.title=Páginas do Nível
+panels.documentInformation.configureSyntaxes=Configurar mais sintaxes
 </content>
 </xwikidoc>

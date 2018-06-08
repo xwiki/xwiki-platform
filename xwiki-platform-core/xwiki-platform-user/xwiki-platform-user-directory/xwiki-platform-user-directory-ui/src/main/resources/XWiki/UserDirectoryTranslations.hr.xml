@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-platform.userdirectory.configSheetApplyOnConfiguration=Ova plahta mora biti primijenjena na dokument s konfiguracijom korisničkog imenika.
-platform.userdirectory.configSheetTitle=Konfiguracijska plahta imenika korisnika
-platform.userdirectory.configTitle=Podešavanje imenika korisnika
-platform.userdirectory.customizeNotAllowed=Nije vam dozvoljeno prilagođavanje ovog imenika korisnika.
-userdirectory.userScopeFilter=Doseg korisnika\:
-userdirectory.userScopeFilter.global=Globalni korisnici koji su članovi ovog wikija
+  <content>userdirectory.userScopeFilter=Doseg korisnika\:
 userdirectory.userScopeFilter.hint=Odaberite kategoriju korisnika koju želite prikazati.
 userdirectory.userScopeFilter.local=Lokalni korisnici
+userdirectory.userScopeFilter.global=Globalni korisnici koji su članovi ovog wikija
+platform.userdirectory.customizeNotAllowed=Nije vam dozvoljeno prilagođavanje ovog imenika korisnika.
+platform.userdirectory.configTitle=Podešavanje imenika korisnika
+platform.userdirectory.configSheetTitle=Konfiguracijska plahta imenika korisnika
+platform.userdirectory.configSheetApplyOnConfiguration=Ova plahta mora biti primijenjena na dokument s konfiguracijom korisničkog imenika.
 </content>
 </xwikidoc>

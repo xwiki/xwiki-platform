@@ -39,9 +39,39 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
-menu.livetable.doc.author=Último Autor
-menu.livetable.doc.date=Data de atualização
+  <content># Class fields
+### Missing: Menu.MenuClass_content1=Menu Structure
+
+# Live table generic keys
+### Missing: menu.livetable.doc.title=Page title
 menu.livetable.doc.name=Nome da página
+### Missing: menu.livetable.doc.space=Space
+### Missing: menu.livetable.doc.fullname=Page full name
+menu.livetable.doc.author=Último Autor
+### Missing: menu.livetable.doc.creator=Creator
+menu.livetable.doc.date=Data de atualização
+### Missing: menu.livetable.doc.creationDate=Creation date
+### Missing: menu.livetable._avatar=Avatar
+### Missing: menu.livetable._images=Images
+### Missing: menu.livetable._attachments=Attachments
+### Missing: menu.livetable._actions=Actions
+### Missing: menu.livetable._actions.edit=Edit
+### Missing: menu.livetable._actions.delete=Delete
+### Missing: menu.livetable.emptyvalue=-
+
+# Live table specific keys
+### Missing: menu.livetable.content1=Menu Structure
+
+# UIX keys
+### Missing: menu.uix.extensionPoint.label=Menu Display Location
+### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
+### Missing: menu.uix.extensionPoint.value.nowhere=Nowhere
+### Missing: menu.uix.extensionPoint.value.template.header.after=After the Page Header
+### Missing: menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel
+### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
+### Missing: menu.uix.content.label=UI Extension Content
+### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
+### Missing: menu.uix.scope.label=Menu Visibility Scope
+### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
 </content>
 </xwikidoc>

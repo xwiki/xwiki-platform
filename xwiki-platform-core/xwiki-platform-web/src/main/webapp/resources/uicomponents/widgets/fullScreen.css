@@ -50,11 +50,6 @@
   background-color: $theme.pageContentBackgroundColor;
 }
 
-/* Comment this to make the version comment and minor edit checkbox visible in full screen */
-.fullScreenWrapper .metamodifs {
-  display: none !important;
-}
-
 * html .fullScreenWrapper {
   position: absolute !important;
 }
@@ -66,6 +61,9 @@
 #body .fullScreenWrapper .buttons .buttonwrapper input, 
 #body .fullScreenWrapper .btn {
   width: auto;
+}
+.fullScreenWrapper .buttonwrapper {
+  float: right;
 }
 #xwikiobjects .fullScreenWrapper textarea:focus, #xwikiclassproperties .fullScreenWrapper textarea:focus {
   background-color: $theme.pageContentBackgroundColor;

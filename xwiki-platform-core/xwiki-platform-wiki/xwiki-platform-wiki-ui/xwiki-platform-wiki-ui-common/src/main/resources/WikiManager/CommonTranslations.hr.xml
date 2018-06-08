@@ -39,14 +39,29 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-admin.wiki.description=Opišite vaš wiki (prikazno ime i opis) i postavite mu vlasnika i početnu stranicu.
-admin.wikis=Wikiji
+  <content>admin.wikis=Wikiji
 admin.wikis.descriptor=Opisnik
 admin.wikis.descriptor.description=Podesite wiki opisnik
-platform.wiki.admin.wiki.csrfInvalidError=Neispravan sigurnosni (CSRF) token. Molim osvježite stranicu i pokušajte ponovo.
+admin.wiki.description=Opišite vaš wiki (prikazno ime i opis) i postavite mu vlasnika i početnu stranicu.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Korisnik novog vlasnika ne postoji ili možda potječe iz nekog drugog wikija.\\nJeste li sigurni da želite odabrati tog korisnika i nastaviti s operacijom spremanja?
-platform.wiki.admin.wiki.ownerWarning=Upozorenje: Jednom kad ovo promijenite, prethodni korisnik će izgubiti svoje vlasničke ovlasti. Ukoliko ste to vi, provjerite da ne ostanete zaključani izvan wikija. Ako se to greškom dogodi, trebat ćete kontaktirati administratore glavnog wikija ili upotrijebiti superadministratorski račun.
+platform.wiki.admin.wiki.csrfInvalidError=Neispravan sigurnosni (CSRF) token. Molim osvježite stranicu i pokušajte ponovo.
 platform.wiki.admin.wiki.requiredFieldsError=Polje 'Početna stranica' ne može biti prazno.
+platform.wiki.admin.wiki.ownerWarning=Upozorenje: Jednom kad ovo promijenite, prethodni korisnik će izgubiti svoje vlasničke ovlasti. Ukoliko ste to vi, provjerite da ne ostanete zaključani izvan wikija. Ako se to greškom dogodi, trebat ćete kontaktirati administratore glavnog wikija ili upotrijebiti superadministratorski račun.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

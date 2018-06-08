@@ -23,9 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -44,6 +43,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
@@ -51,7 +51,10 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
@@ -67,14 +70,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.3M1
  */
+@OldcoreTest
 @PageComponentList
 public class PageTest
 {
-    /**
-     * Page tests use the Oldcore rule to configure some base mocks (such as XWiki).
-     */
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    protected MockitoOldcore oldcore;
 
     /**
      * The stubbed request used to simulate a real Servlet Request.
@@ -100,23 +101,25 @@ public class PageTest
      * The Component Manager to use for getting Component instances or registering Mock Components in the test,
      * provided for ease of use (can also be retrieved through {@link #oldcore}).
      */
-    protected MockitoComponentManager mocker = oldcore.getMocker();
+    @InjectComponentManager
+    protected MockitoComponentManager componentManager;
 
     /**
      * Set up components before Components declared in {@link org.xwiki.test.annotation.ComponentList} are handled.
      *
+     * @param componentManager the component manager to use to register mock components
      * @throws Exception in case of errors
      */
     @BeforeComponent
-    public void setUpComponentsForPageTest() throws Exception
+    public void setUpComponentsForPageTest(MockitoComponentManager componentManager) throws Exception
     {
-        mocker.registerMockComponent(JMXBeanRegistration.class);
-        mocker.registerMockComponent(Environment.class);
-        mocker.registerMockComponent(JobProgressManager.class);
-        mocker.registerMockComponent(RenderingCache.class);
-        mocker.registerMockComponent(EntityResourceActionLister.class);
+        componentManager.registerMockComponent(JMXBeanRegistration.class);
+        componentManager.registerMockComponent(Environment.class);
+        componentManager.registerMockComponent(JobProgressManager.class);
+        componentManager.registerMockComponent(RenderingCache.class);
+        componentManager.registerMockComponent(EntityResourceActionLister.class);
 
-        CacheManager cacheManager = mocker.registerMockComponent(CacheManager.class);
+        CacheManager cacheManager = componentManager.registerMockComponent(CacheManager.class);
         when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));
     }
 
@@ -125,14 +128,16 @@ public class PageTest
      * handled but before {@link MockitoOldcoreRule#before(Class)} has been called (i.e. before it has created Mocks
      * and configured Components).
      *
+     * @param componentManager the component manager
      * @throws Exception in case of errors
      */
     @AfterComponent
-    public void configureComponentsBeforeOldcoreRuleForPageTest() throws Exception
+    public void configureComponentsBeforeOldcoreRuleForPageTest(MockitoComponentManager componentManager)
+        throws Exception
     {
         // Configure the Execution Context
         ExecutionContext ec = new ExecutionContext();
-        mocker.<Execution>getInstance(Execution.class).setContext(ec);
+        componentManager.<Execution>getInstance(Execution.class).setContext(ec);
     }
 
     /**
@@ -177,7 +182,7 @@ public class PageTest
      */
     protected void setOutputSyntax(Syntax syntax) throws Exception
     {
-        MutableRenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
+        MutableRenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
         renderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
             renderingContext.getDefaultSyntax(), "test", renderingContext.isRestricted(), syntax);
     }
@@ -187,7 +192,7 @@ public class PageTest
      *
      * @throws Exception in case of errors
      */
-    @Before
+    @BeforeEach
     public void setUpForPageTest() throws Exception
     {
         // Configure mocks from OldcoreRule
@@ -208,7 +213,7 @@ public class PageTest
         response = new XWikiServletResponseStub();
         context.setResponse(response);
 
-        ExecutionContextManager ecm = mocker.getInstance(ExecutionContextManager.class);
+        ExecutionContextManager ecm = componentManager.getInstance(ExecutionContextManager.class);
         ecm.initialize(oldcore.getExecutionContext());
 
         // Let the user have view access to all pages
@@ -219,7 +224,7 @@ public class PageTest
         URLFactorySetup.setUp(xwiki, context);
 
         // Set up Localization
-        LocalizationSetup.setUp(mocker);
+        LocalizationSetup.setUp(componentManager);
 
         // Set up Skin Extensions
         SkinExtensionSetup.setUp(xwiki, context);
@@ -230,16 +235,16 @@ public class PageTest
      *
      * @throws Exception in case of errors
      */
-    @After
+    @AfterEach
     public void tearDown() throws Exception
     {
-        MutableRenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
+        MutableRenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
         renderingContext.pop();
     }
 
     /**
      * Adds a tool to the Velocity context.
-     * 
+     *
      * @param name the name of the tool
      * @param tool the tool to register; can be a mock
      * @throws Exception in case of errors

@@ -39,14 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language zh_TW generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=空間名稱
-index.spacesMacro.createSpace.link=新增空間
-index.spacesMacro.createSpace.submit=新增
-index.spacesMacro.spaceAdministration.alt=管理員空間
-index.spacesMacro.spaceAdministration.title=空間管理
-index.spacesMacro.spaceIndex.alt=空間列表
+  <content>index.spacesMacro.title=空間
 index.spacesMacro.spaceIndex.title=空間索引
-index.spacesMacro.title=空間
+index.spacesMacro.spaceIndex.alt=空間列表
+index.spacesMacro.spaceAdministration.title=空間管理
+index.spacesMacro.spaceAdministration.alt=管理員空間
+index.spacesMacro.createSpace.link=新增空間
+index.spacesMacro.createSpace.defaultSpaceName=空間名稱
+index.spacesMacro.createSpace.submit=新增
 </content>
 </xwikidoc>

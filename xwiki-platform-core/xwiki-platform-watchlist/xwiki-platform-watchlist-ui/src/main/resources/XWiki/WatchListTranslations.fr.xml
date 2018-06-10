@@ -56,7 +56,7 @@ watchlist.notifications.icons.tooltip.page=Suivre cette page
 watchlist.notifications.icons.tooltip.pageAndChildren=Suivre cette page et les pages filles
 watchlist.notifications.icons.tooltip.space=Suivre la page parente et ses filles
 watchlist.notifications.icons.tooltip.wiki=Suivre ce wiki
-watchlist.notifications.changeStatusError=Impossible de modifier le status de suivi.
+watchlist.notifications.changeStatusError=Impossible de modifier le statut de suivi.
 watchlist.settings=Paramètres
 
 ### Watchlist livetable (in the macro)

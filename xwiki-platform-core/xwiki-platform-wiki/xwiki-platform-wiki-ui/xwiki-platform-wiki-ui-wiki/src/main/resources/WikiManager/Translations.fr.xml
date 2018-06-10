@@ -65,7 +65,7 @@ platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Vous avez demandé à
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Votre demande de rejoindre le wiki "{0}" a été acceptée.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Votre demande de rejoindre le wiki "{0}" a été rejetée.
 platform.wiki.currentwiki.candidateHandledSaveComment=Candidat traité {0} ({1})
-platform.wiki.currentwiki.candidateHandledComment=Commentaire \:
+platform.wiki.currentwiki.candidateHandledComment=Commentaire :
 platform.wiki.currentwiki.candidateAcceptedSuccess=La demande a été acceptée.
 platform.wiki.currentwiki.candidateRejectedSuccess=Demande rejetée avec succès.
 platform.wiki.currentwiki.inviteUserAlreadyMember=L''utilisateur {0} est déjà membre du wiki.
@@ -77,7 +77,7 @@ platform.wiki.currentwiki.inviteSuccess=L''utilisateur {0} a été invité avec 
 platform.wiki.currentwiki.invitationCancelSaveComment=Annuler l''invitation {0} ({1}) 
 platform.wiki.currentwiki.invitationCancelNotification=Votre invitation a été annulée et n'est plus valide.
 platform.wiki.currentwiki.invitationCancelSuccess=Invitation annulée avec succès.
-platform.wiki.currentwiki.invitationCancelFailure=Erreur \: impossible d'annuler l'invitation.
+platform.wiki.currentwiki.invitationCancelFailure=Erreur : impossible d'annuler l'invitation.
 platform.wiki.currentwiki.candidateReviewFailure=Erreur, vous ne pouvez pas annuler l'invitation.
 
 # LABELS
@@ -101,11 +101,11 @@ platform.wiki.currentwiki.invite.username.label=Nom d'utilisateur
 platform.wiki.currentwiki.invite.message.label=Message
 platform.wiki.currentwiki.invite.button.label=Inviter
 platform.wiki.currentwiki.candidates.label=Candidats
-platform.wiki.currentwiki.candidates.status.label=Statut\:
-platform.wiki.currentwiki.candidates.type.label=Type \:
-platform.wiki.currentwiki.candidates.reviewer.label=Admin \:
-platform.wiki.currentwiki.candidates.reviewermessage.label=Message de l'administrateur \:
-platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Message privé \:
+platform.wiki.currentwiki.candidates.status.label=Statut :
+platform.wiki.currentwiki.candidates.type.label=Type :
+platform.wiki.currentwiki.candidates.reviewer.label=Admin :
+platform.wiki.currentwiki.candidates.reviewermessage.label=Message de l'administrateur :
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Message privé :
 platform.wiki.currentwiki.candidates.accept.label=Accepter
 platform.wiki.currentwiki.candidates.reject.label=Rejeter
 platform.wiki.currentwiki.candidates.invitation.cancel.label=Annuler l'invitation
@@ -122,14 +122,14 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Le nom d'affichage du wiki.
 platform.wiki.currentwiki.prop.description.hint=Une courte description du wiki et de son usage.
 platform.wiki.currentwiki.prop.owner.hint=L'utilisateur qui est le gestionnaire du wiki.
 platform.wiki.currentwiki.prop.membershipType.hint=La manière dont les utilisateurs peuvent rejoindre ce wiki.
-platform.wiki.currentwiki.prop.secure.hint=Si cette case est cochée, toutes les URLs externes générées par ce wiki débuteront par {0}https\:~/~/{1}.
+platform.wiki.currentwiki.prop.secure.hint=Si cette case est cochée, toutes les URLs externes générées par ce wiki débuteront par {0}https:~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=Le nom de l'utilisateur à ajouter au wiki.
 platform.wiki.currentwiki.invite.message.hint=Message à envoyer à l'utilisateur.
 platform.wiki.currentwiki.candidates.hint=Utilisateurs qui ont demandé ou qui ont été invités à rejoindre ce wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Gérer les paramètres comme le nom du wiki, sa description, son propriétaire et le type de ses membres.
-admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki\: ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
+admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki: ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
 admin.xwiki.usersconfiguration.title=Configuration
 admin.xwiki.members.title=Membres actuels
     

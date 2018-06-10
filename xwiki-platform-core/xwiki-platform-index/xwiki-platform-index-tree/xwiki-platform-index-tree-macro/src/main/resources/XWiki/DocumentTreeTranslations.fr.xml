@@ -40,7 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.documentTree.name=Arborescence
-rendering.macro.documentTree.description=Affiche l'arborescence des documents XWiki
+rendering.macro.documentTree.description=Affiche l'arborescence des pages XWiki.
 rendering.macro.documentTree.parameter.readOnly.name=Lecture seule
 rendering.macro.documentTree.parameter.readOnly.description=L'utilisateur doit-il être en mesure de modifier la structure de l'arbre, si il a les droits nécessaires ?
 rendering.macro.documentTree.parameter.showWikis.name=Montrer les Wikis
@@ -54,7 +54,7 @@ rendering.macro.documentTree.parameter.showDocumentTitle.description=Pour affich
 rendering.macro.documentTree.parameter.showTranslations.name=Montrer les traductions
 rendering.macro.documentTree.parameter.showTranslations.description=Pour montrer les traductions de documents ou non.
 rendering.macro.documentTree.parameter.showAttachments.name=Montrer les pièces jointes
-rendering.macro.documentTree.parameter.showAttachments.description=Pour afficher les pièces jointes du document ou non
+rendering.macro.documentTree.parameter.showAttachments.description=Pour afficher ou non les pièces jointes de la page.
 rendering.macro.documentTree.parameter.showObjects.name=Montrer les Objects
 rendering.macro.documentTree.parameter.showObjects.description=Pour montrer les objets de document ou non.
 rendering.macro.documentTree.parameter.showClassProperties.name=Montrer les propriétés de Class
@@ -63,8 +63,8 @@ rendering.macro.documentTree.parameter.root.name=Racine
 rendering.macro.documentTree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié. Le format d'un identificateur de noeud est entityType: EntityReference, où le type d'entité peut être par exemple wiki, espace, document. Par exemple: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 rendering.macro.documentTree.parameter.showRoot.name=Afficher la racine
 rendering.macro.documentTree.parameter.showRoot.description=Affiche ou non la racine. Par défaut la racine est masquée car le contexte dans lequel est affichée l’arborescence donne suffisamment d'indications (par exemple présence d'un titre au dessus de l’arborescence).
-rendering.macro.documentTree.parameter.compact.name=Compact
-rendering.macro.documentTree.parameter.compact.description=Si vous avez une espace horizontal disponible limité, alors vous devriez probablement le paramétrer à true. L'effet est que les icônes de noeuds et les branches qui les relient seront cachés. Certains styles spéciaux seront également appliqués pour assurer que l'arbre prenne moins d'espace horizontal tout en maintenant les labels des noeuds entièrement visible. 
+rendering.macro.documentTree.parameter.compact.name=Compacte
+rendering.macro.documentTree.parameter.compact.description=Si vous avez une espace horizontal disponible limité, alors vous devriez probablement le paramétrer à true. L'effet est que les icônes de noeuds et les branches qui les relient seront masqués. Certains styles spéciaux seront également appliqués pour assurer que l'arbre prenne moins d'espace horizontal tout en maintenant les labels des noeuds entièrement visibles.
 rendering.macro.documentTree.parameter.links.name=Liens
 rendering.macro.documentTree.parameter.links.description=Indique si les labels de noeud doivent ressembler ou se comporter comme des liens (ancres).
 rendering.macro.documentTree.parameter.checkboxes.name=Cases à cocher

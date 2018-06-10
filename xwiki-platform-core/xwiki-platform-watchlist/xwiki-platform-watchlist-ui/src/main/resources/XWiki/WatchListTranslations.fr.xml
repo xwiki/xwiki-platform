@@ -50,8 +50,8 @@ XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Quotidien
 XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Hebdomadaire
 
 ### Notification Icons    
-watchlist.notifications.icons.on=OFF
-### Missing: watchlist.notifications.icons.off=OFF
+watchlist.notifications.icons.on=ACTIF
+watchlist.notifications.icons.off=INACTIF
 watchlist.notifications.icons.tooltip.page=Suivre cette page
 watchlist.notifications.icons.tooltip.pageAndChildren=Suivre cette page et les pages filles
 watchlist.notifications.icons.tooltip.space=Suivre la page parente et ses filles

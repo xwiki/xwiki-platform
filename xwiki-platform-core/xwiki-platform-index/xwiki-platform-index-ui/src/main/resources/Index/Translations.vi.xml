@@ -45,7 +45,7 @@ index.spacesMacro.spaceIndex.title=Thấy chỉ mục space
 index.spacesMacro.spaceAdministration.title=Thấy quản trị space
 ### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
 index.spacesMacro.createSpace.link=Tạo trang mới
-index.spacesMacro.createSpace.defaultSpaceName=Tên Space 
+index.spacesMacro.createSpace.defaultSpaceName=Tên Space
 index.spacesMacro.createSpace.submit=Tạo
 </content>
 </xwikidoc>

@@ -54,7 +54,7 @@ platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Donner des droits d'a
 platform.appwithinminutes.appPanelCreateEntry=Créez votre propre application !
 
 ### Wizard step
-platform.appwithinminutes.wizardStepHeading=Étape {0} — {1} 
+platform.appwithinminutes.wizardStepHeading=Étape {0} — {1}
 appWithinMinutes.wizardStep.name.name=Nom
 appWithinMinutes.wizardStep.name.title=Donnez un nom à votre application
 appWithinMinutes.wizardStep.name.description=Choisissez un nom pour l'application
@@ -100,7 +100,7 @@ platform.appwithinminutes.classEditorPaletteHint=Glissez-Déposez des champs de 
 platform.appwithinminutes.classEditorCanvasHint=Glissez-déposez les champs de la palette dans cette zone.
 
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Mettre à jour le template de la classe
-platform.appwithinminutes.classEditorUpdateTemplateHint=Sauvegarder les valeurs par défaut dans le template de la classe ({0}). 
+platform.appwithinminutes.classEditorUpdateTemplateHint=Sauvegarder les valeurs par défaut dans le template de la classe ({0}).
 platform.appwithinminutes.classEditorUpdateSheetLabel=Mettre à jour la sheet de la classe
 platform.appwithinminutes.classEditorUpdateSheetHint=Recréer le formulaire utilisé pour afficher et modifier les objets de cette classe ({0}).
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Mettre à jour le paquet de traduction de la classe

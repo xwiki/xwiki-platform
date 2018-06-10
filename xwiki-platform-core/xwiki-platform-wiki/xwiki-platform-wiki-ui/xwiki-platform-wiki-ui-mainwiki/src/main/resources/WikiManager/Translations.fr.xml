@@ -79,9 +79,9 @@ platform.wiki.menu.deletewiki=Supprimer
 platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
-platform.wiki.dependencies.wiki.missing=Le composant Java "Wiki" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki API" et "Wiki Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle). 
-platform.wiki.dependencies.template.missing=Le composant Java "Wiki Template" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki Template API" et "Wiki Template Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle). 
-platform.wiki.dependencies.user.missing=Le composant Java "Wiki User" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki User API" et "Wiki User Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle). 
+platform.wiki.dependencies.wiki.missing=Le composant Java "Wiki" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki API" et "Wiki Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle).
+platform.wiki.dependencies.template.missing=Le composant Java "Wiki Template" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki Template API" et "Wiki Template Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle).
+platform.wiki.dependencies.user.missing=Le composant Java "Wiki User" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki User API" et "Wiki User Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle).
 
 ## Create
 platform.wiki.create.button=Créer un wiki
@@ -108,7 +108,7 @@ platform.wiki.users.logInToContinue=Afin de continuer, vous devez vous {0}identi
 platform.wiki.users.invitation.userAcceptedNotification=L''utilisateur ''{0}'' ({1}) a accepté l''invitation à rejoindre le wiki ''{2}'' ({3}).
 platform.wiki.users.invitation.userAcceptedSuccess=L''utilisateur {0}{1}{2} a accepté avec succès l''invitation et a rejoint le wiki {3}{4}{5}.
 platform.wiki.users.invitation.userRejectedSuccess=L''utilisateur {0}{1}{2} a rejeté avec succès l''invitation à joindre le wiki {3}{4}{5}.
-platform.wiki.users.join.error.needInvitation=Ce wiki est sur invitation uniquement. Afin d'y accéder, vous devez recevoir une invitation de l'un de ses administrateurs.   
+platform.wiki.users.join.error.needInvitation=Ce wiki est sur invitation uniquement. Afin d'y accéder, vous devez recevoir une invitation de l'un de ses administrateurs.
 platform.wiki.users.join.request.pendingRequestExists=L''utilisateur {0}{1}{2} a déjà une demande en attente pour rejoindre le wiki {3}{4}{5}. Veuillez patienter pour qu''un administrateur du wiki la révise.
 platform.wiki.users.join.request.cancelConfirmation=Êtes-vous certain de vouloir annuler la demande de rejoindre le wiki {0}{1}{2} ?
 platform.wiki.users.join.request.cancelYes=Oui
@@ -244,7 +244,7 @@ admin.wikis.templates.hint=Un modèle est un wiki utilisé pour créer de nouvea
 admin.wikis.rights=Droit de création de Wiki
 
 ## XWikiServer Sheet
-platform.wiki.sheet.title=Description du wiki "{0}" 
+platform.wiki.sheet.title=Description du wiki "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=L''alias wiki "{0}" existe déjà.
 platform.wiki.sheet.erroraliasdoesnotexists=L''alias wiki "{0}" n''existe pas.
 platform.wiki.sheet.title.settings=Paramètres du wiki

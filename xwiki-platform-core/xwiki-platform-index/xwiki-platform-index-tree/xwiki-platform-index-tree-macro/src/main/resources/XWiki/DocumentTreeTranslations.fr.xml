@@ -87,7 +87,7 @@ rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 rendering.macro.documentTree.parameter.exclusions.description=Liste de noeuds à exclure de l'arbre. Les noeuds sont indiqués par leur ID et séparés par des virgules (,).
 
 index.documentTree.empty=Aucune page trouvée
-index.documentTree.more={0} autres... 
+index.documentTree.more={0} autres...
 
 ## Deprecated translation keys
 

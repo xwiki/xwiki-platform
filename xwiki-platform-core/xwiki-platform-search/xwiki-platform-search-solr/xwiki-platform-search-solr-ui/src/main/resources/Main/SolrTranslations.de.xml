@@ -68,7 +68,7 @@ solr.sortBy.author_display_sort=Letzter Autor
 solr.sortBy.filename_sort=Dateiname
 solr.sortBy.attsize_sort=Dateigröße
 solr.sortBy.attdate_sort=Hochgeladen am
-solr.sortBy.attauthor_display_sort=Hochgeladen von 
+solr.sortBy.attauthor_display_sort=Hochgeladen von
 solr.sortOrder.asc=Aufsteigend
 solr.sortOrder.desc=Absteigend
 
@@ -82,7 +82,7 @@ solr.result.language=Sprache
 ### Missing: solr.result.locatedIn=Located in
 solr.result.author=Geändert von {0} am {1}
 solr.result.mediaType=Dateityp {0}
-solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2}) 
+solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2})
 solr.result.highlightAll=Alle Vorkommen anzeigen
 
 solr.facets.title=Suche verfeinern
@@ -136,8 +136,8 @@ solr.facet.size.small=Klein
 solr.facet.size.medium=Mittel
 solr.facet.size.large=Groß
 solr.facet.size.between=Zwischen {0} und {1}
-solr.facet.size.lessThan=Weniger als {0} 
-solr.facet.size.moreThan=Mehr als {0} 
+solr.facet.size.lessThan=Weniger als {0}
+solr.facet.size.moreThan=Mehr als {0}
 solr.facet.size.any=Jede Größe
 
 solr.field.type=Ergebnistyp
@@ -160,7 +160,7 @@ solr.field.creationdate=Erstelldatum
 solr.field.doccontent=Angezeiger Inhalt des Dokuments
 solr.field.doccontentraw=Quelltext des Dokuments
 solr.field.class=Objekttyp
-solr.field.class.definedBy=Definiert durch {0} » {1} 
+solr.field.class.definedBy=Definiert durch {0} » {1}
 solr.field.propertyname=Eigenschaftsname
 solr.field.propertyvalue=Eigenschaftswert
 solr.field.filename=Dateiname

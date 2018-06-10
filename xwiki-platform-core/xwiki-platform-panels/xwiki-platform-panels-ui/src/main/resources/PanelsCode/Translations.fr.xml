@@ -58,12 +58,12 @@ admin.panels.navigation.description=Gérer les pages à afficher dans le panneau
 PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
 PanelsCode.NavigationConfigurationClass_exclusions.hint=Liste des pages à exclure de l'arbre de navigation.
 PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Liste des pages à inclure dans l'arbre de navigation même si elles ont été exclues via un filtre précédent.
+platform.panels.navigation.configuration.excludedPages=Pages exclues
+platform.panels.navigation.configuration.excludedPages.hint=Utilisez le Cliquer / Glisser pour déplacer les pages dans ou hors de l'arbre de navigation.
+platform.panels.navigation.configuration.excludedPages.empty=Aucune
 ### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
+platform.panels.navigation.configuration.otherPages=Autres pages
+platform.panels.navigation.configuration.saveComment=La configuration de l'arbre de navigation a été mise à jour depuis l'Administration
 </content>
 </xwikidoc>

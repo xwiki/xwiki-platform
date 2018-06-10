@@ -84,7 +84,7 @@ rendering.macro.documentTree.parameter.filterHiddenDocuments.description="FALSE"
 rendering.macro.documentTree.parameter.limit.name=Limite
 rendering.macro.documentTree.parameter.limit.description=Le nombre maximum de nœuds fils à afficher lorsqu'un nœud père est déplié pour la première fois. Les autres nœuds sont accessibles grâce au lien "Plus...". Ce paramètre sert essentiellement à définir la pagination afin d'améliorer les performances lorsque les nœuds fils sont nombreux.
 rendering.macro.documentTree.parameter.exclusions.name=Exclusions
-### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+rendering.macro.documentTree.parameter.exclusions.description=Liste de noeuds à exclure de l'arbre. Les noeuds sont indiqués par leur ID et séparés par des virgules (,).
 
 index.documentTree.empty=Aucune page trouvée
 index.documentTree.more={0} autres... 

@@ -41,49 +41,49 @@
   <hidden>true</hidden>
   <content>annotations.title=Annotations
 annotations.menu.loading=Chargement des paramètres pour les annotations
-annotations.menu.loaderror=Erreur :
+annotations.menu.loaderror=Échec : 
 annotations.tab.info.noannotations=Aucune annotation trouvée pour cette page
 
-annotations.settings.display=Afficher les annotations
+annotations.settings.display=Afficher les annotations 
 annotations.settings.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents en syntaxe XWiki 1.0.
 annotations.settings.error.notarget=Aucun document de paramétrage pour les annotations.
 
 annotations.annotated.loading=Chargement des annotations
-annotations.annotated.loaderror=Erreur :
+annotations.annotated.loaderror=Erreur : 
 annotations.annotated.loaderror.wrongresponse=Réponse serveur mal formatée
 annotations.annotated.error.noannotatedelement=Impossible de charger les annotations : leur contenu n'est pas disponible.
 annotations.annotated.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents rédigés en syntaxe XWiki 1.0.
 
 annotations.action.edit.text=[Modifier]
 annotations.action.edit.tooltip=Modifier cette annotation
-annotations.action.edit.submit.text=Enregistrer
+annotations.action.edit.submit.text=Mettre à jour
 annotations.action.edit.cancel.text=Annuler
-annotations.action.edit.success=L'annotation a été mise à jour
-annotations.action.edit.loaderror=Erreur :
-annotations.action.edit.error.notfound=Cette annotation n'existe plus. Merci de recharger la page.
+annotations.action.edit.success=L'annotation a été mise à jour.
+annotations.action.edit.loaderror=Échec : 
+annotations.action.edit.error.notfound=Cette annotation n'existe plus. Merci d'actualiser la page.
 
 annotations.action.delete.text=[Supprimer]
 annotations.action.delete.tooltip=Supprimer l'annotation
-annotations.action.delete.confirm=Etes-vous certain de vouloir supprimer cette annotation ?
+annotations.action.delete.confirm=Êtes-vous certain de vouloir supprimer cette annotation ?
 annotations.action.delete.inProgress=Suppression de l'annotation...
 annotations.action.delete.done=Annotation supprimée
-annotations.action.delete.failed=Impossible de supprimer l'annotation :
+annotations.action.delete.failed=Impossible de supprimer l'annotation : 
 
 annotations.action.create.submit.text=Ajouter l'annotation
 annotations.action.create.cancel.text=Annuler
 annotations.action.create.selection.invalid=Merci de sélectionner du texte dans le corps du document.
-annotations.action.create.form.loaderror=Erreur :
-annotations.action.create.success=L'annotation a été ajoutée avec succès
-annotations.action.create.loaderror=Erreur :
-annotations.action.create.error.unauthorized=Vous n'êtes pas autorisés à annoter ce document.
+annotations.action.create.form.loaderror=Échec : 
+annotations.action.create.success=Annotation ajoutée.
+annotations.action.create.loaderror=Échec : 
+annotations.action.create.error.unauthorized=Vous n'êtes pas autorisés à annoter cette page. 
 annotations.action.create.error.unauthorizedguest=Vous n'êtes pas autorisés à annoter ce document. Commencez par vous identifier.
-annotations.action.create.helpmessage=Pour annoter une portion de texte, sélectionnez-la puis appuyez sur {0}.
+annotations.action.create.helpmessage=Pour annoter un texte, sélectionnez-le puis appuyez sur {0}.
 annotations.action.create.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents rédigés en syntaxe XWiki 1.0.
 annotations.action.create.error.notarget=L'annotation n'est associée à aucun document.
 
-annotations.action.view.hide.text=Masquer
-annotations.action.view.form.loaderror=Erreur :
-annotations.action.view.error.notfound=Cette annotation n'existe plus. Merci de recharger la page.
+annotations.action.view.hide.text=masquer
+annotations.action.view.form.loaderror=Échec : 
+annotations.action.view.error.notfound=Cette annotation n'existe plus. Merci d'actualiser la page.
 annotations.action.view.thread=Afficher la discussion
 
 annotations.altered.text=Cette annotation ne peut être affichée car le texte annoté n'existe plus dans le document.

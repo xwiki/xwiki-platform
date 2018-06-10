@@ -114,7 +114,7 @@ AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Désactiver les annotations
 AnnotationCode.AnnotationConfig_displayed=Par défaut, afficher les annotations
 AnnotationCode.AnnotationConfig_displayed.hint=Indique si les annotations sont affichées par défaut ou seulement en utilisant l'option "Afficher les annotations" de la page
 AnnotationCode.AnnotationConfig_displayHighlight=Par défaut, surligner le texte annoté
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Indique si le surlignement des annotations doit toujours être actif ou uniquement au survol
 AnnotationCode.AnnotationConfig_annotationClass=Classe XWiki définissant la structure des annotations
 </content>
 </xwikidoc>

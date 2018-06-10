@@ -86,7 +86,7 @@ annotations.action.view.form.loaderror=Échec :
 annotations.action.view.error.notfound=Cette annotation n'existe plus. Merci d'actualiser la page.
 annotations.action.view.thread=Afficher la discussion
 
-annotations.altered.text=Cette annotation ne peut être affichée car le texte annoté n'existe plus dans le document.
+annotations.altered.text=Cette annotation ne peut être affichée car le texte annoté n'existe plus dans la page : 
 annotations.updated.text=Cette annotation a été déplacée automatiquement en raison d'une mise à jour du document. Initialement :
 annotations.action.validate.text=[Enregistrer]
 annotations.action.validate.tooltip=Valider la mise à jour automatique du texte sélectionné pour cette annotation

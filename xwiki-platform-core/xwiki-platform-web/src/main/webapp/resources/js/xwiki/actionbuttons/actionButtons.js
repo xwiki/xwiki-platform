@@ -374,20 +374,16 @@ return XWiki;
 // Make sure the action buttons are visible at the bottom of the window.
 require(['jquery'], function ($) {
   var $container = $('.bottombuttons');
-  // Use the placeholder to get the initial container position.
-  var $placeholder = $('<span></span>');
-  $placeholder.insertBefore($container);
+  var $buttons = $container.find('.buttons');
+  var $window = $(window);
 
-  $(window).on("scroll resize load click", function() {
-    var isFullScreen = $('.fullScreenWrapper').length > 0
-    var position = $placeholder.offset().top;
+  $window.on("scroll resize load click", function() {
+    var position = $container.offset().top + $buttons.height() - $window.scrollTop();
 
-    if (!isFullScreen && $(window).height() + $(window).scrollTop() < position) {
-      $container.addClass('bottombuttons-fixed');
-      $container.innerWidth($container.parent().width());
+    if (position > $window.height()) {
+      $buttons.addClass('buttons-fixed');
     } else {
-      $container.removeClass('bottombuttons-fixed');
-      $container.innerWidth('');
+      $buttons.removeClass('buttons-fixed');
     }
   });
 });

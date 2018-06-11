@@ -1,10 +1,10 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
+<div class="topbuttons">#template("previewactions.vm")<hr /></div>
 #template("hierarchy.vm")
 #template("contentview.vm")
-<hr />
-<div class="bottombuttons">#template("previewactions.vm")</div>
+<div class="bottombuttons"><hr />#template("previewactions.vm")</div>
 </div> ## mainContentArea
 </div> ## main
 #template("endpage.vm")

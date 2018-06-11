@@ -4,33 +4,27 @@
   $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   $xwiki.ssfx.use('js/xwiki/actionbuttons/actionButtons.css', true)
   #set ($keyboardShortcutsEnabled = ($editor != 'wysiwyg'))
+  ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
+  <div class="meta-versionSummary metamodifs">
+  <input type="hidden" name="xeditaction" value="$!xcontext.action" />
+  #if ((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
+    #set ($minorFieldAdded = 1)
+    <div class="meta-minorEdit form-inline"><input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/><label for="minorEdit">$services.localization.render('core.minoredit')</label></div>
+  #end
+  #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
+    #set ($commentFieldAdded = 1)
+    #if ($xwiki.isEditCommentFieldHidden())
+      <input type="hidden" name="comment" id="comment" value="$!{escapetool.xml($request.comment)}" />
+    #else
+      <label for="commentinput">$services.localization.render('core.comment') <span>$services.localization.render('core.comment.details')</span></label>
+      <input type="text" name="comment" id="commentinput" value="$!{escapetool.xml($request.comment)}" size="40" title="$services.localization.render('core.comment.tooltip')" />
+    #end
+  #end
+  </div> ## meta-versionSummary
   <div class="buttons">
-    <div class="btn-group">
-      #editActionButton($saveaction, 'saveandview', 'btn-primary')
-      #editActionButton('saveandcontinue', 'save', 'btn-default')
-      #if ($previewenabled) #editActionButton('preview', 'preview', 'btn-default') #end
-    </div>
+    #if ($previewenabled) #editActionButton('preview', 'preview', 'btn-info') #end
+    #editActionButton('saveandcontinue', 'saveandcontinue', 'btn-primary')
+    #editActionButton($saveaction, 'saveandview', 'btn-success')
     #editActionButton('cancel', 'cancel', 'btn-default')
-
-    ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
-    <span class="meta-versionSummary metamodifs">
-      <input type="hidden" name="xeditaction" value="$!xcontext.action" />
-      #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
-        #set ($commentFieldAdded = 1)
-        #if ($xwiki.isEditCommentFieldHidden())
-          <input type="hidden" name="comment" id="comment" value="$!{escapetool.xml($request.comment)}" />
-        #else
-          <input type="text" name="comment" id="commentinput" value="$!{escapetool.xml($request.comment)}" size="40"
-            title="$services.localization.render('core.comment.tooltip')" placeholder="$services.localization.render('core.comment.hint')" />
-        #end
-      #end
-      #if ((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
-        #set ($minorFieldAdded = 1)
-        <span class="meta-minorEdit text-nowrap">
-          <input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/>
-          <label for="minorEdit">$services.localization.render('core.minoredit')</label>
-        </span>
-      #end
-    </span> ## meta-versionSummary
   </div> ## buttons
 #end

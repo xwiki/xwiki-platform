@@ -1,7 +1,9 @@
 #template('colorThemeInit.vm')
 #autosaveControl {
   display: inline;
-  white-space: nowrap;
+}
+#autosaveControl * {
+  vertical-align: text-bottom;
 }
 #autosaveControl input.autosave-frequency {
   text-align: center;
@@ -17,8 +19,5 @@
 }
 #body #autosaveControl label.frequency, #body #autosaveControl label.frequency span {
   text-transform: none;
-  font-weight: 400;
-}
-#autosaveControl label.autosave {
-  font-weight: 400;
+  font-weight: normal;
 }

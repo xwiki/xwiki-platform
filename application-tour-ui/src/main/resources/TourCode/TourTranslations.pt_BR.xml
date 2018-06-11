@@ -92,9 +92,9 @@ tour.steps.edit=Editar
 tour.steps.delete=Deletar
 
 # Upgrade
-tour.upgrade.title = Atualizar
-tour.upgrade.successList = As seguintes páginas foram convertidas com sucesso
-tour.upgrade.successNothing = Nada você para atualizar.
+tour.upgrade.title=Atualizar
+tour.upgrade.successList=As seguintes páginas foram convertidas com sucesso
+tour.upgrade.successNothing=Nada você para atualizar.
 
 # Template
 ### Missing: tour.template.name=Tour

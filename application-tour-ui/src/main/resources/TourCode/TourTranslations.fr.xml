@@ -92,9 +92,9 @@ tour.steps.edit=Modifier
 tour.steps.delete=Supprimer
 
 # Upgrade
-tour.upgrade.title = Mise à jour
-tour.upgrade.successList = Les pages suivantes ont été converties avec succès :
-tour.upgrade.successNothing = Aucune page n'a besoin d'être mise à jour !
+tour.upgrade.title=Mise à jour
+tour.upgrade.successList=Les pages suivantes ont été converties avec succès :
+tour.upgrade.successNothing=Aucune page n'a besoin d'être mise à jour !
 
 # Template
 tour.template.name=Visite guidée

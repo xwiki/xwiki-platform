@@ -92,9 +92,9 @@ tour.steps.edit=Uredi
 tour.steps.delete=Obriši
 
 # Upgrade
-tour.upgrade.title = Nadogradnja
-tour.upgrade.successList = Uspješno su pretvorene sljedeće stranice\:
-tour.upgrade.successNothing = Nema ničega za nadograditi\!
+tour.upgrade.title=Nadogradnja
+tour.upgrade.successList=Uspješno su pretvorene sljedeće stranice\:
+tour.upgrade.successNothing=Nema ničega za nadograditi\!
 
 # Template
 tour.template.name=Obilazak

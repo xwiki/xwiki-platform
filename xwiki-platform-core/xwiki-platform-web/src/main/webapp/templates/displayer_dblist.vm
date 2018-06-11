@@ -1,31 +1,6 @@
 #if ($type == 'edit' || $type == 'search')
   #if ($field.getProperty('displayType').value == 'input' && $field.getProperty('picker').value == 1)
-    #set ($id = $escapetool.xml("${prefix}${name}"))
-    #set ($disabled = $field.getProperty('disabled').value == 1)
-    #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-    ## We don't use $isMultiSelect to determine if there is one or multiple values selected because you can have multiple
-    ## values selected on a single selection property if the property had multiple selection active in the past.
-    #if ("$!value.size()" != '')
-      #set ($values = $value)
-    #else
-      #set ($values = [$value])
-    #end
-    #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-      {'type': 'text/css', 'rel': 'stylesheet'}))
-    #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-      {'forceSkinAction' : true, 'language' : $xcontext.locale}))
-    <select id="$!id" name="$!id" class="suggest-propertyValues"#if ($isMultiSelect) multiple="multiple"#end
-        #if ($disabled)disabled="disabled" #{end}data-className="$!escapetool.xml($field.className)"
-        data-propertyName="$!escapetool.xml($name)" size="1">
-      #foreach ($selectedValue in $values)
-        <option value="$!escapetool.xml($selectedValue)" selected="selected">$!escapetool.xml($selectedValue)</option>
-      #end
-    </select>
-    #if ($isMultiSelect)
-      ## We need a hidden input with an empty value to be able to clear the selected values when no value is selected.
-      <input type="hidden" name="$!id" />
-    #end
+    #xpropertySuggestInputDisplayer($field $prefix $name $value)
   #else
     $doc.displayEdit($field, $prefix, $object)
   #end

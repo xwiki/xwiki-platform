@@ -14,17 +14,18 @@
     position: fixed;
     bottom: 0;
     background-color: @breadcrumb-bg;
-    @media (max-width: @screen-md-min) {
+    @media (max-width: @screen-sm-max) {
       #commentinput, #autosaveControl, .metamodifs {
         display: none;
       }
     }
   }
 
-  input {
+  input[type=checkbox] {
     vertical-align: middle;
     position: relative;
     margin: 0;
+    margin-left: 1em;
     bottom: 1px;
   }
 }

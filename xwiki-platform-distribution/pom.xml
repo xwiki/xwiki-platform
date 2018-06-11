@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>10.5-SNAPSHOT</version>
+    <version>10.5-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -166,28 +166,28 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -198,29 +198,29 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -232,13 +232,13 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>10.5-SNAPSHOT</version>
+        <version>10.5-rc-1</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>

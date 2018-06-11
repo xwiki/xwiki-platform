@@ -50,7 +50,7 @@ CKEditor.ConfigClass_linkShowTargetTab.hint=Vous permet de définir l'attribut t
 CKEditor.ConfigClass_advanced=Configuration avancée
 CKEditor.ConfigClass_advanced.hint=Vous pouvez écrire un snippet Javascript pour modifier directement l''objet configuration. Cf. à la documentation{1} de {0}CKEditor  pour la list des propriétés de configuration disponibles.
 
-ckeditor.admin.saveComment=La configuration CKEditor a été mise à jour depuis l'Administration 
+ckeditor.admin.saveComment=La configuration CKEditor a été mise à jour depuis l'Administration
 ckeditor.admin.reset=Réinitialiser
 ckeditor.admin.reset.hint=Rétablir la configuration par défaut
 ckeditor.admin.reset.confirmation=Êtes-vous certain de vouloir rétablir la configuration par défaut ? Toutes vos modifications seront perdues.
@@ -61,7 +61,7 @@ ckeditor.plugin.link.queryString=Paramètres d'URL
 ckeditor.plugin.link.defaultLabel=Saisir le label du lien
 ckeditor.plugin.link.openInNewTab=Ouvrir le lien dans un nouvel onglet
 
-ckeditor.plugin.macro.placeholder=macro : {0} 
+ckeditor.plugin.macro.placeholder=macro : {0}
 ckeditor.plugin.macro.buttonHint=Macro XWiki
 ckeditor.plugin.macro.refreshFailed=La réactualisation du contenu édité a échoué.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insérer macro {0}
@@ -96,14 +96,14 @@ resource.doc.label=Page
 resource.doc.placeholder=Emplacement.De.La.Page
 resource.icon.label=Icône
 resource.mailto.label=Adresse email
-resource.mailto.placeholder=user@example.org 
+resource.mailto.placeholder=user@example.org
 resource.path.label=Emplacement
 resource.path.placeholder=/Emplacement/du/fichier
 resource.unc.label=Chemin UNC
 resource.unc.placeholder=//serveur/partage/chemin/du/fichier
 resource.unknown.label=Inconnu
 resource.url.label=URL
-resource.url.placeholder=http://www.example.org/image.png 
+resource.url.placeholder=http://www.example.org/image.png
 resource.user.label=Utilisateur
 resource.user.placeholder=alias
 

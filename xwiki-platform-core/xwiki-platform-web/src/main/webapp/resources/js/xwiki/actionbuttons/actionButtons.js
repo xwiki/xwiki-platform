@@ -370,20 +370,3 @@ function init() {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
-
-// Make sure the action buttons are visible at the bottom of the window.
-require(['jquery'], function ($) {
-  var $container = $('.bottombuttons');
-  var $buttons = $container.find('.buttons');
-  var $window = $(window);
-
-  $window.on("scroll resize load click", function() {
-    var position = $container.offset().top + $buttons.height() - $window.scrollTop();
-
-    if (position > $window.height()) {
-      $buttons.addClass('buttons-fixed');
-    } else {
-      $buttons.removeClass('buttons-fixed');
-    }
-  });
-});

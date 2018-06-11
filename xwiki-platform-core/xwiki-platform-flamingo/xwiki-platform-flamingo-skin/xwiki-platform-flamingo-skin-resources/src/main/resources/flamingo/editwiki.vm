@@ -27,7 +27,7 @@ $!services.edit.syntaxContent.text($tdoc.content, $tdoc.syntax, {
 </div> ## xwikitext
 </div> ## noname
 <div class="bottom-editor">
-  <div class="bottombuttons form-inline stickybuttons">#template("editactions.vm")</div>
+  <div class="bottombuttons form-inline sticky-buttons">#template("editactions.vm")</div>
 </div>
 ## Insert JS and CSS needed for the fullscreen edit feature
 $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})

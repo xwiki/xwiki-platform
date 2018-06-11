@@ -2,14 +2,14 @@
 // Edit
 // --------------------------------------------------
 
-.stickybuttons {
+.sticky-buttons {
   background-color: @xwiki-page-content-bg;
   .buttons {
     margin: 0;
     padding: 1em;
   }
 
-  &.stickybuttons-fixed {
+  &.sticky-buttons-fixed {
     z-index: 100;
     position: fixed;
     bottom: 0;
@@ -30,18 +30,18 @@
 }
 
 .bottom-editor {
-  .stickybuttons {
+  .sticky-buttons {
     border: 1px solid @input-border;
     border-top: 0;
     background-color: @xwiki-background-secondary-color;
-    &.stickybuttons-fixed {
+    &.sticky-buttons-fixed {
       border-top: 1px solid @input-border;
     }
   }
 }
 
 #editcolumn, #inline {
-  :not(.stickybuttons).bottombuttons {
+  :not(.sticky-buttons).bottombuttons {
     .buttons {
       margin: 10px 0;
     }

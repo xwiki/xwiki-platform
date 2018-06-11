@@ -373,7 +373,7 @@ return XWiki;
 
 // Make sure the action buttons are visible at the bottom of the window.
 require(['jquery'], function ($) {
-  var $container = $('.stickybuttons');
+  var $container = $('.sticky-buttons');
   if ($container.length == 0) return;
   // Use the placeholder to get the initial container position
   var $placeholder = $('<span></span>');
@@ -384,10 +384,10 @@ require(['jquery'], function ($) {
     var position = $placeholder.offset().top;
 
     if (!isFullScreen && $(window).height() + $(window).scrollTop() < position) {
-      $container.addClass('stickybuttons-fixed');
+      $container.addClass('sticky-buttons-fixed');
       $container.innerWidth($container.parent().width());
     } else {
-      $container.removeClass('stickybuttons-fixed');
+      $container.removeClass('sticky-buttons-fixed');
       $container.innerWidth('');
     }
   });

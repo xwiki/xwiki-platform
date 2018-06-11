@@ -106,7 +106,7 @@ $renderedContent
 ## Action buttons
 ## --------------
 #set($editactions = "bottom")
-<div class="bottombuttons stickybuttons">#template("editactions.vm")</div>
+<div class="bottombuttons sticky-buttons">#template("editactions.vm")</div>
 </div> ## form
 </form>
 #end ## can edit

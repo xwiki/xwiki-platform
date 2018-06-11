@@ -22,6 +22,7 @@ package org.xwiki.rest.internal.resources.classes;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.model.jaxb.PropertyValues;
@@ -46,6 +47,10 @@ public abstract class AbstractListClassPropertyValuesProvider<T extends ListClas
     @Override
     protected PropertyValues getUsedValues(T propertyDefinition, int limit, String filter) throws QueryException
     {
-        return getValues(this.usedValuesQueryBuilder.build(propertyDefinition), limit, filter, propertyDefinition);
+        Query query = this.usedValuesQueryBuilder.build(propertyDefinition);
+        if (propertyDefinition.isMultiSelect() && !propertyDefinition.isRelationalStorage()) {
+            query.addFilter(new SplitValueQueryFilter(propertyDefinition.getSeparators(), limit, filter));
+        }
+        return getValues(query, limit, filter, propertyDefinition);
     }
 }

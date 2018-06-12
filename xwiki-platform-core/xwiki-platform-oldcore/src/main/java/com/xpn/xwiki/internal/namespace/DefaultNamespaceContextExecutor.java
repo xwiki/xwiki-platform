@@ -34,6 +34,8 @@ import org.xwiki.model.reference.WikiReference;
 import com.xpn.xwiki.XWikiContext;
 
 /**
+ * Default implementation for {@link NamespaceContextExecutor}.
+ *
  * @version $Id$
  * @since 10.6RC1
  */

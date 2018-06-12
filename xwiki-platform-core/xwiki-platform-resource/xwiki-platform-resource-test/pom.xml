@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-resource</artifactId>
-    <version>10.5-SNAPSHOT</version>
+    <version>10.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-resource-test</artifactId>
   <name>XWiki Platform - Resource - Tests - Parent POM</name>

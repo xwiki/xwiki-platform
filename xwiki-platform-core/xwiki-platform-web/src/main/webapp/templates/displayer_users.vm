@@ -1,15 +1,5 @@
 #if ($type == 'edit' || $type == 'search')
-  #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-  #set ($id = "${prefix}${name}")
-  #set ($parameters = {
-    'id': $id,
-    'name': $id,
-    'value': $value
-  })
-  #if ($field.getProperty('disabled').value == 1)
-    #set ($parameters.disabled = 'disabled')
-  #end
-  #userPicker($isMultiSelect $parameters)
+  #xpropertySuggestInputDisplayer($field $prefix $name $value)
 #elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedUsers = [])

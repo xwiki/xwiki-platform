@@ -5,8 +5,6 @@
 }
 #autosaveControl input.autosave-frequency {
   text-align: center;
-  vertical-align: baseline;
-  padding-bottom: 0;
   width: 2em;
 }
 

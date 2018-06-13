@@ -22,11 +22,15 @@ package org.xwiki.eventstream.internal;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.text.StringUtils;
@@ -117,22 +121,31 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
 
     private ContextualLocalizationManager contextualLocalizationManager;
 
+    private NamespaceContextExecutor namespaceContextExecutor;
+
+    private Logger logger;
+
     /**
      * Construct a DefaultUntypedRecordableEventDescriptor.
      * @param reference reference of the document holding the descriptor
      * @param authorReference reference of the author of the document
      * @param baseObject object holding the descriptor
      * @param contextualLocalizationManager an instance of the component ContextualLocalizationManager
+     * @param namespaceContextExecutor an instance of the component NamespaceContextExecutor
+     * @param logger the logger to use to report problems
      * @throws EventStreamException if an error occurs
      */
     public DefaultUntypedRecordableEventDescriptor(EntityReference reference, DocumentReference authorReference,
-        BaseObject baseObject, ContextualLocalizationManager contextualLocalizationManager)
+        BaseObject baseObject, ContextualLocalizationManager contextualLocalizationManager,
+            NamespaceContextExecutor namespaceContextExecutor, Logger logger)
             throws EventStreamException
     {
         this.entityReference = reference;
         this.authorReference = authorReference;
         this.setProperties(baseObject);
         this.contextualLocalizationManager = contextualLocalizationManager;
+        this.namespaceContextExecutor = namespaceContextExecutor;
+        this.logger = logger;
     }
 
     /**
@@ -232,7 +245,7 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     @Override
     public String getApplicationName()
     {
-        return this.contextualLocalizationManager.getTranslationPlain(this.applicationName);
+        return getLocalizedMessage(applicationName);
     }
 
     @Override
@@ -244,7 +257,7 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     @Override
     public String getDescription()
     {
-        return this.eventDescription;
+        return getLocalizedMessage(this.eventDescription);
     }
 
     @Override
@@ -262,5 +275,18 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     @Override
     public String getTargetExpression() {
         return this.target;
+    }
+
+    protected String getLocalizedMessage(String key)
+    {
+        try {
+            return namespaceContextExecutor.execute(
+                new WikiNamespace(this.entityReference.extractReference(EntityType.WIKI).getName()),
+                () -> contextualLocalizationManager.getTranslationPlain(key)
+            );
+        } catch (Exception e) {
+            logger.warn("Failed to compute the correct localization with the correct namespace.", e);
+            return contextualLocalizationManager.getTranslationPlain(key);
+        }
     }
 }

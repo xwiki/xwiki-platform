@@ -23,6 +23,11 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.NamespacedComponentManager;
+import org.xwiki.component.namespace.NamespaceContextExecutor;
+import org.xwiki.component.namespace.NamespaceUtils;
 import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
@@ -34,11 +39,20 @@ import org.xwiki.localization.ContextualLocalizationManager;
 public abstract class AbstractRecordableEventDescriptor implements RecordableEventDescriptor
 {
     @Inject
+    protected Logger logger;
+
+    @Inject
+    protected ComponentManager componentManager;
+
+    @Inject
     protected ContextualLocalizationManager contextualLocalizationManager;
 
-    private String descriptionTranslationKey;
+    @Inject
+    protected NamespaceContextExecutor namespaceContextExecutor;
 
-    private String applicationTranslationKey;
+    protected String descriptionTranslationKey;
+
+    protected String applicationTranslationKey;
 
     /**
      * Construct an AbstractRecordableEventDescriptor.
@@ -52,16 +66,35 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
         this.applicationTranslationKey = applicationTranslationKey;
     }
 
+    protected String getLocalizedMessage(String key)
+    {
+        if (componentManager instanceof NamespacedComponentManager) {
+            NamespacedComponentManager namespacedComponentManager = (NamespacedComponentManager) componentManager;
+            String namespaceOfTheDescriptor = namespacedComponentManager.getNamespace();
+
+            if (namespaceOfTheDescriptor != null) {
+                try {
+                    return namespaceContextExecutor.execute(NamespaceUtils.toNamespace(namespaceOfTheDescriptor),
+                        () -> contextualLocalizationManager.getTranslationPlain(key));
+                } catch (Exception e) {
+                    logger.warn("Failed to compute the correct localization with the correct namespace.", e);
+                }
+            }
+        }
+
+        return contextualLocalizationManager.getTranslationPlain(key);
+    }
+
     @Override
     public String getDescription()
     {
-        return contextualLocalizationManager.getTranslationPlain(descriptionTranslationKey);
+        return getLocalizedMessage(descriptionTranslationKey);
     }
 
     @Override
     public String getApplicationName()
     {
-        return contextualLocalizationManager.getTranslationPlain(applicationTranslationKey);
+        return getLocalizedMessage(applicationTranslationKey);
     }
 
     @Override
@@ -80,9 +113,8 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
         if (o instanceof RecordableEventDescriptor) {
             RecordableEventDescriptor other = (RecordableEventDescriptor) o;
             EqualsBuilder equalsBuilder = new EqualsBuilder();
-            equalsBuilder.append(other.getApplicationName(), this.getApplicationName());
-            equalsBuilder.append(other.getEventType(), this.getEventType());
             equalsBuilder.append(other.getApplicationId(), this.getApplicationId());
+            equalsBuilder.append(other.getEventType(), this.getEventType());
 
             return equalsBuilder.isEquals();
         }

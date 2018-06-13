@@ -26,9 +26,11 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.namespace.NamespaceContextExecutor;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.notifications.notifiers.NotificationRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.text.StringUtils;
@@ -48,16 +50,30 @@ public class DefaultNotificationRenderer implements NotificationRenderer
     private ComponentManager componentManager;
 
     @Inject
+    private NamespaceContextExecutor namespaceContextExecutor;
+
+    @Inject
     private NotificationDisplayer defaultDisplayer;
 
     @Override
     public Block render(CompositeEvent event) throws NotificationException
     {
         try {
-            return getDisplayer(event).renderNotification(event);
+            if (event.getDocument() != null) {
+                return namespaceContextExecutor.execute(
+                    new WikiNamespace(event.getDocument().getWikiReference().getName()),
+                    () -> renderCompositeEvent(event));
+            }  else {
+                return renderCompositeEvent(event);
+            }
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         }
+    }
+
+    private Block renderCompositeEvent(CompositeEvent event) throws Exception
+    {
+        return getDisplayer(event).renderNotification(event);
     }
 
     private NotificationDisplayer getDisplayer(CompositeEvent event) throws ComponentLookupException

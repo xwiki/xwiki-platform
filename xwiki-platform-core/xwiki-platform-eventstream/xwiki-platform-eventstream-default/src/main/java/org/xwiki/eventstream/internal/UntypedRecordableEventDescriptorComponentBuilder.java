@@ -88,7 +88,7 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
             return Arrays.asList(
                     new DefaultUntypedRecordableEventDescriptor(
                             baseObject.getReference(), parentDocument.getAuthorReference(), baseObject,
-                            contextualLocalizationManager, namespaceContextExecutor, logger));
+                            contextualLocalizationManager, namespaceContextExecutor));
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
                     "Unable to build the UntypedRecordableEvent wiki component "

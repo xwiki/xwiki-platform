@@ -37,7 +37,7 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity filter="none" output="false"}}
 ## Not used here but kept for retro-compatibility
@@ -216,10 +216,11 @@
  * @param $ann the annotation object
  *#
 #macro(displayAnnotationTitle $ann)
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy'))
   &lt;div class="annotationTitle"&gt;
     &lt;span class="annotationAuthor"&gt;$!xwiki.getUserName($ann.author)&lt;/span&gt;##
 ## Do not indent this, or the comma will be misplaced
-#if("$!{ann.date}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, "dd/MM/yyyy")&lt;/span&gt;#end
+#if("$!{ann.date}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/span&gt;#end
   &lt;/div&gt;
 #end
 ##

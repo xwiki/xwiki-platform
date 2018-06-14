@@ -19,16 +19,20 @@
  */
 package org.xwiki.eventstream;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.NamespacedComponentManager;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.test.AllLogRule;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -41,8 +45,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test for {@link AbstractRecordableEventDescriptor}.
+ *
  * @version $Id$
  * @since 10.6RC1
+ * @since 10.5
  * @since 9.11.6
  */
 public class AbstractRecordableEventDescriptorTest
@@ -52,8 +59,13 @@ public class AbstractRecordableEventDescriptorTest
     private NamespacedComponentManager componentManager;
 
     @Rule
+    // TODO: Replace by junit5
+    public AllLogRule logRule = new AllLogRule();
+
+    @Rule
+    // TODO: Replace by junit5
     public MockitoComponentMockingRule<FakeRecordableEventDescriptor> mocker =
-            new MockitoComponentMockingRule<>(FakeRecordableEventDescriptor.class);
+            new MockitoComponentMockingRule<>(FakeRecordableEventDescriptor.class, Arrays.asList(Logger.class));
 
     @Before
     public void setUp() throws Exception
@@ -62,7 +74,6 @@ public class AbstractRecordableEventDescriptorTest
         mocker.registerComponent(ComponentManager.class, componentManager);
         contextualLocalizationManager = mocker.getInstance(ContextualLocalizationManager.class);
         namespaceContextExecutor = mocker.getInstance(NamespaceContextExecutor.class);
-
     }
 
     @Test
@@ -103,6 +114,38 @@ public class AbstractRecordableEventDescriptorTest
                 mocker.getComponentUnderTest().getDescription());
         assertEquals("On namespace [wiki:subwiki]: My nice application name",
                 mocker.getComponentUnderTest().getApplicationName());
+    }
+
+    @Test
+    public void getDescriptionAndApplicationWithExceptionTest() throws Exception
+    {
+        // Mocks
+        Exception e = new Exception("some error");
+        when(namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
+        when(contextualLocalizationManager.getTranslationPlain("descriptionKey"))
+                .thenReturn("My nice description");
+        when(contextualLocalizationManager.getTranslationPlain("applicationKey"))
+                .thenReturn("My nice application name");
+
+        // On main wiki
+        assertEquals("My nice description",
+                mocker.getComponentUnderTest().getDescription());
+        assertEquals(0, this.logRule.size());
+        assertEquals("My nice application name",
+                mocker.getComponentUnderTest().getApplicationName());
+        assertEquals(0, this.logRule.size());
+
+        // On sub wiki
+        when(componentManager.getNamespace()).thenReturn(new WikiNamespace("subwiki").toString());
+
+        assertEquals("My nice description",
+                mocker.getComponentUnderTest().getDescription());
+        assertEquals("Failed to render the translation key [descriptionKey] in the namespace [wiki:subwiki] "
+                + "for the event descriptor of [fake].", this.logRule.getMessage(0));
+        assertEquals("My nice application name",
+                mocker.getComponentUnderTest().getApplicationName());
+        assertEquals("Failed to render the translation key [applicationKey] in the namespace [wiki:subwiki] "
+                + "for the event descriptor of [fake].", this.logRule.getMessage(1));
     }
 
     private class OtherFakeRecordableEventDescriptor extends AbstractRecordableEventDescriptor

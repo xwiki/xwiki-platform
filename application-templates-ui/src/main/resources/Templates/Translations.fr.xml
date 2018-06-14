@@ -39,14 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+  <content>template.templateProvider.article.name=Article
 template.templateProvider.article.description=Page article
-template.templateProvider.article.name=Article
-template.templateProvider.encyclopedia.description=Page d'Encyclopédie
+
 template.templateProvider.encyclopedia.name=Encyclopédie
-template.templateProvider.meeting.description=Calendrier et Notes
+template.templateProvider.encyclopedia.description=Page d'Encyclopédie
+
 template.templateProvider.meeting.name=Compte-rendu de réunion
-template.templateProvider.simplePage.description=Avec table des matières
+template.templateProvider.meeting.description=Calendrier et Notes
+
 template.templateProvider.simplePage.name=Page simple
+template.templateProvider.simplePage.description=Avec table des matières
 </content>
 </xwikidoc>

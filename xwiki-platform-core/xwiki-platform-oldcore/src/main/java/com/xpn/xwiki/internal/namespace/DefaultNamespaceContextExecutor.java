@@ -38,6 +38,8 @@ import com.xpn.xwiki.XWikiContext;
  *
  * @version $Id$
  * @since 10.6RC1
+ * @since 10.5
+ * @since 9.11.6
  */
 @Component
 @Singleton

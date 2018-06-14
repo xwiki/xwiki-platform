@@ -31,8 +31,8 @@
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1498504128000</date>
-  <contentUpdateDate>1498504128000</contentUpdateDate>
+  <date>1528989962000</date>
+  <contentUpdateDate>1528989504000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.wiki.create.title')</title>
   <comment/>
@@ -582,10 +582,14 @@
         &lt;/div&gt;
       &lt;/div&gt;
       #end
+      #set($errorlogs = $status.log.getLogs('ERROR'))
       &lt;p class="successmessage box #if($status.error || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
-      &lt;p class="errormessage box #if(!$$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
+      &lt;p class="warningmessage box #if($errorlogs.isEmpty() || $state != 'FINISHED')hidden#end" id="errorlogMessage"&gt;
+        $services.localization.render('platform.wiki.create.wizard.step.creation.errorlog', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
+      &lt;/p&gt;
+      &lt;p class="errormessage box #if(!$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
     &lt;/div&gt;
@@ -606,7 +610,7 @@
         #set($cleanUpHidden = false)
       #else
         #set($finalizeHidden = false)
-        #set($cleanUpHidden = true)
+        #set($cleanUpHidden = $errorlogs.isEmpty())
       #end
     #else
       #set($finalizeHidden = true)
@@ -1089,7 +1093,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
       </use>
     </class>
     <property>
-      <cache>long</cache>
+      <cache>forbid</cache>
     </property>
     <property>
       <code>var XWiki = (function (XWiki) {
@@ -1127,6 +1131,9 @@ XWiki.WikiCreationStatusBar = Class.create({
       } else {
         // Success
         $('successMessage').removeClassName('hidden');
+        if (response.hasErrorLog) {
+          $('errorlogMessage').removeClassName('hidden');
+        }
         $('finalize').removeClassName('hidden');
       }
     }

@@ -31,8 +31,8 @@
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1424363230000</date>
-  <contentUpdateDate>1424363230000</contentUpdateDate>
+  <date>1528990153000</date>
+  <contentUpdateDate>1528990153000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -45,9 +45,15 @@
   #set($wikiId = $request.wikiId)
   #set($status = $services.wiki.creationjob.getJobStatus($wikiId))
   #set($errors = $status.log.getLogs('ERROR'))
+  #set($hasErrorLog = false)
+  #if ($errors.size() &gt; 0)
+    #set($hasErrorLog = true)
+  #end
   #set($errorMessage = "")
-  #if($errors.size() &gt; 0)
-    #set($errorMessage = $errors[0].getFormattedMessage())
+  #if ($status.error)
+    ## The last error log is what actually stopped the job
+    #set($lastIndex = $errors.size() - 1)
+    #set($errorMessage = $errors[$lastIndex].getFormattedMessage())
   #end
   ## Log
   #template('logging_macros.vm')
@@ -58,7 +64,7 @@
   #set($loading = $status.state != 'FINISHED')
   #set($logs = "#printLogs($status.log, $loading)")
   #set($doc = $olddoc)
-  #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state, 'error':$errorMessage, 'logs':$logs})
+  #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state, 'error':$errorMessage, 'hasErrorLog':$hasErrorLog, 'logs':$logs})
   $jsontool.serialize($map)
 #end
 {{/velocity}}</content>

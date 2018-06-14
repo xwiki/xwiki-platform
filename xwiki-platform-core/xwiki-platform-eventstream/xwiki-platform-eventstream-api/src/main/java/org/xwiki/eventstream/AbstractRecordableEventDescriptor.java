@@ -66,6 +66,21 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
         this.applicationTranslationKey = applicationTranslationKey;
     }
 
+    /**
+     * Render a translation key in the context of the namespace (e.g. the current wiki) where the component has been
+     * loaded.
+     *
+     * Use-case: an event descriptor coming from the sub wiki is loaded and displayed in the main wiki. If the
+     * translation resource is located in the sub wiki with the "WIKI" scope, the translation could not be rendered in
+     * the main wiki. That's why we need to execute the localization in the context of the sub wiki.
+     *
+     * @param key the key to render
+     * @return the rendered localization.
+     *
+     * @since 10.6RC1
+     * @since 10.5
+     * @since 9.11.6
+     */
     protected String getLocalizedMessage(String key)
     {
         if (componentManager instanceof NamespacedComponentManager) {
@@ -77,7 +92,8 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
                     return namespaceContextExecutor.execute(NamespaceUtils.toNamespace(namespaceOfTheDescriptor),
                         () -> contextualLocalizationManager.getTranslationPlain(key));
                 } catch (Exception e) {
-                    logger.warn("Failed to compute the correct localization with the correct namespace.", e);
+                    logger.warn("Failed to render the translation key [{}] in the namespace [{}] for the event "
+                            + "descriptor of [{}].", key, namespaceOfTheDescriptor, getEventType(), e);
                 }
             }
         }

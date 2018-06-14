@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.component.wiki.WikiComponentScope;
@@ -32,6 +32,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.test.AllLogRule;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -39,7 +40,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -49,9 +49,12 @@ import static org.mockito.Mockito.when;
  */
 public class DefaultUntypedRecordableEventDescriptorTest
 {
+    @Rule
+    // TODO: Replace by junit5
+    public AllLogRule allLogRule = new AllLogRule();
+
     private ContextualLocalizationManager contextualLocalizationManager;
     private NamespaceContextExecutor namespaceContextExecutor;
-    private Logger logger;
 
     private EntityReference entityReference;
     private DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "User");
@@ -64,7 +67,6 @@ public class DefaultUntypedRecordableEventDescriptorTest
     {
         contextualLocalizationManager = mock(ContextualLocalizationManager.class);
         namespaceContextExecutor = mock(NamespaceContextExecutor.class);
-        logger = mock(Logger.class);
 
         entityReference = new ObjectReference("someObject", new DocumentReference("someWiki", "someSpace",
                 "somePage"));
@@ -75,7 +77,7 @@ public class DefaultUntypedRecordableEventDescriptorTest
                 invocationOnMock -> Arrays.asList((String) invocationOnMock.getArgument(0)));
 
         descriptor = new DefaultUntypedRecordableEventDescriptor(entityReference, authorReference, baseObject,
-                contextualLocalizationManager, namespaceContextExecutor, logger);
+                contextualLocalizationManager, namespaceContextExecutor);
 
         when(namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenAnswer(
                 invocationOnMock -> String.format("Namespace [%s] -> [%s]", invocationOnMock.getArgument(0),
@@ -173,7 +175,8 @@ public class DefaultUntypedRecordableEventDescriptorTest
         Exception e = new Exception("Some error");
         when(namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
         assertEquals("applicationName", descriptor.getApplicationName());
-        verify(logger).warn("Failed to compute the correct localization with the correct namespace.", e);
+        assertEquals("Failed to render the translation key [applicationName] in the namespace "
+                + "[wiki:someWiki] for the event descriptor of [eventType].", allLogRule.getMessage(0));
     }
 
     @Test
@@ -185,6 +188,7 @@ public class DefaultUntypedRecordableEventDescriptorTest
         Exception e = new Exception("Some error");
         when(namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
         assertEquals("eventDescription", descriptor.getDescription());
-        verify(logger).warn("Failed to compute the correct localization with the correct namespace.", e);
+        assertEquals("Failed to render the translation key [eventDescription] in the namespace "
+                + "[wiki:someWiki] for the event descriptor of [eventType].", allLogRule.getMessage(0));
     }
 }

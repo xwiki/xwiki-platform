@@ -20,8 +20,12 @@
 package org.xwiki.eventstream;
 
 /**
+ * Fake descriptor used to test the {@link AbstractRecordableEventDescriptor}.
+ *
  * @version $Id$
- * @since
+ * @since 10.6RC1
+ * @since 10.5
+ * @since 9.11.6
  */
 public class FakeRecordableEventDescriptor extends AbstractRecordableEventDescriptor
 {

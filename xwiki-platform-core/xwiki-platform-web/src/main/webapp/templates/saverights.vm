@@ -71,7 +71,7 @@
         #end
       #end
     #end ## end get property
-  #elseif($pers.matches("^(.*,)?${regextool.quote($fullname)}(,.*)?$")) ## The person is in a multiple selection rule, remove it from there.
+  #elseif($pers.matches("^(.*,)?${regextool.quote($fullname)}(,.*)?${escapetool.d}")) ## The person is in a multiple selection rule, remove it from there.
     #set($pers = $pers.replaceAll("^${fullname}(,|$)", ""))
     #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
     $doc.getObject($clsname, $obj.number).set($uorg, $pers)

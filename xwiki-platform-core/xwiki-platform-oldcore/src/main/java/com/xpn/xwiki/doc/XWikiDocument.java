@@ -145,6 +145,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.XMLUtils;
@@ -3395,7 +3396,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         } catch (XWikiVelocityException e) {
             LOGGER.error("Failed to create a standard VelocityContext", e);
 
-            vcontext = new VelocityContext();
+            vcontext = new XWikiVelocityContext();
         }
 
         for (String propertyName : bclass.getPropertyList()) {

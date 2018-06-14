@@ -247,6 +247,102 @@
                     "methodName": "getInstalledExtensionDocument",
                     "elementKind": "method",
                     "justification": "Fixed a typo. Should not have any impact on scripts"
+                  },
+                  // Velocity 2.0 upgrade
+                  {
+                    "code": "java.field.typeChanged",
+                    "old": "field org.apache.velocity.runtime.resource.loader.ResourceLoader.log @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "new": "field org.apache.velocity.runtime.resource.loader.ResourceLoader.log @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "oldType": "org.apache.velocity.runtime.log.Log",
+                    "newType": "org.slf4j.Logger",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "fieldName": "log",
+                    "elementKind": "field",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.field.visibilityReduced",
+                    "old": "field org.apache.velocity.tools.view.WebappResourceLoader.paths @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "new": "field org.xwiki.velocity.XWikiWebappResourceLoader.paths",
+                    "oldVisibility": "protected",
+                    "newVisibility": "private",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "fieldName": "paths",
+                    "elementKind": "field",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.field.removed",
+                    "old": "field org.apache.velocity.tools.view.WebappResourceLoader.servletContext @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "fieldName": "servletContext",
+                    "elementKind": "field",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.field.removed",
+                    "old": "field org.apache.velocity.tools.view.WebappResourceLoader.templatePaths @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "fieldName": "templatePaths",
+                    "elementKind": "field",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, ===org.apache.commons.collections.ExtendedProperties===) @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "new": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, ===org.apache.velocity.util.ExtProperties===) @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "oldType": "org.apache.commons.collections.ExtendedProperties",
+                    "newType": "org.apache.velocity.util.ExtProperties",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "methodName": "commonInit",
+                    "parameterIndex": "1",
+                    "elementKind": "parameter",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method java.io.InputStream org.apache.velocity.tools.view.WebappResourceLoader::getResourceStream(java.lang.String) throws org.apache.velocity.exception.ResourceNotFoundException @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "methodName": "getResourceStream",
+                    "elementKind": "method",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.velocity.XWikiWebappResourceLoader::init(===org.apache.commons.collections.ExtendedProperties===)",
+                    "new": "parameter void org.xwiki.velocity.XWikiWebappResourceLoader::init(===org.apache.velocity.util.ExtProperties===)",
+                    "oldType": "org.apache.commons.collections.ExtendedProperties",
+                    "newType": "org.apache.velocity.util.ExtProperties",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "methodName": "init",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.class.noLongerInheritsFromClass",
+                    "old": "class org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "new": "class org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "superClass": "org.apache.velocity.tools.view.WebappResourceLoader",
+                    "package": "org.xwiki.velocity",
+                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "classSimpleName": "XWikiWebappResourceLoader",
+                    "elementKind": "class",
+                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   }
                 ]
               }

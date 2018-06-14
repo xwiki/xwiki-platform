@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -204,14 +205,14 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         VelocityContext existingVelocityContext = this.velocityManager.getVelocityContext();
         VelocityContext velocityContext;
         if (existingVelocityContext != null) {
-            velocityContext = new VelocityContext(existingVelocityContext);
+            velocityContext = new XWikiVelocityContext(existingVelocityContext);
         } else {
             try {
                 velocityContext = this.velocityContextFactory.createContext();
             } catch (XWikiVelocityException e) {
                 this.logger.error("Failed to create standard VelocityContext", e);
 
-                velocityContext = new VelocityContext();
+                velocityContext = new XWikiVelocityContext();
             }
         }
         if (velocityVariables != null) {

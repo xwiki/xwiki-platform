@@ -399,7 +399,7 @@
         #set($fieldUrl = '')
       #end
     #end
-    #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
+    #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')${escapetool.d}", '')))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     #if($colname == 'wikiprettyname')

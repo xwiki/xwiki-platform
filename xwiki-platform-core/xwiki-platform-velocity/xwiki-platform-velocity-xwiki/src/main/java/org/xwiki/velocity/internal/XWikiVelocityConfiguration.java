@@ -23,8 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.velocity.XWikiWebappResourceLoader;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -40,6 +42,8 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
 {
+    private static final String RESOURCE_LOADER_ID = "xwiki";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -52,5 +56,10 @@ public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
         this.defaultTools.put("numbertool", new XWikiNumberTool(this.contextProvider));
         this.defaultTools.put("datetool", new XWikiDateTool(this.contextProvider));
         this.defaultTools.put("mathttool", new XWikiMathTool(this.contextProvider));
+
+        this.defaultProperties.setProperty(RuntimeConstants.RESOURCE_LOADER, RESOURCE_LOADER_ID);
+        this.defaultProperties.setProperty(RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER + ".class",
+            XWikiWebappResourceLoader.class.getName());
+        this.defaultProperties.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");
     }
 }

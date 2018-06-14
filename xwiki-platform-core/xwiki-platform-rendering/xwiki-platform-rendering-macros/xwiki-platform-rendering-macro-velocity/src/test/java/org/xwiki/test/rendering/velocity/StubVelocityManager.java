@@ -35,6 +35,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
@@ -60,7 +61,7 @@ public class StubVelocityManager implements VelocityManager, Initializable
     @Inject
     private ScriptContextManager scriptContextManager;
 
-    private VelocityContext velocityContext = new VelocityContext();
+    private VelocityContext velocityContext = new XWikiVelocityContext();
 
     @Override
     public void initialize() throws InitializationException

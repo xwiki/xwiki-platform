@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
@@ -71,7 +72,7 @@ public class VelocityRenderer
             // See https://jira.xwiki.org/browse/XWIKI-11400.
             // We set the current context as inner context of the new one to be able to read existing variables.
             // See https://jira.xwiki.org/browse/XWIKI-11426.
-            VelocityContext context = new VelocityContext(velocityManager.getVelocityContext());
+            VelocityContext context = new XWikiVelocityContext(velocityManager.getVelocityContext());
 
             // Render the code
             if (engine.evaluate(context, output, "DefaultIconRenderer", code)) {

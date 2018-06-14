@@ -160,6 +160,7 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -5474,7 +5475,7 @@ public class XWiki implements EventListener
                 } catch (XWikiVelocityException e) {
                     LOGGER.error("Failed to create standard VelocityContext", e);
 
-                    vcontext = new VelocityContext();
+                    vcontext = new XWikiVelocityContext();
                 }
 
                 for (String propname : userobj.getPropertyList()) {

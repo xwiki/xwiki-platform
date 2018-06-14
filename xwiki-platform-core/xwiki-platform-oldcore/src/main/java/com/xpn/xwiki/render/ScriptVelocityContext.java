@@ -27,6 +27,7 @@ import javax.script.ScriptContext;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.directive.Scope;
+import org.xwiki.velocity.XWikiVelocityContext;
 
 /**
  * Maintains the current ScriptContext in sync with any modification of the VelocityContext.
@@ -34,7 +35,7 @@ import org.apache.velocity.runtime.directive.Scope;
  * @version $Id$
  * @since 8.3M1
  */
-public class ScriptVelocityContext extends VelocityContext
+public class ScriptVelocityContext extends XWikiVelocityContext
 {
     private final Set<String> reservedBindings;
 

@@ -1050,12 +1050,12 @@ $html
 #set($height = "600")
 #end
 #if($color!="")
-#set($color = $color.replaceAll("#","%23"))
+#set($color = $color.replaceAll('#',"%23"))
 #else
 #set($color = "%232952A3")
 #end
 #if($bgcolor!="")
-#set($bgcolor = $bgcolor.replaceAll("#","%23"))
+#set($bgcolor = $bgcolor.replaceAll('#',"%23"))
 #else
 #set($bgcolor = "%232952A3")
 #end
@@ -1163,24 +1163,6 @@ $html
     #end
   #end
   #setVariable($resultVariableName $result)
-#end
-##
-##
-##
-#**
- * Assign a value to a variable, given by its name. The purpose of this macro is to emulate call by macro expansion,
- * which was available in velocity versions up to 1.6, but was removed in 1.7.
- *
- * @param variableName the name of the variable to set, a String; when the macro returns, a variable named that way will be created with the output value
- * @param value the value to assign
- *###
-#macro(setVariable $variableName $value)
-## Only do this if the variable name is really a valid variable name
-#if ($variableName.matches('[a-zA-Z_][a-zA-Z0-9_-]*'))
-#evaluate("${escapetool.h}set(${escapetool.d}${variableName}=${escapetool.d}value)")
-#elseif ($variableName.matches('\$[a-zA-Z_][a-zA-Z0-9_-]*'))
-#evaluate("${escapetool.h}set(${variableName}=${escapetool.d}value)")
-#end
 #end
 ##
 ##

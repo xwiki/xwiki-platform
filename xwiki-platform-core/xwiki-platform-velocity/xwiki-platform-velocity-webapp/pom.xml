@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Velocity Engine implementation when in a Servlet environment (templates located in the webapp's root)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

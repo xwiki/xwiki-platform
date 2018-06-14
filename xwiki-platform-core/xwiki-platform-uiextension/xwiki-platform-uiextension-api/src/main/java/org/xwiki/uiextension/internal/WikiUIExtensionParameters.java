@@ -34,6 +34,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
@@ -162,7 +163,7 @@ public class WikiUIExtensionParameters
                         StringWriter writer = new StringWriter();
                         try {
                             String namespace = this.id + ':' + entry.getKey();
-                            velocityEngine.evaluate(new VelocityContext(velocityContext), writer, namespace,
+                            velocityEngine.evaluate(new XWikiVelocityContext(velocityContext), writer, namespace,
                                 entry.getValue());
                             this.evaluatedParameters.put(entry.getKey(), writer.toString());
                         } catch (XWikiVelocityException e) {

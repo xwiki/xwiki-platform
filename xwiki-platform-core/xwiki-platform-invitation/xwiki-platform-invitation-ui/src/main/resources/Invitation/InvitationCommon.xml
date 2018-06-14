@@ -751,7 +751,7 @@
  #set($theme = {"linkColor":"#4791BC"})
 #end
 #set($userName = $xwiki.getUserName($xcontext.getUser(), false))
-#set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))
+#set($wikiName = $xwiki.getRequestURL().replaceAll('http://([^/:]*).*$', "$1"))
 #set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get("guestsActionsPage")).getExternalURL())
 #set($linkStyle = "color:$theme.get('linkColor');text-decoration:none;")
 #set($bigText = "font-size:130%;")
@@ -780,7 +780,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
     </property>
     <property>
       <messageBodyTemplatePlain>{{velocity}}
-#set($userName = $xwiki.getUserName($xcontext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"))#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get('guestsActionsPage')).getExternalURL())$services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])#if("$!messageBody" != '')  $messageBody#end$services.localization.render('xe.invitation.emailContent.joinLink')${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.declineLink')${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.reportMessage', ['', "$util.getNewline()${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID"]){{/velocity}}</messageBodyTemplatePlain>
+#set($userName = $xwiki.getUserName($xcontext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().replaceAll('https?://([^/:]*).*$', '$1'))#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get('guestsActionsPage')).getExternalURL())$services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])#if("$!messageBody" != '')  $messageBody#end$services.localization.render('xe.invitation.emailContent.joinLink')${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.declineLink')${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.reportMessage', ['', "$util.getNewline()${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID"]){{/velocity}}</messageBodyTemplatePlain>
     </property>
     <property>
       <smtp_port>25</smtp_port>
@@ -795,7 +795,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <smtp_server_username/>
     </property>
     <property>
-      <subjectLineTemplate>{{velocity}}$services.localization.render('xe.invitation.emailContent.subjectLine', [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
+      <subjectLineTemplate>{{velocity}}$services.localization.render('xe.invitation.emailContent.subjectLine', [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll('https?://([^/:]*).*$', '$1'), $!subjectLine]){{/velocity}}</subjectLineTemplate>
     </property>
     <property>
       <usersMayPersonalizeMessage>1</usersMayPersonalizeMessage>

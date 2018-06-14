@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -528,7 +529,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         if (vcontext == null) {
             // Use the original velocity context as a starting point
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-            vcontext = new VelocityContext(velocityManager.getVelocityContext());
+            vcontext = new XWikiVelocityContext(velocityManager.getVelocityContext());
         }
 
         vcontext.put("from.name", fromAddr);
@@ -556,7 +557,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         Map<String, Object> parameters, XWikiContext context)
     {
         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = new VelocityContext(velocityManager.getVelocityContext());
+        VelocityContext vcontext = new XWikiVelocityContext(velocityManager.getVelocityContext());
 
         if (parameters != null) {
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {

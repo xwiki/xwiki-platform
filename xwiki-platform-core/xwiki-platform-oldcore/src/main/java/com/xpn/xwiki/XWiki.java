@@ -2180,7 +2180,7 @@ public class XWiki implements EventListener
      * @param template the name of the template
      * @param skinId the id of the skin from which to load the template
      * @param context see {@link XWikiContext}
-     * @deprecated since 7.0M1, use {@link TemplateManager#renderFromSkin(String, Skin)} instead
+     * @deprecated since 7.0M1, use {@link TemplateManager#renderFromSkin} instead
      */
     @Deprecated
     public String parseTemplate(String template, String skinId, XWikiContext context)

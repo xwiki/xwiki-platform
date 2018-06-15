@@ -382,7 +382,7 @@ require(['jquery'], function ($) {
   $placeholder.height(0);
   $placeholder.insertBefore($container);
 
-  $(window).on("scroll resize load click xwiki:profile:switchedCategory", function() {
+  $(window).on("scroll resize load click xwiki:dom:refresh", function() {
     var isFullScreen = $('.fullScreenWrapper').length > 0
     // Show the element and make the gap where the save bar should fit.
     $placeholder.height($container.height());

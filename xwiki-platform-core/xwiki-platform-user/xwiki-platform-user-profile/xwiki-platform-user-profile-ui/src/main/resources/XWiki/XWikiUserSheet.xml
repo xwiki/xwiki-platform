@@ -272,6 +272,7 @@ Object.extend(XWiki, {
       this.tabsContainer.select('.category-tab.current').each(function (activeTab) {
         this.updateCategoryFields(activeTab.id);
         document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.id});
+        document.fire('xwiki:dom:refresh');
       }.bind(this));
       this.handleCancelAction();
 
@@ -302,6 +303,7 @@ Object.extend(XWiki, {
         this.updateURL(tabName);
       }
       document.fire('xwiki:profile:switchedCategory', {'category' : tab});
+      document.fire('xwiki:dom:refresh');
     },
 
     updateCategoryFields : function (category) {

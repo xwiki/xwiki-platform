@@ -88,43 +88,39 @@
     'type': 'attach',
     'reference': $services.model.serialize($attachmentReference, $document.documentReference)
   })
-  #if ("$!request.CKEditorFuncNum" != '')
-    #set ($discard = $response.setContentType('text/html'))
-    &lt;script type="text/javascript"&gt;
-    window.parent.CKEDITOR.tools.callFunction($request.CKEditorFuncNum, '$escapetool.javascript($url)',
-      $jsontool.serialize({
-        'resourceReference': $resourceReference
-    }));
-    &lt;/script&gt;
-  #else
-    #set ($discard = $response.setContentType('application/json'))
+  #set ($discard = $response.setContentType('application/json'))
+  #if ($request.initiator == 'filetools')
     $jsontool.serialize({
       'uploaded': 1,
       'fileName': $fileName,
       'url': $url,
       'resourceReference': $resourceReference
     })
+  #else
+    ## JSON expected by the filebrowser plugin.
+    $jsontool.serialize({
+      'uploaded': 1,
+      'url': $url,
+      'message': {
+        'resourceReference': $resourceReference
+      }
+    })
   #end
 #end
 
 #macro (sendError $code $message)
-  #if ("$!request.CKEditorFuncNum" != '')
-    #set ($discard = $response.setContentType('text/html'))
+  #set ($discard = $response.setContentType('application/json'))
+  ## The filetools plugin doesn't display the proper message if we call sendError() or setStatus() on the response.
+  #if ($request.initiator != 'filetools')
     #set ($discard = $response.setStatus($code))
-    &lt;script type="text/javascript"&gt;
-    window.parent.CKEDITOR.tools.callFunction($request.CKEditorFuncNum, null, '$escapetool.javascript($message)');
-    &lt;/script&gt;
-  #else
-    #set ($discard = $response.setContentType('application/json'))
-    ## The editor doesn't display the proper message if we call sendError() or setStatus() on the response.
-    $jsontool.serialize({
-      'uploaded': 0,
-      'error': {
-        'number': $code,
-        'message': $message
-      }
-    })
   #end
+  $jsontool.serialize({
+    'uploaded': 0,
+    'error': {
+      'number': $code,
+      'message': $message
+    }
+  })
 #end
 {{/velocity}}
 

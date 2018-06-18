@@ -295,6 +295,17 @@ define('xwiki-ckeditor', [
     form_token: $('meta[name="form_token"]').attr('content')
   };
 
+  // We have to pass the plugin that makes the request (the initiator) because the expected response can be different
+  // (e.g. between the filebrowser and filetools plugins).
+  var getUploadURL = function(document, initiator) {
+    return document.getURL('get', $.param({
+      sheet: 'CKEditor.FileUploader',
+      outputSyntax: 'plain',
+      form_token: xwikiMeta.form_token,
+      initiator: initiator
+    }));
+  };
+
   // Extend the default CKEditor configuration with settings that depend on the source document.
   var getConfig = function(element) {
     var sourceDocument = XWiki.currentDocument;
@@ -304,16 +315,13 @@ define('xwiki-ckeditor', [
     }
     var config = {
       allowedContent: allowedContentBySyntax[$(element).attr('data-sourceDocumentSyntax')],
-      filebrowserUploadUrl: sourceDocument.getURL('get', $.param({
-        sheet: 'CKEditor.FileUploader',
-        outputSyntax: 'plain',
-        form_token: xwikiMeta.form_token
-      })),
+      filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
       // This is used in CKEditor.FileUploader so we must keep them in sync.
       fileTools_defaultFileName: '__fileCreatedFromDataURI__',
       height: $(element).height(),
       // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
       language: ($('html').attr('xml:lang') || '').toLowerCase().replace('_', '-'),
+      uploadUrl: getUploadURL(sourceDocument, 'filetools'),
       'xwiki-link': {
         labelGenerator: sourceDocument.getURL('get', 'sheet=CKEditor.LinkLabelGenerator&amp;outputSyntax=plain')
       },

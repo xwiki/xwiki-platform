@@ -209,6 +209,7 @@ editors.XDataEditors = Class.create({
                   }.bind(this),
                   onComplete : function() {
                     item.disabled = false;
+                    document.fire('xwiki:dom:refresh');
                   }
                 },
                 /* Interaction parameters */

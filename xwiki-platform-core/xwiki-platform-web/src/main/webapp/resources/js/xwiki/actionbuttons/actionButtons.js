@@ -375,20 +375,28 @@ return XWiki;
 require(['jquery'], function ($) {
   var $container = $('.sticky-buttons');
   if ($container.length == 0) return;
-  // Use the placeholder to get the initial container position
-  var $placeholder = $('<span></span>');
+  // Use the placeholder to save the initial container position and make a gap to place
+  // the sticky save bar once it reaches its initial position.
+  var $placeholder = $('<div></div>');
+  // Hide the element while keeping its offset.
+  $placeholder.height(0);
   $placeholder.insertBefore($container);
 
   $(window).on("scroll resize load click xwiki:profile:switchedCategory", function() {
     var isFullScreen = $('.fullScreenWrapper').length > 0
-    var position = $placeholder.offset().top;
+    // Show the element and make the gap where the save bar should fit.
+    $placeholder.height($container.height());
+    var position = $placeholder.offset().top + $placeholder.height();
 
     if (!isFullScreen && $(window).height() + $(window).scrollTop() < position) {
       $container.addClass('sticky-buttons-fixed');
+      // The width of the parent element is not inherited when the position is fixed
       $container.innerWidth($container.parent().width());
     } else {
       $container.removeClass('sticky-buttons-fixed');
       $container.innerWidth('');
+      // Hide the element while keeping its offset.
+      $placeholder.height(0);
     }
   });
 });

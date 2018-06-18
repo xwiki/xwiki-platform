@@ -67,7 +67,10 @@ public class DirectMessageStreamNotificationFilter implements NotificationFilter
 
         if (user != null) {
             String userId = serializer.serialize(user);
-            return userId.equals(event.getStream()) ? FilterPolicy.KEEP : FilterPolicy.FILTER;
+            // Here we don't use FilterPolicy.KEEP in case the message is addressed to the given user, because the
+            // sender might be blacklisted by an other filter (the sender might be an harasser).
+            // So we just make sure the message is filtered if the current user is not the recipient, but nothing more.
+            return userId.equals(event.getStream()) ? FilterPolicy.NO_EFFECT : FilterPolicy.FILTER;
         } else {
             return FilterPolicy.FILTER;
         }
@@ -106,5 +109,15 @@ public class DirectMessageStreamNotificationFilter implements NotificationFilter
     public String getName()
     {
         return "Direct Message Stream Notification Filter";
+    }
+
+    @Override
+    public int getPriority()
+    {
+        // The priority must be very high, because for "security" reason, a message that is not sent to the current user
+        // must not been seen by other users.
+        // In particular, the priority must be higher than org.xwiki.notifications.filters.internal.user.EventUserFilter
+        // otherwise users will receive direct messages addressed to others if they follow the sender.
+        return Integer.MAX_VALUE;
     }
 }

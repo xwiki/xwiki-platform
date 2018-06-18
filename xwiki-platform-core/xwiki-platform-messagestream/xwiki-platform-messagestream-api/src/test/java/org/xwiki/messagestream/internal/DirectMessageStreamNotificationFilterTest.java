@@ -74,7 +74,7 @@ public class DirectMessageStreamNotificationFilterTest
         when(event3.getType()).thenReturn("someType");
         when(event3.getStream()).thenReturn("xwiki:XWiki.OtherUser");
 
-        assertEquals(NotificationFilter.FilterPolicy.KEEP,
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
                 mocker.getComponentUnderTest().filterEvent(event1, user, null, null));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
                 mocker.getComponentUnderTest().filterEvent(event2, user, null, null));

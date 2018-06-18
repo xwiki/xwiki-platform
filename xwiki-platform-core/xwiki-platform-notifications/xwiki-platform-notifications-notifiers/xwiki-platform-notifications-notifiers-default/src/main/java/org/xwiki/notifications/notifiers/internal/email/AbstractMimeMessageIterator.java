@@ -159,7 +159,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             }
 
             try {
-                // TODO: in a next version, it will be import to paginate these results and to send several emails
+                // TODO: in a next version, it will be important to paginate these results and to send several emails
                 // if there is too much content
                 this.currentEvents = retrieveCompositeEventList(currentUser);
             } catch (NotificationException e) {

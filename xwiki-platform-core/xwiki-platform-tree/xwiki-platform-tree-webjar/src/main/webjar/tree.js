@@ -85,7 +85,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     // The operation can be 'create_node', 'rename_node', 'delete_node', 'move_node' or 'copy_node'.
     // In case the operation is 'rename_node' the position is filled with the new node name.
     return (operation === 'create_node' && canAcceptChild(parent, node)) ||
-      (operation === 'rename_node' && node.data && node.data.canRename) ||
+      ((operation === 'rename_node' || operation === 'edit') && node.data && node.data.canRename) ||
       (operation === 'delete_node' && node.data && node.data.canDelete) ||
       (operation === 'move_node' && node.data && node.data.canMove && canAcceptChild(parent, node)) ||
       (operation === 'copy_node' && node.data && node.data.canCopy && canAcceptChild(parent, node));

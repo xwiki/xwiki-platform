@@ -39,11 +39,9 @@ public class PreviewEditPage extends EditPage
     private WebElement content;
 
     /**
-     * The button used to return to edit. We don't use the top button because its position in preview mode coincides
-     * with the position of the edit menu in edit mode and since the mouse remains in the same position the edit menu is
-     * opened as soon as we get back to edit (because it opens on hover).
+     * The button used to return to edit.
      */
-    @FindBy(xpath = "//*[@class = 'bottombuttons']//*[@name = 'action_edit']")
+    @FindBy(name = "action_edit")
     private WebElement backToEdit;
 
     /**

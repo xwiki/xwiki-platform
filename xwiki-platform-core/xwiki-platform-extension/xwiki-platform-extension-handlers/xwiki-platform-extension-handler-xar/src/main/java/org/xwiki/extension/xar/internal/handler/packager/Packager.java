@@ -181,11 +181,11 @@ public class Packager
                         if (xarEntry != null) {
                             configuration.setXarEntry(xarEntry);
 
-                            importDocumentToWiki(comment, wikiReference, zis, configuration);
+                            importDocumentToWiki(comment, wikiReference, zis, configuration, entry.getName());
                         }
                     } else {
                         configuration.setXarEntry(null);
-                        importDocumentToWiki(comment, wikiReference, zis, configuration);
+                        importDocumentToWiki(comment, wikiReference, zis, configuration, entry.getName());
                     }
                 }
             }
@@ -197,7 +197,7 @@ public class Packager
     }
 
     private void importDocumentToWiki(String comment, WikiReference wikiReference, InputStream inputStream,
-        PackageConfiguration configuration) throws XWikiException, XarException, IOException
+        PackageConfiguration configuration, String name) throws XWikiException, XarException, IOException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -205,7 +205,7 @@ public class Packager
         try {
             nextDocument = getXWikiDocument(inputStream, wikiReference);
         } catch (Exception e) {
-            this.logger.error("Failed to parse document", e);
+            this.logger.error("Failed to parse XAR entry [{}]", name, e);
 
             return;
         }

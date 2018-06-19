@@ -65,7 +65,7 @@ $job.getProperty('script').value
 #end
 
 #if($xcontext.action=="edit")
-{{info}}$services.localization.render('xe.scheduler.job.scriptexplanation')){{/info}}
+{{info}}$services.localization.render('xe.scheduler.job.scriptexplanation'){{/info}}
 
 {{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
 

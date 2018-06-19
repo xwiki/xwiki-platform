@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation-test</artifactId>
-    <version>10.5-SNAPSHOT</version>
+    <version>10.5</version>
   </parent>
   <artifactId>xwiki-platform-annotation-test-tests</artifactId>
   <name>XWiki Platform - Annotations - Tests - Functional Tests</name>

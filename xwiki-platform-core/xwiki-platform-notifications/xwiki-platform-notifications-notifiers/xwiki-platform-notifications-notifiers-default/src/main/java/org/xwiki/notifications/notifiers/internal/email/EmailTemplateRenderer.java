@@ -27,7 +27,6 @@ import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.Block;
@@ -80,9 +79,6 @@ public class EmailTemplateRenderer
 
     @Inject
     private RenderingContext renderingContext;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * Execute a template.

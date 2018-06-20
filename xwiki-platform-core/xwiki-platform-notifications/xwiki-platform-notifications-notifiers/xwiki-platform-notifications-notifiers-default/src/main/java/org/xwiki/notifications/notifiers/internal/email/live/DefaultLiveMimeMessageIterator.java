@@ -85,6 +85,8 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
     {
         CompositeEvent resultCompositeEvent = new CompositeEvent(this.compositeEvent);
 
+        // TODO: handle followed user for who we don't cate about the notification preference, we just want to receive
+        // all actions the person is doing
         if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)) {
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event

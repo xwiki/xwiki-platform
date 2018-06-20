@@ -80,7 +80,7 @@ platform.wiki.menu.userwikis=Viki
 
 ## Dependencies
 platform.wiki.dependencies.wiki.missing=Nav uzstādīta "Wiki" Java komponente. Šī lapa nedarbosies pareizi. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti "Wiki API" un "Wiki Script" paplašinājumi, vai arī, ka faili 'xwiki-platform-wiki-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
-platform.wiki.dependencies.template.missing=Nav uzstādīta "Wiki Template" Java komponente. Šī lapa nestrādās korekti. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti paplašinājumi "Wiki Template API" un "Wiki Template Script" , vai arī, ka faili 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija). 
+platform.wiki.dependencies.template.missing=Nav uzstādīta "Wiki Template" Java komponente. Šī lapa nestrādās korekti. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti paplašinājumi "Wiki Template API" un "Wiki Template Script" , vai arī, ka faili 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
 platform.wiki.dependencies.user.missing=Nav uzstādīta "Wiki User" Java komponente. Šī lapa nedarbosies pareizi. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti "Wiki User API" un "Wiki User Script" paplašinājumi, vai arī, ka faili 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
 
 ## Create
@@ -88,7 +88,7 @@ platform.wiki.dependencies.user.missing=Nav uzstādīta "Wiki User" Java kompone
 platform.wiki.create.title=Izveidot jaunu viki
 platform.wiki.create.members=Dalībnieki
 platform.wiki.create.prettyname.empty=Skaistais nosaukums nedrīkst būt tukšs
-platform.wiki.create.error=Viki "{0}" izveide neizdevās: {1}. 
+platform.wiki.create.error=Viki "{0}" izveide neizdevās: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Datubāze ar šo nosaukumu jau pastāv
 platform.wiki.create.error.wikiname.wikialreadyexists=Šis identifikators ir jau izmantots
 platform.wiki.create.error.wikiname.empty=Identifikators nedrīkst būt tukšs
@@ -103,28 +103,28 @@ platform.wiki.csrf.error=Drošības marķieris ir nepareizs. Lūdzu atkārtojiet
 
 ## Users
 platform.wiki.users.userAlreadyMemberOfWiki=Lietotājs {0}{1}{2} jau ir viki {3}{4}{5} dalībnieks.
-platform.wiki.users.userNotMemberOfWiki=Lietotājs {0}{1}{2} nav viki {3}{4}{5} dalībnieks. 
+platform.wiki.users.userNotMemberOfWiki=Lietotājs {0}{1}{2} nav viki {3}{4}{5} dalībnieks.
 platform.wiki.users.logInToContinue=Lai turpinātu, jums vispirms ir {0}jāpiesakās{1}.
-platform.wiki.users.invitation.userAcceptedNotification=Lietotājs ''{0}'' ({1}) ir pieņēmis uzaicinājumu pievienoties viki ''{2}'' ({3}). 
-platform.wiki.users.invitation.userAcceptedSuccess=Lietotājs {0}{1}{2} veiksmīgi apstiprināja uzaicinājumu un pievienojās viki {3}{4}{5}. 
-platform.wiki.users.invitation.userRejectedSuccess=Lietotājs {0}{1}{2} veiksmīgi noraidīja uzaicinājumu pievienoties viki {3}{4}{5}. 
+platform.wiki.users.invitation.userAcceptedNotification=Lietotājs ''{0}'' ({1}) ir pieņēmis uzaicinājumu pievienoties viki ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=Lietotājs {0}{1}{2} veiksmīgi apstiprināja uzaicinājumu un pievienojās viki {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=Lietotājs {0}{1}{2} veiksmīgi noraidīja uzaicinājumu pievienoties viki {3}{4}{5}.
 platform.wiki.users.join.error.needInvitation=Šajā viki var pievienoties tikai ar uzaicinājumu. Lai tam pievienotos, jums ir jāsaņem uzaicinājums no viki administratora.
-platform.wiki.users.join.request.pendingRequestExists=Lietotājam {0}{1}{2} jau ir izdots pieprasījums uzaicināt pievienoties viki {3}{4}{5}. Lūdzu gaidiet, kad šo pieprasījumu izskatīs viki administrators. 
+platform.wiki.users.join.request.pendingRequestExists=Lietotājam {0}{1}{2} jau ir izdots pieprasījums uzaicināt pievienoties viki {3}{4}{5}. Lūdzu gaidiet, kad šo pieprasījumu izskatīs viki administrators.
 platform.wiki.users.join.request.cancelConfirmation=Vai tiešām vēlaties noraidīt uzaicinājumu pievienoties viki {0}{1}{2}?
 platform.wiki.users.join.request.cancelYes=Jā
 platform.wiki.users.join.request.cancelNo=Nē
 platform.wiki.users.join.request.cancelSuccess=Lietotājs {0}{1}{2} veiksmīgi noraidīja uzaicinājumu pievienoties viki {3}{4}{5}.
-platform.wiki.users.join.request.saveNotification=Lietotājs ''{0}'' ({1}) ir pieprasījis viņa pievienošanu viki ''{2}'' ({3}). 
-platform.wiki.users.join.request.success=Lietotājs {0}{1}{2} sekmīgi nosūtīja pieprasījumu pievienoties viki {3}{4}{5}. 
+platform.wiki.users.join.request.saveNotification=Lietotājs ''{0}'' ({1}) ir pieprasījis viņa pievienošanu viki ''{2}'' ({3}).
+platform.wiki.users.join.request.success=Lietotājs {0}{1}{2} sekmīgi nosūtīja pieprasījumu pievienoties viki {3}{4}{5}.
 platform.wiki.users.join.confirmation=Vai tiešām vēlaties pievienoties viki {0}{1}{2}?
 platform.wiki.users.join.yes=Jā
 platform.wiki.users.join.no=Nē
-platform.wiki.users.join.success=Lietotājs {0}{1}{2} veiksmīgi pievienojās viki {3}{4}{5}. 
-platform.wiki.users.leave.error.userIsOwner=Lietotājs {0}{1}{2} ir viki {3}{4}{5} īpašnieks. Viki īpašnieks nevar pamest viki līdz viki nav izdzēsts vai arī īpašnieks nav nomainīts uz citu lietotāju. 
+platform.wiki.users.join.success=Lietotājs {0}{1}{2} veiksmīgi pievienojās viki {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=Lietotājs {0}{1}{2} ir viki {3}{4}{5} īpašnieks. Viki īpašnieks nevar pamest viki līdz viki nav izdzēsts vai arī īpašnieks nav nomainīts uz citu lietotāju.
 platform.wiki.users.leave.confirmation=Vai tiešām vēlaties pamest viki {0}{1}{2}?
 platform.wiki.users.leave.confirmation.yes=Jā
 platform.wiki.users.leave.confirmation.no=Nē
-platform.wiki.users.leave.success=Lietotājs {0}{1}{2} veiksmīgi pameta viki {3}{4}{5}. 
+platform.wiki.users.leave.success=Lietotājs {0}{1}{2} veiksmīgi pameta viki {3}{4}{5}.
 platform.wiki.users.join.title=Pievienoties viki
 platform.wiki.users.leave.title=Pamest viki "{0}"
 platform.wiki.users.leave.empty=

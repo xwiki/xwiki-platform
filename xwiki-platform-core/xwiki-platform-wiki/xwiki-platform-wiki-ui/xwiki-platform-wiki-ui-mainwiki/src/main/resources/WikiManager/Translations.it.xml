@@ -94,10 +94,10 @@ platform.wiki.create.error.wikiname.wikialreadyexists=Questo identificatore è g
 platform.wiki.create.error.wikiname.empty=L'identificatore non può essere vuoto
 
 ## Common errors and messages
-platform.wiki.error.wikidoesnotexist=Il wiki {0} non esiste 
+platform.wiki.error.wikidoesnotexist=Il wiki {0} non esiste
 platform.wiki.error.oneParameterNotSpecified=Non è stato specificato il parametro "{0}".
 platform.wiki.error.parameterAcceptsMultipleValues=Sono accettati valori multipli.
-platform.wiki.error.exceptionWithMessage=Eccezione\: {0} 
+platform.wiki.error.exceptionWithMessage=Eccezione\: {0}
 platform.wiki.form.requiredField=Richiesto
 ### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
 

@@ -79,25 +79,25 @@ platform.wiki.menu.deletewiki=Supprimer
 platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
-platform.wiki.dependencies.wiki.missing=Le composant Java "Wiki" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki API" et "Wiki Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle). 
-platform.wiki.dependencies.template.missing=Le composant Java "Wiki Template" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki Template API" et "Wiki Template Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle). 
-platform.wiki.dependencies.user.missing=Le composant Java "Wiki User" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki User API" et "Wiki User Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle). 
+platform.wiki.dependencies.wiki.missing=Le composant Java "Wiki" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki API" et "Wiki Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle).
+platform.wiki.dependencies.template.missing=Le composant Java "Wiki Template" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki Template API" et "Wiki Template Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle).
+platform.wiki.dependencies.user.missing=Le composant Java "Wiki User" n'est pas installé. Sans lui, cette page ne peut pas fonctionner correctement. Vérifiez que les extensions "Wiki User API" et "Wiki User Script" sont installés (via l'Extension Manager) ou que les fichiers 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' et 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar'sont présents dans le répertoire 'WEB-INF/lib/' de l'application (dans le cas d'une installation manuelle).
 
 ## Create
 platform.wiki.create.button=Créer un wiki
 platform.wiki.create.title=Créer un nouveau wiki
 platform.wiki.create.members=MEMBRES
 platform.wiki.create.prettyname.empty=Le nom d'affichage ne peut pas être vide
-platform.wiki.create.error=Échec de la création du wiki "{0}"\: {1}.
+platform.wiki.create.error=Échec de la création du wiki "{0}": {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Une base de données avec cet identifiant existe déjà
 platform.wiki.create.error.wikiname.wikialreadyexists=Cet identifiant existe déjà
 platform.wiki.create.error.wikiname.empty=L'identifiant ne peut pas être vide
 
 ## Common errors and messages
 platform.wiki.error.wikidoesnotexist=Le wiki [{0}] n''existe pas
-platform.wiki.error.oneParameterNotSpecified=Le paramètre ''{0}'' n''a pas été spécifié. 
-platform.wiki.error.parameterAcceptsMultipleValues=Plusieurs valeur acceptées. 
-platform.wiki.error.exceptionWithMessage=Exception\: {0}
+platform.wiki.error.oneParameterNotSpecified=Le paramètre ''{0}'' n''a pas été spécifié.
+platform.wiki.error.parameterAcceptsMultipleValues=Multi valeurs accepté.
+platform.wiki.error.exceptionWithMessage=Exception : {0}
 platform.wiki.form.requiredField=Obligatoire
 platform.wiki.csrf.error=Le jeton de sécurité est invalide. Merci de recommencer.
 
@@ -105,23 +105,23 @@ platform.wiki.csrf.error=Le jeton de sécurité est invalide. Merci de recommenc
 platform.wiki.users.userAlreadyMemberOfWiki=L''utilisateur {0}{1}{2} est déjà membre du wiki {3}{4}{5}.
 platform.wiki.users.userNotMemberOfWiki=L''utilisateur {0}{1}{2} n''est pas un membre du wiki {3}{4}{5}.
 platform.wiki.users.logInToContinue=Afin de continuer, vous devez vous {0}identifier{1}.
-platform.wiki.users.invitation.userAcceptedNotification=L''utilisateur "{0}" ({1}) a accepté l''invitation à rejoindre le wiki "{2}" ({3}). 
+platform.wiki.users.invitation.userAcceptedNotification=L''utilisateur ''{0}'' ({1}) a accepté l''invitation à rejoindre le wiki ''{2}'' ({3}).
 platform.wiki.users.invitation.userAcceptedSuccess=L''utilisateur {0}{1}{2} a accepté avec succès l''invitation et a rejoint le wiki {3}{4}{5}.
 platform.wiki.users.invitation.userRejectedSuccess=L''utilisateur {0}{1}{2} a rejeté avec succès l''invitation à joindre le wiki {3}{4}{5}.
-platform.wiki.users.join.error.needInvitation=Ce wiki est sur invitation uniquement. Afin d'y accéder, vous devez recevoir une invitation de l'un de ses administrateurs.   
+platform.wiki.users.join.error.needInvitation=Ce wiki est sur invitation uniquement. Afin d'y accéder, vous devez recevoir une invitation de l'un de ses administrateurs.
 platform.wiki.users.join.request.pendingRequestExists=L''utilisateur {0}{1}{2} a déjà une demande en attente pour rejoindre le wiki {3}{4}{5}. Veuillez patienter pour qu''un administrateur du wiki la révise.
-platform.wiki.users.join.request.cancelConfirmation=Êtes-vous sûr de vouloir annuler la demande de rejoindre le wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelConfirmation=Êtes-vous certain de vouloir annuler la demande de rejoindre le wiki {0}{1}{2} ?
 platform.wiki.users.join.request.cancelYes=Oui
 platform.wiki.users.join.request.cancelNo=Non
 platform.wiki.users.join.request.cancelSuccess=L''utilisateur {0}{1}{2} a annulé avec succès la demande de rejoindre le wiki {3}{4}{5}.
 platform.wiki.users.join.request.saveNotification=L''utilisateur "{0}" ({1}) a demandé de rejoindre le wiki "{2}" ({3}).
 platform.wiki.users.join.request.success=L''utilisateur {0}{1}{2} a envoyé avec succès la demande de rejoindre le wiki {3}{4}{5}.
-platform.wiki.users.join.confirmation=Êtes-vous sûr de vouloir rejoindre le wiki {0}{1}{2}?
+platform.wiki.users.join.confirmation=Êtes-vous certain de vouloir rejoindre le wiki {0}{1}{2} ?
 platform.wiki.users.join.yes=Oui
 platform.wiki.users.join.no=Non
 platform.wiki.users.join.success=L''utilisateur {0}{1}{2} a rejoint avec succès le wiki {3}{4}{5}.
 platform.wiki.users.leave.error.userIsOwner=L''utilisateur {0}{1}{2} est le propriétaire du wiki {3}{4}{5}. Le propriétaire d''un wiki peut le quitter uniquement si celui-ci est supprimé ou son propriétaire est changé.
-platform.wiki.users.leave.confirmation=Êtes-vous sûr de vouloir quitter le wiki {0}{1}{2}?
+platform.wiki.users.leave.confirmation=Êtes-vous certain de vouloir quitter le wiki {0}{1}{2} ?
 platform.wiki.users.leave.confirmation.yes=Oui
 platform.wiki.users.leave.confirmation.no=Non
 platform.wiki.users.leave.success=L''utilisateur {0}{1}{2} a quitté avec succès le wiki {3}{4}{5}.
@@ -132,7 +132,7 @@ platform.wiki.users.delete.title=Supprimer le Wiki "{0}"
 platform.wiki.users.delete.empty=
 platform.wiki.users.invitation.reply.hint=Une réponse à envoyer à l'administrateur du wiki et dans laquelle vous motivez votre décision.
 platform.wiki.users.join.request.hint=Afin de rejoindre le wiki {0}{1}{2} vous devez formuler une demande de rejoindre. Puis, un administrateur de ce wiki révisera votre demande et envisagera de l''accepter ou de la rejeter.
-platform.wiki.users.join.request.message.hint=Un message à envoyer qui contient la motivation de votre demande et qui est visible pour l'administrateur du wiki. 
+platform.wiki.users.join.request.message.hint=Un message qui explique les motifs de votre demande et qui sera visible de l'administrateur du wiki.
 platform.wiki.users.invitation.title=Vous avez été invité à rejoindre le wiki {0}{1}{2}.
 platform.wiki.users.invitation.message.label=Message d'invitation
 platform.wiki.users.invitation.reply.title=Répondre
@@ -144,7 +144,7 @@ platform.wiki.users.join.request.send.label=Demande envoyée
 platform.wiki.users.join.request.cancel.label=Précédent
 
 ## User profile
-platform.wiki.users.profile.joinedwikis.label=Wikis dont vous êtes membre.
+platform.wiki.users.profile.joinedwikis.label=Wikis dont vous êtes membre
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Vous n'êtes membre d'aucun wiki.
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=L'utilisateur n'est membre d'aucun wiki.
 platform.wiki.users.profile.activity.title=Activité du wiki {0}
@@ -153,8 +153,8 @@ platform.wiki.users.profile.activity.multipletitle=Activité des wikis {0}
 platform.wiki.users.profile.activity.show=afficher l'activité
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=Êtes-vous sûr de vouloir supprimer le wiki {0}{1}{2}?
-platform.wiki.delete.confirmation.retypeWikiId=Merci de resaisir l'identifiant du Wiki \:
+platform.wiki.delete.confirmation=Êtes-vous certain de vouloir supprimer le wiki {0}{1}{2} ? Cette action est définitive !
+platform.wiki.delete.confirmation.retypeWikiId=Merci de resaisir l'identifiant du Wiki :
 platform.wiki.delete.error.wikiIdDoesNotMatch=Saisissez l'identifiant exact du Wiki à supprimer.
 platform.wiki.delete.success=L''utilisateur {0}{1}{2} a supprimé avec succès le wiki "{3}".
 
@@ -231,20 +231,20 @@ platform.wiki.create.wizard.step.next=Étape suivante
 platform.wiki.create.wizard.step.create=Créer
 
 platform.wiki.create.wizard.step.creation=Création du wiki
-platform.wiki.create.wizard.step.creation.wait=Merci de patienter pendant la création du wiki
+platform.wiki.create.wizard.step.creation.wait=Merci de patienter pendant la création du wiki.
 platform.wiki.create.wizard.step.creation.complete=Le wiki {0} a été créé avec succès. Vous pouvez dès à présent y accéder.
 platform.wiki.create.wizard.step.creation.error=Le Wiki {0} a été créé mais certains documents n''ont pu être installés. Ce Wiki risque donc de ne pas fonctionner et vous devrez probablement le supprimer.
 platform.wiki.create.wizard.step.creation.go=Accéder au wiki
 
 ## Admin
-admin.wikis.description=Gestion des wikis
+admin.wikis.description=Gestion des wikis.
 admin.wikis.templates=Modèles
 admin.wikis.templates.description=Gérer les modèles de wiki
 admin.wikis.templates.hint=Un modèle est un wiki utilisé pour créer de nouveaux wikis. Si à la création d'un wiki, l'utilisateur sélectionne un modèle, tout le contenu du wiki modèle est copié dans le nouveau wiki.
 admin.wikis.rights=Droit de création de Wiki
 
 ## XWikiServer Sheet
-platform.wiki.sheet.title=Description du wiki "{0}" 
+platform.wiki.sheet.title=Description du wiki "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=L''alias wiki "{0}" existe déjà.
 platform.wiki.sheet.erroraliasdoesnotexists=L''alias wiki "{0}" n''existe pas.
 platform.wiki.sheet.title.settings=Paramètres du wiki
@@ -264,7 +264,7 @@ platform.wiki.sheet.prop.description=Description
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Page d'accueil
 platform.wiki.sheet.prop.iswikitemplate=Modèle de wiki
-platform.wiki.sheet.descriptor=Cette page vous permet de personnaliser l''accès au wiki {0} et quelques paramètres. Des configurations supplémentaires sont disponibles dans la page d''administration du wiki.
+platform.wiki.sheet.descriptor=Cette page vous permet de personnaliser l''accès au wiki "{0}" et quelques-unes de ses caractéristiques. Pour des configurations supplémentaires, allez à
 platform.wiki.sheet.descriptor.admin=Pages d'administration du wiki.
 platform.wiki.sheet.aliases=Un alias est un nom alternatif du wiki. Vous pouvez ajouter des alias afin de créer des URLs différentes pour le wiki.
 
@@ -299,8 +299,8 @@ platform.wiki.create.wizard.step.provisioning.finalize=Terminer
 #######################################
 ## until 9.5-rc-1
 #######################################
-platform.wiki.delete.confirmation.yes=Oui
-platform.wiki.delete.confirmation.no=Non
+platform.wiki.delete.confirmation.yes=Oui, supprimer ce wiki !
+platform.wiki.delete.confirmation.no=Non, revenir en arrière
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

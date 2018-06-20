@@ -70,7 +70,7 @@ menu.uix.extensionPoint.value.template.header.after=Après l'en-tête du wiki
 menu.uix.extensionPoint.value.panels.rightPanels=Dans un panel droit
 menu.uix.extensionPoint.value.panels.leftPanels=Dans un panel gauche
 menu.uix.content.label=Emplacement de l'interface utilisateur
-menu.uix.content.hint=Si vous lisez ceci, le JavaScript de votre navigateur est probablement désactivé.\nVous devriez donc choisir la même valeur que celle renseignée dans le champ ci-dessus \:  Emplacement du menu
+menu.uix.content.hint=Si vous lisez ceci, le JavaScript de votre navigateur est probablement désactivé.\nVous devriez donc choisir la même valeur que celle renseignée dans le champ ci-dessus :  Emplacement du menu
 menu.uix.scope.label=Contexte de visibilité du menu
 menu.uix.scope.hint=Choix du contexte d'affichage du menu.
 </content>

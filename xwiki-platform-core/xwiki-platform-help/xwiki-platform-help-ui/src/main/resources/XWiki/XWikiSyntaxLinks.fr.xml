@@ -114,7 +114,7 @@ La syntaxe complète d'un lien est ##(alias[|&gt;])+(link)(@interWikiAlias)+([|g
 $subHeading Spécifications des liens pour la syntaxe XWiki 2.0 $subHeading
 {{/velocity}}
 
-La syntaxe complète\ d'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
+La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 
 * ##label##: L'étiquette du lien qui peut contenir de la syntaxe wiki 
 * ##link##: La cible du lien, c'est-à-dire, où aller après cliquer sur un lien.  La syntaxe ressemble à la syntaxe XWiki 1.0 et peut contenir 2 types de URI: ##mailto~:## et##{{{attach:}}}##pour des liens vers une adresse émail et vers une pièce jointe.
@@ -148,7 +148,7 @@ La syntaxe complète\ d'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 $subHeading Spécifications des liens pour la syntaxe XWiki 2.1 $subHeading
 {{/velocity}}
 
-La syntaxe complète\ d'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
+La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 
 * ##label##: L'étiquette du lien qui peut contenir de la syntaxe wiki 
 * ##link##: La cible du lien, c'est-à-dire, où aller après cliquer sur un lien.  La syntaxe ressemble à la syntaxe XWiki 1.0 et peut contenir 2 types de URI: ##mailto~:## et##{{{attach:}}}##pour des liens vers une adresse émail et vers une pièce jointe.

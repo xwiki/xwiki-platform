@@ -50,7 +50,7 @@ activity.rss.feed.tagsAndSpaces.description=Flux RSS des documents modifiés pou
 #@deprecatedstart
 
 ## until 7.3M1
-activity.link.title=Situé dans {0} » {1} » {2} 
+activity.link.title=Situé dans {0} » {1} » {2}
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

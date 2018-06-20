@@ -80,7 +80,7 @@ solr.sortOrder.desc=Aflopend
 
 ### Missing: solr.result.language=Language
 ### Missing: solr.result.locatedIn=Located in
-solr.result.author=Gewijzigd door {0} op {1} 
+solr.result.author=Gewijzigd door {0} op {1}
 solr.result.mediaType=Bestand van het type {0}
 ### Missing: solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 ### Missing: solr.result.highlightAll=Highlight all matches
@@ -180,7 +180,7 @@ solr.field.objcontent=Objecten
 #@deprecatedstart
 
 ## until 7.2M3
-solr.result.location=Gelegen in {0} » {1} » {2} 
+solr.result.location=Gelegen in {0} » {1} » {2}
 
 ## until 7.2RC1
 ### Missing: solr.field.space=Location

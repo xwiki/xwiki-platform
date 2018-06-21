@@ -22,12 +22,10 @@ package org.xwiki.query.internal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -40,22 +38,14 @@ import static org.mockito.Mockito.when;
  * @since 8.4.5
  * @since 9.3RC1
  */
+@ComponentTest
 public class EscapeLikeParametersFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EscapeLikeParametersFilter> mocker =
-        new MockitoComponentMockingRule<>(EscapeLikeParametersFilter.class);
-
-    private QueryFilter filter;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.filter = this.mocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private EscapeLikeParametersFilter filter;
 
     @Test
-    public void filterWithNamedParameterAndNoEscape() throws Exception
+    public void filterWithNamedParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -75,7 +65,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNamedParameterAndLikeAtEnd() throws Exception
+    public void filterWithNamedParameterAndLikeAtEnd()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -91,7 +81,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNamedParameterAndEscape() throws Exception
+    public void filterWithNamedParameterAndEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -107,7 +97,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithPositionalParameterAndNoEscape() throws Exception
+    public void filterWithPositionalParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -130,7 +120,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNumberedPositionalParameterAndNoEscape() throws Exception
+    public void filterWithNumberedPositionalParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -149,7 +139,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithPositionalParameterAndFunction() throws Exception
+    public void filterWithPositionalParameterAndFunction()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);

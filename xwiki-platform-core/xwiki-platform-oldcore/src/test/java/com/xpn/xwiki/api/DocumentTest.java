@@ -21,33 +21,41 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
+@OldcoreTest
 @ReferenceComponentList
 public class DocumentTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @MockComponent
+    private AuthorizationManager authorization;
 
     @Test
     public void testToStringReturnsFullName()
@@ -123,37 +131,46 @@ public class DocumentTest
     @Test
     public void testSaveAsAuthorUsesGuestIfDroppedPermissions() throws XWikiException
     {
-        XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
+        DocumentReference aliceReference = new DocumentReference("wiki", "XWiki", "Alice");
+        DocumentReference bobReference = new DocumentReference("wiki", "XWiki", "Bob");
 
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), eq("XWiki.Alice"), any(),
-            anyXWikiContext())).thenReturn(true);
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), eq("XWikiGuest"), any(),
-            anyXWikiContext())).thenReturn(false);
+        XWikiDocument cdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
+        XWikiDocument sdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "AuthorPage"));
 
-        Document doc = xdoc.newDocument(this.oldcore.getXWikiContext());
-        this.oldcore.getXWikiContext().setDoc(xdoc);
+        when(this.authorization.hasAccess(same(Right.EDIT), eq(aliceReference), eq(cdoc.getDocumentReference())))
+            .thenReturn(true);
+        when(this.authorization.hasAccess(same(Right.EDIT), isNull(), eq(cdoc.getDocumentReference())))
+            .thenReturn(false);
+
+        this.oldcore.getXWikiContext().setDoc(cdoc);
+        this.oldcore.getXWikiContext().put("sdoc", sdoc);
 
         // Alice is the author.
-        xdoc.setAuthorReference(new DocumentReference("wiki", "XWiki", "Alice"));
-        xdoc.setContentAuthorReference(xdoc.getAuthorReference());
+        sdoc.setAuthorReference(aliceReference);
+        sdoc.setContentAuthorReference(sdoc.getAuthorReference());
 
         // Bob is the viewer
-        this.oldcore.getXWikiContext().setUser("XWiki.Bob");
+        this.oldcore.getXWikiContext().setUserReference(bobReference);
+
+        Document doc = cdoc.newDocument(this.oldcore.getXWikiContext());
 
         doc.saveAsAuthor();
 
         this.oldcore.getXWikiContext().dropPermissions();
         try {
             doc.saveAsAuthor();
+
             fail("saveAsAuthor did not throw an exception after dropPermissions() had been called.");
         } catch (XWikiException e) {
             assertTrue("Wrong error message when trying to save a document after calling dropPermissions()",
-                e.getMessage().contains("Access denied; user XWikiGuest, acting through script in "
+                e.getMessage().contains("Access denied; user null, acting through script in "
                     + "document Space.Page cannot save document Space.Page"));
         }
 
-        assertEquals("After dropping permissions and attempting to save a document,"
-            + "the user was permanantly switched to guest.", "XWiki.Bob", this.oldcore.getXWikiContext().getUser());
+        assertEquals(
+            "After dropping permissions and attempting to save a document,"
+                + " the user was permanantly switched to guest.",
+            bobReference, this.oldcore.getXWikiContext().getUserReference());
     }
 
     @Test

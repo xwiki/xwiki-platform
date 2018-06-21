@@ -24,6 +24,10 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.security.authorization.AuthorizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -47,6 +51,10 @@ public class Api
     protected XWikiContext context;
 
     private Provider<XWikiContext> xcontextProvider;
+
+    private AuthorizationManager authorizationManager;
+
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     /**
      * @param context the XWiki Context object
@@ -78,6 +86,28 @@ public class Api
         this.context = this.xcontextProvider.get();
 
         return this.context;
+    }
+
+    /**
+     * @return the {@link AuthorizationManager} component
+     * @since 10.6RC1
+     */
+    protected AuthorizationManager getAuthorizationManager()
+    {
+        if (this.authorizationManager == null) {
+            this.authorizationManager = Utils.getComponent(AuthorizationManager.class);
+        }
+
+        return this.authorizationManager;
+    }
+
+    private EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
+    {
+        if (this.defaultEntityReferenceSerializer == null) {
+            this.defaultEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        }
+
+        return this.defaultEntityReferenceSerializer;
     }
 
     /**
@@ -159,21 +189,35 @@ public class Api
 
     /**
      * Get the name of the content author of the current document for security checking. If
-     * {@link Context#dropPermissions()} has been called then this will return the guest user no matter who the real
-     * author is. If there is no current document then the guest user is returned because there is no reason for script
-     * to have any permission if does not exist in any document.
+     * {@link XWikicontext#dropPermissions()} has been called then this will return the guest user no matter who the
+     * real author is. If there is no current document then the guest user is returned because there is no reason for
+     * script to have any permission if does not exist in any document.
+     *
+     * @return the name of the document author or guest.
+     * @deprecated use {@link #getEffectiveAuthorReference()} instead
+     */
+    @Deprecated
+    String getEffectiveScriptAuthorName()
+    {
+        DocumentReference authorReference = getXWikiContext().getAuthorReference();
+
+        return authorReference != null ? getDefaultEntityReferenceSerializer().serialize(authorReference)
+            : XWikiRightService.GUEST_USER;
+    }
+
+    /**
+     * Get the reference of the current author for security checking. If {@link XWikicontext#dropPermissions()} has been
+     * called then this will return the guest user no matter who the real author is.
      *
      * @return the name of the document author or guest.
      */
-    String getEffectiveScriptAuthorName()
+    DocumentReference getEffectiveAuthorReference()
     {
         if (!this.getXWikiContext().hasDroppedPermissions()) {
-            final XWikiDocument doc = this.getXWikiContext().getDoc();
-            if (doc != null) {
-                return doc.getContentAuthor();
-            }
+            return getXWikiContext().getAuthorReference();
         }
-        return XWikiRightService.GUEST_USER;
+
+        return null;
     }
 
     /**

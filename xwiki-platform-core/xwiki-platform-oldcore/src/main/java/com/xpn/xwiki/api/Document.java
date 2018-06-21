@@ -46,7 +46,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -128,11 +128,6 @@ public class Document extends Api
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     private DocumentRevisionProvider documentRevisionProvider;
-
-    /**
-     * Authorization manager used to check rights.
-     */
-    private ContextualAuthorizationManager authorizationManager;
 
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
@@ -2033,6 +2028,20 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on this
+     * document.
+     * 
+     * @param right the right to check
+     * @param userReference the user to check the right for
+     * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
+     * @since 10.6RC1
+     */
+    public boolean hasAccess(Right right, DocumentReference userReference)
+    {
+        return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());
+    }
+
     public boolean getLocked()
     {
         try {
@@ -2491,17 +2500,20 @@ public class Document extends Api
      */
     public void saveAsAuthor(String comment, boolean minorEdit) throws XWikiException
     {
-        String author = this.getEffectiveScriptAuthorName();
-        if (hasAccessLevel("edit", author)) {
-            String viewer = getXWikiContext().getUser();
+        XWikiContext xcontext = getXWikiContext();
+
+        DocumentReference author = getEffectiveAuthorReference();
+        if (hasAccess(Right.EDIT, author)) {
+            DocumentReference currentUser = xcontext.getUserReference();
             try {
-                getXWikiContext().setUser(author);
+                xcontext.setUserReference(author);
+
                 saveDocument(comment, minorEdit);
             } finally {
-                getXWikiContext().setUser(viewer);
+                xcontext.setUserReference(currentUser);
             }
         } else {
-            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.getFullName() };
+            java.lang.Object[] args = { author, xcontext.getDoc(), getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot save document {2}", null, args);
         }
@@ -2676,17 +2688,20 @@ public class Document extends Api
      */
     public void deleteAsAuthor() throws XWikiException
     {
-        String author = this.getEffectiveScriptAuthorName();
-        if (hasAccessLevel("delete", author)) {
-            String viewer = getXWikiContext().getUser();
+        XWikiContext xcontext = getXWikiContext();
+
+        DocumentReference author = getEffectiveAuthorReference();
+        if (hasAccess(Right.DELETE, author)) {
+            DocumentReference currentUser = xcontext.getUserReference();
             try {
-                getXWikiContext().setUser(author);
+                xcontext.setUserReference(author);
+
                 deleteDocument();
             } finally {
-                getXWikiContext().setUser(viewer);
+                xcontext.setUserReference(currentUser);
             }
         } else {
-            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.getFullName() };
+            java.lang.Object[] args = { author, xcontext.getDoc(), this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null,
                 args);
@@ -3090,14 +3105,5 @@ public class Document extends Api
     public boolean isTranslation()
     {
         return 1 == this.getDoc().getTranslation();
-    }
-
-    private ContextualAuthorizationManager getAuthorizationManager()
-    {
-        if (this.authorizationManager == null) {
-            this.authorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
-        }
-
-        return this.authorizationManager;
     }
 }

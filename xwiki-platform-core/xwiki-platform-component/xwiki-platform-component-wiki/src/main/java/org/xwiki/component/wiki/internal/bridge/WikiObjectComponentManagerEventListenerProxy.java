@@ -134,11 +134,14 @@ public class WikiObjectComponentManagerEventListenerProxy
                     XWikiDocument document = xWikiContext.getWiki().getDocument(sourceDocumentReference, xWikiContext);
 
                     for (BaseObject xObject : document.getXObjects(xObjectClass)) {
-                        BaseObjectReference xObjectReference = xObject.getReference();
-                        builderHelper = this.entityReferenceSerializer.serialize(xObjectReference.getXClassReference());
+                        if (xObject != null) {
+                            BaseObjectReference xObjectReference = xObject.getReference();
+                            builderHelper =
+                                this.entityReferenceSerializer.serialize(xObjectReference.getXClassReference());
 
-                        this.registerObjectComponents(xObjectReference, xObject,
-                            this.contextComponent.getInstance(WikiObjectComponentBuilder.class, builderHelper));
+                            this.registerObjectComponents(xObjectReference, xObject,
+                                this.contextComponent.getInstance(WikiObjectComponentBuilder.class, builderHelper));
+                        }
                     }
                 }
             } catch (Exception e) {

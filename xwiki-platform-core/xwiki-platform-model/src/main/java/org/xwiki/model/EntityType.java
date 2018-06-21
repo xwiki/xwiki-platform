@@ -19,6 +19,9 @@
  */
 package org.xwiki.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -37,51 +40,103 @@ public enum EntityType
      */
     WIKI,
 
+    // Documents
+
     /**
      * Represents a Space Entity.
      */
-    SPACE,
+    SPACE(WIKI, null),
 
     /**
      * Represents a Document Entity.
      */
-    DOCUMENT,
+    DOCUMENT(SPACE),
 
     /**
      * Represents an Attachment Entity.
      */
-    ATTACHMENT,
+    ATTACHMENT(DOCUMENT),
 
     /**
      * Represents an Object Entity.
      */
-    OBJECT,
+    OBJECT(DOCUMENT),
 
     /**
      * Represents an Object Property Entity.
      */
-    OBJECT_PROPERTY,
+    OBJECT_PROPERTY(OBJECT),
 
     /**
      * Represents a class property entity.
+     * 
      * @since 3.2M1
      */
-    CLASS_PROPERTY,
+    CLASS_PROPERTY(DOCUMENT),
 
     /**
      * Represents a structured part of the content of a document or an object property.
+     * 
      * @since 6.0M1
      */
-    BLOCK;
+    BLOCK(DOCUMENT, OBJECT_PROPERTY),
+
+    // Pages
+
+    /**
+     * Represents a Page Entity.
+     * 
+     * @since 10.6RC1
+     */
+    PAGE(WIKI, (EntityType) null),
+
+    /**
+     * Represents an Attachment Entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    PAGE_ATTACHMENT(PAGE),
+
+    /**
+     * Represents an Object Entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    PAGE_OBJECT(PAGE),
+
+    /**
+     * Represents an Object Property Entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    PAGE_OBJECT_PROPERTY(PAGE_OBJECT),
+
+    /**
+     * Represents a class property entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    PAGE_CLASS_PROPERTY(PAGE);
+
+    // TODO: should probably introduce a PAGE_BLOCK when we decide how we want it (we might want to move a two types or
+    // decide to have BLOCK being parent of BLOCK, etc.)
 
     /**
      * The lower case String version of the enum.
      */
-    private String lowerCase;
+    private final String lowerCase;
 
-    EntityType()
+    private final List<EntityType> allowedParents;
+
+    EntityType(EntityType... allowedParents)
     {
         this.lowerCase = name().toLowerCase(Locale.US);
+
+        List<EntityType> list = new ArrayList<>(allowedParents.length);
+        for (EntityType parent : allowedParents) {
+            list.add(parent != null ? parent : this);
+        }
+        this.allowedParents = Collections.unmodifiableList(list);
     }
 
     /**
@@ -91,5 +146,14 @@ public enum EntityType
     public String getLowerCase()
     {
         return this.lowerCase;
+    }
+
+    /**
+     * @return the list of allowed parent for this entity type
+     * @since 10.6RC1
+     */
+    public List<EntityType> getAllowedParents()
+    {
+        return this.allowedParents;
     }
 }

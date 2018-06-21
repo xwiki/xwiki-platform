@@ -19,9 +19,7 @@
  */
 package org.xwiki.model.internal.reference;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,18 +35,16 @@ public interface EntityReferenceConstants
 {
     /**
      * The hierarchy of Entity Types.
+     * 
+     * @deprecated since 10.6RC1, use {@link EntityType#getAllowedParents()} instead
      */
-    Map<EntityType, List<EntityType>> PARENT_TYPES = new HashMap<EntityType, List<EntityType>>()
+    @Deprecated
+    Map<EntityType, List<EntityType>> PARENT_TYPES = new EnumMap<EntityType, List<EntityType>>(EntityType.class)
     {
         {
-            put(EntityType.ATTACHMENT, Arrays.asList(EntityType.DOCUMENT));
-            put(EntityType.DOCUMENT, Arrays.asList(EntityType.SPACE));
-            put(EntityType.SPACE, Arrays.asList(EntityType.WIKI, EntityType.SPACE));
-            put(EntityType.WIKI, Collections.<EntityType>emptyList());
-            put(EntityType.OBJECT, Arrays.asList(EntityType.DOCUMENT));
-            put(EntityType.OBJECT_PROPERTY, Arrays.asList(EntityType.OBJECT));
-            put(EntityType.CLASS_PROPERTY, Arrays.asList(EntityType.DOCUMENT));
-            put(EntityType.BLOCK, Arrays.asList(EntityType.DOCUMENT, EntityType.OBJECT_PROPERTY));
+            for (EntityType type : EntityType.values()) {
+                put(type, type.getAllowedParents());
+            }
         }
     };
 }

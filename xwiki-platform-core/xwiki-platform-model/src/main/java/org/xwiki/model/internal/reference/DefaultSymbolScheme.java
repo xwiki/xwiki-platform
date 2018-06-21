@@ -21,7 +21,7 @@ package org.xwiki.model.internal.reference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +51,11 @@ public class DefaultSymbolScheme implements SymbolScheme
     private static final char CWIKISEP = ':';
 
     /**
+     * A slash string. Slash is used as separator for all pages model elements (except between page and wiki).
+     */
+    private static final char CPAGESEP = '/';
+
+    /**
      * A dot string. Dot is used to separate space names and document name.
      */
     private static final char CSPACESEP = '.';
@@ -63,7 +68,7 @@ public class DefaultSymbolScheme implements SymbolScheme
     /**
      * An hat sign string. Hat sign is used to separate object name.
      */
-    private static final  char COBJECTSEP = '^';
+    private static final char COBJECTSEP = '^';
 
     /**
      * An dot is used to separate object property name.
@@ -75,24 +80,34 @@ public class DefaultSymbolScheme implements SymbolScheme
      */
     private static final char CCLASSPROPSEP = COBJECTSEP;
 
-    private static final Map<EntityType, Map<EntityType, Character>> SEPARATORS =
-        new HashMap<EntityType, Map<EntityType, Character>>()
-    {
-        {
-            put(EntityType.WIKI, Collections.emptyMap());
+    private static final Map<EntityType, Map<EntityType, Character>> SEPARATORS = new EnumMap<>(EntityType.class);
 
-            Map<EntityType, Character> spaceSeparators = new HashMap<>();
-            spaceSeparators.put(EntityType.WIKI, CWIKISEP);
-            spaceSeparators.put(EntityType.SPACE, CSPACESEP);
-            put(EntityType.SPACE, spaceSeparators);
+    static {
+        SEPARATORS.put(EntityType.WIKI, Collections.emptyMap());
 
-            put(EntityType.DOCUMENT, Collections.singletonMap(EntityType.SPACE, CSPACESEP));
-            put(EntityType.ATTACHMENT, Collections.singletonMap(EntityType.DOCUMENT, CATTACHMENTSEP));
-            put(EntityType.OBJECT, Collections.singletonMap(EntityType.DOCUMENT, COBJECTSEP));
-            put(EntityType.OBJECT_PROPERTY, Collections.singletonMap(EntityType.OBJECT, CPROPERTYSEP));
-            put(EntityType.CLASS_PROPERTY, Collections.singletonMap(EntityType.DOCUMENT, CCLASSPROPSEP));
-        }
-    };
+        // Pages
+        Map<EntityType, Character> pageSeparators = new EnumMap<>(EntityType.class);
+        pageSeparators.put(EntityType.WIKI, CWIKISEP);
+        pageSeparators.put(EntityType.SPACE, CPAGESEP);
+        SEPARATORS.put(EntityType.PAGE, pageSeparators);
+
+        SEPARATORS.put(EntityType.PAGE_ATTACHMENT, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
+        SEPARATORS.put(EntityType.PAGE_OBJECT, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
+        SEPARATORS.put(EntityType.PAGE_OBJECT_PROPERTY, Collections.singletonMap(EntityType.PAGE_OBJECT, CPAGESEP));
+        SEPARATORS.put(EntityType.PAGE_CLASS_PROPERTY, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
+
+        // Documents
+        Map<EntityType, Character> spaceSeparators = new EnumMap<>(EntityType.class);
+        spaceSeparators.put(EntityType.WIKI, CWIKISEP);
+        spaceSeparators.put(EntityType.SPACE, CSPACESEP);
+        SEPARATORS.put(EntityType.SPACE, spaceSeparators);
+
+        SEPARATORS.put(EntityType.DOCUMENT, Collections.singletonMap(EntityType.SPACE, CSPACESEP));
+        SEPARATORS.put(EntityType.ATTACHMENT, Collections.singletonMap(EntityType.DOCUMENT, CATTACHMENTSEP));
+        SEPARATORS.put(EntityType.OBJECT, Collections.singletonMap(EntityType.DOCUMENT, COBJECTSEP));
+        SEPARATORS.put(EntityType.OBJECT_PROPERTY, Collections.singletonMap(EntityType.OBJECT, CPROPERTYSEP));
+        SEPARATORS.put(EntityType.CLASS_PROPERTY, Collections.singletonMap(EntityType.DOCUMENT, CCLASSPROPSEP));
+    }
 
     private Map<EntityType, String[]> escapes;
 
@@ -114,8 +129,8 @@ public class DefaultSymbolScheme implements SymbolScheme
         // Dynamically create the escape/replacement maps.
         // The characters to escape are all the characters that are separators between the current type and its parent
         // type + the escape symbol itself.
-        this.escapes = new HashMap<>();
-        this.replacements = new HashMap<>();
+        this.escapes = new EnumMap<>(EntityType.class);
+        this.replacements = new EnumMap<>(EntityType.class);
 
         String escape = Character.toString(getEscapeSymbol());
         for (Map.Entry<EntityType, Map<EntityType, Character>> entry : SEPARATORS.entrySet()) {

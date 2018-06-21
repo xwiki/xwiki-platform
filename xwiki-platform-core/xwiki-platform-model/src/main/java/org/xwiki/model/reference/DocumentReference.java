@@ -32,12 +32,12 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
 /**
- * Represents a reference to a document (wiki, space and page names).
+ * Represents a reference to a document (wiki, space and document names).
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class DocumentReference extends EntityReference
+public class DocumentReference extends AbstractLocalizedEntityReference
 {
     /**
      * The {@link Type} for a {@code Provider<DocumentReference>}.
@@ -50,7 +50,7 @@ public class DocumentReference extends EntityReference
     /**
      * Parameter key for the locale.
      */
-    static final String LOCALE = "LOCALE";
+    static final String LOCALE = AbstractLocalizedEntityReference.LOCALE;
 
     /**
      * Cache the {@link LocalDocumentReference} corresponding to this {@link DocumentReference}.
@@ -241,24 +241,6 @@ public class DocumentReference extends EntityReference
         }
 
         super.setType(EntityType.DOCUMENT);
-    }
-
-    /**
-     * Set the locale of this document reference.
-     *
-     * @param locale the locale of this document reference
-     */
-    protected void setLocale(Locale locale)
-    {
-        setParameter(LOCALE, locale);
-    }
-
-    /**
-     * @return the locale of this document reference
-     */
-    public Locale getLocale()
-    {
-        return (Locale) getParameter(LOCALE);
     }
 
     /**

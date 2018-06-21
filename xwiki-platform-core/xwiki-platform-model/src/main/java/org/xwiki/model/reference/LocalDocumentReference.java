@@ -29,7 +29,7 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 5.0M1
  */
-public class LocalDocumentReference extends EntityReference
+public class LocalDocumentReference extends AbstractLocalizedEntityReference
 {
     /**
      * Create a new Document reference in the current wiki.
@@ -127,25 +127,5 @@ public class LocalDocumentReference extends EntityReference
         }
 
         return spaceReference;
-    }
-
-    /**
-     * @return the locale of this document reference
-     * @since 5.3RC1
-     */
-    public Locale getLocale()
-    {
-        return (Locale) getParameter(DocumentReference.LOCALE);
-    }
-
-    /**
-     * Set the locale of this document reference.
-     * 
-     * @since 5.3RC1
-     * @param locale the locale of this document reference
-     */
-    protected void setLocale(Locale locale)
-    {
-        setParameter(DocumentReference.LOCALE, locale);
     }
 }

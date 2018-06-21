@@ -50,7 +50,7 @@ import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerial
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentGetDocumentReferenceDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentGetDocumentDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver;
@@ -110,7 +110,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     RelativeStringEntityReferenceResolver.class,
     UidStringEntityReferenceSerializer.class,
     XClassRelativeStringEntityReferenceResolver.class,
-    CurrentGetDocumentReferenceDocumentReferenceResolver.class,
+    CurrentGetDocumentDocumentReferenceResolver.class,
     DefaultReferenceDocumentReferenceResolver.class,
     DefaultReferenceEntityReferenceResolver.class,
     DefaultSymbolScheme.class,

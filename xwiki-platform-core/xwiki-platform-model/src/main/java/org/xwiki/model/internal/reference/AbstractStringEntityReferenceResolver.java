@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.internal.reference;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
     @Override
     public void initialize()
     {
-        this.referenceSetup = new HashMap<>();
+        this.referenceSetup = new EnumMap<>(EntityType.class);
 
         Map<EntityType, Map<EntityType, Character>> separators = getSymbolScheme().getSeparatorSymbols();
         for (Map.Entry<EntityType, Map<EntityType, Character>> separatorEntry : separators.entrySet()) {

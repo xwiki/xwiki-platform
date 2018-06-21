@@ -85,7 +85,7 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
         EntityReference normalizedReference = referenceToResolve;
         EntityReference reference = normalizedReference;
         while (reference != null) {
-            List<EntityType> types = EntityReferenceConstants.PARENT_TYPES.get(reference.getType());
+            List<EntityType> types = reference.getType().getAllowedParents();
             if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
                 // The parent reference isn't the allowed parent: insert an allowed reference
                 EntityReference newReference =

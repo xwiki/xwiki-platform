@@ -17,66 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.script;
+package com.xpn.xwiki.internal.debug;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.job.event.status.JobProgress;
-import org.xwiki.script.service.ScriptService;
-
-import com.xpn.xwiki.internal.debug.DebugConfiguration;
-import com.xpn.xwiki.web.XWikiAction;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.container.Container;
 
 /**
- * Various internal debug tools.
+ * Information about debug configuration.
  *
  * @version $Id$
- * @since 7.1M2
+ * @since 10.6RC1
  */
-@Component
+@Component(roles = { DebugConfiguration.class })
 @Singleton
-@Named("debug")
-public class DebugInternalScriptService implements ScriptService
+public class DebugConfiguration
 {
     @Inject
-    private Execution execution;
+    @Named("xwikiproperties")
+    private ConfigurationSource properties;
 
     @Inject
-    private DebugConfiguration debugConfiguration;
-
-    /**
-     * @return is debug enabled in the current execution context
-     */
-    public boolean isEnabled()
-    {
-        return getActionProgress() != null;
-    }
-
-    /**
-     * @return the detailed progress of the current action
-     */
-    public JobProgress getActionProgress()
-    {
-        ExecutionContext econtext = this.execution.getContext();
-
-        if (econtext != null) {
-            return (JobProgress) econtext.getProperty(XWikiAction.ACTION_PROGRESS);
-        }
-
-        return null;
-    }
+    private Container container;
 
     /**
      * @return true if resources should be minified when possible
-     * @since 7.1RC1
+     * @since 10.6RC1
      */
     public boolean isMinify()
     {
-        return this.debugConfiguration.isMinify();
+        String minifyString = (String) this.container.getRequest().getProperty("minify");
+        if (minifyString != null) {
+            return Boolean.valueOf(minifyString);
+        }
+
+        return this.properties.getProperty("debug.minify", true);
     }
 }

@@ -65,7 +65,7 @@ Mail.SendMailConfigClass_password.hint=Heslo pre pripojenie k serveru SMTP, ak j
 Mail.SendMailConfigClass_properties=Ďalšie možnosti
 Mail.SendMailConfigClass_properties.hint=Zoznam JavaMail nastavení. (napr. "mail.smtp.starttls.enable\=true")
 Mail.SendMailConfigClass_sendWaitTime=Čas čakania
-Mail.SendMailConfigClass_sendWaitTime.hint=Čas čakania v ms. (Predvolená hodnota je 8s) 
+Mail.SendMailConfigClass_sendWaitTime.hint=Čas čakania v ms. (Predvolená hodnota je 8s)
 Mail.SendMailConfigClass_discardSuccessStatuses=Zahodiť úspešné stavy?
 Mail.SendMailConfigClass_discardSuccessStatuses.hint=Uchovávať alebo neuchovávať stavy emailov, ktoré boli úspešne odoslané (základne nastavenie je uchovávať)
 Mail.SendMailStatus_livetable.date=Dátum

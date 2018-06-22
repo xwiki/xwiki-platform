@@ -80,8 +80,8 @@ platform.wiki.menu.deletewiki=Löschen
 
 ## Dependencies
 ### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-platform.wiki.dependencies.template.missing=\ 
-platform.wiki.dependencies.user.missing=\ 
+### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 
 ## Create
 ### Missing: platform.wiki.create.button=Create Wiki
@@ -153,7 +153,7 @@ platform.wiki.users.profile.activity.multipletitle=Aktivitäten in den Wikis {0}
 platform.wiki.users.profile.activity.show=Aktivität zeigen
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=Sind Sie sicher, dass Sie das Wiki {0}{1}{2} löschen wollen? 
+platform.wiki.delete.confirmation=Sind Sie sicher, dass Sie das Wiki {0}{1}{2} löschen wollen?
 ### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
 ### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
 platform.wiki.delete.success=Benutzer {0}{1}{2}  hat das Wiki ''{3}'' erfolgreich gelöscht.
@@ -187,7 +187,7 @@ platform.wiki.browse._actions.delete=Löschen
 WikiManager.WikiUserClass_membershipType_open=Alle Benutzer können beitreten
 WikiManager.WikiUserClass_membershipType_request=Alle Benutzer können Mitgliedschaft beantragen, aber ein Admin muss zustimmen
 WikiManager.WikiUserClass_membershipType_invite=Nur Administratoren können Benutzer einladen
-WikiManager.WikiUserClass_userScope_local_only=Das Wiki kennt nur seine eigenen, lokalen Benutzer 
+WikiManager.WikiUserClass_userScope_local_only=Das Wiki kennt nur seine eigenen, lokalen Benutzer
 WikiManager.WikiUserClass_userScope_global_only=Das Wiki kennt nur globale Benutzer
 WikiManager.WikiUserClass_userScope_local_and_global=Das Wiki kennt sowohl lokale als auch globale Benutzer
 platform.wiki.prop.wikiname=Wiki Bezeichner
@@ -202,7 +202,7 @@ platform.wiki.prop.membershipType.hint=Auf welche Weise Benutzer dem Wiki beitre
 platform.wiki.create.wizard.desc.wikiname=Der (eindeutige) Bezeichner für das neue Wiki
 platform.wiki.create.wizard.desc.wikiprettyname=Der Name, unter dem das Wiki angezeigt wird.
 platform.wiki.create.wizard.desc.wikialias=Der Name der Domain, unter der das neue Wiki erreichbar sein wird.
-platform.wiki.create.wizard.desc.newTemplateHint=Vorlage, welche für das Wiki benutzt wird. Beim Anlegen werden alle Dokumente der Vorlage in das neue Wiki kopiert. 
+platform.wiki.create.wizard.desc.newTemplateHint=Vorlage, welche für das Wiki benutzt wird. Beim Anlegen werden alle Dokumente der Vorlage in das neue Wiki kopiert.
 platform.wiki.create.wizard.desc.description=Eine kurze Beschreibung des Wikis und seines Verwendungszweckes.
 platform.wiki.create.wizard.desc.owner=Ein Benutzer, der alle Rechte in dem Wiki hat.
 platform.wiki.create.wizard.desc.members=Die Benutzer, welche am Wiki teilnehmen.

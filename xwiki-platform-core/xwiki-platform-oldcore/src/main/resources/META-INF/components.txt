@@ -18,6 +18,7 @@ com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCacheConfiguration
+com.xpn.xwiki.internal.debug.DebugConfiguration
 com.xpn.xwiki.internal.doc.DatabaseDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DefaultDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DeletedDocumentRevisionProvider

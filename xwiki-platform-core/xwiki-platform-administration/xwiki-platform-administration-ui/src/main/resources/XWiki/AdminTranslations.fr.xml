@@ -46,7 +46,7 @@ administration.title.global=Administration globale
 administration.sectionTitle=Administration : {0}
 administration.sectionTitle.page=Administration de la page : {0}
 administration.sectionTitle.wiki=Administration du wiki : {0}
-administration.sectionTitle.global=Administration globale : {0} 
+administration.sectionTitle.global=Administration globale : {0}
 administration.menu.search.hint=Rechercher...
 administration.menu.search.noResults=Aucun résultat.
 

@@ -99,7 +99,7 @@ public class XWiki extends Api
 
     private DocumentRevisionProvider documentRevisionProvider;
 
-    private ContextualAuthorizationManager authorizationManager;
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     /**
      * XWiki API Constructor
@@ -163,13 +163,13 @@ public class XWiki extends Api
         return this.documentRevisionProvider;
     }
 
-    private ContextualAuthorizationManager getAuthorizationManager()
+    private ContextualAuthorizationManager getContextualAuthorizationManager()
     {
-        if (this.authorizationManager == null) {
-            this.authorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        if (this.contextualAuthorizationManager == null) {
+            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
         }
 
-        return this.authorizationManager;
+        return this.contextualAuthorizationManager;
     }
 
     /**
@@ -367,15 +367,11 @@ public class XWiki extends Api
      */
     public Document getDocumentAsAuthor(DocumentReference reference) throws XWikiException
     {
-        String author = this.getEffectiveScriptAuthorName();
-        XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(),
-            getXWikiContext()) == false) {
+        if (!getAuthorizationManager().hasAccess(Right.VIEW, getEffectiveAuthorReference(), reference)) {
             return null;
         }
 
-        Document newdoc = doc.newDocument(getXWikiContext());
-        return newdoc;
+        return this.xwiki.getDocument(reference, getXWikiContext()).newDocument(getXWikiContext());
     }
 
     /**
@@ -608,7 +604,7 @@ public class XWiki extends Api
             return null;
         }
 
-        if (!getAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
+        if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
             // Finally we return null, otherwise showing search result is a real pain
             return null;
         }
@@ -628,7 +624,7 @@ public class XWiki extends Api
     public Document getDocument(DocumentReference reference, String revision) throws XWikiException
     {
         try {
-            if (reference != null && getAuthorizationManager().hasAccess(Right.VIEW, reference)) {
+            if (reference != null && getContextualAuthorizationManager().hasAccess(Right.VIEW, reference)) {
                 XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(reference, revision);
 
                 if (documentRevision != null) {

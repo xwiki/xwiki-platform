@@ -104,7 +104,7 @@ platform.appwithinminutes.classEditorUpdateTemplateHint=Сохранить зн�
 platform.appwithinminutes.classEditorUpdateSheetLabel=Обновить страницу класса
 platform.appwithinminutes.classEditorUpdateSheetHint=Создать повторно страницу, которая используется для вывода и редактирования объектов этого класса ({0}).
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Обновить связь с переводом класса
-platform.appwithinminutes.classEditorUpdateTranslationsHint=Обновить перевод названий полей и список значений ({0}). 
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Обновить перевод названий полей и список значений ({0}).
 
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Этот класс имеет несколько страниц класса.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Класс содержить два поля с одинаковыми именами\: {0}

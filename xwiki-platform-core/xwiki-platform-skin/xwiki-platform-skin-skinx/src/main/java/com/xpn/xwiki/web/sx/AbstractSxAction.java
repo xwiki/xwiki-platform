@@ -24,21 +24,20 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.debug.DebugConfiguration;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiAction;
-import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.sx.SxSource.CachePolicy;
 
 /**
  * Abstract Skin Extension action. Contains the logic to generate the response based on a extension source and a type of
  * extension that implementing classes must provide.
- * 
+ *
  * @version $Id$
  * @since 1.7M2
  */
@@ -65,16 +64,15 @@ public abstract class AbstractSxAction extends XWikiAction
     /** If the user passes this parameter in the URL, we will look for the script in the jar files. */
     private static final String JAR_RESOURCE_REQUEST_PARAMETER = "resource";
 
-    /** If the user specifies this url parameter equals false, we will send uncompressed script content. */
-    private static final String COMPRESS_SCRIPT_REQUEST_PARAMETER = "minify";
-
     /** @return the logging object of the concrete subclass. */
     protected abstract Logger getLogger();
+
+    private DebugConfiguration debugConfiguration;
 
     /**
      * This method must be called by render(XWikiContext). Render is in charge of creating the proper source and
      * extension type, and pass it as an argument to this method which will forge the proper response using those.
-     * 
+     *
      * @param sxSource the source of the extension.
      * @param sxType the type of extension
      * @param context the XWiki context when rendering the skin extension.
@@ -83,7 +81,6 @@ public abstract class AbstractSxAction extends XWikiAction
     public void renderExtension(SxSource sxSource, Extension sxType, XWikiContext context)
         throws XWikiException
     {
-        XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
 
         String extensionContent = sxSource.getContent();
@@ -109,8 +106,7 @@ public abstract class AbstractSxAction extends XWikiAction
             response.setHeader(CACHE_CONTROL_HEADER, "no-cache, no-store, must-revalidate");
         }
 
-        if (BooleanUtils.toBoolean(StringUtils.defaultIfEmpty(
-            request.get(COMPRESS_SCRIPT_REQUEST_PARAMETER), "true"))) {
+        if (getDebugConfiguration().isMinify()) {
             extensionContent = sxType.getCompressor().compress(extensionContent);
         }
 
@@ -147,11 +143,19 @@ public abstract class AbstractSxAction extends XWikiAction
         return null;
     }
 
+    protected DebugConfiguration getDebugConfiguration()
+    {
+        if (this.debugConfiguration == null) {
+            this.debugConfiguration = Utils.getComponent(DebugConfiguration.class);
+        }
+
+        return this.debugConfiguration;
+    }
+
     /**
      * Get the type of extension, depends on the type of action.
-     * 
+     *
      * @return a new object which extends Extension.
      */
     public abstract Extension getExtensionType();
-
 }

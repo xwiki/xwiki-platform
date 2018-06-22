@@ -82,7 +82,7 @@ solr.result.language=Valoda
 ### Missing: solr.result.locatedIn=Located in
 solr.result.author=Mainījis {0} {1}
 solr.result.mediaType={0} veida fails
-solr.result.uploadedBy=Augšuplādējis {0} {1} ({2}) 
+solr.result.uploadedBy=Augšuplādējis {0} {1} ({2})
 solr.result.highlightAll=Izgaismot visas atbilstības
 
 solr.facets.title=Precizēt meklējumu
@@ -180,7 +180,7 @@ solr.field.attsize=Faila izmērs
 #@deprecatedstart
 
 ## until 7.2M3
-solr.result.location=Atrodas {0} » {1} » {2} 
+solr.result.location=Atrodas {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Vieta

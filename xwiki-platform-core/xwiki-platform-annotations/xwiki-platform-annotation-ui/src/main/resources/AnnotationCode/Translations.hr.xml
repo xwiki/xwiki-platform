@@ -41,15 +41,15 @@
   <hidden>true</hidden>
   <content>annotations.title=Anotiraj
 annotations.menu.loading=Učitavanje postavki anotacija
-annotations.menu.loaderror=Neuspjeh\: 
+annotations.menu.loaderror=Neuspjeh\:
 annotations.tab.info.noannotations=Ova stranica nema anotacija
 
-annotations.settings.display=Prikaži anotacije 
+annotations.settings.display=Prikaži anotacije
 annotations.settings.error.wrongsyntax=Anotacije nisu dostupne za stranice s XWiki/1.0 sintaksom.
 annotations.settings.error.notarget=Nije naznačena stranica za dohvat postavki anotacija.
 
 annotations.annotated.loading=Učitavanje anotirane stranice
-annotations.annotated.loaderror=Neuspjeh\: 
+annotations.annotated.loaderror=Neuspjeh\:
 annotations.annotated.loaderror.wrongresponse=Pogrešno formatiran odgovor poslužitelja
 annotations.annotated.error.noannotatedelement=Anotacije nisu mogle biti učitane jer sadržaj nije dostupan.
 annotations.annotated.error.wrongsyntax=Anotacije nisu dostupne za stranice s XWiki/1.0 sintaksom.
@@ -59,7 +59,7 @@ annotations.action.edit.tooltip=Uredi ovu anotaciju
 annotations.action.edit.submit.text=Ažuriraj
 annotations.action.edit.cancel.text=Otkaži
 annotations.action.edit.success=Anotacija je uspješno ažurirana.
-annotations.action.edit.loaderror=Neuspjeh\: 
+annotations.action.edit.loaderror=Neuspjeh\:
 annotations.action.edit.error.notfound=Ova anotacija više ne postoji. Molim osvježite stranicu za ažurirani pregled.
 
 annotations.action.delete.text=[Obriši]
@@ -67,31 +67,31 @@ annotations.action.delete.tooltip=Obriši ovu anotaciju
 annotations.action.delete.confirm=Jeste li sigurni da želite obrisati ovu anotaciju?
 annotations.action.delete.inProgress=Brisanje anotacije...
 annotations.action.delete.done=Anotacija obrisana
-annotations.action.delete.failed=Brisanje anotacije nije uspjelo\: 
+annotations.action.delete.failed=Brisanje anotacije nije uspjelo\:
 
 annotations.action.create.submit.text=Dodaj anotaciju
 annotations.action.create.cancel.text=Otkaži
 annotations.action.create.selection.invalid=Molim odaberite neprazan tekst u sadržaju stranice.
-annotations.action.create.form.loaderror=Neuspjeh\: 
+annotations.action.create.form.loaderror=Neuspjeh\:
 annotations.action.create.success=Anotacija je uspješno dodana
-annotations.action.create.loaderror=Neuspjeh\: 
-annotations.action.create.error.unauthorized=Niste ovlašteni za dodavanje anotacija ovoj stranici. 
+annotations.action.create.loaderror=Neuspjeh\:
+annotations.action.create.error.unauthorized=Niste ovlašteni za dodavanje anotacija ovoj stranici.
 annotations.action.create.error.unauthorizedguest=Niste ovlašteni za dodavanje anotacija ovoj stranici. Najprije se pokušajte prijaviti.
 annotations.action.create.helpmessage=Da biste anotirali komad teksta, odaberite ga i kliknite {0}.
 annotations.action.create.error.wrongsyntax=Anotacije nisu dostupne za stranice s XWiki/1.0 sintaksom.
 annotations.action.create.error.notarget=Nije naznačena odredišna stranica za izradu anotacije.
 
 annotations.action.view.hide.text=sakrij
-annotations.action.view.form.loaderror=Neuspjeh\: 
+annotations.action.view.form.loaderror=Neuspjeh\:
 annotations.action.view.error.notfound=Ova anotacija više ne postoji. Molim osvježite stranicu za ažurirani pregled.
 annotations.action.view.thread=Vidi dretvu
 
-annotations.altered.text=Ova anotacija ne može biti prikazana jer anotirani tekst nije pronađen u stranici\: 
+annotations.altered.text=Ova anotacija ne može biti prikazana jer anotirani tekst nije pronađen u stranici\:
 annotations.updated.text=Ova anotacija je automatski premještena nakon ažuriranja stranice. Izvorno\:
 annotations.action.validate.text=[Validiraj]
 annotations.action.validate.tooltip=Validiraj automatsko ažuriranje odabranog teksta ove anotacije
 annotations.action.validate.success=Anotacija je uspješno validirana
-annotations.action.validate.loaderror=Neuspjeh\: 
+annotations.action.validate.loaderror=Neuspjeh\:
 
 annotations.filters.show=Razradi kriterije prikaza
 annotations.filters.nooption=Nema vrijednosti za filtriranje po "{0}"

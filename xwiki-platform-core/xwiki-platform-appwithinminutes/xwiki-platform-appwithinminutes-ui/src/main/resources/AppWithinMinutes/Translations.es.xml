@@ -131,7 +131,7 @@ platform.appwithinminutes.classEditorContentFieldName=Contenido
 platform.appwithinminutes.classEditorTitleFieldName=Título
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Borrar
-platform.appwithinminutes.classEditorConfigureFieldLabel=Configurar 
+platform.appwithinminutes.classEditorConfigureFieldLabel=Configurar
 platform.appwithinminutes.classEditorPreviewFieldLabel=Vista previa
 ### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=Hide configuration panel and apply changes
 platform.appwithinminutes.classEditorMoveFieldLabel=Mover
@@ -141,7 +141,7 @@ platform.appwithinminutes.classEditorMoveFieldLabel=Mover
 
 ### Date Picker
 ### Missing: platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Limpiar 
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Limpiar
 platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Ahora
 platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Hoy
 

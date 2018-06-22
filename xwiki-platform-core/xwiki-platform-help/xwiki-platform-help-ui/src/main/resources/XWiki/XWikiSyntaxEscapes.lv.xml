@@ -50,7 +50,7 @@ Viki tekstā iespējams atcelt (ekranēt) atsevišķas rakstzīmes, kuras normā
 
 |=Piemērs|=XWiki 1.0 sintakse|=Rezultāts
 |Atcelt sekojošās rakstzīmes darbību|{{{Sekojošā nav \[saite\]}}}(((
-{{info}}Lai parādītu \ rakstzīmi, to ievada kā HTML izņēmuma rakstzīmju virkni: \{{/info}}
+{{info}}Lai parādītu rakstzīmi, to ievada kā HTML izņēmuma rakstzīmju virkni: \{{/info}}
 )))|{{{Sekojošā nav [saite]}}}
 
 === 2.0 Escapes ===

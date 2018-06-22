@@ -225,7 +225,7 @@
         ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
         ## The object editor will move these 'includes' (link/script tags) in the head of the HTML page.
         ## Note that we need to pull the JavaScript/CSS only once, for the first object of a given type.
-        #skinExtensionHooks
+        #extensionHooks
         #displayClass($class)
       #else
         #foreach ($prop in $props)

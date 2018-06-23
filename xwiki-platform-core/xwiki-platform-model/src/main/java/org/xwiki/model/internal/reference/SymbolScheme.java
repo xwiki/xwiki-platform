@@ -39,9 +39,9 @@ public interface SymbolScheme
     Character getEscapeSymbol();
 
     /**
-     * @return the map containing all the symbols to separate Entity Types. The map's key is an Entity Type and
-     *         the value is another map who's key is the second Entity Type and its value is the character separating
-     *         the 2 Entity Types. For example you could have the {@code .} character separating an
+     * @return the map containing all the symbols to separate Entity Types. The map's key is an Entity Type and the
+     *         value is another map who's key is the second Entity Type and its value is the character separating the 2
+     *         Entity Types. For example you could have the {@code .} character separating an
      *         {@link EntityType#DOCUMENT} and a {@link EntityType#SPACE}. Note that a given Entity Type can have
      *         several separator characters if it can have several different parent types (e.g. a Space reference can
      *         have either a Space Entity Type or a Wiki Entity Type)
@@ -50,16 +50,47 @@ public interface SymbolScheme
 
     /**
      * @param type the Entity Type for which to get the list of strings to escape. For example for a SPACE Entity type
-     *             you could want to escape {@code .}, {@code :} and {@code \}.
+     *            you could want to escape {@code .}, {@code :} and {@code \}.
      * @return the various strings that require escaping for the passed Entity type
      */
     String[] getSymbolsRequiringEscapes(EntityType type);
 
     /**
      * @param type the Entity Type for which to get the list of strings to use to replace each escape returned by
-     *             {@link #getSymbolsRequiringEscapes(EntityType)}. For example for a SPACE Entity type you could
-     *             want to replace {@code .} with {@code \.}, {@code :} with  {@code \:} and {@code \} with {@code \\}
+     *            {@link #getSymbolsRequiringEscapes(EntityType)}. For example for a SPACE Entity type you could want to
+     *            replace {@code .} with {@code \.}, {@code :} with {@code \:} and {@code \} with {@code \\}
      * @return the various replacement strings to replace string that require escaping
      */
     String[] getReplacementSymbols(EntityType type);
+
+    /**
+     * @param type the Entity Type for which to get the parameters separator
+     * @return the {@link Character} used to mark where parameters or an entity reference element starts or null if the
+     *         passed {@link EntityType} does not support parameters
+     * @since 10.6RC1
+     */
+    Character getParameterSeparator(EntityType type);
+
+    /**
+     * @param type the Entity Type for which to get the default parameter
+     * @return the name of the default parameter which will be optional when serializing/unserializing parameters for
+     *         this entity type
+     * @since 10.6RC1
+     */
+    String getDefaultParameter(EntityType type);
+
+    /**
+     * @param type the Entity Type for which to get the list of strings to escape. For example for a SPACE Entity type
+     *            you could want to escape {@code .}, {@code :} and {@code \}.
+     * @return the various strings that require escaping for the passed Entity type
+     */
+    String[] getParameterSymbolsRequiringEscapes(EntityType type);
+
+    /**
+     * @param type the Entity Type for which to get the list of strings to use to replace each escape returned by
+     *            {@link #getSymbolsRequiringEscapes(EntityType)}. For example for a SPACE Entity type you could want to
+     *            replace {@code .} with {@code \.}, {@code :} with {@code \:} and {@code \} with {@code \\}
+     * @return the various replacement strings to replace string that require escaping
+     */
+    String[] getParameterReplacementSymbols(EntityType type);
 }

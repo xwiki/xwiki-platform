@@ -35,18 +35,20 @@ public class LocalPageReference extends AbstractLocalizedEntityReference
     /**
      * Create a new Page reference in the current wiki.
      * 
-     * @param pageName the name of the page containing the document, must not be null
+     * @param pageName the name of the page containing the page, must not be null
+     * @param pageNames an ordered list of the names of the pages containing the page from root page to last one, must
+     *            not be null
      */
-    public LocalPageReference(String pageName)
+    public LocalPageReference(String pageName, String... pageNames)
     {
-        super(pageName, EntityType.PAGE);
+        this(PageReference.toList(pageName, pageNames));
     }
 
     /**
      * Create a new Page reference in the current wiki.
      *
-     * @param pageNames an ordered list of the names of the pages containing the document from root page to last one,
-     *            must not be null
+     * @param pageNames an ordered list of the names of the pages containing the page from root page to last one, must
+     *            not be null
      */
     public LocalPageReference(List<String> pageNames)
     {
@@ -57,22 +59,12 @@ public class LocalPageReference extends AbstractLocalizedEntityReference
     /**
      * Create a new Page reference in the current wiki.
      * 
-     * @param pageName the name of the page containing the document, must not be null
+     * @param pageName the name of the page containing the page, must not be null
      * @param locale the new locale for this reference
      */
     public LocalPageReference(String pageName, Locale locale)
     {
-        super(pageName, EntityType.PAGE);
-
-        setLocale(locale);
-    }
-
-    /**
-     * @param documentReference the full document reference
-     */
-    public LocalPageReference(PageReference documentReference)
-    {
-        super(documentReference, documentReference.getWikiReference(), null);
+        super(pageName, EntityType.PAGE, locale);
     }
 
     /**
@@ -89,19 +81,72 @@ public class LocalPageReference extends AbstractLocalizedEntityReference
      */
     public LocalPageReference(EntityReference entityReference, Locale locale)
     {
-        super(entityReference);
-
-        setLocale(locale);
+        super(entityReference, locale);
     }
 
     /**
      * Create a new Page reference in the current wiki.
      * 
-     * @param pageName the name of the document, must not be null
+     * @param pageName the name of the page, must not be null
      * @param pageReference the reference of the page, must not be null
      */
     public LocalPageReference(String pageName, EntityReference pageReference)
     {
         super(pageName, EntityType.PAGE, pageReference);
+    }
+
+    /**
+     * @param pageReference the full page reference
+     */
+    public LocalPageReference(PageReference pageReference)
+    {
+        super(pageReference, pageReference.getWikiReference(), null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed parent.
+     * </p>
+     *
+     * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
+     * @exception IllegalArgumentException if the passed parent is not a valid page reference parent (ie either a page
+     *                reference or null)
+     */
+    @Override
+    protected void setParent(EntityReference parent)
+    {
+        if (parent != null && parent.getType() != EntityType.PAGE) {
+            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] in a local page reference");
+        }
+
+        super.setParent(parent != null ? new LocalPageReference(parent) : null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed type.
+     * </p>
+     *
+     * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
+     * @exception IllegalArgumentException if the passed type is not a page type
+     */
+    @Override
+    protected void setType(EntityType type)
+    {
+        if (type != EntityType.PAGE) {
+            throw new IllegalArgumentException("Invalid type [" + type + "] for a page reference");
+        }
+
+        super.setType(type);
+    }
+
+    @Override
+    public String toString()
+    {
+        // Compared to EntityReference we don't print the type since the type is already indicated by the fact that
+        // this is a LocalPageReference instance.
+        return TOSTRING_SERIALIZER.serialize(this);
     }
 }

@@ -102,6 +102,19 @@ public class PageReference extends AbstractLocalizedEntityReference
     }
 
     /**
+     * Create a page reference based on a page name and a parent entity reference. The entity reference may be either a
+     * wiki or a page reference.
+     *
+     * @param pageName the name of the page
+     * @param parent the entity reference
+     * @param locale the {@link Locale} of the page.
+     */
+    public PageReference(String pageName, EntityReference parent, Locale locale)
+    {
+        super(pageName, EntityType.PAGE, parent, locale);
+    }
+
+    /**
      * Create a page reference based on a page name and a parent page reference.
      *
      * @param wikiName the name of the wiki
@@ -118,11 +131,14 @@ public class PageReference extends AbstractLocalizedEntityReference
      *
      * @param wikiName the name of the wiki
      * @param pageNames the pages names
+     * @param locale the {@link Locale} of the entity.
      */
     public PageReference(String wikiName, List<String> pageNames, Locale locale)
     {
-        this(pageNames.get(pageNames.size() - 1), pageNames.size() > 1
-            ? new PageReference(wikiName, pageNames.subList(0, pageNames.size() - 1)) : new WikiReference(wikiName));
+        this(
+            pageNames.get(pageNames.size() - 1), pageNames.size() > 1
+                ? new PageReference(wikiName, pageNames.subList(0, pageNames.size() - 1)) : new WikiReference(wikiName),
+            locale);
     }
 
     /**
@@ -148,7 +164,7 @@ public class PageReference extends AbstractLocalizedEntityReference
         super(localPageReference, null, wikiReference);
     }
 
-    private static List<String> toList(String inputPageName, String... inputPageNames)
+    static List<String> toList(String inputPageName, String... inputPageNames)
     {
         List<String> pageNames = new ArrayList<>(inputPageNames.length + 1);
 
@@ -207,7 +223,7 @@ public class PageReference extends AbstractLocalizedEntityReference
             throw new IllegalArgumentException("Invalid type [" + type + "] for a page reference");
         }
 
-        super.setType(EntityType.PAGE);
+        super.setType(type);
     }
 
     @Override
@@ -223,5 +239,13 @@ public class PageReference extends AbstractLocalizedEntityReference
     public WikiReference getWikiReference()
     {
         return (WikiReference) extractReference(EntityType.WIKI);
+    }
+
+    @Override
+    public String toString()
+    {
+        // Compared to EntityReference we don't print the type since the type is already indicated by the fact that
+        // this is a PageReference instance.
+        return TOSTRING_SERIALIZER.serialize(this);
     }
 }

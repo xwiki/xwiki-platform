@@ -65,9 +65,7 @@ public class LocalDocumentReference extends AbstractLocalizedEntityReference
      */
     public LocalDocumentReference(String spaceName, String pageName, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE));
-
-        setLocale(locale);
+        super(pageName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE), locale);
     }
 
     /**
@@ -95,9 +93,7 @@ public class LocalDocumentReference extends AbstractLocalizedEntityReference
      */
     public LocalDocumentReference(EntityReference entityReference, Locale locale)
     {
-        super(entityReference);
-
-        setLocale(locale);
+        super(entityReference, locale);
     }
 
     /**
@@ -127,5 +123,13 @@ public class LocalDocumentReference extends AbstractLocalizedEntityReference
         }
 
         return spaceReference;
+    }
+
+    @Override
+    public String toString()
+    {
+        // Compared to EntityReference we don't print the type since the type is already indicated by the fact that
+        // this is a LocalDocumentReference instance.
+        return TOSTRING_SERIALIZER.serialize(this);
     }
 }

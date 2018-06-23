@@ -165,8 +165,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters parameters for this reference, may be null
      * @since 3.3M2
      */
-    protected EntityReference(String name, EntityType type, EntityReference parent,
-        Map<String, Serializable> parameters)
+    public EntityReference(String name, EntityType type, EntityReference parent, Map<String, Serializable> parameters)
     {
         setName(name);
         setType(type);
@@ -301,7 +300,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @return the value of the parameter
      * @since 5.3RC1
      */
-    final Map<String, Serializable> getParameters()
+    public final Map<String, Serializable> getParameters()
     {
         return this.parameters == null ? Collections.<String, Serializable>emptyMap() : this.parameters;
     }

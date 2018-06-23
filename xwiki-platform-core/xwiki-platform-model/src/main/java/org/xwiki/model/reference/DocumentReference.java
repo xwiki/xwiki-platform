@@ -91,8 +91,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
      */
     public DocumentReference(EntityReference reference, Locale locale)
     {
-        super(reference);
-        setLocale(locale);
+        super(reference, locale);
     }
 
     /**
@@ -159,8 +158,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
      */
     public DocumentReference(String wikiName, List<String> spaceNames, String pageName, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames));
-        setLocale(locale);
+        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames), locale);
     }
 
     /**
@@ -195,8 +193,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
      */
     public DocumentReference(String pageName, SpaceReference parent, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, parent);
-        setLocale(locale);
+        super(pageName, EntityType.DOCUMENT, parent, locale);
     }
 
     /**

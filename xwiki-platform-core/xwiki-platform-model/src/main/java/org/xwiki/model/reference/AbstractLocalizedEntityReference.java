@@ -34,7 +34,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     /**
      * Parameter key for the locale.
      */
-    static final String LOCALE = "LOCALE";
+    public static final String LOCALE = "locale";
 
     /**
      * Create a new root EntityReference.
@@ -48,6 +48,20 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     }
 
     /**
+     * Create a new root EntityReference.
+     *
+     * @param name name for the newly created entity reference, could not be null.
+     * @param type type for the newly created entity reference, could not be null.
+     * @param locale the {@link Locale} of the entity.
+     */
+    public AbstractLocalizedEntityReference(String name, EntityType type, Locale locale)
+    {
+        super(name, type);
+
+        setLocale(locale);
+    }
+
+    /**
      * Create a new EntityReference.
      *
      * @param name name for the newly created entity reference, could not be null.
@@ -57,6 +71,21 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     public AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent)
     {
         super(name, type, parent);
+    }
+
+    /**
+     * Create a new EntityReference.
+     *
+     * @param name name for the newly created entity reference, could not be null.
+     * @param type type for the newly created entity reference, could not be null.
+     * @param parent parent reference for the newly created entity reference, may be null.
+     * @param locale the {@link Locale} of the entity.
+     */
+    public AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent, Locale locale)
+    {
+        super(name, type, parent);
+
+        setLocale(locale);
     }
 
     /**

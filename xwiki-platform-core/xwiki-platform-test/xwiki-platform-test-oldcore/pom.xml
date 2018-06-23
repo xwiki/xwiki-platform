@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-test-oldcore</artifactId>
   <name>XWiki Platform - Test - Oldcore</name>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <description>Entry point for modules that need to manipulate Oldcore related test tools</description>
   <dependencies>
     <dependency>

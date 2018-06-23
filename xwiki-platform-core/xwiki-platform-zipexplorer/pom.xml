@@ -48,6 +48,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
+      <type>pom</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

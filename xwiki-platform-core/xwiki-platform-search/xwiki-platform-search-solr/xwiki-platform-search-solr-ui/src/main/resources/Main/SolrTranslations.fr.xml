@@ -173,7 +173,7 @@ solr.field.attauthor_display=Ajouté par
 solr.field.attdate=Date d'enregistrement
 solr.field.attsize=Taille de fichier
 
-solr.uix.docdoesnotexist.title=Recherchez-vous plutôt une de ces pièces jointes ?
+solr.uix.docdoesnotexist.title=Recherchez-vous plutôt une de ces pages ?
 solr.uix.attachmentdoesnotexist.title=Recherchez-vous plutôt une de ces pièces jointes ?
 
 ## Used to indicate where deprecated keys start

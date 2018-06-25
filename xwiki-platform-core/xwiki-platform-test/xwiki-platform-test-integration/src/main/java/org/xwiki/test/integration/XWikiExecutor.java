@@ -280,7 +280,11 @@ public class XWikiExecutor
         Map<String, String> newEnvironment = EnvironmentUtils.getProcEnvironment();
         newEnvironment.putAll(this.environment);
 
-        executor.execute(command, newEnvironment, resultHandler);
+        try {
+            executor.execute(command, newEnvironment, resultHandler);
+        } catch (Exception e) {
+            throw new Exception(String.format("Failed to execute command [%s]", commandLine), e);
+        }
 
         return resultHandler;
     }

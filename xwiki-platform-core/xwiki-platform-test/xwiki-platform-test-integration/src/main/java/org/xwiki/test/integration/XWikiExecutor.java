@@ -43,6 +43,7 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,12 @@ public class XWikiExecutor
             if (index > 0) {
                 this.executionDirectory += "-" + index;
             }
+        }
+        // Make sure the execution directory exists
+        try {
+            FileUtils.forceMkdir(new File(this.executionDirectory));
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Failed to create directory [%s]", this.executionDirectory), e);
         }
     }
 

@@ -86,7 +86,7 @@ solr.result.uploadedBy=Enregistré par {0} le {1} ({2})
 solr.result.highlightAll=Afficher et surligner toutes les occurrences
 
 solr.facets.title=Affinez votre recherche
-solr.facets.hint=Selectionnez une catégorie et activez les filtres sur les résultats
+solr.facets.hint=Séléctionnez une catégorie et activez les filtres sur les résultats
 solr.facets.resetAll=Tout réinitialiser
 solr.facets.expandAll=Tout étendre
 solr.facets.collapseAll=Tout réduire

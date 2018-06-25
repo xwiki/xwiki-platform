@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Represents the actions possible on the date picker.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
@@ -51,7 +51,7 @@ public class DatePicker extends BaseElement
 
     /**
      * Selects the specified year.
-     * 
+     *
      * @param year the year to select
      */
     public void setYear(String year)
@@ -71,7 +71,7 @@ public class DatePicker extends BaseElement
 
     /**
      * Selects the specified month.
-     * 
+     *
      * @param month the month to select
      */
     public void setMonth(String month)
@@ -91,7 +91,7 @@ public class DatePicker extends BaseElement
 
     /**
      * Selects the specified day from the current month.
-     * 
+     *
      * @param day the day to select
      */
     public void setDay(String day)
@@ -115,7 +115,7 @@ public class DatePicker extends BaseElement
 
     /**
      * Selects the specified hour.
-     * 
+     *
      * @param hour the hour to select
      */
     public void setHour(String hour)
@@ -135,7 +135,7 @@ public class DatePicker extends BaseElement
 
     /**
      * Selects the specified minute.
-     * 
+     *
      * @param minute the minute to select
      */
     public void setMinute(String minute)
@@ -173,8 +173,18 @@ public class DatePicker extends BaseElement
     }
 
     /**
+     * Close the date picker.
+     *
+     * @since 10.6RC1
+     */
+    public void close()
+    {
+        container.findElement(By.partialLinkText("OK")).click();
+    }
+
+    /**
      * Waits for the DatePicker popup to load.
-     * 
+     *
      * @since 6.3M2
      */
     public DatePicker waitToLoad()

@@ -20,11 +20,12 @@
 package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.SelectizeElement;
 import org.xwiki.test.ui.po.editor.UserPicker;
 
 /**
  * Represents the pane used to edit a 'User' class field.
- * 
+ *
  * @version $Id$
  * @since 4.5
  */
@@ -32,7 +33,7 @@ public class UserClassFieldEditPane extends ClassFieldEditPane
 {
     /**
      * Creates a new instance.
-     * 
+     *
      * @param fieldName the name of the date field
      */
     public UserClassFieldEditPane(String fieldName)
@@ -42,7 +43,7 @@ public class UserClassFieldEditPane extends ClassFieldEditPane
 
     /**
      * Sets whether this field supports multiple selection.
-     * 
+     *
      * @param multiple {@code true} to enable multiple selection, {@code false} to disable it
      */
     public void setMultipleSelect(boolean multiple)
@@ -59,5 +60,13 @@ public class UserClassFieldEditPane extends ClassFieldEditPane
     public UserPicker getUserPicker()
     {
         return new UserPicker(getDefaultValueInput());
+    }
+
+    /**
+     * @return the selectize element
+     */
+    public SelectizeElement getSelectize()
+    {
+        return new SelectizeElement(getDefaultValueInput());
     }
 }

@@ -163,7 +163,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   $.fn.xwikiSelectize = function(settings) {
-    return this.selectize($.extend({}, defaultSettings, settings))
+    var $select = this.selectize($.extend({}, defaultSettings, settings))
       .each(loadSelectedValues).each(handleDropdownWidth)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.
@@ -171,5 +171,35 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
           .closest('.xwiki-livetable').attr('id');
         liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
       });
+    var selectize = $select[0].selectize;
+    var load = selectize.settings.load;
+    var addLoading = function() {
+      selectize.$control_input.addClass("loading");
+    }
+    var removeLoading = function() {
+      selectize.$control_input.removeClass("loading");
+    }
+    var timer = -1;
+    var clearTimer = function() {
+      clearTimeout(timer);
+      timer = -1;
+    }
+    selectize.settings.load = function(text, callback) {
+      clearTimer();
+      addLoading();
+      load(text, callback);
+    }
+    selectize.on("type", function() {
+      addLoading();
+      clearTimeout(timer);
+      timer = setTimeout(removeLoading, 1000);
+    });
+    selectize.on("load", function() {
+      if (timer == -1) {
+        removeLoading();
+      }
+    });
+
+    return $select;
   };
 });

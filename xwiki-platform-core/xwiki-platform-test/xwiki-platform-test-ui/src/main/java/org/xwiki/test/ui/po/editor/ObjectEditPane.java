@@ -22,10 +22,11 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.SelectizeElement;
 
 /**
  * Represents a group of form fields that are used to edit an object of a specific type.
- * 
+ *
  * @version $Id$
  * @since 5.1RC1
  */
@@ -44,7 +45,7 @@ public class ObjectEditPane extends FormElement
     /**
      * Creates a new edit pane for an object of the specified type. The form fields from the given container should
      * correspond to properties of the specified type.
-     * 
+     *
      * @param container the element that wraps the form fields used to edit the object
      * @param className the object type
      * @param objectNumber the object number (identifies the object in the set of objects of the same type)
@@ -59,7 +60,7 @@ public class ObjectEditPane extends FormElement
 
     /**
      * Opens the date picker for the specified date property of the edited object.
-     * 
+     *
      * @param datePropertyName the name of a date property of the edited object
      * @return the date picker
      */
@@ -79,8 +80,17 @@ public class ObjectEditPane extends FormElement
     }
 
     /**
+     * @param propertyName the name of a property
+     * @return a selectize for a property of type List of Users
+     */
+    public SelectizeElement getSelectize(String propertyName)
+    {
+        return new SelectizeElement(getDriver().findElementWithoutWaiting(getForm(), byPropertyName(propertyName)));
+    }
+
+    /**
      * Creates a locator for the input fields corresponding to the given object property.
-     * 
+     *
      * @param propertyName the name of an object property
      * @return the locator for the input field corresponding to the specified property
      */

@@ -35,7 +35,7 @@
   </description>
   <properties>
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-eventstream</xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

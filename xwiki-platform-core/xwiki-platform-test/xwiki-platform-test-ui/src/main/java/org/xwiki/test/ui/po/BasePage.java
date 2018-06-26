@@ -668,7 +668,7 @@ public class BasePage extends BaseElement
      */
     public boolean hasLeftPanel(String panelTitle)
     {
-        return getDriver().hasElementWithoutWaiting(By.xpath("//div[@id = 'leftPanels']/div[@class = 'panel expanded "
-            + panelTitle + "']"));
+        return getDriver().hasElementWithoutWaiting(By.xpath(
+            "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
     }
 }

@@ -42,14 +42,14 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link org.xwiki.icon.internal.DefaultIconRenderer}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 public class DefaultIconRendererTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultIconRenderer> mocker =
-            new MockitoComponentMockingRule<>(DefaultIconRenderer.class);
+        new MockitoComponentMockingRule<>(DefaultIconRenderer.class);
 
     private SkinExtension skinExtension;
 
@@ -145,7 +145,7 @@ public class DefaultIconRendererTest
         iconSet.addIcon("test", new Icon("blabla"));
 
         when(velocityRenderer.render("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />"))
-                .thenReturn("<img src=\"blabla.png\" />");
+            .thenReturn("<img src=\"blabla.png\" />");
 
         // Test
         String result = mocker.getComponentUnderTest().renderHTML("test", iconSet);
@@ -206,6 +206,73 @@ public class DefaultIconRendererTest
     }
 
     @Test
+    public void renderCustom() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        iconSet.setRenderCustom("$icon.png");
+        iconSet.addIcon("test", new Icon("blabla"));
+
+        when(velocityRenderer.render("#set($icon = \"blabla\")\n$icon.png")).thenReturn("blabla.png");
+
+        // Test
+        String result = mocker.getComponentUnderTest().renderCustom("test", iconSet);
+
+        // Verify
+        assertEquals("blabla.png", result);
+    }
+
+    @Test
+    public void renderCustomWithCSS() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        iconSet.setCss("css");
+        iconSet.addIcon("test", new Icon("blabla"));
+        when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
+
+        // Test
+        mocker.getComponentUnderTest().renderCustom("test", iconSet);
+
+        // Verify
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("rel", "stylesheet");
+        verify(linkExtension).use(eq("velocityParsedCSS"), eq(parameters));
+        verify(skinExtension, never()).use(any());
+        verify(jsExtension, never()).use(any());
+    }
+
+    @Test
+    public void renderCustomWithSSX() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        iconSet.setSsx("ssx");
+        iconSet.addIcon("test", new Icon("blabla"));
+
+        // Test
+        mocker.getComponentUnderTest().renderCustom("test", iconSet);
+
+        // Verify
+        verify(skinExtension).use("ssx");
+        verify(linkExtension, never()).use(any());
+        verify(jsExtension, never()).use(any());
+    }
+
+    @Test
+    public void renderCustomWithJSX() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        iconSet.setJsx("jsx");
+        iconSet.addIcon("test", new Icon("blabla"));
+
+        // Test
+        mocker.getComponentUnderTest().renderCustom("test", iconSet);
+
+        // Verify
+        verify(jsExtension).use("jsx");
+        verify(linkExtension, never()).use(any());
+        verify(skinExtension, never()).use(any());
+    }
+
+    @Test
     public void renderNonExistentIcon() throws Exception
     {
         IconSet iconSet = new IconSet("default");
@@ -238,5 +305,4 @@ public class DefaultIconRendererTest
         assertNotNull(caughtException);
         assertEquals(exception, caughtException);
     }
-
 }

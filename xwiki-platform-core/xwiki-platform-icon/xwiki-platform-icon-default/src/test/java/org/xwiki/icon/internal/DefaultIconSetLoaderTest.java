@@ -47,14 +47,14 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link org.xwiki.icon.internal.DefaultIconSetLoader}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 public class DefaultIconSetLoaderTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultIconSetLoader> mocker =
-            new MockitoComponentMockingRule<>(DefaultIconSetLoader.class);
+        new MockitoComponentMockingRule<>(DefaultIconSetLoader.class);
 
     private DocumentAccessBridge documentAccessBridge;
 
@@ -76,6 +76,7 @@ public class DefaultIconSetLoaderTest
         assertEquals("IconThemes.JS", result.getJsx());
         assertEquals("{{html clean=\"false\"}}<span class=\"fa fa-$icon\"></span>{{/html}}", result.getRenderWiki());
         assertEquals("<span class=\"fa fa-$icon\"></span>", result.getRenderHTML());
+        assertEquals("fa fa-$icon", result.getRenderCustom());
         assertEquals("anchor", result.getIcon("transmit").getValue());
         assertEquals("globe", result.getIcon("earth").getValue());
         assertEquals(IconType.FONT, result.getType());

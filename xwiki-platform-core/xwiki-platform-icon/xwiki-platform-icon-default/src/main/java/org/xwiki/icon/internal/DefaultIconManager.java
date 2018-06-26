@@ -34,8 +34,8 @@ import org.xwiki.icon.IconSetManager;
 /**
  * Default implementation of {@link org.xwiki.icon.IconManager}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 @Component
 @Singleton
@@ -92,6 +92,28 @@ public class DefaultIconManager implements IconManager
     }
 
     @Override
+    public String renderCustom(String iconName) throws IconException
+    {
+        return iconRenderer.renderCustom(iconName, getIconSet(iconName));
+    }
+
+    @Override
+    public String renderCustom(String iconName, String iconSetName) throws IconException
+    {
+        return this.renderCustom(iconName, iconSetName, true);
+    }
+
+    @Override
+    public String renderCustom(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        IconSet iconSet = getIconSet(iconName, iconSetName, fallback);
+        if (iconSet == null) {
+            return "";
+        }
+        return iconRenderer.renderCustom(iconName, iconSet);
+    }
+
+    @Override
     public List<String> getIconNames() throws IconException
     {
         return iconSetManager.getCurrentIconSet().getIconNames();
@@ -103,26 +125,31 @@ public class DefaultIconManager implements IconManager
         return iconSetManager.getIconSet(iconSetName).getIconNames();
     }
 
-    private IconSet getIconSet(String iconName) throws IconException
+    @Override
+    public IconSet getIconSet(String iconName) throws IconException
     {
-        // First: try to render with the current icon set
-        IconSet currentIconSet = iconSetManager.getCurrentIconSet();
-        if (currentIconSet != null && currentIconSet.getIcon(iconName) != null) {
-            return currentIconSet;
-        }
-
-        // Fallback to the default icon set
-        return iconSetManager.getDefaultIconSet();
+        return getIconSet(iconName, iconSetManager.getCurrentIconSet().getName());
     }
 
-    private IconSet getIconSet(String iconName, String iconSetName, boolean fallback) throws IconException
+    @Override
+    public IconSet getIconSet(String iconName, String iconSetName) throws IconException
+    {
+        return getIconSet(iconName, iconSetName, true);
+    }
+
+    @Override
+    public IconSet getIconSet(String iconName, String iconSetName, boolean fallback) throws IconException
     {
         // Get the specified icon set
         IconSet iconSet = iconSetManager.getIconSet(iconSetName);
 
         // Fallback if necessary
-        if ((iconSet == null || iconSet.getIcon(iconName) == null) && fallback) {
-            return iconSetManager.getDefaultIconSet();
+        if (iconSet == null || iconSet.getIcon(iconName) == null) {
+            if (fallback) {
+                iconSet = iconSetManager.getDefaultIconSet();
+            } else {
+                return null;
+            }
         }
 
         // Return the icon set

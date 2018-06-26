@@ -26,14 +26,15 @@ import org.xwiki.component.annotation.Role;
 /**
  * Component to render an icon, depending on the current icon theme set on the preferences.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 @Role
 public interface IconManager
 {
     /**
      * Generate the wiki syntax to display an icon with the current icon theme.
+     *
      * @param iconName name of the icon to render
      * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
@@ -42,29 +43,30 @@ public interface IconManager
 
     /**
      * Generate the wiki syntax to display an icon with the specified icon theme.
+     *
      * @param iconName name of the icon to render
      * @param iconSetName name of the icon set to use
      * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
-     *
      * @since 6.3RC1
      */
     String render(String iconName, String iconSetName) throws IconException;
 
     /**
      * Generate the wiki syntax to display an icon with the specified icon theme.
+     *
      * @param iconName name of the icon to render
      * @param iconSetName name of the icon set to use
      * @param fallback enable the fallback to the default icon theme if the icon does not exist
      * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
-     *
      * @since 6.3RC1
      */
     String render(String iconName, String iconSetName, boolean fallback) throws IconException;
 
     /**
      * Generate the HTML code to display an icon.
+     *
      * @param iconName name of the icon to render
      * @return the HTML code that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
@@ -73,44 +75,127 @@ public interface IconManager
 
     /**
      * Generate the HTML code to display an icon with the specified icon theme.
+     *
      * @param iconName name of the icon to render
      * @param iconSetName name of the icon set to use
      * @return the HTML code that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
-     *
      * @since 6.3RC1
      */
     String renderHTML(String iconName, String iconSetName) throws IconException;
 
     /**
      * Generate the HTML code to display an icon with the specified icon theme.
+     *
      * @param iconName name of the icon to render
      * @param iconSetName name of the icon set to use
      * @param fallback enable the fallback to the default icon theme if the icon does not exist
      * @return the HTML code that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
-     *
      * @since 6.3RC1
      */
     String renderHTML(String iconName, String iconSetName, boolean fallback) throws IconException;
 
     /**
+     * Generate the custom code to display an icon.
+     *
+     * @param iconName name of the icon to render
+     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    default String renderCustom(String iconName) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Generate the custom code to display an icon with the specified icon theme.
+     *
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    default String renderCustom(String iconName, String iconSetName) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Generate the custom code to display an icon with the specified icon theme.
+     *
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    default String renderCustom(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Get the list of the names of all available icons in the current icon set.
+     *
      * @return the icon names
      * @throws IconException if problem occurs
-     *
      * @since 6.4M1
      */
     List<String> getIconNames() throws IconException;
 
     /**
      * Get the list of the names of all available icons in the specified icon set.
+     *
      * @param iconSetName name of the icon set
      * @return the icon names
      * @throws IconException if problem occurs
-     *
      * @since 6.4M1
      */
     List<String> getIconNames(String iconSetName) throws IconException;
 
+    /**
+     * Get the icon set for the specified icon name.
+     *
+     * @param iconName name of the icon
+     * @return the icon set used for the specified icon name
+     * @throws IconException if problem occurs
+     * @since 10.6RC1
+     */
+    default IconSet getIconSet(String iconName) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Get the icon set for the specified icon name.
+     *
+     * @param iconName name of the icon
+     * @param iconSetName name of the icon set to use
+     * @return the icon set used for the specified icon name
+     * @throws IconException if problem occurs
+     * @since 10.6RC1
+     */
+    default IconSet getIconSet(String iconName, String iconSetName) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Get the icon set for the specified icon name.
+     *
+     * @param iconName name of the icon
+     * @param iconSetName name of the icon set to use
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the icon set used for the specified icon name
+     * @throws IconException if problem occurs
+     * @since 10.6RC1
+     */
+    default IconSet getIconSet(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
 }

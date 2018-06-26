@@ -32,8 +32,8 @@ import org.xwiki.script.service.ScriptService;
 /**
  * Script services to render an icon from the current icon set.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 @Component
 @Named("icon")
@@ -52,10 +52,14 @@ public class IconManagerScriptService implements ScriptService
     private IconSetManager iconSetManager;
 
     @Inject
+    private IconRenderer iconRenderer;
+
+    @Inject
     private Execution execution;
 
     /**
-     * Display an icon from the current {@link org.xwiki.icon.IconSet}.
+     * Display an icon with wiki code from the current {@link org.xwiki.icon.IconSet}.
+     *
      * @param iconName name of the icon to display
      * @return the wiki code that displays the icon
      */
@@ -70,7 +74,8 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     * Display an icon with wiki code from the specified {@link org.xwiki.icon.IconSet}.
+     *
      * @param iconName name of the icon to display
      * @param iconSetName name of the icon set
      * @return the wiki code that displays the icon
@@ -87,7 +92,8 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     * Display an icon with wiki code from the specified {@link org.xwiki.icon.IconSet}.
+     *
      * @param iconName name of the icon to display
      * @param iconSetName name of the icon set
      * @param fallback enable the fallback to the default icon theme if the icon does not exist
@@ -105,7 +111,8 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Display an icon from the current {@link org.xwiki.icon.IconSet}.
+     * Display an icon with HTML code from the current {@link org.xwiki.icon.IconSet}.
+     *
      * @param iconName name of the icon to display
      * @return the HTML code that displays the icon
      */
@@ -120,7 +127,8 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     * Display an icon with HTML code from the specified {@link org.xwiki.icon.IconSet}.
+     *
      * @param iconName name of the icon to display
      * @param iconSetName name of the icon set
      * @return the HTML code that displays the icon
@@ -138,6 +146,7 @@ public class IconManagerScriptService implements ScriptService
 
     /**
      * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     *
      * @param iconName name of the icon to display
      * @param iconSetName name of the icon set
      * @param fallback enable the fallback to the default icon theme if the icon does not exist
@@ -155,7 +164,96 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
+     * Display an icon with custom code from the current {@link org.xwiki.icon.IconSet}.
+     *
+     * @param iconName name of the icon to display
+     * @return the custom code that displays the icon
+     * @since 10.6RC1
+     */
+    public String renderCustom(String iconName)
+    {
+        try {
+            return iconManager.renderCustom(iconName);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Display an icon with custom code from the specified {@link org.xwiki.icon.IconSet}.
+     *
+     * @param iconName name of the icon to display
+     * @param iconSetName name of the icon set
+     * @return the custom code that displays the icon
+     * @since 10.6RC1
+     */
+    public String renderCustom(String iconName, String iconSetName)
+    {
+        try {
+            return iconManager.renderCustom(iconName, iconSetName);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Display an icon with custom code from the specified {@link org.xwiki.icon.IconSet}.
+     *
+     * @param iconName name of the icon to display
+     * @param iconSetName name of the icon set
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the custom code that displays the icon
+     * @since 10.6RC1
+     */
+    public String renderCustom(String iconName, String iconSetName, boolean fallback)
+    {
+        try {
+            return iconManager.renderCustom(iconName, iconSetName, fallback);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Pull the necessary resources to use the default icon set.
+     *
+     * @since 10.6RC1
+     */
+    public void use()
+    {
+        try {
+            IconSet iconSet = iconSetManager.getDefaultIconSet();
+            use(iconSet.getName());
+        } catch (IconException e) {
+            setLastError(e);
+        }
+    }
+
+    /**
+     * Pull the necessary resources to use the specified icon set.
+     *
+     * @param iconSetName name of the icon set
+     * @since 10.6RC1
+     */
+    public void use(String iconSetName)
+    {
+        try {
+            IconSet iconSet = iconSetManager.getIconSet(iconSetName);
+            if (iconSet == null) {
+                iconSet = iconSetManager.getDefaultIconSet();
+            }
+            iconRenderer.use(iconSet);
+        } catch (IconException e) {
+            setLastError(e);
+        }
+    }
+
+    /**
      * Get the name of all the icon sets present in the current wiki.
+     *
      * @return the list of the name of the icon sets present in the current wiki.
      * @since 6.4M1
      */
@@ -171,6 +269,7 @@ public class IconManagerScriptService implements ScriptService
 
     /**
      * Get the list of the names of all available icons in the current icon set.
+     *
      * @return the icon names
      * @since 6.4M1
      */
@@ -186,6 +285,7 @@ public class IconManagerScriptService implements ScriptService
 
     /**
      * Get the list of the names of all available icons in the specified icon set.
+     *
      * @param iconSetName name of the icon set
      * @return the icon names
      * @since 6.4M1
@@ -202,6 +302,7 @@ public class IconManagerScriptService implements ScriptService
 
     /**
      * Get the name of the current icon set.
+     *
      * @return the name of the current icon set
      * @since 6.4M2
      */
@@ -221,6 +322,7 @@ public class IconManagerScriptService implements ScriptService
 
     /**
      * Get the error generated while performing the previously called action.
+     *
      * @return an eventual exception or {@code null} if no exception was thrown
      * @since 6.3RC1
      */

@@ -58,6 +58,8 @@ public class DefaultIconSetLoader implements IconSetLoader
 
     private static final String RENDER_HTML_PROPERTY_NAME = "xwiki.iconset.render.html";
 
+    private static final String RENDER_CUSTOM_PROPERTY_NAME = "xwiki.iconset.render.custom";
+
     private static final String ICON_TYPE_PROPERTY_NAME = "xwiki.iconset.type";
 
     private static final String ERROR_MSG = "Failed to load the IconSet [%s].";
@@ -77,7 +79,7 @@ public class DefaultIconSetLoader implements IconSetLoader
             String content = doc.getContent();
             // The name of the icon set is stored in the IconThemesCode.IconThemeClass XObject of the document
             DocumentReference iconClassRef = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
-                    "IconThemesCode", "IconThemeClass");
+                "IconThemesCode", "IconThemeClass");
             String name = (String) documentAccessBridge.getProperty(iconSetReference, iconClassRef, "name");
             // Load the icon set
             return loadIconSet(new StringReader(content), name);
@@ -98,21 +100,23 @@ public class DefaultIconSetLoader implements IconSetLoader
             // Load all the keys
             for (String key : properties.stringPropertyNames()) {
                 String value = properties.getProperty(key);
-                if (key.equals(CSS_PROPERTY_NAME)) {
+                if (CSS_PROPERTY_NAME.equals(key)) {
                     iconSet.setCss(value);
-                } else if (key.equals(SSX_PROPERTY_NAME)) {
+                } else if (SSX_PROPERTY_NAME.equals(key)) {
                     iconSet.setSsx(value);
-                } else if (key.equals(JSX_PROPERTY_NAME)) {
+                } else if (JSX_PROPERTY_NAME.equals(key)) {
                     iconSet.setJsx(value);
-                } else if (key.equals(RENDER_WIKI_PROPERTY_NAME)) {
+                } else if (RENDER_WIKI_PROPERTY_NAME.equals(key)) {
                     iconSet.setRenderWiki(value);
-                } else if (key.equals(RENDER_HTML_PROPERTY_NAME)) {
+                } else if (RENDER_HTML_PROPERTY_NAME.equals(key)) {
                     iconSet.setRenderHTML(value);
-                } else if (key.equals(ICON_TYPE_PROPERTY_NAME)) {
+                } else if (RENDER_CUSTOM_PROPERTY_NAME.equals(key)) {
+                    iconSet.setRenderCustom(value);
+                } else if (ICON_TYPE_PROPERTY_NAME.equals(key)) {
                     iconSet.setType(IconType.valueOf(value.toUpperCase()));
                 } else {
                     Icon icon = new Icon();
-                    icon.setValue(properties.getProperty(key));
+                    icon.setValue(value);
                     iconSet.addIcon(key, icon);
                 }
             }

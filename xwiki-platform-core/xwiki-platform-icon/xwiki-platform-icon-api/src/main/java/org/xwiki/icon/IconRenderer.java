@@ -24,14 +24,15 @@ import org.xwiki.component.annotation.Role;
 /**
  * Component to render an icon (either with Wiki Syntax or HTML).
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 @Role
 public interface IconRenderer
 {
     /**
      * Generate the wiki syntax to display an icon.
+     *
      * @param iconName name of the icon to render
      * @param iconSet icon set that contains the icon to display
      * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
@@ -41,10 +42,37 @@ public interface IconRenderer
 
     /**
      * Generate the HTML code to display an icon.
+     *
      * @param iconName name of the icon to render
      * @param iconSet icon set that contains the icon to display
      * @return the HTML code that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
      */
     String renderHTML(String iconName, IconSet iconSet) throws IconException;
+
+    /**
+     * Generate the custom code to display an icon.
+     *
+     * @param iconName name of the icon to render
+     * @param iconSet icon set that contains the icon to display
+     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    default String renderCustom(String iconName, IconSet iconSet) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Pull the necessary resources to use the specified icon set.
+     *
+     * @param iconSet icon set to use
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    default void use(IconSet iconSet) throws IconException
+    {
+        throw new UnsupportedOperationException();
+    }
 }

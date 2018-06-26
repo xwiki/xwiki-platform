@@ -27,8 +27,8 @@ import java.util.Map;
 /**
  * A collection of icons, with some properties to display them.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 public class IconSet
 {
@@ -46,10 +46,13 @@ public class IconSet
 
     private String renderHTML;
 
+    private String renderCustom;
+
     private IconType type;
 
     /**
      * Constructor.
+     *
      * @param name name of the icon set
      */
     public IconSet(String name)
@@ -68,6 +71,7 @@ public class IconSet
 
     /**
      * Add an icon to the icon set.
+     *
      * @param name name of the icon
      * @param icon the icon to add
      */
@@ -86,6 +90,7 @@ public class IconSet
 
     /**
      * Set the name of the icon set.
+     *
      * @param name the name to set
      */
     public void setName(String name)
@@ -103,6 +108,7 @@ public class IconSet
 
     /**
      * Set the URL of a CSS file to enable to display this icon set properly.
+     *
      * @param css URL of the CSS file (it can contains velocity code).
      */
     public void setCss(String css)
@@ -120,6 +126,7 @@ public class IconSet
 
     /**
      * Set the page name of a SSX document to enable to display the icon set properly.
+     *
      * @param ssx the SSX document name
      */
     public void setSsx(String ssx)
@@ -137,6 +144,7 @@ public class IconSet
 
     /**
      * Set the page name of a JSX document to enable to display the icon set properly.
+     *
      * @param jsx the JSX document name
      */
     public void setJsx(String jsx)
@@ -154,6 +162,7 @@ public class IconSet
 
     /**
      * Set the wiki code (containing velocity) to display an icon from this set.
+     *
      * @param renderWiki wiki code to set
      */
     public void setRenderWiki(String renderWiki)
@@ -171,11 +180,32 @@ public class IconSet
 
     /**
      * Set the HTML code (containing velocity) to display an icon from this set.
+     *
      * @param renderHTML the HTML code to set
      */
     public void setRenderHTML(String renderHTML)
     {
         this.renderHTML = renderHTML;
+    }
+
+    /**
+     * @return the custom code to manually display an icon from this set.
+     * @since 10.6RC1
+     */
+    public String getRenderCustom()
+    {
+        return renderCustom;
+    }
+
+    /**
+     * Set the custom code to manually display an icon from this set.
+     *
+     * @param renderCustom the custom code to set
+     * @since 10.6RC1
+     */
+    public void setRenderCustom(String renderCustom)
+    {
+        this.renderCustom = renderCustom;
     }
 
     /**
@@ -188,6 +218,7 @@ public class IconSet
 
     /**
      * Set the type of icons that contains this set.
+     *
      * @param type type to set
      */
     public void setType(IconType type)

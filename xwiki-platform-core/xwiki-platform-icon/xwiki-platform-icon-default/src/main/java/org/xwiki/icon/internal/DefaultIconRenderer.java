@@ -36,8 +36,8 @@ import org.xwiki.skinx.SkinExtension;
 /**
  * Default implementation of {@link org.xwiki.icon.IconRenderer}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 public class DefaultIconRenderer implements IconRenderer
 {
@@ -68,7 +68,12 @@ public class DefaultIconRenderer implements IconRenderer
         return render(iconSet, iconName, iconSet.getRenderHTML());
     }
 
-    private String render(IconSet iconSet, String iconName, String renderer) throws IconException
+    @Override public String renderCustom(String iconName, IconSet iconSet) throws IconException
+    {
+        return render(iconSet, iconName, iconSet.getRenderCustom());
+    }
+
+    @Override public void use(IconSet iconSet) throws IconException
     {
         if (!StringUtils.isBlank(iconSet.getCss())) {
             activeCSS(iconSet);
@@ -79,6 +84,11 @@ public class DefaultIconRenderer implements IconRenderer
         if (!StringUtils.isBlank(iconSet.getJsx())) {
             activeJSX(iconSet);
         }
+    }
+
+    private String render(IconSet iconSet, String iconName, String renderer) throws IconException
+    {
+        use(iconSet);
         return renderIcon(iconSet, iconName, renderer);
     }
 

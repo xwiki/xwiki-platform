@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,28 +16,35 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.menu.test.po;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>10.6-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-menu</artifactId>
-  <name>XWiki Platform - Menu</name>
-  <packaging>pom</packaging>
-  <description>Menu application</description>
-  <modules>
-    <module>xwiki-platform-menu-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-menu-test</module>
-      </modules>
-    </profile>
-  </profiles>
-</project>
+import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
+
+/**
+ * Represents the Menu.WebHome page.
+ * 
+ * @version $Id$
+ * @since 10.6RC1
+ */
+public class MenuHomePage extends ApplicationHomePage
+{
+    /**
+     * Go to the home page of the Menu application.
+     */
+    public static MenuHomePage gotoPage()
+    {
+        ApplicationHomePage.gotoPage("Menu");
+        return new MenuHomePage();
+    }
+
+    public static String getSpace()
+    {
+        return "Menu";
+    }
+
+    public static String getPage()
+    {
+        return "WebHome";
+    }
+}

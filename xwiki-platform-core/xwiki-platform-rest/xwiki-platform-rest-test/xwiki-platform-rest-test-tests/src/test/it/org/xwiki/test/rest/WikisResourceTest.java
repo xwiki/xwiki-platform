@@ -392,7 +392,7 @@ public class WikisResourceTest extends AbstractHttpTest
 
         this.solrUtils.waitEmpyQueue();
 
-        String query = String.format("%s?q=\"%s\"", this.pageName, buildURI(WikisSearchQueryResource.class, getWiki()));
+        String query = String.format("%s?q=\"%s\"", buildURI(WikisSearchQueryResource.class, getWiki()), this.pageName);
         GetMethod getMethod = executeGet(URIUtil.encodeQuery(query));
         Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
 

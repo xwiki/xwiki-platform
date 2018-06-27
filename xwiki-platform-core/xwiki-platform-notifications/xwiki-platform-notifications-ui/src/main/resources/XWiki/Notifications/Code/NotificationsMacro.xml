@@ -360,8 +360,8 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       }
       // Store the data in the DOM element so that any javascript code can retrieve it
       notif.data('notif', entry);
-      // Add the notification entry
-      self.macro.append(notif);
+      // Add the notification entry (before the RSS link)
+      notif.insertBefore(self.macro.find('.notifications-macro-rss-link'));
       // Add the "mark as read" button if the notif is not already read
       if (!entry.read) {
         // Style the read button
@@ -521,6 +521,10 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   max-width: 500px;
   min-height: 50px;
   width: 100%;
+}
+
+.notifications-macro-rss-link {
+  text-align: right;
 }
 
 /***********************************************
@@ -800,6 +804,21 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+# Generate the REST URL to display the same notifications but in the RSS format
+#set ($restURL = $services.rest.url($doc.documentReference))
+#set ($restURL = "${restURL.substring(0, $restURL.indexOf('/rest'))}/rest/notifications/rss")
+#set ($restURL = "${restURL}?userId=$!escapetool.url($services.model.serialize($xcontext.userReference, 'default'))")
+#set ($restURL = "${restURL}&amp;useUserPreferences=$!escapetool.url($xcontext.macro.params.useUserPreferences)")
+#set ($restURL = "${restURL}&amp;count=$!escapetool.url($xcontext.macro.params.count)")
+#set ($restURL = "${restURL}&amp;displayOwnEvents=$!escapetool.url($xcontext.macro.params.displayOwnEvents)")
+#set ($restURL = "${restURL}&amp;displayMinorEvents=$!escapetool.url($xcontext.macro.params.displayMinorEvents)")
+#set ($restURL = "${restURL}&amp;displaySystemEvents=$!escapetool.url($xcontext.macro.params.displaySystemEvents)")
+#set ($restURL = "${restURL}&amp;displayReadEvents=$!escapetool.url($xcontext.macro.params.displayReadEvents)")
+#set ($restURL = "${restURL}&amp;wikis=$!escapetool.url($xcontext.macro.params.wikis)")
+#set ($restURL = "${restURL}&amp;spaces=$!escapetool.url($xcontext.macro.params.spaces)")
+#set ($restURL = "${restURL}&amp;pages=$!escapetool.url($xcontext.macro.params.pages)")
+#set ($restURL = "${restURL}&amp;users=$!escapetool.url($xcontext.macro.params.users)")
+#set ($restURL = "${restURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
 {{html clean="false"}}
 &lt;div class="notifications-macro loading" 
   data-userId="$!escapetool.xml($services.model.serialize($xcontext.userReference, 'default'))"
@@ -815,6 +834,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   data-users="$!escapetool.xml($users)"
   data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)"
 &gt;
+  &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$restURL" target="_blank"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 {{/html}}
 #end

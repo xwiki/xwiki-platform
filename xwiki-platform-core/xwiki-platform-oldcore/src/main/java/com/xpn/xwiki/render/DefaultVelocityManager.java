@@ -232,10 +232,6 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
             .getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
     }
 
-    /**
-     * @return the key used to cache the Velocity Engines. We have one Velocity Engine per skin which has a macros.vm
-     *         file on the filesystem. Right now we don't support macros.vm defined in custom skins in wiki pages.
-     */
     private Template getVelocityEngineMacrosTemplate()
     {
         Template template = null;

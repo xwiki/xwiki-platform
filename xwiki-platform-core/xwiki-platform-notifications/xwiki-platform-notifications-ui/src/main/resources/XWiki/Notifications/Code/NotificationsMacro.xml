@@ -319,7 +319,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
           btn.text("$escapetool.javascript($services.localization.render('notifications.menu.more'))");
           btn.addClass('btn').addClass('btn-default').addClass('btn-block');
           loadMore.append(btn);
-          self.macro.append(loadMore);
+          loadMore.insertBefore(self.macro.find('.notifications-macro-rss-link'));
           btn.click(function(event) {
             loadMore.text('').addClass('loading').css('height', '50px');
             // We use the date of the last displayed event as an offset to display those that come next

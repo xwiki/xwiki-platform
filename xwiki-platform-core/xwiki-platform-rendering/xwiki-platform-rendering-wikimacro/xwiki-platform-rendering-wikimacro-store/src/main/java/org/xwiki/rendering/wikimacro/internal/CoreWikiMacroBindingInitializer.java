@@ -29,7 +29,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.internal.macro.wikibridge.WikiMacroBindingInitializer;
+import org.xwiki.rendering.macro.wikibridge.WikiMacro;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -39,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Provide old core related wiki macro bindings.
- * 
+ *
  * @version $Id$
  * @since 2.5M1
  */
@@ -75,9 +76,10 @@ public class CoreWikiMacroBindingInitializer implements WikiMacroBindingInitiali
     }
 
     @Override
-    public void initialize(DocumentReference macroDocumentReference, WikiMacroParameters parameters,
-        String macroContent, MacroTransformationContext context, Map<String, Object> macroBinding)
+    public void initialize(WikiMacro wikiMacro, WikiMacroParameters parameters, String macroContent,
+        MacroTransformationContext context, Map<String, Object> macroBinding)
     {
+        DocumentReference macroDocumentReference = wikiMacro.getDocumentReference();
         try {
             XWikiDocument document = getContext().getWiki().getDocument(macroDocumentReference, getContext());
             macroBinding.put(MACRO_DOC_KEY, document.newDocument(getContext()));

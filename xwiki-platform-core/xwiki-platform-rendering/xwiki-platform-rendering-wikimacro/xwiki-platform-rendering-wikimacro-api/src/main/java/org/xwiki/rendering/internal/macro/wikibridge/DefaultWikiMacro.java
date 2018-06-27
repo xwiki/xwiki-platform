@@ -44,6 +44,7 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
@@ -189,7 +190,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
                 this.componentManager.getInstanceList(WikiMacroBindingInitializer.class);
 
             for (WikiMacroBindingInitializer bindingInitializer : bindingInitializers) {
-                bindingInitializer.initialize(this.macroDocumentReference, parameters, macroContent, context,
+                bindingInitializer.initialize(this, parameters, macroContent, context,
                     macroBinding);
             }
         } catch (ComponentLookupException e) {

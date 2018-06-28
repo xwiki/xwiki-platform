@@ -768,9 +768,9 @@ $fn
 #macro(panelheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.documentReference"))
+#set ($specialClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.documentReference"))
 ## We keep this class for compatibility purpose but the previous one should be used instead.
-#set ($deprecatedClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.name"))
+#set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 <div class="panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
 <h1 class="xwikipaneltitle">$title</h1>
@@ -785,9 +785,9 @@ $fn
 #macro(panelhiddenheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.documentReference"))
+#set ($specialClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.documentReference"))
 ## We keep this class for compatibility purpose but the previous one should be used instead.
-#set ($deprecatedClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.name"))
+#set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 <div class="panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
 <h1 class="xwikipaneltitle hidden">$title</h1>
@@ -802,9 +802,9 @@ $fn
 #macro(largepanelheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.documentReference"))
+#set ($specialClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.documentReference"))
 ## We keep this class for compatibility purpose but the previous one should be used instead.
-#set ($deprecatedClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.name"))
+#set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 <div class="large panel $expanded $!specialClassAttribute $!deprecatedClassAttribute">
 <h1 class="xwikipaneltitle">$title</h1>

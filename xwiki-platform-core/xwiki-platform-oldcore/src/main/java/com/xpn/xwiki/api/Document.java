@@ -43,6 +43,7 @@ import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
@@ -247,6 +248,24 @@ public class Document extends Api
     public DocumentReference getDocumentReferenceWithLocale()
     {
         return this.doc.getDocumentReferenceWithLocale();
+    }
+
+    /**
+     * @return the reference of the document as {@link PageReference} without the {@link Locale}
+     * @since 10.6RC1
+     */
+    public PageReference getPageReference()
+    {
+        return this.doc.getPageReference();
+    }
+
+    /**
+     * @return the reference of the document as {@link PageReference} including the {@link Locale}
+     * @since 10.6RC1
+     */
+    public PageReference getPageReferenceWithLocale()
+    {
+        return this.doc.getPageReferenceWithLocale();
     }
 
     /**

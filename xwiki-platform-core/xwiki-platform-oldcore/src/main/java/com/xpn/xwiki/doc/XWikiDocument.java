@@ -584,10 +584,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private DocumentReference parentReferenceCache;
 
     /**
+     * Cache the document reference with locale resolved kept for improved performance (so that we don't have to resolve
+     * it every time getPageReference() is called.
+     */
+    private DocumentReference documentReferenceWithLocaleCache;
+
+    /**
      * Cache the page reference resolved kept for improved performance (so that we don't have to resolve it every time
      * getPageReference() is called.
      */
     private PageReference pageReferenceCache;
+
+    /**
+     * Cache the page reference with locale resolved kept for improved performance (so that we don't have to resolve it
+     * every time getPageReference() is called.
+     */
+    private PageReference pageReferenceWithLocaleCache;
 
     /**
      * @see #getKey()
@@ -1385,6 +1397,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return this.documentReference;
     }
 
+    /**
+     * @return the reference of the document as {@link PageReference}
+     * @since 10.6RC1
+     */
     public PageReference getPageReference()
     {
         if (this.pageReferenceCache == null) {
@@ -1395,12 +1411,29 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @return the reference of the document as {@link PageReference} including the {@link Locale}
+     * @since 10.6RC1
+     */
+    public PageReference getPageReferenceWithLocale()
+    {
+        if (this.pageReferenceWithLocaleCache == null) {
+            this.pageReferenceWithLocaleCache = new PageReference(getPageReference(), getLocale());
+        }
+
+        return this.pageReferenceWithLocaleCache;
+    }
+
+    /**
      * @return the {@link DocumentReference} of the document also containing the document {@link Locale}
      * @since 5.3M2
      */
     public DocumentReference getDocumentReferenceWithLocale()
     {
-        return new DocumentReference(this.documentReference, getLocale());
+        if (this.documentReferenceWithLocaleCache == null) {
+            this.documentReferenceWithLocaleCache = new DocumentReference(this.documentReference, getLocale());
+        }
+
+        return this.documentReferenceWithLocaleCache;
     }
 
     /**
@@ -1456,7 +1489,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         this.keyCache = null;
         this.localKeyCache = null;
         this.parentReferenceCache = null;
+        this.documentReferenceWithLocaleCache = null;
         this.pageReferenceCache = null;
+        this.pageReferenceWithLocaleCache = null;
     }
 
     /**

@@ -768,10 +768,7 @@ $fn
 #macro(panelheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = '')
-#if ($paneldoc)
-  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
-#end
+#set ($specialClassAttribute = $util.convertToAlphaNumeric($!paneldoc))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 <div class="panel expanded $!specialClassAttribute">
 <h1 class="xwikipaneltitle">$title</h1>
@@ -786,10 +783,7 @@ $fn
 #macro(panelhiddenheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = '')
-#if ($paneldoc && $paneldoc != '')
-  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
-#end
+#set ($specialClassAttribute = $util.convertToAlphaNumeric($!paneldoc))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 <div class="panel expanded $!specialClassAttribute">
 <h1 class="xwikipaneltitle hidden">$title</h1>
@@ -804,10 +798,7 @@ $fn
 #macro(largepanelheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = '')
-#if ($paneldoc && $paneldoc != '')
-  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
-#end
+#set ($specialClassAttribute = $util.convertToAlphaNumeric($!paneldoc))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 <div class="large panel $expanded $!specialClassAttribute">
 <h1 class="xwikipaneltitle">$title</h1>

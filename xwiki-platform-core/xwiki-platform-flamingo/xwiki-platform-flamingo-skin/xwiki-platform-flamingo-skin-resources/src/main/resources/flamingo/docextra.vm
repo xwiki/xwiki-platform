@@ -62,7 +62,8 @@
       <ul class="xwikitabbar" id="docExtrasTabsUl">
         #foreach($docextra in $docextras)
           <li id="${docextra.get(0)}tab">
-            <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")">
+            ## Note: Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
+            <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")" rel="nofollow">
               $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
             </a>
           </li>

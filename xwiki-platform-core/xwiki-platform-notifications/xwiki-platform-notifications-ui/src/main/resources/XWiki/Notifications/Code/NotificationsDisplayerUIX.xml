@@ -809,12 +809,12 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         &lt;div class="col-xs-8 text-right"&gt;
           &lt;p&gt;
             &lt;span class="notifications-header-link"&gt;
-              &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')" class="notifications-header-link"&gt;
+              &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')" class="notifications-header-link" rel="nofollow"&gt;
                 $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
               &lt;/a&gt;
             &lt;/span&gt;
             &lt;span class="notifications-header-link"&gt;
-              &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;
+              &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings" rel="nofollow"&gt;
                 $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))
               &lt;/a&gt;
             &lt;/span&gt;

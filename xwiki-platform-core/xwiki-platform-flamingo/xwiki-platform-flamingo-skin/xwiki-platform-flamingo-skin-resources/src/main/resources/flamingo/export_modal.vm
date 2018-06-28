@@ -34,10 +34,10 @@
     </div>
     <div id="exportModelOfficeCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="exportModalHeadingOffice">
       <div class="panel-body">
-        <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.pdf')</a>
+        <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.pdf')</a>
         #if("$!{services.officemanager.serverState}" == 'Connected')
-          <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.odt')</a>
-          <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.rtf')</a>
+          <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.odt')</a>
+          <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.rtf')</a>
         #end
         #foreach ($exportExtension in $exportExtensions)
           #if ($exportExtension.parameters.category == 'office')
@@ -82,14 +82,14 @@
             })
           </div>
         #end
-        <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.html')</a>
+        <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.html')</a>
         #if($hasAdmin && $services.xar.isXARExportAvailable())
           #set($exportURL = "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,'default'))")
           #if ($doc.name == 'WebHome')
             ## When nested page also export WebPreferences which contain among other things the right of this entity
             #set($exportURL = "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,'default'))}.WebPreferences")
           #end
-          <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary">$services.localization.render('core.menu.export.xar')</a>
+          <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.xar')</a>
         #end
         #foreach ($exportExtension in $exportExtensions)
           $services.rendering.render($exportExtension.execute(), 'html/5.0')

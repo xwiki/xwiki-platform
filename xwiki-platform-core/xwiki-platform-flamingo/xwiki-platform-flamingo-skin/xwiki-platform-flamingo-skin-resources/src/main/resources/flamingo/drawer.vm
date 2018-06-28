@@ -15,11 +15,11 @@
       <div class="brand-links">
         #if ($xcontext.user != 'XWiki.XWikiGuest')
           <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.user, false)</a>
-          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout" rel="nofollow">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
         #else
-          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogin">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('login'))</a>
+          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogin" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('login'))</a>
           #if ($xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
-            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('register'))</a>
+            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('register'))</a>
           #end
         #end
          ##

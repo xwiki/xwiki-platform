@@ -120,7 +120,7 @@
   #if ($hasGlobalAdmin &amp;&amp; $isAdminAppInstalled)
     #template('drawer_macros.vm')
     #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
-    #drawerItem($adminwikiaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin.wiki')), 'tmAdminWiki')
+    #drawerItem($adminwikiaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin.wiki')), 'tmAdminWiki', 'rel="nofollow"')
   #end
 {{/html}}{{/velocity}}
 </content>

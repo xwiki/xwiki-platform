@@ -161,6 +161,21 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      *
      * @param name name for the newly created entity, could not be null.
      * @param type type for the newly created entity, could not be null.
+     * @param parameters parameters for this reference, may be null
+     * @since 10.6RC1
+     */
+    public EntityReference(String name, EntityType type, Map<String, Serializable> parameters)
+    {
+        setName(name);
+        setType(type);
+        setParameters(parameters);
+    }
+
+    /**
+     * Create a new EntityReference. Note: Entity reference are immutable since 3.3M2.
+     *
+     * @param name name for the newly created entity, could not be null.
+     * @param type type for the newly created entity, could not be null.
      * @param parent parent reference for the newly created entity reference, may be null.
      * @param parameters parameters for this reference, may be null
      * @since 3.3M2
@@ -171,6 +186,18 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         setType(type);
         setParent(parent);
         setParameters(parameters);
+    }
+
+    /**
+     * Clone an EntityReference, but use the specified paramaters.
+     *
+     * @param reference the reference to clone
+     * @param parameters parameters for this reference, may be null
+     * @since 10.6RC1
+     */
+    public EntityReference(EntityReference reference, Map<String, Serializable> parameters)
+    {
+        this(reference.getName(), reference.getType(), reference.getParent(), parameters);
     }
 
     /**
@@ -266,14 +293,14 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     protected void setParameter(String name, Serializable value)
     {
         if (value != null) {
-            if (parameters == null) {
-                parameters = new TreeMap<String, Serializable>();
+            if (this.parameters == null) {
+                this.parameters = new TreeMap<>();
             }
-            parameters.put(name, value);
+            this.parameters.put(name, value);
         } else if (parameters != null) {
-            parameters.remove(name);
-            if (parameters.size() == 0) {
-                parameters = null;
+            this.parameters.remove(name);
+            if (this.parameters.size() == 0) {
+                this.parameters = null;
             }
         }
     }
@@ -381,8 +408,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * Extract the first entity of the given type from this one by traversing the current entity to the root.
      *
      * @param type the type of the entity to be extracted
-     * @return the first entity of the given type in the current entity when traversing to the root or null if no
-     *         entity of the passed type exist
+     * @return the first entity of the given type in the current entity when traversing to the root or null if no entity
+     *         of the passed type exist
      * @since 7.4M1
      */
     public EntityReference extractFirstReference(EntityType type)
@@ -522,7 +549,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         EntityReference currentReference1 = this;
         EntityReference currentReference2 = otherReference;
 
-        while (currentReference1 != null && currentReference1.getType().ordinal() >= to.ordinal()) {
+        while (currentReference1 != null
+            && (currentReference1.getType() == to || currentReference1.getType().isAllowedAncestor(to))) {
             if (!currentReference1.equalsNonRecursive(currentReference2)) {
                 return false;
             }
@@ -531,7 +559,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             currentReference2 = currentReference2.getParent();
         }
 
-        if (currentReference2 == null || currentReference2.getType().ordinal() < to.ordinal()) {
+        if (currentReference2 == null || to.isAllowedAncestor(currentReference2.getType())) {
             return true;
         }
 

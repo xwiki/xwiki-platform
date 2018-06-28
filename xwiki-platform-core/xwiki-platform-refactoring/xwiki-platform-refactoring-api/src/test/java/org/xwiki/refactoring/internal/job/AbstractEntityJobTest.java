@@ -50,6 +50,6 @@ public abstract class AbstractEntityJobTest extends AbstractJobTest
 
         EntityReferenceProvider defaultEntityReferenceProvider = getMocker().getInstance(EntityReferenceProvider.class);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
-            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT, null));
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
     }
 }

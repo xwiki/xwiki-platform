@@ -19,56 +19,51 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.component.util.ReflectionUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.test.TestConstants;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the deprecated {@link DefaultEntityReferenceProvider}.
  *
  * @version $Id$
  */
+@ComponentTest
 public class DefaultEntityReferenceProviderTest implements TestConstants
 {
-    private Mockery mockery = new Mockery();
+    @MockComponent
+    private ModelConfiguration configuration;
 
-    private EntityReferenceProvider provider;
+    @InjectMockComponents
+    private DefaultEntityReferenceProvider provider;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    public void beforeEach()
     {
-        this.provider = new DefaultEntityReferenceProvider();
-        final ModelConfiguration mockConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.provider, "configuration", mockConfiguration);
-
-        this.mockery.checking(new Expectations()
-        {
-            {
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.SPACE);
-                will(returnValue(DEFAULT_SPACE));
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue(DEFAULT_WIKI));
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.DOCUMENT);
-                will(returnValue(DEFAULT_PAGE));
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.ATTACHMENT);
-                will(returnValue(DEFAULT_ATTACHMENT));
-            }
-        });
+        when(this.configuration.getDefaultReferenceValue(EntityType.SPACE)).thenReturn(DEFAULT_SPACE);
+        when(this.configuration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn(DEFAULT_WIKI);
+        when(this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT);
+        when(this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT);
+        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE)).thenReturn(DEFAULT_PAGE);
+        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE_ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT);
     }
 
     @Test
     public void testGetDefaultValue()
     {
-        Assert.assertEquals(DEFAULT_PAGE_REFERENCE, this.provider.getDefaultReference(EntityType.DOCUMENT));
-        Assert.assertEquals(DEFAULT_SPACE_REFERENCE, this.provider.getDefaultReference(EntityType.SPACE));
-        Assert.assertEquals(DEFAULT_ATTACHMENT_REFERENCE, this.provider.getDefaultReference(EntityType.ATTACHMENT));
-        Assert.assertEquals(DEFAULT_WIKI_REFERENCE, this.provider.getDefaultReference(EntityType.WIKI));
+        assertEquals(DEFAULT_DOCUMENT_REFERENCE, this.provider.getDefaultReference(EntityType.DOCUMENT));
+        assertEquals(DEFAULT_SPACE_REFERENCE, this.provider.getDefaultReference(EntityType.SPACE));
+        assertEquals(DEFAULT_ATTACHMENT_REFERENCE, this.provider.getDefaultReference(EntityType.ATTACHMENT));
+        assertEquals(DEFAULT_WIKI_REFERENCE, this.provider.getDefaultReference(EntityType.WIKI));
+        assertEquals(DEFAULT_PAGE_REFERENCE, this.provider.getDefaultReference(EntityType.PAGE));
+        assertEquals(DEFAULT_PAGE_ATTACHMENT_REFERENCE, this.provider.getDefaultReference(EntityType.PAGE_ATTACHMENT));
     }
 }

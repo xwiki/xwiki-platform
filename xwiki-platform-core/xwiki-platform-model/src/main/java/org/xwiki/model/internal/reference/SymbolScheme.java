@@ -93,4 +93,16 @@ public interface SymbolScheme
      * @return the various replacement strings to replace string that require escaping
      */
     String[] getParameterReplacementSymbols(EntityType type);
+
+    /**
+     * @param type the Entity Type for which to get the current reference keyword or null if not supported
+     * @return the {@link String} used to indicate current reference (for example ".")
+     */
+    String getCurrentReferenceKeyword(EntityType type);
+
+    /**
+     * @param type the Entity Type for which to get the parent reference keyword or null if not supported
+     * @return the {@link String} used to indicate parent reference (for example "..")
+     */
+    String getParentReferenceKeyword(EntityType type);
 }

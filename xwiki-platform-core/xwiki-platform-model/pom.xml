@@ -33,7 +33,6 @@
   <description>XWiki Model (Wiki, Space, Document, etc)</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>
@@ -69,6 +68,7 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
     </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -89,7 +89,9 @@
             <id>default</id>
             <configuration>
               <excludes>
-                org/xwiki/model/reference/EntityReferenceSet.java
+                org/xwiki/model/internal/reference/AbstractStringEntityReferenceResolver.java,
+                org/xwiki/model/reference/EntityReferenceSet.java,
+                org/xwiki/model/script/ModelScriptService.java
               </excludes>
             </configuration>
           </execution>

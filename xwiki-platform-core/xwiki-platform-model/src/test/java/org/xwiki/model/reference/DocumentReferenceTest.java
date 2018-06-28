@@ -40,7 +40,7 @@ public class DocumentReferenceTest
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         Assert.assertEquals(reference, new DocumentReference(new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI, null)))));
+            new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
         Assert.assertEquals(reference, new DocumentReference("wiki", Arrays.asList("space"), "page"));
         Assert.assertEquals(reference, new DocumentReference("page", new SpaceReference("space", new WikiReference(
             "wiki"))));

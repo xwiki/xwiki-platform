@@ -76,11 +76,17 @@ com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentPageAttachmentReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentPageReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentReferenceObjectReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentReferencePageObjectReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentReferencePageReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentSpaceReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentStringPageAttachmentReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentStringPageReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver

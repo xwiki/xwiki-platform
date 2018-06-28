@@ -29,6 +29,7 @@ import javax.inject.Provider;
 
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a page. Note that nested pages are supported.
@@ -36,6 +37,7 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 10.6RC1
  */
+@Unstable
 public class PageReference extends AbstractLocalizedEntityReference
 {
     /**
@@ -112,6 +114,17 @@ public class PageReference extends AbstractLocalizedEntityReference
     public PageReference(String pageName, EntityReference parent, Locale locale)
     {
         super(pageName, EntityType.PAGE, parent, locale);
+    }
+
+    /**
+     * Clone an EntityReference and change/add the passed Locale.
+     *
+     * @param reference the reference to clone
+     * @param locale the {@link Locale} of the new reference
+     */
+    public PageReference(EntityReference reference, Locale locale)
+    {
+        super(reference, locale);
     }
 
     /**

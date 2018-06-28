@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Represents a type of entity (ie a Model Object such as a Wiki, a Space, a Document, an Attachment, etc).
  * 
@@ -32,9 +34,6 @@ import java.util.Locale;
  */
 public enum EntityType
 {
-    // Note that order below is important since it creates an order.
-    // For example: EntityType.WIKI.ordinal() < EntityType.SPACE.ordinal()
-
     /**
      * Represents a Wiki Entity.
      */
@@ -88,13 +87,15 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
-    PAGE(WIKI, (EntityType) null),
+    @Unstable
+    PAGE(WIKI, null),
 
     /**
      * Represents an Attachment Entity in a page.
      * 
      * @since 10.6RC1
      */
+    @Unstable
     PAGE_ATTACHMENT(PAGE),
 
     /**
@@ -102,6 +103,7 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
+    @Unstable
     PAGE_OBJECT(PAGE),
 
     /**
@@ -109,6 +111,7 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
+    @Unstable
     PAGE_OBJECT_PROPERTY(PAGE_OBJECT),
 
     /**
@@ -116,6 +119,7 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
+    @Unstable
     PAGE_CLASS_PROPERTY(PAGE);
 
     // TODO: should probably introduce a PAGE_BLOCK when we decide how we want it (we might want to move a two types or
@@ -128,6 +132,8 @@ public enum EntityType
 
     private final List<EntityType> allowedParents;
 
+    private final boolean[] allowedAncestors = new boolean[13];
+
     EntityType(EntityType... allowedParents)
     {
         this.lowerCase = name().toLowerCase(Locale.US);
@@ -137,6 +143,18 @@ public enum EntityType
             list.add(parent != null ? parent : this);
         }
         this.allowedParents = Collections.unmodifiableList(list);
+        setParentTypes(this.allowedParents);
+    }
+
+    private void setParentTypes(List<EntityType> parents)
+    {
+        for (EntityType parent : parents) {
+            if (!this.allowedAncestors[parent.ordinal()]) {
+                this.allowedAncestors[parent.ordinal()] = true;
+
+                setParentTypes(parent.getAllowedParents());
+            }
+        }
     }
 
     /**
@@ -155,5 +173,15 @@ public enum EntityType
     public List<EntityType> getAllowedParents()
     {
         return this.allowedParents;
+    }
+
+    /**
+     * @param type the type
+     * @return true of the passed type is a possible ancestor of the passed type
+     * @since 10.6RC1
+     */
+    public boolean isAllowedAncestor(EntityType type)
+    {
+        return this.allowedAncestors[type.ordinal()];
     }
 }

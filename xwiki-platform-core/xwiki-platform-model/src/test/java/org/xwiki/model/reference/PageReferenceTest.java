@@ -40,7 +40,7 @@ public class PageReferenceTest
     {
         PageReference reference = new PageReference("wiki", "space", "page");
         assertEquals(reference, new PageReference(new EntityReference("page", EntityType.PAGE,
-            new EntityReference("space", EntityType.PAGE, new EntityReference("wiki", EntityType.WIKI, null)))));
+            new EntityReference("space", EntityType.PAGE, new EntityReference("wiki", EntityType.WIKI)))));
         assertEquals(reference, new PageReference("wiki", Arrays.asList("space", "page")));
         assertEquals(reference, new PageReference("page", new PageReference("space", new WikiReference("wiki"))));
     }

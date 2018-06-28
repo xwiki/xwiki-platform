@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a page in the current wiki.
@@ -30,6 +31,7 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 10.6RC1
  */
+@Unstable
 public class LocalPageReference extends AbstractLocalizedEntityReference
 {
     /**

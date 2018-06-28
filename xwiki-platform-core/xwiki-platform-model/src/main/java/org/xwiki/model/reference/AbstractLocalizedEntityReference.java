@@ -19,8 +19,10 @@
  */
 package org.xwiki.model.reference;
 
+import java.io.Serializable;
 import java.util.Locale;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.model.EntityType;
 
 /**
@@ -140,5 +142,22 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     public Locale getLocale()
     {
         return (Locale) getParameter(LOCALE);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Make sure to store the locale as {@link Locale}.
+     * 
+     * @see org.xwiki.model.reference.EntityReference#setParameter(java.lang.String, java.io.Serializable)
+     */
+    @Override
+    protected void setParameter(String name, Serializable value)
+    {
+        if (value != null && !(value instanceof Locale) && LOCALE.equals(name)) {
+            super.setParameter(name, LocaleUtils.toLocale(value.toString()));
+        } else {
+            super.setParameter(name, value);
+        }
     }
 }

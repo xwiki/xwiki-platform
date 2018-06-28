@@ -67,7 +67,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
         EntityReferenceProvider referenceProvider = this.resolverMocker.getInstance(EntityReferenceProvider.class);
         when(referenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(referenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_PAGE_REFERENCE);
+        when(referenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT_REFERENCE);
         when(referenceProvider.getDefaultReference(EntityType.ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT_REFERENCE);
         when(referenceProvider.getDefaultReference(EntityType.OBJECT)).thenReturn(DEFAULT_OBJECT_REFERENCE);
         when(referenceProvider.getDefaultReference(EntityType.OBJECT_PROPERTY)).thenReturn(
@@ -90,22 +90,22 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
         assertEquals("wiki:space.page", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:space.", EntityType.DOCUMENT);
-        assertEquals("wiki:space.defpage", serializer.serialize(reference));
+        assertEquals("wiki:space.defdocument", serializer.serialize(reference));
 
         reference = resolver.resolve("space.", EntityType.DOCUMENT);
-        assertEquals("defwiki:space.defpage", serializer.serialize(reference));
+        assertEquals("defwiki:space.defdocument", serializer.serialize(reference));
 
         reference = resolver.resolve("page", EntityType.DOCUMENT);
         assertEquals("defwiki:defspace.page", serializer.serialize(reference));
 
         reference = resolver.resolve(".", EntityType.DOCUMENT);
-        assertEquals("defwiki:defspace.defpage", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument", serializer.serialize(reference));
 
         reference = resolver.resolve(null, EntityType.DOCUMENT);
-        assertEquals("defwiki:defspace.defpage", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument", serializer.serialize(reference));
 
         reference = resolver.resolve("", EntityType.DOCUMENT);
-        assertEquals("defwiki:defspace.defpage", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
         assertEquals("wiki1.wiki2:wiki3:some.space.page", serializer.serialize(reference));
@@ -146,18 +146,18 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
         assertEquals("wiki:space.page@filename", serializer.serialize(reference));
 
         reference = resolver.resolve("", EntityType.ATTACHMENT);
-        assertEquals("defwiki:defspace.defpage@deffilename", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument@deffilename", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:space.page@my.png", EntityType.ATTACHMENT);
         assertEquals("wiki:space.page@my.png", serializer.serialize(reference));
 
         reference = resolver.resolve("some:file.name", EntityType.ATTACHMENT);
-        assertEquals("defwiki:defspace.defpage@some:file.name", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument@some:file.name", serializer.serialize(reference));
 
         // Test escapes
 
         reference = resolver.resolve(":.\\@", EntityType.ATTACHMENT);
-        assertEquals("defwiki:defspace.defpage@:.\\@", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument@:.\\@", serializer.serialize(reference));
     }
 
     @Test
@@ -180,11 +180,11 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
 
         // default values
         reference = resolver.resolve("", EntityType.OBJECT);
-        assertEquals("defwiki:defspace.defpage^defobject", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^defobject", serializer.serialize(reference));
 
         // property reference with no object
         reference = resolver.resolve("wiki:space.page.property", EntityType.OBJECT);
-        assertEquals("defwiki:defspace.defpage^wiki:space.page.property", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^wiki:space.page.property", serializer.serialize(reference));
 
         // test escaping character
         reference = resolver.resolve("wiki:space.page^Obje\\^ct", EntityType.OBJECT);
@@ -194,7 +194,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
         assertEquals("wiki:spa^ce.page^Obje\\^ct", serializer.serialize(reference));
 
         reference = resolver.resolve(":.\\^@", EntityType.OBJECT);
-        assertEquals("defwiki:defspace.defpage^:.\\^@", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^:.\\^@", serializer.serialize(reference));
     }
 
     /**
@@ -208,22 +208,22 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
 
         // default values
         reference = resolver.resolve("", EntityType.OBJECT_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^defobject.defobjproperty", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^defobject.defobjproperty", serializer.serialize(reference));
 
         // using separators
         reference = resolver.resolve("space^page@attachment", EntityType.OBJECT_PROPERTY);
         Assert
-            .assertEquals("defwiki:defspace.defpage^defobject.space^page@attachment", serializer.serialize(reference));
+            .assertEquals("defwiki:defspace.defdocument^defobject.space^page@attachment", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:space^object", EntityType.OBJECT_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^defobject.wiki:space^object", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^defobject.wiki:space^object", serializer.serialize(reference));
 
         // test escaping character
         reference = resolver.resolve("wiki:space.page^xwiki.class[0].prop\\.erty", EntityType.OBJECT_PROPERTY);
         assertEquals("wiki:space.page^xwiki.class[0].prop\\.erty", serializer.serialize(reference));
 
         reference = resolver.resolve(":\\.^@", EntityType.OBJECT_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^defobject.:\\.^@", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^defobject.:\\.^@", serializer.serialize(reference));
     }
 
     /**
@@ -237,11 +237,11 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
 
         // default values
         reference = resolver.resolve("", EntityType.CLASS_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^defclassproperty", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^defclassproperty", serializer.serialize(reference));
 
         // property reference with no object
         reference = resolver.resolve("wiki:space.page.property", EntityType.CLASS_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^wiki:space.page.property", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^wiki:space.page.property", serializer.serialize(reference));
 
         // test escaping character
         reference = resolver.resolve("wiki:space.page^Obje\\^ct", EntityType.CLASS_PROPERTY);
@@ -251,7 +251,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
         assertEquals("wiki:spa^ce.page^Obje\\^ct", serializer.serialize(reference));
 
         reference = resolver.resolve(":.\\^@", EntityType.CLASS_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^:.\\^@", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defdocument^:.\\^@", serializer.serialize(reference));
     }
 
     @Test

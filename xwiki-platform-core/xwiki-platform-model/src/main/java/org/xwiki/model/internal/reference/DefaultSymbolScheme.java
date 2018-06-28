@@ -130,6 +130,10 @@ public class DefaultSymbolScheme implements SymbolScheme
 
     private static final Map<EntityType, ParameterConfiguration> PARAMETER_SEPARATORS = new EnumMap<>(EntityType.class);
 
+    private static final Map<EntityType, String> KEYWORDS_CURRENT = new EnumMap<>(EntityType.class);
+
+    private static final Map<EntityType, String> KEYWORDS_PARENT = new EnumMap<>(EntityType.class);
+
     static {
         SEPARATORS.put(EntityType.WIKI, Collections.emptyMap());
 
@@ -140,6 +144,8 @@ public class DefaultSymbolScheme implements SymbolScheme
         SEPARATORS.put(EntityType.PAGE, pageSeparators);
         PARAMETER_SEPARATORS.put(EntityType.PAGE,
             new ParameterConfiguration(CPARAMETERSEP, AbstractLocalizedEntityReference.LOCALE));
+        KEYWORDS_CURRENT.put(EntityType.PAGE, ".");
+        KEYWORDS_PARENT.put(EntityType.PAGE, "..");
 
         SEPARATORS.put(EntityType.PAGE_ATTACHMENT, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
         PARAMETER_SEPARATORS.put(EntityType.PAGE_ATTACHMENT, new ParameterConfiguration(CPARAMETERSEP));
@@ -276,5 +282,17 @@ public class DefaultSymbolScheme implements SymbolScheme
         ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
 
         return configuration != null ? configuration.replacements : null;
+    }
+
+    @Override
+    public String getCurrentReferenceKeyword(EntityType type)
+    {
+        return KEYWORDS_CURRENT.get(type);
+    }
+
+    @Override
+    public String getParentReferenceKeyword(EntityType type)
+    {
+        return KEYWORDS_PARENT.get(type);
     }
 }

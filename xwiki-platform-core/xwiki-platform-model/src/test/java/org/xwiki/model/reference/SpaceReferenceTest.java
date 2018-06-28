@@ -59,7 +59,7 @@ public class SpaceReferenceTest
     {
         try {
             new SpaceReference(new EntityReference("space", EntityType.SPACE,
-                new EntityReference("whatever", EntityType.DOCUMENT, null)));
+                new EntityReference("whatever", EntityType.DOCUMENT)));
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
             Assert.assertEquals("Invalid parent reference [Document whatever] in a space reference",

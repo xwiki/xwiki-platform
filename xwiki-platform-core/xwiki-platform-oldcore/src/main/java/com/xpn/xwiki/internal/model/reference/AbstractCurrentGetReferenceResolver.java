@@ -44,10 +44,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 public abstract class AbstractCurrentGetReferenceResolver
 {
     @Inject
-    @Named("currentgetdocument")
-    private DocumentReferenceResolver<EntityReference> documentResolver;
-
-    @Inject
     @Named("current")
     private DocumentReferenceResolver<EntityReference> currentDocumentResolver;
 

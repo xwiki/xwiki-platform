@@ -151,10 +151,10 @@ public class EntityReferenceSet
             for (Map.Entry<EntityType, EntityReferenceEntryChildren> entry : this.children.entrySet()) {
                 EntityReferenceEntryChildren typedChilrendEntry = entry.getValue();
 
-                if (typedChilrendEntry.childrenType.ordinal() > entityType.ordinal()) {
+                if (typedChilrendEntry.childrenType.isAllowedAncestor(entityType)) {
                     // Only return a potential child of the passed type
                     if (typedChildren == null
-                        || typedChildren.childrenType.ordinal() > typedChilrendEntry.childrenType.ordinal()) {
+                        || typedChildren.childrenType.isAllowedAncestor(typedChilrendEntry.childrenType)) {
                         typedChildren = typedChilrendEntry;
                     }
                 }
@@ -365,9 +365,10 @@ public class EntityReferenceSet
 
         // Check if the reference is shorter than the exclude(s)
         return currentEntry.children != null
-        // Check if the excluded parameters are the same as the one the reference contains
-            || (currentEntry.parameters != null && CollectionUtils.intersection(
-                getParametersKeys(currentEntry.parameters), reference.getParameters().keySet()).isEmpty());
+            // Check if the excluded parameters are the same as the one the reference contains
+            || (currentEntry.parameters != null && CollectionUtils
+                .intersection(getParametersKeys(currentEntry.parameters), reference.getParameters().keySet())
+                .isEmpty());
     }
 
     private Set<String> getParametersKeys(List<Map<String, Serializable>> parameters)

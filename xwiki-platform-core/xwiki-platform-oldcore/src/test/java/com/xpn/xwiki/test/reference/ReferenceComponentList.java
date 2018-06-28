@@ -27,19 +27,29 @@ import java.lang.annotation.Target;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultDocumentReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultPageReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultReferenceDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultReferencePageAttachmentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultReferencePageReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultSpaceReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultStringPageAttachmentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringPageObjectPropertyReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringPageObjectReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringPageReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.DefaultWikiReferenceProvider;
 import org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitReferencePageReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitStringPageAttachmentReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitStringPageReferenceResolver;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
@@ -51,16 +61,23 @@ import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSe
 import com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentGetDocumentDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentGetPagePageReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentPageAttachmentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentPageReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceObjectReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferencePageObjectReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferencePageReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringPageAttachmentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringPageReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver;
 
@@ -115,6 +132,23 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultReferenceEntityReferenceResolver.class,
     DefaultSymbolScheme.class,
     CurrentReferenceObjectReferenceResolver.class,
+    CurrentPageAttachmentReferenceResolver.class,
+    CurrentPageReferenceProvider.class,
+    CurrentGetPagePageReferenceResolver.class,
+    DefaultPageReferenceProvider.class,
+    DefaultReferencePageAttachmentReferenceResolver.class,
+    DefaultReferencePageReferenceResolver.class,
+    DefaultStringPageAttachmentReferenceResolver.class,
+    DefaultStringPageObjectPropertyReferenceResolver.class,
+    DefaultStringPageObjectReferenceResolver.class,
+    DefaultStringPageReferenceResolver.class,
+    ExplicitReferencePageReferenceResolver.class,
+    ExplicitStringPageAttachmentReferenceResolver.class,
+    ExplicitStringPageReferenceResolver.class,
+    CurrentStringPageAttachmentReferenceResolver.class,
+    CurrentStringPageReferenceResolver.class,
+    CurrentReferencePageObjectReferenceResolver.class,
+    CurrentReferencePageReferenceResolver.class,
 
     DefaultModelConfiguration.class
 })

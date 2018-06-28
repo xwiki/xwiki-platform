@@ -118,7 +118,8 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
                 }
 
                 if (defaultParameter == null || !defaultParameter.equals(entry.getKey())) {
-                    representation.append(entry.getKey());
+                    representation.append(StringUtils.replaceEach(entry.getKey(), parameterSymbolsRequiringEscapes,
+                        parameterReplacementSymbols));
                     representation.append('=');
                 }
                 representation.append(StringUtils.replaceEach(entry.getValue().toString(),

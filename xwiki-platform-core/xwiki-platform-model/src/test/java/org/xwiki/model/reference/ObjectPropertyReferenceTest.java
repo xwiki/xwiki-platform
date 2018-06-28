@@ -62,7 +62,7 @@ public class ObjectPropertyReferenceTest
     public void testInvalidNullParent()
     {
         try {
-            new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY, null));
+            new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid parent reference [null] in an object property reference", expected.getMessage());

@@ -45,6 +45,11 @@ import org.xwiki.model.reference.EntityReferenceTree;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.model.reference.PageClassPropertyReference;
+import org.xwiki.model.reference.PageObjectPropertyReference;
+import org.xwiki.model.reference.PageObjectReference;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
@@ -159,7 +164,7 @@ public class ModelScriptService implements ScriptService
 
     /**
      * Create a Document Reference from a passed wiki, list of spaces and page names, which can be empty strings or null
-     * in which case they are resolved against the Resolver having the hint passed as parameter. Valid hints are for 
+     * in which case they are resolved against the Resolver having the hint passed as parameter. Valid hints are for
      * example "default", "current", "currentmixed".
      *
      * @param wiki the wiki reference name to use (can be empty or null)
@@ -167,7 +172,6 @@ public class ModelScriptService implements ScriptService
      * @param page the page reference name to use (can be empty or null)
      * @param hint the hint of the Resolver to use in case any parameter is empty or null
      * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
-     * 
      * @since 7.2M2
      */
     public DocumentReference createDocumentReference(String wiki, List<String> spaces, String page, String hint)
@@ -176,7 +180,7 @@ public class ModelScriptService implements ScriptService
         if (!StringUtils.isEmpty(wiki)) {
             reference = new EntityReference(wiki, EntityType.WIKI);
         }
-        
+
         if (spaces != null && !spaces.isEmpty()) {
             for (String space : spaces) {
                 reference = new EntityReference(space, EntityType.SPACE, reference);
@@ -198,13 +202,85 @@ public class ModelScriptService implements ScriptService
                 DocumentReferenceResolver<EntityReference> drr =
                     this.componentManager.getInstance(DocumentReferenceResolver.class, hint);
                 documentReference = drr.resolve(reference);
-                this.logger.warn("Deprecated usage of DocumentReferenceResolver with hint [{}]. "
-                    + "Please consider using a DocumentReferenceResolver that takes into account generic types.", hint);
+                this.logger.warn(
+                    "Deprecated usage of DocumentReferenceResolver with hint [{}]. "
+                        + "Please consider using a DocumentReferenceResolver that takes into account generic types.",
+                    hint);
             } catch (ComponentLookupException ex) {
                 documentReference = null;
             }
         }
         return documentReference;
+    }
+
+    /**
+     * Create a Page Reference from a passed wiki and pages names, which can be empty strings or {@code null} in which
+     * case they are resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver.
+     * 
+     * @param wiki the wiki reference name to use (can be empty or null)
+     * @param pages the page reference names to use (can be empty or null)
+     * @return the typed PAge Reference object or null if no Resolver with the passed hint could be found
+     * @since 10.6RC1
+     */
+    public PageReference createPageReference(String wiki, String... pages)
+    {
+        return createPageReference(wiki, Arrays.asList(pages), (Locale) null);
+    }
+
+    /**
+     * Create a Page Reference from a passed wiki, list of page names, which can be empty strings or {@code null} in
+     * which case they are resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver.
+     *
+     * @param wiki the wiki reference name to use (can be empty or null)
+     * @param pages the list of pages name to use (can be empty or null)
+     * @param locale the locale of the page
+     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     * @since 10.6RC1
+     */
+    public PageReference createPageReference(String wiki, List<String> pages, Locale locale)
+    {
+        return createPageReference(wiki, pages, locale, DEFAULT_RESOLVER_HINT);
+    }
+
+    /**
+     * Create a Page Reference from a passed wiki, list of pages names, which can be empty strings or null in which case
+     * they are resolved against the Resolver having the hint passed as parameter. Valid hints are for example
+     * "default", "current", "currentmixed".
+     *
+     * @param wiki the wiki reference name to use (can be empty or null)
+     * @param pages the pages list to use (can be empty or null)
+     * @param locale the locale of the page
+     * @param hint the hint of the Resolver to use in case any parameter is empty or null
+     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     * @since 10.6RC1
+     */
+    public PageReference createPageReference(String wiki, List<String> pages, Locale locale, String hint)
+    {
+        // Add wiki
+        EntityReference reference = null;
+        if (!StringUtils.isEmpty(wiki)) {
+            reference = new EntityReference(wiki, EntityType.WIKI);
+        }
+
+        // Add pages
+        if (pages != null && !pages.isEmpty()) {
+            for (String space : pages) {
+                reference = new EntityReference(space, EntityType.PAGE, reference);
+            }
+        }
+
+        // Resolve
+        EntityReference reolvedReference;
+        try {
+            EntityReferenceResolver<EntityReference> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_REFERENCE, hint);
+            reolvedReference = resolver.resolve(reference, EntityType.PAGE);
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+
+        // Convert
+        return new PageReference(reolvedReference, locale);
     }
 
     /**
@@ -218,6 +294,19 @@ public class ModelScriptService implements ScriptService
     public AttachmentReference createAttachmentReference(DocumentReference documentReference, String fileName)
     {
         return new AttachmentReference(fileName, documentReference);
+    }
+
+    /**
+     * Creates a {@link PageAttachmentReference} from a file name and a reference to the page holding that file.
+     * 
+     * @param pageReference a reference to the page the file is attached to
+     * @param fileName the name of a file attached to a page
+     * @return a reference to the specified attachment
+     * @since 10.6RC1
+     */
+    public PageAttachmentReference createPageAttachmentReference(PageReference pageReference, String fileName)
+    {
+        return new PageAttachmentReference(fileName, pageReference);
     }
 
     /**
@@ -372,6 +461,39 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
+     * @param stringRepresentation the document reference specified as a String (using the "wiki:space/page" format and
+     *            with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a document
+     *            reference relative to another entity reference
+     * @return the typed Document Reference object (resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver)
+     * @since 2.3M2
+     */
+    public PageReference resolvePage(String stringRepresentation, Object... parameters)
+    {
+        return resolvePage(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
+    }
+
+    /**
+     * @param stringRepresentation the document reference specified as a String (using the "wiki:space/page" format and
+     *            with special characters escaped where required)
+     * @param hint the hint of the Resolver to use in case any part of the reference is missing (no wiki specified, no
+     *            space or no page)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a document
+     *            reference relative to another entity reference
+     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     */
+    public PageReference resolvePage(String stringRepresentation, String hint, Object... parameters)
+    {
+        try {
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
+            return new PageReference(resolver.resolve(stringRepresentation, EntityType.PAGE, parameters));
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+    }
+
+    /**
      * @param stringRepresentation an attachment reference specified as {@link String} (using the "wiki:space.page@file"
      *            format and with special characters escaped where required)
      * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an attachment
@@ -401,6 +523,42 @@ public class ModelScriptService implements ScriptService
             EntityReferenceResolver<String> resolver =
                 this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new AttachmentReference(resolver.resolve(stringRepresentation, EntityType.ATTACHMENT, parameters));
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param stringRepresentation an attachment reference specified as {@link String} (using the "wiki:space/page/file"
+     *            format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an attachment
+     *            reference relative to another entity reference
+     * @return the corresponding typed {@link PageAttachmentReference} object (resolved using the
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
+     * @since 2.5M2
+     */
+    public PageAttachmentReference resolvePageAttachment(String stringRepresentation, Object... parameters)
+    {
+        return resolvePageAttachment(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
+    }
+
+    /**
+     * @param stringRepresentation an attachment reference specified as {@link String} (using the "wiki:space/page/file"
+     *            format and with special characters escaped where required)
+     * @param hint the hint of the resolver to use in case any part of the reference is missing (no wiki specified, no
+     *            space or no page)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an attachment
+     *            reference relative to another entity reference
+     * @return the corresponding typed {@link PageAttachmentReference} object
+     * @since 10.6RC1
+     */
+    public PageAttachmentReference resolvePageAttachment(String stringRepresentation, String hint, Object... parameters)
+    {
+        try {
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
+            return new PageAttachmentReference(
+                resolver.resolve(stringRepresentation, EntityType.PAGE_ATTACHMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
         }
@@ -442,6 +600,41 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
+     * @param stringRepresentation an object reference specified as {@link String} (using the "wiki:space/page/object"
+     *            format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
+     *            reference relative to another entity reference
+     * @return the corresponding typed {@link PageObjectReference} object (resolved using the
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
+     * @since 10.6RC1
+     */
+    public PageObjectReference resolvePageObject(String stringRepresentation, Object... parameters)
+    {
+        return resolvePageObject(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
+    }
+
+    /**
+     * @param stringRepresentation an object reference specified as {@link String} (using the "wiki:space/page/object"
+     *            format and with special characters escaped where required)
+     * @param hint the hint of the resolver to use in case any part of the reference is missing (no wiki specified, no
+     *            space or no page)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
+     *            reference relative to another entity reference
+     * @return the corresponding typed {@link PageObjectReference} object
+     * @since 10.6RC1
+     */
+    public PageObjectReference resolvePageObject(String stringRepresentation, String hint, Object... parameters)
+    {
+        try {
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
+            return new PageObjectReference(resolver.resolve(stringRepresentation, EntityType.PAGE_OBJECT, parameters));
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+    }
+
+    /**
      * @param stringRepresentation an object property reference specified as {@link String} (using the
      *            "wiki:space.page^object.property" format and with special characters escaped where required)
      * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
@@ -470,8 +663,45 @@ public class ModelScriptService implements ScriptService
         try {
             EntityReferenceResolver<String> resolver =
                 this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
-            return new ObjectPropertyReference(resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY,
-                parameters));
+            return new ObjectPropertyReference(
+                resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY, parameters));
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param stringRepresentation an object property reference specified as {@link String} (using the
+     *            "wiki:space/page/object/property" format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
+     *            property reference relative to another entity reference
+     * @return the corresponding typed {@link ObjectPropertyReference} object (resolved using the
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
+     * @since 10.6RC1
+     */
+    public PageObjectPropertyReference resolvePageObjectProperty(String stringRepresentation, Object... parameters)
+    {
+        return resolvePageObjectProperty(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
+    }
+
+    /**
+     * @param stringRepresentation an object property reference specified as {@link String} (using the
+     *            "wiki:space/page/object/property" format and with special characters escaped where required)
+     * @param hint the hint of the resolver to use in case any part of the reference is missing (no wiki specified, no
+     *            space or no page)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
+     *            property reference relative to another entity reference
+     * @return the corresponding typed {@link ObjectPropertyReference} object
+     * @since 10.6RC1
+     */
+    public PageObjectPropertyReference resolvePageObjectProperty(String stringRepresentation, String hint,
+        Object... parameters)
+    {
+        try {
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
+            return new PageObjectPropertyReference(
+                resolver.resolve(stringRepresentation, EntityType.PAGE_OBJECT_PROPERTY, parameters));
         } catch (ComponentLookupException e) {
             return null;
         }
@@ -508,8 +738,45 @@ public class ModelScriptService implements ScriptService
         try {
             EntityReferenceResolver<String> resolver =
                 this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
-            return new ClassPropertyReference(resolver.resolve(stringRepresentation, EntityType.CLASS_PROPERTY,
-                parameters));
+            return new ClassPropertyReference(
+                resolver.resolve(stringRepresentation, EntityType.CLASS_PROPERTY, parameters));
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param stringRepresentation a class property reference specified as {@link String} (using the
+     *            "wiki:Space/Class/property" format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a class
+     *            property reference relative to another entity reference
+     * @return the corresponding typed {@link ClassPropertyReference} object (resolved using the
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
+     * @since 10.6RC1
+     */
+    public PageClassPropertyReference resolvePageClassProperty(String stringRepresentation, Object... parameters)
+    {
+        return resolvePageClassProperty(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
+    }
+
+    /**
+     * @param stringRepresentation a class property reference specified as {@link String} (using the
+     *            "wiki:Space/Class/property" format and with special characters escaped where required)
+     * @param hint the hint of the resolver to use in case any part of the reference is missing (no wiki specified, no
+     *            space or no page)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a class
+     *            property reference relative to another entity reference
+     * @return the corresponding typed {@link ClassPropertyReference} object
+     * @since 10.6RC1
+     */
+    public PageClassPropertyReference resolvePageClassProperty(String stringRepresentation, String hint,
+        Object... parameters)
+    {
+        try {
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
+            return new PageClassPropertyReference(
+                resolver.resolve(stringRepresentation, EntityType.CLASS_PROPERTY, parameters));
         } catch (ComponentLookupException e) {
             return null;
         }
@@ -640,7 +907,7 @@ public class ModelScriptService implements ScriptService
      * @return the references as a tree
      * @since 5.4RC1
      */
-    public EntityReferenceTree toTree(Iterable< ? extends EntityReference> references)
+    public EntityReferenceTree toTree(Iterable<? extends EntityReference> references)
     {
         return new EntityReferenceTree(references);
     }

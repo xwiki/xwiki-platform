@@ -109,7 +109,7 @@ public class EntityJobTest
         EntityReferenceProvider defaultEntityReferenceProvider = mock(EntityReferenceProvider.class);
         ReflectionUtils.setFieldValue(job, "defaultEntityReferenceProvider", defaultEntityReferenceProvider);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
-            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT, null));
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
 
         job.initialize(request);
     }

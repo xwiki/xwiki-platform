@@ -79,7 +79,7 @@ public class SolrFieldStringEntityReferenceResolverTest
         // Relative reference resolve based on the current entity.
 
         when(currentEntityReferenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(
-            new EntityReference("Code", EntityType.SPACE, new EntityReference("My App", EntityType.SPACE, null)));
+            new EntityReference("Code", EntityType.SPACE, new EntityReference("My App", EntityType.SPACE)));
         assertEquals(
             new ClassPropertyReference("title",
                 new DocumentReference("bar", Arrays.asList("My App", "Code"), "A Class")),

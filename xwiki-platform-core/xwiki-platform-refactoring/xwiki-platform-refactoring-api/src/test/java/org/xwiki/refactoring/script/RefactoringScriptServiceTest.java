@@ -91,7 +91,7 @@ public class RefactoringScriptServiceTest
 
         EntityReferenceProvider defaultEntityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
-            new EntityReference("WebHome", EntityType.DOCUMENT, null));
+            new EntityReference("WebHome", EntityType.DOCUMENT));
     }
 
     @Test

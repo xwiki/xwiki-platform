@@ -112,6 +112,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.ObjectReferenceResolver;
+import org.xwiki.model.reference.PageReference;
+import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -547,6 +549,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver;
 
     /**
+     * @see #getPageReferenceResolver()
+     */
+    private PageReferenceResolver<EntityReference> pageReferenceResolver;
+
+    /**
      * @see #getUidStringEntityReferenceSerializer()
      */
     private EntityReferenceSerializer<String> uidStringEntityReferenceSerializer;
@@ -575,6 +582,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * resolve the relative reference every time getParentReference() is called.
      */
     private DocumentReference parentReferenceCache;
+
+    /**
+     * Cache the page reference resolved kept for improved performance (so that we don't have to resolve it every time
+     * getPageReference() is called.
+     */
+    private PageReference pageReferenceCache;
 
     /**
      * @see #getKey()
@@ -683,6 +696,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return this.explicitReferenceDocumentReferenceResolver;
+    }
+
+    private PageReferenceResolver<EntityReference> getPageReferenceResolver()
+    {
+        if (this.pageReferenceResolver == null) {
+            this.pageReferenceResolver = Utils.getComponent(PageReferenceResolver.TYPE_REFERENCE);
+        }
+
+        return this.pageReferenceResolver;
     }
 
     /**
@@ -1363,6 +1385,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return this.documentReference;
     }
 
+    public PageReference getPageReference()
+    {
+        if (this.pageReferenceCache == null) {
+            this.pageReferenceCache = getPageReferenceResolver().resolve(getDocumentReference());
+        }
+
+        return this.pageReferenceCache;
+    }
+
     /**
      * @return the {@link DocumentReference} of the document also containing the document {@link Locale}
      * @since 5.3M2
@@ -1425,6 +1456,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         this.keyCache = null;
         this.localKeyCache = null;
         this.parentReferenceCache = null;
+        this.pageReferenceCache = null;
     }
 
     /**

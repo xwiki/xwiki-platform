@@ -319,7 +319,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
           btn.text("$escapetool.javascript($services.localization.render('notifications.menu.more'))");
           btn.addClass('btn').addClass('btn-default').addClass('btn-block');
           loadMore.append(btn);
-          loadMore.insertBefore(self.macro.find('.notifications-macro-rss-link'));
+          self.insertElementInMacroContainer(loadMore);
           btn.click(function(event) {
             loadMore.text('').addClass('loading').css('height', '50px');
             // We use the date of the last displayed event as an offset to display those that come next
@@ -331,6 +331,18 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         promise.resolve(data.notifications);
       });
       return promise;
+    };
+    
+    /**
+     * Add the given DOM element into the macro container (could be before the RSS link if there is one).
+     */
+    self.insertElementInMacroContainer = function (domToInsert) {
+      var rssLink = self.macro.find('.notifications-macro-rss-link');
+      if (rssLink.length &gt; 0) {
+        domToInsert.insertBefore(rssLink);
+      } else {
+        self.macro.append(domToInsert);
+      }
     };
 
     /**
@@ -360,8 +372,8 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       }
       // Store the data in the DOM element so that any javascript code can retrieve it
       notif.data('notif', entry);
-      // Add the notification entry (before the RSS link)
-      notif.insertBefore(self.macro.find('.notifications-macro-rss-link'));
+      // Add the notification entry
+      self.insertElementInMacroContainer(notif);
       // Add the "mark as read" button if the notif is not already read
       if (!entry.read) {
         // Style the read button
@@ -804,21 +816,6 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-# Generate the REST URL to display the same notifications but in the RSS format
-#set ($restURL = $services.rest.url($doc.documentReference))
-#set ($restURL = "${restURL.substring(0, $restURL.indexOf('/rest'))}/rest/notifications/rss")
-#set ($restURL = "${restURL}?userId=$!escapetool.url($services.model.serialize($xcontext.userReference, 'default'))")
-#set ($restURL = "${restURL}&amp;useUserPreferences=$!escapetool.url($xcontext.macro.params.useUserPreferences)")
-#set ($restURL = "${restURL}&amp;count=$!escapetool.url($xcontext.macro.params.count)")
-#set ($restURL = "${restURL}&amp;displayOwnEvents=$!escapetool.url($xcontext.macro.params.displayOwnEvents)")
-#set ($restURL = "${restURL}&amp;displayMinorEvents=$!escapetool.url($xcontext.macro.params.displayMinorEvents)")
-#set ($restURL = "${restURL}&amp;displaySystemEvents=$!escapetool.url($xcontext.macro.params.displaySystemEvents)")
-#set ($restURL = "${restURL}&amp;displayReadEvents=$!escapetool.url($xcontext.macro.params.displayReadEvents)")
-#set ($restURL = "${restURL}&amp;wikis=$!escapetool.url($xcontext.macro.params.wikis)")
-#set ($restURL = "${restURL}&amp;spaces=$!escapetool.url($xcontext.macro.params.spaces)")
-#set ($restURL = "${restURL}&amp;pages=$!escapetool.url($xcontext.macro.params.pages)")
-#set ($restURL = "${restURL}&amp;users=$!escapetool.url($xcontext.macro.params.users)")
-#set ($restURL = "${restURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
 {{html clean="false"}}
 &lt;div class="notifications-macro loading" 
   data-userId="$!escapetool.xml($services.model.serialize($xcontext.userReference, 'default'))"
@@ -834,7 +831,24 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   data-users="$!escapetool.xml($users)"
   data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)"
 &gt;
-  &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$restURL" target="_blank"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
+#if ('true' == $xcontext.macro.params.displayRSSLink)
+  ## Generate the RSS URL to display the same notifications but in the RSS format
+  #set ($rssURL = $services.rest.url($doc.documentReference))
+  #set ($rssURL = "${rssURL.substring(0, $rssURL.indexOf('/rest'))}/rest/notifications/rss")
+  #set ($rssURL = "${rssURL}?userId=$!escapetool.url($services.model.serialize($xcontext.userReference, 'default'))")
+  #set ($rssURL = "${rssURL}&amp;useUserPreferences=$!escapetool.url($xcontext.macro.params.useUserPreferences)")
+  #set ($rssURL = "${rssURL}&amp;count=$!escapetool.url($xcontext.macro.params.count)")
+  #set ($rssURL = "${rssURL}&amp;displayOwnEvents=$!escapetool.url($xcontext.macro.params.displayOwnEvents)")
+  #set ($rssURL = "${rssURL}&amp;displayMinorEvents=$!escapetool.url($xcontext.macro.params.displayMinorEvents)")
+  #set ($rssURL = "${rssURL}&amp;displaySystemEvents=$!escapetool.url($xcontext.macro.params.displaySystemEvents)")
+  #set ($rssURL = "${rssURL}&amp;displayReadEvents=$!escapetool.url($xcontext.macro.params.displayReadEvents)")
+  #set ($rssURL = "${rssURL}&amp;wikis=$!escapetool.url($xcontext.macro.params.wikis)")
+  #set ($rssURL = "${rssURL}&amp;spaces=$!escapetool.url($xcontext.macro.params.spaces)")
+  #set ($rssURL = "${rssURL}&amp;pages=$!escapetool.url($xcontext.macro.params.pages)")
+  #set ($rssURL = "${rssURL}&amp;users=$!escapetool.url($xcontext.macro.params.users)")
+  #set ($rssURL = "${rssURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
+  &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" target="_blank"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
+#end
 &lt;/div&gt;
 {{/html}}
 #end
@@ -1655,6 +1669,72 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayWatchedUsersOnly</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsMacro</name>
+    <number>13</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>2dfca976-0354-4fe4-9813-10161ecc09a7</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>true</defaultValue>
+    </property>
+    <property>
+      <description/>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>displayRSSLink</name>
     </property>
   </object>
 </xwikidoc>

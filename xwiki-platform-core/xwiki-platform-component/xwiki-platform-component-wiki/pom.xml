@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-component</artifactId>
-    <version>9.11.7-SNAPSHOT</version>
+    <version>9.11.7</version>
   </parent>
   <artifactId>xwiki-platform-component-wiki</artifactId>
   <name>XWiki Platform - Component - Wiki Components</name>

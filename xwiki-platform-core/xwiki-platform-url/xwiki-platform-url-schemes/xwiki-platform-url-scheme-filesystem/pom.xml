@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url-schemes</artifactId>
-    <version>9.11.7</version>
+    <version>9.11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
   <name>XWiki Platform - URL - Scheme - Filesystem Implementation</name>

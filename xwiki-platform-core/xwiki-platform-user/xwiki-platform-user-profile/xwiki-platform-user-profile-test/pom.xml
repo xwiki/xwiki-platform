@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-profile</artifactId>
-    <version>9.11.7</version>
+    <version>9.11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-profile-test</artifactId>
   <name>XWiki Platform - User - Profile - Tests - Parent POM</name>

@@ -45,7 +45,10 @@ public class EntryNamePane extends BaseElement
     public void setName(String name)
     {
         nameInput.clear();
-        nameInput.sendKeys(name);
+        // Note: Normally we should use: nameInput.sendKeys(name);
+        // However this fails on Vincent's Mac for some reason and the following seems to work everywhere.
+        // Revert when Selenium is fixed.
+        getDriver().executeScript("arguments[0].value='" + name + "';", nameInput);
     }
 
     /**

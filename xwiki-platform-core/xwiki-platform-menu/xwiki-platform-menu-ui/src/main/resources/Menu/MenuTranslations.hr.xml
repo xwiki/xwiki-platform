@@ -45,6 +45,7 @@ Menu.MenuClass_content1=Struktura izbornika
 # Live table generic keys
 menu.livetable.doc.title=Naslov stranice
 menu.livetable.doc.name=Ime stranice
+menu.livetable.doc.location=Lokacija
 menu.livetable.doc.space=Prostor
 menu.livetable.doc.fullname=Puno ime stranice
 menu.livetable.doc.author=Posljednji autor

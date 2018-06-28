@@ -34,4 +34,12 @@
   <modules>
     <module>xwiki-platform-menu-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-menu-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

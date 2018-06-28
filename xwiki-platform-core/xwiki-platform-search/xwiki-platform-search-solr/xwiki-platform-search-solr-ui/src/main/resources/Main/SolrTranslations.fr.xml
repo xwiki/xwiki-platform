@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Administration de la recherche Solr
 solr.admin.submit=Appliquer
-solr.admin.error.notallowed=Vous n'êtes pas autorisé à effectuer cette action.
+solr.admin.error.notallowed=Vous n'êtes pas autorisé(e) à effectuer cette action.
 solr.admin.error.norights=Les droits d'administration sont nécessaires pour accéder à cette section.
 
 solr.admin.status.title=Statut
@@ -55,7 +55,7 @@ solr.admin.indexing.action.select_index=Ajouter à l'index
 solr.admin.indexing.action.select_delete=Supprimer de l'index
 solr.admin.indexing.action.select_reindex=Réindexer
 solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.hint=Le wiki pour lequel tous les documents seront affectés par l'indexation.
+solr.admin.indexing.wiki.hint=Le wiki dont tous les documents seront affectés par l'indexation.
 solr.admin.indexing.wiki.select_farm=Ferme entière
 solr.admin.indexing.query.label=Recherche avancée
 solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
@@ -64,7 +64,7 @@ solr.sortBy=Trier par :
 solr.sortBy.score=Pertinence
 solr.sortBy.title_sort=Titre
 solr.sortBy.date=Date
-solr.sortBy.author_display_sort=Dernier Auteur
+solr.sortBy.author_display_sort=Dernier auteur
 solr.sortBy.filename_sort=Nom de fichier
 solr.sortBy.attsize_sort=Taille du fichier
 solr.sortBy.attdate_sort=Date d'enregistrement
@@ -80,15 +80,15 @@ solr.options.facet.title=Autoriser le fitrage dans les résultats
 
 solr.result.language=Langage
 solr.result.locatedIn=Situé dans
-solr.result.author=Mofidié par {0} le {1}
+solr.result.author=Modifié par {0} le {1}
 solr.result.mediaType=Ficher de type {0}
 solr.result.uploadedBy=Enregistré par {0} le {1} ({2})
 solr.result.highlightAll=Afficher et surligner toutes les occurrences
 
 solr.facets.title=Affinez votre recherche
-solr.facets.hint=Selectionnez une catégorie et activez les filtres sur les résultats
+solr.facets.hint=Sélectionnez une catégorie et activez les filtres sur les résultats
 solr.facets.resetAll=Tout réinitialiser
-solr.facets.expandAll=Tout étendre
+solr.facets.expandAll=Tout déplier
 solr.facets.collapseAll=Tout réduire
 solr.facets.emptyValue=Valeur vide
 solr.facets.moreValues={0} restants
@@ -173,8 +173,8 @@ solr.field.attauthor_display=Ajouté par
 solr.field.attdate=Date d'enregistrement
 solr.field.attsize=Taille de fichier
 
-solr.uix.docdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pages ?
-solr.uix.attachmentdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pièces jointes ?
+solr.uix.docdoesnotexist.title=Recherchez-vous plutôt une de ces pièces jointes ?
+solr.uix.attachmentdoesnotexist.title=Recherchez-vous plutôt une de ces pièces jointes ?
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

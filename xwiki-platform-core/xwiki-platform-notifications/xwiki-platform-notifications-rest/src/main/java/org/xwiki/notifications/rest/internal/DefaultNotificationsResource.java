@@ -49,9 +49,9 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.status.EventReadAlertFilter;
 import org.xwiki.notifications.filters.internal.user.OwnEventFilter;
+import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.rest.NotificationsResource;
-import org.xwiki.notifications.rest.model.Notification;
 import org.xwiki.notifications.rest.model.Notifications;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
@@ -59,6 +59,7 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.text.StringUtils;
 
 import com.google.common.collect.Sets;
+import com.rometools.rome.io.SyndFeedOutput;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -98,6 +99,9 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     @Inject
     private UsersParameterHandler usersParameterHandler;
 
+    @Inject
+    private NotificationRSSManager notificationRSSManager;
+
     @Override
     public Notifications getNotifications(
             String useUserPreferences,
@@ -115,6 +119,33 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             String displayReadEvents,
             String displayReadStatus
     ) throws Exception
+    {
+        List<CompositeEvent> events =
+                getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
+                        users, count,
+                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents);
+        return new Notifications(
+                notificationsRenderer.renderNotifications(events, userId, TRUE.equals(displayReadStatus)));
+    }
+
+    @Override
+    public String getNotificationsRSS(String useUserPreferences, String userId, String untilDate,
+            String blackList, String pages, String spaces, String wikis, String users, String count,
+            String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
+            String displayReadStatus) throws Exception
+    {
+        List<CompositeEvent> events =
+                getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
+                        users, count,
+                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents);
+        SyndFeedOutput output = new SyndFeedOutput();
+        return output.outputString(notificationRSSManager.renderFeed(events));
+    }
+
+    private List<CompositeEvent> getCompositeEvents(String useUserPreferences, String userId,
+            String untilDate, String blackList, String pages, String spaces, String wikis, String users, String count,
+            String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents)
+            throws NotificationException, EventStreamException
     {
         NotificationParameters parameters = new NotificationParameters();
         parameters.format = NotificationFormat.ALERT;
@@ -139,7 +170,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                     displaySystemEvents, displayReadEvents);
         }
 
-        return new Notifications(getAndRenderNotifications(userId, parameters, TRUE.equals(displayReadStatus)));
+        return getCompositeEvents(parameters);
     }
 
     private void dontUseUserPreferences(String pages, String spaces, String wikis, String users,
@@ -182,11 +213,9 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         }
     }
 
-    private List<Notification> getAndRenderNotifications(String userId, NotificationParameters
-        parameters, boolean showReadStatus) throws Exception
+    private List<CompositeEvent> getCompositeEvents(NotificationParameters parameters) throws NotificationException
     {
-        List<CompositeEvent> compositeEvents = newNotificationManager.getEvents(parameters);
-        return notificationsRenderer.renderNotifications(compositeEvents, userId, showReadStatus);
+        return newNotificationManager.getEvents(parameters);
     }
 
     private void handlePagesParameter(String pages, NotificationParameters parameters)

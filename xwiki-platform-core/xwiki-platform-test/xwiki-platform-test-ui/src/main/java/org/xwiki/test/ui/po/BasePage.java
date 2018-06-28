@@ -660,4 +660,15 @@ public class BasePage extends BaseElement
             .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
             .getText();
     }
+
+    /**
+     * @param panelTitle the panel displayed title
+     * @return true if the panel is visible in the left panels or false otherwise
+     * @since 10.6RC1
+     */
+    public boolean hasLeftPanel(String panelTitle)
+    {
+        return getDriver().hasElementWithoutWaiting(By.xpath(
+            "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
+    }
 }

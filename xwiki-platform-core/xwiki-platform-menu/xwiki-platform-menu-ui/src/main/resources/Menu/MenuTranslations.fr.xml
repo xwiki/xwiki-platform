@@ -45,6 +45,7 @@ Menu.MenuClass_content1=Structure du menu
 # Live table generic keys
 menu.livetable.doc.title=Titre de la page
 menu.livetable.doc.name=Nom de la page
+menu.livetable.doc.location=Emplacement
 menu.livetable.doc.space=Espace
 menu.livetable.doc.fullname=Nom complet de la page
 menu.livetable.doc.author=Dernier auteur

@@ -226,6 +226,8 @@ rendering.macro.notifications.parameter.users.name=Users
 rendering.macro.notifications.parameter.users.description=List of users (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display followed users only
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Either or not to display only the events done by the given list of users (if empty, the list of followed users of the current user is used)
+rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
+rendering.macro.notifications.parameter.displayRSSLink.description=Either or not to display a link to the RSS view of the current macro.
 
 ## Notifications Macro
 notifications.macro.noWatchedUsers=You are not following anybody.

@@ -37,7 +37,7 @@ import org.xwiki.stability.Unstable;
 public interface NotificationsResource
 {
     /**
-     * Get notifications for the given wiki.
+     * Get notifications RSS for the given parameters.
      * @return notifications
      * @throws Exception if an error occurs
      */
@@ -58,4 +58,32 @@ public interface NotificationsResource
             @QueryParam("displayReadEvents") String displayReadEvents,
             @QueryParam("displayReadStatus") String displayReadStatus
             ) throws Exception;
+
+    /**
+     * Get notifications RSS for the given parameters. Since the URL and the return type is different, I had no choice
+     * but duplicating the same parameters than <code>getNotifications()</code>.
+     *
+     * @return the RSS feed as a string
+     * @throws Exception if an error occurs
+     *
+     * @since 10.6RC1
+     */
+    @GET
+    @Path("/rss")
+    String getNotificationsRSS(
+            @QueryParam("useUserPreferences") String useUserPreferences,
+            @QueryParam("userId") String userId,
+            @QueryParam("untilDate") String untilDate,
+            @QueryParam("blackList") String blackList,
+            @QueryParam("pages") String pages,
+            @QueryParam("spaces") String spaces,
+            @QueryParam("wikis") String wikis,
+            @QueryParam("users") String users,
+            @QueryParam("count") String count,
+            @QueryParam("displayOwnEvents") String displayOwnEvents,
+            @QueryParam("displayMinorEvents") String displayMinorEvents,
+            @QueryParam("displaySystemEvents") String displaySystemEvents,
+            @QueryParam("displayReadEvents") String displayReadEvents,
+            @QueryParam("displayReadStatus") String displayReadStatus
+    ) throws Exception;
 }

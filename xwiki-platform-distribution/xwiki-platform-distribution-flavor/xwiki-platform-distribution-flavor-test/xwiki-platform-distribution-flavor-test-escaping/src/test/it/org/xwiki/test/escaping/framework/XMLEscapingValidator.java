@@ -48,8 +48,6 @@ public class XMLEscapingValidator implements Validator
     /** Test for unescaped quote. */
     private static final String TEST_QUOT = "aaa\"bbb";
 
-    private static final String TEST_QUOT_ESCAPED = "aaa&quot;bbb";
-
     /** Test for unescaped tag start. */
     private static final String TEST_LT = "ddd<eee";
 
@@ -170,25 +168,15 @@ public class XMLEscapingValidator implements Validator
      * @param line the line to check
      * @param lineNr line number reported on failures
      */
-    protected void checkStringDelimiters(String line, int lineNr)
+    private void checkStringDelimiters(String line, int lineNr)
     {
         // NOTE this method produces false NEGATIVES if XML-tag escaping method is used inside tag attributes (unlikely)
-
         final int offset = INPUT_STRING.indexOf(TEST_APOS) - INPUT_STRING.indexOf(TEST_QUOT);
         int idx = 0;
         while ((idx = line.indexOf(TEST_APOS, idx)) >= 0) {
-            // expected_idx = start of escaping string (INPUT_STRING) in the line when the single quote is not escaped
+            // ignore if quote was not escaped either
             int expected_idx = idx - offset;
-            // Also ignore if the INPUT_STRING is inside a double quote since that we don't need to escape single
-            // quotes inside double quotes.
-
-            // Find position of INPUT_STRING start so that we can verify if the previous char is a double quote.
-            // Note: if we find TEST_QUOT, i.e unescaped double quote then the unescaped single quote will be ignored
-            // too.
-            int startInputIdx = idx - TEST_QUOT_ESCAPED.length() + "bbb".length();
-            if (expected_idx < 0 || (line.indexOf(TEST_QUOT, expected_idx) != expected_idx
-                && startInputIdx > 0 && line.charAt(startInputIdx - 1) != '\"'))
-            {
+            if (expected_idx < 0 || line.indexOf(TEST_QUOT, expected_idx) != expected_idx) {
                 this.errors.add(new ValidationError(Type.WARNING, lineNr, idx, "Unescaped ' character"));
             }
             idx++;

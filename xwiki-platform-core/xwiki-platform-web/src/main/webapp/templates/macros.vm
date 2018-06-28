@@ -768,13 +768,15 @@ $fn
 #macro(panelheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = $util.convertToAlphaNumeric($!paneldoc))
+#set ($specialClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.documentReference"))
+## We keep this class for compatibility purpose but the previous one should be used instead.
+#set ($deprecatedClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="panel expanded $!specialClassAttribute">
+<div class="panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
 <h1 class="xwikipaneltitle">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="panel expanded $specialClassAttribute" %)(((
+(% class="panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
 {{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
@@ -783,13 +785,15 @@ $fn
 #macro(panelhiddenheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = $util.convertToAlphaNumeric($!paneldoc))
+#set ($specialClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.documentReference"))
+## We keep this class for compatibility purpose but the previous one should be used instead.
+#set ($deprecatedClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="panel expanded $!specialClassAttribute">
+<div class="panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
 <h1 class="xwikipaneltitle hidden">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="panel expanded $specialClassAttribute" %)(((
+(% class="panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
 {{html}}<h1 class="xwikipaneltitle hidden">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
@@ -798,13 +802,15 @@ $fn
 #macro(largepanelheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = $util.convertToAlphaNumeric($!paneldoc))
+#set ($specialClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.documentReference"))
+## We keep this class for compatibility purpose but the previous one should be used instead.
+#set ($deprecatedClassAttribute = $stringtool.convertToAlphaNumeric("$!paneldoc.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="large panel $expanded $!specialClassAttribute">
+<div class="large panel $expanded $!specialClassAttribute $!deprecatedClassAttribute">
 <h1 class="xwikipaneltitle">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="large panel expanded $!specialClassAttribute" %)(((
+(% class="large panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
 {{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end

@@ -23,14 +23,16 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.stability.Unstable;
 
 /**
  * Initialize the binding provided to the script macros. Called before executing each wiki macro is executed.
  *
  * @version $Id$
- * @since 2.5M1
+ * @since 10.6RC1
  */
 @Role
+@Unstable
 public interface WikiMacroBindingInitializer
 {
     /**

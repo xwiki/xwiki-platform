@@ -36,9 +36,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -46,6 +48,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -94,6 +97,8 @@ public class XWiki extends Api
      * with entity references but have to call older, often internal, methods that still use string references.
      */
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
+
+    private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
@@ -152,6 +157,16 @@ public class XWiki extends Api
         }
 
         return this.defaultStringEntityReferenceSerializer;
+    }
+
+    private EntityReferenceResolver<String> getRelativeStringEntityReferenceResolver()
+    {
+        if (this.relativeStringEntityReferenceResolver == null) {
+            this.relativeStringEntityReferenceResolver =
+                Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+        }
+
+        return this.relativeStringEntityReferenceResolver;
     }
 
     private DocumentRevisionProvider getDocumentRevisionProvider()
@@ -264,25 +279,45 @@ public class XWiki extends Api
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
      *
-     * @param fullName the full name of the XWiki document to be loaded
+     * @param documentReference the reference of the document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      */
-    public Document getDocument(String fullName) throws XWikiException
+    public Document getDocument(String documentReference) throws XWikiException
     {
         DocumentReference reference;
 
         // We ignore the passed full name if it's null to be backward compatible with previous behaviors.
-        if (fullName != null) {
+        if (documentReference != null) {
             // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
             // specified in the passed string, rather than use the current document's page name.
-            reference = getCurrentMixedDocumentReferenceResolver().resolve(fullName);
+            reference = getCurrentMixedDocumentReferenceResolver().resolve(documentReference);
         } else {
             reference = getDefaultDocumentReferenceResolver().resolve("");
         }
 
         return getDocument(reference);
+    }
+
+    /**
+     * Loads an Document from the database. Rights are checked before sending back the document.
+     *
+     * @param reference the reference of the document to be loaded
+     * @param type the type of the reference
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @throws XWikiException
+     * @since 10.6RC1
+     */
+    @Unstable
+    public Document getDocument(String referenceString, EntityType type) throws XWikiException
+    {
+        if (type == EntityType.DOCUMENT || StringUtils.isEmpty(referenceString)) {
+            return getDocument(referenceString);
+        }
+
+        return getDocument(getRelativeStringEntityReferenceResolver().resolve(referenceString, type));
     }
 
     /**
@@ -326,7 +361,7 @@ public class XWiki extends Api
      */
     public Document getDocument(EntityReference reference) throws XWikiException
     {
-        return getDocument(getCurrentgetdocumentResolver().resolve(reference));
+        return getDocument(reference);
     }
 
     /**

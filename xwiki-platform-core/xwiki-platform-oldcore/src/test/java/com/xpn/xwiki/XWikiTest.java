@@ -561,37 +561,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.getPrefsClass(getContext());
     }
 
-    public void testGetDocumentWithEntityReference() throws Exception
-    {
-        Mock mockStore = registerMockComponent(XWikiStoreInterface.class);
-        this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
-
-        mockStore.expects(atLeastOnce()).method("loadXWikiDoc").with(NOT_NULL, same(getContext()))
-            .will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
-            {
-                @Override
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    return invocation.parameterValues.get(0);
-                }
-            });
-
-        DocumentReference documentReference = new DocumentReference("wiki", "Main", "WebHome");
-
-        WikiDescriptor mockWikiDescriptor = new WikiDescriptor("wiki", "wiki");
-        mockWikiDescriptor.setMainPageReference(documentReference);
-
-        this.mockWikiDescriptorManager.stubs().method("getById").with(same("wiki"))
-            .will(returnValue(mockWikiDescriptor));
-
-        assertEquals(documentReference, this.xwiki.getDocument(new WikiReference("wiki"), getContext())
-            .getDocumentReference());
-
-        assertEquals(documentReference,
-            this.xwiki.getDocument(new ObjectReference("object", documentReference), getContext())
-                .getDocumentReference());
-    }
-
     /**
      * XWIKI-12398: No layout for login page in a closed wiki
      */

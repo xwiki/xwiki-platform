@@ -126,6 +126,8 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.PageReference;
+import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -156,6 +158,7 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
+import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.velocity.VelocityManager;
@@ -267,6 +270,12 @@ public class XWiki implements EventListener
 
     /** Represents no value (ie the default value will be used) in xproperties */
     private static final String NO_VALUE = "---";
+
+    /**
+     * List of top level space names that can be used in the fake context document created when accessing a resource
+     * with the 'skin' action.
+     */
+    private static final List<String> SKIN_RESOURCE_SPACE_NAMES = Arrays.asList("skins", "resources");
 
     /** The main document storage. */
     private XWikiStoreInterface store;
@@ -418,17 +427,13 @@ public class XWiki implements EventListener
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
+    private PageReferenceResolver<EntityReference> currentgetpageResolver;
+
     private AttachmentReferenceResolver<EntityReference> currentAttachmentReferenceResolver;
 
     private WikiSkinUtils wikiSkinUtils;
 
     private DocumentRevisionProvider documentRevisionProvider;
-
-    /**
-     * List of top level space names that can be used in the fake context document created when accessing a resource
-     * with the 'skin' action.
-     */
-    private List<String> SKIN_RESOURCE_SPACE_NAMES = Arrays.asList("skins", "resources");
 
     private ConfigurationSource getConfiguration()
     {
@@ -597,6 +602,15 @@ public class XWiki implements EventListener
         }
 
         return this.currentgetdocumentResolver;
+    }
+
+    private PageReferenceResolver<EntityReference> getCurrentGetPageResolver()
+    {
+        if (this.currentgetpageResolver == null) {
+            this.currentgetpageResolver = Utils.getComponent(PageReferenceResolver.TYPE_REFERENCE, "currentgetpage");
+        }
+
+        return this.currentgetpageResolver;
     }
 
     private AttachmentReferenceResolver<EntityReference> getCurrentAttachmentResolver()
@@ -1829,7 +1843,15 @@ public class XWiki implements EventListener
      */
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
-        return getDocument(getCurrentGetDocumentResolver().resolve(reference), context);
+        XWikiDocument document;
+
+        if (reference.getType() == EntityType.PAGE || reference.getType().isAllowedAncestor(EntityType.PAGE)) {
+            document = getDocument(getCurrentGetPageResolver().resolve(reference), context);
+        } else {
+            document = getDocument(getCurrentGetDocumentResolver().resolve(reference), context);
+        }
+
+        return document;
     }
 
     /**
@@ -1904,6 +1926,31 @@ public class XWiki implements EventListener
         doc.setContentDirty(true);
 
         return getDocument(doc, context);
+    }
+
+    /**
+     * @param reference the reference of the page
+     * @param context see {@link XWikiContext}
+     * @since 10.6RC1
+     */
+    @Unstable
+    public XWikiDocument getDocument(PageReference reference, XWikiContext context) throws XWikiException
+    {
+        DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
+
+        XWikiDocument document = getDocument(documentReference, context);
+
+        if (document.isNew() && documentReference.getParent().getParent().getType() == EntityType.SPACE) {
+            // Try final page
+            XWikiDocument finalDocument = getDocument(new DocumentReference(documentReference.getParent().getName(),
+                documentReference.getParent().getParent(), documentReference.getParameters()), context);
+
+            if (!finalDocument.isNew()) {
+                document = finalDocument;
+            }
+        }
+
+        return document;
     }
 
     /**

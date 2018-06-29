@@ -41,8 +41,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 /**
  * Default implementation of {@link org.xwiki.icon.IconSetLoader}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 @Component
 @Singleton
@@ -58,9 +58,11 @@ public class DefaultIconSetLoader implements IconSetLoader
 
     private static final String RENDER_HTML_PROPERTY_NAME = "xwiki.iconset.render.html";
 
-    private static final String RENDER_CUSTOM_PROPERTY_NAME = "xwiki.iconset.render.custom";
-
     private static final String ICON_TYPE_PROPERTY_NAME = "xwiki.iconset.type";
+
+    private static final String ICON_URL_PROPERTY_NAME = "xwiki.iconset.icon.url";
+
+    private static final String ICON_CSS_CLASS_PROPERTY_NAME = "xwiki.iconset.icon.cssClass";
 
     private static final String ERROR_MSG = "Failed to load the IconSet [%s].";
 
@@ -91,40 +93,41 @@ public class DefaultIconSetLoader implements IconSetLoader
     @Override
     public IconSet loadIconSet(Reader input, String name) throws IconException
     {
+        IconSet iconSet = new IconSet(name);
+        Properties properties = new Properties();
         try {
-            IconSet iconSet = new IconSet(name);
-
-            Properties properties = new Properties();
             properties.load(input);
-
-            // Load all the keys
-            for (String key : properties.stringPropertyNames()) {
-                String value = properties.getProperty(key);
-                if (CSS_PROPERTY_NAME.equals(key)) {
-                    iconSet.setCss(value);
-                } else if (SSX_PROPERTY_NAME.equals(key)) {
-                    iconSet.setSsx(value);
-                } else if (JSX_PROPERTY_NAME.equals(key)) {
-                    iconSet.setJsx(value);
-                } else if (RENDER_WIKI_PROPERTY_NAME.equals(key)) {
-                    iconSet.setRenderWiki(value);
-                } else if (RENDER_HTML_PROPERTY_NAME.equals(key)) {
-                    iconSet.setRenderHTML(value);
-                } else if (RENDER_CUSTOM_PROPERTY_NAME.equals(key)) {
-                    iconSet.setRenderCustom(value);
-                } else if (ICON_TYPE_PROPERTY_NAME.equals(key)) {
-                    iconSet.setType(IconType.valueOf(value.toUpperCase()));
-                } else {
-                    Icon icon = new Icon();
-                    icon.setValue(value);
-                    iconSet.addIcon(key, icon);
-                }
-            }
-
-            // return
-            return iconSet;
         } catch (IOException e) {
             throw new IconException(String.format(ERROR_MSG, name), e);
+        }
+
+        properties.stringPropertyNames().forEach(key -> setIconSetProperty(iconSet, key, properties.getProperty(key)));
+
+        return iconSet;
+    }
+
+    private void setIconSetProperty(IconSet iconSet, String key, String value)
+    {
+        if (CSS_PROPERTY_NAME.equals(key)) {
+            iconSet.setCss(value);
+        } else if (SSX_PROPERTY_NAME.equals(key)) {
+            iconSet.setSsx(value);
+        } else if (JSX_PROPERTY_NAME.equals(key)) {
+            iconSet.setJsx(value);
+        } else if (RENDER_WIKI_PROPERTY_NAME.equals(key)) {
+            iconSet.setRenderWiki(value);
+        } else if (RENDER_HTML_PROPERTY_NAME.equals(key)) {
+            iconSet.setRenderHTML(value);
+        } else if (ICON_TYPE_PROPERTY_NAME.equals(key)) {
+            iconSet.setType(IconType.valueOf(value.toUpperCase()));
+        } else if (ICON_URL_PROPERTY_NAME.equals(key)) {
+            iconSet.setUrl(value);
+        } else if (ICON_CSS_CLASS_PROPERTY_NAME.equals(key)) {
+            iconSet.setCssClass(value);
+        } else {
+            Icon icon = new Icon();
+            icon.setValue(value);
+            iconSet.addIcon(key, icon);
         }
     }
 }

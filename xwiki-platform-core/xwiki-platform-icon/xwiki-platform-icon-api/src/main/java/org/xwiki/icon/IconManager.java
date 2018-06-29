@@ -20,6 +20,7 @@
 package org.xwiki.icon;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 
@@ -32,6 +33,23 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface IconManager
 {
+    /**
+     * Icon set name used.
+     */
+    String META_DATA_ICON_SET_NAME = "iconSetName";
+    /**
+     * Type of the icon set used.
+     */
+    String META_DATA_ICON_SET_TYPE = "iconSetType";
+    /**
+     * URL of the icon image.
+     */
+    String META_DATA_URL = "url";
+    /**
+     * CSS class of the icon.
+     */
+    String META_DATA_CSS_CLASS = "cssClass";
+
     /**
      * Generate the wiki syntax to display an icon with the current icon theme.
      *
@@ -104,7 +122,7 @@ public interface IconManager
      * @throws IconException if problems occur
      * @since 10.6RC1
      */
-    default String renderCustom(String iconName) throws IconException
+    default Map<String, Object> getMetaData(String iconName) throws IconException
     {
         throw new UnsupportedOperationException();
     }
@@ -118,7 +136,7 @@ public interface IconManager
      * @throws IconException if problems occur
      * @since 10.6RC1
      */
-    default String renderCustom(String iconName, String iconSetName) throws IconException
+    default Map<String, Object> getMetaData(String iconName, String iconSetName) throws IconException
     {
         throw new UnsupportedOperationException();
     }
@@ -133,7 +151,7 @@ public interface IconManager
      * @throws IconException if problems occur
      * @since 10.6RC1
      */
-    default String renderCustom(String iconName, String iconSetName, boolean fallback) throws IconException
+    default Map<String, Object> getMetaData(String iconName, String iconSetName, boolean fallback) throws IconException
     {
         throw new UnsupportedOperationException();
     }
@@ -156,46 +174,4 @@ public interface IconManager
      * @since 6.4M1
      */
     List<String> getIconNames(String iconSetName) throws IconException;
-
-    /**
-     * Get the icon set for the specified icon name.
-     *
-     * @param iconName name of the icon
-     * @return the icon set used for the specified icon name
-     * @throws IconException if problem occurs
-     * @since 10.6RC1
-     */
-    default IconSet getIconSet(String iconName) throws IconException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Get the icon set for the specified icon name.
-     *
-     * @param iconName name of the icon
-     * @param iconSetName name of the icon set to use
-     * @return the icon set used for the specified icon name
-     * @throws IconException if problem occurs
-     * @since 10.6RC1
-     */
-    default IconSet getIconSet(String iconName, String iconSetName) throws IconException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Get the icon set for the specified icon name.
-     *
-     * @param iconName name of the icon
-     * @param iconSetName name of the icon set to use
-     * @param fallback enable the fallback to the default icon theme if the icon does not exist
-     * @return the icon set used for the specified icon name
-     * @throws IconException if problem occurs
-     * @since 10.6RC1
-     */
-    default IconSet getIconSet(String iconName, String iconSetName, boolean fallback) throws IconException
-    {
-        throw new UnsupportedOperationException();
-    }
 }

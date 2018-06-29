@@ -5,7 +5,8 @@ xwiki.iconset.ssx = IconThemes.Default
 xwiki.iconset.jsx = IconThemes.JS
 xwiki.iconset.render.wiki = {{html clean="false"}}<span class="fa fa-$icon"></span>{{/html}}
 xwiki.iconset.render.html = <span class="fa fa-$icon"></span>
-xwiki.iconset.render.custom = fa fa-$icon
+xwiki.iconset.icon.url = http://url_to_image/$icon.png
+xwiki.iconset.icon.cssClass = fa fa-$icon
 
 ## Icons
 transmit = anchor

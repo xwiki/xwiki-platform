@@ -20,6 +20,7 @@
 package org.xwiki.icon;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -164,60 +165,6 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Display an icon with custom code from the current {@link org.xwiki.icon.IconSet}.
-     *
-     * @param iconName name of the icon to display
-     * @return the custom code that displays the icon
-     * @since 10.6RC1
-     */
-    public String renderCustom(String iconName)
-    {
-        try {
-            return iconManager.renderCustom(iconName);
-        } catch (IconException e) {
-            setLastError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Display an icon with custom code from the specified {@link org.xwiki.icon.IconSet}.
-     *
-     * @param iconName name of the icon to display
-     * @param iconSetName name of the icon set
-     * @return the custom code that displays the icon
-     * @since 10.6RC1
-     */
-    public String renderCustom(String iconName, String iconSetName)
-    {
-        try {
-            return iconManager.renderCustom(iconName, iconSetName);
-        } catch (IconException e) {
-            setLastError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Display an icon with custom code from the specified {@link org.xwiki.icon.IconSet}.
-     *
-     * @param iconName name of the icon to display
-     * @param iconSetName name of the icon set
-     * @param fallback enable the fallback to the default icon theme if the icon does not exist
-     * @return the custom code that displays the icon
-     * @since 10.6RC1
-     */
-    public String renderCustom(String iconName, String iconSetName, boolean fallback)
-    {
-        try {
-            return iconManager.renderCustom(iconName, iconSetName, fallback);
-        } catch (IconException e) {
-            setLastError(e);
-            return null;
-        }
-    }
-
-    /**
      * Pull the necessary resources to use the default icon set.
      *
      * @since 10.6RC1
@@ -313,6 +260,66 @@ public class IconManagerScriptService implements ScriptService
             if (currentIconSet != null) {
                 return currentIconSet.getName();
             }
+        } catch (IconException e) {
+            setLastError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Generate the custom code to display an icon.
+     *
+     * @param iconName name of the icon to render
+     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    public Map<String, Object> getMetaData(String iconName) throws IconException
+    {
+        try {
+            return iconManager.getMetaData(iconName);
+        } catch (IconException e) {
+            setLastError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Generate the custom code to display an icon with the specified icon theme.
+     *
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    public Map<String, Object> getMetaData(String iconName, String iconSetName) throws IconException
+    {
+        try {
+            return iconManager.getMetaData(iconName, iconSetName);
+        } catch (IconException e) {
+            setLastError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Generate the custom code to display an icon with the specified icon theme.
+     *
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     * @since 10.6RC1
+     */
+    public Map<String, Object> getMetaData(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        try {
+            return iconManager.getMetaData(iconName, iconSetName, fallback);
         } catch (IconException e) {
             setLastError(e);
         }

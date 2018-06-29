@@ -46,7 +46,9 @@ public class IconSet
 
     private String renderHTML;
 
-    private String renderCustom;
+    private String url;
+
+    private String cssClass;
 
     private IconType type;
 
@@ -189,23 +191,43 @@ public class IconSet
     }
 
     /**
-     * @return the custom code to manually display an icon from this set.
+     * @return the icon url
      * @since 10.6RC1
      */
-    public String getRenderCustom()
+    public String getUrl()
     {
-        return renderCustom;
+        return url;
     }
 
     /**
-     * Set the custom code to manually display an icon from this set.
+     * Set the url of the icon.
      *
-     * @param renderCustom the custom code to set
+     * @param url the icon url
      * @since 10.6RC1
      */
-    public void setRenderCustom(String renderCustom)
+    public void setUrl(String url)
     {
-        this.renderCustom = renderCustom;
+        this.url = url;
+    }
+
+    /**
+     * @return the icon css class
+     * @since 10.6RC1
+     */
+    public String getCssClass()
+    {
+        return cssClass;
+    }
+
+    /**
+     * Set the css class of the icon.
+     *
+     * @param cssClass the icon css class
+     * @since 10.6RC1
+     */
+    public void setCssClass(String cssClass)
+    {
+        this.cssClass = cssClass;
     }
 
     /**

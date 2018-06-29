@@ -51,15 +51,19 @@ public interface IconRenderer
     String renderHTML(String iconName, IconSet iconSet) throws IconException;
 
     /**
-     * Generate the custom code to display an icon.
+     * Render an icon with the specified renderer.
+     *
+     * <p>The renderer contains velocity code which should use the <b>$icon</b> variable.
+     * For instance: <pre>String renderer = "fa fa-$icon";</pre>
      *
      * @param iconName name of the icon to render
      * @param iconSet icon set that contains the icon to display
-     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @param renderer velocity code to render
+     * @return rendered icon using the renderer through velocity
      * @throws IconException if problems occur
      * @since 10.6RC1
      */
-    default String renderCustom(String iconName, IconSet iconSet) throws IconException
+    default String renderIcon(String iconName, IconSet iconSet, String renderer) throws IconException
     {
         throw new UnsupportedOperationException();
     }

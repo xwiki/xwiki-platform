@@ -25,20 +25,21 @@ import java.io.Reader;
 import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -50,21 +51,21 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.2M1
  */
+@ComponentTest
 public class DefaultIconSetLoaderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultIconSetLoader> mocker =
-        new MockitoComponentMockingRule<>(DefaultIconSetLoader.class);
+    @InjectMockComponents
+    private DefaultIconSetLoader iconSetLoader;
 
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
     }
 
@@ -76,7 +77,8 @@ public class DefaultIconSetLoaderTest
         assertEquals("IconThemes.JS", result.getJsx());
         assertEquals("{{html clean=\"false\"}}<span class=\"fa fa-$icon\"></span>{{/html}}", result.getRenderWiki());
         assertEquals("<span class=\"fa fa-$icon\"></span>", result.getRenderHTML());
-        assertEquals("fa fa-$icon", result.getRenderCustom());
+        assertEquals("http://url_to_image/$icon.png", result.getUrl());
+        assertEquals("fa fa-$icon", result.getCssClass());
         assertEquals("anchor", result.getIcon("transmit").getValue());
         assertEquals("globe", result.getIcon("earth").getValue());
         assertEquals(IconType.FONT, result.getType());
@@ -88,7 +90,7 @@ public class DefaultIconSetLoaderTest
         Reader content = new InputStreamReader(getClass().getResourceAsStream("/test.iconset"));
 
         // Test
-        IconSet result = mocker.getComponentUnderTest().loadIconSet(content, "FontAwesome");
+        IconSet result = iconSetLoader.loadIconSet(content, "FontAwesome");
 
         // Verify
         verifies(result);
@@ -109,7 +111,7 @@ public class DefaultIconSetLoaderTest
         when(doc.getContent()).thenReturn(content.toString());
 
         // Test
-        IconSet result = mocker.getComponentUnderTest().loadIconSet(iconSetRef);
+        IconSet result = iconSetLoader.loadIconSet(iconSetRef);
 
         // Verify
         verifies(result);
@@ -126,13 +128,13 @@ public class DefaultIconSetLoaderTest
         // Test
         Exception caughException = null;
         try {
-            mocker.getComponentUnderTest().loadIconSet(content, "FontAwesome");
+            iconSetLoader.loadIconSet(content, "FontAwesome");
         } catch (IconException e) {
             caughException = e;
         }
 
         assertNotNull(caughException);
-        assert(caughException instanceof IconException);
+        assert (caughException instanceof IconException);
         assertEquals(exception, caughException.getCause());
         assertEquals("Failed to load the IconSet [FontAwesome].", caughException.getMessage());
     }
@@ -146,13 +148,13 @@ public class DefaultIconSetLoaderTest
         // Test
         Exception caughException = null;
         try {
-            mocker.getComponentUnderTest().loadIconSet(new DocumentReference("a", "b", "c"));
+            iconSetLoader.loadIconSet(new DocumentReference("a", "b", "c"));
         } catch (IconException e) {
             caughException = e;
         }
 
         assertNotNull(caughException);
-        assert(caughException instanceof IconException);
+        assert (caughException instanceof IconException);
         assertEquals(exception, caughException.getCause());
         assertEquals("Failed to load the IconSet [a:b.c].", caughException.getMessage());
     }

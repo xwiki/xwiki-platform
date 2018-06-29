@@ -2059,6 +2059,7 @@ public class Document extends Api
      * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
      * @since 10.6RC1
      */
+    @Unstable
     public boolean hasAccess(Right right, DocumentReference userReference)
     {
         return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());

@@ -43,8 +43,6 @@ public interface PageReferenceResolver<T>
 
     /**
      * Type instance for {@code PageReferenceResolver<EntityReference>}.
-     * 
-     * @since 4.0M1
      */
     ParameterizedType TYPE_REFERENCE =
         new DefaultParameterizedType(null, PageReferenceResolver.class, EntityReference.class);

@@ -48,6 +48,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -254,6 +255,7 @@ public class Document extends Api
      * @return the reference of the document as {@link PageReference} without the {@link Locale}
      * @since 10.6RC1
      */
+    @Unstable
     public PageReference getPageReference()
     {
         return this.doc.getPageReference();
@@ -263,6 +265,7 @@ public class Document extends Api
      * @return the reference of the document as {@link PageReference} including the {@link Locale}
      * @since 10.6RC1
      */
+    @Unstable
     public PageReference getPageReferenceWithLocale()
     {
         return this.doc.getPageReferenceWithLocale();

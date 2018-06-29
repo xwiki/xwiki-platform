@@ -145,6 +145,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.XMLUtils;
@@ -1401,6 +1402,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the reference of the document as {@link PageReference}
      * @since 10.6RC1
      */
+    @Unstable
     public PageReference getPageReference()
     {
         if (this.pageReferenceCache == null) {
@@ -1414,6 +1416,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the reference of the document as {@link PageReference} including the {@link Locale}
      * @since 10.6RC1
      */
+    @Unstable
     public PageReference getPageReferenceWithLocale()
     {
         if (this.pageReferenceWithLocaleCache == null) {

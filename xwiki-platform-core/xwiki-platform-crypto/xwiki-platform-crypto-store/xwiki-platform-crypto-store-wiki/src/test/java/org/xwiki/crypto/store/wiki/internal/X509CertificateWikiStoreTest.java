@@ -44,6 +44,7 @@ import org.xwiki.crypto.store.wiki.internal.query.AbstractX509KeyIdentifierQuery
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509StoreQuery;
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509SubjectQuery;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -150,12 +151,12 @@ public class X509CertificateWikiStoreTest
     @Before
     public void setUp() throws Exception
     {
-        EntityReferenceProvider valueProvider = mock(EntityReferenceProvider.class);
+        this.mocker.registerMockComponent(EntityReferenceProvider.class, "default");
+
+        EntityReferenceProvider valueProvider = this.mocker.registerMockComponent(EntityReferenceProvider.class, "current");
         when(valueProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
         when(valueProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
         when(valueProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DOCUMENT_REFERENCE);
-
-        mocker.registerComponent(EntityReferenceProvider.class, "current", valueProvider);
 
         Provider<XWikiContext> xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);

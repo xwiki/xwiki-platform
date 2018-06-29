@@ -77,8 +77,8 @@ public class DefaultIconSetLoaderTest
         assertEquals("IconThemes.JS", result.getJsx());
         assertEquals("{{html clean=\"false\"}}<span class=\"fa fa-$icon\"></span>{{/html}}", result.getRenderWiki());
         assertEquals("<span class=\"fa fa-$icon\"></span>", result.getRenderHTML());
-        assertEquals("http://url_to_image/$icon.png", result.getUrl());
-        assertEquals("fa fa-$icon", result.getCssClass());
+        assertEquals("http://url_to_image/$icon.png", result.getIconUrl());
+        assertEquals("fa fa-$icon", result.getIconCssClass());
         assertEquals("anchor", result.getIcon("transmit").getValue());
         assertEquals("globe", result.getIcon("earth").getValue());
         assertEquals(IconType.FONT, result.getType());

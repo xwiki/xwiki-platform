@@ -121,9 +121,9 @@ public class DefaultIconSetLoader implements IconSetLoader
         } else if (ICON_TYPE_PROPERTY_NAME.equals(key)) {
             iconSet.setType(IconType.valueOf(value.toUpperCase()));
         } else if (ICON_URL_PROPERTY_NAME.equals(key)) {
-            iconSet.setUrl(value);
+            iconSet.setIconUrl(value);
         } else if (ICON_CSS_CLASS_PROPERTY_NAME.equals(key)) {
-            iconSet.setCssClass(value);
+            iconSet.setIconCssClass(value);
         } else {
             Icon icon = new Icon();
             icon.setValue(value);

@@ -46,9 +46,9 @@ public class IconSet
 
     private String renderHTML;
 
-    private String url;
+    private String iconUrl;
 
-    private String cssClass;
+    private String iconCssClass;
 
     private IconType type;
 
@@ -194,40 +194,40 @@ public class IconSet
      * @return the icon url
      * @since 10.6RC1
      */
-    public String getUrl()
+    public String getIconUrl()
     {
-        return url;
+        return iconUrl;
     }
 
     /**
      * Set the url of the icon.
      *
-     * @param url the icon url
+     * @param iconUrl the icon url
      * @since 10.6RC1
      */
-    public void setUrl(String url)
+    public void setIconUrl(String iconUrl)
     {
-        this.url = url;
+        this.iconUrl = iconUrl;
     }
 
     /**
      * @return the icon css class
      * @since 10.6RC1
      */
-    public String getCssClass()
+    public String getIconCssClass()
     {
-        return cssClass;
+        return iconCssClass;
     }
 
     /**
      * Set the css class of the icon.
      *
-     * @param cssClass the icon css class
+     * @param iconCssClass the icon css class
      * @since 10.6RC1
      */
-    public void setCssClass(String cssClass)
+    public void setIconCssClass(String iconCssClass)
     {
-        this.cssClass = cssClass;
+        this.iconCssClass = iconCssClass;
     }
 
     /**

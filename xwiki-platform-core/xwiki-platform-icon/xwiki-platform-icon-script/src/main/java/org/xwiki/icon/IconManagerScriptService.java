@@ -189,9 +189,6 @@ public class IconManagerScriptService implements ScriptService
     {
         try {
             IconSet iconSet = iconSetManager.getIconSet(iconSetName);
-            if (iconSet == null) {
-                iconSet = iconSetManager.getDefaultIconSet();
-            }
             iconRenderer.use(iconSet);
         } catch (IconException e) {
             setLastError(e);

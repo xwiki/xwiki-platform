@@ -187,8 +187,8 @@ public class DefaultIconManagerTest
     {
         IconSet iconSet = new IconSet("iconSet");
         iconSet.setType(IconType.FONT);
-        iconSet.setUrl("http://url_to_image/$icon.png");
-        iconSet.setCssClass("fa fa-$icon");
+        iconSet.setIconUrl("http://url_to_image/$icon.png");
+        iconSet.setIconCssClass("fa fa-$icon");
         iconSet.addIcon("test", new Icon("hello"));
 
         // Mocks
@@ -216,7 +216,7 @@ public class DefaultIconManagerTest
 
         IconSet defaultIconSet = new IconSet("default");
         defaultIconSet.setType(IconType.IMAGE);
-        defaultIconSet.setCssClass("fa fa-$icon");
+        defaultIconSet.setIconCssClass("fa fa-$icon");
         defaultIconSet.addIcon("test", new Icon("hello"));
 
         // Mocks

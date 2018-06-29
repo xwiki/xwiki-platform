@@ -96,7 +96,7 @@ public class DefaultIconManager implements IconManager
     @Override
     public Map<String, Object> getMetaData(String iconName) throws IconException
     {
-        return this.getMetaData(iconName, getIconSet(iconName).getName());
+        return this.getMetaData(iconName, getIconSet(iconName));
     }
 
     @Override
@@ -108,13 +108,17 @@ public class DefaultIconManager implements IconManager
     @Override
     public Map<String, Object> getMetaData(String iconName, String iconSetName, boolean fallback) throws IconException
     {
+        return this.getMetaData(iconName, getIconSet(iconName, iconSetName, fallback));
+    }
+
+    private Map<String, Object> getMetaData(String iconName, IconSet iconSet) throws IconException
+    {
         Map<String, Object> metaData = new HashMap<>();
-        IconSet iconSet = getIconSet(iconName, iconSetName, fallback);
         if (iconSet != null) {
             metaData.put(META_DATA_ICON_SET_NAME, iconSet.getName());
             metaData.put(META_DATA_ICON_SET_TYPE, iconSet.getType().name());
-            metaData.put(META_DATA_URL, iconRenderer.renderIcon(iconName, iconSet, iconSet.getUrl()));
-            metaData.put(META_DATA_CSS_CLASS, iconRenderer.renderIcon(iconName, iconSet, iconSet.getCssClass()));
+            metaData.put(META_DATA_URL, iconRenderer.renderIcon(iconName, iconSet, iconSet.getIconUrl()));
+            metaData.put(META_DATA_CSS_CLASS, iconRenderer.renderIcon(iconName, iconSet, iconSet.getIconCssClass()));
         }
 
         return metaData;

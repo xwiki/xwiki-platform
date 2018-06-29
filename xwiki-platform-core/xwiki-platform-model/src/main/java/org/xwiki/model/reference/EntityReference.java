@@ -32,6 +32,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -164,6 +165,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters parameters for this reference, may be null
      * @since 10.6RC1
      */
+    @Unstable
     public EntityReference(String name, EntityType type, Map<String, Serializable> parameters)
     {
         setName(name);
@@ -195,6 +197,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters parameters for this reference, may be null
      * @since 10.6RC1
      */
+    @Unstable
     public EntityReference(EntityReference reference, Map<String, Serializable> parameters)
     {
         this(reference.getName(), reference.getType(), reference.getParent(), parameters);

@@ -53,6 +53,7 @@ import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides Model-specific Scripting APIs.
@@ -222,6 +223,7 @@ public class ModelScriptService implements ScriptService
      * @return the typed PAge Reference object or null if no Resolver with the passed hint could be found
      * @since 10.6RC1
      */
+    @Unstable
     public PageReference createPageReference(String wiki, String... pages)
     {
         return createPageReference(wiki, Arrays.asList(pages), (Locale) null);
@@ -237,6 +239,7 @@ public class ModelScriptService implements ScriptService
      * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
      * @since 10.6RC1
      */
+    @Unstable
     public PageReference createPageReference(String wiki, List<String> pages, Locale locale)
     {
         return createPageReference(wiki, pages, locale, DEFAULT_RESOLVER_HINT);
@@ -254,6 +257,7 @@ public class ModelScriptService implements ScriptService
      * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
      * @since 10.6RC1
      */
+    @Unstable
     public PageReference createPageReference(String wiki, List<String> pages, Locale locale, String hint)
     {
         // Add wiki
@@ -304,6 +308,7 @@ public class ModelScriptService implements ScriptService
      * @return a reference to the specified attachment
      * @since 10.6RC1
      */
+    @Unstable
     public PageAttachmentReference createPageAttachmentReference(PageReference pageReference, String fileName)
     {
         return new PageAttachmentReference(fileName, pageReference);
@@ -552,6 +557,7 @@ public class ModelScriptService implements ScriptService
      * @return the corresponding typed {@link PageAttachmentReference} object
      * @since 10.6RC1
      */
+    @Unstable
     public PageAttachmentReference resolvePageAttachment(String stringRepresentation, String hint, Object... parameters)
     {
         try {
@@ -608,6 +614,7 @@ public class ModelScriptService implements ScriptService
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 10.6RC1
      */
+    @Unstable
     public PageObjectReference resolvePageObject(String stringRepresentation, Object... parameters)
     {
         return resolvePageObject(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
@@ -623,6 +630,7 @@ public class ModelScriptService implements ScriptService
      * @return the corresponding typed {@link PageObjectReference} object
      * @since 10.6RC1
      */
+    @Unstable
     public PageObjectReference resolvePageObject(String stringRepresentation, String hint, Object... parameters)
     {
         try {
@@ -679,6 +687,7 @@ public class ModelScriptService implements ScriptService
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 10.6RC1
      */
+    @Unstable
     public PageObjectPropertyReference resolvePageObjectProperty(String stringRepresentation, Object... parameters)
     {
         return resolvePageObjectProperty(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
@@ -694,6 +703,7 @@ public class ModelScriptService implements ScriptService
      * @return the corresponding typed {@link ObjectPropertyReference} object
      * @since 10.6RC1
      */
+    @Unstable
     public PageObjectPropertyReference resolvePageObjectProperty(String stringRepresentation, String hint,
         Object... parameters)
     {
@@ -754,6 +764,7 @@ public class ModelScriptService implements ScriptService
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 10.6RC1
      */
+    @Unstable
     public PageClassPropertyReference resolvePageClassProperty(String stringRepresentation, Object... parameters)
     {
         return resolvePageClassProperty(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
@@ -769,6 +780,7 @@ public class ModelScriptService implements ScriptService
      * @return the corresponding typed {@link ClassPropertyReference} object
      * @since 10.6RC1
      */
+    @Unstable
     public PageClassPropertyReference resolvePageClassProperty(String stringRepresentation, String hint,
         Object... parameters)
     {

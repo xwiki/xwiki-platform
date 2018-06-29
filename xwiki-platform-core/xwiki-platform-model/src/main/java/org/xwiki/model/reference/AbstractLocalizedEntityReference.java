@@ -21,6 +21,7 @@ package org.xwiki.model.reference;
 
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.model.EntityType;
@@ -41,7 +42,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     public static final String LOCALE = "locale";
 
     /**
-     * Create a new root EntityReference.
+     * Create a new EntityReference.
      *
      * @param name name for the newly created entity reference, could not be null.
      * @param type type for the newly created entity reference, could not be null.
@@ -52,7 +53,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     }
 
     /**
-     * Create a new root EntityReference.
+     * Create a new EntityReference.
      *
      * @param name name for the newly created entity reference, could not be null.
      * @param type type for the newly created entity reference, could not be null.
@@ -60,7 +61,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      */
     public AbstractLocalizedEntityReference(String name, EntityType type, Locale locale)
     {
-        super(name, type);
+        this(name, type);
 
         setLocale(locale);
     }
@@ -80,6 +81,18 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     /**
      * Create a new EntityReference.
      *
+     * @param name name for the newly created entity reference, could not be null.
+     * @param type type for the newly created entity reference, could not be null.
+     * @param parent parent reference for the newly created entity reference, may be null.
+     * @param parameters parameters for this reference, may be null
+     */
+    public AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent,
+        Map<String, Serializable> parameters)
+    {
+        super(name, type, parent, parameters);
+    }
+
+    /**
      * @param name name for the newly created entity reference, could not be null.
      * @param type type for the newly created entity reference, could not be null.
      * @param parent parent reference for the newly created entity reference, may be null.

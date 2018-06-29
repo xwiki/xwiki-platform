@@ -170,6 +170,7 @@ public enum EntityType
      * @return the list of allowed parent for this entity type
      * @since 10.6RC1
      */
+    @Unstable
     public List<EntityType> getAllowedParents()
     {
         return this.allowedParents;
@@ -180,6 +181,7 @@ public enum EntityType
      * @return true of the passed type is a possible ancestor of the passed type
      * @since 10.6RC1
      */
+    @Unstable
     public boolean isAllowedAncestor(EntityType type)
     {
         return this.allowedAncestors[type.ordinal()];

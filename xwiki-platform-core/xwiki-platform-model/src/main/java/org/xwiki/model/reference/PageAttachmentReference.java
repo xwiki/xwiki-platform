@@ -22,6 +22,7 @@ package org.xwiki.model.reference;
 import java.beans.Transient;
 
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Attachment (page reference and file name). Note that an attachment is always attached to
@@ -30,6 +31,7 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 10.6RC1
  */
+@Unstable
 public class PageAttachmentReference extends EntityReference
 {
     /**

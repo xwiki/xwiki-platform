@@ -20,16 +20,19 @@
 package org.xwiki.model.reference;
 
 import java.beans.Transient;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Provider;
 
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a document (wiki, space and document names).
@@ -194,6 +197,18 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     public DocumentReference(String pageName, SpaceReference parent, Locale locale)
     {
         super(pageName, EntityType.DOCUMENT, parent, locale);
+    }
+
+    /**
+     * @param pageName the name of the document
+     * @param parent the parent space for the document
+     * @param parameters parameters for this reference, may be null
+     * @since 10.6RC1
+     */
+    @Unstable
+    public DocumentReference(String pageName, EntityReference parent, Map<String, Serializable> parameters)
+    {
+        super(pageName, EntityType.DOCUMENT, parent, parameters);
     }
 
     /**

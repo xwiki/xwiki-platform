@@ -268,7 +268,7 @@ public class TestUtils
 
     public XWikiWebDriver getDriver()
     {
-        return context.getDriver();
+        return TestUtils.context.getDriver();
     }
 
     public Session getSession()

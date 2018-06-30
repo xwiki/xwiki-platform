@@ -19,9 +19,12 @@
  */
 package org.xwiki.test.ui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
@@ -82,7 +85,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         try {
-            return this.wrappedDriver.findElement(by);
+            return findElement(by);
         } finally {
             setDriverImplicitWait();
         }
@@ -93,7 +96,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         try {
-            return this.wrappedDriver.findElements(by);
+            return findElements(by);
         } finally {
             setDriverImplicitWait();
         }
@@ -174,7 +177,25 @@ public class XWikiWebDriver extends RemoteWebDriver
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         Wait<WebDriver> wait = new WebDriverWait(this, getTimeout());
         try {
-            wait.until(condition);
+            // Handle both Selenium 2 and Selenium 3
+            try {
+                Method method = WebDriverWait.class.getMethod("until", Function.class);
+                // We're in Selenium3, it requires a java Function passed to the wait
+                try {
+                    method.invoke(wait, new Function<WebDriver, T>()
+                    {
+                        @Override public T apply(WebDriver webDriver)
+                        {
+                            return condition.apply(webDriver);
+                        }
+                    });
+                } catch (IllegalAccessException|InvocationTargetException e) {
+                    throw new RuntimeException("Error converting to selenium3", e);
+                }
+            } catch (NoSuchMethodException e) {
+                // We're in Selenium 2!
+                wait.until(condition);
+            }
         } finally {
             // Reset timeout
             setDriverImplicitWait();
@@ -578,7 +599,13 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElement(By by)
     {
-        return this.wrappedDriver.findElement(by);
+        WebElement element = this.wrappedDriver.findElement(by);
+
+        // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
+        // visible floating save bar would hide the element.
+        executeScript("arguments[0].scrollIntoView();", element);
+
+        return element;
     }
 
     @Override

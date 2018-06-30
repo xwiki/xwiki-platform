@@ -41,16 +41,14 @@ public class PersistentTestContext
     private static final String BROWSER_NAME_SYSTEM_PROPERTY = System.getProperty("browser", "*firefox");
 
     /** This starts and stops the wiki engine. */
-    private final List<XWikiExecutor> executors;
+    private List<XWikiExecutor> executors;
 
-    private final XWikiWebDriver driver;
+    private XWikiWebDriver driver;
 
     /** Utility methods which should be available to tests and to pages. */
-    private final TestUtils util;
+    private TestUtils util;
 
-    private final WebDriverFactory webDriverFactory;
-
-    private final Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Starts an XWiki instance if not already started.
@@ -63,18 +61,28 @@ public class PersistentTestContext
     /**
      * Don't start an XWiki instance, instead use an existing started instance.
      */
-    public PersistentTestContext(List<XWikiExecutor> executors) throws Exception
+    public PersistentTestContext(List<XWikiExecutor> executors)
+    {
+        initialize(executors);
+        // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
+        // extensions such as Firebug), simply uncomment the following line:
+        // System.setProperty("webdriver.firefox.profile", "default");
+        WebDriverFactory webDriverFactory = new WebDriverFactory();
+        setDriver(webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY));
+    }
+
+    public PersistentTestContext(List<XWikiExecutor> executors, XWikiWebDriver driver)
+    {
+        initialize(executors);
+        this.driver = driver;
+    }
+
+    private void initialize(List<XWikiExecutor> executors)
     {
         this.executors = executors;
 
         this.util = new TestUtils();
         this.util.setExecutors(executors);
-
-        // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
-        // extensions such as Firebug), simply uncomment the following line:
-        // System.setProperty("webdriver.firefox.profile", "default");
-        this.webDriverFactory = new WebDriverFactory();
-        this.driver = this.webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY);
     }
 
     public PersistentTestContext(PersistentTestContext toClone)
@@ -82,13 +90,17 @@ public class PersistentTestContext
         this.executors = toClone.executors;
         this.util = toClone.util;
         this.driver = toClone.driver;
-        this.webDriverFactory = toClone.webDriverFactory;
         this.properties.putAll(toClone.properties);
     }
 
     public XWikiWebDriver getDriver()
     {
         return this.driver;
+    }
+
+    public void setDriver(XWikiWebDriver driver)
+    {
+        this.driver = driver;
     }
 
     public List<XWikiExecutor> getExecutors()
@@ -113,7 +125,9 @@ public class PersistentTestContext
 
     public void shutdown() throws Exception
     {
-        this.driver.quit();
+        if (this.driver != null) {
+            this.driver.quit();
+        }
         for (XWikiExecutor executor : this.executors) {
             executor.stop();
         }

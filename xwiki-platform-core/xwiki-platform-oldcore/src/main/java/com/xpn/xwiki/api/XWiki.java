@@ -283,6 +283,7 @@ public class XWiki extends Api
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
+     * @see {@link #getEntityDocument(String, EntityType)}
      */
     public Document getDocument(String documentReference) throws XWikiException
     {
@@ -311,7 +312,7 @@ public class XWiki extends Api
      * @since 10.6RC1
      */
     @Unstable
-    public Document getDocument(String referenceString, EntityType type) throws XWikiException
+    public Document getEntityDocument(String referenceString, EntityType type) throws XWikiException
     {
         if (type == EntityType.DOCUMENT || StringUtils.isEmpty(referenceString)) {
             return getDocument(referenceString);

@@ -278,6 +278,9 @@ public class XWiki extends Api
 
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
+     * <p>
+     * This is a helper for document reference but you can use {@link #getEntityDocument(String, EntityType)} for any
+     * other kind of reference.
      *
      * @param documentReference the reference of the document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
@@ -314,10 +317,6 @@ public class XWiki extends Api
     @Unstable
     public Document getEntityDocument(String referenceString, EntityType type) throws XWikiException
     {
-        if (type == EntityType.DOCUMENT || StringUtils.isEmpty(referenceString)) {
-            return getDocument(referenceString);
-        }
-
         return getDocument(getRelativeStringEntityReferenceResolver().resolve(referenceString, type));
     }
 

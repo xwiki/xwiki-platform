@@ -45,6 +45,7 @@ xwiki.iconset.ssx = IconThemes.FontAwesome
 xwiki.iconset.jsx = IconThemes.FontAwesome
 xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon"&gt;&lt;/span&gt;{{/html}}
 xwiki.iconset.render.html = &lt;span class="fa fa-$icon"&gt;&lt;/span&gt;
+xwiki.iconset.icon.cssClass = fa fa-$icon
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
 home = home

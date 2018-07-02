@@ -19,7 +19,9 @@
  */
 package org.xwiki.icon.internal;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,8 +36,8 @@ import org.xwiki.icon.IconSetManager;
 /**
  * Default implementation of {@link org.xwiki.icon.IconManager}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 @Component
 @Singleton
@@ -92,6 +94,37 @@ public class DefaultIconManager implements IconManager
     }
 
     @Override
+    public Map<String, Object> getMetaData(String iconName) throws IconException
+    {
+        return this.getMetaData(iconName, getIconSet(iconName));
+    }
+
+    @Override
+    public Map<String, Object> getMetaData(String iconName, String iconSetName) throws IconException
+    {
+        return this.getMetaData(iconName, iconSetName, true);
+    }
+
+    @Override
+    public Map<String, Object> getMetaData(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        return this.getMetaData(iconName, getIconSet(iconName, iconSetName, fallback));
+    }
+
+    private Map<String, Object> getMetaData(String iconName, IconSet iconSet) throws IconException
+    {
+        Map<String, Object> metaData = new HashMap<>();
+        if (iconSet != null) {
+            metaData.put(META_DATA_ICON_SET_NAME, iconSet.getName());
+            metaData.put(META_DATA_ICON_SET_TYPE, iconSet.getType().name());
+            metaData.put(META_DATA_URL, iconRenderer.render(iconName, iconSet, iconSet.getIconUrl()));
+            metaData.put(META_DATA_CSS_CLASS, iconRenderer.render(iconName, iconSet, iconSet.getIconCssClass()));
+        }
+
+        return metaData;
+    }
+
+    @Override
     public List<String> getIconNames() throws IconException
     {
         return iconSetManager.getCurrentIconSet().getIconNames();
@@ -103,26 +136,43 @@ public class DefaultIconManager implements IconManager
         return iconSetManager.getIconSet(iconSetName).getIconNames();
     }
 
+    /**
+     * @param iconName name of the icon
+     * @return the current icon set if the icon name is inside, otherwise the default icon set
+     */
     private IconSet getIconSet(String iconName) throws IconException
     {
-        // First: try to render with the current icon set
-        IconSet currentIconSet = iconSetManager.getCurrentIconSet();
-        if (currentIconSet != null && currentIconSet.getIcon(iconName) != null) {
-            return currentIconSet;
-        }
-
-        // Fallback to the default icon set
-        return iconSetManager.getDefaultIconSet();
+        return getIconSet(iconName, iconSetManager.getCurrentIconSet(), true);
     }
 
+    /**
+     * @param iconName name of the icon
+     * @param iconSetName name of the icon set
+     * @param fallback specify if the default icon set should be used in case the icon is not in the specified icon set
+     * @return the specified icon set if the icon name is inside, otherwise the default icon set if fallback is true
+     * and null if fallback is false
+     */
     private IconSet getIconSet(String iconName, String iconSetName, boolean fallback) throws IconException
     {
-        // Get the specified icon set
-        IconSet iconSet = iconSetManager.getIconSet(iconSetName);
+        return getIconSet(iconName, iconSetManager.getIconSet(iconSetName), fallback);
+    }
 
+    /**
+     * @param iconName name of the icon
+     * @param iconSet the icon set
+     * @param fallback specify if the default icon set should be used in case the icon is not in the specified icon set
+     * @return the specified icon set if the icon name is inside, otherwise the default icon set if fallback is true
+     * and null if fallback is false
+     */
+    private IconSet getIconSet(String iconName, IconSet iconSet, boolean fallback) throws IconException
+    {
         // Fallback if necessary
-        if ((iconSet == null || iconSet.getIcon(iconName) == null) && fallback) {
-            return iconSetManager.getDefaultIconSet();
+        if (iconSet == null || iconSet.getIcon(iconName) == null) {
+            if (fallback) {
+                return iconSetManager.getDefaultIconSet();
+            } else {
+                return null;
+            }
         }
 
         // Return the icon set

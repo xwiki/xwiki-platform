@@ -83,7 +83,7 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         // user override.
         // Note that this system property is used by the XWikiExecutor code to start/stop XWiki.
         if (System.getProperty(URL_PREFIX_PROPERTY) == null) {
-            System.setProperty(URL_PREFIX_PROPERTY, "http://" + InetAddress.getLocalHost().getHostAddress());
+            System.setProperty(URL_PREFIX_PROPERTY, "http://" + getIP());
         }
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
@@ -257,5 +257,20 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
                 throw new RuntimeException("Failed to shutdown PersistentTestContext", e);
             }
         }
+    }
+
+    private String getIP() throws Exception
+    {
+        InetAddress inet = InetAddress.getLocalHost();
+        InetAddress[] ips = InetAddress.getAllByName(inet.getCanonicalHostName());
+        if (ips  != null ) {
+            for (int i = 0; i < ips.length; i++) {
+                if (!ips[i].getHostName().equals("127.0.0.1")) {
+                    return ips[i].getHostName();
+                }
+            }
+        }
+
+        throw new RuntimeException("Failed to find IP address of host");
     }
 }

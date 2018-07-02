@@ -768,9 +768,12 @@ $fn
 ### @param isHeaderHidden True if the header should be hidden (default: false)
 ###
 #macro(panelheader $title $isLarge $isHeaderHidden)
-## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
-## the Panels selectively using CSS.
-## We want to avoid showing the "WebHome" suffix as we are working on removing it.
+## Note: We pass the Panel name as an HTML class attribute so that it's possible to style the Panels selectively using
+## CSS.
+## We want to avoid showing the "WebHome" suffix in the generated class since we're working to remove it from the UI
+## and from the APIs. In addition it generates class names longer than they are needed. Thus for nested pages we strip
+## it. We also strip the wiki prefix to have a shorter generated class name and because they're not needed to provide
+## per-wiki styling of Panels.
 #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
 #if ($paneldoc.documentReference.name == $defaultDocumentName)
   #set ($serializedDocument = $services.model.serialize($paneldoc.documentReference.parent, 'compactwiki'))

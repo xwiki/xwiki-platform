@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -265,12 +266,13 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         InetAddress[] ips = InetAddress.getAllByName(inet.getCanonicalHostName());
         if (ips  != null ) {
             for (int i = 0; i < ips.length; i++) {
-                if (!ips[i].getHostName().equals("127.0.0.1")) {
-                    return ips[i].getHostName();
+                if (!ips[i].getHostAddress().equals("127.0.0.1")) {
+                    return ips[i].getHostAddress();
                 }
             }
         }
 
-        throw new RuntimeException("Failed to find IP address of host");
+        throw new RuntimeException(String.format("Failed to find IP address of host. Found [%s]",
+            StringUtils.join(ips, ',')));
     }
 }

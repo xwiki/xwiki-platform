@@ -21,14 +21,7 @@ You need Maven 3.1+ in order to build this extension.
 
 ## Release Steps
 
-    ## Release the new version in JIRA and create the next version.
-
-    ## Update the translations.
-    ## * download the translation pack from l10n and unpack
-    ##   http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Contrib.CKEditorIntegration&app=Contrib
-    ## * copy the translation pages to the UI module sources
-    ## * apply XAR format and review the changes
-    ## * commit only the significant changes
+    ## Create the next version in JIRA and release the current version.
 
     ## Prepare the tag for the new version.
     mvn org.apache.maven.plugins:maven-release-plugin:2.5:prepare -DautoVersionSubmodules -DskipTests -Darguments="-DskipTests" -Pintegration-tests

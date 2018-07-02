@@ -28,12 +28,13 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
         submitButton.prop('disabled', !$(event.target).val());
       });
       submitButton.click(function(event) {
-        var form = modalBody.find('form')[0];
-        if (form) {
-          var output = new FormData(form);
-          if (output.has('filePath')) {
-            modal.data('output', output).modal('hide');
-          }
+        var output = {
+          files: modalBody.find('input[name="filePath"]')[0].files,
+          filterStyles: modalBody.find('input[name="filterStyles"]').prop('checked'),
+          useOfficeViewer: modalBody.find('input[name="useOfficeViewer"]').prop('checked')
+        };
+        if (output.files && output.files.length > 0) {
+          modal.data('output', output).modal('hide');
         }
       });
     }
@@ -141,10 +142,10 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
         editor.showNotification(editor.localization.get('xwiki-office.importer.noUploadURL'), 'warning');
         return;
       }
-      var file = formData.get('filePath');
+      var file = formData.files[0];
       // Save the rest of the import parameters on the file to be used later.
-      file.filterStyles = formData.get('filterStyles');
-      file.useOfficeViewer = formData.get('useOfficeViewer');
+      file.filterStyles = formData.filterStyles;
+      file.useOfficeViewer = formData.useOfficeViewer;
       var loader = editor.uploadRepository.create(file);
       var placeholder = editor.document.createElement('div');
       placeholder.appendText(editor.localization.get('xwiki-office.importer.inProgress'));

@@ -265,10 +265,17 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Generate the custom code to display an icon.
+     * Generate metadata of an icon.
+     * <p> It can contain useful information such as:
+     * <ul>
+     * <li> The icon set name
+     * <li> The icon set type name
+     * <li> The icon url if defined
+     * <li> The icon css class if defined
+     * </ul>
      *
-     * @param iconName name of the icon to render
-     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @param iconName name of the icon
+     * @return a metadata map
      * @throws IconException if problems occur
      * @since 10.6RC1
      */
@@ -284,11 +291,18 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Generate the custom code to display an icon with the specified icon theme.
+     * Generate metadata of an icon.
+     * <p> It can contain useful information such as:
+     * <ul>
+     * <li> The icon set name
+     * <li> The icon set type name
+     * <li> The icon url if defined
+     * <li> The icon css class if defined
+     * </ul>
      *
-     * @param iconName name of the icon to render
+     * @param iconName name of the icon
      * @param iconSetName name of the icon set to use
-     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @return a metadata map
      * @throws IconException if problems occur
      * @since 10.6RC1
      */
@@ -304,12 +318,19 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
-     * Generate the custom code to display an icon with the specified icon theme.
+     * Generate metadata of an icon.
+     * <p> It can contain useful information such as:
+     * <ul>
+     * <li> The icon set name
+     * <li> The icon set type name
+     * <li> The icon url if defined
+     * <li> The icon css class if defined
+     * </ul>
      *
-     * @param iconName name of the icon to render
+     * @param iconName name of the icon
      * @param iconSetName name of the icon set to use
-     * @param fallback enable the fallback to the default icon theme if the icon does not exist
-     * @return the custom code that displays the icon or an empty string if the icon does not exist
+     * @param fallback enable the fallback to the default icon set if the icon does not exist
+     * @return a metadata map
      * @throws IconException if problems occur
      * @since 10.6RC1
      */

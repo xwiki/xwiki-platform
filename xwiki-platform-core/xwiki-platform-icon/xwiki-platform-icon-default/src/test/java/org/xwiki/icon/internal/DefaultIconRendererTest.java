@@ -91,6 +91,7 @@ public class DefaultIconRendererTest
     public void renderWithCSS() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderWiki("image:$icon.png");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
         when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
@@ -110,6 +111,7 @@ public class DefaultIconRendererTest
     public void renderWithSSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderWiki("image:$icon.png");
         iconSet.setSsx("ssx");
         iconSet.addIcon("test", new Icon("blabla"));
 
@@ -126,6 +128,7 @@ public class DefaultIconRendererTest
     public void renderWithJSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderWiki("image:$icon.png");
         iconSet.setJsx("jsx");
         iconSet.addIcon("test", new Icon("blabla"));
 
@@ -159,6 +162,7 @@ public class DefaultIconRendererTest
     public void renderHTMLWithCSS() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
         when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
@@ -178,6 +182,7 @@ public class DefaultIconRendererTest
     public void renderHTMLWithSSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.setSsx("ssx");
         iconSet.addIcon("test", new Icon("blabla"));
 
@@ -194,6 +199,7 @@ public class DefaultIconRendererTest
     public void renderHTMLWithJSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.setJsx("jsx");
         iconSet.addIcon("test", new Icon("blabla"));
 
@@ -248,10 +254,10 @@ public class DefaultIconRendererTest
         when(velocityRenderer.render("#set($icon = \"hello\")\nfa fa-$icon")).thenReturn("fa fa-hello");
 
         // Test
-        String renderedIcon1 = iconRenderer.renderIcon("test", iconSet, "fa fa-$icon");
-        String renderedIcon2 = iconRenderer.renderIcon("none", iconSet, "fa fa-$icon");
-        String renderedIcon3 = iconRenderer.renderIcon("none", null, "fa fa-$icon");
-        String renderedIcon4 = iconRenderer.renderIcon("none", iconSet, null);
+        String renderedIcon1 = iconRenderer.render("test", iconSet, "fa fa-$icon");
+        String renderedIcon2 = iconRenderer.render("none", iconSet, "fa fa-$icon");
+        String renderedIcon3 = iconRenderer.render("none", null, "fa fa-$icon");
+        String renderedIcon4 = iconRenderer.render("none", iconSet, null);
 
         // Verify
         assertEquals("fa fa-hello", renderedIcon1);

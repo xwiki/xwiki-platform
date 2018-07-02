@@ -117,8 +117,8 @@ public class DefaultIconManager implements IconManager
         if (iconSet != null) {
             metaData.put(META_DATA_ICON_SET_NAME, iconSet.getName());
             metaData.put(META_DATA_ICON_SET_TYPE, iconSet.getType().name());
-            metaData.put(META_DATA_URL, iconRenderer.renderIcon(iconName, iconSet, iconSet.getIconUrl()));
-            metaData.put(META_DATA_CSS_CLASS, iconRenderer.renderIcon(iconName, iconSet, iconSet.getIconCssClass()));
+            metaData.put(META_DATA_URL, iconRenderer.render(iconName, iconSet, iconSet.getIconUrl()));
+            metaData.put(META_DATA_CSS_CLASS, iconRenderer.render(iconName, iconSet, iconSet.getIconCssClass()));
         }
 
         return metaData;
@@ -142,17 +142,7 @@ public class DefaultIconManager implements IconManager
      */
     private IconSet getIconSet(String iconName) throws IconException
     {
-        return getIconSet(iconName, iconSetManager.getCurrentIconSet().getName());
-    }
-
-    /**
-     * @param iconName name of the icon
-     * @param iconSetName name of the icon set
-     * @return the specified icon set if the icon name is inside, otherwise the default icon set
-     */
-    private IconSet getIconSet(String iconName, String iconSetName) throws IconException
-    {
-        return getIconSet(iconName, iconSetName, true);
+        return getIconSet(iconName, iconSetManager.getCurrentIconSet(), true);
     }
 
     /**
@@ -164,13 +154,22 @@ public class DefaultIconManager implements IconManager
      */
     private IconSet getIconSet(String iconName, String iconSetName, boolean fallback) throws IconException
     {
-        // Get the specified icon set
-        IconSet iconSet = iconSetManager.getIconSet(iconSetName);
+        return getIconSet(iconName, iconSetManager.getIconSet(iconSetName), fallback);
+    }
 
+    /**
+     * @param iconName name of the icon
+     * @param iconSet the icon set
+     * @param fallback specify if the default icon set should be used in case the icon is not in the specified icon set
+     * @return the specified icon set if the icon name is inside, otherwise the default icon set if fallback is true
+     * and null if fallback is false
+     */
+    private IconSet getIconSet(String iconName, IconSet iconSet, boolean fallback) throws IconException
+    {
         // Fallback if necessary
         if (iconSet == null || iconSet.getIcon(iconName) == null) {
             if (fallback) {
-                iconSet = iconSetManager.getDefaultIconSet();
+                return iconSetManager.getDefaultIconSet();
             } else {
                 return null;
             }

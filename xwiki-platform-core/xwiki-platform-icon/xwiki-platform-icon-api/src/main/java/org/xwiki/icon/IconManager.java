@@ -167,7 +167,7 @@ public interface IconManager
      *
      * @param iconName name of the icon
      * @param iconSetName name of the icon set to use
-     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @param fallback enable the fallback to the default icon set if the icon does not exist
      * @return a metadata map
      * @throws IconException if problems occur
      * @since 10.6RC1

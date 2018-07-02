@@ -194,8 +194,8 @@ public class DefaultIconManagerTest
         // Mocks
         when(iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
         when(iconSetManager.getIconSet("iconSet")).thenReturn(iconSet);
-        when(iconRenderer.renderIcon("test", iconSet, "fa fa-$icon")).thenReturn("fa fa-hello");
-        when(iconRenderer.renderIcon("test", iconSet, "http://url_to_image/$icon.png"))
+        when(iconRenderer.render("test", iconSet, "fa fa-$icon")).thenReturn("fa fa-hello");
+        when(iconRenderer.render("test", iconSet, "http://url_to_image/$icon.png"))
             .thenReturn("http://url_to_image/hello.png");
 
         // Test
@@ -223,7 +223,7 @@ public class DefaultIconManagerTest
         when(iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
         when(iconSetManager.getDefaultIconSet()).thenReturn(defaultIconSet);
         when(iconSetManager.getIconSet("iconSet")).thenReturn(iconSet);
-        when(iconRenderer.renderIcon("test", defaultIconSet, "fa fa-$icon")).thenReturn("fa fa-hello");
+        when(iconRenderer.render("test", defaultIconSet, "fa fa-$icon")).thenReturn("fa fa-hello");
 
         // Test
         Map<String, Object> metadata = iconManager.getMetaData("test", "iconSet", true);

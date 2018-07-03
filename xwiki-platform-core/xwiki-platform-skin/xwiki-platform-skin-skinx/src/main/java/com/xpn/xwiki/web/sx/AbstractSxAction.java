@@ -64,10 +64,10 @@ public abstract class AbstractSxAction extends XWikiAction
     /** If the user passes this parameter in the URL, we will look for the script in the jar files. */
     private static final String JAR_RESOURCE_REQUEST_PARAMETER = "resource";
 
+    private DebugConfiguration debugConfiguration;
+
     /** @return the logging object of the concrete subclass. */
     protected abstract Logger getLogger();
-
-    private DebugConfiguration debugConfiguration;
 
     /**
      * This method must be called by render(XWikiContext). Render is in charge of creating the proper source and

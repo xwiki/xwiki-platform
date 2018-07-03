@@ -102,4 +102,15 @@ public class DisplayMacroParameters
     {
         return this.section;
     }
+
+    /**
+     * @param page the reference of the page to display
+     * @since 10.6RC1
+     */
+    @PropertyDescription("The reference of the page to display")
+    public void setPage(String page)
+    {
+        this.reference = page;
+        this.type = EntityType.PAGE;
+    }
 }

@@ -33,7 +33,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
@@ -44,6 +45,8 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.display.DisplayMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * @version $Id$
@@ -66,12 +69,15 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
     /**
      * Used to transform the passed document reference macro parameter into a typed {@link DocumentReference} object.
      */
     @Inject
     @Named("macro")
-    private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
@@ -131,15 +137,9 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
                 "You must specify a 'reference' parameter pointing to the entity to display.");
         }
 
-        DocumentReference includedReference = resolve(context.getCurrentMacroBlock(), parameters);
+        EntityReference includedReference = resolve(context.getCurrentMacroBlock(), parameters);
 
         checkRecursiveDisplay(context.getCurrentMacroBlock(), includedReference);
-
-        if (!this.documentAccessBridge.isDocumentViewable(includedReference)) {
-            throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUserReference()
-                + "] doesn't have view rights on document ["
-                + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
-        }
 
         // Step 2: Retrieve the included document.
         DocumentModelBridge documentBridge;
@@ -151,7 +151,14 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
                 e);
         }
 
-        // Step 3: Display the content of the included document.
+        // Step 3: Check right
+        if (!this.authorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
+            throw new MacroExecutionException(
+                String.format("Current user [%s] doesn't have view rights on document [%s]",
+                    this.documentAccessBridge.getCurrentUserReference(), includedReference));
+        }
+
+        // Step 4: Display the content of the included document.
         // Display the content in an isolated execution and transformation context.
         DocumentDisplayerParameters displayParameters = new DocumentDisplayerParameters();
         displayParameters.setContentTransformed(true);
@@ -177,7 +184,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
             references.pop();
         }
 
-        // Step 4: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
+        // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
         String source = this.defaultEntityReferenceSerializer.serialize(includedReference);
@@ -191,21 +198,19 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
      * Protect form recursive display.
      * 
      * @param currrentBlock the child block to check
-     * @param documentReference the reference of the document being included
+     * @param reference the reference of the document being included
      * @throws MacroExecutionException recursive inclusion has been found
      */
-    private void checkRecursiveDisplay(Block currrentBlock, DocumentReference documentReference)
-        throws MacroExecutionException
+    private void checkRecursiveDisplay(Block currrentBlock, EntityReference reference) throws MacroExecutionException
     {
         // Try to find recursion in the thread
         Stack<Object> references = this.displaysBeingExecuted.get();
-        if (references != null && references.contains(documentReference)) {
-            throw new MacroExecutionException("Found recursive display of document [" + documentReference + "]");
+        if (references != null && references.contains(reference)) {
+            throw new MacroExecutionException("Found recursive display of document [" + reference + "]");
         }
     }
 
-    private DocumentReference resolve(MacroBlock block, DisplayMacroParameters parameters)
-        throws MacroExecutionException
+    private EntityReference resolve(MacroBlock block, DisplayMacroParameters parameters) throws MacroExecutionException
     {
         String reference = parameters.getReference();
 
@@ -214,6 +219,6 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
                 "You must specify a 'reference' parameter pointing to the entity to include.");
         }
 
-        return this.macroDocumentReferenceResolver.resolve(reference, block);
+        return this.macroEntityReferenceResolver.resolve(reference, parameters.getType(), block);
     }
 }

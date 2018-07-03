@@ -20,10 +20,9 @@
 package org.xwiki.test.docker.junit5;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -77,6 +76,17 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
+        // Start the Browser (this creates and initializes the PersistentTestContext, XWikiWebDriver objects)
+        startBrowser(extensionContext);
+
+        // Start XWiki
+        // TODO: in the future, refactor XWikiExecutor so that it becomes an interface and so that we can have
+        // various implementations, including one using Docker to start/stop XWiki.
+        PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
+        for (XWikiExecutor executor : testContext.getExecutors()) {
+            executor.start();
+        }
+
         // Since the browser is running inside a Docker container, it needs to access the host where XWiki is running.
         // Thus it cannot access it with "localhost" since that points to the Docker container itself. Thus we need
         // to find one IP (we use the first IP, hoping that it'll be a good one).
@@ -84,36 +94,7 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         // user override.
         // Note that this system property is used by the XWikiExecutor code to start/stop XWiki.
         if (System.getProperty(URL_PREFIX_PROPERTY) == null) {
-            System.setProperty(URL_PREFIX_PROPERTY, "http://" + getIP());
-        }
-
-        // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
-        UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
-        BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
-            .withDesiredCapabilities(uiTestAnnotation.value().getCapabilities())
-            .withNetwork(Network.SHARED)
-            .withNetworkAliases("vnchost")
-            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
-            .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
-
-        webDriverContainer.start();
-
-        // Store it so that we can stop it later on
-        saveBrowserWebDriverContainer(extensionContext, webDriverContainer);
-
-        // Construct the XWikiWebDriver instance and save it in case it needs to be injected as a test method parameter.
-        XWikiWebDriver xwikiWebDriver = new XWikiWebDriver(webDriverContainer.getWebDriver());
-        saveXWikiWebDriver(extensionContext, xwikiWebDriver);
-
-        // Initialize the test context
-        PersistentTestContext testContext = initializePersistentTestContext(xwikiWebDriver);
-        savePersistentTestContext(extensionContext, testContext);
-
-        // Start XWiki
-        // TODO: in the future, refactor XWikiExecutor so that it becomes an interface and so that we can have
-        // various implementations, including one using Docker to start/stop XWiki.
-        for (XWikiExecutor executor : testContext.getExecutors()) {
-            executor.start();
+            XWikiExecutor.URL = "http://" + getHost();
         }
 
         // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
@@ -178,6 +159,31 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);
+    }
+
+    private void startBrowser(ExtensionContext extensionContext)
+    {
+        // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
+        UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
+        BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
+            .withDesiredCapabilities(uiTestAnnotation.value().getCapabilities())
+            .withNetwork(Network.SHARED)
+            .withNetworkAliases("vnchost")
+            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
+            .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+
+        webDriverContainer.start();
+
+        // Store it so that we can stop it later on
+        saveBrowserWebDriverContainer(extensionContext, webDriverContainer);
+
+        // Construct the XWikiWebDriver instance and save it in case it needs to be injected as a test method parameter.
+        XWikiWebDriver xwikiWebDriver = new XWikiWebDriver(webDriverContainer.getWebDriver());
+        saveXWikiWebDriver(extensionContext, xwikiWebDriver);
+
+        // Initialize the test context
+        PersistentTestContext testContext = initializePersistentTestContext(xwikiWebDriver);
+        savePersistentTestContext(extensionContext, testContext);
     }
 
     private void saveXWikiWebDriver(ExtensionContext context, XWikiWebDriver xwikiWebDriver)
@@ -260,19 +266,8 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         }
     }
 
-    private String getIP() throws Exception
+    private String getHost()
     {
-        InetAddress inet = InetAddress.getLocalHost();
-        InetAddress[] ips = InetAddress.getAllByName(inet.getCanonicalHostName());
-        if (ips  != null ) {
-            for (int i = 0; i < ips.length; i++) {
-                if (!ips[i].getHostAddress().equals("127.0.0.1")) {
-                    return ips[i].getHostAddress();
-                }
-            }
-        }
-
-        throw new RuntimeException(String.format("Failed to find IP address of host. Found [%s]",
-            StringUtils.join(ips, ',')));
+        return SystemUtils.IS_OS_LINUX ? "172.17.0.1" : "host.docker.internal";
     }
 }

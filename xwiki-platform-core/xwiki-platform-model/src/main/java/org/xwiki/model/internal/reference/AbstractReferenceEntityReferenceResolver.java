@@ -19,15 +19,10 @@
  */
 package org.xwiki.model.internal.reference;
 
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.InvalidEntityReferenceException;
 
@@ -42,32 +37,6 @@ import org.xwiki.model.reference.InvalidEntityReferenceException;
 public abstract class AbstractReferenceEntityReferenceResolver extends AbstractEntityReferenceResolver
     implements EntityReferenceResolver<EntityReference>
 {
-    protected static final Map<EntityType, EntityType> TYPE_CONVERT_MAPPING = new EnumMap<>(EntityType.class);
-
-    static {
-        TYPE_CONVERT_MAPPING.put(EntityType.WIKI, EntityType.WIKI);
-
-        TYPE_CONVERT_MAPPING.put(EntityType.PAGE, EntityType.SPACE);
-        TYPE_CONVERT_MAPPING.put(EntityType.PAGE_ATTACHMENT, EntityType.ATTACHMENT);
-        TYPE_CONVERT_MAPPING.put(EntityType.PAGE_CLASS_PROPERTY, EntityType.CLASS_PROPERTY);
-        TYPE_CONVERT_MAPPING.put(EntityType.PAGE_OBJECT, EntityType.OBJECT);
-        TYPE_CONVERT_MAPPING.put(EntityType.PAGE_OBJECT_PROPERTY, EntityType.OBJECT_PROPERTY);
-
-        TYPE_CONVERT_MAPPING.put(EntityType.SPACE, EntityType.PAGE);
-        TYPE_CONVERT_MAPPING.put(EntityType.ATTACHMENT, EntityType.PAGE_ATTACHMENT);
-        TYPE_CONVERT_MAPPING.put(EntityType.CLASS_PROPERTY, EntityType.PAGE_CLASS_PROPERTY);
-        TYPE_CONVERT_MAPPING.put(EntityType.OBJECT, EntityType.PAGE_OBJECT);
-        TYPE_CONVERT_MAPPING.put(EntityType.OBJECT_PROPERTY, EntityType.PAGE_OBJECT_PROPERTY);
-    }
-
-    @Inject
-    private EntityReferenceProvider defaultProvider;
-
-    private String getDefaultDocumentName()
-    {
-        return this.defaultProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-    }
-
     @Override
     public EntityReference resolve(EntityReference referenceToResolve, EntityType type, Object... parameters)
     {
@@ -81,7 +50,7 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
                 && !normalizedReference.getType().isAllowedAncestor(type)) {
                 normalizedReference = normalizeReference(normalizedReference, parameters);
 
-                normalizedReference = convert(normalizedReference, type, true);
+                normalizedReference = toCompatibleEntityReference(normalizedReference, type);
             }
 
             // If the passed type is a supertype of the reference to resolve's type then we need to insert a top
@@ -105,59 +74,6 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
         }
 
         return normalizedReference;
-    }
-
-    private EntityReference convert(EntityReference referenceToConvert, EntityType toType, boolean firstPage)
-    {
-        if (referenceToConvert == null) {
-            return null;
-        }
-
-        // Convert parent
-        EntityReference convertedParent = convert(referenceToConvert.getParent(), toType,
-            firstPage && referenceToConvert.getType() != EntityType.PAGE);
-
-        // Convert reference
-        EntityReference convertedReference;
-        if (referenceToConvert.getType() == EntityType.DOCUMENT) {
-            if (getDefaultDocumentName().equals(referenceToConvert.getName())) {
-                convertedReference = new EntityReference(convertedParent, referenceToConvert.getParameters());
-            } else {
-                convertedReference = new EntityReference(referenceToConvert.getName(), EntityType.PAGE, convertedParent,
-                    referenceToConvert.getParameters());
-            }
-        } else if (referenceToConvert.getType() == EntityType.PAGE && firstPage
-            && (toType == EntityType.DOCUMENT || toType.isAllowedAncestor(EntityType.DOCUMENT))) {
-            convertedReference = toDOCUMENT(referenceToConvert, convertedParent);
-        } else {
-            convertedReference = convert(referenceToConvert, convertedParent);
-        }
-
-        return convertedReference;
-    }
-
-    private EntityReference toDOCUMENT(EntityReference referenceToConvert, EntityReference convertedParent)
-    {
-        return new EntityReference(getDefaultDocumentName(), EntityType.DOCUMENT,
-            new EntityReference(referenceToConvert.getName(), EntityType.SPACE, convertedParent),
-            referenceToConvert.getParameters());
-    }
-
-    private EntityReference convert(EntityReference referenceToConvert, EntityReference convertedParent)
-    {
-        EntityType convertedType = TYPE_CONVERT_MAPPING.get(referenceToConvert.getType());
-
-        EntityReference convertedReference;
-        if (convertedType == referenceToConvert.getType()) {
-            convertedReference = referenceToConvert;
-        } else if (convertedType != null) {
-            convertedReference = new EntityReference(referenceToConvert.getName(), convertedType, convertedParent,
-                referenceToConvert.getParameters());
-        } else {
-            throw new InvalidEntityReferenceException("Reference [" + referenceToConvert + "] cannot be converted");
-        }
-
-        return convertedReference;
     }
 
     /**

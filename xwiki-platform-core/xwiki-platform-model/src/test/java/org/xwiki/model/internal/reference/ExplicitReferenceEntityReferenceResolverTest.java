@@ -97,7 +97,22 @@ public class ExplicitReferenceEntityReferenceResolverTest
         Assert.assertEquals("wiki", reference.getParent().getParent().getName());
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
-    
+
+    @Test
+    public void testResolveWithExplicitReferenceWithHolesAndIncompatibleParameter()
+    {
+        EntityReference reference = this.resolver.resolve(
+            new EntityReference("page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)),
+            EntityType.DOCUMENT, new EntityReference("page", EntityType.PAGE));
+
+        Assert.assertEquals("page", reference.getName());
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
+        Assert.assertEquals("page", reference.getParent().getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
+        Assert.assertEquals("wiki", reference.getParent().getParent().getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+    }
+
     @Test
     public void testResolveWithNoExplicitAndPartialReference()
     {

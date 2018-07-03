@@ -195,15 +195,27 @@ public class DefaultSymbolScheme implements SymbolScheme
         String escape = Character.toString(getEscapeSymbol());
         for (Map.Entry<EntityType, Map<EntityType, Character>> entry : SEPARATORS.entrySet()) {
             EntityType type = entry.getKey();
+
+            // Add separators escaping
             Map<EntityType, Character> separators = entry.getValue();
             List<String> charactersToEscape = new ArrayList<>();
             List<String> replacementCharacters = new ArrayList<>();
             for (Character characterToEscape : separators.values()) {
-                charactersToEscape.add(Character.toString(characterToEscape));
-                replacementCharacters.add(escape + Character.toString(characterToEscape));
+                charactersToEscape.add(characterToEscape.toString());
+                replacementCharacters.add(escape + characterToEscape);
             }
+
+            // Add parameter escaping
+            ParameterConfiguration parameter = PARAMETER_SEPARATORS.get(type);
+            if (parameter != null  && parameter.separator != null) {
+                charactersToEscape.add(parameter.separator.toString());
+                replacementCharacters.add(escape + parameter.separator);
+            }
+
+            // Add escaping character
             charactersToEscape.add(escape);
             replacementCharacters.add(escape + escape);
+
             String[] escapesArray = new String[charactersToEscape.size()];
             this.escapes.put(type, charactersToEscape.toArray(escapesArray));
             String[] replacementsArray = new String[replacementCharacters.size()];
@@ -215,14 +227,11 @@ public class DefaultSymbolScheme implements SymbolScheme
             ParameterConfiguration configuration = entry.getValue();
 
             if (configuration.separator != null) {
-                String separator = configuration.separator.toString();
-
                 String[] escapesArray = this.escapes.get(type);
-                configuration.escapes = ArrayUtils.addAll(escapesArray, String.valueOf(CPARAMETERVALUESEP), separator);
+                configuration.escapes = ArrayUtils.addAll(escapesArray, String.valueOf(CPARAMETERVALUESEP));
 
                 String[] replacementsArray = this.replacements.get(type);
-                configuration.replacements = ArrayUtils.addAll(replacementsArray, escape + CPARAMETERVALUESEP,
-                    escape + configuration.separator.toString());
+                configuration.replacements = ArrayUtils.addAll(replacementsArray, escape + CPARAMETERVALUESEP);
 
             }
         }

@@ -48,10 +48,10 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * <p>
  * Example:
  * <pre><code>
- * @UITest
+ * &#064;UITest
  * public class SeleniumTest
  * {
- *     @Test
+ *     &#064;Test
  *     public void test(XWikiWebDriver driver, TestUtils setup)
  *     {
  *         driver.get("http://xwiki.org");

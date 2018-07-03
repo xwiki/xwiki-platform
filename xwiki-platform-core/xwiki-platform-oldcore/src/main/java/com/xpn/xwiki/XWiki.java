@@ -1855,6 +1855,22 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Loads a XWikiDocument from the store.
+     *
+     * @param reference the reference of the document to be loaded
+     * @param type the type of the reference
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @throws XWikiException
+     * @since 10.6RC1
+     */
+    @Unstable
+    public XWikiDocument getDocument(String reference, EntityType type, XWikiContext xcontext) throws XWikiException
+    {
+        return getDocument(getRelativeEntityReferenceResolver().resolve(reference, type), xcontext);
+    }
+
+    /**
      * @param doc the document
      * @param context see {@link XWikiContext}
      */

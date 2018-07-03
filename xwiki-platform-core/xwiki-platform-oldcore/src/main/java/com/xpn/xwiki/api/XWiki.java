@@ -40,7 +40,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -97,8 +96,6 @@ public class XWiki extends Api
      * with entity references but have to call older, often internal, methods that still use string references.
      */
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
-
-    private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
@@ -157,16 +154,6 @@ public class XWiki extends Api
         }
 
         return this.defaultStringEntityReferenceSerializer;
-    }
-
-    private EntityReferenceResolver<String> getRelativeStringEntityReferenceResolver()
-    {
-        if (this.relativeStringEntityReferenceResolver == null) {
-            this.relativeStringEntityReferenceResolver =
-                Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
-        }
-
-        return this.relativeStringEntityReferenceResolver;
     }
 
     private DocumentRevisionProvider getDocumentRevisionProvider()
@@ -286,7 +273,7 @@ public class XWiki extends Api
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
-     * @see {@link #getEntityDocument(String, EntityType)}
+     * @see #getEntityDocument(String, EntityType)
      */
     public Document getDocument(String documentReference) throws XWikiException
     {
@@ -315,9 +302,14 @@ public class XWiki extends Api
      * @since 10.6RC1
      */
     @Unstable
-    public Document getEntityDocument(String referenceString, EntityType type) throws XWikiException
+    public Document getEntityDocument(String reference, EntityType type) throws XWikiException
     {
-        return getDocument(getRelativeStringEntityReferenceResolver().resolve(referenceString, type));
+        XWikiDocument doc = this.xwiki.getDocument(reference, type, getXWikiContext());
+        if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
+            return null;
+        }
+
+        return doc.newDocument(getXWikiContext());
     }
 
     /**

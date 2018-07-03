@@ -130,6 +130,13 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    public DocumentModelBridge getDocumentInstance(EntityReference reference) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        return xcontext.getWiki().getDocument(reference, xcontext);
+    }
+
+    @Override
     public DocumentModelBridge getTranslatedDocumentInstance(DocumentReference documentReference) throws Exception
     {
         XWikiContext xcontext = getContext();

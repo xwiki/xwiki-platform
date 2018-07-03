@@ -82,6 +82,19 @@ public interface DocumentAccessBridge
     }
 
     /**
+     * Get the document object associated with the passed reference.
+     * 
+     * @param reference the direct or indicate reference of the document instance to find
+     * @return the document instance matching the passed reference
+     * @throws Exception when loading the document failed
+     * @since 10.6RC1
+     */
+    default DocumentModelBridge getDocumentInstance(EntityReference reference) throws Exception
+    {
+        return null;
+    }
+
+    /**
      * Get the document object associated with the passed document name and context locale.
      * <p>
      * Note that the returned document does not contain objects and attachment so it should be used very carefully.

@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * output format is XML and as a JSON object when the output format is JSON. This adapter allows us to use
  * {@link java.util.Map} in the REST resource that retrieves the class property values, while the XML serialization will
  * be done using the schema-generated {@link Map}.
- * 
+ *
  * @version $Id$
  * @since 9.8RC1
  */
@@ -42,7 +42,15 @@ public class MapAdapter extends XmlAdapter<Map, java.util.Map<String, java.lang.
             return null;
         } else {
             Map output = new Map();
-            input.forEach((key, value) -> output.getEntries().add(new MapEntry().withKey(key).withValue(value)));
+            for (String key : input.keySet()) {
+                java.lang.Object value = input.get(key);
+                if (value instanceof java.util.Map) {
+                    java.util.Map<String, java.lang.Object> nestedMap = new HashMap<>();
+                    ((java.util.Map<?, ?>) value).forEach((k, v) -> nestedMap.put(k.toString(), v));
+                    value = marshal(nestedMap);
+                }
+                output.getEntries().add(new MapEntry().withKey(key).withValue(value));
+            }
             return output;
         }
     }

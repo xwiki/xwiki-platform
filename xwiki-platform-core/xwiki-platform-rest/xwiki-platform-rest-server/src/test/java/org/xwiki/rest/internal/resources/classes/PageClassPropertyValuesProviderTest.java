@@ -38,8 +38,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.PageClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -53,18 +53,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DBListClassPropertyValuesProvider}.
+ * Unit tests for {@link PageClassPropertyValuesProvider}.
  *
  * @version $Id$
- * @since 9.8RC1
+ * @since 10.6RC1
  */
 @ComponentTest
-public class DBListClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
+public class PageClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
-    @InjectMockComponents
-    private DBListClassPropertyValuesProvider provider;
+    private PageClass pageClass = new PageClass();
 
-    private DBListClass dbListClass = new DBListClass();
+    @InjectMockComponents
+    private PageClassPropertyValuesProvider provider;
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -77,7 +77,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     {
         super.configure();
 
-        addProperty("category", this.dbListClass, true);
+        addProperty("category", this.pageClass, true);
         addProperty("date", new DateClass(), false);
 
         when(this.xcontext.getWiki().getDocument(new ClassPropertyReference("status", this.classReference),
@@ -103,14 +103,14 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         Throwable exception = assertThrows(XWikiRestException.class, () -> {
             this.provider.getValues(propertyReference, 0);
         });
-        assertEquals(exception.getMessage(), "This [status reference] is not a [DBListClass] property.");
+        assertEquals(exception.getMessage(), "This [status reference] is not a [PageClass] property.");
     }
 
     @Test
     public void getValuesAllowed() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
-        DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
+        DocumentReference authorReference = this.pageClass.getOwnerDocument().getAuthorReference();
         PropertyValues values = new PropertyValues();
         when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
 
@@ -123,7 +123,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     public void getValuesMixedWithoutUsed() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
-        DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
+        DocumentReference authorReference = this.pageClass.getOwnerDocument().getAuthorReference();
         PropertyValues values = new PropertyValues();
         values.getPropertyValues().add(new PropertyValue());
         when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
@@ -138,7 +138,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     public void getValuesMixedWithUsed() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
-        DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
+        DocumentReference authorReference = this.pageClass.getOwnerDocument().getAuthorReference();
 
         PropertyValues values = new PropertyValues();
         PropertyValue red = new PropertyValue();
@@ -150,7 +150,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
         Query query = mock(Query.class);
         QueryParameter queryParameter = mock(QueryParameter.class);
-        when(this.usedValuesQueryBuilder.build(dbListClass)).thenReturn(query);
+        when(this.usedValuesQueryBuilder.build(pageClass)).thenReturn(query);
         when(query.bindValue("text")).thenReturn(queryParameter);
         when(queryParameter.anyChars()).thenReturn(queryParameter);
         when(queryParameter.literal("bar")).thenReturn(queryParameter);

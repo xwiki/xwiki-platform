@@ -19,6 +19,9 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -41,7 +44,7 @@ import com.xpn.xwiki.objects.classes.GroupsClass;
 
 /**
  * Provides values for the "List of Groups" type of properties.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
@@ -81,23 +84,27 @@ public class GroupsClassPropertyValuesProvider extends AbstractUsersAndGroupsCla
     }
 
     @Override
-    protected String getIcon(DocumentReference groupReference)
+    protected Map<String, Object> getIcon(DocumentReference groupReference)
     {
+        Map<String, Object> icon = new HashMap<>();
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument groupProfileDocument = xcontext.getWiki().getDocument(groupReference, xcontext);
             XWikiAttachment avatarAttachment = getFirstImageAttachment(groupProfileDocument, xcontext);
             if (avatarAttachment != null) {
-                return xcontext.getWiki().getURL(avatarAttachment.getReference(), "download",
-                    "width=30&height=30&keepAspectRatio=true", null, xcontext);
+                icon.put(META_DATA_ICON, xcontext.getWiki().getURL(avatarAttachment.getReference(), "download",
+                    "width=30&height=30&keepAspectRatio=true", null, xcontext));
             }
         } catch (XWikiException e) {
             this.logger.warn(
                 "Failed to read the avatar of group [{}]. Root cause is [{}]. Using the default avatar instead.",
                 groupReference.getName(), ExceptionUtils.getRootCauseMessage(e));
         }
+        if (!icon.containsKey(META_DATA_ICON)) {
+            icon.put(META_DATA_ICON, xcontext.getWiki().getSkinFile("icons/xwiki/noavatargroup.png", true, xcontext));
+        }
 
-        return xcontext.getWiki().getSkinFile("icons/xwiki/noavatargroup.png", true, xcontext);
+        return icon;
     }
 
     private XWikiAttachment getFirstImageAttachment(XWikiDocument document, XWikiContext xcontext)

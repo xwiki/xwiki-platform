@@ -19,6 +19,9 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -38,7 +41,7 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 
 /**
  * Provides values for the "List of Users" type of properties.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
@@ -80,23 +83,27 @@ public class UsersClassPropertyValuesProvider extends AbstractUsersAndGroupsClas
     }
 
     @Override
-    protected String getIcon(DocumentReference userReference)
+    protected Map<String, Object> getIcon(DocumentReference userReference)
     {
+        Map<String, Object> icon = new HashMap<>();
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument userProfileDocument = xcontext.getWiki().getDocument(userReference, xcontext);
             String avatar = userProfileDocument.getStringValue("avatar");
             XWikiAttachment avatarAttachment = userProfileDocument.getAttachment(avatar);
             if (avatarAttachment != null && avatarAttachment.isImage(xcontext)) {
-                return xcontext.getWiki().getURL(avatarAttachment.getReference(), "download",
-                    "width=30&height=30&keepAspectRatio=true", null, xcontext);
+                icon.put(META_DATA_ICON, xcontext.getWiki().getURL(avatarAttachment.getReference(), "download",
+                    "width=30&height=30&keepAspectRatio=true", null, xcontext));
             }
         } catch (XWikiException e) {
             this.logger.warn(
                 "Failed to read the avatar of user [{}]. Root cause is [{}]. Using the default avatar instead.",
                 userReference.getName(), ExceptionUtils.getRootCauseMessage(e));
         }
+        if (!icon.containsKey(META_DATA_ICON)) {
+            icon.put(META_DATA_ICON, xcontext.getWiki().getSkinFile("icons/xwiki/noavatar.png", true, xcontext));
+        }
 
-        return xcontext.getWiki().getSkinFile("icons/xwiki/noavatar.png", true, xcontext);
+        return icon;
     }
 }

@@ -58,7 +58,9 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
       value: propertyValue.value,
       label: metaData.label,
       icon: metaData.icon,
-      url: metaData.url
+      url: metaData.url,
+      hint: metaData.hint,
+      iconMetaData: metaData.iconMetaData
     };
   };
 

@@ -31,7 +31,8 @@
   <name>XWiki Platform - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.02</xwiki.jacoco.instructionRatio>
+    <!-- The jacoco instruction ratio precision is higher here because the jaxb2 plugin generates classes that are not excluded in the analysis. -->
+    <xwiki.jacoco.instructionRatio>0.0292</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Test dependencies. -->

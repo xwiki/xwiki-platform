@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -32,13 +34,14 @@ import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
  * Base class for {@link ClassPropertyValuesProvider} implementations that work with list properties whose values are
  * document references.
- * 
+ *
  * @param <T> the property type
  * @version $Id$
  * @since 10.6RC1
@@ -57,6 +60,17 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     @Inject
     @Named("viewable")
     private QueryFilter viewableFilter;
+
+    /**
+     * A map with an icon css class / url or with {@link org.xwiki.icon.IconManager#getMetaData icon metadata}.
+     *
+     * <p>The entries of this map are meant to be added to the metadata of the
+     * {@link #getValueFromQueryResult values of the query result}.
+     *
+     * @param documentReference document reference used to generate the icon
+     * @return a map with icon related information
+     */
+    protected abstract Map<String, Object> getIcon(DocumentReference documentReference);
 
     @Override
     protected PropertyValues getUsedValues(T propertyDefinition, int limit, String filter) throws QueryException
@@ -85,8 +99,9 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
             value.setValue(this.compactSerializer.serialize(documentReference, wikiReference));
             value.getMetaData().put(META_DATA_LABEL,
                 getLabel(documentReference, value.getMetaData().get(META_DATA_LABEL)));
-            value.getMetaData().put(META_DATA_ICON, getIcon(documentReference));
-            value.getMetaData().put("url", getURL(documentReference));
+            value.getMetaData().putAll(getIcon(documentReference));
+            value.getMetaData().put(META_DATA_URL, getURL(documentReference));
+            value.getMetaData().put(META_DATA_HINT, getHint(documentReference));
         }
         return value;
     }
@@ -94,14 +109,25 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     protected String getLabel(DocumentReference documentReference, Object currentLabel)
     {
         String label = currentLabel == null ? "" : currentLabel.toString().trim();
-        return label.isEmpty() ? documentReference.getName() : label;
-    }
+        if (label.isEmpty()) {
+            if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(documentReference.getName())) {
+                label = documentReference.getParent().getName();
+            } else {
+                label = documentReference.getName();
+            }
+        }
 
-    protected abstract String getIcon(DocumentReference documentReference);
+        return label;
+    }
 
     protected String getURL(DocumentReference documentReference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         return xcontext.getWiki().getURL(documentReference, xcontext);
+    }
+
+    protected String getHint(DocumentReference documentReference)
+    {
+        return null;
     }
 }

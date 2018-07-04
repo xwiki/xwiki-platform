@@ -33,6 +33,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
@@ -61,6 +62,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
     @InjectMockComponents
     private UsersClassPropertyValuesProvider provider;
 
+    @MockComponent
     private WikiUserManager wikiUserManager;
 
     private ClassPropertyReference propertyReference = new ClassPropertyReference("owner", this.classReference);
@@ -73,8 +75,6 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         addProperty(this.propertyReference.getName(), new UsersClass(), true);
         when(this.xcontext.getWiki().getSkinFile("icons/xwiki/noavatar.png", true, this.xcontext))
             .thenReturn("url/to/noavatar.png");
-
-        this.wikiUserManager = this.componentManager.getInstance(WikiUserManager.class);
     }
 
     @Test

@@ -30,6 +30,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
@@ -55,6 +56,7 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
     @InjectMockComponents
     private GroupsClassPropertyValuesProvider provider;
 
+    @MockComponent
     private WikiUserManager wikiUserManager;
 
     private ClassPropertyReference propertyReference = new ClassPropertyReference("band", this.classReference);
@@ -67,8 +69,6 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
         addProperty(this.propertyReference.getName(), new GroupsClass(), true);
         when(this.xcontext.getWiki().getSkinFile("icons/xwiki/noavatargroup.png", true, this.xcontext))
             .thenReturn("url/to/noavatar.png");
-
-        this.wikiUserManager = this.componentManager.getInstance(WikiUserManager.class);
     }
 
     @Test

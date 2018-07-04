@@ -36,20 +36,31 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     '</div>'
   ].join('');
 
-  var renderOption = function(option) {
+  var renderCommon = function(option) {
     var output = $(optionTemplate);
     var value = (option && typeof option === 'object') ? option.value : option;
     output.attr('data-value', value);
+    var iconMetaData = option && option.iconMetaData;
+    if (typeof iconMetaData !== 'object') {
+      iconMetaData = {};
+    }
     var icon = option && option.icon;
-    if (typeof icon === 'string') {
+    if (typeof icon === 'string' && icon !== '') {
       if (icon.indexOf('/') >= 0 || icon.indexOf('.') >= 0) {
         // The icon is specified by its path.
-        var image = $('<img class="xwiki-selectize-option-icon" alt="" />').attr('src', icon);
-        output.find('.xwiki-selectize-option-icon').replaceWith(image);
+        iconMetaData.iconSetType = 'IMAGE';
+        iconMetaData.url = icon;
       } else {
         // The icon is specified by its CSS class.
-        output.find('.xwiki-selectize-option-icon').addClass(icon);
+        iconMetaData.iconSetType = 'FONT';
+        iconMetaData.cssClass = icon;
       }
+    }
+    if (iconMetaData.iconSetType === 'IMAGE') {
+      var image = $('<img class="xwiki-selectize-option-icon" alt="" />').attr('src', iconMetaData.url);
+      output.find('.xwiki-selectize-option-icon').replaceWith(image);
+    } else if (iconMetaData.iconSetType === 'FONT') {
+      output.find('.xwiki-selectize-option-icon').addClass(iconMetaData.cssClass);
     } else {
       output.find('.xwiki-selectize-option-icon').remove();
     }
@@ -65,6 +76,24 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     output.find('.xwiki-selectize-option-label').text(label);
     return output;
   };
+
+  var renderOption = function(option) {
+    var output = renderCommon(option);
+    var hint = option && option.hint;
+    if (typeof hint === 'string' && hint !== '') {
+      output.append('<em class="xwiki-selectize-option-hint">' + hint + '</em>');
+    }
+    return output;
+  }
+
+  var renderItem = function(option) {
+    var output = renderCommon(option);
+    var hint = option && option.hint;
+    if (typeof hint === 'string' && hint !== '') {
+      output.attr('title', hint);
+    }
+    return output;
+  }
 
   var defaultSettings = {
     // Copying the CSS classes from the form field to the dropdown can have unexpected side effects if those classes are
@@ -87,7 +116,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     persist: false,
     preload: 'focus',
     render: {
-      item: renderOption,
+      item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
         // TODO: Use translation key here.

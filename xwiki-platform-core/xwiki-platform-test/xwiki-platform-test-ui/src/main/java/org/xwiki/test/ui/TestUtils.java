@@ -195,6 +195,8 @@ public class TestUtils
      */
     private static Unmarshaller unmarshaller;
 
+    private static String urlPrefix = XWikiExecutor.URL;
+
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
@@ -933,9 +935,17 @@ public class TestUtils
      */
     public String getBaseURL()
     {
-        return XWikiExecutor.URL + ":"
+        return TestUtils.urlPrefix + ":"
             + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
             + XWikiExecutor.DEFAULT_CONTEXT + "/";
+    }
+
+    /**
+     * @since 10.6RC1
+     */
+    public static void setURLPrefix(String urlPrefix)
+    {
+        TestUtils.urlPrefix = urlPrefix;
     }
 
     /**

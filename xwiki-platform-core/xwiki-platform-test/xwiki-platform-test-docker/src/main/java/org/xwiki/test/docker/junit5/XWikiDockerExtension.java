@@ -94,7 +94,7 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         // user override.
         // Note that this system property is used by the XWikiExecutor code to start/stop XWiki.
         if (System.getProperty(URL_PREFIX_PROPERTY) == null) {
-            XWikiExecutor.URL = "http://" + getHost();
+            testContext.getUtil().setURLPrefix("http://" + getHost());
         }
 
         // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically

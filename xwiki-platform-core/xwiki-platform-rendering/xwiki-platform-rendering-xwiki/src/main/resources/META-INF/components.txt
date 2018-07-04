@@ -4,5 +4,6 @@
 org.xwiki.rendering.internal.resolver.AttachmentResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceResolver
+org.xwiki.rendering.internal.resolver.PageResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.SpaceResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.script.RenderingScriptService

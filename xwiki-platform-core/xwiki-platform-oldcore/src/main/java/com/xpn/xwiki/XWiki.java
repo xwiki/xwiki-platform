@@ -1983,7 +1983,9 @@ public class XWiki implements EventListener
     {
         DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
 
-        if (exists(documentReference, context)) {
+        // If the document has been found or it's top level space, return the reference
+        if (exists(documentReference, context)
+            || documentReference.getParent().getParent().getType() == EntityType.WIKI) {
             return documentReference;
         }
 

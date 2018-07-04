@@ -26,7 +26,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -57,8 +57,8 @@ public class UidStringEntityReferenceSerializer extends AbstractStringEntityRefe
         representation.append(name.length()).append(':').append(name);
 
         // Append Locale
-        if (currentReference instanceof DocumentReference) {
-            Locale locale = ((DocumentReference) currentReference).getLocale();
+        if (currentReference instanceof AbstractLocalizedEntityReference) {
+            Locale locale = ((AbstractLocalizedEntityReference) currentReference).getLocale();
             if (locale != null) {
                 String localeString = locale.toString();
                 if (!localeString.isEmpty()) {

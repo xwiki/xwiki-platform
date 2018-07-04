@@ -21,17 +21,15 @@ package org.xwiki.rest.internal.resources.classes;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
@@ -40,25 +38,28 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.GroupsClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link GroupsClassPropertyValuesProvider}.
- * 
+ *
  * @version $Id$
  */
+@ComponentTest
 public class GroupsClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ClassPropertyValuesProvider> mocker =
-        new MockitoComponentMockingRule<ClassPropertyValuesProvider>(GroupsClassPropertyValuesProvider.class);
+    @InjectMockComponents
+    private GroupsClassPropertyValuesProvider provider;
 
     private WikiUserManager wikiUserManager;
 
     private ClassPropertyReference propertyReference = new ClassPropertyReference("band", this.classReference);
 
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
         super.configure();
@@ -67,13 +68,7 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
         when(this.xcontext.getWiki().getSkinFile("icons/xwiki/noavatargroup.png", true, this.xcontext))
             .thenReturn("url/to/noavatar.png");
 
-        this.wikiUserManager = this.mocker.getInstance(WikiUserManager.class);
-    }
-
-    @Override
-    protected MockitoComponentManagerRule getMocker()
-    {
-        return this.mocker;
+        this.wikiUserManager = this.componentManager.getInstance(WikiUserManager.class);
     }
 
     @Test
@@ -102,7 +97,7 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
 
         when(this.allowedValuesQuery.execute()).thenReturn(Arrays.asList(devsReference, adminsReference));
 
-        PropertyValues values = this.mocker.getComponentUnderTest().getValues(this.propertyReference, 5, "foo");
+        PropertyValues values = this.provider.getValues(this.propertyReference, 5, "foo");
 
         assertEquals(2, values.getPropertyValues().size());
 
@@ -120,10 +115,10 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.GLOBAL_ONLY);
 
-        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        WikiDescriptorManager wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("chess");
 
-        this.mocker.getComponentUnderTest().getValues(this.propertyReference, 5, "foo");
+        this.provider.getValues(this.propertyReference, 5, "foo");
 
         verify(this.allowedValuesQuery).setWiki("chess");
         verify(this.allowedValuesQuery, times(2)).execute();

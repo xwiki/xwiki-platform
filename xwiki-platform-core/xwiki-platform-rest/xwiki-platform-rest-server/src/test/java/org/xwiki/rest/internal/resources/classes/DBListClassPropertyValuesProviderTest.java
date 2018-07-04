@@ -22,44 +22,46 @@ package org.xwiki.rest.internal.resources.classes;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DateClass;
-import com.xpn.xwiki.objects.classes.ListClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DBListClassPropertyValuesProvider}.
- * 
+ *
  * @version $Id$
  * @since 9.8RC1
  */
+@ComponentTest
 public class DBListClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ClassPropertyValuesProvider> mocker =
-        new MockitoComponentMockingRule<ClassPropertyValuesProvider>(DBListClassPropertyValuesProvider.class);
+    @InjectMockComponents
+    private DBListClassPropertyValuesProvider provider;
 
     private DBListClass dbListClass = new DBListClass();
 
@@ -67,7 +69,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
     private AuthorExecutor authorExecutor;
 
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
         super.configure();
@@ -78,16 +80,8 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         when(this.xcontext.getWiki().getDocument(new ClassPropertyReference("status", this.classReference),
             this.xcontext)).thenReturn(this.classDocument);
 
-        this.entityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.authorExecutor = this.mocker.getInstance(AuthorExecutor.class);
-        DefaultParameterizedType listQueryBuilderType =
-            new DefaultParameterizedType(null, QueryBuilder.class, ListClass.class);
-    }
-
-    @Override
-    protected MockitoComponentManagerRule getMocker()
-    {
-        return this.mocker;
+        this.entityReferenceSerializer = this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        this.authorExecutor = this.componentManager.getInstance(AuthorExecutor.class);
     }
 
     @Test
@@ -95,12 +89,10 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("status", this.classReference);
         when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
-        try {
-            this.mocker.getComponentUnderTest().getValues(propertyReference, 0);
-            fail();
-        } catch (XWikiRestException expected) {
-            assertEquals("Property [status reference] not found.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(XWikiRestException.class, () -> {
+            this.provider.getValues(propertyReference, 0);
+        });
+        assertEquals(exception.getMessage(), "Property [status reference] not found.");
     }
 
     @Test
@@ -108,12 +100,10 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("date", this.classReference);
         when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
-        try {
-            this.mocker.getComponentUnderTest().getValues(propertyReference, 0);
-            fail();
-        } catch (XWikiRestException expected) {
-            assertEquals("This [status reference] is not a [DBListClass] property.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(XWikiRestException.class, () -> {
+            this.provider.getValues(propertyReference, 0);
+        });
+        assertEquals(exception.getMessage(), "This [status reference] is not a [DBListClass] property.");
     }
 
     @Test
@@ -124,9 +114,9 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         PropertyValues values = new PropertyValues();
         when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 3));
+        assertSame(values, this.provider.getValues(propertyReference, 3));
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 0, "text"));
+        assertSame(values, this.provider.getValues(propertyReference, 0, "text"));
     }
 
     @Test
@@ -138,7 +128,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         values.getPropertyValues().add(new PropertyValue());
         when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 1, "foo"));
+        assertSame(values, this.provider.getValues(propertyReference, 1, "foo"));
         assertEquals(1, values.getPropertyValues().size());
 
         verify(this.usedValuesQueryBuilder, never()).build(any());
@@ -153,7 +143,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         PropertyValues values = new PropertyValues();
         PropertyValue red = new PropertyValue();
         red.setValue("red");
-        red.setMetaData(new HashMap<String, Object>());
+        red.setMetaData(new HashMap<>());
         red.getMetaData().put("label", "Red");
         values.getPropertyValues().add(red);
         when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
@@ -164,12 +154,12 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         when(query.bindValue("text")).thenReturn(queryParameter);
         when(queryParameter.anyChars()).thenReturn(queryParameter);
         when(queryParameter.literal("bar")).thenReturn(queryParameter);
-        when(query.execute()).thenReturn(Arrays.asList(new Object[] {"blue", 21L}, new Object[] {"red", 17L}));
+        when(query.execute()).thenReturn(Arrays.asList(new Object[]{ "blue", 21L }, new Object[]{ "red", 17L }));
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 3, "bar"));
+        assertSame(values, this.provider.getValues(propertyReference, 3, "bar"));
 
         verify(query).setLimit(2);
-        verify(query).addFilter(this.mocker.getInstance(QueryFilter.class, "text"));
+        verify(query).addFilter(this.componentManager.getInstance(QueryFilter.class, "text"));
         verify(queryParameter, times(2)).anyChars();
 
         assertEquals(2, values.getPropertyValues().size());

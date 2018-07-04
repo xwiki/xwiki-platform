@@ -142,4 +142,15 @@ public class IncludeMacroParameters
     {
         return this.section;
     }
+
+    /**
+     * @param page the reference of the page to include
+     * @since 10.6RC1
+     */
+    @PropertyDescription("The reference of the page to include")
+    public void setPage(String page)
+    {
+        this.reference = page;
+        this.type = EntityType.PAGE;
+    }
 }

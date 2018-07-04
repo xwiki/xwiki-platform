@@ -36,8 +36,10 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
@@ -57,6 +59,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
@@ -80,9 +84,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     /**
      * Mocks the component that is used to resolve the 'reference' parameter.
      */
-    private DocumentReferenceResolver<String> mockDocumentReferenceResolver;
+    private EntityReferenceResolver<String> mockEntityReferenceResolver;
 
-    private AuthorizationManager mockAuthorization;
+    private ContextualAuthorizationManager mockContextualAuthorization;
 
     private DocumentModelBridge mockDocument;
 
@@ -103,23 +107,49 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
 
-        this.mockDocumentReferenceResolver =
-            registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
-        this.mockAuthorization = registerMockComponent(AuthorizationManager.class);
+        this.mockEntityReferenceResolver =
+            registerMockComponent(EntityReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
+        // Make sure to not load the standard AuthorizationManager which trigger too many things
+        registerMockComponent(AuthorizationManager.class);
 
+        this.mockContextualAuthorization = getComponentManager().getInstance(ContextualAuthorizationManager.class);
         this.includeMacro = getComponentManager().getInstance(Macro.class, "include");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
 
     @Test
+    public void testIncludeMacro() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [word]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, "word", false);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
     public void testIncludeMacroWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
     {
+        // @formatter:off
         String expected = "beginDocument\n"
             + "beginMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n" + "beginParagraph\n" + "onSpecialSymbol [#]\n"
-            + "onWord [testmacro]\n" + "endParagraph\n" + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
+            + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
+            + "beginParagraph\n"
+            + "onSpecialSymbol [#]\n"
+            + "onWord [testmacro]\n"
+            + "endParagraph\n"
+            + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
             + "endMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
             + "endDocument";
+        // @formatter:on
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
         List<Block> blocks =
@@ -131,9 +161,12 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroWithNewContextShowsPassingOnRestrictedFlag() throws Exception
     {
-        String expected = "beginDocument\n" + "beginMetaData "
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData "
             + "[[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "beginMacroMarkerStandalone [velocity] [] [$foo]\n" + "beginGroup [[class]=[xwikirenderingerror]]\n"
+            + "beginMacroMarkerStandalone [velocity] [] [$foo]\n"
+            + "beginGroup [[class]=[xwikirenderingerror]]\n"
             + "onWord [Failed to execute the [velocity] macro. Cause: [The execution of the [velocity] script "
             + "macro is not allowed. Check the rights of its last author or the parameters if it's rendered "
             + "from another script.]. Click on this message for details.]\n"
@@ -141,6 +174,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "beginGroup [[class]=[xwikirenderingerrordescription hidden]]\n"
             + "onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: "
             + "The execution of the [velocity] script macro is not allowed.";
+        // @formatter:on
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
         List<Block> blocks = runIncludeMacro(Context.NEW, "{{velocity}}$foo{{/velocity}}", true);
@@ -152,9 +186,13 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
-        String expected = "beginDocument\n" + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
             + "onMacroStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n" + "endDocument";
+            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
 
         // We verify that a Velocity macro set in the including page is seen in the included page.
         List<Block> blocks = runIncludeMacroWithPreVelocity(Context.CURRENT, "#macro(testmacro)#end",
@@ -183,15 +221,23 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroWhenIncludingDocumentWithRelativeReferences() throws Exception
     {
-        String expected = "beginDocument\n" + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage]"
-            + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n" + "beginParagraph\n"
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage]"
+            + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
             + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
-            + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n" + "onSpace\n"
+            + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
+            + "onSpace\n"
             + "beginLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
-            + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n" + "onSpace\n"
-            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n" + "endParagraph\n"
+            + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
+            + "onSpace\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
+            + "endParagraph\n"
             + "endMetaData [[base]=[includedWiki:includedSpace.includedPage]"
-            + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n" + "endDocument";
+            + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
 
         final DocumentReference includedDocumentReference =
             new DocumentReference("includedWiki", "includedSpace", "includedPage");
@@ -200,7 +246,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(EntityReference.class)));
                 will(returnValue(true));
                 oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)),
                     with(any(DocumentModelBridge.class)));
@@ -235,9 +281,10 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentReferenceResolver).resolve("wiki:space.page", macroContext.getCurrentMacroBlock());
+                allowing(mockEntityReferenceResolver).resolve("wiki:space.page", EntityType.DOCUMENT,
+                    macroContext.getCurrentMacroBlock());
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
-                allowing(mockDocumentReferenceResolver).resolve("space.page", includeMacroMarker);
+                allowing(mockEntityReferenceResolver).resolve("space.page", EntityType.DOCUMENT, includeMacroMarker);
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
             }
         });
@@ -274,18 +321,15 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         parameters.setReference("wiki:space.page");
         parameters.setContext(Context.NEW);
 
+        final DocumentReference includedDocumentReference = new DocumentReference("wiki", "space", "page");
+        setUpDocumentMock("wiki:space.page", includedDocumentReference, "");
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentReferenceResolver).resolve("wiki:space.page", macroContext.getCurrentMacroBlock());
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
-
-                allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(EntityReference.class)));
                 will(returnValue(true));
-                allowing(mockSetup.bridge).getDocumentInstance(with(any(DocumentReference.class)));
-                will(returnValue(null));
 
-                allowing(mockDocumentDisplayer).display(with(same((DocumentModelBridge) null)),
+                allowing(mockDocumentDisplayer).display(with(same(mockDocument)),
                     with(any(DocumentDisplayerParameters.class)));
                 will(new CustomAction("recursively call the include macro again")
                 {
@@ -318,9 +362,15 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
-        String expected = "beginDocument\n" + "beginMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n" + "onWord [content]\n" + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n" + "endDocument";
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [content]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("relativePage");
@@ -336,11 +386,12 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentReferenceResolver).resolve("relativePage", macroContext.getCurrentMacroBlock());
+                oneOf(mockEntityReferenceResolver).resolve("relativePage", EntityType.DOCUMENT,
+                    macroContext.getCurrentMacroBlock());
                 will(returnValue(resolvedReference));
-                oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
                 will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocumentInstance(resolvedReference);
+                oneOf(mockSetup.bridge).getDocumentInstance((EntityReference) resolvedReference);
                 will(returnValue(mockDocument));
                 oneOf(mockSetup.bridge).getTranslatedDocumentInstance(resolvedReference);
                 will(returnValue(mockDocument));
@@ -350,7 +401,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(getXDOM("content")));
                 oneOf(mockDocument).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
-                oneOf(mockDocument).getDocumentReference();
+                allowing(mockDocument).getDocumentReference();
                 will(returnValue(resolvedReference));
                 allowing(mockDocument).getRealLanguage();
                 will(returnValue(""));
@@ -365,10 +416,18 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroWhenSectionSpecified() throws Exception
     {
-        String expected = "beginDocument\n" + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginHeader [1, Hsection]\n" + "onWord [section]\n" + "endHeader [1, Hsection]\n" + "beginParagraph\n"
-            + "onWord [content2]\n" + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n" + "endDocument";
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginHeader [1, Hsection]\n"
+            + "onWord [section]\n"
+            + "endHeader [1, Hsection]\n"
+            + "beginParagraph\n"
+            + "onWord [content2]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
@@ -380,17 +439,18 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentReferenceResolver).resolve("document", macroContext.getCurrentMacroBlock());
+                oneOf(mockEntityReferenceResolver).resolve("document", EntityType.DOCUMENT,
+                    macroContext.getCurrentMacroBlock());
                 will(returnValue(resolvedReference));
-                oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
                 will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocumentInstance(resolvedReference);
+                oneOf(mockSetup.bridge).getDocumentInstance((EntityReference) resolvedReference);
                 will(returnValue(mockDocument));
                 oneOf(mockSetup.bridge).getTranslatedDocumentInstance(resolvedReference);
                 will(returnValue(mockDocument));
                 oneOf(mockSetup.bridge).getCurrentDocumentReference();
                 will(returnValue(new DocumentReference("wiki", "Space", "IncludingPage")));
-                oneOf(mockDocument).getDocumentReference();
+                allowing(mockDocument).getDocumentReference();
                 will(returnValue(resolvedReference));
                 oneOf(mockDocument).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
@@ -419,11 +479,12 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentReferenceResolver).resolve("document", macroContext.getCurrentMacroBlock());
+                oneOf(mockEntityReferenceResolver).resolve("document", EntityType.DOCUMENT,
+                    macroContext.getCurrentMacroBlock());
                 will(returnValue(resolvedReference));
-                oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
                 will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocumentInstance(resolvedReference);
+                oneOf(mockSetup.bridge).getDocumentInstance((EntityReference) resolvedReference);
                 will(returnValue(mockDocument));
                 allowing(mockSetup.bridge).getTranslatedDocumentInstance(resolvedReference);
                 will(returnValue(mockDocument));
@@ -465,10 +526,10 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentReferenceResolver).resolve(with(resolve),
+                allowing(mockEntityReferenceResolver).resolve(with(resolve), with(EntityType.DOCUMENT),
                     with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(reference));
-                allowing(mockSetup.bridge).getDocumentInstance(reference);
+                allowing(mockSetup.bridge).getDocumentInstance((EntityReference) reference);
                 will(returnValue(mockDocument));
                 allowing(mockSetup.bridge).getTranslatedDocumentInstance(reference);
                 will(returnValue(mockDocument));
@@ -515,7 +576,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockSetup.bridge).isDocumentViewable(with(same(includedDocumentReference)));
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(same(includedDocumentReference)));
                 will(returnValue(true));
                 // Verify that push/pop are called when context is NEW
                 if (context == Context.NEW) {

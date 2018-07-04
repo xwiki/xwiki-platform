@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import javax.inject.Provider;
 
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -30,7 +31,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,11 +40,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Base class for writing unit tests for {@link ClassPropertyValuesProvider}s.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
@@ -61,9 +63,12 @@ public abstract class AbstractListClassPropertyValuesProviderTest
 
     protected QueryBuilder<ListClass> usedValuesQueryBuilder;
 
+    @InjectComponentManager
+    protected ComponentManager componentManager;
+
     public void configure() throws Exception
     {
-        Provider<XWikiContext> xcontextProvider = getMocker().getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         XWiki xwiki = mock(XWiki.class);
         BaseClass xclass = mock(BaseClass.class);
         DocumentReference authorReference = new DocumentReference("wiki", "Users", "Alice");
@@ -81,8 +86,6 @@ public abstract class AbstractListClassPropertyValuesProviderTest
         when(queryParameter.literal("foo")).thenReturn(queryParameter);
     }
 
-    protected abstract MockitoComponentManagerRule getMocker();
-
     protected void addProperty(String name, PropertyClass definition, boolean withQueryBuilders) throws Exception
     {
         XWiki xwiki = this.xcontext.getWiki();
@@ -96,13 +99,14 @@ public abstract class AbstractListClassPropertyValuesProviderTest
         if (withQueryBuilders) {
             DefaultParameterizedType allowedValuesQueryBuilderType =
                 new DefaultParameterizedType(null, QueryBuilder.class, definition.getClass());
-            QueryBuilder allowedValuesQueryBuilder = getMocker().getInstance(allowedValuesQueryBuilderType);
+            QueryBuilder allowedValuesQueryBuilder = this.componentManager.getInstance(allowedValuesQueryBuilderType);
             when(allowedValuesQueryBuilder.build(definition)).thenReturn(this.allowedValuesQuery);
 
             if (definition instanceof ListClass) {
                 DefaultParameterizedType usedValuesQueryBuilderType =
                     new DefaultParameterizedType(null, QueryBuilder.class, ListClass.class);
-                this.usedValuesQueryBuilder = getMocker().getInstance(usedValuesQueryBuilderType, "usedValues");
+                this.usedValuesQueryBuilder =
+                    this.componentManager.getInstance(usedValuesQueryBuilderType, "usedValues");
                 when(this.usedValuesQueryBuilder.build((ListClass) definition)).thenReturn(this.usedValuesQuery);
             }
         }

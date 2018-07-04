@@ -1970,6 +1970,31 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Find the document reference corresponding to the entity reference based on what exist in the database (page
+     * reference can means two different documents for example).
+     * 
+     * @param reference the reference to resolve
+     * @param context the XWiki context
+     * @return the document reference
+     * @since 10.6RC1
+     */
+    @Unstable
+    public DocumentReference getDocumentReference(EntityReference reference, XWikiContext context)
+    {
+        DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
+
+        if (exists(documentReference, context)) {
+            return documentReference;
+        }
+
+        // Try final page
+        DocumentReference finalPageReference = new DocumentReference(documentReference.getParent().getName(),
+            documentReference.getParent().getParent(), documentReference.getParameters());
+
+        return exists(finalPageReference, context) ? finalPageReference : documentReference;
+    }
+
+    /**
      * @param fullname the reference of the document as String
      * @param context see {@link XWikiContext}
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead

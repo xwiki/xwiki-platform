@@ -353,20 +353,7 @@ public class XWiki extends Api
      */
     public Document getDocument(EntityReference reference) throws XWikiException
     {
-        try {
-            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
-                return null;
-            }
-
-            return doc.newDocument(getXWikiContext());
-        } catch (Exception ex) {
-            LOGGER.warn("Failed to access document [{}]. Root reason: [{}]", reference,
-                ExceptionUtils.getRootCauseMessage(ex));
-
-            return new Document(new XWikiDocument(getCurrentgetdocumentResolver().resolve(reference)),
-                getXWikiContext());
-        }
+        return getDocument(this.xwiki.getDocumentReference(reference, getXWikiContext()));
     }
 
     /**

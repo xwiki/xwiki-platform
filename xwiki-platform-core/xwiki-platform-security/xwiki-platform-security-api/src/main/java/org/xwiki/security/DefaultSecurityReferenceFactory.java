@@ -52,11 +52,11 @@ public class DefaultSecurityReferenceFactory implements SecurityReferenceFactory
         }
         return mainWikiReference;
     }
-    
+
     @Override
     public SecurityReference newEntityReference(EntityReference reference)
     {
-        return new SecurityReference(reference, getMainWikiReference());
+        return new SecurityReference(this.wikiBridge.toCompatibleEntityReference(reference), getMainWikiReference());
     }
 
     @Override

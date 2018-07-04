@@ -30,12 +30,15 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -61,6 +64,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -70,10 +74,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@ComponentList({
-    DefaultStringEntityReferenceSerializer.class,
-    DefaultSymbolScheme.class
-})
+@ComponentList({ DefaultStringEntityReferenceSerializer.class, DefaultSymbolScheme.class })
 public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
     @Rule
@@ -95,10 +96,13 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     private TestCache<Object> cache;
 
     private SecurityReference aMissingParentRef;
+
     private SecurityReference aMissingEntityRef;
 
     private UserSecurityReference aMissingUserRef;
+
     private GroupSecurityReference aMissingGroupRef;
+
     private SecurityReference aMissingWikiRef;
 
     @Before
@@ -113,18 +117,27 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         XWikiBridge xwikiBridge = securityReferenceFactoryMocker.getInstance(XWikiBridge.class);
         when(xwikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
+        when(xwikiBridge.toCompatibleEntityReference(any(EntityReference.class)))
+            .thenAnswer(new Answer<EntityReference>()
+            {
+                @Override
+                public EntityReference answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return invocation.getArgument(0);
+                }
+            });
 
         this.factory = securityReferenceFactoryMocker.getComponentUnderTest();
         this.securityCache = securityCacheMocker.getComponentUnderTest();
 
         aMissingParentRef = factory.newEntityReference(new SpaceReference("space", new WikiReference("missing")));
-        aMissingEntityRef = factory.newEntityReference(new DocumentReference("missingPage",
-            xspaceRef.getOriginalSpaceReference()));
+        aMissingEntityRef =
+            factory.newEntityReference(new DocumentReference("missingPage", xspaceRef.getOriginalSpaceReference()));
 
-        aMissingUserRef = factory.newUserReference(new DocumentReference("missingUser",
-            xXWikiSpace.getOriginalSpaceReference()));
-        aMissingGroupRef = factory.newGroupReference(new DocumentReference("missingGroup",
-            xXWikiSpace.getOriginalSpaceReference()));
+        aMissingUserRef =
+            factory.newUserReference(new DocumentReference("missingUser", xXWikiSpace.getOriginalSpaceReference()));
+        aMissingGroupRef =
+            factory.newGroupReference(new DocumentReference("missingGroup", xXWikiSpace.getOriginalSpaceReference()));
         aMissingWikiRef = factory.newEntityReference(new WikiReference("missingWiki"));
     }
 
@@ -135,21 +148,19 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         return entry;
     }
 
-    private SecurityShadowEntry mockSecurityShadowEntry(final UserSecurityReference user,
-        final SecurityReference wiki)
+    private SecurityShadowEntry mockSecurityShadowEntry(final UserSecurityReference user, final SecurityReference wiki)
     {
-        SecurityShadowEntry entry = mock(SecurityShadowEntry.class,
-            "Shadow for " +  user.toString() + " on " + wiki.toString());
+        SecurityShadowEntry entry =
+            mock(SecurityShadowEntry.class, "Shadow for " + user.toString() + " on " + wiki.toString());
         when(entry.getReference()).thenReturn(user);
         when(entry.getWikiReference()).thenReturn(wiki);
         return entry;
     }
 
-    private SecurityAccessEntry mockSecurityAccessEntry(final SecurityReference ref,
-        final UserSecurityReference user)
+    private SecurityAccessEntry mockSecurityAccessEntry(final SecurityReference ref, final UserSecurityReference user)
     {
-        SecurityAccessEntry entry = mock(SecurityAccessEntry.class,
-            "Access for " +  user.toString() + " on " + ref.toString());
+        SecurityAccessEntry entry =
+            mock(SecurityAccessEntry.class, "Access for " + user.toString() + " on " + ref.toString());
         when(entry.getReference()).thenReturn(ref);
         when(entry.getUserReference()).thenReturn(user);
         return entry;
@@ -188,8 +199,8 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             final List<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
                 if (groupRefs.get(group).contains(entry.getReference())) {
-                    if (group.getOriginalReference().getWikiReference().equals(
-                        entry.getReference().getOriginalDocumentReference().getWikiReference())) {
+                    if (group.getOriginalReference().getWikiReference()
+                        .equals(entry.getReference().getOriginalDocumentReference().getWikiReference())) {
                         groups.add(group);
                     }
                 }
@@ -210,8 +221,8 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             final List<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
                 if (groupRefs.get(group).contains(user.getReference())) {
-                    if (group.getOriginalReference().getWikiReference().equals(
-                        user.getWikiReference().getOriginalWikiReference())) {
+                    if (group.getOriginalReference().getWikiReference()
+                        .equals(user.getWikiReference().getOriginalWikiReference())) {
                         groups.add(group);
                     }
                 }
@@ -261,15 +272,14 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         return entries;
     }
 
-    private Map<String, SecurityEntry>  InsertUsers()
-        throws ConflictingInsertionException, ParentEntryEvictedException
+    private Map<String, SecurityEntry> InsertUsers() throws ConflictingInsertionException, ParentEntryEvictedException
     {
         Map<String, SecurityEntry> entries = InsertUsersWithouShadow();
 
         // Check inserting shadow users
         for (UserSecurityReference ref : userRefs) {
             if (ref.isGlobal()) {
-                for(SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
+                for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
                     entries.put(AddUserEntry(entry), entry);
                 }
@@ -279,7 +289,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Insert some groups
         for (GroupSecurityReference ref : groupRefs.keySet()) {
             if (ref.isGlobal()) {
-                for(SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
+                for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
                     entries.put(AddUserEntry(entry), entry);
                 }
@@ -289,7 +299,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Insert shadow users in shadow groups
         for (UserSecurityReference ref : groupUserRefs) {
             if (ref.isGlobal()) {
-                for(SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
+                for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
                     entries.put(AddUserEntry(entry), entry);
                 }
@@ -299,7 +309,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         return entries;
     }
 
-    private Map<String, SecurityEntry>  InsertEntities()
+    private Map<String, SecurityEntry> InsertEntities()
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
         Map<String, SecurityEntry> entries = new HashMap<String, SecurityEntry>();
@@ -314,8 +324,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         return entries;
     }
 
-    private Map<String, SecurityEntry>  InsertAccess()
-        throws ConflictingInsertionException, ParentEntryEvictedException
+    private Map<String, SecurityEntry> InsertAccess() throws ConflictingInsertionException, ParentEntryEvictedException
     {
         Map<String, SecurityEntry> entries = new HashMap<String, SecurityEntry>();
 
@@ -324,11 +333,13 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             for (SecurityReference ref : entityRefs) {
                 SecurityAccessEntry entry = mockSecurityAccessEntry(ref, user);
                 String key = AddAccessEntry(entry);
-                if (key != null) entries.put(key, entry);
+                if (key != null)
+                    entries.put(key, entry);
             }
             SecurityAccessEntry entry = mockSecurityAccessEntry(user, user);
             String key = AddAccessEntry(entry);
-            if (key != null) entries.put(key, entry);
+            if (key != null)
+                entries.put(key, entry);
         }
 
         // Insert access for group users
@@ -336,11 +347,13 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             for (SecurityReference ref : entityRefs) {
                 SecurityAccessEntry entry = mockSecurityAccessEntry(ref, user);
                 String key = AddAccessEntry(entry);
-                if (key != null) entries.put(key, entry);
+                if (key != null)
+                    entries.put(key, entry);
             }
             SecurityAccessEntry entry = mockSecurityAccessEntry(user, user);
             String key = AddAccessEntry(entry);
-            if (key != null) entries.put(key, entry);
+            if (key != null)
+                entries.put(key, entry);
         }
 
         return entries;
@@ -349,26 +362,33 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     interface KeepEntries
     {
         boolean keepRule(SecurityRuleEntry entry);
+
         boolean keepAccess(SecurityAccessEntry entry);
+
         boolean keepShadow(SecurityShadowEntry entry);
     }
 
     class Keeper implements KeepEntries
     {
-        public boolean keepRule(SecurityRuleEntry entry) {
+        public boolean keepRule(SecurityRuleEntry entry)
+        {
             return true;
         }
-        public boolean keepAccess(SecurityAccessEntry entry) {
+
+        public boolean keepAccess(SecurityAccessEntry entry)
+        {
             return true;
         }
-        public boolean keepShadow(SecurityShadowEntry entry) {
+
+        public boolean keepShadow(SecurityShadowEntry entry)
+        {
             return true;
         }
     }
 
     private void checkEntries(Map<String, SecurityEntry> entries, KeepEntries keeper)
     {
-        for(Iterator<Map.Entry<String, SecurityEntry>> it = entries.entrySet().iterator(); it.hasNext(); ) {
+        for (Iterator<Map.Entry<String, SecurityEntry>> it = entries.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, SecurityEntry> entry = it.next();
             if (entry.getValue() instanceof SecurityRuleEntry) {
                 SecurityRuleEntry sentry = (SecurityRuleEntry) entry.getValue();
@@ -406,89 +426,117 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         void remove(SecurityReference ref);
     }
 
-    private void removerTest(Map<String, SecurityEntry> entries, Remover remover) {
+    private void removerTest(Map<String, SecurityEntry> entries, Remover remover)
+    {
 
         // Remove an document entity
         remover.remove(docRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepRule(SecurityRuleEntry entry) {
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepRule(SecurityRuleEntry entry)
+            {
                 return entry.getReference() != docRef;
             }
-            public boolean keepAccess(SecurityAccessEntry entry) {
+
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
                 return entry.getReference() != docRef;
             }
         });
 
         // Remove an user entity
         remover.remove(anotherWikiUserRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepRule(SecurityRuleEntry entry) {
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepRule(SecurityRuleEntry entry)
+            {
                 return entry.getReference() != anotherWikiUserRef;
             }
-            public boolean keepAccess(SecurityAccessEntry entry) {
+
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
                 return entry.getUserReference() != anotherWikiUserRef;
             }
         });
 
         // Remove a global user entity with shadow entry
         remover.remove(anotherGroupXUserRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepRule(SecurityRuleEntry entry) {
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepRule(SecurityRuleEntry entry)
+            {
                 return entry.getReference() != anotherGroupXUserRef;
             }
-            public boolean keepAccess(SecurityAccessEntry entry) {
+
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
                 return entry.getUserReference() != anotherGroupXUserRef;
             }
-            public boolean keepShadow(SecurityShadowEntry entry) {
+
+            public boolean keepShadow(SecurityShadowEntry entry)
+            {
                 return entry.getReference() != anotherGroupXUserRef;
             }
         });
 
         // Remove a group entity
         remover.remove(groupRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepRule(SecurityRuleEntry entry) {
-                return (entry.getReference() != groupRef
-                    && (!groupRefs.get(groupRef).contains(entry.getReference())
-                    || entry.getReference().getOriginalReference().extractReference(EntityType.WIKI)
-                        != wikiRef.getOriginalWikiReference()));
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepRule(SecurityRuleEntry entry)
+            {
+                return (entry.getReference() != groupRef && (!groupRefs.get(groupRef).contains(entry.getReference())
+                    || entry.getReference().getOriginalReference().extractReference(EntityType.WIKI) != wikiRef
+                        .getOriginalWikiReference()));
             }
-            public boolean keepAccess(SecurityAccessEntry entry) {
-                return (!groupRefs.get(groupRef).contains(entry.getUserReference())
-                    || entry.getReference().getOriginalReference().extractReference(EntityType.WIKI)
-                        != wikiRef.getOriginalWikiReference());
+
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
+                return (!groupRefs.get(groupRef).contains(entry.getUserReference()) || entry.getReference()
+                    .getOriginalReference().extractReference(EntityType.WIKI) != wikiRef.getOriginalWikiReference());
             }
-            public boolean keepShadow(SecurityShadowEntry entry) {
-                return (!groupRefs.get(groupRef).contains(entry.getReference())
-                    || entry.getWikiReference() != wikiRef);
+
+            public boolean keepShadow(SecurityShadowEntry entry)
+            {
+                return (!groupRefs.get(groupRef).contains(entry.getReference()) || entry.getWikiReference() != wikiRef);
             }
         });
 
         // Remove a space entry
         remover.remove(spaceRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepRule(SecurityRuleEntry entry) {
-                return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE)
-                    != spaceRef.getOriginalSpaceReference());
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepRule(SecurityRuleEntry entry)
+            {
+                return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE) != spaceRef
+                    .getOriginalSpaceReference());
             }
-            public boolean keepAccess(SecurityAccessEntry entry) {
-                return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE)
-                    != spaceRef.getOriginalSpaceReference());
+
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
+                return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE) != spaceRef
+                    .getOriginalSpaceReference());
             }
         });
 
         // Remove an wiki entity
         remover.remove(wikiRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepRule(SecurityRuleEntry entry) {
-                return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI)
-                    != wikiRef.getOriginalWikiReference());
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepRule(SecurityRuleEntry entry)
+            {
+                return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI) != wikiRef
+                    .getOriginalWikiReference());
             }
-            public boolean keepAccess(SecurityAccessEntry entry) {
-                return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI)
-                    != wikiRef.getOriginalWikiReference());
+
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
+                return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI) != wikiRef
+                    .getOriginalWikiReference());
             }
-            public boolean keepShadow(SecurityShadowEntry entry) {
+
+            public boolean keepShadow(SecurityShadowEntry entry)
+            {
                 return (entry.getWikiReference() != wikiRef);
             }
 
@@ -496,14 +544,20 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         // Remove the main wiki entry
         remover.remove(xwikiRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepRule(SecurityRuleEntry entry) {
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepRule(SecurityRuleEntry entry)
+            {
                 return false;
             }
-            public boolean keepAccess(SecurityAccessEntry entry) {
+
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
                 return false;
             }
-            public boolean keepShadow(SecurityShadowEntry entry) {
+
+            public boolean keepShadow(SecurityShadowEntry entry)
+            {
                 return false;
             }
 
@@ -571,8 +625,8 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Check a conflicting duplicate insertion
         try {
             final SecurityReference ref = ruleEntries.get(0).getReference();
-            SecurityRuleEntry entry = mock(SecurityRuleEntry.class, "Another entry for "
-                + ruleEntries.get(0).getReference().toString());
+            SecurityRuleEntry entry =
+                mock(SecurityRuleEntry.class, "Another entry for " + ruleEntries.get(0).getReference().toString());
             when(entry.getReference()).thenReturn(ref);
 
             AddRuleEntry(entry);
@@ -609,10 +663,10 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Check inserting shadow users
         for (UserSecurityReference ref : userRefs) {
             if (ref.isGlobal()) {
-                for(SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
+                for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
                     assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry)entry));
+                        sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -621,10 +675,10 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Check inserting some shadow groups
         for (GroupSecurityReference ref : groupRefs.keySet()) {
             if (ref.isGlobal()) {
-                for(SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
+                for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
                     assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry)entry));
+                        sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -633,10 +687,10 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Check inserting shadow users in shadow groups
         for (UserSecurityReference ref : groupUserRefs) {
             if (ref.isGlobal()) {
-                for(SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
+                for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
                     assertThat(((DefaultSecurityCache) securityCache).get(AddUserEntry(entry)),
-                        sameInstance((SecurityEntry)entry));
+                        sameInstance((SecurityEntry) entry));
                     allEntries.add(entry);
                 }
             }
@@ -667,7 +721,6 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             // Expected.
         }
     }
-
 
     @Test
     public void testAddSecurityAccessEntry() throws Exception
@@ -717,9 +770,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         try {
             final SecurityReference ref = allEntries.get(0).getReference();
             final UserSecurityReference user = allEntries.get(0).getUserReference();
-            SecurityAccessEntry entry = mock(SecurityAccessEntry.class, "Another access for "
-                + allEntries.get(0).getUserReference().toString() + " on "
-                + allEntries.get(0).getReference().toString());
+            SecurityAccessEntry entry =
+                mock(SecurityAccessEntry.class, "Another access for " + allEntries.get(0).getUserReference().toString()
+                    + " on " + allEntries.get(0).getReference().toString());
             when(entry.getUserReference()).thenReturn(user);
             when(entry.getReference()).thenReturn(ref);
 
@@ -776,8 +829,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         final Map<SecurityReference, String> keys = new HashMap<SecurityReference, String>();
 
-        for (Map.Entry<String, SecurityEntry> entry : entries.entrySet())
-        {
+        for (Map.Entry<String, SecurityEntry> entry : entries.entrySet()) {
             if (entry.getValue() instanceof SecurityRuleEntry) {
                 keys.put(entry.getValue().getReference(), entry.getKey());
             }
@@ -803,8 +855,10 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         // Remove the access level for a user on a document
         securityCache.remove(userRef, docRef);
-        checkEntries(entries, new Keeper() {
-            public boolean keepAccess(SecurityAccessEntry entry) {
+        checkEntries(entries, new Keeper()
+        {
+            public boolean keepAccess(SecurityAccessEntry entry)
+            {
                 return entry.getReference() != docRef || entry.getUserReference() != userRef;
             }
         });

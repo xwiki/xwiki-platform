@@ -20,8 +20,10 @@
 package org.xwiki.security.internal;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Temporary interface to access XWiki information without depending on oldcore.
@@ -50,4 +52,15 @@ public interface XWikiBridge
      * @since 6.1RC1
      */
     boolean needsAuthentication(Right right);
+
+    /**
+     * Right now the security module logic only works with DOCUMENT based reference so PAGE reference need to be
+     * converted.
+     * 
+     * @param reference the reference
+     * @return the compatible reference
+     * @since 10.6RC1
+     */
+    @Unstable
+    EntityReference toCompatibleEntityReference(EntityReference reference);
 }

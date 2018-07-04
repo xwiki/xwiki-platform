@@ -21,23 +21,27 @@ package org.xwiki.security;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -46,59 +50,70 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 4.0M2
  */
+@ComponentTest
 public class SecurityReferenceTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<SecurityReferenceFactory> securityReferenceFactoryMocker =
-        new MockitoComponentMockingRule<SecurityReferenceFactory>(DefaultSecurityReferenceFactory.class);
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private EntityReference xwiki = new EntityReference("xwiki", EntityType.WIKI);
+
     private EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
-    private EntityReference xspace = new EntityReference("space", EntityType.SPACE,
-        new EntityReference("xwiki", EntityType.WIKI));
-    private EntityReference space = new EntityReference("space", EntityType.SPACE,
-        new EntityReference("wiki", EntityType.WIKI));
+
+    private EntityReference xspace =
+        new EntityReference("space", EntityType.SPACE, new EntityReference("xwiki", EntityType.WIKI));
+
+    private EntityReference space =
+        new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI));
+
     private EntityReference subEntity = new EntityReference("page", EntityType.DOCUMENT, space);
+
     private EntityReference mainEntity = new EntityReference("page", EntityType.DOCUMENT, xspace);
+
     private SpaceReference xwikispace = new SpaceReference("XWiki", xwiki);
+
     private SpaceReference wikispace = new SpaceReference("XWiki", wiki);
+
     private DocumentReference userRef = new DocumentReference("user1", xwikispace);
+
     private DocumentReference anotherWikiUserRef = new DocumentReference("user2", wikispace);
+
     private DocumentReference groupRef = new DocumentReference("group1", xwikispace);
+
     private DocumentReference anotherWikiGroupRef = new DocumentReference("group2", wikispace);
 
-    private SecurityReferenceFactory factory;
-    
-    @Before
-    public void configure() throws Exception
+    @MockComponent
+    private XWikiBridge xwikiBridge;
+
+    @InjectMockComponents
+    private DefaultSecurityReferenceFactory factory;
+
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        XWikiBridge xwikiBridge = securityReferenceFactoryMocker.getInstance(XWikiBridge.class);
         when(xwikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
-        
-        factory = securityReferenceFactoryMocker.getComponentUnderTest();
+        when(xwikiBridge.toCompatibleEntityReference(any(EntityReference.class)))
+            .thenAnswer(new Answer<EntityReference>()
+            {
+                @Override
+                public EntityReference answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return invocation.getArgument(0);
+                }
+            });
     }
 
     @Test
     public void testEquality() throws Exception
     {
-        assertThat(factory.newEntityReference(mainEntity),
-            equalTo(factory.newEntityReference(mainEntity)));
-        assertThat(factory.newEntityReference(subEntity),
-            equalTo(factory.newEntityReference(subEntity)));
-        assertThat(factory.newEntityReference(mainEntity),
-            not(equalTo(factory.newEntityReference(subEntity))));
-        assertThat(factory.newEntityReference(subEntity),
-            not(equalTo(factory.newEntityReference(mainEntity))));
+        assertThat(factory.newEntityReference(mainEntity), equalTo(factory.newEntityReference(mainEntity)));
+        assertThat(factory.newEntityReference(subEntity), equalTo(factory.newEntityReference(subEntity)));
+        assertThat(factory.newEntityReference(mainEntity), not(equalTo(factory.newEntityReference(subEntity))));
+        assertThat(factory.newEntityReference(subEntity), not(equalTo(factory.newEntityReference(mainEntity))));
     }
 
     @Test
     public void testGetReversedSecurityReferenceChain() throws Exception
     {
-        List<SecurityReference> subList = (List<SecurityReference>) factory.newEntityReference(subEntity)
-            .getReversedSecurityReferenceChain();
+        List<SecurityReference> subList =
+            (List<SecurityReference>) factory.newEntityReference(subEntity).getReversedSecurityReferenceChain();
         assertThat(subList.get(0), equalTo(xwiki));
         assertThat(subList.get(0).getOriginalReference(), equalTo(xwiki));
         assertThat(subList.get(1), equalTo(wiki));
@@ -108,8 +123,8 @@ public class SecurityReferenceTest
         assertThat(subList.get(3), equalTo(subEntity));
         assertThat(subList.get(3).getOriginalReference(), equalTo(subEntity));
 
-        List<SecurityReference> mainList = (List<SecurityReference>) factory.newEntityReference(mainEntity)
-            .getReversedSecurityReferenceChain();
+        List<SecurityReference> mainList =
+            (List<SecurityReference>) factory.newEntityReference(mainEntity).getReversedSecurityReferenceChain();
         assertThat(mainList.get(0), equalTo(xwiki));
         assertThat(mainList.get(0).getOriginalReference(), equalTo(xwiki));
         assertThat(mainList.get(1), equalTo(xspace));
@@ -126,9 +141,10 @@ public class SecurityReferenceTest
         assertThat(factory.newEntityReference(null).getOriginalReference(), equalTo(xwiki));
         assertThat(factory.newUserReference(null).getOriginalDocumentReference(), nullValue());
 
-        thrown.expect(IllegalArgumentException.class);
-        factory.newGroupReference(null);
-        // never reached !!
+        assertThrows(IllegalArgumentException.class, () -> {
+            factory.newGroupReference(null);
+            // never reached !!
+        });
     }
 
     @Test

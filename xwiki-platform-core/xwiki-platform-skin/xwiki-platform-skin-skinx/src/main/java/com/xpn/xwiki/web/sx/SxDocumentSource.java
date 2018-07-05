@@ -138,8 +138,8 @@ public class SxDocumentSource implements SxSource
                     LESSResourceReference lessResourceReference =
                         lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
                     try {
-                        // We don't use cache here because it should be managed by the browser using cache policy.
-                        sxContent = lessCompiler.compile(lessResourceReference, true, (parse == 1), true);
+                        sxContent = lessCompiler.compile(lessResourceReference, true, (parse == 1),
+                            CachePolicy.FORBID.equals(getCachePolicy()));
                     } catch (LESSCompilerException e) {
                         // Set the error message in a CSS comment to help the developer understand why its SSX is not
                         // working (it will work only if the CSS minifier is not used).

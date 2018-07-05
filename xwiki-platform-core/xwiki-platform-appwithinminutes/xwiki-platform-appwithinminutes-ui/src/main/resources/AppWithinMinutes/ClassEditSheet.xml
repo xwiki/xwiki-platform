@@ -340,8 +340,10 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(displayNewField)
   ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
+  ## Output also the LinkExtension hook because $xwiki.linkx.use() is used to load CSS files from WebJars.
   ## The class editor moves this resource includes in the HTML page head.
   {{html}}
+  &lt;!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin --&gt;
   #skinExtensionHooks
   {{/html}}
 

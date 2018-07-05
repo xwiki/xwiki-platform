@@ -64,6 +64,11 @@
   z-index: 100005;
 }
 
+/* Make sure the suggest input drop down is visible. */
+.selectize-dropdown, .selectize-dropdown.form-control {
+  z-index: 100006;
+}
+
 #lb {
   left: 0;
   margin-left: 0;

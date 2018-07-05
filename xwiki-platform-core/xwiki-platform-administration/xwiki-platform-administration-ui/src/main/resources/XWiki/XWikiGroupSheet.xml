@@ -194,17 +194,18 @@
   var addMembers = function(event) {
     event &amp;&amp; event.stop();
     var form = event.element().form;
-    if (form.select('ul.accepted-suggestions li').length == 0 &amp;&amp; $('userInput').value.strip() == ''
-      &amp;&amp; $('groupInput').value.strip() == '') {
+    var parameters = form.serialize(true);
+    var names = Object.isArray(parameters.name) ? parameters.name : [parameters.name];
+    if (names.join('').strip() === '') {
       // Nothing to add.
       return;
     }
     new Ajax.Request(form.action, {
-      parameters: form.serialize(),
+      parameters: parameters,
       onSuccess: function() {
         // Clear the list of selected users and groups.
-        XWiki.widgets.UserPicker.instances.groupInput.clear();
-        XWiki.widgets.UserPicker.instances.userInput.clear();
+        jQuery('#userInput')[0].selectize.clear(true);
+        jQuery('#groupInput')[0].selectize.clear(true);
         // Reload the live table.
         var end = editgrouptable.limit;
         var start = Math.max(editgrouptable.lastOffset, 1);

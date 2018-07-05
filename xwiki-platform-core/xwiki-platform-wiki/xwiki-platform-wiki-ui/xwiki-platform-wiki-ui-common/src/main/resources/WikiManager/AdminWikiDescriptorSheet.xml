@@ -140,15 +140,12 @@
                 &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.owner')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
-                #userPicker_import()
-                #set ($class = 'suggestUsers')
-                #set ($userScope = "$!services.wiki.user.userScope")
-                #if ($userScope == 'LOCAL_AND_GLOBAL')
-                  #set ($class = "$class withScope")
-                #elseif ($userScope == 'GLOBAL_ONLY')
-                  #set ($class = "$class global")
-                #end
-                &lt;input id='owner' name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
+                #set ($userPickerParams = {
+                  'id': 'owner',
+                  'name': 'owner',
+                  'value': $descriptor.ownerId
+                })
+                #userPicker(false $userPickerParams)
               &lt;/dd&gt;
 
               &lt;dd class='warning'&gt;

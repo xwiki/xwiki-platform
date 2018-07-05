@@ -214,95 +214,79 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 
-###
-###    displayUser
-###
-### Display the profile of a user (or a list of users) with an image
-###
-### @param arg Could be either a string, a reference or a list of them
-###
-#macro(displayUser $arg)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
+#**
+ * Displays the user avatar and name, linked to the user profile page.
+ *
+ * @param arg could be either a string, a reference or a list of them
+ *#
+#macro (displayUser $arg)
   #if ($arg.iterator())
     #set ($usersList = $arg)
   #else
     #set ($usersList = [$arg])
   #end
-  <ul class="users">
-    #foreach($user in $usersList)
-      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
-      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
-      #set ($userReference = $user.extractReference('DOCUMENT'))
-      #if (!$userReference)
-        #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
-      #end
-      #set($userReferenceString = $services.model.serialize($userReference, 'default'))
-      #getUserAvatarURL($userReference $avatarURL 30)
-      <li class="user">
-        <div class="user-avatar-wrapper">
-          ## The string returned by XWiki#getUserName() is XML encoded.
-          <img src="${escapetool.xml($avatarURL.url)}" class="icon"
-            alt="${xwiki.getUserName($userReferenceString, false)}" />
-        </div>
-        <div class="user-name">${xwiki.getUserName($userReferenceString)}</div>
-        <div>
-          <span class="user-alias">${escapetool.xml($userReference.name)}</span>
-          ## Display the wiki only for local users.
-          #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
-            <span class="user-wiki">${escapetool.xml($userReference.wikiReference.name)}</span>
-          #end
-        </div>
-      </li>
+  #set ($output = [])
+  #foreach ($user in $usersList)
+    ## Since we accept both a String or an EntityReference as input, we first check if we have an Entity Reference
+    ## to a Document and if not then we resolve the String to convert it to a Document Reference.
+    #set ($userReference = $user.extractReference('DOCUMENT'))
+    #if (!$userReference)
+      #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
     #end
-  </ul>
+    #getUserAvatarURL($userReference $avatarURL 30)
+    #set ($escapedUserName = $escapetool.xml($xwiki.getPlainUserName($userReference)))
+    ## We avoid the whitespace because the users are displayed as inline blocks.
+    #set ($discard = $output.addAll([
+      '<li class="user">',
+        "<img class=""user-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
+        "<a class=""user-name"" href=""$escapetool.xml($xwiki.getURL($userReference))"">$escapedUserName</a>",
+      '</li>'
+    ]))
+  #end
+  #if ($output.size() > 0)
+    <ul class="users">$stringtool.join($output, '')</ul>
+  #end
 #end
 
-
-###
-###    displayGroup
-###
-### Display the profile of a group (or a list of groups) with an image
-###
-### @param arg Could be either a string, a reference or a list of them
-###
-#macro(displayGroup $arg)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+#**
+ * Displays the group avatar and name, linked to the group profile page.
+ *
+ * @param arg could be either a string, a reference or a list of them
+ *#
+#macro (displayGroup $arg)
   #if ($arg.iterator())
     #set ($groupsList = $arg)
   #else
     #set ($groupsList = [$arg])
   #end
-  <ul class="users">
-    #foreach ($group in $groupsList)
-      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
-      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
-      #set ($groupReference = $group.extractReference('DOCUMENT'))
-      #if (!$groupReference)
-        #set ($groupReference = $services.model.resolveDocument($group, 'group/current'))
-      #end
-      #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
-      #if ("$!groupTitle" == '')
-        #set ($groupTitle = $groupReference.name)
-      #end
-      <li class="user">
-        <div class="user-avatar-wrapper">
-          #getUserAvatarURL($groupReference $avatarURL 30)
-          <img src="${escapetool.xml($avatarURL.url)}" class="icon"
-            alt="${escapetool.xml($groupTitle)}" />
-        </div>
-        <div class="user-name">
-          <a href="${escapetool.xml($xwiki.getURL($groupReference))}">${escapetool.xml($groupTitle)}</a>
-        </div>
-        <div>
-          <span class="user-alias">${escapetool.xml($groupReference.name)}</span>
-          ## Display the wiki only for local groups.
-          #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
-            <span class="user-wiki">${escapetool.xml($groupReference.wikiReference.name)}</span>
-          #end
-        </div>
-      </li>
+  #set ($output = [])
+  #foreach ($group in $groupsList)
+    ## Since we accept both a String or an EntityReference as input, we first check if we have an Entity Reference
+    ## to a Document and if not then we resolve the String to convert it to a Document Reference.
+    #set ($groupReference = $group.extractReference('DOCUMENT'))
+    #if (!$groupReference)
+      #set ($groupReference = $services.model.resolveDocument($group, 'group/current'))
     #end
-  </ul>
+    #set ($groupName = $xwiki.getDocument($groupReference).plainTitle)
+    #if ("$!groupName" == '')
+      #set ($groupName = $groupReference.name)
+      #if ($groupName == $services.model.getEntityReference('DOCUMENT', 'default'))
+        #set ($groupName = $groupReference.lastSpaceReference.name)
+      #end
+    #end
+    #set ($escapedGroupName = $escapetool.xml($groupName))
+    #getUserAvatarURL($groupReference $avatarURL 30)
+    ## We avoid the whitespace because the groups are displayed as inline blocks.
+    #set ($discard = $output.addAll([
+      '<li class="group">',
+        "<img class=""group-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedGroupName"" />",
+        "<a class=""group-name"" href=""$escapetool.xml($xwiki.getURL($groupReference))"">$escapedGroupName</a>",
+      '</li>'
+    ]))
+  #end
+  #if ($output.size() > 0)
+    <ul class="groups">$stringtool.join($output, '')</ul>
+  #end
 #end
 
 
@@ -2290,64 +2274,38 @@ function (row, i, table) {
 $string##
 #end
 
+
 #**
- * Pulls all the JavaScript and CSS resources needed by the UserPicker.
- *
- * @param $sortable whether the list of selected users should be sortable or not
+ * Pulls all the JavaScript and CSS resources needed by the user and group picker.
  *#
-#macro (userPicker_import $sortable)
-  #if ($sortable)
-    ## Needed for sorting the selected values.
-    #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
-  #end
-  ## Needed for displaying a list of suggestions based on the user input (included by default).
-  ##set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
-  ##set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
-  ## Needed for managing the selected values. In single selection mode the value selected from the list of suggestions
-  ## overwrites the previously selected value.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js', true))
-  ## The actual user picker. Provides a custom display for the user suggestions and selected users.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
+#macro (userPicker_import)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
 #end
 
 #macro (userPicker_input $multiSelect $parameters)
-  #set ($parameters.type = 'text')
   #if ($multiSelect)
-    #set ($discard = $parameters.put('class', "$!parameters.get('class') multipleSelection"))
+    #set ($discard = $parameters.put('multiple', 'multiple'))
   #end
-  #set ($attributes = [])
-  #foreach ($entry in $parameters.entrySet())
-    #set ($discard = $attributes.add("$escapetool.xml($entry.key)='$!escapetool.xml($entry.value)'"))
-  #end
-  <input $stringtool.join($attributes, ' ') />
+  #set ($discard = $parameters.putIfAbsent('data-userScope', $services.wiki.user.userScope))
+  #suggestInput($parameters)
 #end
 
 #macro (userPicker $multiSelect $parameters)
-  #userPicker_import($multiSelect)
-  #set ($class = 'suggestUsers')
-  #set ($userScope = "$!services.wiki.user.userScope")
-  #if ($userScope == 'LOCAL_AND_GLOBAL')
-    #set ($class = "$class withScope")
-  #elseif ($userScope == 'GLOBAL_ONLY')
-    #set ($class = "$class global")
-  #end
-  #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
+  #userPicker_import
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-users"))
   #userPicker_input($multiSelect $parameters)
 #end
 
 #macro (groupPicker $multiSelect $parameters)
-  #userPicker_import($multiSelect)
-  #set ($class = 'suggestGroups')
-  #if (!$xcontext.isMainWiki() && "$!services.wiki.user.userScope" != 'LOCAL_ONLY')
-    ## We can have both local and global groups in a subwiki that accepts global users. In case the wiki accepts only
-    ## global users, local groups can be used to setup various rights for the global users.
-    #set ($class = "$class withScope")
-  #end
-  #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
+  #userPicker_import
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-groups"))
   #userPicker_input($multiSelect $parameters)
 #end
+
 
 #**
  * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the
@@ -2527,37 +2485,61 @@ Recursive title display detected!##
  * Used by custom property displayers that need a generic suggest input.
  *#
 #macro (xpropertySuggestInputDisplayer $field $prefix $name $value)
-  #set ($id = $escapetool.xml("${prefix}${name}"))
-  #set ($disabled = $field.getProperty('disabled').value == 1)
-  #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-  ## We don't use $isMultiSelect to determine if there is one or multiple values selected because you can have multiple
-  ## values selected on a single selection property if the property had multiple selection active in the past.
-  #if ("$!value.size()" != '')
-    #set ($values = $value)
-  #elseif ($isMultiSelect)
-    ## Multiple selection without relational storage.
-    #set ($separators = $field.getProperty('separators').value)
-    #if ("$!separators" == '')
-      #set ($separators = '|,')
-    #end
-    #set ($values = $stringtool.split($value, $separators))
-  #else
-    #set ($values = [$value])
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($id = "${prefix}${name}")
+  #set ($parameters = {
+    'id': $id,
+    'name': $id,
+    'value': $value,
+    'class': 'suggest-propertyValues',
+    'data-className': $field.className,
+    'data-propertyName': $name
+  })
+  #if ($field.getProperty('disabled').value == 1)
+    #set ($parameters.disabled = 'disabled')
   #end
+  #if ($field.getProperty('multiSelect').value == 1)
+    #set ($parameters.multiple = 'multiple')
+    #set ($separators = $field.getProperty('separators').value)
+    #if ("$!separators" != '')
+      #set ($parameters.separators = $separators)
+    #end
+  #end
+  #suggestInput($parameters)
+#end
+
+#**
+ * Utility macro to output a generic suggest input.
+ *
+ * @param $parameters the parameters (most of them are treated as HTML attributes)
+ *#
+#macro (suggestInput $parameters)
   #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
     {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-    {'forceSkinAction' : true, 'language' : $xcontext.locale}))
-  <select id="$!id" name="$!id" class="suggest-propertyValues"#if ($isMultiSelect) multiple="multiple"#end
-      #if ($disabled)disabled="disabled" #{end}data-className="$!escapetool.xml($field.className)"
-      data-propertyName="$!escapetool.xml($name)" size="1">
+  #set ($discard = $parameters.put('size', 1))
+  #set ($attributes = [])
+  #set ($nonAttributes = ['value', 'separators'])
+  #foreach ($entry in $parameters.entrySet())
+    #if (!$nonAttributes.contains($entry.key))
+      #set ($discard = $attributes.add("$escapetool.xml($entry.key)='$!escapetool.xml($entry.value)'"))
+    #end
+  #end
+  #if ("$!parameters.value.size()" != '')
+    #set ($values = $parameters.value)
+  #elseif ($parameters.multiple)
+    #set ($values = $stringtool.split($parameters.value, $parameters.getOrDefault('separators', '|,')))
+  #else
+    #set ($values = [$parameters.value])
+  #end
+  <select $stringtool.join($attributes, ' ')>
     #foreach ($selectedValue in $values)
       <option value="$!escapetool.xml($selectedValue)" selected="selected">$!escapetool.xml($selectedValue)</option>
     #end
   </select>
-  #if ($isMultiSelect)
+  #if ($parameters.multiple)
     ## We need a hidden input with an empty value to be able to clear the selected values when no value is selected.
-    <input type="hidden" name="$!id" />
+    <input type="hidden" name="$!escapetool.xml($parameters.name)" />
   #end
 #end

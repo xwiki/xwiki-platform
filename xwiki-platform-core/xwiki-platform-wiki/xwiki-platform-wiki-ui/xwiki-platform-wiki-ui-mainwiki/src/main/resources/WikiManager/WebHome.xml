@@ -46,8 +46,6 @@
   &lt;p&gt;&lt;a href="$xwiki.getURL('WikiManager.CreateWiki')" class="button button-success" id="tmCreateWiki"&gt;$services.icon.renderHTML('add') $services.localization.render('platform.wiki.create.button')&lt;/a&gt;&lt;/p&gt;
 #end
 {{/html}}
-## Load the User Picker style for the wiki owner column.
-#set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #set($columns = ['wikiprettyname', 'description', 'owner', 'doc.creationDate', 'membershipType'])
 #set($columnsProperties = {
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },

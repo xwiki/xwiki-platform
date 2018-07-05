@@ -43,8 +43,6 @@
 (% class="noitems" %)
 {{translation key="admin.wikis.templates.hint" /}}
 
-## Load the User Picker style for the wiki owner column.
-#set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #set($columns = ['wikiprettyname', 'description', 'owner', 'membershipType'])
 #set($columnsProperties = {
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },

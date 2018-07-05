@@ -245,7 +245,6 @@
 #if("$!services.wiki.user.userScope" != 'LOCAL_ONLY')
 #if($hasEditGroupRight)
 {{html}}
-#userPicker_import()
 #set ($discard = $xwiki.ssx.use('WikiManager.WikiUsers'))
 &lt;form id='inviteUserForm' class='xform half' method='post'&gt;
   &lt;h2&gt;$services.localization.render('platform.wiki.currentwiki.member.add')&lt;/h2&gt;
@@ -256,7 +255,12 @@
     &lt;/dt&gt;
     &lt;dd&gt;
       ## The workspace can accept only global users.
-      &lt;input type="text" id="userInput" name="name" class="suggestUsers multipleSelection global" /&gt;
+      #set ($userPickerParams = {
+        'id': 'userInput',
+        'name': 'name',
+        'data-userScope': 'GLOBAL_ONLY'
+      })
+      #userPicker(true $userPickerParams)
     &lt;/dd&gt;
     &lt;dt&gt;
       &lt;label for='message'&gt;$services.localization.render('platform.wiki.currentwiki.invite.message.label')&lt;/label&gt;
@@ -477,15 +481,17 @@
   var addMembers = function(event) {
     event &amp;&amp; event.stop();
     var form = event.element().form;
-    if (form.select('ul.accepted-suggestions li').length == 0 &amp;&amp; $('userInput').value.strip() == '') {
+    var parameters = form.serialize(true);
+    var names = Object.isArray(parameters.name) ? parameters.name : [parameters.name];
+    if (names.join('').strip() === '') {
       // Nothing to add.
       return;
     }
     new Ajax.Request("$xwiki.getURL('XWiki.XWikiAllGroup', 'get', 'xpage=adduorg')", {
-      parameters: form.serialize(),
+      parameters: parameters,
       onSuccess: function() {
         // Clear the list of selected users.
-        XWiki.widgets.UserPicker.instances.userInput.clear();
+        jQuery('#userInput')[0].selectize.clear(true);
         // Reload the live table.
         var end = editgrouptable.limit;
         var start = Math.max(editgrouptable.lastOffset, 1);

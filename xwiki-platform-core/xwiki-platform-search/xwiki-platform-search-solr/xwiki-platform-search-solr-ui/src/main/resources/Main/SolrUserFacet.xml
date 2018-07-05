@@ -42,25 +42,14 @@
   <content>{{velocity}}
 #macro (displaySearchFacetValue_user $user)
   #set ($userReference = $services.model.resolveDocument($user))
-  ## The string returned by XWiki#getUserName() is XML encoded.
-  #set ($userName = $xwiki.getUserName($user, false))
-  &lt;span class="user"&gt;
-    &lt;span class="user-avatar-wrapper"&gt;
-      #getUserAvatarURL($userReference $avatarURL 30)
-      &lt;img src="$escapetool.xml($avatarURL.url)" class="icon" alt="$userName" /&gt;
-    &lt;/span&gt;
-    &lt;span class="user-name"&gt;$userName&lt;/span&gt;
-    &lt;span&gt;
-      &lt;span class="user-alias"&gt;$escapetool.xml($userReference.name)&lt;/span&gt;
-      ## Display the wiki only for local users.
-      #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
-        &lt;span class="user-wiki"&gt;$escapetool.xml($userReference.wikiReference.name)&lt;/span&gt;
-      #end
-    &lt;/span&gt;
-  &lt;/span&gt;
+  #set ($escapedUserName = $escapetool.xml($xwiki.getPlainUserName($userReference)))
+  #getUserAvatarURL($userReference $avatarURL 30)
+  &lt;span class="user"&gt;##
+    &lt;img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="$escapedUserName" /&gt;##
+    &lt;span class="user-name"&gt;$escapedUserName&lt;/span&gt;##
+  &lt;/span&gt;##
 #end
 #if ($facetValues)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
   #set ($discard = $xwiki.ssx.use('Main.SolrUserFacet'))
   {{html clean="false"}}
   &lt;ul class="users"&gt;
@@ -168,10 +157,6 @@
       <code>.users .itemName .user {
   display: block;
   margin: 0;
-}
-
-.users .itemName .user-name {
-  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
 }</code>

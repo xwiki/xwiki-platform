@@ -120,17 +120,6 @@ ${escapetool.h}set (${escapetool.d}columnsProperties = {
 #end
 #end
 
-#macro(generateColumnExtraSSX)
-#set($userPicker = false)
-#foreach($column in $columns)
-#set($field = $xclass.get($column))
-#if($field &amp;&amp; ($field.classType == 'Users' || $field.classType == 'Groups') &amp;&amp; !$userPicker)
-#set($userPicker = true)
-${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
-#end
-#end
-#end
-
 #macro(generateLiveTable)
 {{{##
 {{velocity}}
@@ -138,7 +127,6 @@ ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uico
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
 #set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
-#generateColumnExtraSSX()
 #generateColumnProperties()
 ${escapetool.h}set (${escapetool.d}options = {
   'className': '#escapeSingleQuotes($className)',

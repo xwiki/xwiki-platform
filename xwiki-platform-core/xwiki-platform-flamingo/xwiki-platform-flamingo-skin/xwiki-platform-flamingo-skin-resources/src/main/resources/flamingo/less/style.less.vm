@@ -14,6 +14,7 @@
 @import "breadcrumbs";
 @import "drawer";
 @import "edit";
+@import "figure";
 @import "forms";
 @import "general";
 @import "grid";
@@ -26,9 +27,9 @@
 @import "tables";
 @import "tree";
 @import "type";
+@import "users";
 @import "vertical-menus";
 @import "xlist";
-@import "figure";
 // In order to let custom skins easily override styling, we import a custom.less that is empty by default.
 // Make sure the custom.less import is the last one in the imports list.
 @import "custom"; 

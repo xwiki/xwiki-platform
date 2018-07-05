@@ -5140,7 +5140,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     // TODO: Add support for ATTACHMENT as well.
                     if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)
                         && !ResourceType.PAGE.equals(resourceType)) {
-                        // We are only interested in Document or Space references.
+                        // We are only interested in resources leading to a document
                         continue;
                     }
 

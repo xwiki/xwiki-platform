@@ -169,10 +169,10 @@ public class DefaultDocumentSplitter implements DocumentSplitter
         }
     }
 
-    private boolean isDocument(ResourceType resoureceType)
+    private boolean isDocument(ResourceType resourceType)
     {
-        return ResourceType.DOCUMENT.equals(resoureceType) || ResourceType.SPACE.equals(resoureceType)
-            || ResourceType.PAGE.equals(resoureceType);
+        return ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)
+            || ResourceType.PAGE.equals(resourceType);
     }
 
     /**

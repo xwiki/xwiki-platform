@@ -1426,7 +1426,11 @@ XWiki.FormFieldHintManager = Class.create({
         hintInput.title = 'Hint';
       }
       // Move the hint input below the pretty name input, in the field viewer.
+      var dd = hintInput.up('dd');
+      var dt = dd.previous('dt');
       field.getViewer().down('label').insert({after: hintInput});
+      dt.remove();
+      dd.remove();
       // Enhance the hint input.
       new XWiki.InputWithTitle(hintInput);
       new XWiki.AutoResizeInput(hintInput);
@@ -2076,7 +2080,9 @@ return XWiki;
 }
 
 #fields input.xHint {
-  border: 0 none;
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  font-weight: normal;
 }
 
 #fields .labelLine label {

@@ -42,6 +42,7 @@
   <content>{{velocity}}
 #if($doc.getObject('XWiki.SchedulerJobClass'))
 #set($job = $doc.getObject("XWiki.SchedulerJobClass"))
+(%class="xform"%)(((
 **$services.localization.render('xe.scheduler.job.name')**
 
 $!doc.display('jobName')
@@ -63,6 +64,7 @@ $!doc.display("script")
 $job.getProperty('script').value
 {{/code}}
 #end
+)))
 
 #if($xcontext.action=="edit")
 {{info}}$services.localization.render('xe.scheduler.job.scriptexplanation')){{/info}}

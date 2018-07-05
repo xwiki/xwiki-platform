@@ -43,22 +43,22 @@
 #if($doc.getObject('XWiki.SchedulerJobClass'))
 #set($job = $doc.getObject("XWiki.SchedulerJobClass"))
 (%class="xform"%)(((
-**$services.localization.render('xe.scheduler.job.name')**
+; **$services.localization.render('xe.scheduler.job.name')**
 
-$!doc.display('jobName')
+: $!doc.display('jobName')
 
-**$services.localization.render('xe.scheduler.job.description')**
+; **$services.localization.render('xe.scheduler.job.description')**
 
-$!doc.display('jobDescription')
+: $!doc.display('jobDescription')
 
-**$services.localization.render('xe.scheduler.job.expression')**
+; **$services.localization.render('xe.scheduler.job.expression')**
 
-$!doc.display('cron')
+: $!doc.display('cron')
 
-**$services.localization.render('xe.scheduler.job.script')**
+; **$services.localization.render('xe.scheduler.job.script')**
 
 #if($xcontext.action=="edit")
-$!doc.display("script")
+: $!doc.display("script")
 #elseif($xcontext.action=="view" &amp;&amp; "$!job.getProperty('script').value" !="")
 {{code language="groovy"}}
 $job.getProperty('script').value
@@ -67,7 +67,7 @@ $job.getProperty('script').value
 )))
 
 #if($xcontext.action=="edit")
-{{info}}$services.localization.render('xe.scheduler.job.scriptexplanation')){{/info}}
+{{info}}$services.localization.render('xe.scheduler.job.scriptexplanation'){{/info}}
 
 {{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
 

@@ -108,6 +108,17 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    public DocumentReference getDocumentReference(EntityReference entityReference)
+    {
+        XWikiContext context = getContext();
+        if (context != null) {
+            return context.getWiki().getDocumentReference(entityReference, context);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     @Deprecated
     public DocumentModelBridge getDocument(String documentReference) throws Exception
     {
@@ -141,6 +152,13 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         return xcontext.getWiki().getDocument(documentReference, xcontext).getTranslatedDocument(xcontext);
+    }
+
+    @Override
+    public DocumentModelBridge getTranslatedDocumentInstance(EntityReference entityReference) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        return xcontext.getWiki().getDocument(entityReference, xcontext).getTranslatedDocument(xcontext);
     }
 
     @Override
@@ -653,6 +671,22 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             return this.getContext().getWiki().getURL(documentReference, action, queryString, anchor,
                 this.getContext());
         }
+    }
+
+    @Override
+    public String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor)
+    {
+        return getDocumentURL(entityReference, action, queryString, anchor, false);
+    }
+
+    @Override
+    public String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor,
+        boolean isFullURL)
+    {
+        XWikiContext xcontext = getContext();
+        DocumentReference documentReference = xcontext.getWiki().getDocumentReference(entityReference, xcontext);
+
+        return getDocumentURL(documentReference, action, queryString, anchor, isFullURL);
     }
 
     @Override

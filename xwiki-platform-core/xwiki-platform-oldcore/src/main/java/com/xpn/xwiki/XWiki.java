@@ -4731,7 +4731,7 @@ public class XWiki implements EventListener
         }
 
         // For all other types, we return the URL of the default corresponding document.
-        DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(entityReference);
+        DocumentReference documentReference = getDocumentReference(entityReference, context);
         return getURL(documentReference, action, queryString, anchor, context);
     }
 

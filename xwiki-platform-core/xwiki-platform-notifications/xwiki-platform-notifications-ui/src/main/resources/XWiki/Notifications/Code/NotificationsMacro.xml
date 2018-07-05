@@ -292,7 +292,11 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         'spaces':              self.spaces,
         'pages':               self.pages,
         'users':               self.users,
-        'displayReadStatus':   self.displayReadStatus
+        'displayReadStatus':   self.displayReadStatus,
+        // Add a unique value here to be sure the browser won't cache the result of this request
+        // (adding a random-ish value in the request is the best way to be sure no outdated cached version of the
+        // request will be used).
+        'noCache':             Date.now()
       };
       if (untilDate) {
         params.untilDate = untilDate;

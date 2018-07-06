@@ -141,7 +141,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #if ("$!commentSelection" != "")
     #set($isAnnotation = true)
   #end
-  #set ($isUserComment = $services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference)
+  #if ($comment.author == '')
+    #set ($isUserComment = false)
+  #else
+    #set ($isUserComment = $services.model.resolveDocument($comment.author, 'user') == $xcontext.userReference)
+  #end
   <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
     <div class="commentheader">

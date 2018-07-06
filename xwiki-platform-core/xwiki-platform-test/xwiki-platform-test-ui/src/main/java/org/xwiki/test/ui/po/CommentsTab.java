@@ -27,7 +27,7 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Page Object for Comments Tab.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -113,7 +113,7 @@ public class CommentsTab extends BaseElement
 
     /**
      * Clicks on the reply icon near the specified comment.
-     * 
+     *
      * @param id identifies the comment to reply to
      * @return the form used to reply
      */
@@ -133,7 +133,7 @@ public class CommentsTab extends BaseElement
 
     /**
      * Clicks on the edit icon near the specified comment.
-     * 
+     *
      * @param id identifies the comment to be edited
      * @return the form used to edit the comment
      */
@@ -172,5 +172,16 @@ public class CommentsTab extends BaseElement
     {
         return getDriver().findElementsWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
             + commentId + "']//a[contains(@class, 'edit')]")).size() > 0;
+    }
+
+    /**
+     * @param commentId the comment id
+     * @return true if the comment has the delete button
+     * @since 10.6RC1
+     */
+    public boolean hasDeleteButtonForCommentByID(int commentId)
+    {
+        return getDriver().findElementsWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
+            + commentId + "']//a[contains(@class, 'delete')]")).size() > 0;
     }
 }

@@ -892,12 +892,10 @@ public abstract class AbstractXWikiTestCase extends AbstractTest implements Skin
      */
     public void dragAndDrop(By sourceLocator, By targetLocator)
     {
-        // Selenium#dragAndDropToObject(source, target) is not implemented over WebDriver.
         WebDriver driver = getDriver();
         WebElement source = driver.findElement(sourceLocator);
         WebElement target = driver.findElement(targetLocator);
-        // Don't click in the middle of the element because it can contain a link.
-        new Actions(driver).moveToElement(source, 1, 1).clickAndHold().release(target).perform();
+        new Actions(driver).dragAndDrop(source, target).build().perform();
     }
 
     /**

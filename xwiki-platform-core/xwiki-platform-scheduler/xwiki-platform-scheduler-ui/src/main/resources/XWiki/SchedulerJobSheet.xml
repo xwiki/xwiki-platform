@@ -40,49 +40,49 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if($doc.getObject('XWiki.SchedulerJobClass'))
-#set($job = $doc.getObject("XWiki.SchedulerJobClass"))
-(%class="xform"%)(((
-; **$services.localization.render('xe.scheduler.job.name')**
+#if ($doc.getObject('XWiki.SchedulerJobClass'))
+  #set ($job = $doc.getObject("XWiki.SchedulerJobClass"))
+  #macro (displayJobProperty $obj $propName)
+    #set ($class = $obj.xWikiClass)
+    #set ($prettyName = $class.get($propName).translatedPrettyName)
+    ; #if ($xcontext.action == 'edit')
+      {{html}}&lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$prettyName&lt;/label&gt;{{/html}}
+    #else
+      $prettyName
+    #end
+    : $doc.display($propName, $obj)
+  #end
+  (% class="xform" %) (((
+  #if ($job)
+    #displayJobProperty($job 'jobName')
+    #displayJobProperty($job 'jobDescription')
+    #displayJobProperty($job 'cron')
+    #displayJobProperty($job 'script')
+  #end
+  )))
+  #if ($xcontext.action == 'view' &amp;&amp; "$!job.getProperty('script').value" != '')
+    {{code language = "groovy"}}
+    $job.getValue('script')
+    {{/code}}
+  #end
 
-: $!doc.display('jobName')
+  #if($xcontext.action=='edit')
+    {{info}}$services.localization.render('xe.scheduler.job.scriptexplanation'){{/info}}
 
-; **$services.localization.render('xe.scheduler.job.description')**
+    {{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
 
-: $!doc.display('jobDescription')
+    |= Cron expression |= Meaning
+    | **0 15 10 * * ?** | Fire at 10:15am every day
+    | **0 15 10 ? * MON-FRI** | Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday
+    | ** 0 0/5 14 * * ?** | Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day
+    | ** 0 15 10 ? * 6L** | Fire at 10:15am on the last Friday of every month
+    {{/info}}
 
-; **$services.localization.render('xe.scheduler.job.expression')**
-
-: $!doc.display('cron')
-
-; **$services.localization.render('xe.scheduler.job.script')**
-
-#if($xcontext.action=="edit")
-: $!doc.display("script")
-#elseif($xcontext.action=="view" &amp;&amp; "$!job.getProperty('script').value" !="")
-{{code language="groovy"}}
-$job.getProperty('script').value
-{{/code}}
-#end
-)))
-
-#if($xcontext.action=="edit")
-{{info}}$services.localization.render('xe.scheduler.job.scriptexplanation'){{/info}}
-
-{{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
-
-|= Cron expression |= Meaning
-| **0 15 10 * * ?** | Fire at 10:15am every day
-| **0 15 10 ? * MON-FRI** | Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday
-| ** 0 0/5 14 * * ?** | Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day
-| ** 0 15 10 ? * 6L** | Fire at 10:15am on the last Friday of every month
-{{/info}}
-
-#elseif($xcontext.action=="view")
-[[$services.localization.render('xe.scheduler.job.backtolist')&gt;&gt;Scheduler.WebHome]]
-#end
+  #elseif ($xcontext.action == 'view')
+    [[$services.localization.render('xe.scheduler.job.backtolist')&gt;&gt;Scheduler.WebHome]]
+  #end
 #else
- {{warning}}$services.localization.render('xe.scheduler.job.object'){{/warning}}
+  {{warning}}$services.localization.render('xe.scheduler.job.object'){{/warning}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

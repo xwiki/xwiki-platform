@@ -97,6 +97,7 @@
 {{/velocity}}</content>
   <attachment>
     <filename>icon.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1357308644000</date>
     <version>1.3</version>

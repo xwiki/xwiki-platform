@@ -439,6 +439,7 @@ $doc.dropPermissions()##
 {{/velocity}}</content>
   <attachment>
     <filename>DefaultAdminSectionIcon.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1266210801000</date>
     <version>1.1</version>

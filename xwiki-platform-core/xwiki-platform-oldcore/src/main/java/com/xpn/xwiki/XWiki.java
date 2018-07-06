@@ -1981,7 +1981,7 @@ public class XWiki implements EventListener
     @Unstable
     public DocumentReference getDocumentReference(EntityReference reference, XWikiContext context)
     {
-        DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
+        DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(reference);
 
         // If the document has been found or it's top level space, return the reference
         if (documentReference.getParent().getParent().getType() != EntityType.SPACE

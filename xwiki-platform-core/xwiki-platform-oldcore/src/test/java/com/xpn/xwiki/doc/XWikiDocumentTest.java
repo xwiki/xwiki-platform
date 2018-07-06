@@ -109,7 +109,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         super.setUp();
 
         DocumentReference documentReference = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
-        this.document = new XWikiDocument();
+        this.document = new XWikiDocument(documentReference);
         this.document.setSyntax(Syntax.XWIKI_1_0);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");

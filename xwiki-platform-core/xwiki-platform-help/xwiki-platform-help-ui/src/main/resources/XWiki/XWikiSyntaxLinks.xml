@@ -231,6 +231,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 ** **##target##**: An optional parameter that allows to open link target in new window. Example: ##target="~_blank"##</content>
   <attachment>
     <filename>img.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1454612208000</date>
     <version>1.2</version>

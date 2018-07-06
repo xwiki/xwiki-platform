@@ -421,6 +421,7 @@
 {{/velocity}}</content>
   <attachment>
     <filename>applications.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296854749000</date>
     <version>1.1</version>
@@ -430,6 +431,7 @@
   </attachment>
   <attachment>
     <filename>configuration.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1299688703000</date>
     <version>1.1</version>
@@ -439,6 +441,7 @@
   </attachment>
   <attachment>
     <filename>content.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296854234000</date>
     <version>1.1</version>
@@ -448,6 +451,7 @@
   </attachment>
   <attachment>
     <filename>editing.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1301306187000</date>
     <version>1.1</version>
@@ -457,6 +461,7 @@
   </attachment>
   <attachment>
     <filename>elements.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1301147407000</date>
     <version>1.1</version>
@@ -466,6 +471,7 @@
   </attachment>
   <attachment>
     <filename>email.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1299769724000</date>
     <version>1.1</version>
@@ -475,6 +481,7 @@
   </attachment>
   <attachment>
     <filename>export.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296854234000</date>
     <version>1.1</version>
@@ -484,6 +491,7 @@
   </attachment>
   <attachment>
     <filename>extensionmanager.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1326132162000</date>
     <version>1.1</version>
@@ -493,6 +501,7 @@
   </attachment>
   <attachment>
     <filename>groups.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296853321000</date>
     <version>1.1</version>
@@ -502,6 +511,7 @@
   </attachment>
   <attachment>
     <filename>import.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296854813000</date>
     <version>1.1</version>
@@ -511,6 +521,7 @@
   </attachment>
   <attachment>
     <filename>lf.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296853696000</date>
     <version>1.1</version>
@@ -520,6 +531,7 @@
   </attachment>
   <attachment>
     <filename>localization.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1299769742000</date>
     <version>1.1</version>
@@ -539,6 +551,7 @@
   </attachment>
   <attachment>
     <filename>pagerights.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1441103849000</date>
     <version>1.1</version>
@@ -548,6 +561,7 @@
   </attachment>
   <attachment>
     <filename>presentation.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1299702971000</date>
     <version>1.1</version>
@@ -557,6 +571,7 @@
   </attachment>
   <attachment>
     <filename>registration.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296853602000</date>
     <version>1.1</version>
@@ -566,6 +581,7 @@
   </attachment>
   <attachment>
     <filename>rights.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296853523000</date>
     <version>1.1</version>
@@ -575,6 +591,7 @@
   </attachment>
   <attachment>
     <filename>templates.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1284765598000</date>
     <version>1.1</version>
@@ -584,6 +601,7 @@
   </attachment>
   <attachment>
     <filename>users.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296853435000</date>
     <version>1.1</version>
@@ -593,6 +611,7 @@
   </attachment>
   <attachment>
     <filename>usersgroups.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1296853310000</date>
     <version>1.1</version>

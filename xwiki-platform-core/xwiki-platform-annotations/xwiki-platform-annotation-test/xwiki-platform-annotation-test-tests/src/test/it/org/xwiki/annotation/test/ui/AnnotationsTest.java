@@ -19,15 +19,16 @@
  */
 package org.xwiki.annotation.test.ui;
 
-import java.lang.String;
-import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
 import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
+import org.xwiki.test.ui.po.CommentsTab;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Annotation Test.
@@ -37,9 +38,6 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
  */
 public class AnnotationsTest extends AbstractTest
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     // Note: Make sure Annotations and Comments are merged (this is not the default ATM!) by setting the
     // $showannotation velocity variable to false in the page content
     private static final String CONTENT = "{{velocity}}#set ($showannotations = false){{/velocity}}"
@@ -62,25 +60,51 @@ public class AnnotationsTest extends AbstractTest
 
     private static final String ANNOTATION_TEXT_4 = "Yes, we have our WYSIWYG";
 
+    private static final String USER_NAME = "UserAnnotation";
+
+    private static final String USER_PASS = "pass";
+
+    @Before
+    public void setUp() throws Exception
+    {
+        getUtil().createUser(USER_NAME, USER_PASS, "", "");
+    }
+
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
+        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146"),
+        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")
     })
-    public void addAndDeleteAnnotations()
+    public void addAndDeleteAnnotations() throws Exception
     {
+        getUtil().loginAsAdmin();
         getUtil().deletePage(getTestClassName(), getTestMethodName());
+        getUtil().login(USER_NAME, USER_PASS);
         AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(
             getUtil().createPage(getTestClassName(), getTestMethodName(), CONTENT, null));
+        CommentsTab commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
 
         annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
-        Assert.assertEquals(ANNOTATION_TEXT_1, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_1));
         annotatableViewPage.addAnnotation(ANNOTATED_TEXT_2, ANNOTATION_TEXT_2);
-        Assert.assertEquals(ANNOTATION_TEXT_2, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_2));
         annotatableViewPage.addAnnotation(ANNOTATED_TEXT_3, ANNOTATION_TEXT_3);
-        Assert.assertEquals(ANNOTATION_TEXT_3, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_3));
         annotatableViewPage.addAnnotation(ANNOTATED_TEXT_4, ANNOTATION_TEXT_4);
-        Assert.assertEquals(ANNOTATION_TEXT_4, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_4));
+
+        int commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_1));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_1, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_1));
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_2));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_2, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_2));
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_3));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_3, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_3));
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_4));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_4, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_4));
 
         // It seems that there are some issues refreshing content while this tab is not open. This might be a bug in the
         // Annotations Application
@@ -96,9 +120,10 @@ public class AnnotationsTest extends AbstractTest
      * are shown This test is against XAANNOTATIONS-17
      */
     @Test
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    public void annotationsShouldNotBeShownInXWiki10Syntax()
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")
+    public void annotationsShouldNotBeShownInXWiki10Syntax() throws Exception
     {
+        getUtil().loginAsAdmin();
         getUtil().deletePage(getTestClassName(), getTestMethodName());
         // Note: Make sure Annotations and Comments are merged (this is not the default ATM!) by setting the
         // $showannotation velocity variable to false in the page content
@@ -109,7 +134,7 @@ public class AnnotationsTest extends AbstractTest
 
         annotatableViewPage.showAnnotationsPane();
         // Annotations are disabled in 1.0 Pages. This element should no be here
-        Assert.assertTrue(annotatableViewPage.checkIfAnnotationsAreDisabled());
+        assertTrue(annotatableViewPage.checkIfAnnotationsAreDisabled());
         annotatableViewPage.simulateCTRL_M();
         annotatableViewPage.waitforAnnotationWarningNotification();
     }

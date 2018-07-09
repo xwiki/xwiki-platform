@@ -27,8 +27,8 @@ import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * @since 4.2M1
  * @version $Id$
+ * @since 4.2M1
  */
 public class AnnotatableViewPage extends BaseElement
 {
@@ -96,7 +96,6 @@ public class AnnotatableViewPage extends BaseElement
         annotationsPane = new AnnotationsPane();
         annotationsWindow = new AnnotationsWindow();
         annotationsLabel = new AnnotationsLabel();
-
     }
 
     public ViewPage getWrappedViewPage()
@@ -127,6 +126,16 @@ public class AnnotatableViewPage extends BaseElement
     public String getAnnotationContentByText(String searchText)
     {
         return annotationsLabel.getAnnotationContentByText(searchText);
+    }
+
+    /**
+     * @param searchText the text selected by the annotation.
+     * @return the annotation id
+     * @since 10.6RC1
+     */
+    public String getAnnotationIdByText(String searchText)
+    {
+        return annotationsLabel.getAnnotationIdByText(searchText);
     }
 
     // Shows the annotations pane from the top of the page
@@ -175,15 +184,28 @@ public class AnnotatableViewPage extends BaseElement
 
     public boolean checkIfAnnotationsAreDisabled()
     {
-        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0)
+        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
 
     // Check if the bottom notifications warning appears that you are not allowed to annotate 1.0 syntax pages
     public void waitforAnnotationWarningNotification()
     {
         waitForNotificationWarningMessage(XWIKI_SYNTAX_1_WARNING);
+    }
+
+    /**
+     * @param annotationId the annotation id.
+     * @return the comment id. Used by {@link org.xwiki.test.ui.po.CommentsTab}.
+     * @since 10.6RC1
+     */
+    public int getCommentId(String annotationId)
+    {
+        return Integer.valueOf(getDriver().findElementByXPath("//*[@id='_comments']" +
+            "//div[contains(@class, 'annotation')][a[contains(@href,'#" + annotationId + "')]]")
+            .getAttribute("id").replace("xwikicomment_", ""));
     }
 }

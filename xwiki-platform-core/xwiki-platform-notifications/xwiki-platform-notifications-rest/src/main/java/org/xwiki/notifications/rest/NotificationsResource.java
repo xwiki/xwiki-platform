@@ -22,8 +22,8 @@ package org.xwiki.notifications.rest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
-import org.xwiki.notifications.rest.model.Notifications;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -42,7 +42,7 @@ public interface NotificationsResource
      * @throws Exception if an error occurs
      */
     @GET
-    Notifications getNotifications(
+    Response getNotifications(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
             @QueryParam("untilDate") String untilDate,

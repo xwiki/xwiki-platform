@@ -162,6 +162,21 @@
                     "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.6-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "Adding a REST endpoint is actually not an API breakage."
+                  },
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method org.xwiki.notifications.rest.model.Notifications org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "oldType": "org.xwiki.notifications.rest.model.Notifications",
+                    "newType": "javax.ws.rs.core.Response",
+                    "package": "org.xwiki.notifications.rest",
+                    "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
+                    "classSimpleName": "NotificationsResource",
+                    "methodName": "getNotifications",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.5",
+                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.6-SNAPSHOT",
+                    "elementKind": "method",
+                    "justification": "Not a breake: the REST endpoint is the same."
                   }
                 ]
               }

@@ -52,6 +52,7 @@ image:Koi5.jpg
 {{/example}}</content>
   <attachment>
     <filename>Koi1.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1486135070000</date>
     <version>1.1</version>
@@ -61,6 +62,7 @@ image:Koi5.jpg
   </attachment>
   <attachment>
     <filename>Koi2.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1486135070000</date>
     <version>1.1</version>
@@ -70,6 +72,7 @@ image:Koi5.jpg
   </attachment>
   <attachment>
     <filename>Koi3.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1486135070000</date>
     <version>1.1</version>
@@ -79,6 +82,7 @@ image:Koi5.jpg
   </attachment>
   <attachment>
     <filename>Koi4.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1486135070000</date>
     <version>1.1</version>
@@ -88,6 +92,7 @@ image:Koi5.jpg
   </attachment>
   <attachment>
     <filename>Koi5.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1486135070000</date>
     <version>1.1</version>

@@ -109,6 +109,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   </attachment>
   <attachment>
     <filename>image1.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1486135070000</date>
     <version>1.1</version>
@@ -118,6 +119,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
   </attachment>
   <attachment>
     <filename>image2.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1486135070000</date>
     <version>1.1</version>

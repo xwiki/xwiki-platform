@@ -360,7 +360,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         Assert.assertNotNull(attachment.getDate());
         Assert.assertEquals("1.1", attachment.getVersion());
         Assert.assertEquals("", attachment.getComment());
-        Assert.assertEquals("image/png", attachment.getMimeType());
+        Assert.assertEquals("text/plain", attachment.getMimeType());
     }
 
     @Test

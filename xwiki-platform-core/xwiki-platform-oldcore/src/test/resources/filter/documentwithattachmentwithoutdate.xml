@@ -12,7 +12,7 @@
                 <parameters>
                   <entry>
                     <string>mimetype</string>
-                    <string>image/png</string>
+                    <string>text/plain</string>
                   </entry>
                 </parameters>
               </p>

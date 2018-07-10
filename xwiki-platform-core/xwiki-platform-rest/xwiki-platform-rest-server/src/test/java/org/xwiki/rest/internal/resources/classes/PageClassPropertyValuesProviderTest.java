@@ -20,37 +20,30 @@
 package org.xwiki.rest.internal.resources.classes;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.query.QueryParameter;
-import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.model.jaxb.PropertyValue;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.classes.PageClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyValuesProvider.META_DATA_ICON_META_DATA;
 
 /**
  * Unit tests for {@link PageClassPropertyValuesProvider}.
@@ -61,111 +54,62 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class PageClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
-    private PageClass pageClass = new PageClass();
-
     @InjectMockComponents
     private PageClassPropertyValuesProvider provider;
 
     @MockComponent
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @MockComponent
-    private AuthorExecutor authorExecutor;
+    private PageClass pageClass;
 
     @BeforeEach
     public void configure() throws Exception
     {
         super.configure();
 
-        addProperty("category", this.pageClass, true);
-        addProperty("date", new DateClass(), false);
-
-        when(this.xcontext.getWiki().getDocument(new ClassPropertyReference("status", this.classReference),
-            this.xcontext)).thenReturn(this.classDocument);
+        when(this.pageClass.getOwnerDocument()).thenReturn(this.classDocument);
+        when(this.xcontext.getWiki().getDocument(any(DocumentReference.class), eq(this.xcontext)))
+            .thenReturn(this.classDocument);
+        when(this.classDocument.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Document");
     }
 
     @Test
-    public void getValuesForMissingProperty() throws Exception
+    public void getValues() throws Exception
     {
-        ClassPropertyReference propertyReference = new ClassPropertyReference("status", this.classReference);
-        when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
-        Throwable exception = assertThrows(XWikiRestException.class, () -> {
-            this.provider.getValues(propertyReference, 0);
-        });
-        assertEquals(exception.getMessage(), "Property [status reference] not found.");
-    }
-
-    @Test
-    public void getValuesForWrongProperty() throws Exception
-    {
-        ClassPropertyReference propertyReference = new ClassPropertyReference("date", this.classReference);
-        when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
-        Throwable exception = assertThrows(XWikiRestException.class, () -> {
-            this.provider.getValues(propertyReference, 0);
-        });
-        assertEquals(exception.getMessage(), "This [status reference] is not a [PageClass] property.");
-    }
-
-    @Test
-    public void getValuesAllowed() throws Exception
-    {
-        ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
-        DocumentReference authorReference = this.pageClass.getOwnerDocument().getAuthorReference();
-        PropertyValues values = new PropertyValues();
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
-
-        assertSame(values, this.provider.getValues(propertyReference, 3));
-
-        assertSame(values, this.provider.getValues(propertyReference, 0, "text"));
-    }
-
-    @Test
-    public void getValuesMixedWithoutUsed() throws Exception
-    {
-        ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
-        DocumentReference authorReference = this.pageClass.getOwnerDocument().getAuthorReference();
-        PropertyValues values = new PropertyValues();
-        values.getPropertyValues().add(new PropertyValue());
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
-
-        assertSame(values, this.provider.getValues(propertyReference, 1, "foo"));
-        assertEquals(1, values.getPropertyValues().size());
-
-        verify(this.usedValuesQueryBuilder, never()).build(any());
-    }
-
-    @Test
-    public void getValuesMixedWithUsed() throws Exception
-    {
-        ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
-        DocumentReference authorReference = this.pageClass.getOwnerDocument().getAuthorReference();
-
-        PropertyValues values = new PropertyValues();
-        PropertyValue red = new PropertyValue();
-        red.setValue("red");
-        red.setMetaData(new HashMap<>());
-        red.getMetaData().put("label", "Red");
-        values.getPropertyValues().add(red);
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
+        List<String> spaces = Arrays.asList("space1", "space2");
+        DocumentReference documentReference = new DocumentReference("wiki", spaces, "page");
 
         Query query = mock(Query.class);
-        QueryParameter queryParameter = mock(QueryParameter.class);
-        when(this.usedValuesQueryBuilder.build(pageClass)).thenReturn(query);
-        when(query.bindValue("text")).thenReturn(queryParameter);
-        when(queryParameter.anyChars()).thenReturn(queryParameter);
-        when(queryParameter.literal("bar")).thenReturn(queryParameter);
-        when(query.execute()).thenReturn(Arrays.asList(new Object[]{ "blue", 21L }, new Object[]{ "red", 17L }));
+        when(query.execute()).thenReturn(Collections.singletonList(documentReference));
 
-        assertSame(values, this.provider.getValues(propertyReference, 3, "bar"));
+        PropertyValues values = this.provider.getValues(query, 3, "", this.pageClass);
+        assertEquals(1, values.getPropertyValues().size());
 
-        verify(query).setLimit(2);
-        verify(query).addFilter(this.componentManager.getInstance(QueryFilter.class, "text"));
-        verify(queryParameter, times(2)).anyChars();
+        Map<String, Object> metadata = values.getPropertyValues().get(0).getMetaData();
+        assertEquals("space1 / space2", metadata.get("hint"));
+        assertEquals("Document", metadata.get("label"));
+        assertTrue(metadata.containsKey(META_DATA_ICON_META_DATA));
+    }
 
+    @Test
+    public void getValuesWithNonTerminalPage() throws Exception
+    {
+        List<String> spaces = Arrays.asList("space1", "space2");
+        DocumentReference documentReference1 = new DocumentReference("wiki", spaces, "page");
+        DocumentReference documentReference2 = new DocumentReference("wiki", spaces, XWiki.DEFAULT_SPACE_HOMEPAGE);
+
+        Query query = mock(Query.class);
+        when(query.execute()).thenReturn(Arrays.asList(documentReference1, documentReference2));
+
+        PropertyValues values = this.provider.getValues(query, 3, "", this.pageClass);
         assertEquals(2, values.getPropertyValues().size());
-        assertEquals("red", values.getPropertyValues().get(0).getValue());
-        assertEquals(17L, values.getPropertyValues().get(0).getMetaData().get("count"));
-        assertEquals("blue", values.getPropertyValues().get(1).getValue());
-        assertEquals(21L, values.getPropertyValues().get(1).getMetaData().get("count"));
+
+        Map<String, Object> metadata = values.getPropertyValues().get(0).getMetaData();
+        assertEquals("space1 / space2", metadata.get("hint"));
+        assertEquals("Document", metadata.get("label"));
+        assertTrue(metadata.containsKey(META_DATA_ICON_META_DATA));
+
+        metadata = values.getPropertyValues().get(1).getMetaData();
+        assertEquals("space1", metadata.get("hint"));
+        assertEquals("Document", metadata.get("label"));
+        assertTrue(metadata.containsKey(META_DATA_ICON_META_DATA));
     }
 }

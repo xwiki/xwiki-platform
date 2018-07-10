@@ -169,7 +169,7 @@
       <category>AppWithinMinutes.Document</category>
     </property>
     <property>
-      <icon>icons/silk/text_heading_1.png</icon>
+      <icon>text_heading_1</icon>
     </property>
     <property>
       <priority>1</priority>

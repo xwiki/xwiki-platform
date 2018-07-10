@@ -114,13 +114,18 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
           #set($formFieldDoc = $xwiki.getDocument($formField))
           #set($discard = $formFieldDocs.add($formFieldDoc))
           #set($formFieldIcon = $formFieldDoc.getObject($formFieldClassName).getProperty('icon').value)
-          #if($formFieldIcon.contains('/'))
-            #set($formFieldIconURL = $xwiki.getSkinFile($formFieldIcon))
-          #else
-            #set($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
+          ## Fallbacks on the default icon set if Silk is not available.
+          #set($formFieldIconRendered = $services.icon.renderHTML($formFieldIcon, 'Silk'))
+          #if ("$!formFieldIconRendered" == "")
+            #if($formFieldIcon.contains('/'))
+              #set($formFieldIconURL = $xwiki.getSkinFile($formFieldIcon))
+            #else
+              #set($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
+            #end
+            #set($formFieldIconRendered = "&lt;img src='$formFieldIconURL' alt='$escapetool.xml($formFieldDoc.plainTitle)' class='icon' /&gt;")
           #end
           ** (% class="field" %){{html}}
-              &lt;img src="$formFieldIconURL" alt="$escapetool.xml($formFieldDoc.plainTitle)" class="icon" /&gt;
+              $formFieldIconRendered
               $escapetool.xml($formFieldDoc.plainTitle)
               ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
               ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through

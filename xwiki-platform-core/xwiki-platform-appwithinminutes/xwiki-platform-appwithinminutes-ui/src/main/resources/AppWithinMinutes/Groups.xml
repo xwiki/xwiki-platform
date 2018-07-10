@@ -153,7 +153,7 @@
       <category>AppWithinMinutes.Pickers</category>
     </property>
     <property>
-      <icon>icons/datamodel/groups.png</icon>
+      <icon>group</icon>
     </property>
     <property>
       <priority>2</priority>

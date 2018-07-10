@@ -1519,7 +1519,7 @@ $Msz MB##
       'Email': 'text',
       'Groups': 'suggest',
       'Number': 'number',
-      'Page': 'text',
+      'Page': 'suggest',
       'StaticList': 'list',
       'String': 'text',
       'TextArea': 'text',

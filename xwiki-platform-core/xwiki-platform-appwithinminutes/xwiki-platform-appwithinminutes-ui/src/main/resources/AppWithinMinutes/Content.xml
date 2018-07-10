@@ -190,7 +190,7 @@
       <category>AppWithinMinutes.Document</category>
     </property>
     <property>
-      <icon>icons/silk/page_white_edit.png</icon>
+      <icon>edit</icon>
     </property>
     <property>
       <priority>0</priority>

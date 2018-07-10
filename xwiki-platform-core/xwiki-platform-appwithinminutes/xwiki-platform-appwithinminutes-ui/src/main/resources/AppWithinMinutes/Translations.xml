@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Long Text
 platform.appwithinminutes.classEditorStringFieldName=Short Text
 platform.appwithinminutes.classEditorContentFieldName=Content
 platform.appwithinminutes.classEditorTitleFieldName=Title
+platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Delete
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configure

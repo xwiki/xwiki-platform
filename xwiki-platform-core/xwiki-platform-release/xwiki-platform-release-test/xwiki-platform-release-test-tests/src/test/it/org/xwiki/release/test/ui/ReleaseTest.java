@@ -22,9 +22,9 @@ package org.xwiki.release.test.ui;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.panels.test.po.ApplicationsPanel;
-import org.xwiki.release.test.po.ReleaseEntryEditPage;
 import org.xwiki.release.test.po.ReleaseHomePage;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -68,8 +68,9 @@ public class ReleaseTest extends AbstractTest
         ReleaseHomePage homePage = new ReleaseHomePage();
 
         // Add new Release
-        ReleaseEntryEditPage entryPage = homePage.addRelease(RELEASE_VERSION);
-        vp = entryPage.waitUntilPageIsLoaded().clickSaveAndView();
+        InlinePage entryPage = homePage.addRelease(RELEASE_VERSION);
+        entryPage.waitUntilPageIsLoaded();
+        vp = entryPage.clickSaveAndView();
 
         // Go back to the home page by clicking in the breadcrumb
         vp.clickBreadcrumbLink("Releases");

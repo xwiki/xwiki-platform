@@ -21,6 +21,7 @@ package org.xwiki.release.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -59,14 +60,14 @@ public class ReleaseHomePage extends ViewPage
 
     /**
      * @param releaseName the name of the Release entry to add
-     * @return the new FAQ entry page
+     * @return the new Release entry page
      */
-    public ReleaseEntryEditPage addRelease(String releaseName)
+    public InlinePage addRelease(String releaseName)
     {
         this.releaseNameField.clear();
         this.releaseNameField.sendKeys(releaseName);
         this.releaseNameButton.click();
-        return new ReleaseEntryEditPage();
+        return new InlinePage();
     }
 
     /**

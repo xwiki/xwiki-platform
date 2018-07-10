@@ -68,5 +68,13 @@ require(['jquery', 'xwiki-selectize'], function($) {
     });
   };
 
-  $('.suggest-propertyValues').suggestPropertyValues();
+  var updateSuggests = function() {
+    $('select.suggest-propertyValues:not(.selectized)').suggestPropertyValues();
+  }
+
+  var observer = new MutationObserver(function(mutationsList) {
+    updateSuggests();
+  });
+  observer.observe(document, { attributes: false, childList: true, subtree: true });
+  updateSuggests();
 });

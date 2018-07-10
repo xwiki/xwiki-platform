@@ -2370,6 +2370,14 @@ Recursive title display detected!##
 #end
 
 #**
+ * Outputs the skin extension hooks and the link extension hooks.
+ *#
+#macro (extensionHooks)
+ #skinExtensionHooks
+ #linkExtensionHook
+#end
+
+#**
  * Hook for inserting CSS skin extensions.
  *#
 #macro (styleSheetExtensionHooks)
@@ -2391,6 +2399,13 @@ Recursive title display detected!##
   <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
   ## - Skin extension hook
   <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+#end
+
+#**
+ * Hook for inserting the Link extension.
+ *#
+#macro (linkExtensionHook)
+ <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
 #end
 
 ###

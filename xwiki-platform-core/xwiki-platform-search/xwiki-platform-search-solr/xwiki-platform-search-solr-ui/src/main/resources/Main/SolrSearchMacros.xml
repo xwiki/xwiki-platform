@@ -871,7 +871,7 @@ $value##
       ## The search UI is updated dynamically through AJAX and we need to pull the skin extensions.
       ## We put the skin extension imports inside a &lt;noscript&gt; element to prevent jQuery from fetching the JavaScript
       ## files automatically (we want to fetch only the new JavaScript files).
-      &lt;noscript class="hidden skin-extension-imports"&gt;#skinExtensionHooks&lt;/noscript&gt;
+      &lt;noscript class="hidden skin-extension-imports"&gt;#extensionHooks&lt;/noscript&gt;
       {{/html}}
 
     #end

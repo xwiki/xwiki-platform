@@ -46,12 +46,12 @@ platform.appwithinminutes.createAppButtonLabel=Crear Aplicación
 platform.appwithinminutes.appsLiveTableHeading=Aplicaciones
 platform.appwithinminutes.appsLiveTable.doc.space=Nombre de aplicación
 platform.appwithinminutes.appsLiveTable.doc.author=Ultimo autor
-### Missing: platform.appwithinminutes.appsLiveTable.doc.date=Update date
+platform.appwithinminutes.appsLiveTable.doc.date=Fecha de actualización
 platform.appwithinminutes.appsLiveTable._actions=Acciones
 ### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Crea tu propio\!
+platform.appwithinminutes.appPanelCreateEntry=Crea tu propio!
 
 ### Wizard step
 ### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
@@ -207,7 +207,7 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Borrar
 platform.appwithinminutes.appHomePageActionsHeading=Acciones
 platform.appwithinminutes.appHomePageAddEntryLabel=Añadir
 platform.appwithinminutes.appHomePageAddEntryHint=Añadir nueva entrada
-platform.appwithinminutes.appHomePageEntryNameLabel=Nombre de entrada\:
+platform.appwithinminutes.appHomePageEntryNameLabel=Nombre de entrada:
 ### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
 platform.appwithinminutes.appHomePageEditAppLabel=Editar aplicación
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traducir aplicación

@@ -39,36 +39,55 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity output='false'}}
+#macro (displayJobProperty $obj $propName)
+  #set ($class = $obj.xWikiClass)
+  #set ($prettyName = $class.get($propName).translatedPrettyName)
+  &lt;dt&gt;
+    &lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$prettyName&lt;/label&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    $!doc.display($propName, $obj)
+  &lt;/dd&gt;
+#end
+{{/velocity}}
+
+{{velocity}}
 #if ($doc.getObject('XWiki.SchedulerJobClass'))
   #set ($job = $doc.getObject("XWiki.SchedulerJobClass"))
-  #macro (displayJobProperty $obj $propName)
-    #set ($class = $obj.xWikiClass)
-    #set ($prettyName = $class.get($propName).translatedPrettyName)
-    ; #if ($xcontext.action == 'edit')
-      {{html}}&lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$prettyName&lt;/label&gt;{{/html}}
-    #else
-      $prettyName
-    #end
-    : $doc.display($propName, $obj)
-  #end
-  (% class="xform" %) (((
-  #if ($job)
-    #displayJobProperty($job 'jobName')
-    #displayJobProperty($job 'jobDescription')
-    #displayJobProperty($job 'cron')
-    #displayJobProperty($job 'script')
-  #end
-  )))
-  #if ($xcontext.action == 'view' &amp;&amp; "$!job.getProperty('script').value" != '')
-    {{code language = "groovy"}}
-    $job.getValue('script')
-    {{/code}}
-  #end
+  {{html wiki='true'}}
+  &lt;div class = 'xform'&gt;
+    &lt;dl&gt;
+      #if ($job)
+        #displayJobProperty($job 'jobName')
+        #displayJobProperty($job 'jobDescription')
+        #displayJobProperty($job 'cron')
+      #end
+      #set ($class = $job.xWikiClass)
+      #set ($prettyName = $class.get('script').translatedPrettyName)
+      #if ($xcontext.action == 'edit')
+        &lt;dt&gt;
+          &lt;label for="${class.getName()}_0_script"&gt;$prettyName&lt;/label&gt;
+          &lt;span class="xHint"&gt;
+            $services.localization.render('xe.scheduler.job.scriptexplanation')
+          &lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          $!doc.display('script')
+        &lt;/dd&gt;
+      #else
+        &lt;dt&gt;
+          &lt;label for="${class.getName()}_0_script"&gt;$prettyName&lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          ((({{code language='groovy'}}$!job.getValue('script'){{/code}})))
+        &lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+  &lt;/div&gt;
+  {{/html}}
 
-  #if($xcontext.action=='edit')
-    {{info}}$services.localization.render('xe.scheduler.job.scriptexplanation'){{/info}}
-
+  #if ($xcontext.action == 'edit')
     {{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
 
     |= Cron expression |= Meaning
@@ -77,8 +96,7 @@
     | ** 0 0/5 14 * * ?** | Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day
     | ** 0 15 10 ? * 6L** | Fire at 10:15am on the last Friday of every month
     {{/info}}
-
-  #elseif ($xcontext.action == 'view')
+  #else
     [[$services.localization.render('xe.scheduler.job.backtolist')&gt;&gt;Scheduler.WebHome]]
   #end
 #else

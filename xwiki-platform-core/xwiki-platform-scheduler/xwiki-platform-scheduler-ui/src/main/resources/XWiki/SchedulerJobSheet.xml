@@ -65,24 +65,19 @@
       #end
       #set ($class = $job.xWikiClass)
       #set ($prettyName = $class.get('script').translatedPrettyName)
-      #if ($xcontext.action == 'edit')
-        &lt;dt&gt;
+      &lt;dt&gt;
           &lt;label for="${class.getName()}_0_script"&gt;$prettyName&lt;/label&gt;
           &lt;span class="xHint"&gt;
             $services.localization.render('xe.scheduler.job.scriptexplanation')
           &lt;/span&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #if ($xcontext.action == 'edit')
           $!doc.display('script')
-        &lt;/dd&gt;
-      #else
-        &lt;dt&gt;
-          &lt;label for="${class.getName()}_0_script"&gt;$prettyName&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
+        #else
           ((({{code language='groovy'}}$!job.getValue('script'){{/code}})))
-        &lt;/dd&gt;
-      #end
+        #end
+      &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
   {{/html}}

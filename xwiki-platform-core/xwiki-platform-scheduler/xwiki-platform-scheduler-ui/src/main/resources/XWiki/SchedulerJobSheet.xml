@@ -54,15 +54,13 @@
 
 {{velocity}}
 #if ($doc.getObject('XWiki.SchedulerJobClass'))
-  #set ($job = $doc.getObject("XWiki.SchedulerJobClass"))
+  #set ($job = $doc.getObject('XWiki.SchedulerJobClass'))
   {{html wiki='true'}}
   &lt;div class = 'xform'&gt;
     &lt;dl&gt;
-      #if ($job)
-        #displayJobProperty($job 'jobName')
-        #displayJobProperty($job 'jobDescription')
-        #displayJobProperty($job 'cron')
-      #end
+      #displayJobProperty($job 'jobName')
+      #displayJobProperty($job 'jobDescription')
+      #displayJobProperty($job 'cron')
       #set ($class = $job.xWikiClass)
       #set ($prettyName = $class.get('script').translatedPrettyName)
       &lt;dt&gt;

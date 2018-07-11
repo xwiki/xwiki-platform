@@ -69,7 +69,7 @@
 #set($columns = ["version", "releaseManagers", "releaseDate", "releaseNotes"])
 #set($columnsProperties = {
     "version" : { "type" : "text" , "link" : "view"},
-    "releaseManagers" : { "type" : "text" },
+    "releaseManagers" : { "html" : true },
     "releaseDate" : { "type" : "text" }
 })
 #set($options = { 

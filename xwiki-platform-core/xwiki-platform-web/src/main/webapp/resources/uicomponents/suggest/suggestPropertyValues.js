@@ -24,7 +24,7 @@ require.config({
   }
 });
 
-require(['jquery', 'xwiki-selectize'], function($) {
+define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($) {
   'use strict';
 
   var getSelectizeOptions = function(select) {
@@ -67,6 +67,14 @@ require(['jquery', 'xwiki-selectize'], function($) {
       $(this).xwikiSelectize(getSelectizeOptions($(this)));
     });
   };
+});
 
-  $('.suggest-propertyValues').suggestPropertyValues();
+require(['jquery', 'xwiki-suggestPropertyValues', 'xwiki-events-bridge'], function($) {
+  var init = function(event, data) {
+    var container = $((data && data.elements) || document);
+    container.find('.suggest-propertyValues').suggestPropertyValues();
+  };
+
+  $(document).on('xwiki:dom:updated', init);
+  init();
 });

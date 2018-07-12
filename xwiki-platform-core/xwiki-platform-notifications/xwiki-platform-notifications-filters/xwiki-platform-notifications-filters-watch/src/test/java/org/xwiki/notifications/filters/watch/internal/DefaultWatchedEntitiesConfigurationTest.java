@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
- * @since 10.6
+ * @since 10.6RC1
  * @since 9.11.8
  */
 public class DefaultWatchedEntitiesConfigurationTest

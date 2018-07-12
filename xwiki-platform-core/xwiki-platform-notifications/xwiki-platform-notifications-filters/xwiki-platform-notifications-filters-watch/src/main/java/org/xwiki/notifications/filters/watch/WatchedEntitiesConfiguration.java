@@ -49,7 +49,7 @@ public interface WatchedEntitiesConfiguration
      * @param wikiReference a reference to a wiki
      * @return the automatic watch mode configured for the given wiki
      * @since 9.11.8
-     * @since 10.6
+     * @since 10.6RC1
      */
     AutomaticWatchMode getDefaultAutomaticWatchMode(WikiReference wikiReference);
 }

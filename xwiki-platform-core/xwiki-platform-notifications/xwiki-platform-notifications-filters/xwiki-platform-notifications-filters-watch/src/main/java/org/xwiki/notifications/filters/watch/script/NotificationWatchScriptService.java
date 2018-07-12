@@ -166,7 +166,7 @@ public class NotificationWatchScriptService implements ScriptService
     /**
      * @return the default automatic watch mode configured for the current wiki
      * @since 9.11.8
-     * @since 10.6
+     * @since 10.6RC1
      */
     public AutomaticWatchMode getDefaultAutomaticWatchMode()
     {

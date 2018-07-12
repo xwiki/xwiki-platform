@@ -384,7 +384,7 @@ require(['jquery'], function ($) {
 
   $(window).on("scroll resize load click xwiki:dom:refresh", function() {
     var isFullScreen = $('.fullScreenWrapper').length > 0
-    var isVisible = $container.css('display') != 'none';
+    var isVisible = $container.is(':visible');
     // Show the element and make the gap where the save bar should fit.
     $placeholder.height($container.height());
     var position = $placeholder.offset().top + $placeholder.height();

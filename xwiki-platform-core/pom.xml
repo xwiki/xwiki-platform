@@ -551,8 +551,19 @@
                     "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.5",
                     "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.6-SNAPSHOT",
                     "elementKind": "method",
-                    "justification": "Not a breakage: the REST endpoint is the same."
-                   }
+                    "justification": "Not a breake: the REST endpoint is the same."
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.notifications.filters.watch.AutomaticWatchMode org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration::getDefaultAutomaticWatchMode(org.xwiki.model.reference.WikiReference)",
+                    "package": "org.xwiki.notifications.filters.watch",
+                    "classQualifiedName": "org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration",
+                    "classSimpleName": "WatchedEntitiesConfiguration",
+                    "methodName": "getDefaultAutomaticWatchMode",
+                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-watch:jar:10.6-SNAPSHOT",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  }
                 ]
               }
             }

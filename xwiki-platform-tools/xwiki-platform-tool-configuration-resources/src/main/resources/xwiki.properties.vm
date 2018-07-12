@@ -867,4 +867,19 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.watchedEntities.enabled = true
 
+#-# [Since 9.11.8]
+#-# [Since 10.6RC1]
+#-# The automatic watch mode used by default. The value can be changed by an administrator in the wiki's administration
+#-# or by any user in their own settings.
+#-#
+#-# Possible values:
+#-#
+#-# - none:  no page is added to the list of watched pages automatically.
+#-# - all:   everytime a user makes a change on a page, it is automatically added to her list of watched pages.
+#-# - major: everytime a user makes a major change on a page, it is automatically added to her list of watched pages.
+#-# - new:   only pages created by a user are added to her list of watched pages.
+#-#
+#-# The default is :
+# notifications.watchedEntities.autoWatch = major
+
 $!xwikiPropertiesAdditionalProperties

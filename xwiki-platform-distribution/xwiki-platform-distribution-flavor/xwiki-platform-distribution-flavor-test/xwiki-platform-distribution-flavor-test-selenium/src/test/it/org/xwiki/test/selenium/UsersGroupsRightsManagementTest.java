@@ -20,8 +20,11 @@
 package org.xwiki.test.selenium;
 
 import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.xwiki.administration.test.po.AdministrationMenu;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 import static org.junit.Assert.*;
 
@@ -199,7 +202,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         waitForCondition("selenium.isElementPresent(\"" + xpath + "\")");
         getSelenium().click("//tbody/tr[td/a=\"" + group + "\"]/td[3]/img[@title=\"Edit\"]");
         waitForLightbox("SUBGROUPS TO ADD");
-        setFieldValue("groupInput", "XWiki.XWikiAllGroup");
+        setSuggestInputValue("groupInput", "XWikiAllGroup");
         clickLinkWithLocator("addMembers", false);
         String xpathPrefix = "//div[@id='lb-content']/div/div/table/tbody/tr/td/table/tbody/tr";
         String adminGroupXPath =
@@ -215,7 +218,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         // Now same test, but from the group document UI in inline mode
         clickLinkWithText(group);
         clickEditPageInlineForm();
-        setFieldValue("groupInput", "XWiki.XWikiAdminGroup");
+        setSuggestInputValue("groupInput", "XWikiAdminGroup");
         clickLinkWithLocator("addMembers", false);
         waitForTextContains("id=groupusers", "XWiki.XWikiAdminGroup");
 
@@ -329,7 +332,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         waitForCondition("selenium.isElementPresent(\"" + xpath + "\")");
         getSelenium().click(xpath);
         waitForLightbox("USERS TO ADD");
-        setFieldValue("userInput", "XWiki." + user);
+        setSuggestInputValue("userInput", user);
         clickLinkWithLocator("addMembers", false);
 
         String xpathPrefix = "//div[@id='lb-content']/div/div/table/tbody/tr/td/table/tbody/tr";
@@ -345,6 +348,13 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         open("XWiki", group);
         waitForGroupUsersLiveTable();
         assertTextPresent(user);
+    }
+
+    private void setSuggestInputValue(String id, String value)
+    {
+        SuggestInputElement suggester = new SuggestInputElement(getDriver().findElementWithoutWaiting(By.id(id)));
+        suggester.clearSelectedSuggestions().sendKeys(value).waitForSuggestions().sendKeys(Keys.ENTER)
+            .hideSuggestions();
     }
 
     private void waitForLightbox(String lightboxName)

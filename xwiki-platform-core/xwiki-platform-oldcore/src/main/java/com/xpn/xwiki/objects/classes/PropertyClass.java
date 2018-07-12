@@ -303,6 +303,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                     final String classSyntax = classDocument.getSyntax().toIdString();
                     // Using author reference since the document content is not relevant in this case.
                     DocumentReference authorReference = classDocument.getAuthorReference();
+                    if (authorReference == null && classDocument.isNew()) {
+                        // If the class document has not been saved yet (e.g. we could be previewing a class property in
+                        // the class editor) then use the context user as author (e.g. the user that is in the process
+                        // of creating the class).
+                        authorReference = context.getUserReference();
+                    }
 
                     // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. class
                     // document author).

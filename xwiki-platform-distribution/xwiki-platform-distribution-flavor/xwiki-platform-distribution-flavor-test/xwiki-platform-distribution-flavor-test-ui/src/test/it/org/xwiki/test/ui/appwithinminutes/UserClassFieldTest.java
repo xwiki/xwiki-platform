@@ -91,8 +91,9 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         // "a" should bring many suggestions. Also, a single letter should bring suggestions.
         Assert.assertTrue(userPicker.clear().sendKeys("a").waitForSuggestions().getSuggestions().size() > 2);
 
-        // An empty text input brings a default list of suggestions.
-        Assert.assertEquals(3, userPicker.sendKeys(Keys.BACK_SPACE).waitForSuggestions().getSuggestions().size());
+        // An empty text input brings a default list of suggestions. There should be at least 3 users (the 2 users we
+        // created plus the default administrator).
+        Assert.assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForSuggestions().getSuggestions().size() > 2);
 
         // We should be able to close the list of suggestions using the escape key.
         Assert.assertTrue(

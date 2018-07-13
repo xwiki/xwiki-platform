@@ -159,7 +159,6 @@
                     "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
                     "classSimpleName": "NotificationsResource",
                     "methodName": "getNotificationsRSS",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.6-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "Adding a REST endpoint is actually not an API breakage."
                   },
@@ -173,8 +172,6 @@
                     "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
                     "classSimpleName": "NotificationsResource",
                     "methodName": "getNotifications",
-                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.5",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.6-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "Not a breake: the REST endpoint is the same."
                   },
@@ -185,7 +182,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration",
                     "classSimpleName": "WatchedEntitiesConfiguration",
                     "methodName": "getDefaultAutomaticWatchMode",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-watch:jar:10.6-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "Young API"
                   }

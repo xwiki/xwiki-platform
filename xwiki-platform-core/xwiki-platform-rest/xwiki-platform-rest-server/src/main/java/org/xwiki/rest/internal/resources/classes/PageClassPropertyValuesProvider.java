@@ -53,7 +53,7 @@ import com.xpn.xwiki.objects.classes.PageClass;
  * Provides values for Page properties.
  *
  * @version $Id$
- * @since 10.6RC1
+ * @since 10.6
  */
 @Component
 @Named("Page")

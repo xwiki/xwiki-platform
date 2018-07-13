@@ -37,7 +37,7 @@ import com.xpn.xwiki.objects.classes.PageClass;
  * Builds a query that returns the values allowed for a Page property.
  *
  * @version $Id$
- * @since 10.6RC1
+ * @since 10.6
  */
 @Component
 @Singleton

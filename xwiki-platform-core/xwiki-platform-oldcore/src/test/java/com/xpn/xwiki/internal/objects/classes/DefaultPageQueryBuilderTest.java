@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultPageQueryBuilder}.
  *
  * @version $Id$
- * @since 10.6RC1
+ * @since 10.6
  */
 @ComponentTest
 public class DefaultPageQueryBuilderTest

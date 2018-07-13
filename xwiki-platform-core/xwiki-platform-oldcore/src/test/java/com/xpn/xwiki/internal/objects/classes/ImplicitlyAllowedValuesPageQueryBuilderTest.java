@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link ImplicitlyAllowedValuesPageQueryBuilder}.
  *
  * @version $Id$
- * @since 10.6RC1
+ * @since 10.6
  */
 @ComponentTest
 public class ImplicitlyAllowedValuesPageQueryBuilderTest

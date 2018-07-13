@@ -49,7 +49,7 @@ import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyVal
  * Unit tests for {@link PageClassPropertyValuesProvider}.
  *
  * @version $Id$
- * @since 10.6RC1
+ * @since 10.6
  */
 @ComponentTest
 public class PageClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest

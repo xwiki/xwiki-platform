@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>10.6-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-web</artifactId>
   <name>XWiki Platform - Web Resources</name>

@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Update XWiki.XWikiComments document with all required informations.
+ * Update XWiki.WikiMacroParameterClass document with all required informations.
  * 
  * @version $Id$
  * @since 4.3M1

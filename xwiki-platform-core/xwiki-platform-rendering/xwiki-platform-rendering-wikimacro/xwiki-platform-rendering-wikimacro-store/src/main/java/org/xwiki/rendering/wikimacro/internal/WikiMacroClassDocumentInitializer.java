@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Update XWiki.XWikiComments document with all required informations.
+ * Update XWiki.WikiMacroClass document with all required informations.
  * 
  * @version $Id$
  * @since 4.3M1

@@ -240,6 +240,7 @@ bug = bug
 building = building
 bullet_arrow_down = caret-down
 bullet_arrow_up = caret-up
+bullet_black = circle
 bullet_go = caret-right
 cake=birthday-cake
 calculator = calculator

@@ -24,6 +24,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+import org.xwiki.icon.IconManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
@@ -50,6 +52,12 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     extends AbstractListClassPropertyValuesProvider<T>
 {
     @Inject
+    protected Logger logger;
+
+    @Inject
+    protected IconManager iconManager;
+
+    @Inject
     @Named("compact")
     private EntityReferenceSerializer<String> compactSerializer;
 
@@ -62,10 +70,7 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     private QueryFilter viewableFilter;
 
     /**
-     * A map with an icon css class / url or with {@link org.xwiki.icon.IconManager#getMetaData icon metadata}.
-     *
-     * <p>The entries of this map are meant to be added to the metadata of the
-     * {@link #getValueFromQueryResult values of the query result}.
+     * A map sharing the same keys as the {@link org.xwiki.icon.IconManager#getMetaData icon metadata}.
      *
      * @param documentReference document reference used to generate the icon
      * @return a map with icon related information
@@ -99,7 +104,7 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
             value.setValue(this.compactSerializer.serialize(documentReference, wikiReference));
             value.getMetaData().put(META_DATA_LABEL,
                 getLabel(documentReference, value.getMetaData().get(META_DATA_LABEL)));
-            value.getMetaData().putAll(getIcon(documentReference));
+            value.getMetaData().put(META_DATA_ICON, getIcon(documentReference));
             value.getMetaData().put(META_DATA_URL, getURL(documentReference));
             value.getMetaData().put(META_DATA_HINT, getHint(documentReference));
         }

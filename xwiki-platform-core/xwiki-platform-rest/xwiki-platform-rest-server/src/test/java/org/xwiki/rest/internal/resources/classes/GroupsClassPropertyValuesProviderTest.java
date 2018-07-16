@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.resources.classes;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.GroupsClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -102,10 +104,13 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
         assertEquals(2, values.getPropertyValues().size());
 
         assertEquals("Developers", values.getPropertyValues().get(0).getMetaData().get("label"));
-        assertEquals("url/to/noavatar.png", values.getPropertyValues().get(0).getMetaData().get("icon"));
+        assertTrue(values.getPropertyValues().get(0).getMetaData().get("icon") instanceof Map);
 
         assertEquals("Administrators", values.getPropertyValues().get(1).getMetaData().get("label"));
-        assertEquals("url/to/admins/image", values.getPropertyValues().get(1).getMetaData().get("icon"));
+        assertTrue(values.getPropertyValues().get(1).getMetaData().get("icon") instanceof Map);
+        Map icon = (Map) values.getPropertyValues().get(1).getMetaData().get("icon");
+        assertEquals("url/to/admins/image", icon.get("url"));
+        assertEquals("IMAGE", icon.get("iconSetType"));
     }
 
     @Test

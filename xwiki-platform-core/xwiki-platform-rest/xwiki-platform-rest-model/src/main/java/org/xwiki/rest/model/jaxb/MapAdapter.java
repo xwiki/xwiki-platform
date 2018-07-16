@@ -42,8 +42,9 @@ public class MapAdapter extends XmlAdapter<Map, java.util.Map<String, java.lang.
             return null;
         } else {
             Map output = new Map();
-            for (String key : input.keySet()) {
-                java.lang.Object value = input.get(key);
+            for (java.util.Map.Entry<String, java.lang.Object> entry : input.entrySet()) {
+                String key = entry.getKey();
+                java.lang.Object value = entry.getValue();
                 if (value instanceof java.util.Map) {
                     java.util.Map<String, java.lang.Object> nestedMap = new HashMap<>();
                     ((java.util.Map<?, ?>) value).forEach((k, v) -> nestedMap.put(k.toString(), v));

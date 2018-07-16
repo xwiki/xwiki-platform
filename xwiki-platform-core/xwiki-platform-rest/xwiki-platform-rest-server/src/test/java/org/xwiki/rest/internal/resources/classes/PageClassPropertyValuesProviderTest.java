@@ -43,7 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyValuesProvider.META_DATA_ICON_META_DATA;
+import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyValuesProvider.META_DATA_ICON;
 
 /**
  * Unit tests for {@link PageClassPropertyValuesProvider}.
@@ -86,7 +86,7 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         Map<String, Object> metadata = values.getPropertyValues().get(0).getMetaData();
         assertEquals("space1 / space2", metadata.get("hint"));
         assertEquals("Document", metadata.get("label"));
-        assertTrue(metadata.containsKey(META_DATA_ICON_META_DATA));
+        assertTrue(metadata.containsKey(META_DATA_ICON));
     }
 
     @Test
@@ -105,11 +105,11 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         Map<String, Object> metadata = values.getPropertyValues().get(0).getMetaData();
         assertEquals("space1 / space2", metadata.get("hint"));
         assertEquals("Document", metadata.get("label"));
-        assertTrue(metadata.containsKey(META_DATA_ICON_META_DATA));
+        assertTrue(metadata.containsKey(META_DATA_ICON));
 
         metadata = values.getPropertyValues().get(1).getMetaData();
         assertEquals("space1", metadata.get("hint"));
         assertEquals("Document", metadata.get("label"));
-        assertTrue(metadata.containsKey(META_DATA_ICON_META_DATA));
+        assertTrue(metadata.containsKey(META_DATA_ICON));
     }
 }

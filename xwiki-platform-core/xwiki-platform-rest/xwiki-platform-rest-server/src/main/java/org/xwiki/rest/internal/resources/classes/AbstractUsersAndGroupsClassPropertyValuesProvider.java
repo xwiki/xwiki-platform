@@ -23,7 +23,6 @@ import java.util.Iterator;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.rest.model.jaxb.PropertyValue;
@@ -36,7 +35,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 /**
  * Base class for {@link ClassPropertyValuesProvider} implementations that work with list of users and groups
  * properties.
- * 
+ *
  * @param <T> the property type
  * @version $Id$
  * @since 9.8
@@ -44,9 +43,6 @@ import com.xpn.xwiki.objects.classes.ListClass;
 public abstract class AbstractUsersAndGroupsClassPropertyValuesProvider<T extends ListClass>
     extends AbstractDocumentListClassPropertyValuesProvider<T>
 {
-    @Inject
-    protected Logger logger;
-
     @Inject
     protected WikiDescriptorManager wikiDescriptorManager;
 

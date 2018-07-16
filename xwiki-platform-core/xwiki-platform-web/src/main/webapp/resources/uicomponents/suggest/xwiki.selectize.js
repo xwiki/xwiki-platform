@@ -40,29 +40,23 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     var output = $(optionTemplate);
     var value = (option && typeof option === 'object') ? option.value : option;
     output.attr('data-value', value);
-    var iconMetaData = option && option.iconMetaData;
-    if (typeof iconMetaData !== 'object') {
-      iconMetaData = {};
-    }
     var icon = option && option.icon;
-    if (typeof icon === 'string' && icon !== '') {
-      if (icon.indexOf('/') >= 0 || icon.indexOf('.') >= 0) {
-        // The icon is specified by its path.
-        iconMetaData.iconSetType = 'IMAGE';
-        iconMetaData.url = icon;
-      } else {
-        // The icon is specified by its CSS class.
-        iconMetaData.iconSetType = 'FONT';
-        iconMetaData.cssClass = icon;
+    if (typeof icon === 'object') {
+      // Set the icon set type in case it was missing.
+      if (!icon.iconSetType && icon.url) {
+        icon.iconSetType = 'IMAGE';
+      } else if (!icon.iconSetType && icon.cssClass) {
+          icon.iconSetType = 'FONT';
       }
-    }
-    if (iconMetaData.iconSetType === 'IMAGE') {
-      var image = $('<img class="xwiki-selectize-option-icon" alt="" />').attr('src', iconMetaData.url);
-      output.find('.xwiki-selectize-option-icon').replaceWith(image);
-    } else if (iconMetaData.iconSetType === 'FONT') {
-      output.find('.xwiki-selectize-option-icon').addClass(iconMetaData.cssClass);
-    } else {
-      output.find('.xwiki-selectize-option-icon').remove();
+      // Render the icon depending on the icon set type.
+      if (icon.iconSetType === 'IMAGE') {
+        var image = $('<img class="xwiki-selectize-option-icon" alt="" />').attr('src', icon.url);
+        output.find('.xwiki-selectize-option-icon').replaceWith(image);
+      } else if (icon.iconSetType === 'FONT') {
+        output.find('.xwiki-selectize-option-icon').addClass(icon.cssClass);
+      } else {
+        output.find('.xwiki-selectize-option-icon').remove();
+      }
     }
     var url = option && option.url;
     if (typeof url === 'string') {

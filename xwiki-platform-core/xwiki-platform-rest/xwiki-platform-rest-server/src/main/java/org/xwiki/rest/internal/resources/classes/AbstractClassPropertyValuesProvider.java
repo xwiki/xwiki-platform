@@ -58,8 +58,6 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
 
     protected static final String META_DATA_HINT = "hint";
 
-    protected static final String META_DATA_ICON_META_DATA = "iconMetaData";
-
     protected static final String META_DATA_URL = "url";
 
     @Inject

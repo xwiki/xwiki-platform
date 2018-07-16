@@ -65,6 +65,7 @@ public class DefaultPageQueryBuilder implements QueryBuilder<PageClass>
         Query query;
         if (StringUtils.isEmpty(pageClass.getSql())) {
             query = this.implicitlyAllowedValuesQueryBuilder.build(pageClass);
+            // We don't need the viewable filter here as the query builder already adds its own viewable filter.
             query.addFilter(this.documentFilter);
         } else {
             query = this.explicitlyAllowedValuesQueryBuilder.build(pageClass);

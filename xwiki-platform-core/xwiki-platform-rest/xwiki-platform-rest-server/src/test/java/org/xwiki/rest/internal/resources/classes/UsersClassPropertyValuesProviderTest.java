@@ -22,6 +22,7 @@ package org.xwiki.rest.internal.resources.classes;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.UsersClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -124,13 +126,16 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         assertEquals("Users.Alice", values.getPropertyValues().get(0).getValue());
         assertEquals("Alice One", values.getPropertyValues().get(0).getMetaData().get("label"));
         assertEquals(3L, values.getPropertyValues().get(0).getMetaData().get("count"));
-        assertEquals("url/to/noavatar.png", values.getPropertyValues().get(0).getMetaData().get("icon"));
+        assertTrue(values.getPropertyValues().get(0).getMetaData().get("icon") instanceof Map);
         assertEquals("url/to/alice", values.getPropertyValues().get(0).getMetaData().get("url"));
 
         assertEquals("Users.Bob", values.getPropertyValues().get(1).getValue());
         assertEquals("Bob", values.getPropertyValues().get(1).getMetaData().get("label"));
         assertEquals(17L, values.getPropertyValues().get(1).getMetaData().get("count"));
-        assertEquals("url/to/bob/avatar", values.getPropertyValues().get(1).getMetaData().get("icon"));
+        assertTrue(values.getPropertyValues().get(1).getMetaData().get("icon") instanceof Map);
+        Map icon = (Map) values.getPropertyValues().get(1).getMetaData().get("icon");
+        assertEquals("url/to/bob/avatar", icon.get("url"));
+        assertEquals("IMAGE", icon.get("iconSetType"));
         assertEquals("url/to/bob", values.getPropertyValues().get(1).getMetaData().get("url"));
 
         verify(this.allowedValuesQuery, never()).setWiki(any(String.class));

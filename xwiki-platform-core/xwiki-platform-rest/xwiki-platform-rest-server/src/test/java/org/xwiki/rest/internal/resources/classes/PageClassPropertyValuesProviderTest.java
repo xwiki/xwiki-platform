@@ -100,7 +100,7 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
     }
 
     @Test
-    public void getValuesWithNonTerminalPage() throws Exception
+    public void getValuesWithTerminalPage() throws Exception
     {
         WikiReference wikiRef = new WikiReference("wiki");
         SpaceReference space1Ref = new SpaceReference("space1", wikiRef);
@@ -113,7 +113,7 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         XWikiDocument page1Doc = mock(XWikiDocument.class);
         XWikiDocument page2Doc = mock(XWikiDocument.class);
         when(this.xwiki.getDocument(space1Ref, this.xcontext)).thenReturn(space1Doc);
-        when(this.xwiki.getDocument(space2Ref, this.xcontext)).thenReturn(space2Doc);
+        when(this.xwiki.getDocument(space2Ref, this.xcontext)).thenReturn(page2Doc);
         when(this.xwiki.getDocument(page1Ref, this.xcontext)).thenReturn(page1Doc);
         when(this.xwiki.getDocument(page2Ref, this.xcontext)).thenReturn(page2Doc);
         when(space1Doc.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Space 1");
@@ -128,13 +128,13 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         assertEquals(2, values.getPropertyValues().size());
 
         Map<String, Object> metadata = values.getPropertyValues().get(0).getMetaData();
-        assertEquals("Space 1 / Space 2", metadata.get("hint"));
+        assertEquals("Space 1 / Page 2", metadata.get("hint"));
         assertEquals("Page 1", metadata.get("label"));
         assertTrue(metadata.containsKey(META_DATA_ICON));
 
         metadata = values.getPropertyValues().get(1).getMetaData();
         assertEquals("Space 1", metadata.get("hint"));
-        assertEquals("Space 2", metadata.get("label"));
+        assertEquals("Page 2", metadata.get("label"));
         assertTrue(metadata.containsKey(META_DATA_ICON));
     }
 }

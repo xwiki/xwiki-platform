@@ -52,13 +52,13 @@
     #end
   &lt;/dt&gt;
   &lt;dd&gt;
-  #if ($propName == 'script' &amp;&amp; $xcontext.action == 'view' &amp;&amp; "$!job.getValue('script')" != '')
+    #if ($propName == 'script' &amp;&amp; $xcontext.action == 'view' &amp;&amp; "$!job.getValue('script')" != '')
 
-    {{code language='groovy'}}$!job.getValue($propName){{/code}}
+      {{code language='groovy'}}$!job.getValue($propName){{/code}}
 
-  #else
-    $!doc.display($propName, $obj)
-  #end
+    #else
+      $!doc.display($propName, $obj)
+    #end
   &lt;/dd&gt;
 #end
 {{/velocity}}

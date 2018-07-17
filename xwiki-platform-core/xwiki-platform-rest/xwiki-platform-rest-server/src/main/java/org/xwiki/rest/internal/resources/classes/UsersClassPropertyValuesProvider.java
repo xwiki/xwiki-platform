@@ -19,12 +19,18 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.icon.IconException;
+import org.xwiki.icon.IconManager;
+import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.rest.model.jaxb.PropertyValues;
@@ -38,7 +44,7 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 
 /**
  * Provides values for the "List of Users" type of properties.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
@@ -47,6 +53,8 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 @Singleton
 public class UsersClassPropertyValuesProvider extends AbstractUsersAndGroupsClassPropertyValuesProvider<UsersClass>
 {
+    private static final String DEFAULT_ICON_NAME = "user";
+
     @Inject
     private WikiUserManager wikiUserManager;
 
@@ -80,23 +88,33 @@ public class UsersClassPropertyValuesProvider extends AbstractUsersAndGroupsClas
     }
 
     @Override
-    protected String getIcon(DocumentReference userReference)
+    protected Map<String, Object> getIcon(DocumentReference userReference)
     {
+        Map<String, Object> icon = new HashMap<>();
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument userProfileDocument = xcontext.getWiki().getDocument(userReference, xcontext);
             String avatar = userProfileDocument.getStringValue("avatar");
             XWikiAttachment avatarAttachment = userProfileDocument.getAttachment(avatar);
             if (avatarAttachment != null && avatarAttachment.isImage(xcontext)) {
-                return xcontext.getWiki().getURL(avatarAttachment.getReference(), "download",
-                    "width=30&height=30&keepAspectRatio=true", null, xcontext);
+                icon.put(IconManager.META_DATA_URL, xcontext.getWiki().getURL(avatarAttachment.getReference(),
+                    "download", "width=30&height=30&keepAspectRatio=true", null, xcontext));
+                icon.put(IconManager.META_DATA_ICON_SET_TYPE, IconType.IMAGE.name());
             }
         } catch (XWikiException e) {
             this.logger.warn(
                 "Failed to read the avatar of user [{}]. Root cause is [{}]. Using the default avatar instead.",
                 userReference.getName(), ExceptionUtils.getRootCauseMessage(e));
         }
+        if (!icon.containsKey(IconManager.META_DATA_URL)) {
+            try {
+                icon = this.iconManager.getMetaData(DEFAULT_ICON_NAME);
+            } catch (IconException e) {
+                this.logger.warn("Error getting the icon [{}]. Root cause is [{}].", DEFAULT_ICON_NAME,
+                    ExceptionUtils.getRootCause(e));
+            }
+        }
 
-        return xcontext.getWiki().getSkinFile("icons/xwiki/noavatar.png", true, xcontext);
+        return icon;
     }
 }

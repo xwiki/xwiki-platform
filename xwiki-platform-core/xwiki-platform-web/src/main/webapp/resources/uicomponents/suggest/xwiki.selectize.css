@@ -40,6 +40,9 @@ a.xwiki-selectize-option-label {
   color: inherit;
   text-decoration: none;
 }
+em.xwiki-selectize-option-hint {
+  display: block;
+}
 
 /* Live Table Filter */
 .xwiki-livetable-display-header-filter .selectize-input {

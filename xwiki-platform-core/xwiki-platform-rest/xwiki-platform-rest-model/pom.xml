@@ -20,7 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
@@ -31,7 +32,11 @@
   <name>XWiki Platform - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.02</xwiki.jacoco.instructionRatio>
+    <!--
+      The jacoco instruction ratio precision is higher here because the jaxb2 plugin generates classes
+      that are not excluded in the analysis.
+    -->
+    <xwiki.jacoco.instructionRatio>0.0292</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Test dependencies. -->

@@ -169,6 +169,11 @@
       <artifactId>jaxb2-fluent-api</artifactId>
       <version>3.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

@@ -256,27 +256,19 @@ viewers.Comments = Class.create({
     }.bindAsEventListener(this));
   },
   /**
-   * Permalink: Display a modal popup providing the permalink.
+   * Permalink: Display a bootstrap modal providing the permalink.
    */
   addPermalinkListener : function() {
     $$(this.xcommentSelector + ' a.permalink').each(function(item) {
       item.observe('click', function(event) {
-        item.blur();
-        event.stop();
-        var permalinkBox = new XWiki.widgets.ConfirmationBox(
-        {
-          onYes : function () {
-            window.location = item.href;
-          }
-        },
-        /* Interaction parameters */
-        {
-          confirmationText: "$services.localization.render('core.viewers.comments.permalink'): <input type='text' class='full' value='" + item.href + "'/>",
-          yesButtonText: "$services.localization.render('core.viewers.comments.permalink.goto')",
-          noButtonText : "$services.localization.render('core.viewers.comments.permalink.hide')"
+        //Updating the permalink inside modal
+        var modal = $('permalinkModal');
+        var fieldPermalink = modal.select('.form-control')[0];
+        fieldPermalink.setValue(item.href);
+        //Going to permalink location
+        $$('#permalinkModal .buttons .button')[0].observe('click', function() {
+          window.location = item.href;
         });
-        permalinkBox.dialog.addClassName('permalinkBox')
-        permalinkBox.dialog.down('input[type="text"]').select();
       });
     });
   },

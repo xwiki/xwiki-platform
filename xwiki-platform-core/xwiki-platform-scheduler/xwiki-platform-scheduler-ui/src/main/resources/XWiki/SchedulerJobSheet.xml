@@ -43,15 +43,15 @@
 #macro (displayJobProperty $obj $propName)
   #set ($class = $obj.xWikiClass)
   #set ($prettyName = $class.get($propName).translatedPrettyName)
-    <dt>
-      <label for="${class.getName()}_${obj.number}_${propName}">$prettyName</label>
+    &lt;dt&gt;
+      &lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$prettyName&lt;/label&gt;
     #if ($propName == 'script')
-      <span class='xHint'>
+      &lt;span class='xHint'&gt;
         $services.localization.render('xe.scheduler.job.scriptexplanation')
-      </span>
+      &lt;/span&gt;
     #end
-    </dt>
-    <dd>
+    &lt;/dt&gt;
+    &lt;dd&gt;
     #if ($propName == 'script' &amp;&amp; $xcontext.action == 'view')
 
       {{code language='groovy'}}$!job.getValue($propname){{/code}}
@@ -59,7 +59,7 @@
     #else
       $!doc.display($propName, $obj)
     #end
-  </dd>
+  &lt;/dd&gt;
 #end
 {{/velocity}}
 
@@ -67,14 +67,14 @@
 #if ($doc.getObject('XWiki.SchedulerJobClass'))
   #set ($job = $doc.getObject('XWiki.SchedulerJobClass'))
   {{html wiki='true'}}
-    <div class='xform'>
-      <dl>
+    &lt;div class='xform'&gt;
+      &lt;dl&gt;
       #displayJobProperty($job 'jobName')
       #displayJobProperty($job 'jobDescription')
       #displayJobProperty($job 'cron')
       #displayJobProperty($job 'script')
-    </dl>
-    </div>
+    &lt;/dl&gt;
+    &lt;/div&gt;
   {{/html}}
 
   #if ($xcontext.action == 'edit')

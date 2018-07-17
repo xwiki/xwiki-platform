@@ -154,6 +154,8 @@ notifications.settings.events=Events
 notifications.settings.watch.title=Watched Pages
 notifications.settings.watch.autowatchmode=Automatic page watching
 notifications.settings.watch.autowatchmode.hint=Decide if you wish to watch a page after you have worked on it
+notifications.settings.watch.forGuest=Log in or register to handle your notification settings.
+notifications.settings.watch.disabled=The watched entities are disabled. Please contact your administrator.
 notifications.events.by=edited by {0}.
 notifications.events.lastChange=Last change: {0}.
 notifications.events.lastComment=Last comment: {0}.
@@ -199,6 +201,11 @@ rendering.macro.notificationsApplicationsPreferences.name=Notifications Applicat
 rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+
+rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
+rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
 
 rendering.macro.notifications.name=Notifications
 rendering.macro.notifications.description=Display notifications about events happened on the wiki.

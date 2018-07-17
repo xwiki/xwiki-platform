@@ -70,6 +70,7 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
         }
 
         this.entity.setFilename(name);
+        this.entity.setMimeType(getString(WikiAttachmentFilter.PARAMETER_MIMETYPE, parameters, null));
 
         if (content != null) {
             try {
@@ -90,7 +91,6 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
             setVersion(parameters);
             this.entity.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
             this.entity.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
-            this.entity.setMimeType(getString(WikiAttachmentFilter.PARAMETER_MIMETYPE, parameters, null));
 
             String revisions = getString(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
             if (revisions != null) {

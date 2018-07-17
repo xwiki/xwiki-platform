@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
@@ -103,7 +105,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private NotificationRSSManager notificationRSSManager;
 
     @Override
-    public Notifications getNotifications(
+    public Response getNotifications(
             String useUserPreferences,
             String userId,
             String untilDate,
@@ -120,12 +122,21 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             String displayReadStatus
     ) throws Exception
     {
+        // 1. Get the events and render them as notifications.
         List<CompositeEvent> events =
                 getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
                         users, count,
                         displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents);
-        return new Notifications(
+
+        Notifications notifications = new Notifications(
                 notificationsRenderer.renderNotifications(events, userId, TRUE.equals(displayReadStatus)));
+
+        // 2: Build the response to add the "cache control" header.
+        Response.ResponseBuilder response = Response.ok(notifications);
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+        response.cacheControl(cacheControl);
+        return response.build();
     }
 
     @Override

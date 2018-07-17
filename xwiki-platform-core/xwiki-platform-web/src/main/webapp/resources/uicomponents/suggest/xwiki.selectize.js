@@ -78,6 +78,12 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     highlight: false,
     labelField: 'label',
     loadThrottle: 500,
+    onDropdownClose: function(dropdown) {
+      dropdown.removeClass('active');
+    },
+    onDropdownOpen: function(dropdown) {
+      dropdown.addClass('active');
+    },
     persist: false,
     preload: 'focus',
     render: {
@@ -91,7 +97,13 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
         return output;
       }
     },
-    searchField: ['value', 'label']
+    searchField: ['value', 'label'],
+    onType: function(value) {
+      if (!this.loadedSearches.hasOwnProperty(value)) {
+        var wrapper = this.$wrapper;
+        wrapper.addClass(this.settings.loadingClass);
+      }
+    }
   };
 
   var loadSelectedValues = function() {
@@ -163,7 +175,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   $.fn.xwikiSelectize = function(settings) {
-    return this.selectize($.extend({}, defaultSettings, settings))
+    return this.not('.selectized, .selectize-control')
+      .selectize($.extend({}, defaultSettings, settings))
       .each(loadSelectedValues).each(handleDropdownWidth)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.

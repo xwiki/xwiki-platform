@@ -22,7 +22,7 @@ package org.xwiki.release.test.po;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.editor.UserPicker;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents a Release entry page being added.
@@ -38,15 +38,17 @@ public class ReleaseEntryEditPage extends InlinePage
     @Override
     public ReleaseEntryEditPage waitUntilPageIsLoaded()
     {
-        getReleaseManagersPicker().waitToLoad();
+        // Wait for the user picker to be ready.
+        getReleaseManagersPicker();
+
         return this;
     }
 
     /**
      * @return the user picker used to select the release managers
      */
-    public UserPicker getReleaseManagersPicker()
+    public SuggestInputElement getReleaseManagersPicker()
     {
-        return new UserPicker(releaseManagersInput);
+        return new SuggestInputElement(this.releaseManagersInput);
     }
 }

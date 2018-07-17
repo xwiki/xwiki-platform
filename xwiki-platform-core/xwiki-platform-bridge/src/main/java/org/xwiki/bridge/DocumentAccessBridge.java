@@ -24,11 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -40,6 +42,20 @@ import org.xwiki.model.reference.ObjectReference;
 @Role
 public interface DocumentAccessBridge
 {
+    /**
+     * Find the document reference corresponding to the entity reference based on what exist in the database (page
+     * reference can means two different documents for example).
+     * 
+     * @param entityReference the reference to resolve
+     * @return the document reference
+     * @since 10.6RC1
+     */
+    @Unstable
+    default DocumentReference getDocumentReference(EntityReference entityReference)
+    {
+        return new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT));
+    }
+
     /**
      * Get the document object associated with the passed document name and context language.
      * <p>
@@ -108,6 +124,21 @@ public interface DocumentAccessBridge
     default DocumentModelBridge getTranslatedDocumentInstance(DocumentReference documentReference) throws Exception
     {
         return getDocument(documentReference);
+    }
+
+    /**
+     * Get the document object associated with the passed entity reference and context locale.
+     * <p>
+     * Note that the returned document does not contain objects and attachment so it should be used very carefully.
+     * 
+     * @param entityReference the reference of the entity instance to find
+     * @return the document instance matching the passed document reference and context locale
+     * @throws Exception when loading the document failed
+     * @since 10.6RC1
+     */
+    default DocumentModelBridge getTranslatedDocumentInstance(EntityReference entityReference) throws Exception
+    {
+        return getTranslatedDocumentInstance(new DocumentReference(entityReference));
     }
 
     /**
@@ -506,7 +537,25 @@ public interface DocumentAccessBridge
     String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor);
 
     /**
-     * Retrieves the relitive (without the hostname) or absolute (with the hostname) URL that can be used to access a
+     * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
+     * 
+     * @param entityReference the reference of the entity to access
+     * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
+     *            <code>edit</code> to open the document for modifications, etc.
+     * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
+     *            skip.
+     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
+     * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
+     *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
+     * @since 10.6RC1
+     */
+    default String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor)
+    {
+        return getDocumentURL(entityReference, action, queryString, anchor, false);
+    }
+
+    /**
+     * Retrieves the relative (without the hostname) or absolute (with the hostname) URL that can be used to access a
      * document, using a specific action.
      * 
      * @param documentReference the reference of the document to access
@@ -522,6 +571,28 @@ public interface DocumentAccessBridge
      */
     String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor,
         boolean isFullURL);
+
+    /**
+     * Retrieves the relative (without the hostname) or absolute (with the hostname) URL that can be used to access a
+     * document, using a specific action.
+     * 
+     * @param entityReference the reference of the entity to access
+     * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
+     *            <code>edit</code> to open the document for modifications, etc.
+     * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
+     *            skip.
+     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
+     * @param isFullURL if true then the URL will be an absolute URL which contains the host name, and protocol.
+     * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
+     *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
+     * @since 10.6RC1
+     */
+    default String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor,
+        boolean isFullURL)
+    {
+        return getDocumentURL(entityReference.extractReference(EntityType.DOCUMENT), action, queryString, anchor,
+            isFullURL);
+    }
 
     /**
      * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.

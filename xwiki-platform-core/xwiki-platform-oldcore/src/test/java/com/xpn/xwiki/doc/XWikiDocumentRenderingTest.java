@@ -96,7 +96,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         getComponentManager().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"),
             getConfigurationSource());
 
-        this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
+        DocumentReference documentReference = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
+        this.document = new XWikiDocument(documentReference);
         this.document.setSyntax(Syntax.XWIKI_2_1);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
@@ -129,6 +130,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
+        this.mockXWiki.stubs().method("getDocumentReference").will(returnValue(documentReference));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
         // Called from MessageToolVelocityContextInitializer.

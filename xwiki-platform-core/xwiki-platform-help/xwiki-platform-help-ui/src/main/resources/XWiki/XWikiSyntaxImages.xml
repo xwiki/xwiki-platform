@@ -129,6 +129,7 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[ima
 ** **##queryString##**: Allows queries to be passed to the server when creating the download link for the referenced image. Example: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## will fail if the ##width## and ##height## parameters are specified in addition to ##queryString##!**)</content>
   <attachment>
     <filename>img.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1300910356000</date>
     <version>1.1</version>

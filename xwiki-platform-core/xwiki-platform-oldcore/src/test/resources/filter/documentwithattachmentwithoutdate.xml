@@ -9,6 +9,12 @@
             <wikiAttachment name="attachment.txt" size="10">
               <p>
                 <content>AAECAwQFBgcICQ==</content>
+                <parameters>
+                  <entry>
+                    <string>mimetype</string>
+                    <string>text/plain</string>
+                  </entry>
+                </parameters>
               </p>
             </wikiAttachment>
           </wikiDocumentRevision>

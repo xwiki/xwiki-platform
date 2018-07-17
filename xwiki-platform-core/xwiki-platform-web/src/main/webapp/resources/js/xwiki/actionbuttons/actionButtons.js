@@ -384,11 +384,12 @@ require(['jquery'], function ($) {
 
   $(window).on("scroll resize load click xwiki:dom:refresh", function() {
     var isFullScreen = $('.fullScreenWrapper').length > 0
+    var isVisible = $container.is(':visible');
     // Show the element and make the gap where the save bar should fit.
     $placeholder.height($container.height());
     var position = $placeholder.offset().top + $placeholder.height();
 
-    if (!isFullScreen && $(window).height() + $(window).scrollTop() < position) {
+    if (isVisible && !isFullScreen && $(window).height() + $(window).scrollTop() < position) {
       $container.addClass('sticky-buttons-fixed');
       // The width of the parent element is not inherited when the position is fixed
       $container.innerWidth($container.parent().width());

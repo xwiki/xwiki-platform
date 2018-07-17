@@ -21,7 +21,7 @@ package org.xwiki.wiki.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.editor.UserPicker;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 public class CreateWikiPageStepUser extends ExtendedViewPage
 {
@@ -35,23 +35,25 @@ public class CreateWikiPageStepUser extends ExtendedViewPage
     {
         return createButton.isEnabled();
     }
-    
+
     public WikiCreationPage create()
     {
         createButton.click();
         return new WikiCreationPage();
-        
+
     }
 
-    public UserPicker getOwnerPicker()
+    public SuggestInputElement getOwnerPicker()
     {
-        return new UserPicker(this.ownerInput);
+        return new SuggestInputElement(this.ownerInput);
     }
 
     @Override
     public CreateWikiPageStepUser waitUntilPageIsLoaded()
     {
-        getOwnerPicker().waitToLoad();
+        // Wait for the owner picker to be ready.
+        getOwnerPicker();
+
         return this;
     }
 }

@@ -44,6 +44,8 @@
     Get the number of unread notifications as JSON
 ********************************************************#
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
+  #set ($discard = $response.setHeader('Cache-Control', 'no-cache'))
+  #set ($discard = $response.setHeader('Content-Type', 'application/json'))
   $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(21)})
 #********************************************************
              Mark a notification as read
@@ -284,7 +286,7 @@
    * Get the number of unread notifications.
    */
   var getUnreadNotificationsCount = function () {
-    $.getJSON(url, {action: 'getUnreadCount'}).done(function (data) {
+    $.ajax(url, {method: 'GET', cache: false, data: {action: 'getUnreadCount'}}).done(function (data) {
       updateNotificationCount(data.unread);
       // Display the "nothing!" message if there is no notification
       if (data.unread == 0) {

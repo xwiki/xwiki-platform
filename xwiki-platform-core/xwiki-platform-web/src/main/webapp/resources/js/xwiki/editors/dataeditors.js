@@ -317,7 +317,7 @@ editors.XDataEditors = Class.create({
                 if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                   failureReason = 'Server not responding';
                 }
-                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.failed')" + failureReason, "error"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.failed') " + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;

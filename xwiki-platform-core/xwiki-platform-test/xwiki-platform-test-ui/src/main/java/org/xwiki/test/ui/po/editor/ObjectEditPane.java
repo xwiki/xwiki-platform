@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents a group of form fields that are used to edit an object of a specific type.
@@ -73,9 +74,10 @@ public class ObjectEditPane extends FormElement
      * @param userPropertyName the name of a property of type List of Users
      * @return a user picker for a property of type List of Users
      */
-    public UserPicker getUserPicker(String userPropertyName)
+    public SuggestInputElement getUserPicker(String userPropertyName)
     {
-        return new UserPicker(getDriver().findElementWithoutWaiting(getForm(), byPropertyName(userPropertyName)));
+        return new SuggestInputElement(
+            getDriver().findElementWithoutWaiting(getForm(), byPropertyName(userPropertyName)));
     }
 
     /**

@@ -221,9 +221,11 @@ rendering.macro.notifications.parameter.pages.name=Pages
 rendering.macro.notifications.parameter.displayReadStatus.name=Afficher l'état "lu"
 rendering.macro.notifications.parameter.displayReadStatus.description=Définit si l'état lu ou non lu doit être affiché pour les évènements
 rendering.macro.notifications.parameter.users.name=Utilisateurs
-### Missing: rendering.macro.notifications.parameter.users.description=List of users (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.users.description=List of users to consider (comma-separated). Ignored if "useUserPreferences" is set to "true".
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher uniquement les utilisateurs suivis
-### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Either or not to display only the events done by the given list of users (if empty, the list of followed users of the current user is used)
+### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
+### Missing: rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
+### Missing: rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
 
 ## Notifications Macro
 notifications.macro.noWatchedUsers=Vous ne suivez personne.

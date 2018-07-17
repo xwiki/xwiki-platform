@@ -141,6 +141,10 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #if ("$!commentSelection" != "")
     #set($isAnnotation = true)
   #end
+  ## An empty comment author means that the comment author is a guest.
+  ## This variable should be true only for an authenticate user that matches the comment author.
+  ## We don't allow guests to be edit or delete comments because we can't know if they are the comment author.
+  #set ($isUserComment = $comment.author != '' && $services.model.resolveDocument($comment.author, 'user') == $xcontext.userReference)
   <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
     <div class="commentheader">
@@ -153,12 +157,12 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <div class="btn-group commenttools">
       #if($xwiki.hasAccessLevel('comment'))
         <a class="commentreply btn btn-default btn-xs" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.icon.renderHTML('comment')</a></span>
-        #if($services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference || $hasAdmin)
+        #if($hasAdmin || $isUserComment)
           <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
         #end
       #end
       <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
-      #if ($hasAdmin || (!$isGuest && $hasEdit && $comment.author == $xcontext.user))
+      #if ($hasAdmin || ($hasEdit && $isUserComment))
         <a class="delete btn btn-default btn-xs " rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')</a>
       #end
       </div>## btn-group

@@ -67,27 +67,8 @@
 #if ($services.notification.watch.isEnabled())
 (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
 (((
-{{html clean="false"}}
-&lt;h1&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.title'))&lt;/h1&gt;
-&lt;div class="notification-top-panel-preferences"&gt;
-  &lt;div class="xform"&gt;
-    &lt;dl&gt;
-      &lt;dt class="label"&gt;&lt;label&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode'))&lt;/label&gt;
-      &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode.hint'))&lt;/p&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #set ($mode = $services.notification.watch.automaticWatchMode)
-        &lt;select class="notificationAutoWatchMode"&gt;
-          &lt;option value="NONE" #if($mode == 'NONE')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE'))&lt;/option&gt;
-          &lt;option value="ALL"  #if($mode == 'ALL')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL'))&lt;/option&gt;
-          &lt;option value="MAJOR" #if($mode == 'MAJOR')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR'))&lt;/option&gt;
-          &lt;option value="NEW" #if($mode == 'NEW')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW'))&lt;/option&gt;
-        &lt;/select&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-{{/html}}
+  = $escapetool.xml($services.localization.render('notifications.settings.watch.title')) =
+  {{notificationsAutoWatchPreferences /}}
 )))
 #end
 ######################################################
@@ -108,120 +89,6 @@
 )))
 {{/velocity}}
 </content>
-  <object>
-    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
-    <number>6</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>c51d89a5-6ddc-4c67-81ed-5fd8dd6385cd</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
-
-  $(document).ready(function() {
-    $('.notificationAutoWatchMode').change( function (event) {
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
-      $.post(url, {
-        action: 'setAutoWatchMode',
-        mode: $(this).val(),
-        csrf: xm.form_token
-      }).done(function() {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).error(function() {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      });
-    });
-  });
-
-});</code>
-    </property>
-    <property>
-      <name>Automatic Page Watching</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
   <object>
     <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
     <number>1</number>

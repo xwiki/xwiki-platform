@@ -70,12 +70,11 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
           #if($xwiki.hasEditComment())
             <th scope="col">$services.localization.render('core.viewers.history.comment')</th>
           #end
-  ## Editors see the Revert button.
-          #if($hasEdit && !$hasAdmin)
-            <th scope="col"></th>
-  ## Admins see the Revert and Delete buttons.
-          #elseif($hasAdmin)
-            <th scope="col" colspan="2"></th>
+  ## Editors see the Revert button. Admins see the Revert and Delete buttons.
+          #if ($hasEdit)
+            <th scope="col" #if($hasAdmin)colspan="2"#end>
+              $services.localization.render('core.viewers.history.actions')
+            </th>
           #end
           </tr>
         </thead>

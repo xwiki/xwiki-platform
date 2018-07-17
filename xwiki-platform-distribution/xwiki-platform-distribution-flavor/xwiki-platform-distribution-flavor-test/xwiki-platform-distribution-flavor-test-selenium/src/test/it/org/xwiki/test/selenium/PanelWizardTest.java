@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class PanelWizardTest extends AbstractXWikiTestCase
 {
     @Override
@@ -101,17 +103,17 @@ public class PanelWizardTest extends AbstractXWikiTestCase
         waitForBodyContains("Page Layout");
         waitForBodyContains("Panel List");
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.xpath("//div[@class='panel expanded QuickLinks']"), By.id("leftPanels"));
-        dragAndDrop(By.xpath("//div[@class='panel expanded RecentlyModified']"), By.id("rightPanels"));
+        dragAndDrop(By.cssSelector(".panel.QuickLinks h1"), By.id("leftPanels"));
+        dragAndDrop(By.cssSelector(".panel.RecentlyModified h1"), By.id("rightPanels"));
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
         open("Panels", "PanelWizard");
-        waitForCondition("selenium.isElementPresent(\"//div[@class='panel expanded QuickLinks']\")!=false;");
-        waitForCondition("selenium.isElementPresent(\"//div[@class='panel expanded Backlinks']\")!=false;");
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".panel.QuickLinks"));
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".panel.RecentlyModified"));
         waitForCondition("selenium.isElementPresent(\"leftPanels\")!=false;");
         waitForCondition("selenium.isElementPresent(\"rightPanels\")!=false;");
-        assertElementPresent("//div[@class='panel expanded QuickLinks']");
-        assertElementPresent("//div[@class='panel expanded RecentlyModified']");
+        assertTrue(getDriver().hasElementWithoutWaiting(By.cssSelector(".panel.QuickLinks")));
+        assertTrue(getDriver().hasElementWithoutWaiting(By.cssSelector(".panel.RecentlyModified")));
         assertElementPresent("leftPanels");
         assertElementPresent("rightPanels");
     }
@@ -142,7 +144,7 @@ public class PanelWizardTest extends AbstractXWikiTestCase
         clickLinkWithXPath("//div[@id='leftcolumn']", false);
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
         waitForCondition("selenium.isElementPresent(\"//button[text()='Reset']\")!=false;");
-        dragAndDrop(By.xpath("//div[@class = 'panel expanded QuickLinks']"), By.id("leftPanels"));
+        dragAndDrop(By.cssSelector(".panel.QuickLinks h1"), By.id("leftPanels"));
         getSelenium().click("revertLayout");
 
         // Test the Save button.

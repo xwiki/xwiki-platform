@@ -73,6 +73,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   var renderOption = function(option) {
     var output = renderCommon(option);
+    // This class is needed starting with v0.12.5 in order to have proper styling.
+    output.addClass('option');
     var hint = option && option.hint;
     if (typeof hint === 'string' && hint !== '') {
       output.append($('<em class="xwiki-selectize-option-hint"/>').text(hint));
@@ -115,7 +117,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       option_create: function(data, escapeHTML) {
         // TODO: Use translation key here.
         var text = 'Select {0} ...';
-        var output = $('<div class="create"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
+        // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
+        var output = $('<div class="create option"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
         output.find('em').text(data.input);
         return output;
       }

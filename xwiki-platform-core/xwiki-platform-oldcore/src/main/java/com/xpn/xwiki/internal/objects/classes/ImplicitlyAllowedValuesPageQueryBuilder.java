@@ -54,6 +54,9 @@ public class ImplicitlyAllowedValuesPageQueryBuilder implements QueryBuilder<Pag
         if (StringUtils.isEmpty(dbListClass.getIdField())) {
             dbListClass.setIdField("doc.fullName");
         }
+        if (StringUtils.isEmpty(dbListClass.getValueField())) {
+            dbListClass.setValueField("doc.title");
+        }
 
         return implicitlyAllowedValuesQueryBuilder.build(dbListClass);
     }

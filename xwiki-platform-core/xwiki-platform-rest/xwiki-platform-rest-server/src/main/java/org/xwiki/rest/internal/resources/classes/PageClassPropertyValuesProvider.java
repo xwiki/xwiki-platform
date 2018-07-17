@@ -93,22 +93,29 @@ public class PageClassPropertyValuesProvider extends AbstractDocumentListClassPr
         return icon;
     }
 
-    @Override
-    protected String getLabel(DocumentReference documentReference, Object currentLabel)
+    private String getLabel(EntityReference entityReference)
     {
-        String label = currentLabel == null ? "" : currentLabel.toString().trim();
-        if (label.isEmpty()) {
-            try {
-                XWikiContext xcontext = this.xcontextProvider.get();
-                XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-                label = document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
-            } catch (XWikiException e) {
-                this.logger.error("Error while loading the document [{}]. Root cause is [{}]", documentReference,
-                    ExceptionUtils.getRootCause(e));
-                label = super.getLabel(documentReference, currentLabel);
+        String label;
+        try {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            XWikiDocument document = xcontext.getWiki().getDocument(entityReference, xcontext);
+            label = document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
+        } catch (XWikiException e) {
+            this.logger.error("Error while loading the document [{}]. Root cause is [{}]", entityReference,
+                ExceptionUtils.getRootCause(e));
+            if (entityReference instanceof DocumentReference) {
+                label = super.getLabel((DocumentReference) entityReference, "");
+            } else {
+                label = entityReference.getName();
             }
         }
         return label;
+    }
+
+    @Override
+    protected String getLabel(DocumentReference documentReference, Object currentLabel)
+    {
+        return getLabel(documentReference);
     }
 
     @Override
@@ -120,7 +127,7 @@ public class PageClassPropertyValuesProvider extends AbstractDocumentListClassPr
         }
         return parentSpace.getReversedReferenceChain().stream()
             .filter(entityReference -> !(entityReference instanceof WikiReference))
-            .map(EntityReference::getName)
+            .map(this::getLabel)
             .collect(Collectors.joining(" / "));
     }
 }

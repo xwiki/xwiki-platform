@@ -175,7 +175,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   $.fn.xwikiSelectize = function(settings) {
-    return this.selectize($.extend({}, defaultSettings, settings))
+    return this.not('.selectized, .selectize-control')
+      .selectize($.extend({}, defaultSettings, settings))
       .each(loadSelectedValues).each(handleDropdownWidth)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.

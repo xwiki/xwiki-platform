@@ -97,9 +97,11 @@ com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
 com.xpn.xwiki.internal.namespace.DefaultNamespaceContextExecutor
 com.xpn.xwiki.internal.objects.classes.DefaultDBListQueryBuilder
 com.xpn.xwiki.internal.objects.classes.DefaultGroupsQueryBuilder
+com.xpn.xwiki.internal.objects.classes.DefaultPageQueryBuilder
 com.xpn.xwiki.internal.objects.classes.DefaultUsersQueryBuilder
 com.xpn.xwiki.internal.objects.classes.ExplicitlyAllowedValuesDBListQueryBuilder
 com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesDBListQueryBuilder
+com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder
 com.xpn.xwiki.internal.objects.classes.UsedValuesListQueryBuilder
 com.xpn.xwiki.internal.objects.classes.ViewableAllowedDBListValueFilter
 com.xpn.xwiki.internal.objects.classes.XClassMigratorListener

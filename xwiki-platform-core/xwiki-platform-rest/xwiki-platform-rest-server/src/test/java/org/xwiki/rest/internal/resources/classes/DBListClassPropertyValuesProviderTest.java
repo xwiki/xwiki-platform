@@ -36,6 +36,7 @@ import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DateClass;
@@ -65,8 +66,10 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
     private DBListClass dbListClass = new DBListClass();
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @MockComponent
     private AuthorExecutor authorExecutor;
 
     @BeforeEach
@@ -79,9 +82,6 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
         when(this.xcontext.getWiki().getDocument(new ClassPropertyReference("status", this.classReference),
             this.xcontext)).thenReturn(this.classDocument);
-
-        this.entityReferenceSerializer = this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.authorExecutor = this.componentManager.getInstance(AuthorExecutor.class);
     }
 
     @Test

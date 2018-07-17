@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.resources.classes;
 
 import java.util.Arrays;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.component.manager.ComponentManager;
@@ -32,6 +33,7 @@ import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -61,6 +63,10 @@ public abstract class AbstractListClassPropertyValuesProviderTest
 
     protected XWikiDocument classDocument = mock(XWikiDocument.class);
 
+    protected XWiki xwiki = mock(XWiki.class);
+
+    @MockComponent
+    @Named("usedValues")
     protected QueryBuilder<ListClass> usedValuesQueryBuilder;
 
     @InjectComponentManager
@@ -69,12 +75,11 @@ public abstract class AbstractListClassPropertyValuesProviderTest
     public void configure() throws Exception
     {
         Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-        XWiki xwiki = mock(XWiki.class);
         BaseClass xclass = mock(BaseClass.class);
         DocumentReference authorReference = new DocumentReference("wiki", "Users", "Alice");
 
         when(xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.xcontext.getWiki()).thenReturn(xwiki);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
         when(this.classDocument.getXClass()).thenReturn(xclass);
         when(this.classDocument.getDocumentReference()).thenReturn(this.classReference);
         when(this.classDocument.getAuthorReference()).thenReturn(authorReference);
@@ -103,10 +108,6 @@ public abstract class AbstractListClassPropertyValuesProviderTest
             when(allowedValuesQueryBuilder.build(definition)).thenReturn(this.allowedValuesQuery);
 
             if (definition instanceof ListClass) {
-                DefaultParameterizedType usedValuesQueryBuilderType =
-                    new DefaultParameterizedType(null, QueryBuilder.class, ListClass.class);
-                this.usedValuesQueryBuilder =
-                    this.componentManager.getInstance(usedValuesQueryBuilderType, "usedValues");
                 when(this.usedValuesQueryBuilder.build((ListClass) definition)).thenReturn(this.usedValuesQuery);
             }
         }

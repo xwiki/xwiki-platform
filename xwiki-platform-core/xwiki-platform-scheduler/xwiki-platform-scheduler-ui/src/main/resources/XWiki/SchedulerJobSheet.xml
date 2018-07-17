@@ -52,7 +52,7 @@
     #end
     &lt;/dt&gt;
     &lt;dd&gt;
-    #if ($propName == 'script' &amp;&amp; $xcontext.action == 'view')
+    #if ($propName == 'script' &amp;&amp; $xcontext.action == 'view' &amp;&amp; "$!job.getProperty('script').value" !="")
 
       {{code language='groovy'}}$!job.getValue($propname){{/code}}
 

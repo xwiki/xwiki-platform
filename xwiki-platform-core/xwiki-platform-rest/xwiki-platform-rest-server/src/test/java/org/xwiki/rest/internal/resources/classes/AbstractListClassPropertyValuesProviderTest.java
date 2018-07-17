@@ -63,6 +63,8 @@ public abstract class AbstractListClassPropertyValuesProviderTest
 
     protected XWikiDocument classDocument = mock(XWikiDocument.class);
 
+    protected XWiki xwiki = mock(XWiki.class);
+
     @MockComponent
     @Named("usedValues")
     protected QueryBuilder<ListClass> usedValuesQueryBuilder;
@@ -73,12 +75,11 @@ public abstract class AbstractListClassPropertyValuesProviderTest
     public void configure() throws Exception
     {
         Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-        XWiki xwiki = mock(XWiki.class);
         BaseClass xclass = mock(BaseClass.class);
         DocumentReference authorReference = new DocumentReference("wiki", "Users", "Alice");
 
         when(xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.xcontext.getWiki()).thenReturn(xwiki);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
         when(this.classDocument.getXClass()).thenReturn(xclass);
         when(this.classDocument.getDocumentReference()).thenReturn(this.classReference);
         when(this.classDocument.getAuthorReference()).thenReturn(authorReference);

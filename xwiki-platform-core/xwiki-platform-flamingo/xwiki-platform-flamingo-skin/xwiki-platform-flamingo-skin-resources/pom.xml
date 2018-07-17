@@ -131,10 +131,10 @@
       <version>2.1.24</version>
     </dependency>
     <dependency>
-      <!-- Used by the Database List property displayer and filter. -->
+      <!-- Used by the Database List, List of Users, List of Groups and Page property displayers and filters. -->
       <groupId>org.webjars</groupId>
       <artifactId>selectize.js</artifactId>
-      <version>0.12.4</version>
+      <version>0.12.5</version>
     </dependency>
     <!-- Refactoring -->
     <dependency>

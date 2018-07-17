@@ -75,7 +75,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     var output = renderCommon(option);
     var hint = option && option.hint;
     if (typeof hint === 'string' && hint !== '') {
-      output.append('<em class="xwiki-selectize-option-hint">' + hint + '</em>');
+      output.append($('<em class="xwiki-selectize-option-hint"/>').text(hint));
     }
     return output;
   }

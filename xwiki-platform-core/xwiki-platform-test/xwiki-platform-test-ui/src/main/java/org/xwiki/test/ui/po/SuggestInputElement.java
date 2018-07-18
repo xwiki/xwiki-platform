@@ -57,7 +57,8 @@ public class SuggestInputElement extends BaseElement
         public String getIcon()
         {
             WebElement icon = this.suggestion.findElement(By.className("xwiki-selectize-option-icon"));
-            return "img".equals(icon.getTagName()) ? icon.getAttribute("src") : icon.getAttribute("class");
+            return "img".equals(icon.getTagName()) ? icon.getAttribute("src") : icon.getAttribute("class")
+                .replace("xwiki-selectize-option-icon", "");
         }
 
         public String getURL()

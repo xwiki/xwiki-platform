@@ -86,7 +86,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         // Default administrator user should be suggested.
         suggestions = userPicker.clear().sendKeys("admin").waitForSuggestions().getSuggestions();
         Assert.assertEquals(1, suggestions.size());
-        assertUserSuggestion(suggestions.get(0), "Administrator", "Admin", "noavatar.png");
+        assertUserSuggestion(suggestions.get(0), "Administrator", "Admin", "fa-user");
 
         // "a" should bring many suggestions. Also, a single letter should bring suggestions.
         Assert.assertTrue(userPicker.clear().sendKeys("a").waitForSuggestions().getSuggestions().size() > 2);
@@ -136,11 +136,10 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         }
 
         if (image != null) {
-            Assert.assertTrue(user.getIcon().contains("/" + image));
+            Assert.assertTrue(user.getIcon().contains(image));
         } else {
             try {
-                user.getIcon();
-                Assert.fail();
+                Assert.assertEquals("", user.getIcon());
             } catch (NoSuchElementException e) {
             }
         }
@@ -173,7 +172,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
         selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
-        assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "noavatar.png");
+        assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "fa-user");
         Assert.assertEquals(Collections.singletonList("XWiki.Admin"), userPicker.getValue());
     }
 
@@ -202,7 +201,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
         selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(2, selectedUsers.size());
-        assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "noavatar.png");
+        assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "fa-user");
         assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
         Assert.assertEquals(Arrays.asList("XWiki.Admin", "XWiki.Enygma2002"), userPicker.getValue());
 
@@ -243,7 +242,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
-        assertUserSuggestion(selectedUsers.get(1), "Administrator", "Admin", "noavatar.png");
+        assertUserSuggestion(selectedUsers.get(1), "Administrator", "Admin", "fa-user");
         Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin"), userPicker.getValue());
 
         // We should be able to input free text also.

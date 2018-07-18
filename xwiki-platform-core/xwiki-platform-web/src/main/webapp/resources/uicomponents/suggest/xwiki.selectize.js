@@ -57,6 +57,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       } else {
         output.find('.xwiki-selectize-option-icon').remove();
       }
+    } else {
+      output.find('.xwiki-selectize-option-icon').remove();
     }
     var url = option && option.url;
     if (typeof url === 'string') {

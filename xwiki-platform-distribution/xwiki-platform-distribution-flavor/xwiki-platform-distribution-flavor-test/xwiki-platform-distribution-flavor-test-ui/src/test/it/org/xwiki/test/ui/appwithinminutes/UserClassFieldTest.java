@@ -139,7 +139,8 @@ public class UserClassFieldTest extends AbstractClassEditorTest
             Assert.assertTrue(user.getIcon().contains(image));
         } else {
             try {
-                Assert.assertEquals("", user.getIcon());
+                user.getIcon();
+                Assert.fail();
             } catch (NoSuchElementException e) {
             }
         }

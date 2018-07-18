@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -26,7 +27,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 
@@ -42,6 +45,9 @@ public class ScopeNotificationFilterLocationStateComputer
 {
     @Inject
     private ScopeNotificationFilterPreferencesGetter preferencesGetter;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     private enum WatchedState {
         WATCHED,
@@ -80,6 +86,30 @@ public class ScopeNotificationFilterLocationStateComputer
             return true;
         }
 
+        // First look if the document itself is into the whitelist or into the blacklist of the user
+        if (location.getType() == EntityType.DOCUMENT) {
+            String pageLocation = serializer.serialize(location);
+
+            ArrayList<String> pagesToInclude = preferences.getPagesToInclude();
+            if (!pagesToInclude.isEmpty()) {
+                if (pagesToInclude.contains(pageLocation)) {
+                    return true;
+                }
+            }
+            ArrayList<String> pagesToExclude = preferences.getPagesToExclude();
+            if (!pagesToExclude.isEmpty()) {
+                if (pagesToExclude.contains(pageLocation)) {
+                    return false;
+                }
+            }
+        }
+
+        return isLocationWatchedByWikiOrSpaceFilters(location, preferences);
+    }
+
+    private boolean isLocationWatchedByWikiOrSpaceFilters(EntityReference location,
+            ScopeNotificationFilterPreferencesHierarchy preferences)
+    {
         WatchedState state = handleExclusiveFilters(location, preferences);
         if (state != WatchedState.UNKNOWN) {
             return state == WatchedState.WATCHED;

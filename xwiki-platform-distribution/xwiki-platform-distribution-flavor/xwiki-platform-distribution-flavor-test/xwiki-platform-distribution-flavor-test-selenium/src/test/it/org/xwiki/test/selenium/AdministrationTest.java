@@ -83,7 +83,7 @@ public class AdministrationTest extends AbstractXWikiTestCase
         clickLinkWithXPath("//div[@id='rightcolumn']", false);
         waitForBodyContains("Panel List");
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.xpath("//div[@class='panel expanded QuickLinks']//h1"), By.id("rightPanels"));
+        dragAndDrop(By.cssSelector(".panel.QuickLinks h1"), By.id("rightPanels"));
         assertElementPresent("//div[@id = 'rightPanels']/div[contains(@class, 'QuickLinks')]");
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
@@ -101,8 +101,8 @@ public class AdministrationTest extends AbstractXWikiTestCase
         clickLinkWithXPath("//div[@id='bothcolumns']", false);
         waitForBodyContains("Panel List");
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.xpath("//div[@id='rightPanels']//div[contains(@class, 'QuickLinks')]//h1"),
-            By.xpath("//div[@id='allviewpanels']//div[@class='accordionTabContentBox']"));
+        dragAndDrop(By.cssSelector("#rightPanels .panel.QuickLinks h1"),
+            By.cssSelector("#allviewpanels .accordionTabContentBox"));
         assertElementNotPresent("//div[@id = 'rightPanels']//div[contains(@class, 'QuickLinks')]");
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
@@ -123,7 +123,7 @@ public class AdministrationTest extends AbstractXWikiTestCase
         clickLinkWithXPath("//div[@id='leftcolumn']", false);
         waitForBodyContains("Panel List");
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.xpath("//div[@class='panel expanded QuickLinks']//h1"), By.id("leftPanels"));
+        dragAndDrop(By.cssSelector(".panel.QuickLinks h1"), By.id("leftPanels"));
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
         open("TestPanelsAdmin", "WebHome");

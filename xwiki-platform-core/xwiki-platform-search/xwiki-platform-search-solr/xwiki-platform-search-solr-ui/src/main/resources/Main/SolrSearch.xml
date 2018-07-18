@@ -48,6 +48,7 @@
 {{/velocity}}</content>
   <attachment>
     <filename>dark-grey-disclosure-arrow-down.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1412172041000</date>
     <version>1.1</version>
@@ -57,6 +58,7 @@
   </attachment>
   <attachment>
     <filename>dark-grey-disclosure-arrow-left.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1412172041000</date>
     <version>1.1</version>
@@ -66,6 +68,7 @@
   </attachment>
   <attachment>
     <filename>light-grey-disclosure-arrow-down.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1412172041000</date>
     <version>1.1</version>
@@ -75,6 +78,7 @@
   </attachment>
   <attachment>
     <filename>light-grey-disclosure-arrow-left.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1412172041000</date>
     <version>1.1</version>

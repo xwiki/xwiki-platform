@@ -92,13 +92,19 @@
   #if ("$!exception" != '')
     $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
   #end
-#elseif ("$!request.action" == 'setAutoWatchMode')
+#elseif ("$!request.action" == 'setAutoWatchMode' || "$!request.action" == 'setDefaultAutoWatchMode')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
-      #set ($obj = $userDoc.getObject('XWiki.Notifications.Code.AutomaticWatchModeClass', true))
+      #if ($request.action == 'setAutoWatchMode')
+        #set ($targetDoc = $xwiki.getDocument($xcontext.userReference))
+      #elseif (!$hasAdmin)
+        $response.sendError(401, 'Unauthorized')
+      #else
+        #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
+      #end
+      #set ($obj = $targetDoc.getObject('XWiki.Notifications.Code.AutomaticWatchModeClass', true))
       #set ($discard = $obj.set('automaticWatchMode', $request.mode))
-      #set ($discard = $userDoc.save('Update the automaticWatchMode.'))
+      #set ($discard = $targetDoc.save('Update the automaticWatchMode.'))
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end

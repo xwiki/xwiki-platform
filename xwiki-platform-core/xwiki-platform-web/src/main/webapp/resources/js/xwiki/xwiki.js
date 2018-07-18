@@ -197,7 +197,7 @@ Object.extend(XWiki, {
                 extraID + "pane",
                 window.docgeturl + '?xpage=xpart&vm=' + extraTemplate,
                 {
-                    method: 'post',
+                    method: 'get',
                     evalScripts: true,
                     onComplete: function(transport){
                       $("docextrapanes").className="";

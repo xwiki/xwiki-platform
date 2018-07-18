@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>10.7-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>10.6-SNAPSHOT</version>
+  <version>10.7-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -734,15 +734,14 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
-          <!-- Verify that all org.xwiki.commons dependencies have a version specified either as:
+          <!-- Verify that all org.xwiki.commons dependencies have a version specified as:
                - ${commons.version}
-               - a value not starting with $ (we want to allow supporting ranges)
-               Also verifies that all org.xwiki.rendering dependencies have a version specified either as:
+               Also verifies that all org.xwiki.rendering dependencies have a version specified as:
                - ${rendering.version}
-               - a value not starting with $ (we want to allow supporting ranges)
                Also verifies that all org.xwiki.platform dependencies have a version specified either as:
                - ${project.version}
-               - a value not starting with $ (we want to allow supporting ranges)
+               - [${project.version}] (single version specified as a version range)
+               - ${platform.version}
           -->
           <execution>
             <id>check-dependency-version</id>

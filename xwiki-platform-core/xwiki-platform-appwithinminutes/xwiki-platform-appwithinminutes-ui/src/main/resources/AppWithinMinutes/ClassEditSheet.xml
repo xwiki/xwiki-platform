@@ -275,7 +275,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #displayFieldMetaData($field)
     ## We need this information to avoid querying and loading all FormField documents twice.
     ## NOTE: We use a different ID format to avoid collisions with the field meta properties.
-    &lt;input type="hidden" id="template-$field.name" name="template-$field.name" value="$escapetool.xml($formFieldDoc.fullName)" /&gt;
+    &lt;input type="hidden" id="template-$field.name" name="template-$field.name"
+      value="$escapetool.xml($formFieldDoc.fullName)"
+      data-propertyName="$escapetool.xml($formFieldDoc.getxWikiClass().propertyNames[0])" /&gt;
   {{/html}}
 
   #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
@@ -355,7 +357,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #if("$!field.prettyName" == '')
       #set($discard = $field.setPrettyName($formFieldDoc.title))
     #end
-    #set($discard = $doc.getxWikiClass().getXWikiClass().addField($field.name, $field))
+    #set($xclass = $doc.getxWikiClass().getXWikiClass())
+    #set($discard = $xclass.addField($field.name, $field))
+    #set($discard = $field.setObject($xclass))
     #displayField($doc.getxWikiClass().get($field.name) $formFieldDoc)
   #else
     Unsupported form field.
@@ -389,6 +393,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ## (otherwise the field value from the request is ignored).
   #set($xclass = $doc.getxWikiClass().getXWikiClass())
   #set($discard = $xclass.addField($fieldName, $field))
+  #set($discard = $field.setObject($xclass))
   ##
   ## Create an object that has this field and set its value from request.
   #set($object = $fieldTemplateDoc.getObject($doc.fullName, true))
@@ -405,10 +410,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($discard = $xclass.fromMap({$fieldName: $values.toArray($stringArray)}, $object.getXWikiObject()))
   #end
   ##
-  ## Display the field (with the rights of the current user).
+  ## Display the field.
   #set($field = $doc.getxWikiClass().get($fieldName))
-  ## Note that we don't modify the cached document because the previous line has cloned it.
-  #set ($discard = $doc.document.setAuthorReference($xcontext.userReference))
   {{html clean="false"}}#displayPropertyEditInput($field, "${doc.fullName}_0_", $object){{/html}}
 #end
 
@@ -746,6 +749,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 {{/velocity}}</content>
   <attachment>
     <filename>arrow-move.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1319483586000</date>
     <version>1.1</version>
@@ -755,6 +759,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   </attachment>
   <attachment>
     <filename>bulletcross.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1319483586000</date>
     <version>1.1</version>
@@ -764,6 +769,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   </attachment>
   <attachment>
     <filename>bullettick.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1319483586000</date>
     <version>1.1</version>
@@ -1489,7 +1495,7 @@ XWiki.FormCanvas = Class.create({
     });
   },
   _onDrop : function(field) {
-    var fieldContainer = new Element('li');
+    var fieldContainer = new Element('li', {'data-new': 'true'});
     this.fields.insert(fieldContainer);
     this.container.removeClassName('empty');
     new XWiki.FormField(fieldContainer).enhance(field.down('.data').value);
@@ -1620,7 +1626,48 @@ return XWiki;
     return true;
   }
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
-}).call();</code>
+}).call();
+
+require(['jquery', 'xwiki-events-bridge'], function($) {
+  $(document).on('xwiki:class:displayField xwiki:class:previewField', function(event, data) {
+    var container = $(data.field.getContainer());
+    if (container.attr('data-new') === 'true') {
+      // We can't suggest property values for properties that don't exist yet (have not been saved) so we provide
+      // suggestions for the template property that was used to create them. Note that the suggested values depend on
+      // the saved property meta data so changing the property (field) meta data may not affect the suggestions until
+      // those changes are saved.
+      var templateHiddenInput = container.find('#' + 'template-' + data.field.getName());
+      var propertyValueSuggester = container.find('.field-viewer .suggest-propertyValues').first();
+      propertyValueSuggester.attr({
+        'data-className': templateHiddenInput.val(),
+        'data-propertyName': templateHiddenInput.attr('data-propertyName')
+      });
+    }
+  }).on('xwiki:document:saved', function(event) {
+    // We need to update the property value suggesters because:
+    // * newly saved properties should have their own suggestions instead of relying on the template property
+    // * for renamed properties we need to fetch the suggestions from a different location
+    $('ul#fields &gt; li').each(function() {
+      var container = $(this);
+      container.removeAttr('data-new');
+      var propertyValueSuggester = container.find('.field-viewer .suggest-propertyValues').first();
+      if (propertyValueSuggester.length &gt; 0) {
+        // We need to preserve the selected values because they are lost when the suggester is destroyed.
+        var selectedValues = propertyValueSuggester.children();
+        propertyValueSuggester[0].selectize.destroy();
+        // Restore the selected values.
+        propertyValueSuggester.empty().append(selectedValues);
+        var className = XWiki.Model.serialize(XWiki.currentDocument.documentReference.relativeTo(
+          new XWiki.WikiReference(XWiki.currentWiki)));
+        propertyValueSuggester.attr({
+          'data-className': className,
+          'data-propertyName': propertyValueSuggester.attr('name').substr((className + '_0_').length)
+        });
+        propertyValueSuggester.suggestPropertyValues();
+      }
+    });
+  });
+});</code>
     </property>
     <property>
       <name>Framework</name>

@@ -41,6 +41,7 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -60,6 +61,7 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -219,6 +221,7 @@ public class PageTest
         // Let the user have view access to all pages
         when(oldcore.getMockRightService().hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), any(),
             eq(context))).thenReturn(true);
+        when(oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.VIEW), any())).thenReturn(true);
 
         // Set up URL Factory
         URLFactorySetup.setUp(xwiki, context);

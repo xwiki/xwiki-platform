@@ -108,7 +108,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
+        DocumentReference documentReference = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
+        this.document = new XWikiDocument(documentReference);
         this.document.setSyntax(Syntax.XWIKI_1_0);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
@@ -139,6 +140,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
+        this.mockXWiki.stubs().method("getDocumentReference").will(returnValue(documentReference));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(2L));
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));

@@ -45,6 +45,7 @@
 # Live table generic keys
 ### Missing: menu.livetable.doc.title=Page title
 menu.livetable.doc.name=Nome da página
+### Missing: menu.livetable.doc.location=Location
 ### Missing: menu.livetable.doc.space=Space
 ### Missing: menu.livetable.doc.fullname=Page full name
 menu.livetable.doc.author=Último Autor

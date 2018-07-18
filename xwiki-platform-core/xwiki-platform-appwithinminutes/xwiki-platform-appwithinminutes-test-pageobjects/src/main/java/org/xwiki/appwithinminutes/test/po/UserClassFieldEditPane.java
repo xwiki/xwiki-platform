@@ -20,7 +20,7 @@
 package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.editor.UserPicker;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents the pane used to edit a 'User' class field.
@@ -56,8 +56,8 @@ public class UserClassFieldEditPane extends ClassFieldEditPane
     /**
      * @return the user picker
      */
-    public UserPicker getUserPicker()
+    public SuggestInputElement getUserPicker()
     {
-        return new UserPicker(getDefaultValueInput());
+        return new SuggestInputElement(getDefaultValueInput());
     }
 }

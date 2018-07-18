@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui.appwithinminutes;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -26,11 +28,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.appwithinminutes.test.po.UserClassFieldEditPane;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.editor.UserPicker;
-import org.xwiki.test.ui.po.editor.UserPicker.UserElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
 /**
@@ -58,60 +61,43 @@ public class UserClassFieldTest extends AbstractClassEditorTest
     @Test
     public void testSuggestions()
     {
-        UserPicker userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
 
         // The suggestions should be case-insensitive. Match the last name.
-        List<UserElement> suggestions = userPicker.sendKeys("mOr").waitForSuggestions().getSuggestions();
+        List<SuggestionElement> suggestions = userPicker.sendKeys("mOr").waitForSuggestions().getSuggestions();
         Assert.assertEquals(2, suggestions.size());
-        assertUserElement(suggestions.get(0), "Eduard Moraru", "Enygma2002");
-        assertUserElement(suggestions.get(1), "Thomas Mortagne");
+        assertUserSuggestion(suggestions.get(0), "Thomas Mortagne");
+        assertUserSuggestion(suggestions.get(1), "Eduard Moraru", "Enygma2002");
 
         // Match the first name.
         suggestions = userPicker.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "As").waitForSuggestions().getSuggestions();
         Assert.assertEquals(1, suggestions.size());
-        assertUserElement(suggestions.get(0), "Thomas Mortagne");
+        assertUserSuggestion(suggestions.get(0), "Thomas Mortagne");
 
         // Match the alias.
         suggestions = userPicker.sendKeys(Keys.BACK_SPACE, "20").waitForSuggestions().getSuggestions();
         Assert.assertEquals(1, suggestions.size());
-        assertUserElement(suggestions.get(0), "Eduard Moraru", "Enygma2002");
+        assertUserSuggestion(suggestions.get(0), "Eduard Moraru", "Enygma2002");
 
         // The guest user shouldn't be suggested.
         suggestions = userPicker.clear().sendKeys("guest").waitForSuggestions().getSuggestions();
-        Assert.assertEquals(1, suggestions.size());
-        Assert.assertEquals("User not found", suggestions.get(0).getText());
+        Assert.assertTrue(suggestions.isEmpty());
 
         // Default administrator user should be suggested.
         suggestions = userPicker.clear().sendKeys("admin").waitForSuggestions().getSuggestions();
         Assert.assertEquals(1, suggestions.size());
-        assertUserElement(suggestions.get(0), "Administrator", "Admin", "noavatar.png");
+        assertUserSuggestion(suggestions.get(0), "Administrator", "Admin", "noavatar.png");
 
         // "a" should bring many suggestions. Also, a single letter should bring suggestions.
         Assert.assertTrue(userPicker.clear().sendKeys("a").waitForSuggestions().getSuggestions().size() > 2);
 
-        // An empty text input shouldn't bring any suggestions.
-        try {
-            userPicker.sendKeys(Keys.BACK_SPACE).waitForSuggestions();
-            Assert.fail();
-        } catch (Exception e) {
-        }
+        // An empty text input brings a default list of suggestions. There should be at least 3 users (the 2 users we
+        // created plus the default administrator).
+        Assert.assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForSuggestions().getSuggestions().size() > 2);
 
         // We should be able to close the list of suggestions using the escape key.
-        userPicker.sendKeys("mor").waitForSuggestions().sendKeys(Keys.ESCAPE).waitForSuggestionsToFadeOut();
-
-        // The list of suggestions should close itself after a while.
-        userPicker.moveMouseOver().sendKeys(Keys.BACK_SPACE).waitForSuggestions().waitForSuggestionsToDisappear();
-
-        // The list of suggestions should stay open if the mouse is over it.
-        userPicker.sendKeys(Keys.BACK_SPACE).waitForSuggestions().getSuggestions().get(0).moveMouseOver();
-        try {
-            userPicker.waitForSuggestionsToDisappear();
-            Assert.fail();
-        } catch (Exception e) {
-        }
-
-        // .. and the list of suggestions should fade out when the mouse is moved out.
-        userPicker.moveMouseOver().waitForSuggestionsToFadeOut();
+        Assert.assertTrue(
+            userPicker.sendKeys("mor").waitForSuggestions().sendKeys(Keys.ESCAPE).getSuggestions().isEmpty());
     }
 
     /**
@@ -121,7 +107,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
      * @param name the expected name
      * @param extra extra user fields (alias, image, etc.)
      */
-    private void assertUserElement(UserElement user, String name, String... extra)
+    private void assertUserSuggestion(SuggestionElement user, String name, String... extra)
     {
         String alias;
         if (extra.length > 0) {
@@ -140,47 +126,55 @@ public class UserClassFieldTest extends AbstractClassEditorTest
             image = extra[1];
         }
 
-        Assert.assertEquals(name, user.getName());
-        Assert.assertEquals(alias, user.getAlias());
-        WebElement avatar = user.getAvatar();
-        Assert.assertEquals(name, avatar.getAttribute("alt"));
-        Assert.assertTrue(avatar.getAttribute("src").contains("/" + image));
+        Assert.assertEquals(name, user.getLabel());
+        
+        String value = user.getValue();
+        if (value.startsWith("XWiki.")) {
+            Assert.assertEquals("XWiki." + alias, value);
+        } else {
+            Assert.assertEquals(alias, value);
+        }
+
+        if (image != null) {
+            Assert.assertTrue(user.getIcon().contains("/" + image));
+        } else {
+            try {
+                user.getIcon();
+                Assert.fail();
+            } catch (NoSuchElementException e) {
+            }
+        }
     }
 
     @Test
     public void testSingleSelection()
     {
-        UserPicker userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
 
         // Use the keyboard.
-        userPicker.sendKeys("mor").waitForSuggestions().sendKeys(Keys.ARROW_DOWN, Keys.ARROW_DOWN, Keys.ENTER);
-        List<UserElement> selectedUsers = userPicker.waitForSuggestionsToFadeOut().getAcceptedSuggestions();
+        userPicker.sendKeys("mor").waitForSuggestions().sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
+        List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Thomas Mortagne");
-        Assert.assertEquals("", userPicker.getValue());
-        // The link to clear the list of selected users should be displayed if at least 2 users are selected.
-        Assert.assertFalse(userPicker.getClearSelectionLink().isDisplayed());
+        assertUserSuggestion(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
+        Assert.assertEquals(Collections.singletonList("XWiki.Enygma2002"), userPicker.getValue());
 
         // Use the mouse. Since we have single selection by default, the previously selected user should be replaced.
-        userPicker.sendKeys("mor").waitForSuggestions().select("Enygma2002");
-        selectedUsers = userPicker.waitForSuggestionsToFadeOut().getAcceptedSuggestions();
+        selectedUsers = userPicker.click().selectByVisibleText("Thomas Mortagne").getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
-        Assert.assertEquals("", userPicker.getValue());
-        Assert.assertFalse(userPicker.getClearSelectionLink().isDisplayed());
+        assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
+        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValue());
 
         // Delete the selected user.
         selectedUsers.get(0).delete();
-        Assert.assertEquals(0, userPicker.getAcceptedSuggestions().size());
-        Assert.assertFalse(userPicker.getClearSelectionLink().isDisplayed());
+        Assert.assertEquals(0, userPicker.getSelectedSuggestions().size());
+        Assert.assertEquals(Collections.singletonList(""), userPicker.getValue());
 
         // When there is only one suggestion, Enter key should select it.
         userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
-        selectedUsers = userPicker.waitForSuggestionsToFadeOut().getAcceptedSuggestions();
+        selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Administrator", "Admin", "noavatar.png");
-        Assert.assertEquals("", userPicker.getValue());
-        Assert.assertFalse(userPicker.getClearSelectionLink().isDisplayed());
+        assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "noavatar.png");
+        Assert.assertEquals(Collections.singletonList("XWiki.Admin"), userPicker.getValue());
     }
 
     @Test
@@ -190,54 +184,47 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         userField.openConfigPanel();
         userField.setMultipleSelect(true);
         userField.closeConfigPanel();
-        UserPicker userPicker = userField.getUserPicker();
+        SuggestInputElement userPicker = userField.getUserPicker();
 
         // Select 2 users.
-        userPicker.sendKeys("tmortagne").waitForSuggestions().sendKeys(Keys.ENTER).waitForSuggestionsToFadeOut();
-        Assert.assertFalse(userPicker.getClearSelectionLink().isDisplayed());
-        userPicker.sendKeys("2002").waitForSuggestions().select("Enygma").waitForSuggestionsToFadeOut();
-        Assert.assertTrue(userPicker.getClearSelectionLink().isDisplayed());
-        List<UserElement> selectedUsers = userPicker.getAcceptedSuggestions();
+        userPicker.sendKeys("tmortagne").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.sendKeys("2002").waitForSuggestions().selectByValue("XWiki.Enygma2002");
+        List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(2, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Thomas Mortagne");
-        assertUserElement(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
-        Assert.assertEquals("", userPicker.getValue());
+        assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
+        assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
+        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Enygma2002"), userPicker.getValue());
 
         // Delete the first selected user.
         selectedUsers.get(0).delete();
-        Assert.assertFalse(userPicker.getClearSelectionLink().isDisplayed());
 
         // Select another user.
-        userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER).waitForSuggestionsToFadeOut();
-        selectedUsers = userPicker.getAcceptedSuggestions();
+        userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
+        selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(2, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
-        assertUserElement(selectedUsers.get(1), "Administrator", "Admin", "noavatar.png");
-        Assert.assertEquals("", userPicker.getValue());
-
-        // Change the order of the selected users.
-        selectedUsers.get(1).moveBefore(selectedUsers.get(0));
-        assertUserElement(userPicker.getAcceptedSuggestions().get(0), "Administrator", "Admin", "noavatar.png");
+        assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "noavatar.png");
+        assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
+        Assert.assertEquals(Arrays.asList("XWiki.Admin", "XWiki.Enygma2002"), userPicker.getValue());
 
         // Clear the list of selected users.
-        userPicker.getClearSelectionLink().click();
-        Assert.assertFalse(userPicker.getClearSelectionLink().isDisplayed());
-        Assert.assertEquals(0, userPicker.getAcceptedSuggestions().size());
+        userPicker.clearSelectedSuggestions();
+        Assert.assertEquals(0, userPicker.getSelectedSuggestions().size());
+        Assert.assertTrue(userPicker.getValue().isEmpty());
     }
 
     @Test
     public void testSaveAndInitialSelection()
     {
-        UserPicker userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
         userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndView().edit();
 
         UserClassFieldEditPane userField = new UserClassFieldEditPane("user1");
-        userPicker = userField.getUserPicker().waitToLoad();
-        List<UserElement> selectedUsers = userPicker.getAcceptedSuggestions();
+        userPicker = userField.getUserPicker();
+        List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Thomas Mortagne");
-        Assert.assertEquals("", userPicker.getValue());
+        assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
+        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValue());
 
         // Enable multiple selection.
         userField.openConfigPanel();
@@ -248,47 +235,47 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         userPicker = userField.getUserPicker();
 
         // Select one more user.
-        userPicker.waitToLoad().sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
-        userPicker = new UserClassFieldEditPane("user1").getUserPicker().waitToLoad();
-        selectedUsers = userPicker.getAcceptedSuggestions();
+        userPicker = new UserClassFieldEditPane("user1").getUserPicker();
+        selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(2, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Thomas Mortagne");
-        assertUserElement(selectedUsers.get(1), "Administrator", "Admin", "noavatar.png");
-        Assert.assertEquals("", userPicker.getValue());
+        assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
+        assertUserSuggestion(selectedUsers.get(1), "Administrator", "Admin", "noavatar.png");
+        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin"), userPicker.getValue());
 
         // We should be able to input free text also.
-        userPicker.sendKeys("foobar").waitForSuggestions().sendKeys(Keys.ESCAPE).waitForSuggestionsToFadeOut();
+        userPicker.sendKeys("foobar").waitForSuggestions().selectTypedText();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
-        userPicker = new UserClassFieldEditPane("user1").getUserPicker().waitToLoad();
-        selectedUsers = userPicker.getAcceptedSuggestions();
+        userPicker = new UserClassFieldEditPane("user1").getUserPicker();
+        selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(3, selectedUsers.size());
-        assertUserElement(selectedUsers.get(2), "foobar", "foobar", "noavatar.png");
-        Assert.assertEquals("", userPicker.getValue());
+        assertUserSuggestion(selectedUsers.get(2), "foobar", "foobar", null);
+        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin", "foobar"), userPicker.getValue());
 
         // Delete the fake user.
         selectedUsers.get(2).delete();
-        Assert.assertEquals(2, userPicker.getAcceptedSuggestions().size());
+        Assert.assertEquals(2, userPicker.getSelectedSuggestions().size());
 
         // Delete all selected users.
-        userPicker.getClearSelectionLink().click();
+        userPicker.clearSelectedSuggestions();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
-        userPicker = new UserClassFieldEditPane("user1").getUserPicker().waitToLoad();
-        Assert.assertEquals(0, userPicker.getAcceptedSuggestions().size());
-        Assert.assertEquals("", userPicker.getValue());
+        userPicker = new UserClassFieldEditPane("user1").getUserPicker();
+        Assert.assertEquals(0, userPicker.getSelectedSuggestions().size());
+        Assert.assertTrue(userPicker.getValue().isEmpty());
     }
 
     @Test
     public void testApplicationEntry()
     {
         // Create the application class.
-        UserPicker userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
         userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndView();
 
@@ -298,20 +285,22 @@ public class UserClassFieldTest extends AbstractClassEditorTest
 
         // Assert the initial value.
         String id = getTestClassName() + "." + getTestMethodName() + "_0_user1";
-        userPicker = new UserPicker(getDriver().findElement(By.id(id)));
-        List<UserElement> selectedUsers = userPicker.waitToLoad().getAcceptedSuggestions();
+        userPicker = new SuggestInputElement(getDriver().findElement(By.id(id)));
+        List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
-        assertUserElement(selectedUsers.get(0), "Thomas Mortagne");
-        Assert.assertEquals("", userPicker.getValue());
+        assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
+        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValue());
 
         // Change the selected user.
-        userPicker.sendKeys("eduard").waitForSuggestions().sendKeys(Keys.ENTER).waitForSuggestionsToFadeOut();
+        userPicker.clearSelectedSuggestions().sendKeys("eduard").waitForSuggestions().sendKeys(Keys.ENTER);
         // We wait for the page to load because Selenium doesn't do it all the time when Save & View is clicked.
         entryEditPage.clickSaveAndView().waitUntilPageIsLoaded();
 
         // Assert the view mode.
         List<WebElement> users = getDriver().findElements(By.className("user"));
         Assert.assertEquals(1, users.size());
-        assertUserElement(new UserElement(users.get(0)), "Eduard Moraru", "Enygma2002");
+        Assert.assertEquals("Eduard Moraru", users.get(0).getText());
+        Assert.assertTrue(
+            users.get(0).findElement(By.className("user-avatar")).getAttribute("src").contains("/Enygma2002.png?"));
     }
 }

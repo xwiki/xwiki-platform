@@ -74,8 +74,8 @@
 ###############################################################################
 
 ## Menus
-### Missing: platform.wiki.menu.wikiindex=Wiki Index
-### Missing: platform.wiki.menu.deletewiki=Delete wiki
+platform.wiki.menu.wikiindex=Indeks Wiki
+platform.wiki.menu.deletewiki=Usuń Wiki
 ### Missing: platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
@@ -84,69 +84,69 @@
 ### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 
 ## Create
-### Missing: platform.wiki.create.button=Create Wiki
+platform.wiki.create.button=Utwórz Wiki
 platform.wiki.create.title=Utwórz nową wiki
 platform.wiki.create.members=CZŁONKOWIE
 platform.wiki.create.prettyname.empty=Ładna nazwa nie może być pusta
-platform.wiki.create.error=Utworzenie wiki "{0}" nie powiodło się\: {1}.
+platform.wiki.create.error=Utworzenie wiki "{0}" nie powiodło się: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Baza danych o tym identyfikatorze już istnieje
 platform.wiki.create.error.wikiname.wikialreadyexists=Ten identyfikator jest już użyty
 platform.wiki.create.error.wikiname.empty=Identyfikator nie może być pusty
 
 ## Common errors and messages
-### Missing: platform.wiki.error.wikidoesnotexist=Wiki [{0}] does not exist
-### Missing: platform.wiki.error.oneParameterNotSpecified=The ''{0}'' parameter was not specified.
-### Missing: platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
-### Missing: platform.wiki.error.exceptionWithMessage=Exception: {0}
-### Missing: platform.wiki.form.requiredField=Required
+platform.wiki.error.wikidoesnotexist=Wiki [{0}] nie istnieje
+platform.wiki.error.oneParameterNotSpecified=Parametr ''{0}'' nie został określony.
+platform.wiki.error.parameterAcceptsMultipleValues=Możliwe wiele wartości.
+platform.wiki.error.exceptionWithMessage=Wyjątek: {0}
+platform.wiki.form.requiredField=Wymagane
 platform.wiki.csrf.error=Token bezpieczeństwa jest nieprawidłowy. Proszę powtórz operację.
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
+platform.wiki.users.userAlreadyMemberOfWiki=Użytkownik {0}{1}{2} jest już członkiem wiki {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=Użytkownik {0}{1}{2} nie jest członkiem wiki {3}{4}{5}.
+platform.wiki.users.logInToContinue=Aby kontynuować musisz się najpierw {0}zalogować{1}.
 ### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
 ### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.
+platform.wiki.users.join.error.needInvitation=Ta wiki jest dostępna tylko po otrzymaniu zaproszenia od administratorów.
 ### Missing: platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
-### Missing: platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.request.cancelYes=Yes
-### Missing: platform.wiki.users.join.request.cancelNo=No
+platform.wiki.users.join.request.cancelConfirmation=Czy na pewno chcesz anulować wniosek o przyłączenie do wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelYes=Tak
+platform.wiki.users.join.request.cancelNo=Nie
 ### Missing: platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
 ### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.yes=Yes
-### Missing: platform.wiki.users.join.no=No
+platform.wiki.users.join.yes=Tak
+platform.wiki.users.join.no=Nie
 ### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
 ### Missing: platform.wiki.users.leave.confirmation=Are you sure you want to leave wiki {0}{1}{2}?
-### Missing: platform.wiki.users.leave.confirmation.yes=Yes
-### Missing: platform.wiki.users.leave.confirmation.no=No
+platform.wiki.users.leave.confirmation.yes=Tak
+platform.wiki.users.leave.confirmation.no=Nie
 ### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.title=Join Wiki
-### Missing: platform.wiki.users.leave.title=Leave Wiki "{0}"
+platform.wiki.users.join.title=Dołącz do wiki
+platform.wiki.users.leave.title=Opuść wiki "{0}"
 platform.wiki.users.leave.empty=
-### Missing: platform.wiki.users.delete.title=Delete Wiki "{0}"
+platform.wiki.users.delete.title=Usuń wiki "{0}"
 platform.wiki.users.delete.empty=
 ### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
 ### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
 ### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
 ### Missing: platform.wiki.users.invitation.title=You have been invited to join the wiki {0}{1}{2}.
-### Missing: platform.wiki.users.invitation.message.label=Invitation message
-### Missing: platform.wiki.users.invitation.reply.title=Reply
-### Missing: platform.wiki.users.invitation.accept.label=Accept
-### Missing: platform.wiki.users.invitation.reject.label=Reject
-### Missing: platform.wiki.users.invitation.postpone.label=Later
-### Missing: platform.wiki.users.join.request.message.label=Message
-### Missing: platform.wiki.users.join.request.send.label=Send Request
-### Missing: platform.wiki.users.join.request.cancel.label=Back
+platform.wiki.users.invitation.message.label=Zaproszenie
+platform.wiki.users.invitation.reply.title=Odpowiedz
+platform.wiki.users.invitation.accept.label=Akceptuj
+platform.wiki.users.invitation.reject.label=Odrzuć
+platform.wiki.users.invitation.postpone.label=Później
+platform.wiki.users.join.request.message.label=Wiadomość
+platform.wiki.users.join.request.send.label=Wyślij zapytanie
+platform.wiki.users.join.request.cancel.label=Wstecz
 
 ## User profile
 ### Missing: platform.wiki.users.profile.joinedwikis.label=Joined wikis
-### Missing: platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Nie jesteś jeszcze członkiem żadnej wiki
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Użytkownik nie jest jeszcze członkiem żadnej wiki.
 ### Missing: platform.wiki.users.profile.activity.title=Activity of wiki {0}
 ### Missing: platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
 ### Missing: platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}

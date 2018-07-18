@@ -1387,17 +1387,8 @@ $Msz MB##
               #else
                 #set($isSortable = false)
               #end
-              ## Determine the name to be displayed in the column header. Strategy is as following :
-              ## - If defined the displayName passed as a column option wins
-              ## - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name
-              ## - Finally, we fall back on the column name
-              #if("$!colprop.displayName" != '')
-                #set($displayName = $colprop.displayName)
-              #elseif($transprefix != '')
-                #set($displayName = $services.localization.render("${transprefix}${colname}"))
-              #else
-                #set($displayName = $colname)
-              #end
+              ## Get the column's display name to use in the header.
+              #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
@@ -1582,6 +1573,30 @@ $Msz MB##
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
     </select>
   #end
+#end
+
+#**
+ * Internal macro - Determine the name to be displayed in a livetable's column header. Strategy is as follows :
+ * - If defined, the 'displayName' passed as a column option wins.
+ * - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name.
+ * - Finally, we fall back on the column name.
+ *
+ * @param colname the column name
+ * @param colprop the column properties map
+ * @param transprefix the translations prefix to use
+ *
+ * @internal
+ *#
+##
+#macro(getLivetableColumnDisplayName $colname $colprop $transprefix)
+  #if("$!colprop.displayName" != '')
+    #set($displayName = $colprop.displayName)##
+  #elseif($transprefix != '')
+    #set($displayName = $services.localization.render("${transprefix}${colname}"))##
+  #else
+    #set($displayName = $colname)##
+  #end
+$displayName##
 #end
 
 #**

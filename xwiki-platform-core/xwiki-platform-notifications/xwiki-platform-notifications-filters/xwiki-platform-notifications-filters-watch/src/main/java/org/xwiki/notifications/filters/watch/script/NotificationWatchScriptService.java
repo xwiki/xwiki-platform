@@ -164,6 +164,17 @@ public class NotificationWatchScriptService implements ScriptService
     }
 
     /**
+     * @return the default automatic watch mode configured for the current wiki
+     * @since 9.11.8
+     * @since 10.6RC1
+     */
+    public AutomaticWatchMode getDefaultAutomaticWatchMode()
+    {
+        return configuration.getDefaultAutomaticWatchMode(
+                documentAccessBridge.getCurrentDocumentReference().getWikiReference());
+    }
+
+    /**
      * @return the user watched by the current user
      * @throws NotificationException if an error occurs
      * @since 10.4RC1

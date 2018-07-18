@@ -1981,7 +1981,7 @@ public class XWiki implements EventListener
     @Unstable
     public DocumentReference getDocumentReference(EntityReference reference, XWikiContext context)
     {
-        DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
+        DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(reference);
 
         // If the document has been found or it's top level space, return the reference
         if (documentReference.getParent().getParent().getType() != EntityType.SPACE
@@ -4177,7 +4177,16 @@ public class XWiki implements EventListener
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
             if (om != null) {
-                om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), blankDoc, context);
+                CancelableEvent documentEvent = new DocumentDeletingEvent(doc.getDocumentReference());
+                om.notify(documentEvent, blankDoc, context);
+
+                // If the action has been canceled by the user then don't perform any deletion and throw an exception
+                if (documentEvent.isCanceled()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                           XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
+                           String.format("An Event Listener has cancelled the document deletion for [%s]. Reason: [%s]",
+                           doc.getDocumentReference(), documentEvent.getReason()));
+                }
             }
 
             if (hasRecycleBin(context) && totrash) {
@@ -4731,7 +4740,7 @@ public class XWiki implements EventListener
         }
 
         // For all other types, we return the URL of the default corresponding document.
-        DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(entityReference);
+        DocumentReference documentReference = getDocumentReference(entityReference, context);
         return getURL(documentReference, action, queryString, anchor, context);
     }
 

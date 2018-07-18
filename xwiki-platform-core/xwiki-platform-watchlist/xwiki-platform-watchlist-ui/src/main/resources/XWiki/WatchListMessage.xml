@@ -43,6 +43,7 @@
 </content>
   <attachment>
     <filename>arrowup.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1256566820000</date>
     <version>1.1</version>
@@ -52,6 +53,7 @@
   </attachment>
   <attachment>
     <filename>attach.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251898026000</date>
     <version>1.1</version>
@@ -61,6 +63,7 @@
   </attachment>
   <attachment>
     <filename>boolean.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -70,6 +73,7 @@
   </attachment>
   <attachment>
     <filename>class.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251897880000</date>
     <version>1.1</version>
@@ -79,6 +83,7 @@
   </attachment>
   <attachment>
     <filename>date.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -88,6 +93,7 @@
   </attachment>
   <attachment>
     <filename>dblist.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -97,6 +103,7 @@
   </attachment>
   <attachment>
     <filename>dbtreelist.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -106,6 +113,7 @@
   </attachment>
   <attachment>
     <filename>document.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251108275000</date>
     <version>1.1</version>
@@ -115,6 +123,7 @@
   </attachment>
   <attachment>
     <filename>groups.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -124,6 +133,7 @@
   </attachment>
   <attachment>
     <filename>levels.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -133,6 +143,7 @@
   </attachment>
   <attachment>
     <filename>metadata.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251898471000</date>
     <version>1.1</version>
@@ -142,6 +153,7 @@
   </attachment>
   <attachment>
     <filename>number.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -151,6 +163,7 @@
   </attachment>
   <attachment>
     <filename>object.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251897889000</date>
     <version>1.1</version>
@@ -160,6 +173,7 @@
   </attachment>
   <attachment>
     <filename>password.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -169,6 +183,7 @@
   </attachment>
   <attachment>
     <filename>space.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251108275000</date>
     <version>1.1</version>
@@ -178,6 +193,7 @@
   </attachment>
   <attachment>
     <filename>staticlist.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -187,6 +203,7 @@
   </attachment>
   <attachment>
     <filename>string.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -196,6 +213,7 @@
   </attachment>
   <attachment>
     <filename>textarea.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -205,6 +223,7 @@
   </attachment>
   <attachment>
     <filename>users.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251988718000</date>
     <version>1.1</version>
@@ -214,6 +233,7 @@
   </attachment>
   <attachment>
     <filename>wiki.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
     <date>1251108275000</date>
     <version>1.1</version>

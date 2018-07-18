@@ -36,21 +36,47 @@ public class XMLEscapingValidatorTest
     {
         XMLEscapingValidator validator = new XMLEscapingValidator();
 
-        // Escaped single quote inside double quotes: that's ok
+        // Test attributes
+
+        // Escaped single quote & escaped double quote inside double quotes: that's ok
         validator.checkStringDelimiters("value=\"aaa&quot;bbb&apos;ccc&gt;ddd&lt;eee\"", 1);
         assertEquals(0, validator.getErrors().size());
 
-        // Not escaped single quote inside double quote: that's ok too
-        validator.checkStringDelimiters("value=\"aaa&quot;bbb'ccc&gt;ddd&lt;eee\"", 1);
-        assertEquals(0, validator.getErrors().size());
-
-        // If double quote is not escaped then it's ok for the single quote to not be escaped. Not sure why
-        // it seems to be some sort of protection to avoid false positives...
-        validator.checkStringDelimiters("value=\"aaa\"bbb'ccc&gt;ddd&lt;eee\"", 1);
+        // Escaped single quote & escaped double quote inside single quotes: that's ok
+        validator.checkStringDelimiters("value='aaa&quot;bbb&apos;ccc&gt;ddd&lt;eee'", 1);
         assertEquals(0, validator.getErrors().size());
 
         // Not escaped single quote inside single quotes: that's not ok!
         validator.checkStringDelimiters("value='aaa&quot;bbb'ccc&gt;ddd&lt;eee'", 1);
         assertEquals(1, validator.getErrors().size());
+        validator.clear();
+
+        // Not escaped double quote inside double quotes: that's not ok!
+        validator.checkStringDelimiters("value=\"aaa\"bbb'ccc&gt;ddd&lt;eee\"", 1);
+        assertEquals(1, validator.getErrors().size());
+        validator.clear();
+
+        // Not escaped single quote inside single quotes: that's not ok!
+        validator.checkStringDelimiters("value='aaa\"bbb'ccc&gt;ddd&lt;eee'", 1);
+        assertEquals(1, validator.getErrors().size());
+        validator.clear();
+
+        // Not escaped single quote inside double quotes: that's ok
+        validator.checkStringDelimiters("value=\"aaa&quot;bbb'ccc&gt;ddd&lt;eee\"", 1);
+        assertEquals(0, validator.getErrors().size());
+
+        // Not escaped double quote inside single quotes: that's ok
+        validator.checkStringDelimiters("value='aaa\"bbb&apos;ccc&gt;ddd&lt;eee'", 1);
+        assertEquals(0, validator.getErrors().size());
+
+        // Content
+
+        // Escaped quotes in content: that's ok
+        validator.checkStringDelimiters("<p>aaa&quot;bbb&apos;ccc&gt;ddd&lt;eee</p>", 1);
+        assertEquals(0, validator.getErrors().size());
+
+        // Not escaped quotes in content: that's ok
+        validator.checkStringDelimiters("<p>aaa\"bbb'ccc&gt;ddd&lt;eee</p>", 1);
+        assertEquals(0, validator.getErrors().size());
     }
 }

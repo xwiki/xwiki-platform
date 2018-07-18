@@ -51,7 +51,6 @@ viewers.Comments = Class.create({
     this.loadIDs();
     this.addDeleteListener();
     this.addReplyListener();
-    this.addPermalinkListener();
     this.addSubmitListener(this.form);
     this.addCancelListener();
     this.addEditListener();
@@ -254,23 +253,6 @@ viewers.Comments = Class.create({
       // Hide the reply button
       item.hide();
     }.bindAsEventListener(this));
-  },
-  /**
-   * Permalink: Display a bootstrap modal providing the permalink.
-   */
-  addPermalinkListener : function() {
-    $$(this.xcommentSelector + ' a.permalink').each(function(item) {
-      item.observe('click', function(event) {
-        //Updating the permalink inside modal
-        var modal = $('permalinkModal');
-        var fieldPermalink = modal.select('.form-control')[0];
-        fieldPermalink.setValue(item.href);
-        //Going to permalink location
-        $$('#permalinkModal .buttons .button')[0].observe('click', function() {
-          window.location = item.href;
-        });
-      });
-    });
   },
   /**
    * When pressing Submit, check that the comment is not empty. Submit the form with ajax and update the whole comments
@@ -476,3 +458,20 @@ function init() {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
+
+require(['jquery'], function ($) {
+  /**
+ * Permalink: Events triggered when the permalink modal is displayed
+ */
+  $(document).on('show.bs.modal','#permalinkModal', function (event) {
+    // Updating the permalink inside modal
+    var modal = $(this);
+    var button = $(event.relatedTarget);
+    var permalinkValue = button.attr('href');
+    modal.find('.form-control').val(permalinkValue);
+    // Going to permalink locations
+    $('#permalinkModal .btn-group .btn-primary').on('click', function() {
+      window.location = permalinkValue;
+    });
+  })
+});

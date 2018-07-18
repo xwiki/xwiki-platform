@@ -5,15 +5,17 @@
     $doc.displayEdit($field, $prefix, $object)
   #end
 #elseif ($type == 'view')
-  #set ($pages = [])
-  #foreach($pageReference in $value)
-    #set ($discard = $pages.add("#displayPageReference($pageReference)"))
-  #end
-  #if ($pages.size() > 0)
-    $stringtool.join($pages, '-')
+  #if ("$!value.size()" != "")
+    #set ($values = $value)
   #else
-    #displayPageReference($value)
+    #set ($values = [$value])
   #end
+  #set ($pages = [])
+  #foreach($pageReference in $values)
+    #set ($page = "#displayPageReference($pageReference)")
+    #set ($discard = $pages.add($page.trim()))
+  #end
+  $stringtool.join($pages, ', ')
 #elseif ($type == 'rendered')
   $doc.displayRendered($field, $prefix, $object)
 #elseif ($type == 'hidden')
@@ -29,12 +31,11 @@
   #if ("$!pageDoc" == "")
     $pageReference
   #else
+    #set ($title = $escapetool.xml($pageDoc.plainTitle))
     #if ($pageDoc.isNew())
-      <span class="wikicreatelink">
-        <a href="$pageDoc.getURL('create')">$pageDoc.getRenderedTitle('plain/1.0')</a>
-      <span/>
+      <span class="wikicreatelink"><a href="$pageDoc.getURL('create')">$title</a><span/>
     #else
-      <a href="$pageDoc.URL">$pageDoc.getRenderedTitle('plain/1.0')</a>
+      <a href="$pageDoc.URL">$title</a>
     #end
   #end
 #end

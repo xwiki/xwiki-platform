@@ -5,12 +5,14 @@
     $doc.displayEdit($field, $prefix, $object)
   #end
 #elseif ($type == 'view')
-  #set ($value = $doc.displayView($field, $prefix, $object))
-  #set ($pageDoc = $xwiki.getDocument($value))
-  #if ("$!pageDoc" == "" || $pageDoc.isNew())
-    $value
+  #set ($pages = [])
+  #foreach($pageReference in $value)
+    #set ($discard = $pages.add("#displayPageReference($pageReference)"))
+  #end
+  #if ($pages.size() > 0)
+    $stringtool.join($pages, '-')
   #else
-    <a href="$pageDoc.URL">$pageDoc.getRenderedTitle('plain/1.0')</a>
+    #displayPageReference($value)
   #end
 #elseif ($type == 'rendered')
   $doc.displayRendered($field, $prefix, $object)
@@ -20,4 +22,19 @@
   ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
   ## mode must not be empty. Let's output something.
   Unknown display mode.
+#end
+
+#macro(displayPageReference $pageReference)
+  #set ($pageDoc = $xwiki.getDocument($pageReference))
+  #if ("$!pageDoc" == "")
+    $pageReference
+  #else
+    #if ($pageDoc.isNew())
+      <span class="wikicreatelink">
+        <a href="$pageDoc.getURL('create')">$pageDoc.getRenderedTitle('plain/1.0')</a>
+      <span/>
+    #else
+      <a href="$pageDoc.URL">$pageDoc.getRenderedTitle('plain/1.0')</a>
+    #end
+  #end
 #end

@@ -62,7 +62,7 @@
       <number>1</number>
       <picker>1</picker>
       <prettyName>Page</prettyName>
-      <relationalStorage>0</relationalStorage>
+      <relationalStorage>1</relationalStorage>
       <separator> </separator>
       <separators/>
       <size>1</size>

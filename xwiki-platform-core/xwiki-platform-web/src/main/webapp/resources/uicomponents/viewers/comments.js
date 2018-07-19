@@ -463,17 +463,17 @@ require(['jquery'], function ($) {
   /**
    * Permalink: Events triggered while the permalink modal is displayed
    */
-  $(document).on('show.bs.modal' , '#permalinkModal', function (event) {
+  $(document).on('show.bs.modal', '#permalinkModal', function (event) {
     // Updating the permalink inside modal
     var modal = $(this);
-    var button = $(event.relatedTarget); 
+    var button = $(event.relatedTarget);
     var permalinkValue = button.prop('href');
     modal.find('.form-control').val(permalinkValue);
   });
   /**
    * Permalink: Events triggered after the permalink modal is displayed
    */
-  $(document).on('shown.bs.modal' , '#permalinkModal', function (event) {
+  $(document).on('shown.bs.modal', '#permalinkModal', function (event) {
     var modal = $(this);
     var button = $(event.relatedTarget); 
     var permalinkValue = button.prop('href');

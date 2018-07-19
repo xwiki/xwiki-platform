@@ -30,7 +30,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.xwiki.appwithinminutes.test.po.UserClassFieldEditPane;
+import org.xwiki.appwithinminutes.test.po.SuggestClassFieldEditPane;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
@@ -61,7 +61,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
     @Test
     public void testSuggestions()
     {
-        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
 
         // The suggestions should be case-insensitive. Match the last name.
         List<SuggestionElement> suggestions = userPicker.sendKeys("mOr").waitForSuggestions().getSuggestions();
@@ -149,42 +149,42 @@ public class UserClassFieldTest extends AbstractClassEditorTest
     @Test
     public void testSingleSelection()
     {
-        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
 
         // Use the keyboard.
         userPicker.sendKeys("mor").waitForSuggestions().sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
-        Assert.assertEquals(Collections.singletonList("XWiki.Enygma2002"), userPicker.getValue());
+        Assert.assertEquals(Collections.singletonList("XWiki.Enygma2002"), userPicker.getValues());
 
         // Use the mouse. Since we have single selection by default, the previously selected user should be replaced.
         selectedUsers = userPicker.click().selectByVisibleText("Thomas Mortagne").getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
-        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValue());
+        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValues());
 
         // Delete the selected user.
         selectedUsers.get(0).delete();
         Assert.assertEquals(0, userPicker.getSelectedSuggestions().size());
-        Assert.assertEquals(Collections.singletonList(""), userPicker.getValue());
+        Assert.assertEquals(Collections.singletonList(""), userPicker.getValues());
 
         // When there is only one suggestion, Enter key should select it.
         userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
         selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "fa-user");
-        Assert.assertEquals(Collections.singletonList("XWiki.Admin"), userPicker.getValue());
+        Assert.assertEquals(Collections.singletonList("XWiki.Admin"), userPicker.getValues());
     }
 
     @Test
     public void testMultipleSelection()
     {
-        UserClassFieldEditPane userField = new UserClassFieldEditPane(editor.addField("User").getName());
+        SuggestClassFieldEditPane userField = new SuggestClassFieldEditPane(editor.addField("User").getName());
         userField.openConfigPanel();
         userField.setMultipleSelect(true);
         userField.closeConfigPanel();
-        SuggestInputElement userPicker = userField.getUserPicker();
+        SuggestInputElement userPicker = userField.getPicker();
 
         // Select 2 users.
         userPicker.sendKeys("tmortagne").waitForSuggestions().sendKeys(Keys.ENTER);
@@ -193,7 +193,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         Assert.assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
         assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
-        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Enygma2002"), userPicker.getValue());
+        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Enygma2002"), userPicker.getValues());
 
         // Delete the first selected user.
         selectedUsers.get(0).delete();
@@ -204,27 +204,27 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         Assert.assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Administrator", "Admin", "fa-user");
         assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
-        Assert.assertEquals(Arrays.asList("XWiki.Admin", "XWiki.Enygma2002"), userPicker.getValue());
+        Assert.assertEquals(Arrays.asList("XWiki.Admin", "XWiki.Enygma2002"), userPicker.getValues());
 
         // Clear the list of selected users.
         userPicker.clearSelectedSuggestions();
         Assert.assertEquals(0, userPicker.getSelectedSuggestions().size());
-        Assert.assertTrue(userPicker.getValue().isEmpty());
+        Assert.assertTrue(userPicker.getValues().isEmpty());
     }
 
     @Test
     public void testSaveAndInitialSelection()
     {
-        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
         userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndView().edit();
 
-        UserClassFieldEditPane userField = new UserClassFieldEditPane("user1");
-        userPicker = userField.getUserPicker();
+        SuggestClassFieldEditPane userField = new SuggestClassFieldEditPane("user1");
+        userPicker = userField.getPicker();
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
-        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValue());
+        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValues());
 
         // Enable multiple selection.
         userField.openConfigPanel();
@@ -232,30 +232,30 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         userField.closeConfigPanel();
 
         // Re-take the user picker because the display has been reloaded.
-        userPicker = userField.getUserPicker();
+        userPicker = userField.getPicker();
 
         // Select one more user.
         userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
-        userPicker = new UserClassFieldEditPane("user1").getUserPicker();
+        userPicker = new SuggestClassFieldEditPane("user1").getPicker();
         selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
         assertUserSuggestion(selectedUsers.get(1), "Administrator", "Admin", "fa-user");
-        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin"), userPicker.getValue());
+        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin"), userPicker.getValues());
 
         // We should be able to input free text also.
         userPicker.sendKeys("foobar").waitForSuggestions().selectTypedText();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
-        userPicker = new UserClassFieldEditPane("user1").getUserPicker();
+        userPicker = new SuggestClassFieldEditPane("user1").getPicker();
         selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(3, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(2), "foobar", "foobar", null);
-        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin", "foobar"), userPicker.getValue());
+        Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin", "foobar"), userPicker.getValues());
 
         // Delete the fake user.
         selectedUsers.get(2).delete();
@@ -266,16 +266,16 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
-        userPicker = new UserClassFieldEditPane("user1").getUserPicker();
+        userPicker = new SuggestClassFieldEditPane("user1").getPicker();
         Assert.assertEquals(0, userPicker.getSelectedSuggestions().size());
-        Assert.assertTrue(userPicker.getValue().isEmpty());
+        Assert.assertTrue(userPicker.getValues().isEmpty());
     }
 
     @Test
     public void testApplicationEntry()
     {
         // Create the application class.
-        SuggestInputElement userPicker = new UserClassFieldEditPane(editor.addField("User").getName()).getUserPicker();
+        SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
         userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndView();
 
@@ -289,7 +289,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(1, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
-        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValue());
+        Assert.assertEquals(Collections.singletonList("XWiki.tmortagne"), userPicker.getValues());
 
         // Change the selected user.
         userPicker.clearSelectedSuggestions().sendKeys("eduard").waitForSuggestions().sendKeys(Keys.ENTER);

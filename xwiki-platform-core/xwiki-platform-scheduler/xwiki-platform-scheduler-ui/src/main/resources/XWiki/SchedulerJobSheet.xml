@@ -44,7 +44,7 @@
   #set ($class = $obj.xWikiClass)
   #set ($prettyName = $class.get($propName).translatedPrettyName)
   &lt;dt&gt;
-    &lt;label#if ($xcontext.action == 'edit')) for="${class.getName()}_${obj.number}_${propName}"#end&gt;
+    &lt;label #if ($xcontext.action == 'edit') for="${class.getName()}_${obj.number}_${propName}" #end&gt;
       $prettyName
     &lt;/label&gt;
     #if ($propName == 'script')

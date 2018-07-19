@@ -464,24 +464,22 @@ require(['jquery'], function ($) {
    * Permalink: Events triggered while the permalink modal is displayed
    */
   $(document).on('show.bs.modal', '#permalinkModal', function (event) {
-    // Updating the permalink inside modal
     var modal = $(this);
     var button = $(event.relatedTarget);
     var permalinkValue = button.prop('href');
+    // Updating the permalink inside modal
     modal.find('.form-control').val(permalinkValue);
+    // Go to permalink location
+    modal.find('input.btn.btn-primary').click( function() {
+      window.location = permalinkValue;
+    });
   });
   /**
    * Permalink: Events triggered after the permalink modal is displayed
    */
   $(document).on('shown.bs.modal', '#permalinkModal', function (event) {
     var modal = $(this);
-    var button = $(event.relatedTarget); 
-    var permalinkValue = button.prop('href');
     // Autofocus on permalink field
     modal.find('.form-control').focus();
-    // Go to permalink location
-    modal.find('input.btn.btn-primary').click( function() {
-      window.location = permalinkValue;
-    });
   })
 });

@@ -77,6 +77,10 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     var output = renderCommon(option);
     // This class is needed starting with v0.12.5 in order to have proper styling.
     output.addClass('option');
+    // We need a wrapper around the icon in order to center it because it looks better if the labels are aligned when
+    // the suggestions are displayed on separate lines in the drop down list. We don't need to center the icon for the
+    // selected suggestions because they are displayed in-line so the labels don't have to be aligned.
+    output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"/>');
     var hint = option && option.hint;
     if (typeof hint === 'string' && hint !== '') {
       output.append($('<div class="xwiki-selectize-option-hint"/>').text(hint));

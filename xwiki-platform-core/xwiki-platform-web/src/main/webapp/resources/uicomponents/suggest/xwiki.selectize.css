@@ -28,10 +28,17 @@
 
 /* Option styles */
 .xwiki-selectize-option {
-  font-size: .875em;
   white-space: nowrap;
 }
-.xwiki-selectize-option-icon {
+.xwiki-selectize-option-icon-wrapper {
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  margin-right: .3em;
+  text-align: center;
+  width: 18px;
+}
+.selectize-input .xwiki-selectize-option-icon {
   margin-right: .3em;
 }
 img.xwiki-selectize-option-icon {
@@ -46,7 +53,7 @@ a.xwiki-selectize-option-label {
 }
 .xwiki-selectize-option-hint {
   color: $theme.textSecondaryColor;
-  font-size: .8em;
+  font-size: smaller;
 }
 
 /* Live Table Filter */

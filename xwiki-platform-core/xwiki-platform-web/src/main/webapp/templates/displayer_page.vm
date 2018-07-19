@@ -1,1 +1,41 @@
-#template('displayer_dblist.vm')
+#if ($type == 'edit' || $type == 'search')
+  #if ($field.getProperty('displayType').value == 'input' && $field.getProperty('picker').value == 1)
+    #xpropertySuggestInputDisplayer($field $prefix $name $value)
+  #else
+    $doc.displayEdit($field, $prefix, $object)
+  #end
+#elseif ($type == 'view')
+  #if ("$!value.size()" != "")
+    #set ($values = $value)
+  #else
+    #set ($values = [$value])
+  #end
+  #set ($pages = [])
+  #foreach($pageReference in $values)
+    #set ($page = "#displayPageReference($pageReference)")
+    #set ($discard = $pages.add($page.trim()))
+  #end
+  $stringtool.join($pages, ', ')
+#elseif ($type == 'rendered')
+  $doc.displayRendered($field, $prefix, $object)
+#elseif ($type == 'hidden')
+  $doc.displayHidden($field, $prefix, $object)
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end
+
+#macro(displayPageReference $pageReference)
+  #set ($pageDoc = $xwiki.getDocument($pageReference))
+  #if ("$!pageDoc" == "")
+    $pageReference
+  #else
+    #set ($title = $escapetool.xml($pageDoc.plainTitle))
+    #if ($pageDoc.isNew())
+      <span class="wikicreatelink"><a href="$pageDoc.getURL('create')">$title</a><span/>
+    #else
+      <a href="$pageDoc.URL">$title</a>
+    #end
+  #end
+#end

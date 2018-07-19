@@ -153,7 +153,7 @@
       <category>AppWithinMinutes.Pickers</category>
     </property>
     <property>
-      <icon>icons/datamodel/users.png</icon>
+      <icon>user</icon>
     </property>
     <property>
       <priority>1</priority>

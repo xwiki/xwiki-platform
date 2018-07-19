@@ -79,7 +79,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     output.addClass('option');
     var hint = option && option.hint;
     if (typeof hint === 'string' && hint !== '') {
-      output.append($('<em class="xwiki-selectize-option-hint"/>').text(hint));
+      output.append($('<div class="xwiki-selectize-option-hint"/>').text(hint));
     }
     return output;
   }

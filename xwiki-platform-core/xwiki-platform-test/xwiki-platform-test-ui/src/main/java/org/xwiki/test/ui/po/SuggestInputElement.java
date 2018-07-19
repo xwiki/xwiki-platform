@@ -108,7 +108,7 @@ public class SuggestInputElement extends BaseElement
 
     private WebElement getTextInput()
     {
-        return getDriver().findElementWithoutWaiting(this.container, By.cssSelector("input[type='text']"));
+        return getDriver().findElementWithoutWaiting(this.container, By.cssSelector(".selectize-input > input"));
     }
 
     public SuggestInputElement click()

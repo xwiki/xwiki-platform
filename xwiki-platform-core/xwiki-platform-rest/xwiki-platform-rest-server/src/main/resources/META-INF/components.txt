@@ -56,6 +56,7 @@ org.xwiki.rest.internal.resources.classes.ClassPropertyValuesResourceImpl
 org.xwiki.rest.internal.resources.classes.DBListClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.classes.DefaultClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.classes.GroupsClassPropertyValuesProvider
+org.xwiki.rest.internal.resources.classes.PageClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.classes.UsersClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.search.HQLSearchSource
 org.xwiki.rest.internal.resources.search.XWQLSearchSource

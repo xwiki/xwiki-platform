@@ -22,49 +22,26 @@
 
 <xwikidoc version="1.1">
   <web>AppWithinMinutes</web>
-  <name>Date</name>
+  <name>Pages</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1318181297000</creationDate>
+  <creationDate>1530090955000</creationDate>
   <parent>AppWithinMinutes.FormFieldClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1319488378000</date>
-  <contentUpdateDate>1319488378000</contentUpdateDate>
+  <date>1530091283000</date>
+  <contentUpdateDate>1530090955000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('platform.appwithinminutes.classEditorDateFieldName')</title>
+  <title>$services.localization.render('platform.appwithinminutes.classEditorPageFieldName')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-{{html clean="false"}}
-##
-## This is a custom displayer used by Date properties. Since 4.3M2 this is the default Date displayer so there is no
-## need to use it on new Date properties. We have to keep it because there may be old Date properties that are still using it.
-##
-#set($field = $object.getxWikiClass().get($name))
-#set($format = $field.getProperty('dateFormat').value)
-#set($formattedValue = $escapetool.xml($datetool.format($format, $value)))
-#if($type == 'edit')
-  ## A simple date picker widget.
-  #set($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
-  #set($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
-  ## Used to parse and serialize the selected date using the date format specified in the XClass.
-  #set($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
-  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
-  #set($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
-  #set($id = $escapetool.xml("${prefix}${name}"))
-  &lt;input type="text" id="$!id" name="$!id" class="datetime t$!value.time" value="$!formattedValue" title="$!escapetool.xml($format)"/&gt;
-#else
-  $!formattedValue
-#end
-{{/html}}
-{{/velocity}}</content>
+  <content/>
   <class>
-    <name>AppWithinMinutes.Date</name>
+    <name>AppWithinMinutes.Pages</name>
     <customClass/>
     <customMapping/>
     <defaultViewSheet/>
@@ -72,27 +49,37 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
-    <date>
-      <customDisplay>{{include reference="AppWithinMinutes.DateDisplayer" /}}</customDisplay>
-      <dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+    <Page>
+      <cache>0</cache>
+      <classname/>
+      <customDisplay/>
       <disabled>0</disabled>
-      <emptyIsToday>1</emptyIsToday>
-      <name>date</name>
+      <displayType>input</displayType>
+      <hint/>
+      <idField/>
+      <multiSelect>0</multiSelect>
+      <name>page</name>
       <number>1</number>
       <picker>1</picker>
-      <prettyName>Date</prettyName>
-      <size>20</size>
+      <prettyName>Page</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>1</size>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
-    </date>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+    </Page>
   </class>
   <object>
-    <name>AppWithinMinutes.Date</name>
+    <name>AppWithinMinutes.Pages</name>
     <number>0</number>
     <className>AppWithinMinutes.FormFieldClass</className>
-    <guid>d62ccf69-1aca-4675-bb43-16b8b78a3bd9</guid>
+    <guid>55fc1153-129a-4824-b797-cf5fe49bbb0a</guid>
     <class>
       <name>AppWithinMinutes.FormFieldClass</name>
       <customClass/>
@@ -170,13 +157,13 @@
       <category>AppWithinMinutes.Pickers</category>
     </property>
     <property>
-      <icon>calendar</icon>
+      <icon>page_white</icon>
     </property>
     <property>
-      <priority>0</priority>
+      <priority/>
     </property>
     <property>
-      <properties>emptyIsToday dateFormat</properties>
+      <properties>multiSelect</properties>
     </property>
   </object>
 </xwikidoc>

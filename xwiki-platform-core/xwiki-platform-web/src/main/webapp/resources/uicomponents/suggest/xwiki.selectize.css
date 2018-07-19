@@ -10,7 +10,8 @@
 }
 
 /* Styles for the loading state. */
-.selectize-control.loading .selectize-input {
+.selectize-control.loading .selectize-input,
+.selectize-control.single.loading .selectize-input.input-active {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
   background-repeat: no-repeat;
 }
@@ -39,6 +40,9 @@ img.xwiki-selectize-option-icon {
 a.xwiki-selectize-option-label {
   color: inherit;
   text-decoration: none;
+}
+em.xwiki-selectize-option-hint {
+  display: block;
 }
 
 /* Live Table Filter */

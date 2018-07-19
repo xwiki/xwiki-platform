@@ -115,13 +115,13 @@ public interface IconManager
     String renderHTML(String iconName, String iconSetName, boolean fallback) throws IconException;
 
     /**
-     * Generate metadata of an icon.
-     * <p> It can contain useful information such as:
+     * Generates metadata of an icon.
+     * <p> The map can contain useful information such as:
      * <ul>
-     * <li> The icon set name
-     * <li> The icon set type name
-     * <li> The icon url if defined
-     * <li> The icon css class if defined
+     * <li> The icon set name ({@value META_DATA_ICON_SET_NAME})
+     * <li> The icon set type name ({@value META_DATA_ICON_SET_TYPE})
+     * <li> The icon url if defined ({@value META_DATA_URL})
+     * <li> The icon css class if defined ({@value META_DATA_CSS_CLASS})
      * </ul>
      *
      * @param iconName name of the icon
@@ -135,13 +135,13 @@ public interface IconManager
     }
 
     /**
-     * Generate metadata of an icon.
-     * <p> It can contain useful information such as:
+     * Generates metadata of an icon.
+     * <p> The map can contain useful information such as:
      * <ul>
-     * <li> The icon set name
-     * <li> The icon set type name
-     * <li> The icon url if defined
-     * <li> The icon css class if defined
+     * <li> The icon set name ({@value META_DATA_ICON_SET_NAME})
+     * <li> The icon set type name ({@value META_DATA_ICON_SET_TYPE})
+     * <li> The icon url if defined ({@value META_DATA_URL})
+     * <li> The icon css class if defined ({@value META_DATA_CSS_CLASS})
      * </ul>
      *
      * @param iconName name of the icon
@@ -156,13 +156,13 @@ public interface IconManager
     }
 
     /**
-     * Generate metadata of an icon.
-     * <p> It can contain useful information such as:
+     * Generates metadata of an icon.
+     * <p> The map can contain useful information such as:
      * <ul>
-     * <li> The icon set name
-     * <li> The icon set type name
-     * <li> The icon url if defined
-     * <li> The icon css class if defined
+     * <li> The icon set name ({@value META_DATA_ICON_SET_NAME})
+     * <li> The icon set type name ({@value META_DATA_ICON_SET_TYPE})
+     * <li> The icon url if defined ({@value META_DATA_URL})
+     * <li> The icon css class if defined ({@value META_DATA_CSS_CLASS})
      * </ul>
      *
      * @param iconName name of the icon

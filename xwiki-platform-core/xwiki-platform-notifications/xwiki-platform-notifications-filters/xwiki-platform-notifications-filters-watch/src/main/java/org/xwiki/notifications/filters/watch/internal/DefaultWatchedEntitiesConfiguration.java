@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -35,6 +36,8 @@ import org.xwiki.notifications.filters.watch.AutomaticWatchMode;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.text.StringUtils;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 
 /**
  * Default implementation of {@link WatchedEntitiesConfiguration}.
@@ -61,11 +64,17 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
 
     private static final String AUTOMATIC_WATCH_MODE = "automaticWatchMode";
 
+    private static final String WATCHLIST_AUTOWATCH_PROPERTY = "xwiki.plugin.watchlist.automaticwatch";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
     private ConfigurationSource configurationSource;
+
+    @Inject
+    @Named(XWikiCfgConfigurationSource.ROLEHINT)
+    private ConfigurationSource xwikiCfgConfigurationSource;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -114,14 +123,32 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
             }
         }
 
-        // Fallback to the property in the configuration
-        value = configurationSource.getProperty("notifications.watchedEntities.autoWatch");
+        // Fallback to the default automatic watch mode as it is configured in properties files.
+        return getAutomaticWatchMode();
+    }
+
+    private AutomaticWatchMode getAutomaticWatchMode()
+    {
+        // Look into the configuration.
+        Object value = configurationSource.getProperty("notifications.watchedEntities.autoWatch");
         if (value != null) {
             return AutomaticWatchMode.valueOf(((String) value).toUpperCase());
         }
 
         // Fallback to the configuration of the watchlist (if it exists)
-        value = configurationSource.getProperty("xwiki.plugin.watchlist.automaticwatch");
+        // For historic reason, we look both in xwiki.properties and xwiki.cfg.
+        // - xwiki.cfg because it is where the watchlist configuration belongs to
+        // - xwiki.properties because we badly look there between XWiki 9.8RC1 and 10.6 and we don't want to break the
+        //   configuration of people who rely on it.
+        value = configurationSource.getProperty(WATCHLIST_AUTOWATCH_PROPERTY);
+        if (value != null) {
+            return AutomaticWatchMode.valueOf(((String) value).toUpperCase());
+        }
+
+        // So here we load in xwiki.cfg.
+        // Note that it would have been better to just use the "all" ConfigurationSource, but for some reason it does
+        // not handle xwiki.cfg.
+        value = xwikiCfgConfigurationSource.getProperty(WATCHLIST_AUTOWATCH_PROPERTY);
         if (value != null) {
             return AutomaticWatchMode.valueOf(((String) value).toUpperCase());
         }

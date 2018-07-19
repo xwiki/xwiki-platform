@@ -44,7 +44,7 @@
   #set ($class = $obj.xWikiClass)
   #set ($prettyName = $class.get($propName).translatedPrettyName)
   &lt;dt&gt;
-    &lt;label #if ($xcontext.action == 'edit') for="${class.getName()}_${obj.number}_${propName}" #end&gt;
+    &lt;label #if ($xcontext.action == 'edit')for="${class.getName()}_${obj.number}_${propName}"#end&gt;
       $prettyName
     &lt;/label&gt;
     #if ($propName == 'script')
@@ -68,7 +68,7 @@
 {{velocity}}
 #if ($doc.getObject('XWiki.SchedulerJobClass'))
   #set ($job = $doc.getObject('XWiki.SchedulerJobClass'))
-  {{html wiki='true'}}
+  {{html wiki='true' clean='false'}}
   &lt;div class='xform'&gt;
     &lt;dl&gt;
       #displayJobProperty($job 'jobName')

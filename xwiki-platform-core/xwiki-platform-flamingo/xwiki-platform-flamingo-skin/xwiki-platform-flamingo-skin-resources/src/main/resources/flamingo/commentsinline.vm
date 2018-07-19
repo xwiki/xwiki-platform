@@ -161,7 +161,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
         #end
       #end
-      <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
+      <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
+      title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
       #if ($hasAdmin || ($hasEdit && $isUserComment))
         <a class="delete btn btn-default btn-xs " rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')</a>
       #end
@@ -299,12 +300,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           </div>
         </div>
         <div class="modal-footer">
-          <div class="btn-group pull-left">
-            <input type="button" class="btn btn-primary" data-dismiss="modal"
-              value="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.goto'))"/>
-            <input type="button" class="btn btn-default" data-dismiss="modal"
-              value="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.hide'))"/>
-          </div>
+          <input type="button" class="btn btn-primary" data-dismiss="modal"
+          value="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.goto'))"/>
+          <input type="button" class="btn btn-default" data-dismiss="modal"
+          value="$escapetool.xml($services.localization.render('cancel'))"/>
+        </div>
         </div>
       </div>
     </div>

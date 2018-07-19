@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,13 +28,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -45,7 +45,6 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -63,6 +62,12 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {
+    protected static final String FIELD_PAGES = "pages";
+
+    protected static final String FIELD_SPACES = "spaces";
+
+    protected static final String FIELD_WIKIS = "wikis";
+
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
             new SpaceReference("Notifications",
                     new SpaceReference("XWiki", new WikiReference("xwiki"))
@@ -89,12 +94,6 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String FIELD_EVENT_TYPES = "eventTypes";
 
-    private static final String FIELD_PAGES = "pages";
-
-    private static final String FIELD_SPACES = "spaces";
-
-    private static final String FIELD_WIKIS = "wikis";
-
     private static final String FIELD_USERS = "users";
 
     private static final String FIELD_FILTER_TYPE = "filterType";
@@ -102,6 +101,8 @@ public class DefaultModelBridge implements ModelBridge
     private static final String FIELD_FILTER_FORMATS = "filterFormats";
 
     private static final String FIELD_STARTING_DATE = "startingDate";
+
+    private static final String EXPLODED_PREFERENCES_PREFIX = "EXPLODED_";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -127,6 +128,10 @@ public class DefaultModelBridge implements ModelBridge
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
+                        // IDEA: to avoid having too much xobjects, we decide to have only 1 xobject for all
+                        // common properties, and using the ability of the relational storage to store several
+                        // pages, spaces, wikis, etc...
+
                         Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
                                 createNotificationFilterPropertiesMap(obj);
 
@@ -152,7 +157,7 @@ public class DefaultModelBridge implements ModelBridge
                         notificationFilterPreference.setPreferenceProperties(filterPreferenceProperties);
                         notificationFilterPreference.setStartingDate(obj.getDateValue(FIELD_STARTING_DATE));
 
-                        preferences.add(notificationFilterPreference);
+                        addOrExplodePreference(preferences, notificationFilterPreference);
                     }
                 }
             }
@@ -163,6 +168,37 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    private void addOrExplodePreference(Set<NotificationFilterPreference> preferences,
+            DefaultNotificationFilterPreference notificationFilterPreference)
+    {
+        boolean hasBeenExploded;
+
+        hasBeenExploded = explodedFilterPreference(notificationFilterPreference, NotificationFilterProperty.PAGE,
+                preferences);
+        hasBeenExploded |= explodedFilterPreference(notificationFilterPreference, NotificationFilterProperty.SPACE,
+                preferences);
+        hasBeenExploded |= explodedFilterPreference(notificationFilterPreference, NotificationFilterProperty.WIKI,
+                preferences);
+
+        if (!hasBeenExploded) {
+            preferences.add(notificationFilterPreference);
+        }
+    }
+
+    private boolean explodedFilterPreference(DefaultNotificationFilterPreference notificationFilterPreference,
+            NotificationFilterProperty property, Set<NotificationFilterPreference> preferences)
+    {
+        List<String> values = notificationFilterPreference.getProperties(property);
+        int numberOfValues = values.size();
+        if (numberOfValues > 0) {
+            for (int i = 0; i < numberOfValues; ++i) {
+                preferences.add(new ExplodedFilterPreference(notificationFilterPreference, property, i));
+            }
+            return true;
+        }
+        return false;
     }
 
     private Map<NotificationFilterProperty, List<String>> createNotificationFilterPropertiesMap(BaseObject obj)
@@ -231,13 +267,26 @@ public class DefaultModelBridge implements ModelBridge
 
         try {
             XWikiDocument doc = xwiki.getDocument(user, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
-            if (preferencesObj != null) {
-                for (BaseObject obj : preferencesObj) {
-                    if (obj != null
-                            && StringUtils.equals(filterPreferenceName, obj.getStringValue(FILTER_PREFERENCE_NAME))) {
-                        doc.removeXObject(obj);
+
+            BaseObject obj = doc.getXObject(notificationFilterPreferenceClass, FILTER_PREFERENCE_NAME,
+                    filterPreferenceName);
+            if (obj != null) {
+                doc.removeXObject(obj);
+                shouldSave = true;
+            } else if (filterPreferenceName.startsWith(EXPLODED_PREFERENCES_PREFIX)) {
+                ExplodedFilterPreferenceReference reference
+                        = new ExplodedFilterPreferenceReference(filterPreferenceName);
+                obj = doc.getXObject(notificationFilterPreferenceClass, FILTER_PREFERENCE_NAME,
+                        reference.getObjectName());
+                if (obj != null) {
+                    if (obj.getListValue(reference.getPropertyName()).remove(reference.getLocation())) {
                         shouldSave = true;
+
+                        // Remove the whole object if it is now totally empty
+                        if (obj.getListValue(FIELD_PAGES).isEmpty() && obj.getListValue(FIELD_SPACES).isEmpty()
+                                && obj.getListValue(FIELD_WIKIS).isEmpty()) {
+                            doc.removeXObject(obj);
+                        }
                     }
                 }
             }
@@ -264,17 +313,25 @@ public class DefaultModelBridge implements ModelBridge
 
         try {
             XWikiDocument doc = xwiki.getDocument(user, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
-            if (preferencesObj != null) {
-                for (BaseObject obj : preferencesObj) {
-                    if (obj != null
-                            && StringUtils.equals(filterPreferenceName, obj.getStringValue(FILTER_PREFERENCE_NAME))
-                            && (obj.getIntValue(FIELD_IS_ENABLED) != 0) != enabled) {
-                        obj.setIntValue(FIELD_IS_ENABLED, enabled ? 1 : 0);
-                        shouldSave = true;
+            BaseObject obj = doc.getXObject(notificationFilterPreferenceClass, FILTER_PREFERENCE_NAME,
+                    filterPreferenceName);
+            if (obj != null) {
+                obj.setIntValue(FIELD_IS_ENABLED, enabled ? 1 : 0);
+                shouldSave = true;
+            } else if (filterPreferenceName.startsWith(EXPLODED_PREFERENCES_PREFIX)) {
+
+                Set<NotificationFilterPreference> existingPreferences = this.getFilterPreferences(user);
+                for (NotificationFilterPreference existingPref : existingPreferences) {
+                    if (filterPreferenceName.equals(existingPref.getFilterPreferenceName())) {
+                        if (existingPref.isEnabled() != enabled) {
+                            deleteFilterPreference(user, filterPreferenceName);
+                            saveFilterPreferences(user,
+                                    Arrays.asList(new NotificationFilterPreferenceWrapper(existingPref, enabled)));
+                        }
                     }
                 }
             }
+
             if (shouldSave) {
                 // Make this change a minor edit so it's not displayed, by default, in notifications
                 xwiki.saveDocument(doc, String.format("%s filter preference [%s].",
@@ -295,11 +352,6 @@ public class DefaultModelBridge implements ModelBridge
             return;
         }
 
-        // Convert the collection of preferences to save to a Map sorted by filter names
-        Map<String, NotificationFilterPreference> toSave = filterPreferences.stream().collect(
-                Collectors.toMap(NotificationFilterPreference::getFilterPreferenceName, Function.identity())
-        );
-
         // Usual XWiki objects
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
@@ -310,10 +362,9 @@ public class DefaultModelBridge implements ModelBridge
         try {
             XWikiDocument doc = xwiki.getDocument(user, context);
 
-            // Update existing objects if they match the filter preferences to save
-            updateExistingObjects(toSave, notificationFilterPreferenceClass, doc);
-            // Create objects from the remaining filter preferences to save
-            createNewObjects(toSave, notificationFilterPreferenceClass, doc, context);
+            for (NotificationFilterPreference prefToSave : filterPreferences) {
+                saveFilterPreferences(context, notificationFilterPreferenceClass, doc, prefToSave);
+            }
 
             // Make this change a minor edit so it's not displayed, by default, in notifications
             xwiki.saveDocument(doc, "Save notification filter preferences.", true, context);
@@ -323,6 +374,64 @@ public class DefaultModelBridge implements ModelBridge
                     e
             );
         }
+    }
+
+    private void saveFilterPreferences(XWikiContext context, DocumentReference notificationFilterPreferenceClass,
+            XWikiDocument doc, NotificationFilterPreference prefToSave) throws XWikiException
+    {
+        // Get existing objects
+        List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
+        if (preferencesObj != null) {
+            for (BaseObject obj : preferencesObj) {
+                if (obj == null) {
+                    continue;
+                }
+
+                // Get the filter preference corresponding to this base object
+                // Since we now have the notion of ExplodedFilterPreference, we need to do some tricks here
+                if (isObjectSimilarToPref(obj, prefToSave)) {
+                    // Then update the base object
+                    fillBaseObjectWithProperty(obj, prefToSave, FIELD_PAGES, NotificationFilterProperty.PAGE);
+                    fillBaseObjectWithProperty(obj, prefToSave, FIELD_SPACES, NotificationFilterProperty.SPACE);
+                    fillBaseObjectWithProperty(obj, prefToSave, FIELD_WIKIS, NotificationFilterProperty.WIKI);
+                    // Object is saved, nothing to do more
+                    return;
+                }
+            }
+        }
+
+        // Create a new one if no one matches
+        int objNumber = doc.createXObject(notificationFilterPreferenceClass, context);
+        BaseObject obj = doc.getXObject(notificationFilterPreferenceClass, objNumber);
+        convertFilterPreferenceToBaseObject(prefToSave, obj);
+    }
+
+    private void fillBaseObjectWithProperty(BaseObject obj, NotificationFilterPreference prefToSave,
+            String fieldName, NotificationFilterProperty property)
+    {
+        Set<String> pages = new HashSet<>(obj.getListValue(fieldName));
+        if (pages.addAll(prefToSave.getProperties(property))) {
+            obj.setDBStringListValue(fieldName, new ArrayList(pages));
+        }
+    }
+
+    private boolean isObjectSimilarToPref(BaseObject obj, NotificationFilterPreference prefToSave)
+    {
+        EqualsBuilder equalsBuilder = new EqualsBuilder();
+        equalsBuilder.append(obj.getStringValue(FIELD_FILTER_NAME), prefToSave.getFilterName());
+        equalsBuilder.append(obj.getIntValue(FIELD_IS_ENABLED) == 1, prefToSave.isEnabled());
+        equalsBuilder.append(obj.getIntValue(FIELD_IS_ACTIVE) == 1, prefToSave.isActive());
+        equalsBuilder.append(obj.getStringValue(FIELD_FILTER_TYPE), prefToSave.getFilterType().name().toLowerCase());
+        equalsBuilder.append(obj.getListValue(FIELD_FILTER_FORMATS),
+                toCollectionOfStrings(prefToSave.getFilterFormats()));
+        equalsBuilder.append(obj.getListValue(FIELD_APPLICATIONS),
+                prefToSave.getProperties(NotificationFilterProperty.APPLICATION));
+        equalsBuilder.append(obj.getListValue(FIELD_EVENT_TYPES),
+                prefToSave.getProperties(NotificationFilterProperty.EVENT_TYPE));
+        equalsBuilder.append(obj.getListValue(FIELD_USERS),
+                prefToSave.getProperties(NotificationFilterProperty.USER));
+        // All other fields are ignored
+        return equalsBuilder.isEquals();
     }
 
     @Override
@@ -360,64 +469,6 @@ public class DefaultModelBridge implements ModelBridge
                     String.format("Failed to save the notification preferences starting date for the user [%s].", user),
                     e
             );
-        }
-    }
-
-    /**
-     * Update existing XObjects with the values contained in the map of filter preferences.
-     *
-     * @param toSave map of filter preferences to save, sorted by name
-     * @param notificationFilterPreferenceClass class of the XObjects
-     * @param doc the document on which the objects are located
-     */
-    private void updateExistingObjects(Map<String, NotificationFilterPreference> toSave,
-            DocumentReference notificationFilterPreferenceClass, XWikiDocument doc)
-    {
-        // Get existing objects
-        List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
-        if (preferencesObj == null) {
-            return;
-        }
-
-        for (BaseObject obj : preferencesObj) {
-            if (obj == null) {
-                continue;
-            }
-
-            // Get the filter preference corresponding to this base object
-            NotificationFilterPreference correspondingPref = toSave.get(obj.getStringValue(FILTER_PREFERENCE_NAME));
-            if (correspondingPref == null) {
-                // If there is none, pass to the next base object
-                continue;
-            }
-
-            // Update the existing base object with the values of the filter preferences
-            convertFilterPreferenceToBaseObject(correspondingPref, obj);
-
-            // Remove this preference from the map of preferences to save, so that remaining preferences
-            // will be stored in new objects
-            toSave.remove(correspondingPref);
-        }
-    }
-
-    /**
-     * Create new XObjects to save the filter preferences present in the given collection.
-     *
-     * @param toSave map of filter preferences to save, sorted by name
-     * @param notificationFilterPreferenceClass class of the XObjects
-     * @param doc the document on which the objects are located
-     * @param context XWiki Context
-     *
-     * @throws XWikiException if error happens
-     */
-    private void createNewObjects(Map<String, NotificationFilterPreference> toSave,
-            DocumentReference notificationFilterPreferenceClass, XWikiDocument doc, XWikiContext context)
-                throws XWikiException
-    {
-        for (NotificationFilterPreference filterPreference : toSave.values()) {
-            int objNumber = doc.createXObject(notificationFilterPreferenceClass, context);
-            BaseObject obj = doc.getXObject(notificationFilterPreferenceClass, objNumber);
-            convertFilterPreferenceToBaseObject(filterPreference, obj);
         }
     }
 

@@ -44,17 +44,26 @@
 ##
 #macro (addResultData $result $results $wikiReference)
   #set ($reference = $services.model.resolveDocument($result, $wikiReference))
-  #getUserAvatarURL($reference $avatarURL 50)
   #if ($request.uorg == 'user')
     #set ($label = $xwiki.getPlainUserName($reference))
+    #set ($defaultIcon = $services.icon.getMetaData('user'))
   #else
     #set ($label = $xwiki.getDocument($reference).plainTitle)
+    #set ($defaultIcon = $services.icon.getMetaData('group'))
+  #end
+  #getUserAvatarURL($reference $avatarURL 50)
+  #set ($icon = $defaultIcon)
+  #if ($avatarURL.specified)
+    #set ($icon = {
+      'iconSetType': 'IMAGE',
+      'url': $avatarURL.url
+    })
   #end
   ## Use the local reference as value if possible (see XWIKI-10046).
   #set ($discard = $results.add({
     'value': $services.model.serialize($reference, 'compactwiki'),
     'label': $label,
-    'icon': $avatarURL.url,
+    'icon': $icon,
     'url': $xwiki.getURL($reference)
   }))
 #end
@@ -64,7 +73,11 @@
   <?xml version="1.0" encoding="UTF-8"?>
   <results>
     #foreach ($result in $results)
-      <rs id="$escapetool.xml($result.url)" icon="$escapetool.xml($result.icon)"
+      #set ($icon = $result.icon.url)
+      #if ("$!icon" == '')
+        #set ($icon = $result.icon.cssClass)
+      #end
+      <rs id="$escapetool.xml($result.url)" icon="$!escapetool.xml($icon)"
         info="$escapetool.xml($result.label)">$escapetool.xml($result.value)</rs>
     #end
   </results>

@@ -368,6 +368,7 @@ text_align_left = align-left
 text_align_right = align-right
 text_bold = bold
 text_columns = columns
+text_heading_1 = header
 text_indent = indent
 text_indent_remove = outdent
 text_italic = italic

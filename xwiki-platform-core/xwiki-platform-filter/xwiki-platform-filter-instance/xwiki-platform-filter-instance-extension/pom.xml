@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter-instance</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>10.6</version>
   </parent>
   <artifactId>xwiki-platform-filter-instance-extension</artifactId>
   <name>XWiki Platform - Filter - Instance - Extension</name>

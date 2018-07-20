@@ -20,7 +20,9 @@
 }
 /* Basic form elements styling */
 #xwikiobjects input, #xwikiobjects textarea,
-#xwikiclassproperties input, #xwikiclassproperties textarea {
+#xwikiobjects select, #xwikiobjects .selectize-input,
+#xwikiclassproperties input, #xwikiclassproperties textarea,
+#xwikiclassproperties select, #xwikiclassproperties .selectize-input {
   border: 1px solid $theme.borderColor;
   width: 90%;
 }

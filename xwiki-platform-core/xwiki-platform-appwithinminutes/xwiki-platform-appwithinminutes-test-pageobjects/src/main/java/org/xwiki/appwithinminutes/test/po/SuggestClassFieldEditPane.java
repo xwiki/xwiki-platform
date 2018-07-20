@@ -23,19 +23,20 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
- * Represents the pane used to edit a 'User' class field.
+ * Represents the pane used to edit a class field with a suggest.
+ * Example of class fields: User and Page.
  * 
  * @version $Id$
  * @since 4.5
  */
-public class UserClassFieldEditPane extends ClassFieldEditPane
+public class SuggestClassFieldEditPane extends ClassFieldEditPane
 {
     /**
      * Creates a new instance.
      * 
      * @param fieldName the name of the date field
      */
-    public UserClassFieldEditPane(String fieldName)
+    public SuggestClassFieldEditPane(String fieldName)
     {
         super(fieldName);
     }
@@ -54,9 +55,9 @@ public class UserClassFieldEditPane extends ClassFieldEditPane
     }
 
     /**
-     * @return the user picker
+     * @return the picker
      */
-    public SuggestInputElement getUserPicker()
+    public SuggestInputElement getPicker()
     {
         return new SuggestInputElement(getDefaultValueInput());
     }

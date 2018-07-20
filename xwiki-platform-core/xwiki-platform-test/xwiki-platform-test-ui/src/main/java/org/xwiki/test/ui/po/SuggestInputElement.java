@@ -44,27 +44,42 @@ public class SuggestInputElement extends BaseElement
             this.suggestion = suggestion;
         }
 
+        /**
+         * @return the value of this suggestion
+         */
         public String getValue()
         {
             return this.suggestion.getAttribute("data-value");
         }
 
+        /**
+         * @return the label of this suggestion
+         */
         public String getLabel()
         {
             return this.suggestion.findElement(By.className("xwiki-selectize-option-label")).getText();
         }
 
+        /**
+         * @return the icon class or src attribute of this suggestion
+         */
         public String getIcon()
         {
             WebElement icon = this.suggestion.findElement(By.className("xwiki-selectize-option-icon"));
             return "img".equals(icon.getTagName()) ? icon.getAttribute("src") : icon.getAttribute("class");
         }
 
+        /**
+         * @return the url of this suggestion
+         */
         public String getURL()
         {
             return this.suggestion.findElement(By.className("xwiki-selectize-option-label")).getAttribute("href");
         }
 
+        /**
+         * @return the hint of this suggestion
+         */
         public String getHint()
         {
             return this.suggestion.findElement(By.className("xwiki-selectize-option-hint")).getText();
@@ -82,6 +97,9 @@ public class SuggestInputElement extends BaseElement
             getDriver().getKeyboard().sendKeys(Keys.BACK_SPACE);
         }
 
+        /**
+         * Selects this suggestion.
+         */
         public void select()
         {
             this.suggestion.click();
@@ -106,35 +124,65 @@ public class SuggestInputElement extends BaseElement
         getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading"));
     }
 
+    /**
+     * @return the actual text input
+     */
     private WebElement getTextInput()
     {
         return getDriver().findElementWithoutWaiting(this.container, By.cssSelector(".selectize-input > input"));
     }
 
+    /**
+     * Clicks on the text input.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement click()
     {
+        // On single selects, the text input isn't visible until the container is focused.
         this.container.click();
+        this.getTextInput().click();
         return this;
     }
 
+    /**
+     * Removes the typed text.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement clear()
     {
         getTextInput().clear();
         return this;
     }
 
+    /**
+     * Removes all the selected elements.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement clearSelectedSuggestions()
     {
         getSelectedSuggestions().forEach(SuggestionElement::delete);
         return this;
     }
 
+    /**
+     * Sends the given sequence of keys to the input.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement sendKeys(CharSequence... keysToSend)
     {
         getTextInput().sendKeys(keysToSend);
         return this;
     }
 
+    /**
+     * Waits until the suggestions have been loaded.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement waitForSuggestions()
     {
         // Wait for the suggestions to be fetched from the server and for the suggestion drop down list to be visible.
@@ -144,6 +192,9 @@ public class SuggestInputElement extends BaseElement
         return this;
     }
 
+    /**
+     * @return a list of all the suggestion elements
+     */
     public List<SuggestionElement> getSuggestions()
     {
         return getDriver()
@@ -151,6 +202,11 @@ public class SuggestInputElement extends BaseElement
             .map(SuggestionElement::new).collect(Collectors.toList());
     }
 
+    /**
+     * Selects an element by clicking on the suggestion with the given position.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement selectByIndex(int index)
     {
         getDriver().findElementWithoutWaiting(
@@ -161,6 +217,11 @@ public class SuggestInputElement extends BaseElement
         return this;
     }
 
+    /**
+     * Selects an element by clicking on the suggestion with the given value.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement selectByValue(String value)
     {
         getDriver().findElementWithoutWaiting(
@@ -171,6 +232,11 @@ public class SuggestInputElement extends BaseElement
         return this;
     }
 
+    /**
+     * Selects an element by clicking on the suggestion with the given label.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement selectByVisibleText(String text)
     {
         getDriver().findElementWithoutWaiting(
@@ -181,6 +247,11 @@ public class SuggestInputElement extends BaseElement
         return this;
     }
 
+    /**
+     * Selects and creates an element with the input text.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement selectTypedText()
     {
         getDriver().findElementWithoutWaiting(By.cssSelector(".selectize-dropdown.active .create")).click();
@@ -188,7 +259,10 @@ public class SuggestInputElement extends BaseElement
         return this;
     }
 
-    public List<String> getValue()
+    /**
+     * @return list of all the values of the selected elements.
+     */
+    public List<String> getValues()
     {
         if ("select".equals(this.originalInput.getTagName())) {
             return new Select(this.originalInput).getAllSelectedOptions().stream()
@@ -198,12 +272,20 @@ public class SuggestInputElement extends BaseElement
         }
     }
 
+    /**
+     * @return list of suggestion elements found in the suggestion panel
+     */
     public List<SuggestionElement> getSelectedSuggestions()
     {
         return getDriver().findElementsWithoutWaiting(this.container, By.className("xwiki-selectize-option")).stream()
             .map(SuggestionElement::new).collect(Collectors.toList());
     }
 
+    /**
+     * Hides the suggestions panel.
+     *
+     * @return the current suggest input element
+     */
     public SuggestInputElement hideSuggestions()
     {
         getTextInput().sendKeys(Keys.ESCAPE);

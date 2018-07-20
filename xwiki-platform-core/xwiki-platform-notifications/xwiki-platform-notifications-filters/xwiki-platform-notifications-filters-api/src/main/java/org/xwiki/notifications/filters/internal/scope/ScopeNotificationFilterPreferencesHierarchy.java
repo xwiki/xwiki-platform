@@ -19,12 +19,9 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
@@ -60,63 +57,22 @@ public class ScopeNotificationFilterPreferencesHierarchy
     }
 
     /**
-     * @return the list of documents to include (page is the deepest possible level so it cannot be contradicted)
-     */
-    public ArrayList<String> getPagesToInclude()
-    {
-        Iterator<ScopeNotificationFilterPreference> it = getFiltersAboutPages().filter(
-            pref -> pref.getFilterType() == NotificationFilterType.INCLUSIVE).iterator();
-        ArrayList<String> pagesToInclude = new ArrayList<>();
-        while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-            for (String page : pref.getProperties(NotificationFilterProperty.PAGE)) {
-                pagesToInclude.add(page);
-            }
-        }
-        return pagesToInclude;
-    }
-
-    /**
-     * @return the list of documents to exclude (page is the deepest possible level so it cannot be contradicted)
-     */
-    public ArrayList<String> getPagesToExclude()
-    {
-        Iterator<ScopeNotificationFilterPreference> it = getFiltersAboutPages().filter(
-            pref -> pref.getFilterType() == NotificationFilterType.EXCLUSIVE).iterator();
-        ArrayList<String> pagesToExclude = new ArrayList<>();
-        while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-            for (String page : pref.getProperties(NotificationFilterProperty.PAGE)) {
-                pagesToExclude.add(page);
-            }
-        }
-        return pagesToExclude;
-    }
-
-    private Stream<ScopeNotificationFilterPreference> getFiltersAboutPages()
-    {
-        return preferences.stream().filter(pref -> !pref.getProperties(NotificationFilterProperty.PAGE).isEmpty());
-    }
-
-    /**
-     * @return an iterator to get top level exclusive filters (ie the black list) except those that concern a document
+     * @return an iterator to get top level exclusive filters (ie the black list)
      */
     public Iterator<ScopeNotificationFilterPreference> getExclusiveFiltersThatHasNoParents()
     {
         return preferences.stream().filter(
             pref -> !pref.hasParent() && pref.getFilterType() == NotificationFilterType.EXCLUSIVE
-                && pref.getProperties(NotificationFilterProperty.PAGE).isEmpty()
         ).iterator();
     }
 
     /**
-     * @return an iterator to get top level inclusive filters (ie the white list) except those that concern a document
+     * @return an iterator to get top level inclusive filters (ie the white list)
      */
     public Iterator<ScopeNotificationFilterPreference> getInclusiveFiltersThatHasNoParents()
     {
         return preferences.stream().filter(
             pref -> !pref.hasParent() && pref.getFilterType() == NotificationFilterType.INCLUSIVE
-                && pref.getProperties(NotificationFilterProperty.PAGE).isEmpty()
         ).iterator();
     }
 

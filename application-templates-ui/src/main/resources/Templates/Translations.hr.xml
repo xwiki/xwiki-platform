@@ -39,14 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+  <content>template.templateProvider.article.name=Članak
 template.templateProvider.article.description=Stranica s člankom
-template.templateProvider.article.name=Članak
-template.templateProvider.encyclopedia.description=Enciklopedijska stranica
+
 template.templateProvider.encyclopedia.name=Enciklopedija
-template.templateProvider.meeting.description=Dnevni red i bilješke
+template.templateProvider.encyclopedia.description=Enciklopedijska stranica
+
 template.templateProvider.meeting.name=Izvještaj sa sastanka
-template.templateProvider.simplePage.description=S tablicom sadržaja
+template.templateProvider.meeting.description=Dnevni red i bilješke
+
 template.templateProvider.simplePage.name=Obična stranica
+template.templateProvider.simplePage.description=S tablicom sadržaja
 </content>
 </xwikidoc>

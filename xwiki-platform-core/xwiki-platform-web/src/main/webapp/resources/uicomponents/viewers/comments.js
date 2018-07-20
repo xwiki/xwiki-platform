@@ -51,7 +51,6 @@ viewers.Comments = Class.create({
     this.loadIDs();
     this.addDeleteListener();
     this.addReplyListener();
-    this.addPermalinkListener();
     this.addSubmitListener(this.form);
     this.addCancelListener();
     this.addEditListener();
@@ -254,31 +253,6 @@ viewers.Comments = Class.create({
       // Hide the reply button
       item.hide();
     }.bindAsEventListener(this));
-  },
-  /**
-   * Permalink: Display a modal popup providing the permalink.
-   */
-  addPermalinkListener : function() {
-    $$(this.xcommentSelector + ' a.permalink').each(function(item) {
-      item.observe('click', function(event) {
-        item.blur();
-        event.stop();
-        var permalinkBox = new XWiki.widgets.ConfirmationBox(
-        {
-          onYes : function () {
-            window.location = item.href;
-          }
-        },
-        /* Interaction parameters */
-        {
-          confirmationText: "$services.localization.render('core.viewers.comments.permalink'): <input type='text' class='full' value='" + item.href + "'/>",
-          yesButtonText: "$services.localization.render('core.viewers.comments.permalink.goto')",
-          noButtonText : "$services.localization.render('core.viewers.comments.permalink.hide')"
-        });
-        permalinkBox.dialog.addClassName('permalinkBox')
-        permalinkBox.dialog.down('input[type="text"]').select();
-      });
-    });
   },
   /**
    * When pressing Submit, check that the comment is not empty. Submit the form with ajax and update the whole comments
@@ -484,3 +458,28 @@ function init() {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
+
+require(['jquery'], function ($) {
+  /**
+   * Permalink: Events triggered while the permalink modal is displayed
+   */
+  $(document).on('show.bs.modal', '#permalinkModal', function (event) {
+    var modal = $(this);
+    var button = $(event.relatedTarget);
+    var permalinkValue = button.prop('href');
+    // Updating the permalink inside modal
+    modal.find('.form-control').val(permalinkValue);
+    // Go to permalink location
+    modal.find('input.btn.btn-primary').click( function() {
+      window.location = permalinkValue;
+    });
+  });
+  /**
+   * Permalink: Events triggered after the permalink modal is displayed
+   */
+  $(document).on('shown.bs.modal', '#permalinkModal', function (event) {
+    var modal = $(this);
+    // Autofocus on permalink field
+    modal.find('.form-control').focus();
+  })
+});

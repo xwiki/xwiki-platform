@@ -147,12 +147,6 @@ ul.commentreplies, .reply {
   /* fix for IE7 */
   width: 98%;
 }
-/* Permalink box */
-.permalinkBox .xdialog-box-confirmation .question {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
-  padding-left: 0;
-  text-indent: 22px;
-}
 /* The message that appears in the place of a comment deleted with ajax */
 div.notification {
   background-color: $theme.highlightColor;

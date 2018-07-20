@@ -53,7 +53,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -76,7 +75,6 @@ public class ScopeNotificationFilterTest
     private NotificationFilterManager notificationFilterManager;
     private EntityReferenceSerializer<String> serializer;
     private EntityReferenceResolver<String> resolver;
-    private EntityReferenceSerializer<String> defaultSerializer;
 
     @Before
     public void setUp() throws Exception
@@ -87,11 +85,6 @@ public class ScopeNotificationFilterTest
         mocker.registerComponent(EntityReferenceSerializer.TYPE_STRING, "local", serializer);
         resolver = mock(EntityReferenceResolver.class);
         mocker.registerComponent(EntityReferenceResolver.TYPE_STRING, resolver);
-        defaultSerializer = mock(EntityReferenceSerializer.class);
-        mocker.registerComponent(EntityReferenceSerializer.TYPE_STRING, defaultSerializer);
-        when(defaultSerializer.serialize(any(DocumentReference.class))).thenAnswer(
-                invocationOnMock -> invocationOnMock.getArgument(0).toString()
-        );
     }
 
     private NotificationFilterPreference mockNotificationFilterPreference(String entityStringValue,
@@ -159,7 +152,6 @@ public class ScopeNotificationFilterTest
         // γ: Inclusive filter on "wikiA:SpaceB"
         // δ: Exclusive filter on "wikiA:SpaceB.SpaceC"
         // ε: Exclusive filter on "wikiA:SpaceB.SpaceC.SpaceD"
-        // Z: Exclusive filter on "wikiA:SpaceB.SpaceC.SpaceD.Page1"
 
         // Mock α
         NotificationPreference preference = mock(NotificationPreference.class);
@@ -188,28 +180,16 @@ public class ScopeNotificationFilterTest
         NotificationFilterPreference prefε = mockNotificationFilterPreference("wikiA:SpaceB.SpaceC.SpaceD",
                 spaceReferenceD, NotificationFilterType.INCLUSIVE, null);
 
-        // Mock Z
-        DocumentReference pageReference = new DocumentReference("Page1", spaceReferenceD);
-        NotificationFilterPreference prefZ = mockNotificationFilterPreference("wikiA:SpaceB.SpaceC.SpaceD.Page1",
-                pageReference, NotificationFilterType.INCLUSIVE, null);
-
-        // Mock ZZ
-        DocumentReference pageReference2 = new DocumentReference("Page1", spaceReferenceD);
-        NotificationFilterPreference prefZZ = mockNotificationFilterPreference("wikiA:SpaceB.SpaceC.SpaceD.Page2",
-                pageReference2, NotificationFilterType.EXCLUSIVE, null);
-
-        Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefβ, prefγ, prefδ, prefε, prefZ, prefZZ);
+        Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefβ, prefγ, prefδ, prefε);
 
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Test 1
         String result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference).toString();
-        assertEquals("(((((NOT (WIKI = \"wikiA\") OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\"))"
-                + " OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\")) "
-                + "AND (NOT ((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC\")) "
-                + "OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\"))) "
-                + "OR PAGE IN (\"wikiA:SpaceB.SpaceC.SpaceD.Page1\")) "
-                + "AND NOT (PAGE IN (\"wikiA:SpaceB.SpaceC.SpaceD.Page2\")))", result);
+        assertEquals("(((NOT (WIKI = \"wikiA\") OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\"))" +
+                " OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\")) AND (NOT ((WIKI = \"wikiA\" " +
+                "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC\")) OR (WIKI = \"wikiA\" " +
+                "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\")))", result);
 
         // Test with wikiA:SpaceE (filtered by β)
         Event event1 = mock(Event.class);
@@ -277,7 +257,7 @@ public class ScopeNotificationFilterTest
         // Test 1
         String result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference).toString();
         assertEquals("((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") " +
-                "OR PAGE IN (\"wikiA:SpaceM.DocumentN\"))", result);
+                "OR (WIKI = \"wikiA\" AND PAGE = \"wikiA:SpaceM.DocumentN\"))", result);
 
         // Test with wikiA:SpaceE (filtered by γ & ζ)
         Event event1 = mock(Event.class);

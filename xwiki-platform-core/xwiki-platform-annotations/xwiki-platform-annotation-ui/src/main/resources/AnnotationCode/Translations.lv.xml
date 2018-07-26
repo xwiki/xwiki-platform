@@ -51,7 +51,7 @@ annotations.settings.error.notarget=Nav norādīts dokuments, kuram rādīt anot
 annotations.annotated.loading=Ielādē anotēto dokumentu
 annotations.annotated.loaderror=Neizdevās:
 annotations.annotated.loaderror.wrongresponse=Nepareizi noformēta servera atbilde
-annotations.annotated.error.noannotatedelement=Anotāciju neizdevās ielādēt, jo nav pieejams dokumenta saturs
+annotations.annotated.error.noannotatedelement=Anotāciju neizdevās ielādēt, jo nav pieejams dokumenta saturs.
 annotations.annotated.error.wrongsyntax=Anotācijas nevar izmantot dokumentā ar XWiki/1.0 sintaksi.
 
 annotations.action.edit.text=[Mainīt]
@@ -94,7 +94,7 @@ annotations.action.validate.success=Anotācija ir veismīgi validēta.
 annotations.action.validate.loaderror=Neizdevās:
 
 annotations.filters.show=Detalizēt attēlošanas nosacījumus
-annotations.filters.nooption=Nav norādīta "{0}" filtrējamā vērtība
+annotations.filters.nooption=Nav ievadīta "{0}" filtrējamā vērtība
 annotations.filters.anyvalue=jebkura vērtība
 annotations.filters.clearvalue=attīrīt
 

@@ -60,7 +60,7 @@ solr.admin.indexing.wiki.select_farm=Visai fermai
 solr.admin.indexing.query.label=Pielāgots pieprasījums
 solr.admin.indexing.query.hint=Neobligāts dokumentu skaita ierobežojums, kuriem indeksā tiks pielietota izvēlētā darbība.
 
-solr.sortBy=Kārtot pēc\:
+solr.sortBy=Kārtot pēc:
 solr.sortBy.score=Atbilstība
 solr.sortBy.title_sort=Virsraksts
 solr.sortBy.date=Pēdējo izmaiņu laiks
@@ -72,8 +72,8 @@ solr.sortBy.attauthor_display_sort=Augšuplādējis
 solr.sortOrder.asc=Augoši
 solr.sortOrder.desc=Dilstoši
 
-### Missing: solr.options=Show:
-### Missing: solr.options.highlight=Highlighting
+solr.options=Rādīt:
+solr.options.highlight=Izgaismošana
 ### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
 ### Missing: solr.options.facet=Facets
 ### Missing: solr.options.facet.title=Allow extra filtering of the result

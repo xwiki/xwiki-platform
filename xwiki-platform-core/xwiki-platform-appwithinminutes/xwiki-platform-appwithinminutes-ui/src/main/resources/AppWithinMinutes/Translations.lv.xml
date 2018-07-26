@@ -79,12 +79,12 @@ platform.appwithinminutes.wizardStepHelpDescription=Šis vednis palīdzēs jums 
 ### Wizard Step 1: Application Name
 appWithinMinutes.createApp.location.label=Vieta
 appWithinMinutes.createApp.location.hint=Izveidojamās lietotnes atrašanās vieta lapu hierarhijā
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
-### Missing: appWithinMinutes.codeSpace.title=Code
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+appWithinMinutes.createApp.parent.label=Vecāks
+appWithinMinutes.createApp.parent.hint=Jaunās lietotnes vecāks. Ja vēlaties, lai tā ir augstākā līmeņa lietotne, atstājiet šo lauku tukšu.
+appWithinMinutes.createApp.parent.placeholder=Ceļš.uz.vecāku
+appWithinMinutes.codeSpace.title=Kods
+appWithinMinutes.codeSpace.description=Šī ir vieta, kurā atrodas lietotnes kods.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Lai gan jūsu profilā ir norādīts tās nerādīt, tiek rādītas arī slēptās lapas. Pretējā gadījumā lietotnes kods nebūtu redzams, jo pēc noklusēšanas visas šīs lapas  ir slēptas.
 platform.appwithinminutes.appNamePageTitle=Izveidot lietotni
 platform.appwithinminutes.appNameLabel=Lietotnes nosaukums
 platform.appwithinminutes.appNameHint=Lietotnes nosaukums nosaka tās adresi (URL), kur tiks saglabāti lietotnes dati, kā arī klases, kurā tiks saglabāta objektu datu struktūra, nosaukumu.
@@ -94,7 +94,7 @@ platform.appwithinminutes.appNameIsUsedWarning=Tāda lietotne jau pastāv. Ja tu
 platform.appwithinminutes.appNameEmptyError=Lūdzu ievadiet lietotnes nosaukumu.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
+appWithinMinutes.classEditor.title={0} struktūra
 platform.appwithinminutes.classEditorPaletteTitle=Lauku palete
 platform.appwithinminutes.classEditorPaletteHint=Velciet un nometiet laukus, lai izveidotu savu formu.
 platform.appwithinminutes.classEditorCanvasHint=Velciet laukus no paletes uz šo lauku.
@@ -129,7 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Garš teksts
 platform.appwithinminutes.classEditorStringFieldName=Īss teksts
 platform.appwithinminutes.classEditorContentFieldName=Saturs
 platform.appwithinminutes.classEditorTitleFieldName=Virsraksts
-### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
+platform.appwithinminutes.classEditorPageFieldName=Lapa
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Dzēst
 platform.appwithinminutes.classEditorConfigureFieldLabel=Iestatīt
@@ -152,17 +152,17 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Pievienot
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Dzēst
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
-### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+appWithinMinutes.templateProviderEditor.title={0} ieraksti
+appWithinMinutes.templateProviderEditor.hint=Lietotnes ieraksti ir viki lapas, kuras satur strukturētus datus.
+appWithinMinutes.templateProviderEditor.icon.hint=Lietotnes norādes ikona.
+appWithinMinutes.templateProviderEditor.description.hint=Īss lietotnes norādes apraksts.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=No kurienes sagatavot ierakstus
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Ja vieta nav norādīta, ierakstus var izveidot no jebkuras lapas.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Kur izveidot ierakstus
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Ja vieta nav norādīta, ierakstus var izveidot jebkurā viki vietā.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Neuzspiest ierakstu atrašanās vietu
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Izmantot augšminētās vietas tikai kā ieteikumus, atļaujot lietotājam norādīt arī citu lietotnes ieraksta atrašanās vietu.
+appWithinMinutes.templateProviderEditor.terminal.hint=Vai lietotnes ierakstiem jābūt beigu lapai, vai nē.
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Klases lauki
@@ -173,8 +173,8 @@ platform.appwithinminutes.liveTableEditorDocTitleColumnName=Lapas virsraksts
 platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Lietotnes sākuma lapas virsraksts
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Lapas nosaukums
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Lietotnes sākuma lapas nosaukums
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Vieta
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Lietotnes datu saturošās lapas atrašanās vieta
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Pēdējais mainījis
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Lietotājs, kas pēdējais mainīja lietotni
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Izveidojis

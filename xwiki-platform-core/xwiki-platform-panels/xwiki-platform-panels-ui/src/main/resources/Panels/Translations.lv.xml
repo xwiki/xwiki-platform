@@ -46,8 +46,8 @@ panels.type=Veids
 panels.category=Kategorija
 panels._actions=Darbības
 panels.emptyvalue=
-### Missing: panels.children.title=Child Pages
-### Missing: panels.siblings.title=Sibling Pages
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.children.title=Bērnu lapas
+panels.siblings.title=Brāļu lapas
+panels.documentInformation.configureSyntaxes=Iestatīt papildu sintakses
 </content>
 </xwikidoc>

@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.wikis=Visi viki
+  <content>admin.wikis=Viki
 admin.wikis.descriptor=Apraksts
 admin.wikis.descriptor.description=Iestatīt viki aprakstu
 admin.wiki.description=Aprakstiet savu viki (skaistu nosaukumu un aprakstu) un norādiet tā īpašnieku un sākuma lapu.

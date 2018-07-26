@@ -51,7 +51,7 @@ platform.appwithinminutes.appsLiveTable._actions=Darbības
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Pievienot vietas pārvaldības tiesības
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Izveido savu\!
+platform.appwithinminutes.appPanelCreateEntry=Izveido savu!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Solis {0} no {1}
@@ -61,9 +61,9 @@ appWithinMinutes.wizardStep.name.description=Ievadiet lietotnes nosaukumu.
 appWithinMinutes.wizardStep.structure.name=Struktūra
 appWithinMinutes.wizardStep.structure.title=Norādiet lietotnes struktūru
 appWithinMinutes.wizardStep.structure.description=Izveidojiet lietotnes struktūru, norādot, kādus laukus tā saturēs.
-### Missing: appWithinMinutes.wizardStep.entries.name=Entries
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
-### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.entries.name=Ieraksti
+appWithinMinutes.wizardStep.entries.title=Norādiet datu vietu
+appWithinMinutes.wizardStep.entries.description=Izvēlieties, kur saglabāt datus
 appWithinMinutes.wizardStep.presentation.name=Izskats
 appWithinMinutes.wizardStep.presentation.title=Pielāgojiet lietotnes izskatu
 appWithinMinutes.wizardStep.presentation.description=Pielāgojiet lietotnes sākuma lapu.
@@ -74,11 +74,11 @@ platform.appwithinminutes.wizardStepFinishButtonTip=Doties uz lietotnes sākuma 
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Iepriekšējais solis
 platform.appwithinminutes.wizardStepPreviousButtonTip=Doties uz iepriekšējo soli
 platform.appwithinminutes.wizardStepHelpTitle=Soļi
-platform.appwithinminutes.wizardStepHelpDescription=Šis vednis palīdzēs jums izveidot savu lietotni. Turpmākajos soļos jūs norādīsiet, kādu informāciju lietotne apstrādās un kā tā tiks attēlota\:
+platform.appwithinminutes.wizardStepHelpDescription=Šis vednis palīdzēs jums izveidot savu lietotni. Turpmākajos soļos jūs norādīsiet, kādu informāciju lietotne apstrādās un kā tā tiks attēlota:
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
+appWithinMinutes.createApp.location.label=Vieta
+appWithinMinutes.createApp.location.hint=Izveidojamās lietotnes atrašanās vieta lapu hierarhijā
 ### Missing: appWithinMinutes.createApp.parent.label=Parent
 ### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
 ### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
@@ -107,7 +107,7 @@ platform.appwithinminutes.classEditorUpdateTranslationsLabel=Atjaunot klases tul
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Atjauno lauku iezīmju un sarakstu tulkojumus ({0}).
 
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Šai klasei ir vairākas lapas
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasei ir divi lauki ar vienādu nosaukumu\: {0}
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasei ir divi lauki ar vienādu nosaukumu: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Atjaunot noklusētās vērtības
 platform.appwithinminutes.classEditorBindSheetSaveComment=Klasei piesaistītā lapa
 platform.appwithinminutes.classEditorSheetSaveComment=Atjaunot klases lapu
@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Garš teksts
 platform.appwithinminutes.classEditorStringFieldName=Īss teksts
 platform.appwithinminutes.classEditorContentFieldName=Saturs
 platform.appwithinminutes.classEditorTitleFieldName=Virsraksts
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Dzēst
 platform.appwithinminutes.classEditorConfigureFieldLabel=Iestatīt
@@ -196,7 +197,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Atjaunot tabulu
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Velciet kolonnas, lai mainītu to kārtību
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Dzēst
 platform.appwithinminutes.liveTableEditorAddColumnHint=Pievienot
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?\n&lt;a href\=""&gt;Jā&lt;/a&gt; / &lt;a href\=""&gt;Nē&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?\n&lt;a href=""&gt;Jā&lt;/a&gt; / &lt;a href=""&gt;Nē&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Saite uz ikonu. Jūs varat norādīt jebkuru attēlu no ikonu izvēles zem šī lauka (kad tas ir aktivizēts), vai arī norādīt saiti uz jebkuru citu viki attēlu.
 

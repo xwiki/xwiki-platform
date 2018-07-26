@@ -47,9 +47,9 @@ admin.emailsend=Sūta e-pastu
 admin.emailsend.description=Iestatīt e-pasta sūtīšanas iestatījumus.
 admin.emailstatus=E-pasta sūtīšanas statuss
 admin.emailstatus.description=Skatīt nosūtīto e-pastu statusu.
-### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
+admin.emailstatus.hint=Ja nevarat atrast vēstules statusu, iespējams tāpēc, ka nosūtīšanas iespējās nebija norādīts, ka vēstules statuss ir jāsaglabā.
 Mail.GeneralMailConfigClass_obfuscate=Slēpt e-pasta adresi
-Mail.GeneralMailConfigClass_obfuscate.hint=Šis iestatījums darbojas tikai uz e-pasta adresēm, kuras ir saglabātas Email veidā, un ja nav mainīta noklusētā attēlošana. Izskata piemērs\: a...@domain.org
+Mail.GeneralMailConfigClass_obfuscate.hint=Šis iestatījums darbojas tikai uz e-pasta adresēm, kuras ir saglabātas Email veidā, un ja nav mainīta noklusētā attēlošana. Izskata piemērs: a...@domain.org
 Mail.SendMailConfigClass_from=Nosūtīto e-pastu sūtītāja adrese
 Mail.SendMailConfigClass_from.hint=Noklusētā e-pasta adrese, kuru norādīs kā nosūtīto pastu sūtītāja adresi.
 Mail.SendMailConfigClass_bcc=BCC e-pasta adreses
@@ -63,7 +63,7 @@ Mail.SendMailConfigClass_username.hint=Ja SMTP serveris pieprasa autentifikācij
 Mail.SendMailConfigClass_password=E-pasta servera parole
 Mail.SendMailConfigClass_password.hint=Ja SMTP serveris pieprasa autentifikāciju, šeit norādiet lietotāja paroli
 Mail.SendMailConfigClass_properties=Papildu īpašības
-Mail.SendMailConfigClass_properties.hint=Saraksts ar papildu JavaMail īpašībām (piem.,  "mail.smtp.starttls.enable\=true", lai lietotu TLS)
+Mail.SendMailConfigClass_properties.hint=Saraksts ar papildu JavaMail īpašībām (piem.,  "mail.smtp.starttls.enable=true", lai lietotu TLS)
 Mail.SendMailConfigClass_sendWaitTime=Izsūtīšanas pauzes ilgums
 Mail.SendMailConfigClass_sendWaitTime.hint=Pauze milisekundēs, kuru nogaidīt pēc katra e-pasta izsūtīšanas (pēc noklusēšanas 8 sekundes)
 Mail.SendMailConfigClass_discardSuccessStatuses=Dzēst veiksmes ziņojumus?

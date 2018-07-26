@@ -293,8 +293,8 @@ admin.wikis.template=Viki veidne
 platform.wiki.create.wizard.step.provisioning=Viki nodrošina sistēma.
 platform.wiki.create.wizard.step.provisioning.wait=Gaidiet, kamēr sistēma izveido viki.
 platform.wiki.create.wizard.step.provisioning.complete=Viki ir gandrīz gatavs. Lūdzu, klikšķiniet uz "pabeigt", lai veiktu pēdējās darbības.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning.error=Viki {0} ir izveidots, bet dažas no veidnes lapām nav pārkopētas. Iespējams, jums vajadzētu izdzēst šo viki.
+platform.wiki.create.wizard.step.provisioning.finalize=Pabeigt
 
 #######################################
 ## until 9.5-rc-1

@@ -174,7 +174,7 @@ solr.field.attdate=Augšuplādes laiks
 solr.field.attsize=Faila izmērs
 
 solr.uix.docdoesnotexist.title=Varbūt jūs meklējāt sekojošas lapas?
-solr.uix.attachmentdoesnotexist.title=Varbūt jūs meklējāt sekojošus pielikumus?
+solr.uix.attachmentdoesnotexist.title=Varbūt jūs meklējāt kādu no sekojošiem pielikumiem?
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

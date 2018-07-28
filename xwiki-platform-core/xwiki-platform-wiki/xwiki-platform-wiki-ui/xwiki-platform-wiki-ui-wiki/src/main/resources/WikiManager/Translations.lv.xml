@@ -134,6 +134,6 @@ admin.xwiki.usersconfiguration.title=Iestatījumi
 admin.xwiki.members.title=Tekošie dalībnieki
     
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home
+platform.wiki.drawer.homeWiki=Sākums
 </content>
 </xwikidoc>

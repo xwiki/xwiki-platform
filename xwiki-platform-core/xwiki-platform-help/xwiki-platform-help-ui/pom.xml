@@ -77,11 +77,13 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-page</artifactId>
       <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

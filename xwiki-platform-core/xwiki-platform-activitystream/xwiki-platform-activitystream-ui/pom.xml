@@ -36,6 +36,16 @@
     <xwiki.extension.name>Activity Stream Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- Test dependencies forced in front to workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=536868 -->
+    <!-- TODO: remove when Eclipse 4.9 final is released -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-activitystream-api</artifactId>

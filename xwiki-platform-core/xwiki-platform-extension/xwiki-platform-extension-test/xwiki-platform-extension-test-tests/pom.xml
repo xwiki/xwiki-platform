@@ -106,6 +106,7 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -123,6 +124,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-repository-test-utils</artifactId>
       <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>

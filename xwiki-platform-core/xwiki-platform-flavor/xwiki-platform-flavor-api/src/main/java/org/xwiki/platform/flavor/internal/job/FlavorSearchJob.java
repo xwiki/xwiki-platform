@@ -149,8 +149,8 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
      */
     @Override
     protected void installMandatoryExtensionDependency(ExtensionDependency extensionDependency, String namespace,
-        List<ModifableExtensionPlanNode> parentBranch, Map<String, ExtensionDependency> managedDependencies)
-        throws InstallException, IncompatibleVersionConstraintException, ResolveException
+        List<ModifableExtensionPlanNode> parentBranch, Map<String, ExtensionDependency> managedDependencies,
+        Set<String> parents) throws InstallException, IncompatibleVersionConstraintException, ResolveException
     {
         // Cheating a bit to speed up resolution:
         // Skip it when we already know it's valid
@@ -160,7 +160,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
             if (this.validatedExtensions.get(extensionDependency) == Boolean.TRUE
                 && this.configuration.getRecomendedVersionConstraint(extensionDependency.getId()) == null) {
                 super.installMandatoryExtensionDependency(extensionDependency, namespace, parentBranch,
-                    managedDependencies);
+                    managedDependencies, parents);
             }
 
             valid = Boolean.TRUE;

@@ -26,7 +26,9 @@
 
 <Context path="/xwiki" docBase="/usr/lib/xwiki" privileged="true"
   allowLinking="true" crossContext="true">
-  <!-- make symlinks work in Tomcat -->
-  <Resources className="org.apache.naming.resources.FileDirContext"
-    allowLinking="true" />
+  <!-- Make symlinks work in Tomcat -->
+  <Resources className="org.apache.naming.resources.FileDirContext" allowLinking="true" />
+
+  <!-- Disable JAR scanning since Xwiki does not need that -->
+  <JarScanner scanClassPath="false"/>
 </Context>

@@ -25,6 +25,9 @@
 <!-- Context configuration file for the XWiki Web App -->
 
 <Context path="/xwiki" docBase="/usr/lib/xwiki" privileged="true" crossContext="true">
-  <!-- make symlinks work in Tomcat -->
+  <!-- Make symlinks work in Tomcat -->
   <Resources allowLinking="true" />
+
+  <!-- Disable JAR scanning since Xwiki does not need that -->
+  <JarScanner scanClassPath="false"/>
 </Context>

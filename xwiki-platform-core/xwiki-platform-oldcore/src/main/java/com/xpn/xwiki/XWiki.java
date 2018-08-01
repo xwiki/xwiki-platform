@@ -4101,9 +4101,9 @@ public class XWiki implements EventListener
                 // If the action has been canceled by the user then don't perform any deletion and throw an exception
                 if (documentEvent.isCanceled()) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                           XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
-                           String.format("An Event Listener has cancelled the document deletion for [%s]. Reason: [%s]",
-                           doc.getDocumentReference(), documentEvent.getReason()));
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
+                        String.format("An Event Listener has cancelled the document deletion for [%s]. Reason: [%s]",
+                            doc.getDocumentReference(), documentEvent.getReason()));
                 }
             }
 
@@ -6608,6 +6608,22 @@ public class XWiki implements EventListener
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException
     {
+        return rollback(tdoc, rev, true, context);
+    }
+
+    /**
+     * @param tdoc the document to rollback
+     * @param rev the revision to rollback to
+     * @param addRevision true if a new revision should be created
+     * @param context the XWiki context
+     * @return the new document
+     * @throws XWikiException when failing to rollback the document
+     * @since 10.7RC1
+     * @since 9.11.8
+     */
+    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision, XWikiContext context)
+        throws XWikiException
+    {
         LOGGER.debug("Rolling back [{}] to version [{}]", tdoc, rev);
 
         // Let's clone rolledbackDoc since we might modify it
@@ -6754,9 +6770,19 @@ public class XWiki implements EventListener
         // now we save the final document..
         rolledbackDoc.setOriginalDocument(tdoc);
         rolledbackDoc.setAuthorReference(context.getUserReference());
-        rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
-        rolledbackDoc.setVersion(tdoc.getVersion());
-        rolledbackDoc.setContentDirty(true);
+        rolledbackDoc.setContentAuthorReference(context.getUserReference());
+
+        // Make sure the history is not modified if addRevision is disabled
+        String message;
+        if (!addRevision) {
+            rolledbackDoc.setMetaDataDirty(false);
+            rolledbackDoc.setContentDirty(false);
+            rolledbackDoc.setRCSVersion(tdoc.getDocumentArchive().getLatestVersion());
+            message = rolledbackDoc.getComment();
+        } else {
+            rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
+            message = localizePlainOrKey("core.comment.rollback", rev);
+        }
 
         ObservationManager om = getObservationManager();
         if (om != null) {
@@ -6766,7 +6792,7 @@ public class XWiki implements EventListener
             om.notify(new DocumentRollingBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc, context);
         }
 
-        saveDocument(rolledbackDoc, localizePlainOrKey("core.comment.rollback", rev), context);
+        saveDocument(rolledbackDoc, message, context);
 
         // Since the the store resets the original document, we need to temporarily put it back to send notifications.
         XWikiDocument newOriginalDocument = rolledbackDoc.getOriginalDocument();

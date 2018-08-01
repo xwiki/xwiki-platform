@@ -216,6 +216,9 @@ public class XWikiAttachment implements Cloneable
         try {
             attachment = (XWikiAttachment) super.clone();
 
+            // The new attachment is not associated to any document yet
+            attachment.setDoc(null, false);
+
             attachment.setComment(getComment());
             attachment.setDate(getDate());
             attachment.setFilename(getFilename());

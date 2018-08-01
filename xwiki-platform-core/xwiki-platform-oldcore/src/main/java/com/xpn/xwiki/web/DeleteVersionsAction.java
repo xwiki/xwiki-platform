@@ -75,25 +75,7 @@ public class DeleteVersionsAction extends XWikiAction
                 // There are still some versions left.
                 // If we delete the most recent (current) version, then rollback to latest undeleted version.
                 if (!tdoc.getRCSVersion().equals(archive.getLatestVersion())) {
-                    XWikiDocument newdoc = archive.loadDocument(archive.getLatestVersion(), context);
-                    // Reset the document reference, since the one taken from the archive might be wrong (old name from
-                    // before a rename)
-                    newdoc.setDocumentReference(tdoc.getDocumentReference());
-
-                    // Get rid of objects that don't exist in new version
-                    newdoc.addXObjectsToRemoveFromVersion(tdoc);
-
-                    // Make sure we don't create a new rev!
-                    newdoc.setMetaDataDirty(false);
-                    newdoc.setContentDirty(false);
-
-                    // Make sure the previous current document is seen as original document of
-                    // the new current document for comparisons
-                    newdoc.setOriginalDocument(tdoc.getOriginalDocument());
-
-                    // Update the database with what is now the current document
-                    context.getWiki().saveDocument(newdoc, newdoc.getComment(), context);
-                    context.setDoc(newdoc);
+                    context.getWiki().rollback(tdoc, archive.getLatestVersion().toString(), false, context);
                 }
             }
         }

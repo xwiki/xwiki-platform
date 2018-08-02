@@ -139,7 +139,7 @@
   ##
   #if ($stringtool.isNotBlank($menuContent.toString()))
     &lt;li class="dropdown" id="tmNotifications"&gt;
-      &lt;a class="icon-navbar dropdown-toggle" data-toggle="dropdown" role="button" title="$services.localization.render('watchlist')"&gt;&lt;span class="sr-only"&gt;$services.localization.render('core.menu.toggleNavigation')&lt;/span&gt;$services.icon.renderHTML('bell')&lt;/a&gt;
+      &lt;a class="icon-navbar dropdown-toggle" data-toggle="dropdown" role="button" title="$services.localization.render('watchlist.notifications')"&gt;&lt;span class="sr-only"&gt;$services.localization.render('core.menu.toggleNavigation')&lt;/span&gt;$services.icon.renderHTML('bell')&lt;/a&gt;
       &lt;ul class="dropdown-menu"&gt;
         $menuContent
       &lt;/ul&gt;

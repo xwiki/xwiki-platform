@@ -134,7 +134,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #classSwitcher()
 ##
 ##
-<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock">
+<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock xform">
 <div id="xwikieditcontent" class="clear">
 ##
 ##

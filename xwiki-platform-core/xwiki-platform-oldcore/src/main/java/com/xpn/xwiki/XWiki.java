@@ -6862,6 +6862,7 @@ public class XWiki implements EventListener
             rolledbackDoc.setRCSVersion(tdoc.getDocumentArchive().getLatestVersion());
             message = rolledbackDoc.getComment();
         } else {
+            rolledbackDoc.setMetaDataDirty(true);
             rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
             message = localizePlainOrKey("core.comment.rollback", rev);
         }

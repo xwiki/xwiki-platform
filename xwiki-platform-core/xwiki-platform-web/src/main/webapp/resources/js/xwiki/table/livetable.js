@@ -127,6 +127,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.handler = handler || function(){};
     this.totalRows = -1;
     this.fetchedRows = new Array();
+    this.renderedRows = new Array();
     this.getUrl = url;
     this.sendReqNo = 0;
     this.recvReqNo = 0;
@@ -303,7 +304,10 @@ XWiki.widgets.LiveTable = Class.create({
 
     for (var i = off; i <= f; i++) {
       if (this.fetchedRows[i]) {
-        var elem = this.handler(this.fetchedRows[i], i, this);
+        if (this.renderedRows[i] === undefined) {
+          this.renderedRows[i] = this.handler(this.fetchedRows[i], i, this);
+        }
+        var elem = this.renderedRows[i];
         this.displayNode.appendChild(elem);
         var memo = {
           "data": this.fetchedRows[i],

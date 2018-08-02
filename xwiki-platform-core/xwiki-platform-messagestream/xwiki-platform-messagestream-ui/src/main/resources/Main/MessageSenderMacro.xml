@@ -649,14 +649,14 @@ return XWiki;
             &lt;div class="message-target message-target-user#if ($defaultTarget != 'user') hidden#end"&gt;
               #set ($discard = $userPickerParams.put('class', 'targetName'))
               #set ($userPickerParams.disabled = $inEditMode || $defaultTarget != 'user')
-              #userPicker(true, $userPickerParams)
+              #userPicker(false, $userPickerParams)
             &lt;/div&gt;
           #end
           #if ($possibleTargets.contains('group'))
             &lt;div class="message-target message-target-group#if ($defaultTarget != 'group') hidden#end"&gt;
               #set ($discard = $userPickerParams.put('class', 'targetName'))
               #set ($userPickerParams.disabled = $inEditMode || $defaultTarget != 'group')
-              #groupPicker(true, $userPickerParams)
+              #groupPicker(false, $userPickerParams)
             &lt;/div&gt;
           #end
           &lt;div class="message-target message-target-default"&gt;

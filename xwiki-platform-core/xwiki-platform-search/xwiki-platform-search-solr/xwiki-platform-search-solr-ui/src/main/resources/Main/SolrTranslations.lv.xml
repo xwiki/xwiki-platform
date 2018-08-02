@@ -60,7 +60,7 @@ solr.admin.indexing.wiki.select_farm=Visai fermai
 solr.admin.indexing.query.label=Pielāgots pieprasījums
 solr.admin.indexing.query.hint=Neobligāts dokumentu skaita ierobežojums, kuriem indeksā tiks pielietota izvēlētā darbība.
 
-solr.sortBy=Kārtot pēc\:
+solr.sortBy=Kārtot pēc:
 solr.sortBy.score=Atbilstība
 solr.sortBy.title_sort=Virsraksts
 solr.sortBy.date=Pēdējo izmaiņu laiks
@@ -72,14 +72,14 @@ solr.sortBy.attauthor_display_sort=Augšuplādējis
 solr.sortOrder.asc=Augoši
 solr.sortOrder.desc=Dilstoši
 
-### Missing: solr.options=Show:
-### Missing: solr.options.highlight=Highlighting
-### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
-### Missing: solr.options.facet=Facets
-### Missing: solr.options.facet.title=Allow extra filtering of the result
+solr.options=Rādīt:
+solr.options.highlight=Izgaismošana
+solr.options.highlight.title=Parādīt iztvērumu ar atbilstošo rezultātu
+solr.options.facet=Aspekti
+solr.options.facet.title=Atļaut papildu meklēšanu rezultātos
 
 solr.result.language=Valoda
-### Missing: solr.result.locatedIn=Located in
+solr.result.locatedIn=Atrodas
 solr.result.author=Mainījis {0} {1}
 solr.result.mediaType={0} veida fails
 solr.result.uploadedBy=Augšuplādējis {0} {1} ({2})
@@ -145,9 +145,9 @@ solr.field.locale=Valoda
 solr.field.locale.emptyValue=Nav valodas
 solr.field.locale.emptyValue.hint=Dažiem dokumentiem nav norādīta valoda, jo tajos ir skripti (kuri nav rakstīti cilvēku valodā) vai arī lietotāja saskarnes izskats, kuru attēlo lietotāja izvēlētajā valodā (kā šo lapu).
 solr.field.wiki=Viki
-### Missing: solr.field.spaces=Location
+solr.field.spaces=Vieta
 solr.field.space_exact=Vieta
-### Missing: solr.field.space_facet=Location
+solr.field.space_facet=Vieta
 solr.field.name=Lapa
 solr.field.name_exact=Lapa
 solr.field.title=Virsraksts
@@ -173,8 +173,8 @@ solr.field.attauthor_display=Augšuplādējis
 solr.field.attdate=Augšuplādes laiks
 solr.field.attsize=Faila izmērs
 
-### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
-### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+solr.uix.docdoesnotexist.title=Varbūt jūs meklējāt sekojošas lapas?
+solr.uix.attachmentdoesnotexist.title=Varbūt jūs meklējāt kādu no sekojošiem pielikumiem?
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

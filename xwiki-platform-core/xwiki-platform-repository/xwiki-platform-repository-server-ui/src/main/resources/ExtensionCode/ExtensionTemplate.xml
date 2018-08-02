@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.3" reference="ExtensionCode.ExtensionTemplate" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionTemplate</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Extension.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1359990173000</creationDate>
-  <date>1359990709000</date>
-  <contentUpdateDate>1359990709000</contentUpdateDate>
+  <parent>Extension.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1533215134000</date>
+  <contentUpdateDate>1533213429000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>ExtensionCode.ExtensionTemplate</name>
+    <number>0</number>
+    <className>ExtensionCode.ExtensionClass</className>
+    <guid>4198d765-1f52-4c74-b098-9b8f2cf7aad4</guid>
     <class>
       <name>ExtensionCode.ExtensionClass</name>
       <customClass/>
@@ -53,11 +54,49 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <authors>
+      <allowednamespaces>
         <cache>0</cache>
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <hint/>
+        <multiSelect>1</multiSelect>
+        <name>allowednamespaces</name>
+        <number>26</number>
+        <picker>0</picker>
+        <prettyName>Allowed namespaces</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators>|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </allowednamespaces>
+      <allowednamespaces_empty>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>allowednamespaces_empty</name>
+        <number>27</number>
+        <prettyName>Is allowed namespaces empty</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </allowednamespaces_empty>
+      <authors>
+        <cache>0</cache>
+        <customDisplay>{{include reference="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
         <multiSelect>1</multiSelect>
         <name>authors</name>
         <number>7</number>
@@ -74,12 +113,38 @@
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </authors>
+      <category>
+        <cache>0</cache>
+        <classname>ExtensionCode.ExtensionCategoryClass</classname>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <hint/>
+        <idField>id</idField>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>16</number>
+        <picker>0</picker>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>1</size>
+        <sort>value</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField>name</valueField>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </category>
       <customInstallationOnly>
         <customDisplay/>
         <defaultValue>0</defaultValue>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
+        <hint/>
         <name>customInstallationOnly</name>
         <number>15</number>
         <prettyName>Only Custom Installation instructions</prettyName>
@@ -89,9 +154,11 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </customInstallationOnly>
       <description>
+        <contenttype>---</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>---</editor>
+        <hint/>
         <name>description</name>
         <number>5</number>
         <picker>0</picker>
@@ -108,6 +175,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <hint/>
         <multiSelect>1</multiSelect>
         <name>features</name>
         <number>8</number>
@@ -127,6 +195,7 @@
       <icon>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>icon</name>
         <number>12</number>
         <picker>0</picker>
@@ -140,6 +209,7 @@
       <id>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>id</name>
         <number>1</number>
         <picker>0</picker>
@@ -151,9 +221,11 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </id>
       <installation>
+        <contenttype>---</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>---</editor>
+        <hint/>
         <name>installation</name>
         <number>13</number>
         <picker>0</picker>
@@ -165,9 +237,55 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </installation>
+      <installedCount>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>installedCount</name>
+        <number>23</number>
+        <numberType>long</numberType>
+        <prettyName>Installed count</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </installedCount>
+      <issueManagementSystem>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>issueManagementSystem</name>
+        <number>20</number>
+        <picker>0</picker>
+        <prettyName>Issue Management System</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </issueManagementSystem>
+      <issueManagementURL>
+        <contenttype>PureText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <hint/>
+        <name>issueManagementURL</name>
+        <number>27</number>
+        <picker>0</picker>
+        <prettyName>Issue Management URL</prettyName>
+        <rows>1</rows>
+        <size>100</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </issueManagementURL>
       <lastVersion>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>lastVersion</name>
         <number>9</number>
         <picker>0</picker>
@@ -183,6 +301,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <hint/>
         <multiSelect>0</multiSelect>
         <name>licenseName</name>
         <number>10</number>
@@ -202,6 +321,7 @@
       <name>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>name</name>
         <number>3</number>
         <picker>0</picker>
@@ -212,22 +332,137 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
-      <source>
+      <properties>
+        <cache>0</cache>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>source</name>
-        <number>14</number>
+        <displayType>input</displayType>
+        <hint/>
+        <multiSelect>1</multiSelect>
+        <name>properties</name>
+        <number>17</number>
         <picker>0</picker>
-        <prettyName>Source</prettyName>
-        <size>75</size>
+        <prettyName>Properties</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators>|</separators>
+        <size>1</size>
+        <sort>none</sort>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </properties>
+      <rating>
+        <customDisplay>{{template name="rating_macros.vm"/}}
+
+{{velocity}}
+  #set($averageRating = $doc.getObject('XWiki.AverageRatingsClass'))
+  #if ($averageRating)
+    #set($averagevote = $averageRating.getValue('averagevote'))
+    #set($nbvotes = $averageRating.getValue('nbvotes'))
+    {{html clean="false"}}
+      #ratingstars("rating_$doc" "" "" $averagevote $nbvotes true)
+    {{/html}}
+  #end
+{{/velocity}}</customDisplay>
+        <disabled>0</disabled>
+        <hint/>
+        <name>rating</name>
+        <number>22</number>
+        <prettyName>Rating</prettyName>
+        <script/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.ComputedFieldClass</classType>
+      </rating>
+      <recommended>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>recommended</name>
+        <number>25</number>
+        <prettyName>Recommended</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </recommended>
+      <scmconnection>
+        <contenttype>PureText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <hint/>
+        <name>scmconnection</name>
+        <number>25</number>
+        <picker>0</picker>
+        <prettyName>Sources connection</prettyName>
+        <rows>1</rows>
+        <size>100</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </scmconnection>
+      <scmdevconnection>
+        <contenttype>PureText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <hint/>
+        <name>scmdevconnection</name>
+        <number>26</number>
+        <picker>0</picker>
+        <prettyName>Sources dev connection</prettyName>
+        <rows>1</rows>
+        <size>100</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </scmdevconnection>
+      <showInstalledCount>
+        <customDisplay/>
+        <defaultValue>1</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>showInstalledCount</name>
+        <number>24</number>
+        <prettyName>Show installed count</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showInstalledCount>
+      <source>
+        <contenttype>PureText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <hint/>
+        <name>source</name>
+        <number>24</number>
+        <picker>0</picker>
+        <prettyName>Source</prettyName>
+        <rows>1</rows>
+        <size>100</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </source>
       <summary>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>summary</name>
         <number>4</number>
         <picker>0</picker>
@@ -244,6 +479,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <hint/>
         <idField>id</idField>
         <multiSelect>0</multiSelect>
         <name>type</name>
@@ -268,6 +504,7 @@
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
+        <hint/>
         <name>validExtension</name>
         <number>11</number>
         <prettyName>Installable with Extension Manager</prettyName>
@@ -277,25 +514,34 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </validExtension>
       <website>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
+        <editor>---</editor>
+        <hint/>
         <name>website</name>
         <number>6</number>
         <picker>0</picker>
         <prettyName>Website</prettyName>
-        <size>30</size>
+        <rows>1</rows>
+        <size>100</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </website>
     </class>
-    <name>ExtensionCode.ExtensionTemplate</name>
-    <number>0</number>
-    <className>ExtensionCode.ExtensionClass</className>
-    <guid>4198d765-1f52-4c74-b098-9b8f2cf7aad4</guid>
+    <property>
+      <allowednamespaces/>
+    </property>
+    <property>
+      <allowednamespaces_empty>0</allowednamespaces_empty>
+    </property>
     <property>
       <authors/>
+    </property>
+    <property>
+      <category>other</category>
     </property>
     <property>
       <customInstallationOnly>0</customInstallationOnly>
@@ -316,6 +562,15 @@
       <installation/>
     </property>
     <property>
+      <installedCount/>
+    </property>
+    <property>
+      <issueManagementSystem/>
+    </property>
+    <property>
+      <issueManagementURL/>
+    </property>
+    <property>
       <lastVersion/>
     </property>
     <property>
@@ -323,6 +578,21 @@
     </property>
     <property>
       <name/>
+    </property>
+    <property>
+      <properties/>
+    </property>
+    <property>
+      <recommended>0</recommended>
+    </property>
+    <property>
+      <scmconnection/>
+    </property>
+    <property>
+      <scmdevconnection/>
+    </property>
+    <property>
+      <showInstalledCount>1</showInstalledCount>
     </property>
     <property>
       <source/>
@@ -340,5 +610,4 @@
       <website/>
     </property>
   </object>
-  <content/>
 </xwikidoc>

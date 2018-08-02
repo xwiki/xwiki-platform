@@ -39,14 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.wikis=Visi viki
+  <content>admin.wikis=Viki
 admin.wikis.descriptor=Apraksts
-### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
+admin.wikis.descriptor.description=Iestatīt viki aprakstu
 admin.wiki.description=Aprakstiet savu viki (skaistu nosaukumu un aprakstu) un norādiet tā īpašnieku un sākuma lapu.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Jaunais īpašnieks nepastāv vai arī ir reģistrēts citā viki.\\nVai tiešām vēlaties turpināt saglabāšanu?
 platform.wiki.admin.wiki.csrfInvalidError=Nepareizs CSRF drošības marķieris. Lūdzu atjaunojiet lapas saturu un mēģiniet vēlreiz.
 platform.wiki.admin.wiki.requiredFieldsError=Īpašnieks un mājas lapa ir obligāti lauki
-platform.wiki.admin.wiki.ownerWarning=Brīdinājums\: Kad jūs apstiprināsiet izmaiņas, iepriekšējais viki īpašnieks zaudēs savas tiesības. Ja tas esat jūs, pārliecinieties, ka neizslēgsit sevi no šī viki. Ja tā tomēr gadīsies, jums būs jāsazinās ar viki galveno superadministratoru, kurš pārvalda visus viki.
+platform.wiki.admin.wiki.ownerWarning=Brīdinājums: Kad jūs apstiprināsiet izmaiņas, iepriekšējais viki īpašnieks zaudēs savas tiesības. Ja tas esat jūs, pārliecinieties, ka neizslēgsit sevi no šī viki. Ja tā tomēr gadīsies, jums būs jāsazinās ar viki galveno superadministratoru, kurš pārvalda visus viki.
 
 ###############################################################################
 ## Deprecated
@@ -59,7 +59,7 @@ platform.wiki.admin.wiki.ownerWarning=Brīdinājums\: Kad jūs apstiprināsiet i
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wiki=Wiki
+admin.wiki=Viki
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

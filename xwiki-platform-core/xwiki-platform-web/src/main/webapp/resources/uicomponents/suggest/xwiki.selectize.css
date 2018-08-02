@@ -1,3 +1,5 @@
+#template('colorThemeInit.vm')
+
 /* Overwrite the styles associated with the 'full' CSS class from the XWiki skin. */
 .selectize-input.full {
   min-height: 34px;
@@ -28,7 +30,15 @@
 .xwiki-selectize-option {
   white-space: nowrap;
 }
-.xwiki-selectize-option-icon {
+.xwiki-selectize-option-icon-wrapper {
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  margin-right: .3em;
+  text-align: center;
+  width: 18px;
+}
+.selectize-input .xwiki-selectize-option-icon {
   margin-right: .3em;
 }
 img.xwiki-selectize-option-icon {
@@ -41,8 +51,9 @@ a.xwiki-selectize-option-label {
   color: inherit;
   text-decoration: none;
 }
-em.xwiki-selectize-option-hint {
-  display: block;
+.xwiki-selectize-option-hint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
 }
 
 /* Live Table Filter */

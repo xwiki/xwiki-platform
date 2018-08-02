@@ -47,7 +47,7 @@ platform.flamingo.themes.home.warningCurrentOldColorTheme=Pašreiz tiek izmantot
 platform.flamingo.themes.home.useThisTheme=Lietot šo tēmu
 platform.flamingo.themes.home.newThemeName=Tēmas nosaukums...
 platform.flamingo.themes.home.create=Izveidot jaunu tēmu
-platform.flamingo.themes.home.create.invalid=Nepareizs tēmas nosaukums\!
+platform.flamingo.themes.home.create.invalid=Nepareizs tēmas nosaukums!
 platform.flamingo.themes.home.create.csrf=Drošības nolūkos lūdzam apstiprināt, ka vēlaties izveidot tēmu ar nosaukumu  "{0}".
 platform.flamingo.themes.home.create.confirm=Apstiprināt
 platform.flamingo.themes.home.set.success=Tēma iestatīta uz  "{0}".
@@ -62,7 +62,7 @@ platform.flamingo.themes.category.base-colors=Pamatkrāsas
 platform.flamingo.themes.category.typography=Burtu izskats
 platform.flamingo.themes.category.forms=Formas
 platform.flamingo.themes.category.buttons=Pogas
-### Missing: platform.flamingo.themes.category.tables=Tables
+platform.flamingo.themes.category.tables=Tabulas
 platform.flamingo.themes.category.navbar=Navigācijas josla
 platform.flamingo.themes.category.dropdowns=Izvēlnes
 platform.flamingo.themes.category.panels=Paneļi
@@ -71,8 +71,8 @@ platform.flamingo.themes.category.advanced=Padziļināti
 platform.flamingo.themes.defaultvalue=Noklusētais
 platform.flamingo.themes.lessCode.description=Šajā laukā varat tieši ierakstīt LESS kodu, kurš tiks pievienots apdarei.
 platform.flamingo.themes.incompatiblebrowser=Piedodiet, bet tēmas priešskatīšana nedarbojas ar šo Internet Explorer versiju. Jums ir jāizmanto pārlūkprogrammas modernāka versija.
-### Missing: platform.flamingo.themes.local=Local
-### Missing: platform.flamingo.themes.global=Global
+platform.flamingo.themes.local=Lokāla
+platform.flamingo.themes.global=Globāla
 
 ###############################################################################
 ## Deprecated

@@ -55,7 +55,7 @@ import com.xpn.xwiki.objects.classes.PageClass;
 @Singleton
 public class PageClassPropertyValuesProvider extends AbstractDocumentListClassPropertyValuesProvider<PageClass>
 {
-    private static final String DEFAULT_ICON_NAME = "page";
+    private static final String DEFAULT_ICON_NAME = "page_white";
 
     @Inject
     private QueryBuilder<PageClass> allowedValuesQueryBuilder;

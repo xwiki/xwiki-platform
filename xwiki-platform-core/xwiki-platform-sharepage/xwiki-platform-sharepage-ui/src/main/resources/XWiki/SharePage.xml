@@ -179,6 +179,7 @@ require(['jquery', 'xwiki-suggestUsers'], function($) {
   };
 
   var initShareStatus = function() {
+    modal.find('.modal-body').removeClass('loading');
     modal.find('.share-backlink').attr('data-dismiss', 'modal');
   };
 

@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -29,15 +28,12 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
-import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Generate an {@link ExpressionNode} to handle Scope Notification Filters for a given pair of user / event type.
@@ -93,18 +89,6 @@ public class ScopeNotificationFilterExpressionGenerator
         // event.location = F
         // etc...
 
-        // Pages to include (whatever what other scope notification filter preference said)
-        ArrayList<String> pagesToInclude = preferences.getPagesToInclude();
-        if (!pagesToInclude.isEmpty()) {
-            topNode = topNode.or(value(EventProperty.PAGE).inStrings(pagesToInclude));
-        }
-
-        // Pages to exclude (whatever what other scope notification filter preference said)
-        ArrayList<String> pagesToExclude = preferences.getPagesToExclude();
-        if (!pagesToExclude.isEmpty()) {
-            topNode = topNode.and(not(value(EventProperty.PAGE).inStrings(pagesToExclude)));
-        }
-
         return topNode;
     }
 
@@ -130,9 +114,6 @@ public class ScopeNotificationFilterExpressionGenerator
 
             // Children are a list of inclusive filters located under the current one.
             for (ScopeNotificationFilterPreference childFilter : pref.getChildren()) {
-                if (!childFilter.getProperties(NotificationFilterProperty.PAGE).isEmpty()) {
-                    continue;
-                }
                 // child filter is something like "event.location = A.B"
                 filterNode = filterNode.or(generateNode(childFilter));
             }

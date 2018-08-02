@@ -84,7 +84,7 @@ platform.wiki.dependencies.template.missing=Nav uzstādīta "Wiki Template" Java
 platform.wiki.dependencies.user.missing=Nav uzstādīta "Wiki User" Java komponente. Šī lapa nedarbosies pareizi. Pārliecinieties, ka (ar Paplašinājumu pārvaldnieku) ir uzstādīti "Wiki User API" un "Wiki User Script" paplašinājumi, vai arī, ka faili 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' un 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' atrodas tīmekļa lietotņu mapē 'WEB-INF/lib/' (pieņemot, ka šī ir manuāla instalācija).
 
 ## Create
-### Missing: platform.wiki.create.button=Create Wiki
+platform.wiki.create.button=Izveidot viki
 platform.wiki.create.title=Izveidot jaunu viki
 platform.wiki.create.members=Dalībnieki
 platform.wiki.create.prettyname.empty=Skaistais nosaukums nedrīkst būt tukšs
@@ -221,10 +221,10 @@ platform.wiki.create.wizard.template.noTemplate=Bez veidnes (noklusētais)
 platform.wiki.create.wizard.userScope.label=Lietotāju apgabals
 platform.wiki.create.wizard.userScope.hint=Izvēlieties, kādi lietotāju veidi varēs piekļūt viki
 platform.wiki.create.wizard.template.label=Veidne
-### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
-### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
-### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
-### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
+platform.wiki.create.wizard.flavortemplate.label=Veids/veidne
+platform.wiki.create.wizard.flavortemplate.hint=Jaunā viki veids un sākotnējais saturs no veidnes
+platform.wiki.create.wizard.flavortemplate.flavorTab=Veids
+platform.wiki.create.wizard.flavortemplate.templateTab=Veidne
 platform.wiki.create.wizard.step.dw=Pēc klikšķa uz "Izveidot" pogas, tiks izveidots viki un Distribūcijas vednis sāks inicializēt to. Ja jūs to izlaidīsiet, jūsu viki būs tukšs.
 platform.wiki.create.wizard.step.previous=Iepriekšējais solis
 platform.wiki.create.wizard.step.next=Doties uz nākamo soli
@@ -239,8 +239,8 @@ platform.wiki.create.wizard.step.creation.go=Doties uz viki
 ## Admin
 admin.wikis.description=Viki pārvaldība.
 admin.wikis.templates=Veidnes
-### Missing: admin.wikis.templates.description=Manage the wiki templates
-### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
+admin.wikis.templates.description=Pārvaldīt viki veidnes
+admin.wikis.templates.hint=Veidne ir viki, kura tiks izmantota kā paraugs jauna viki izveidei. Lietotājam izvēloties noteiktu viki veidni, uz jauno viki tiks pārkopēts viss viki veidnes saturs.
 admin.wikis.rights=Izveides tiesības
 
 ## XWikiServer Sheet
@@ -279,22 +279,22 @@ platform.wiki.sheet.aliases=Sinonīms ir cits viki nosaukums. Jūs varat izmanto
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing=Nav uzstādīts {0}Lietotņu pārvaldnieka spraudnis{1}. Lūdzu, uzstādiet to un mēģiniet vēlreiz.
 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis=Viki
+admin.wikis.template=Viki veidne
 
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=Viki nodrošina sistēma.
+platform.wiki.create.wizard.step.provisioning.wait=Gaidiet, kamēr sistēma izveido viki.
+platform.wiki.create.wizard.step.provisioning.complete=Viki ir gandrīz gatavs. Lūdzu, klikšķiniet uz "pabeigt", lai veiktu pēdējās darbības.
+platform.wiki.create.wizard.step.provisioning.error=Viki {0} ir izveidots, bet dažas no veidnes lapām nav pārkopētas. Iespējams, jums vajadzētu izdzēst šo viki.
+platform.wiki.create.wizard.step.provisioning.finalize=Pabeigt
 
 #######################################
 ## until 9.5-rc-1

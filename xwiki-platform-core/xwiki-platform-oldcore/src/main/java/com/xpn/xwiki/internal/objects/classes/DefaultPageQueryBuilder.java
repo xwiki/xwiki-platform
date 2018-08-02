@@ -59,16 +59,24 @@ public class DefaultPageQueryBuilder implements QueryBuilder<PageClass>
     @Named("viewable")
     private QueryFilter viewableFilter;
 
+    @Inject
+    @Named("hidden/document")
+    private QueryFilter hiddenFilter;
+
     @Override
     public Query build(PageClass pageClass) throws QueryException
     {
         Query query;
         if (StringUtils.isEmpty(pageClass.getSql())) {
             query = this.implicitlyAllowedValuesQueryBuilder.build(pageClass);
+            // We can filter hidden documents here because we control how the query is build ('doc' alias is present).
+            query.addFilter(hiddenFilter);
             // We don't need the viewable filter here as the query builder already adds its own viewable filter.
             query.addFilter(this.documentFilter);
         } else {
             query = this.explicitlyAllowedValuesQueryBuilder.build(pageClass);
+            // NOTE: If the user provides an explicit query then he's responsible for filtering hidden documents if he
+            // needs it. We can't use the hidden document filter here because we don't control the query.
             query.addFilter(this.documentFilter);
             query.addFilter(this.viewableFilter);
         }

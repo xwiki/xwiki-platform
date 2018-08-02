@@ -26,7 +26,7 @@
 	<groupId>maven</groupId>
 	<artifactId>oldextension</artifactId>
 	<name>name</name>
-	<version>2.0</version>
+	<version>0.9</version>
 	<packaging>jar</packaging>
 	<description>summary2</description>
 	<url>http://website2</url>

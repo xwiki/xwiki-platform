@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -350,6 +351,8 @@ public class RepositoryManager implements Initializable, Disposable
      */
     private String findLastVersion(XWikiDocument document)
     {
+        String extensionId = getExtensionId(document);
+
         DocumentReference versionClassReference =
             getClassReference(document, XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
 
@@ -359,11 +362,15 @@ public class RepositoryManager implements Initializable, Disposable
         if (versionObjects != null) {
             for (BaseObject versionObject : versionObjects) {
                 if (versionObject != null) {
-                    String versionString = getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
-                    if (versionString != null) {
-                        DefaultVersion version = new DefaultVersion(versionString);
-                        if (lastVersion == null || version.compareTo(lastVersion) > 0) {
-                            lastVersion = version;
+                    String versionId = getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_ID);
+
+                    if (StringUtils.isEmpty(versionId) || Objects.equals(extensionId, versionId)) {
+                        String versionString = getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
+                        if (versionString != null) {
+                            DefaultVersion version = new DefaultVersion(versionString);
+                            if (lastVersion == null || version.compareTo(lastVersion) > 0) {
+                                lastVersion = version;
+                            }
                         }
                     }
                 }
@@ -371,6 +378,11 @@ public class RepositoryManager implements Initializable, Disposable
         }
 
         return lastVersion != null ? lastVersion.getValue() : null;
+    }
+
+    private String getExtensionId(XWikiDocument document)
+    {
+        return document.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_ID);
     }
 
     private DocumentReference getClassReference(XWikiDocument document, EntityReference localReference)
@@ -560,9 +572,7 @@ public class RepositoryManager implements Initializable, Disposable
 
         for (Version version : versionsIterable) {
             if (type == null || version.getType() == type) {
-                if (!versions.containsKey(version)) {
-                    versions.put(version, extensionId);
-                }
+                versions.putIfAbsent(version, extensionId);
             }
 
             lastVersion = version;
@@ -574,19 +584,19 @@ public class RepositoryManager implements Initializable, Disposable
     public DocumentReference importExtension(String extensionId, ExtensionRepository repository, Type type)
         throws QueryException, XWikiException, ResolveException
     {
-        TreeMap<Version, String> versions = new TreeMap<Version, String>();
+        TreeMap<Version, String> extensionVersions = new TreeMap<>();
 
-        Version lastVersion = getVersions(extensionId, repository, type, versions);
+        Version lastVersion = getVersions(extensionId, repository, type, extensionVersions);
 
         if (lastVersion == null) {
             throw new ExtensionNotFoundException(
                 "Can't find any version for the extension [" + extensionId + "] on repository [" + repository + "]");
-        } else if (versions.isEmpty()) {
+        } else if (extensionVersions.isEmpty()) {
             // If no valid version import the last version
-            versions.put(lastVersion, extensionId);
+            extensionVersions.put(lastVersion, extensionId);
         } else {
             // Select the last valid version
-            lastVersion = versions.lastKey();
+            lastVersion = extensionVersions.lastKey();
         }
 
         Extension extension = repository.resolve(new ExtensionId(extensionId, lastVersion));
@@ -594,9 +604,11 @@ public class RepositoryManager implements Initializable, Disposable
         // Get former ids versions
         Collection<ExtensionId> features = extension.getExtensionFeatures();
 
+        TreeMap<Version, String> featureVersions = new TreeMap<>();
+
         for (ExtensionId feature : features) {
             try {
-                getVersions(feature.getId(), repository, type, versions);
+                getVersions(feature.getId(), repository, type, featureVersions);
             } catch (ResolveException e) {
                 // Ignore
             }
@@ -675,7 +687,8 @@ public class RepositoryManager implements Initializable, Disposable
                         document.removeXObject(versionObject);
                         needSave = true;
                     } else {
-                        if (!versions.containsKey(new DefaultVersion(version))) {
+                        if (!extensionVersions.containsKey(new DefaultVersion(version))
+                            && featureVersions.containsKey(new DefaultVersion(version))) {
                             // The version does not exist on remote repository
                             if (!isVersionValid(document, versionObject, xcontext)) {
                                 // The version is invalid, removing it to not make the whole extension invalid
@@ -709,29 +722,28 @@ public class RepositoryManager implements Initializable, Disposable
             }
         }
 
-        // Update versions
+        // Update features versions
 
-        for (Map.Entry<Version, String> entry : versions.entrySet()) {
+        for (Map.Entry<Version, String> entry : featureVersions.entrySet()) {
             Version version = entry.getKey();
             String id = entry.getValue();
 
-            try {
-                Extension versionExtension;
-                if (version.equals(extension.getId().getVersion())) {
-                    versionExtension = extension;
-                } else if (isVersionProxyingEnabled(document)) {
-                    continue;
-                } else {
-                    versionExtension = repository.resolve(new ExtensionId(id, version));
-                }
-
-                // Update version related informations
-                needSave |= updateExtensionVersion(document, versionExtension);
-            } catch (Exception e) {
-                this.logger.error("Failed to resolve extension with id [" + id + "] and version [" + version
-                    + "] on repository [" + repository + "]", e);
+            // Give priority to extension version in case of conflict
+            if (!extensionVersions.containsKey(version)) {
+                updateVersion(id, version, extension, repository, document);
             }
         }
+
+        // Update extension versions
+
+        for (Map.Entry<Version, String> entry : extensionVersions.entrySet()) {
+            Version version = entry.getKey();
+            String id = entry.getValue();
+
+            updateVersion(id, version, extension, repository, document);
+        }
+
+        // Save
 
         if (needSave) {
             document.setAuthorReference(xcontext.getUserReference());
@@ -746,6 +758,29 @@ public class RepositoryManager implements Initializable, Disposable
         }
 
         return document.getDocumentReference();
+    }
+
+    private boolean updateVersion(String id, Version version, Extension extension, ExtensionRepository repository,
+        XWikiDocument document)
+    {
+        try {
+            Extension versionExtension;
+            if (version.equals(extension.getId().getVersion())) {
+                versionExtension = extension;
+            } else if (isVersionProxyingEnabled(document)) {
+                return false;
+            } else {
+                versionExtension = repository.resolve(new ExtensionId(id, version));
+            }
+
+            // Update version related informations
+            return updateExtensionVersion(document, versionExtension);
+        } catch (Exception e) {
+            this.logger.error("Failed to resolve extension with id [" + id + "] and version [" + version
+                + "] on repository [" + repository + "]", e);
+        }
+
+        return false;
     }
 
     /**

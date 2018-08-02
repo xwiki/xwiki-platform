@@ -93,6 +93,8 @@ public class AllTests
         FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
             "maven/oldextension/0.9/oldextension-0.9.jar"));
         FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
+            "maven/oldextension/10.0/oldversionnedextension-10.0.jar"));
+        FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
             "maven/dependency/version/dependency-version.jar"));
     }
 }

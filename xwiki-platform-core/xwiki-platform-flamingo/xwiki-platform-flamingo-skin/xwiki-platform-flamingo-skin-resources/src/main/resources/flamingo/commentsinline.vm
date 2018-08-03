@@ -167,11 +167,17 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       #if ($hasAdmin || ($hasEdit && $isUserComment))
         ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
         ## By providing an anchor this behavior is stoped, without altering the URL functionality.
+        #set ($deleteQueryString = $escapetool.url({
+          'form_token': $services.csrf.token,
+          'classname': $xCommentClass,
+          'classid': $comment.number,
+          'xredirect': $doc.getURL('view')
+        }))
+        #set ($deleteURL = $doc.getURL('objectremove', "${deleteQueryString}#xwikicomment_${comment.number}"))
         <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
-          href="$doc.getURL('objectremove',
-          "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$doc.getURL('view')
-          #xwikicomment_${comment.number}")"
-          title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')</a>
+          href="$deleteURL"
+          title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')
+        </a>
        #end
       </div>## btn-group
     </div>## commentheader

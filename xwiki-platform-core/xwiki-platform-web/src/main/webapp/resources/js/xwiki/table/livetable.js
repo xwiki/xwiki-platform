@@ -127,7 +127,6 @@ XWiki.widgets.LiveTable = Class.create({
     this.handler = handler || function(){};
     this.totalRows = -1;
     this.fetchedRows = new Array();
-    this.renderedRows = new Array();
     this.getUrl = url;
     this.sendReqNo = 0;
     this.recvReqNo = 0;
@@ -304,21 +303,22 @@ XWiki.widgets.LiveTable = Class.create({
 
     for (var i = off; i <= f; i++) {
       if (this.fetchedRows[i]) {
-        if (this.renderedRows[i] === undefined) {
-          this.renderedRows[i] = this.handler(this.fetchedRows[i], i, this);
+        var elem = this.fetchedRows[i].livetableRenderedRow;
+        if (elem === undefined) {
+          this.fetchedRows[i].livetableRenderedRow = this.handler(this.fetchedRows[i], i, this);
+          elem = this.fetchedRows[i].livetableRenderedRow;
+          var memo = {
+            "data": this.fetchedRows[i],
+            "row":elem,
+            "table":this,
+            "tableId":this.domNodeName
+          };
+          // 1. Named event (for code interested by that table only)
+          document.fire("xwiki:livetable:" + this.domNodeName + ":newrow", memo);
+          // 2. Generic event (for code potentially interested in any livetable)
+          document.fire("xwiki:livetable:newrow", memo);
         }
-        var elem = this.renderedRows[i];
         this.displayNode.appendChild(elem);
-        var memo = {
-          "data": this.fetchedRows[i],
-          "row":elem,
-          "table":this,
-          "tableId":this.domNodeName
-        };
-        // 1. Named event (for code interested by that table only)
-        document.fire("xwiki:livetable:" + this.domNodeName + ":newrow", memo);
-        // 2. Generic event (for code potentially interested in any livetable)
-        document.fire("xwiki:livetable:newrow", memo);
       }
     }
     if (this.paginator) this.paginator.refreshPagination();

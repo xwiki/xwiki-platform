@@ -140,7 +140,7 @@
   #if ($stringtool.isNotBlank($menuContent.toString()))
     &lt;li class="dropdown" id="tmNotifications"&gt;
       &lt;a class="icon-navbar dropdown-toggle" data-toggle="dropdown" role="button"
-      title="$services.localization.render('watchlist.notifications')"&gt;
+      title="$services.localization.render('watchlist.notification.tooltip')"&gt;
         &lt;span class="sr-only"&gt;
           $services.localization.render('core.menu.toggleNavigation')
         &lt;/span&gt;

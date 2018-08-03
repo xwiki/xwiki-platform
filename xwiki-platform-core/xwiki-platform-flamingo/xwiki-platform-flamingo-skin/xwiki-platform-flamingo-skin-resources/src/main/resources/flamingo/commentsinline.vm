@@ -165,8 +165,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
         title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
       #if ($hasAdmin || ($hasEdit && $isUserComment))
-        ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap
-        ## By providing an anchor this behavior is stoped, without altering the URL functionality
+        ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
+        ## By providing an anchor this behavior is stoped, without altering the URL functionality.
         <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
           href="$doc.getURL('objectremove',
           "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$doc.getURL('view')
@@ -335,7 +335,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         <div class="modal-footer">
           <input type="button" class="btn btn-danger"
             value="$escapetool.xml($services.localization.render('core.viewers.comments.delete'))" data-dismiss="modal">
-          <input type="button" class="btn btn-default" value="$escapetool.xml($services.localization.render('cancel'))" data-dismiss="modal">
+          <input type="button" class="btn btn-default"
+            value="$escapetool.xml($services.localization.render('cancel'))" data-dismiss="modal">
         </div>
       </div>
     </div>

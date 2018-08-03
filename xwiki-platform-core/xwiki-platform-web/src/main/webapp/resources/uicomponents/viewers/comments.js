@@ -397,29 +397,29 @@ return XWiki;
 
 require(['jquery'], function ($) {
   /**
-   * Permalink: Events triggered while the permalink modal is displayed
+   * Permalink: Events triggered while the permalink modal is displayed.
    */
   $(document).on('show.bs.modal', '#permalinkModal', function (event) {
     var modal = $(this);
     var button = $(event.relatedTarget);
     var permalinkValue = button.prop('href');
-    // Updating the permalink inside modal
+    // Updating the permalink inside modal.
     modal.find('.form-control').val(permalinkValue);
-    // Go to permalink location
+    // Go to permalink location.
     modal.find('input.btn.btn-primary').click( function() {
       window.location = permalinkValue;
     });
   });
   /**
-   * Permalink: Events triggered after the permalink modal is displayed
+   * Permalink: Events triggered after the permalink modal is displayed.
    */
   $(document).on('shown.bs.modal', '#permalinkModal', function (event) {
     var modal = $(this);
-    // Autofocus on permalink field
+    // Autofocus on permalink field.
     modal.find('.form-control').focus();
   })
   /**
-   * Delete: Events triggered after the delete modal is displayed
+   * Delete: Events triggered after the delete modal is displayed.
    */
   $(document).on('shown.bs.modal' , '#deleteModal', function (event) {
     var modal = $(this);
@@ -432,8 +432,8 @@ require(['jquery'], function ($) {
       $.ajax({
         url : button.prop('href'),
         success : function() {
-          var comment = button.parentsUntil(".reply");
-          // Replace the comment with a "deleted comment" placeholder
+          var comment = button.parentsUntil('.reply');
+          // Replace the comment with a "deleted comment" placeholder.
           comment.replaceWith(createNotification("$services.localization.render('core.viewers.comments.commentDeleted')"));
           new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.commentDeleted')", 'done');
         },
@@ -443,11 +443,11 @@ require(['jquery'], function ($) {
       })
     });
   /**
-   * Just a simple message box that is displayed at 'comment deleted' event
+   * Just a simple message box that is displayed at 'comment deleted' event.
    */
   });
   var createNotification = function(message) {
-    var msg = new Element('div', {"class" : "notification" });
+    var msg = new Element('div', {'class' : 'notification' });
     msg.update(message);
     return msg;
   };

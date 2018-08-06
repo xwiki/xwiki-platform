@@ -165,8 +165,20 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
         title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
       #if ($hasAdmin || ($hasEdit && $isUserComment))
-        <a class="delete btn btn-default btn-xs " rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')</a>
-      #end
+        ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
+        ## By providing an anchor this behavior is stoped, without altering the URL functionality.
+        #set ($queryString = $escapetool.url({
+          'form_token': $services.csrf.token,
+          'classname': $xCommentClass,
+          'classid': $comment.number,
+          'xredirect': $doc.getURL('view')
+        }))
+        #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
+        <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
+          href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
+          $services.icon.renderHTML('cross')
+        </a>
+       #end
       </div>## btn-group
     </div>## commentheader
     #if ($isAnnotation)
@@ -175,6 +187,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
   </div>## xwikicomment
   #showPermalinkModal
+  #showDeleteModal
 #end
 ##
 ##
@@ -306,6 +319,30 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <input type="button" class="btn btn-default" data-dismiss="modal"
             value="$escapetool.xml($services.localization.render('cancel'))"/>
         </div>
+        </div>
+      </div>
+    </div>
+  </div>
+#end
+##
+##
+##
+#macro(showDeleteModal)
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">$services.localization.render('core.viewers.comments.delete')</h4>
+        </div>
+        <div class="modal-body">
+          <div>$services.localization.render('core.viewers.comments.delete.confirm')</div>
+        </div>
+        <div class="modal-footer">
+          <input type="button" class="btn btn-danger"
+            value="$escapetool.xml($services.localization.render('core.viewers.comments.delete'))" data-dismiss="modal">
+          <input type="button" class="btn btn-default"
+            value="$escapetool.xml($services.localization.render('cancel'))" data-dismiss="modal">
         </div>
       </div>
     </div>

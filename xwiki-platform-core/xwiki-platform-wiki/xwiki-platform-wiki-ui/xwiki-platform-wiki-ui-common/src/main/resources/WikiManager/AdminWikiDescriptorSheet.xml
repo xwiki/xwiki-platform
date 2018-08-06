@@ -124,7 +124,12 @@
               #else
                 #set ($homepage = '')
               #end
-              &lt;input id='homepage' name='homepage' type='text' size='30' class='suggestDocuments' value="$!{escapetool.xml($homepage)}" /&gt;
+              #set ($pagePickerParams = {
+                'id': 'homepage',
+                'name': 'homepage',
+                'value': $!{escapetool.xml($homepage)}
+              })
+              #pagePicker(false $pagePickerParams)
             &lt;/dd&gt;
 
             ## Only show the owner change form element if the current user is the current owner or a global admin (has edit on the wiki's descriptor document).

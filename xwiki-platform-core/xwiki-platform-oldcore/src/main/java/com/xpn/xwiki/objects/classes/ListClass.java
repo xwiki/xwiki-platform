@@ -135,7 +135,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * @return a string of separator characters used to split/deserialize an input string coming from the UI (filled by
-     *         the user) that represents a serialized list
+     * the user) that represents a serialized list
      * @see #displayEdit(StringBuffer, String, String, BaseCollection, XWikiContext)
      * @see #fromString(String)
      */
@@ -150,7 +150,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * @param separators a string of characters used to split/deserialize an input string coming from the UI (filled by
-     *            the user) that represents a serialized list
+     * the user) that represents a serialized list
      */
     public void setSeparators(String separators)
     {
@@ -229,7 +229,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * @return a string (usually just 1 character long) used to join this list's items when displaying it in the UI in
-     *         view mode.
+     * view mode.
      * @see #displayView(StringBuffer, String, String, BaseCollection, XWikiContext)
      */
     public String getSeparator()
@@ -239,7 +239,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * @param separator a string (usually just 1 character long) used to join this list's items when displaying it in
-     *            the UI in view mode.
+     * the UI in view mode.
      */
     public void setSeparator(String separator)
     {
@@ -261,10 +261,9 @@ public abstract class ListClass extends PropertyClass
     /**
      * @param value the string holding a serialized list
      * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
-     *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
-     *            list items
+     * string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside list items
      * @param withMap set to true if the list's values contain map entries (key=value pairs) that should also be parsed.
-     *            Only the keys are extracted from such list items
+     * Only the keys are extracted from such list items
      * @return the list that was stored in the input string
      */
     public static List<String> getListFromString(String value, String separators, boolean withMap)
@@ -318,7 +317,7 @@ public abstract class ListClass extends PropertyClass
      *
      * @param list the list to serialize
      * @return a string representing a serialized list, delimited by the first separator character (from the ones inside
-     *         the separators string). Separators inside list items are safely escaped ({@value #SEPARATOR_ESCAPE}).
+     * the separators string). Separators inside list items are safely escaped ({@value #SEPARATOR_ESCAPE}).
      * @see #getStringFromList(List, String)
      */
     public static String getStringFromList(List<String> list)
@@ -329,10 +328,10 @@ public abstract class ListClass extends PropertyClass
     /**
      * @param list the list to serialize
      * @param separators the separator characters (given as a string) used when the list was populated with values. The
-     *            list's items can contain these separators in plain/unescaped form. The first separator character will
-     *            be used to join the list in the output.
+     * list's items can contain these separators in plain/unescaped form. The first separator character will be used to
+     * join the list in the output.
      * @return a string representing a serialized list, delimited by the first separator character (from the ones inside
-     *         the separators string). Separators inside list items are safely escaped ({@value #SEPARATOR_ESCAPE}).
+     * the separators string). Separators inside list items are safely escaped ({@value #SEPARATOR_ESCAPE}).
      */
     public static String getStringFromList(List<String> list, String separators)
     {
@@ -387,8 +386,8 @@ public abstract class ListClass extends PropertyClass
      *
      * @param property a property to be used in an form input
      * @return the text value to be used in an form input. If a {@link ListProperty} is passed, the list's separators
-     *         defined by {@link #getSeparators()} are escaped for each list item and the items are joined by the first
-     *         separator
+     * defined by {@link #getSeparators()} are escaped for each list item and the items are joined by the first
+     * separator
      * @see #getStringFromList(List, String)
      */
     public String toFormString(BaseProperty property)
@@ -542,12 +541,12 @@ public abstract class ListClass extends PropertyClass
      * Search for an internationalizable display text for the current value. The value can be either a simple string, or
      * a value=name pair selected from the database.
      *
-     * @see #getDisplayValue(String, String, Map, XWikiContext)
      * @param rawvalue The internal value, or a value=name pair.
      * @param name The name of the ListProperty.
      * @param map The value=name mapping specified in the "values" parameter of the property.
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     * @see #getDisplayValue(String, String, Map, XWikiContext)
      */
     protected String getDisplayValue(Object rawvalue, String name, Map<String, ListItem> map, XWikiContext context)
     {
@@ -844,6 +843,17 @@ public abstract class ListClass extends PropertyClass
 
         // Fallback on default ListProperty merging
         super.mergeProperty(currentProperty, previousProperty, newProperty, configuration, context, mergeResult);
+    }
+
+    @Override
+    public BaseProperty fromValue(Object value)
+    {
+        if (value instanceof String) {
+            return this.fromString((String) value);
+        }
+        BaseProperty property = newProperty();
+        property.setValue(value);
+        return property;
     }
 
     protected <T extends EntityReference> void mergeNotOrderedListProperty(BaseProperty<T> currentProperty,

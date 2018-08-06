@@ -173,10 +173,10 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           'classid': $comment.number,
           'xredirect': $doc.getURL('view')
         }))
-        #set ($deleteURL = $doc.getURL('objectremove', "${deleteQueryString}#xwikicomment_${comment.number}"))
+        #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $deleteQueryString, "xwikicomment_${comment.number}"))
         <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
-          href="$deleteURL"
-          title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')
+          href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
+          $services.icon.renderHTML('cross')
         </a>
        #end
       </div>## btn-group

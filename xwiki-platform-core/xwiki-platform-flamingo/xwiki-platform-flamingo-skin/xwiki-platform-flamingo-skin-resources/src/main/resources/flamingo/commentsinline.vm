@@ -319,7 +319,6 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <input type="button" class="btn btn-default" data-dismiss="modal"
             value="$escapetool.xml($services.localization.render('cancel'))"/>
         </div>
-        </div>
       </div>
     </div>
   </div>

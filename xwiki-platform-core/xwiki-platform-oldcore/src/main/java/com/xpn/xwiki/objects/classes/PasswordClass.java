@@ -59,7 +59,6 @@ public class PasswordClass extends StringClass
     public PasswordClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Password", wclass);
-        setxWikiClass(wclass);
     }
 
     public PasswordClass()
@@ -132,6 +131,15 @@ public class PasswordClass extends StringClass
             }
         }
         return DEFAULT_STORAGE;
+    }
+
+    /**
+     * @param storageType One of 'Clear', 'Hash' or 'Encrypt'
+     * @since 10.7RC1
+     */
+    public void setStorageType(String storageType)
+    {
+        setStringValue(PasswordMetaClass.STORAGE_TYPE, storageType);
     }
 
     /**

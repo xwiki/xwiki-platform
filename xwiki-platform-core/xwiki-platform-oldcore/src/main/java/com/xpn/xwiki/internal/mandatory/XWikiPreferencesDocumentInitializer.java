@@ -35,6 +35,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
+import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 
 /**
  * Update XWiki.XWikiPreferences document with all required informations.
@@ -189,7 +190,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("ldap_server", "Ldap server adress", 60);
         xclass.addTextField("ldap_port", "Ldap server port", 60);
         xclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
-        xclass.addTextField("ldap_bind_pass", "Ldap password matching", 60);
+        xclass.addPasswordField("ldap_bind_pass", "Ldap password matching", 60, PasswordMetaClass.CLEAR);
         xclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", "yesno");
         xclass.addTextField("ldap_user_group", "Ldap group filter", 60);
         xclass.addTextField("ldap_exclude_group", "Ldap group to exclude", 60);

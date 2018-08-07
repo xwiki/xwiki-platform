@@ -537,13 +537,21 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addPasswordField(String fieldName, String fieldPrettyName, int size)
     {
+        return addPasswordField(fieldName, fieldPrettyName, size, null);
+    }
+
+    public boolean addPasswordField(String fieldName, String fieldPrettyName, int size, String storageType)
+    {
         if (get(fieldName) == null) {
-            PasswordClass text_class = new PasswordClass();
-            text_class.setName(fieldName);
-            text_class.setPrettyName(fieldPrettyName);
-            text_class.setSize(size);
-            text_class.setObject(this);
-            put(fieldName, text_class);
+            PasswordClass passwordClass = new PasswordClass();
+            passwordClass.setName(fieldName);
+            passwordClass.setPrettyName(fieldPrettyName);
+            passwordClass.setSize(size);
+            if (storageType != null) {
+                passwordClass.setStorageType(storageType);
+            }
+            passwordClass.setObject(this);
+            put(fieldName, passwordClass);
 
             return true;
         }

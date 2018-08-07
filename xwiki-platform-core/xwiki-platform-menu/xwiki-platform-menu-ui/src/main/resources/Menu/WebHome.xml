@@ -40,7 +40,6 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
   <content>{{velocity}}
-#set ($discard = $services.localization.use('document', 'Menu.MenuTranslations'))
 #set ($columnsProperties = {
   'doc.name': {"type":"text","size":10,"link":"view"},
   'doc.date': {"type":"date","size":10},

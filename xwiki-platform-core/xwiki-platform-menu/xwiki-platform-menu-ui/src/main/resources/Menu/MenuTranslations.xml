@@ -118,7 +118,7 @@ menu.description=This is a simple application that helps you create navigation m
       </scope>
     </class>
     <property>
-      <scope>WIKI</scope>
+      <scope>GLOBAL</scope>
     </property>
   </object>
 </xwikidoc>

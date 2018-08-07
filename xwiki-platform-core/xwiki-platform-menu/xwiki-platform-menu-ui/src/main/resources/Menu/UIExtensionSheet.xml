@@ -51,7 +51,6 @@
 #end
 ##
 ##
-#set ($discard = $services.localization.use('document', 'Menu.MenuTranslations'))
 #set ($discard = $doc.use('XWiki.UIExtensionClass'))
 #set ($uixObject = $doc.getObject('XWiki.UIExtensionClass'))
 #set ($selectedExtensionPointId = $uixObject.getProperty('extensionPointId').value)

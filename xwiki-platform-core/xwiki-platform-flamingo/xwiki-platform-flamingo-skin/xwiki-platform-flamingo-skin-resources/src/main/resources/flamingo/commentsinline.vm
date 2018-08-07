@@ -306,11 +306,9 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <h4 class="modal-title">$services.localization.render('core.viewers.comments.permalink')</h4>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <div class="input-group">
-              <div class="input-group-addon">$services.icon.renderHTML('link')</div>
-              <input type="text" class="form-control"/>
-            </div>
+          <div class="input-group">
+            <div class="input-group-addon">$services.icon.renderHTML('link')</div>
+            <input type="text" class="form-control"/>
           </div>
         </div>
         <div class="modal-footer">
@@ -318,7 +316,6 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
             value="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.goto'))"/>
           <input type="button" class="btn btn-default" data-dismiss="modal"
             value="$escapetool.xml($services.localization.render('cancel'))"/>
-        </div>
         </div>
       </div>
     </div>

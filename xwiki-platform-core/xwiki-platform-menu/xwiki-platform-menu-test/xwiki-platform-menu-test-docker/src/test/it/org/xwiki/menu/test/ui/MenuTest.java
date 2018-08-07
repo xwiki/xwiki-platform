@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Various Menu tests to prove that the Menu feature works (add a new menu after the header, add a left panel menu,
- * add a right panel menu, etc).
+ * Various Menu tests to prove that the Menu feature works (add a new menu after the header, add a left panel menu, add
+ * a right panel menu, etc).
  *
  * @version $Id$
  * @since 10.6RC1

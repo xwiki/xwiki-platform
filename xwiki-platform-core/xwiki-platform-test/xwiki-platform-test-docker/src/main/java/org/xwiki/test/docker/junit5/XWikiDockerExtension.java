@@ -174,6 +174,8 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
 
         webDriverContainer.start();
 
+        LoggerFactory.getLogger(this.getClass()).info("VNC server address = " + webDriverContainer.getVncAddress());
+
         // Store it so that we can stop it later on
         saveBrowserWebDriverContainer(extensionContext, webDriverContainer);
 

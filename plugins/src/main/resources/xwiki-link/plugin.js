@@ -321,7 +321,8 @@
       },
       getDefaultResourceReference: function() {
         // Compute the default reference by cleaning up the link label.
-        var linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText();
+        // Fall-back on the empty string if there's no text selection (e.g. if an image is selected).
+        var linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText() || '';
         // Normalize the white space.
         var defaultReference = linkLabel.trim().replace(/\s+/g, ' ');
         return {

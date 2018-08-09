@@ -18,12 +18,6 @@
   margin: 0;
   position: static;
 }
-/* Basic form elements styling */
-#xwikiobjects input, #xwikiobjects textarea,
-#xwikiclassproperties input, #xwikiclassproperties textarea {
-  border: 1px solid $theme.borderColor;
-  width: 90%;
-}
 div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="checkbox"],
 div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio"] {
   width: auto;

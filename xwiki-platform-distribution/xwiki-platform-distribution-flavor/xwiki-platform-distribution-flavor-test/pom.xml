@@ -528,6 +528,7 @@
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>
     <module>xwiki-platform-distribution-flavor-test-storage</module>
+    <module>xwiki-platform-distribution-flavor-test-upgrade</module>
     <module>xwiki-platform-distribution-flavor-test-jmeter</module>
   </modules>
 </project>

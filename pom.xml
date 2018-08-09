@@ -76,6 +76,8 @@
 
     <!-- Disable release staging and directly deploy on the configured distributionManagement -->
     <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
+
+    <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -765,6 +767,7 @@
                   </versionCheck>
                 </validateDependencyVersion>
               </rules>
+              <skip>${xwiki.enforcer.check-dependency-version.skip}</skip>
             </configuration>
           </execution>
         </executions>

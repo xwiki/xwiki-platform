@@ -47,47 +47,59 @@
   #if ($isAjaxRequest)
     #displayUpgradeInvalidFlavorStatus()
   #else
-      == {{translation key="platform.extension.distributionWizard.flavorStepCurrentFlavorLabel"/}}
+      (% id="current-flavor" %)
+      (((
+        == {{translation key="platform.extension.distributionWizard.flavorStepCurrentFlavorLabel"/}}
 
-      (% class="xHint" %)
-      {{translation key="platform.extension.distributionWizard.flavorStepCurrentFlavorHint"/}}
+        (% class="xHint" %)
+        {{translation key="platform.extension.distributionWizard.flavorStepCurrentFlavorHint"/}}
 
-      {{html}}#displayExtension($currentFlavor, true){{/html}}
+        {{html}}#displayExtension($currentFlavor, true){{/html}}
 
-      {{error}}{{translation key="platform.extension.distributionWizard.flavorStepCurrentFlavorInvalidError"/}}{{/error}}
+        {{error}}{{translation key="platform.extension.distributionWizard.flavorStepCurrentFlavorInvalidError"/}}{{/error}}
+      )))
 
     #if ($knownInvalidFlavors.contains($currentFlavor.id.id))
-      ## The current flavor is known to have no compatible version
-      == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewLabel"/}}
+      (% id="known-invalid-flavor-upgrade" %)
+      (((
+        ## The current flavor is known to have no compatible version
+        == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewLabel"/}}
 
-      (% class="xHint" %)
-      {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewHint"/}}
+        (% class="xHint" %)
+        {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewHint"/}}
 
-      #displayFlavorPickerStep()
+        #displayFlavorPickerStep()
+      )))
     #elseif ($knownFlavorId)
-      ## We know a compatible version of the current flavor
-      == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeKnownLabel"/}}
+      (% id="known-valid-flavor-upgrade" %)
+      (((
+        ## We know a compatible version of the current flavor
+        == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeKnownLabel"/}}
 
-      (% class="xHint" %)
-      {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeKnownHint"/}}
+        (% class="xHint" %)
+        {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeKnownHint"/}}
 
-      #set ($knownFlavorExtension = $services.extension.resolve($knownFlavorId.id, $knownFlavorId.version))
-      {{html}}#displayExtension($knownFlavorExtension){{/html}}
+        #set ($knownFlavorExtension = $services.extension.resolve($knownFlavorId.id, $knownFlavorId.version))
+        {{html}}#displayExtension($knownFlavorExtension){{/html}}
+      )))
     #else
-      ## The current flavor is unknown
-      == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeLabel"/}}
+      (% id="no-flavor" %)
+      (((
+        ## The current flavor is unknown
+        == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeLabel"/}}
 
-      (% class="xHint" %)
-      {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeHint"/}}
+        (% class="xHint" %)
+        {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeHint"/}}
 
-      #displayUpgradeInvalidFlavor()
+        #displayUpgradeInvalidFlavor()
 
-      == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorOrInstallNewLabel"/}}
+        == {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorOrInstallNewLabel"/}}
 
-      (% class="xHint" %)
-      {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorOrInstallNewHint"/}}
+        (% class="xHint" %)
+        {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorOrInstallNewHint"/}}
 
-      #displayFlavorPickerStep()
+        #displayFlavorPickerStep()
+      )))
     #end
   #end
 #end

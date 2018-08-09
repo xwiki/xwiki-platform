@@ -82,6 +82,12 @@ def builds = [
       pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml'
     )
   },
+  'Flavor Test - Upgrade' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Upgrade',
+      pom: 'xwiki-platform-distribution-flavor-test-upgrade/pom.xml'
+    )
+  },
   'Flavor Test - Webstandards' : {
     buildFunctionalTest(
       name: 'Flavor Test - Webstandards',

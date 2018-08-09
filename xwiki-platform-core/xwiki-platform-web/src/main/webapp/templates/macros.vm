@@ -420,8 +420,8 @@ $xwiki.getUserName("xwiki:${username}")
     #set($discard = $mimetypeMap.put('image/svg+xml',                      ['vector', 'svg']))
     #set($discard = $mimetypeMap.put('image/',                             ['image', 'image']))
     ## text
-    #set($discard = $mimetypeMap.put('text/html',                          ['html', 'html']))
-    #set($discard = $mimetypeMap.put('text/css',                           ['css', 'css']))
+    #set($discard = $mimetypeMap.put('text/html',                          ['file-code', 'html']))
+    #set($discard = $mimetypeMap.put('text/css',                           ['file-code', 'css']))
     #set($discard = $mimetypeMap.put('text/',                              ['file-text', 'text']))
     ## documents
     #set($discard = $mimetypeMap.put('application/xml',                    ['file-code', 'xml']))

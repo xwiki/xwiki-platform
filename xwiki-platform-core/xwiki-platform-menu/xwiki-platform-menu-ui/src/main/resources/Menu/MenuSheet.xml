@@ -42,7 +42,6 @@
   <content>{{velocity}}
 {{html wiki="true"}}
 #set ($discard = $doc.use('Menu.MenuClass'))
-#set ($discard = $services.localization.use('document', 'Menu.MenuTranslations'))
 (% class="xform" %)
 (((
   ; &lt;label#if ($xcontext.action=='edit') for="Menu.MenuClass_0_content1"#end&gt;$escapetool.xml($doc.displayPrettyName('content1', false, false))&lt;/label&gt;

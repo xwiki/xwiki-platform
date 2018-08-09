@@ -599,6 +599,7 @@
     </legend-color>
     <lessCode>
       <disabled>0</disabled>
+      <editor>Text</editor>
       <name>lessCode</name>
       <number>56</number>
       <prettyName>lessCode</prettyName>

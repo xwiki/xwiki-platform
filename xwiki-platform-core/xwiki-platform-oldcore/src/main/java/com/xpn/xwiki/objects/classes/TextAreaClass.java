@@ -78,6 +78,7 @@ public class TextAreaClass extends StringClass
          *
          * @param value the value of the editor type
          * @return the editor type matching the value or null
+         * @since 10.7RC1
          */
         public static EditorType getByValue(String value)
         {
@@ -132,6 +133,7 @@ public class TextAreaClass extends StringClass
          *
          * @param value the value of the content type
          * @return the content type matching the value or null
+         * @since 10.7RC1
          */
         public static ContentType getByValue(String value)
         {
@@ -184,6 +186,7 @@ public class TextAreaClass extends StringClass
      * @param contentType the content type value
      * @param def the current editor type
      * @return the editor type compatible with the passed content type, def if several are compatible
+     * @since 10.7RC1
      */
     public static EditorType getEditorType(String contentType, EditorType def)
     {

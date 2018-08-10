@@ -598,8 +598,8 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </legend-color>
     <lessCode>
+      <contenttype>PureText</contenttype>
       <disabled>0</disabled>
-      <editor>Text</editor>
       <name>lessCode</name>
       <number>56</number>
       <prettyName>lessCode</prettyName>

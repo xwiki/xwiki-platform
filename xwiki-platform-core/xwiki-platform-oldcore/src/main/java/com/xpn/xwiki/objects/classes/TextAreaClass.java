@@ -19,8 +19,10 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -64,7 +66,23 @@ public class TextAreaClass extends StringClass
          */
         WYSIWYG("Wysiwyg");
 
+        private static final Map<String, EditorType> editorTypeMap = Arrays.stream(EditorType.values())
+            .collect(Collectors.toMap(e -> e.value.toLowerCase(), e -> e));
+
         private final String value;
+
+        /**
+         * Retreive the {@link EditorType} based on its value.
+         * <p>
+         * The search is case insensitive.
+         *
+         * @param value the value of the editor type
+         * @return the editor type matching the value or null
+         */
+        public static EditorType getByValue(String value)
+        {
+            return value != null ? editorTypeMap.get(value.toLowerCase()) : null;
+        }
 
         private EditorType(String value)
         {
@@ -102,7 +120,23 @@ public class TextAreaClass extends StringClass
          */
         VELOCITY_CODE("VelocityCode");
 
+        private static final Map<String, ContentType> contentTypeMap = Arrays.stream(ContentType.values())
+            .collect(Collectors.toMap(c -> c.value.toLowerCase(), c -> c));
+
         private final String value;
+
+        /**
+         * Retreive the {@link ContentType} based on its value.
+         * <p>
+         * The search is case insensitive.
+         *
+         * @param value the value of the content type
+         * @return the content type matching the value or null
+         */
+        public static ContentType getByValue(String value)
+        {
+            return value != null ? contentTypeMap.get(value.toLowerCase()) : null;
+        }
 
         private ContentType(String value)
         {
@@ -147,6 +181,16 @@ public class TextAreaClass extends StringClass
     }
 
     /**
+     * @param contentType the content type value
+     * @param def the current editor type
+     * @return the editor type compatible with the passed content type, def if several are compatible
+     */
+    public static EditorType getEditorType(String contentType, EditorType def)
+    {
+        return getEditorType(ContentType.getByValue(contentType), def);
+    }
+
+    /**
      * @param editorType the editor type
      * @return the content type compatible with the passed editor type, null if several are compatible
      */
@@ -180,7 +224,15 @@ public class TextAreaClass extends StringClass
 
     public String getEditor()
     {
-        return getStringValue("editor").toLowerCase();
+        String editor = getStringValue("editor").toLowerCase();
+        if (EditorType.getByValue(editor) == null) {
+            EditorType compatibleEditor = getEditorType(getContentType(), null);
+            if (compatibleEditor != null) {
+                return compatibleEditor.value.toLowerCase();
+            }
+        }
+
+        return editor;
     }
 
     /**

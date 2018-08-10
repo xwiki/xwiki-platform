@@ -46,5 +46,6 @@
     <module>xwiki-platform-test-oldcore</module>
     <module>xwiki-platform-test-page</module>
     <module>xwiki-platform-test-ui</module>
+    <module>xwiki-platform-test-ugrade</module>
   </modules>
 </project>

@@ -101,7 +101,7 @@ public class WatchedUserReference implements WatchedEntityReference
 
         // Properties
         Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-        filterPreference.setPreferenceProperties(preferenceProperties);
+        filterPreference.setProperties(preferenceProperties);
 
         preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
         preferenceProperties.put(NotificationFilterProperty.USER, Collections.singletonList(userId));
@@ -125,7 +125,7 @@ public class WatchedUserReference implements WatchedEntityReference
 
         // Properties
         Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-        filterPreference.setPreferenceProperties(preferenceProperties);
+        filterPreference.setProperties(preferenceProperties);
 
         preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
         preferenceProperties.put(NotificationFilterProperty.USER, Collections.singletonList(userId));

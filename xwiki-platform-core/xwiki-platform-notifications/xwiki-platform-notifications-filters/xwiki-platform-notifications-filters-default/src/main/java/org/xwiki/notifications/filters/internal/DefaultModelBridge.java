@@ -34,9 +34,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
@@ -44,7 +46,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
-import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -52,6 +53,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Default implementation for {@link ModelBridge}.
@@ -109,6 +111,9 @@ public class DefaultModelBridge implements ModelBridge
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
             throws NotificationException
@@ -119,50 +124,23 @@ public class DefaultModelBridge implements ModelBridge
         final DocumentReference notificationFilterPreferenceClass
                 = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
 
-        Set<NotificationFilterPreference> preferences = new HashSet<>();
+        List<NotificationFilterPreference> preferences;
 
+        // Search in the main database
+        String oriDatabase = context.getWikiId();
         try {
-            XWikiDocument doc = xwiki.getDocument(user, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
-            if (preferencesObj != null) {
-                for (BaseObject obj : preferencesObj) {
-                    if (obj != null) {
-                        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
-                                createNotificationFilterPropertiesMap(obj);
-
-                        NotificationFilterType filterType = NotificationFilterType.valueOf(
-                                obj.getStringValue(FIELD_FILTER_TYPE).toUpperCase());
-
-                        Set<NotificationFormat> filterFormats = new HashSet<>();
-                        for (String format : (List<String>) obj.getListValue(FIELD_FILTER_FORMATS)) {
-                            filterFormats.add(NotificationFormat.valueOf(format.toUpperCase()));
-                        }
-
-                        // Create the new filter preference and add it to the list of preferences
-                        DefaultNotificationFilterPreference notificationFilterPreference
-                                = new DefaultNotificationFilterPreference(
-                                        obj.getStringValue(FILTER_PREFERENCE_NAME));
-
-                        notificationFilterPreference.setProviderHint("userProfile");
-                        notificationFilterPreference.setFilterName(obj.getStringValue(FIELD_FILTER_NAME));
-                        notificationFilterPreference.setEnabled(obj.getIntValue(FIELD_IS_ENABLED, 1) == 1);
-                        notificationFilterPreference.setActive(obj.getIntValue(FIELD_IS_ACTIVE, 1) == 1);
-                        notificationFilterPreference.setFilterType(filterType);
-                        notificationFilterPreference.setNotificationFormats(filterFormats);
-                        notificationFilterPreference.setPreferenceProperties(filterPreferenceProperties);
-                        notificationFilterPreference.setStartingDate(obj.getDateValue(FIELD_STARTING_DATE));
-
-                        preferences.add(notificationFilterPreference);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new NotificationException(
-                    String.format("Failed to get the notification preferences scope for the user [%s].",
-                            user), e);
+            context.setWikiId(context.getMainXWiki());
+            preferences =
+                    context.getWiki().getStore().search(
+                            "select * frm notifications_filters_preferences where user = xwiki:XWiki.Admin",
+                            1000, 0, context);
+        } catch (XWikiException e) {
+            throw new NotificationException("error", e);
+        } finally {
+            context.setWikiId(oriDatabase);
         }
 
-        return preferences;
+        return new HashSet<>(preferences);
     }
 
     private Map<NotificationFilterProperty, List<String>> createNotificationFilterPropertiesMap(BaseObject obj)
@@ -295,6 +273,8 @@ public class DefaultModelBridge implements ModelBridge
             return;
         }
 
+        String serializedUser = entityReferenceSerializer.serialize(user);
+
         // Convert the collection of preferences to save to a Map sorted by filter names
         Map<String, NotificationFilterPreference> toSave = filterPreferences.stream().collect(
                 Collectors.toMap(NotificationFilterPreference::getFilterPreferenceName, Function.identity())
@@ -304,24 +284,25 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        final DocumentReference notificationFilterPreferenceClass
-                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
-
-        try {
-            XWikiDocument doc = xwiki.getDocument(user, context);
-
-            // Update existing objects if they match the filter preferences to save
-            updateExistingObjects(toSave, notificationFilterPreferenceClass, doc);
-            // Create objects from the remaining filter preferences to save
-            createNewObjects(toSave, notificationFilterPreferenceClass, doc, context);
-
-            // Make this change a minor edit so it's not displayed, by default, in notifications
-            xwiki.saveDocument(doc, "Save notification filter preferences.", true, context);
-        } catch (Exception e) {
-            throw new NotificationException(
-                    String.format("Failed to save the notification preferences scope for the user [%s].", user),
-                    e
-            );
+        for(NotificationFilterPreference preference : filterPreferences) {
+            if (preference instanceof DefaultNotificationFilterPreference) {
+                DefaultNotificationFilterPreference pref = (DefaultNotificationFilterPreference) preference;
+                pref.setUser(serializedUser);
+            }
+            // store event in the main database
+            String oriDatabase = context.getWikiId();
+            context.setWikiId(context.getMainXWiki());
+            XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
+            try {
+                mainHibernateStore.beginTransaction(context);
+                Session session = mainHibernateStore.getSession(context);
+                session.save(preference);
+                mainHibernateStore.endTransaction(context, true);
+            } catch (XWikiException e) {
+                mainHibernateStore.endTransaction(context, false);
+            } finally {
+                context.setWikiId(oriDatabase);
+            }
         }
     }
 

@@ -60,7 +60,7 @@ public class DefaultNotificationFilterPreferenceTest
         preference.setActive(isActive);
         preference.setFilterType(filterType);
         preference.setNotificationFormats(notificationFormats);
-        preference.setPreferenceProperties(propertiesMap);
+        preference.setProperties(propertiesMap);
 
         assertEquals(filterPreferenceName, preference.getFilterPreferenceName());
         assertEquals(filterName, preference.getFilterName());

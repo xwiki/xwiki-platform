@@ -104,7 +104,7 @@ public class UsersParameterHandler
 
         Map<NotificationFilterProperty, List<String>> properties = new HashMap<>();
         properties.put(NotificationFilterProperty.USER, userList);
-        pref.setPreferenceProperties(properties);
+        pref.setProperties(properties);
 
         parameters.filterPreferences.add(pref);
     }

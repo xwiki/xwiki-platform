@@ -56,6 +56,8 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private Date startingDate;
 
+    private String user;
+
     /**
      * Constructs a new {@link DefaultNotificationFilterPreference} using the given filter preference name.
      *
@@ -173,11 +175,21 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     /**
+     * @return a map concerning all properties of the notification filter preferences.
+     * @since 10.7RC1
+     */
+    public Map<NotificationFilterProperty, List<String>> getProperties()
+    {
+        return preferenceProperties;
+    }
+
+    /**
      * Set the properties of the current filter preference.
      *
      * @param preferenceProperties a map of lists defining the filter preference properties
+     * @since 10.7RC1
      */
-    public void setPreferenceProperties(Map<NotificationFilterProperty, List<String>> preferenceProperties)
+    public void setProperties(Map<NotificationFilterProperty, List<String>> preferenceProperties)
     {
         this.preferenceProperties = preferenceProperties;
     }
@@ -204,6 +216,16 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         return notificationFormats;
     }
 
+    /**
+     * Set the given formats to the preference.
+     * @param formats formats to set
+     * @since 10.7RC1
+     */
+    public void setFilterFormats(Set<NotificationFormat> formats)
+    {
+        this.notificationFormats = formats;
+    }
+
     @Override
     public Date getStartingDate()
     {
@@ -226,5 +248,15 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setNotificationFormats(Set<NotificationFormat> notificationFormats)
     {
         this.notificationFormats = notificationFormats;
+    }
+
+    public String getUser()
+    {
+        return user;
+    }
+
+    public void setUser(String user)
+    {
+        this.user = user;
     }
 }

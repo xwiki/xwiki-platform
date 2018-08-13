@@ -261,7 +261,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                 List<String> locationList = new ArrayList<>();
                 locationList.add(locationArray[i].trim());
                 preferenceProperties.put(property, locationList);
-                pref.setPreferenceProperties(preferenceProperties);
+                pref.setProperties(preferenceProperties);
                 parameters.filterPreferences.add(
                         new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
             }

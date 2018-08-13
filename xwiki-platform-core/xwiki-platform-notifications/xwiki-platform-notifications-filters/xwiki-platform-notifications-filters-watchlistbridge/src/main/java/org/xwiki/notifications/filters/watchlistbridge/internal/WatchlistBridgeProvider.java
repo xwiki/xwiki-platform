@@ -134,7 +134,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
                     String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
                 Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
                 preferenceProperties.put(property, Collections.singletonList(value));
-                pref.setPreferenceProperties(preferenceProperties);
+                pref.setProperties(preferenceProperties);
                 results.add(pref);
             }
         }
@@ -148,7 +148,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         pref.setProviderHint(PROVIDER_HINT);
         pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
-        pref.setPreferenceProperties(new HashMap<>());
+        pref.setProperties(new HashMap<>());
         return pref;
     }
 

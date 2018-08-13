@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.internal.user;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,12 +33,12 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.text.StringUtils;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
@@ -111,9 +110,8 @@ public class EventUserFilter implements NotificationFilter
             AbstractOperatorNode node = null;
             while (iterator.hasNext()) {
                 NotificationFilterPreference pref = iterator.next();
-                List<String> users = pref.getProperties(NotificationFilterProperty.USER);
-                if (!users.isEmpty()) {
-                    AbstractOperatorNode thisNode = value(EventProperty.USER).inStrings(users).and(
+                if (StringUtils.isNotBlank(pref.getUser())) {
+                    AbstractOperatorNode thisNode = value(EventProperty.USER).eq(value(pref.getUser())).and(
                             value(EventProperty.DATE).greaterThan(value(pref.getStartingDate())));
                     if (node == null) {
                         node = thisNode;

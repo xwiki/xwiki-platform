@@ -73,7 +73,7 @@
 #elseif ("$!request.action" == 'deleteFilterPreference')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      $services.notification.filters.deleteFilterPreference($request.filterPreferenceName)
+      $services.notification.filters.deleteFilterPreference($request.filterPreferenceId)
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end
@@ -84,7 +84,26 @@
 #elseif ("$!request.action" == 'setFilterPreferenceEnabled')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      $services.notification.filters.setFilterPreferenceEnabled($request.filterPreferenceName, $stringtool.equals("$!request.enabled", 'true'))
+      $services.notification.filters.setFilterPreferenceEnabled($request.filterPreferenceId, $stringtool.equals("$!request.enabled", 'true'))
+    #else
+      $response.sendError(401, 'Bad CSRF Token')
+    #end
+  #end
+  #if ("$!exception" != '')
+    $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
+  #end
+#elseif ("$!request.action" == 'createScopeFilterPreference')
+  #try()
+    #if ($services.csrf.isTokenValid($request.csrf))
+      #set ($reference = '')
+      #if ("$!request.wiki" != '')
+        #set ($reference = $services.model.createWikiReference($request.wiki))
+      #elseif ("$!request.space" != '')
+        #set ($reference = $services.model.resolveSpace($request.space))
+      #elseif ("$!request.page" != '')
+        #set ($reference = $services.model.resolveDocument($request.page))
+      #end
+      $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference)
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end

@@ -467,6 +467,8 @@ xwiki.plugin.image.cache.capacity=30
 #-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
 #-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
 #-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
+#-# Moreover, disabling the main store makes impossible for global users to watch pages from subwikis. It is not
+#-# recommended.
 #-#
 #-# Default: 1
 # xwiki.plugin.activitystream.uselocalstore=1

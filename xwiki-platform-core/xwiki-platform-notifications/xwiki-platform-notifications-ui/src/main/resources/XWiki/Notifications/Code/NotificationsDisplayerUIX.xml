@@ -502,6 +502,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
        * URL to the service that return the notifications to display
        */
       var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       $.post(url, {
         'action': action,
         'location': location,
@@ -514,7 +515,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         watchPageSwitch.bootstrapSwitch('state', data.document, true);
         watchSpaceSwitch.bootstrapSwitch('state', data.space, true);
         watchWikiSwitch.bootstrapSwitch('state', data.wiki, true);
+        // Display success message
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
       }).fail (function() {
+        notification.hide();
         new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('watchlist.notifications.changeStatusError'))', 'error');
         allWatchSwitches.bootstrapSwitch('disabled', false);
       });

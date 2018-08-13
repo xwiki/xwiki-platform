@@ -21,11 +21,9 @@ package org.xwiki.notifications.filters.watchlistbridge.internal;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -133,25 +131,35 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         List<String> values = obj.getListValue(fieldName);
         if (values != null && !values.isEmpty()) {
             for (String value : values) {
-                DefaultNotificationFilterPreference pref = createDefaultNotificationFilterPreference(
+                DefaultNotificationFilterPreference pref = createNotificationFilterPreference(
                         String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
-                Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-                preferenceProperties.put(property, Collections.singletonList(value));
-                pref.setPreferenceProperties(preferenceProperties);
+                switch (property) {
+                    case PAGE:
+                        pref.setPageOnly(value);
+                        break;
+                    case SPACE:
+                        pref.setPage(value);
+                        break;
+                    case WIKI:
+                        pref.setWiki(value);
+                        break;
+                    default:
+                        break;
+                }
                 results.add(pref);
             }
         }
     }
 
-    private DefaultNotificationFilterPreference createDefaultNotificationFilterPreference(String name)
+    private DefaultNotificationFilterPreference createNotificationFilterPreference(String id)
     {
-        DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(name);
+        DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
+        pref.setId(id);
         pref.setEnabled(true);
         pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         pref.setProviderHint(PROVIDER_HINT);
         pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
-        pref.setPreferenceProperties(new HashMap<>());
         return pref;
     }
 
@@ -164,13 +172,13 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceId)
     {
         if (!configuration.isEnabled()) {
             return;
         }
 
-        String[] parts = filterPreferenceName.split("_");
+        String[] parts = filterPreferenceId.split("_");
         if (parts.length != 3 || !"watchlist".equals(parts[0])) {
             return;
         }
@@ -194,7 +202,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
                 if (obj == null) {
                     continue;
                 }
-                found |= removeValueFromObject(filterPreferenceName, type, fieldName, obj);
+                found |= removeValueFromObject(filterPreferenceId, type, fieldName, obj);
             }
 
             if (found) {

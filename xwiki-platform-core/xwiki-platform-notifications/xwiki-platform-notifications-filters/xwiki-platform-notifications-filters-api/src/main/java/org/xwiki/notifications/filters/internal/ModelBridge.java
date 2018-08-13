@@ -21,13 +21,17 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -60,23 +64,23 @@ public interface ModelBridge
     /**
      * Delete a filter preference.
      * @param user reference of the user concerned by the filter preference
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId name of the filter preference
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException;
+    void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
      * @param user reference of the user concerned by the filter preference
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId name of the filter preference
      * @param enabled either or not the filter preference should be enabled
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+    void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException;
 
     /**
@@ -102,4 +106,21 @@ public interface ModelBridge
      * @since 9.11.5
      */
     void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException;
+
+    /**
+     * Create a scope notification filter preference for the current user.
+     *
+     * @param user the user for who the preference will be created
+     * @param type type of the filter preference to create
+     * @param formats formats concerned by the preference
+     * @param eventTypes the event types concerned by the preference
+     * @param reference the reference of the wiki, the space or the page concerned by the preference
+     * @throws NotificationException if an error occurs
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
+            Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
+            throws NotificationException;
 }

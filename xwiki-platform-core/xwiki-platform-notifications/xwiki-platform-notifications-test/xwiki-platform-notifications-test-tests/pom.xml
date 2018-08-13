@@ -42,7 +42,7 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Mapping needed by the ActivityStream migrator since AS is a dependency of the User Directory -->
     <!-- Mapping needed by the Mail Sender -->
-    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml,mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml,mailsender.hbm.xml,notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
   </properties>
@@ -128,6 +128,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-filters-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-storage</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
@@ -177,6 +183,11 @@
           <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-mail-send-storage</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-notifications-filters-default</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>

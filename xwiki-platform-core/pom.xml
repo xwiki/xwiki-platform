@@ -139,402 +139,134 @@
                 "ignore" : [
                   // Add more ignores below...
                   {
-                    "code": "java.class.removed",
-                    "old": "class org.xwiki.notifications.filters.watchlistbridge.WatchlistBridgeProvider",
-                    "package": "org.xwiki.notifications.filters.watchlistbridge",
-                    "classQualifiedName": "org.xwiki.notifications.filters.watchlistbridge.WatchlistBridgeProvider",
-                    "classSimpleName": "WatchlistBridgeProvider",
-                    "elementKind": "class",
-                    "justification": "Class wrongly made public in previous releases! See "
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method boolean org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
-                    "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
-                    "oldType": "boolean",
-                    "newType": "org.xwiki.notifications.filters.NotificationFilter.FilterPolicy",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterEvent",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method boolean org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
-                    "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.NotificationFormat)",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterEvent",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method boolean org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
-                    "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.NotificationFormat)",
-                    "oldType": "boolean",
-                    "newType": "org.xwiki.notifications.filters.NotificationFilter.FilterPolicy",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterEvent",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat)",
-                    "new": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat)",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterExpression",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.preferences.NotificationPreference)",
-                    "new": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.preferences.NotificationPreference)",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterExpression",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilter>",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getAllFilters",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
                     "code": "java.method.addedToInterface",
-                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(boolean) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.Set<java.lang.String> org.xwiki.notifications.filters.NotificationFilterPreference::getEventTypes()",
                     "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getAllFilters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getEventTypes",
                     "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getEnabledFilters(java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>, java.util.Map<java.lang.String, java.lang.Boolean>)",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getEnabledFilters",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(===org.xwiki.model.reference.DocumentReference===, org.xwiki.notifications.filters.NotificationFilter) throws org.xwiki.notifications.NotificationException",
-                    "new": "parameter java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(===java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>===, org.xwiki.notifications.filters.NotificationFilter)",
-                    "oldType": "org.xwiki.model.reference.DocumentReference",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "parameterIndex": "0",
-                    "elementKind": "parameter",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.filters.NotificationFilter)",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "newType": "java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.filters.NotificationFilter)",
-                    "exception": "org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(===org.xwiki.model.reference.DocumentReference===, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType) throws org.xwiki.notifications.NotificationException",
-                    "new": "parameter java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(===java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>===, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType)",
-                    "oldType": "org.xwiki.model.reference.DocumentReference",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "parameterIndex": "0",
-                    "elementKind": "parameter",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType)",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "newType": "java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType)",
-                    "exception": "org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(===org.xwiki.model.reference.DocumentReference===, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat) throws org.xwiki.notifications.NotificationException",
-                    "new": "parameter java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(===java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>===, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat)",
-                    "oldType": "org.xwiki.model.reference.DocumentReference",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "parameterIndex": "0",
-                    "elementKind": "parameter",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat)",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "newType": "java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat)",
-                    "exception": "org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilterPreferences",
-                    "elementKind": "method",
-                    "justification": "Young API"
+                    "justification": "NotificationFilterPreference store did not scale"
                   },
                   {
                     "code": "java.method.removed",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getFilters(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.preferences.NotificationPreference) throws org.xwiki.notifications.NotificationException",
+                    "old": "method java.util.Set<org.xwiki.notifications.NotificationFormat> org.xwiki.notifications.filters.NotificationFilterPreference::getFilterFormats()",
                     "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFilters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getFilterFormats",
                     "elementKind": "method",
-                    "justification": "Young API"
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getFilterPreferenceName()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getFilterPreferenceName",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
                   },
                   {
                     "code": "java.method.addedToInterface",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getFiltersRelatedToNotificationPreference(java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>, org.xwiki.notifications.preferences.NotificationPreference)",
+                    "new": "method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getId()",
                     "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getFiltersRelatedToNotificationPreference",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getId",
                     "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getToggleableFilters(===org.xwiki.model.reference.DocumentReference===) throws org.xwiki.notifications.NotificationException",
-                    "new": "parameter java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getToggleableFilters(===java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>===)",
-                    "oldType": "org.xwiki.model.reference.DocumentReference",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getToggleableFilters",
-                    "parameterIndex": "0",
-                    "elementKind": "parameter",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getToggleableFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getToggleableFilters(java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>)",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilter>",
-                    "newType": "java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilter>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getToggleableFilters",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getToggleableFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.stream.Stream<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getToggleableFilters(java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>)",
-                    "exception": "org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getToggleableFilters",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.script.NotificationFiltersScriptService::getFilters() throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.script.NotificationFiltersScriptService::getFilters() throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilter>",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>",
-                    "package": "org.xwiki.notifications.filters.script",
-                    "classSimpleName": "NotificationFiltersScriptService",
-                    "methodName": "getFilters",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method boolean org.xwiki.notifications.filters.watch.WatchedEntityReference::isWatched(org.xwiki.model.reference.DocumentReference)",
-                    "new": "method boolean org.xwiki.notifications.filters.watch.WatchedEntityReference::isWatched(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "exception": "org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters.watch",
-                    "classSimpleName": "WatchedEntityReference",
-                    "methodName": "isWatched",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method void org.xwiki.notifications.filters.watch.WatchedLocationReference::<init>(org.xwiki.model.reference.EntityReference, java.lang.String, org.xwiki.model.reference.EntityReferenceResolver<java.lang.String>, org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer)",
-                    "new": "method void org.xwiki.notifications.filters.watch.WatchedLocationReference::<init>(org.xwiki.model.reference.EntityReference, java.lang.String, org.xwiki.model.reference.EntityReferenceResolver<java.lang.String>, org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer, org.xwiki.notifications.filters.NotificationFilterManager)",
-                    "package": "org.xwiki.notifications.filters.watch",
-                    "classSimpleName": "WatchedLocationReference",
-                    "methodName": "<init>",
-                    "elementKind": "constructor",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method boolean org.xwiki.notifications.filters.watch.WatchedLocationReference::isWatched(org.xwiki.model.reference.DocumentReference)",
-                    "new": "method boolean org.xwiki.notifications.filters.watch.WatchedLocationReference::isWatched(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "exception": "org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters.watch",
-                    "classSimpleName": "WatchedLocationReference",
-                    "methodName": "isWatched",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method void org.xwiki.notifications.filters.watch.WatchedUserReference::<init>(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter)",
-                    "new": "method void org.xwiki.notifications.filters.watch.WatchedUserReference::<init>(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter, org.xwiki.notifications.filters.NotificationFilterManager)",
-                    "package": "org.xwiki.notifications.filters.watch",
-                    "classSimpleName": "WatchedUserReference",
-                    "methodName": "<init>",
-                    "elementKind": "constructor",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method boolean org.xwiki.notifications.filters.watch.WatchedUserReference::isWatched(org.xwiki.model.reference.DocumentReference)",
-                    "new": "method boolean org.xwiki.notifications.filters.watch.WatchedUserReference::isWatched(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "exception": "org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters.watch",
-                    "classSimpleName": "WatchedUserReference",
-                    "methodName": "isWatched",
-                    "elementKind": "method",
-                    "justification": "Young API"
+                    "justification": "NotificationFilterPreference store did not scale"
                   },
                   {
                     "code": "java.method.addedToInterface",
-                    "new": "method java.util.Map<java.lang.String, java.lang.Boolean> org.xwiki.notifications.filters.NotificationFilterManager::getToggeableFilterActivations(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.Set<org.xwiki.notifications.NotificationFormat> org.xwiki.notifications.filters.NotificationFilterPreference::getNotificationFormats()",
                     "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getToggeableFilterActivations",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getNotificationFormats",
                     "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
-                    "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.NotificationFormat)",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterEvent",
-                    "elementKind": "method",
-                    "justification": "Young API"
+                    "justification": "NotificationFilterPreference store did not scale"
                   },
                   {
                     "code": "java.method.addedToInterface",
-                    "new": "method java.util.Collection<java.lang.String> org.xwiki.notifications.filters.watch.WatchedEntitiesManager::getWatchedUsers(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getPage()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getPage",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getPageOnly()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getPageOnly",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method java.util.List<java.lang.String> org.xwiki.notifications.filters.NotificationFilterPreference::getProperties(org.xwiki.notifications.filters.NotificationFilterProperty)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getProperties",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.noLongerDefault",
+                    "old": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "new": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "oldModifiers": "public default",
+                    "newModifiers": "public abstract",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getStartingDate",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.nowAbstract",
+                    "old": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "new": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "oldModifiers": "public default",
+                    "newModifiers": "public abstract",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getStartingDate",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getUser()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getUser",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getWiki()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getWiki",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreference::setEnabled(boolean)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "setEnabled",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.notifications.filters.watch.AutomaticWatchMode org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration::getDefaultAutomaticWatchMode(org.xwiki.model.reference.WikiReference)",
                     "package": "org.xwiki.notifications.filters.watch",
-                    "classSimpleName": "WatchedEntitiesManager",
-                    "methodName": "getWatchedUsers",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference, boolean) throws org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getAllFilters",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference, boolean) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilter>",
-                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "getAllFilters",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::setStartDateForUser(org.xwiki.model.reference.DocumentReference, java.util.Date) throws org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterManager",
-                    "methodName": "setStartDateForUser",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setStartDateForUser(org.xwiki.model.reference.DocumentReference, java.util.Date) throws org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilterPreferenceProvider",
-                    "methodName": "setStartDateForUser",
+                    "classSimpleName": "WatchedEntitiesConfiguration",
+                    "methodName": "getDefaultAutomaticWatchMode",
                     "elementKind": "method",
                     "justification": "Young API"
                   },
@@ -545,24 +277,10 @@
                     "oldType": "org.xwiki.notifications.rest.model.Notifications",
                     "newType": "javax.ws.rs.core.Response",
                     "package": "org.xwiki.notifications.rest",
-                    "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
                     "classSimpleName": "NotificationsResource",
                     "methodName": "getNotifications",
-                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.5",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.6-SNAPSHOT",
                     "elementKind": "method",
-                    "justification": "Not a breake: the REST endpoint is the same."
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method org.xwiki.notifications.filters.watch.AutomaticWatchMode org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration::getDefaultAutomaticWatchMode(org.xwiki.model.reference.WikiReference)",
-                    "package": "org.xwiki.notifications.filters.watch",
-                    "classQualifiedName": "org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration",
-                    "classSimpleName": "WatchedEntitiesConfiguration",
-                    "methodName": "getDefaultAutomaticWatchMode",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-watch:jar:10.6-SNAPSHOT",
-                    "elementKind": "method",
-                    "justification": "Young API"
+                    "justification": "Not a break: the REST endpoint is the same."
                   }
                 ]
               }

@@ -19,7 +19,9 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.By;
@@ -28,6 +30,7 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.platform.notifications.test.po.preferences.AbstractNotificationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
+import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.ViewPage;
@@ -54,6 +57,9 @@ public class NotificationsUserProfilePage extends ViewPage
     private WebElement notificationAutoWatchModeSelect;
 
     private Map<String, ApplicationPreferences> applicationPreferences = new HashMap<>();
+
+    @FindBy(id = "notificationFilterPreferencesLiveTable-display")
+    private WebElement notificationFilterPreferencesLivetable;
 
     /**
      * Construct a NotificationsUserProfilePage (and for the browser page to be fully loaded).
@@ -227,5 +233,21 @@ public class NotificationsUserProfilePage extends ViewPage
         } catch (Exception e) {
             // Do nothing, the exception is only triggered if we try to use an invalid state
         }
+    }
+
+    /**
+     * @return the notification filter preferences, as they are described in the corresponding livetable
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public List<NotificationFilterPreference> getNotificationFilterPreferences()
+    {
+
+        List<NotificationFilterPreference> preferences = new ArrayList<>();
+        for (WebElement row : this.notificationFilterPreferencesLivetable.findElements(By.tagName("tr"))) {
+            preferences.add(new NotificationFilterPreference(this, row, this.getDriver()));
+        }
+        return preferences;
     }
 }

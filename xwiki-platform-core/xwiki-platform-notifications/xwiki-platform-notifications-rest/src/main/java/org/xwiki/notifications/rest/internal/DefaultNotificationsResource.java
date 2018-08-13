@@ -22,9 +22,7 @@ package org.xwiki.notifications.rest.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -221,18 +219,25 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         if (StringUtils.isNotBlank(locations)) {
             String[] locationArray = locations.split(FIELD_SEPARATOR);
             for (int i = 0; i < locationArray.length; ++i) {
-                DefaultNotificationFilterPreference pref
-                        = new DefaultNotificationFilterPreference(String.format("%s_%s_%s",
-                        ScopeNotificationFilter.FILTER_NAME, property, i));
+                DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
+                pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));
                 pref.setEnabled(true);
                 pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
                 pref.setFilterType(NotificationFilterType.INCLUSIVE);
                 pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.ALERT));
-                Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-                List<String> locationList = new ArrayList<>();
-                locationList.add(locationArray[i].trim());
-                preferenceProperties.put(property, locationList);
-                pref.setPreferenceProperties(preferenceProperties);
+                switch (property) {
+                    case WIKI:
+                        pref.setWiki(locationArray[i]);
+                        break;
+                    case SPACE:
+                        pref.setPage(locationArray[i]);
+                        break;
+                    case PAGE:
+                        pref.setPageOnly(locationArray[i]);
+                        break;
+                    default:
+                        break;
+                }
                 parameters.filterPreferences.add(
                         new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
             }

@@ -57,7 +57,9 @@
     </xwiki.extension.knownInvalidFlavors>
 
     <!-- Hibernate configuration -->
-    <xwiki.db.common.extraMappings>activitystream.hbm.xml,instance.hbm.xml</xwiki.db.common.extraMappings>
+    <xwiki.db.common.extraMappings>
+      activitystream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
+    </xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
     <xwiki.db.mysql.extraMappings>mailsender.hbm.xml</xwiki.db.mysql.extraMappings>

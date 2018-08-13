@@ -330,7 +330,27 @@ define('xwiki-ckeditor', [
       },
       'xwiki-source': {
         htmlConverter: sourceDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
-      }
+      },
+      mentions: [
+        {
+          feed: sourceDocument.getURL('get', 'sheet=CKEditor.LinkSuggestions&amp;outputSyntax=plain&amp;input={encodedQuery}'),
+          itemTemplate: [
+            '&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;',
+              '&lt;div&gt;',
+                '&lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;',
+                  // We have to output both icon types but normally only one is defined and the other is hidden.
+                  '&lt;img src="{iconURL}"/&gt;',
+                  '&lt;span class="{iconClass}"&gt;&lt;/span&gt;',
+                '&lt;/span&gt;',
+                '&lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;',
+              '&lt;/div&gt;',
+              '&lt;div class="ckeditor-autocomplete-item-hint"&gt;{hint}&lt;/div&gt;',
+            '&lt;/li&gt;'].join(''),
+          outputTemplate: '&lt;a href="{url}" data-reference="{typed}|-|{type}|-|{reference}"&gt;{label}&lt;/a&gt;',
+          marker: '[',
+          itemsLimit: 10
+        }
+      ]
     };
     if ($(element).attr('data-officeImporterSupported') === 'true') {
       config['xwiki-office'] = {
@@ -1134,6 +1154,41 @@ a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__of
 }
 .cke_button_icon.cke_button__officeimporter_icon::before {
   content: "\e022";
+}
+
+/**
+ * Autocomplete styles
+ */
+ul.cke_autocomplete_panel {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  padding: 5px 0;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item {
+  padding: 3px 12px;
+}
+.ckeditor-autocomplete-item-icon-wrapper {
+  display: inline-block;
+  height: 14px;
+  line-height: 14px;
+  margin-right: .3em;
+  text-align: center;
+  width: 14px;
+}
+.ckeditor-autocomplete-item-icon-wrapper img {
+  border-radius: 3px;
+  max-height: 14px;
+  max-width: 14px;
+  vertical-align: text-top;
+}
+.ckeditor-autocomplete-item-hint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  margin-top: .3em;
+}
+.ckeditor-autocomplete-item-hint:empty {
+  margin-top: 0;
 }</code>
     </property>
     <property>

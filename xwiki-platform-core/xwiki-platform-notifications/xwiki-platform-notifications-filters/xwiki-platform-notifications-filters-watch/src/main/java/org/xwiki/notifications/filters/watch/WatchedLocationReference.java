@@ -22,10 +22,7 @@ package org.xwiki.notifications.filters.watch;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -35,7 +32,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
@@ -98,7 +94,7 @@ public class WatchedLocationReference implements WatchedEntityReference
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
-            && notificationFilterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()) {
+            && notificationFilterPreference.getEventTypes().isEmpty()) {
             ScopeNotificationFilterPreference scope
                     = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
             return entityReference.equals(scope.getScopeReference());
@@ -110,8 +106,7 @@ public class WatchedLocationReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        DefaultNotificationFilterPreference preference = createFilterPreference();
-        return new ScopeNotificationFilterPreference(preference, entityReference);
+        return new ScopeNotificationFilterPreference(createFilterPreference(), resolver);
     }
 
     @Override
@@ -119,13 +114,12 @@ public class WatchedLocationReference implements WatchedEntityReference
     {
         DefaultNotificationFilterPreference preference = createFilterPreference();
         preference.setFilterType(NotificationFilterType.EXCLUSIVE);
-        return new ScopeNotificationFilterPreference(preference, entityReference);
+        return new ScopeNotificationFilterPreference(preference, resolver);
     }
 
     private DefaultNotificationFilterPreference createFilterPreference()
     {
-        DefaultNotificationFilterPreference filterPreference
-                = new DefaultNotificationFilterPreference(Long.toString(new Date().getTime()));
+        DefaultNotificationFilterPreference filterPreference = new DefaultNotificationFilterPreference();
 
         // Fields
         filterPreference.setEnabled(true);
@@ -134,24 +128,20 @@ public class WatchedLocationReference implements WatchedEntityReference
         filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
+        filterPreference.setStartingDate(new Date());
 
         // Properties
-        Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-        filterPreference.setPreferenceProperties(preferenceProperties);
-
-        preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
 
         // Scope value
-        List<String> value = Collections.singletonList(serializedReference);
         switch (entityReference.getType()) {
             case WIKI:
-                preferenceProperties.put(NotificationFilterProperty.WIKI, value);
+                filterPreference.setWiki(serializedReference);
                 break;
             case SPACE:
-                preferenceProperties.put(NotificationFilterProperty.SPACE, value);
+                filterPreference.setPage(serializedReference);
                 break;
             case DOCUMENT:
-                preferenceProperties.put(NotificationFilterProperty.PAGE, value);
+                filterPreference.setPageOnly(serializedReference);
                 break;
             default:
                 break;

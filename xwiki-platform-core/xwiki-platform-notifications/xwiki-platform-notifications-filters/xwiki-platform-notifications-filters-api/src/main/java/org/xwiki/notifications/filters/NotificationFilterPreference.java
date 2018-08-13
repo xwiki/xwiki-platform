@@ -20,13 +20,13 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import org.xwiki.notifications.NotificationFormat;
 
 /**
  * Define the preference of a notification filter.
+ *
  * A notification filter preference represents a set of parameters that can be passed to a filter in order to
  * customize it.
  *
@@ -43,18 +43,11 @@ import org.xwiki.notifications.NotificationFormat;
 public interface NotificationFilterPreference
 {
     /**
-     * Get a list of the properties that corresponds to the given {@link NotificationFilterProperty}.
-     * If the property is not used by the current preference, return an empty set.
-     *
-     * @param property a corresponding {@link NotificationFilterProperty}
-     * @return a set of properties.
+     * @return the unique identifier of the filter preference.
+     * @since 10.8RC1
+     * @since 9.11.8
      */
-    List<String> getProperties(NotificationFilterProperty property);
-
-    /**
-     * @return the name of the filter preference.
-     */
-    String getFilterPreferenceName();
+    String getId();
 
     /**
      * @return the name of the filter corresponding to this preference.
@@ -89,16 +82,60 @@ public interface NotificationFilterPreference
 
     /**
      * @return a set of {@link NotificationFormat} for which the filter should be applied.
+     * @since 10.8RC1
+     * @since 9.11.8
      */
-    Set<NotificationFormat> getFilterFormats();
+    Set<NotificationFormat> getNotificationFormats();
 
     /**
      * @return the date from which the filter preference is enabled.
+     *
      * @since 10.5RC1
      * @since 10.4
      * @since 9.11.5
      */
-    default Date getStartingDate() {
-        return null;
-    };
+    Date getStartingDate();
+
+    /**
+     * @return the event types concerned by the preference (can be empty to affect all event types)
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    Set<String> getEventTypes();
+
+    /**
+     * @return the user concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    String getUser();
+
+    /**
+     * @return the page concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    String getPageOnly();
+
+    /**
+     * @return the page (and its children) concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    String getPage();
+
+    /**
+     * @return the wiki concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    String getWiki();
+
+    /**
+     * @param enabled if the preference is enabled or not
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    void setEnabled(boolean enabled);
 }

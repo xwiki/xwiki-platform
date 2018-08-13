@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;
+import org.xwiki.notifications.filters.expression.ConcatNode;
 import org.xwiki.notifications.filters.expression.DateValueNode;
 import org.xwiki.notifications.filters.expression.EndsWith;
 import org.xwiki.notifications.filters.expression.EntityReferenceNode;
@@ -36,6 +37,7 @@ import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
+import org.xwiki.notifications.filters.expression.InSubQueryNode;
 import org.xwiki.notifications.filters.expression.LesserThanNode;
 import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
@@ -216,6 +218,12 @@ public class ExpressionNodeToHQLConverter
             returnValue = String.format(VARIABLE_NAME, mapKey);
         } else if (value instanceof BooleanValueNode) {
             returnValue = ((BooleanValueNode) value).getContent().toString();
+        } else if (value instanceof ConcatNode) {
+            ConcatNode node = (ConcatNode) value;
+            returnValue = String.format("CONCAT(%s, %s)",
+                    parseBlock(node.getLeftOperand(), result),
+                    parseBlock(node.getRightOperand(), result)
+            );
         } else {
             returnValue = StringUtils.EMPTY;
         }
@@ -288,6 +296,16 @@ public class ExpressionNodeToHQLConverter
             builder.append(")");
 
             returnValue = builder.toString();
+        } else if (operator instanceof InSubQueryNode) {
+            InSubQueryNode inSubQueryOperator = (InSubQueryNode) operator;
+            StringBuilder builder = new StringBuilder(parseBlock(inSubQueryOperator.getLeftOperand(), result));
+            builder.append(" IN (");
+            builder.append(inSubQueryOperator.getSubQuery());
+            builder.append(")");
+
+            returnValue = builder.toString();
+
+            result.getQueryParameters().putAll(inSubQueryOperator.getParameters());
         } else if (operator instanceof OrderByNode) {
             OrderByNode orderByNode = (OrderByNode) operator;
             returnValue = String.format("%s ORDER BY %s %s", parseBlock(orderByNode.getQuery(), result),

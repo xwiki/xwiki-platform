@@ -251,7 +251,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       <cache>long</cache>
     </property>
     <property>
-      <code>define('AddNotificationFilterPreferenceLivetable', ['jquery', 'bootstrap'], function($) {
+      <code>define('AddNotificationFilterPreferenceLivetable', ['jquery', 'xwiki-meta', 'bootstrap'], function($, xm) {
 
   return function(modal, filterPreferencesLivetable, buttonAddFilter, userURL) {
     var self = this;
@@ -293,37 +293,30 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       var tree = $.jstree.reference(self.filterScopeTree);
       var nodes = tree.get_selected(true);
 
+      var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
+      var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
+
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
-
-        var scopeType = 'pageOnly';
         var reference = node.data.id;
-        var filterType = self.filterTypeSelector.val();
-        var notificationFormats = self.notificationFormatSelector.val();
-        var eventTypes = self.eventTypeSelector.val();
-
-        var payload = {
-          'className': 'XWiki.Notifications.Code.NotificationFilterPreferenceClass',
-          'property#filterName': 'scopeNotificationFilter',
-          'property#filterPreferenceName': Date.now(),
-          'property#isEnabled': 1,
-          'property#filterType': filterType,
-          'property#filterFormats': notificationFormats.join(','),
-          'property#eventTypes': eventTypes.join(',')
-        };
-
+        var params = {
+          action: 'createScopeFilterPreference',
+          filterType: self.filterTypeSelector.val(),
+          filterFormats: self.notificationFormatSelector.val().join(','),
+          eventTypes: self.eventTypeSelector.val().join(','),
+          csrf: xm.form_token
+        }
         if (node.data.type == 'wiki') {
-          payload['property#wikis'] = reference;
+          params['wiki'] = reference;
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
-          payload['property#spaces'] = reference.substring(0, reference.length - '.WebHome'.length);
+          params['space'] = reference.substring(0, reference.length - '.WebHome'.length);
         } else {
-          payload['property#pages'] = reference;
+          params['page'] = reference;
         }
 
         // Saving
         var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-        var restURL = self.userURL + '/objects?media=json';
-        $.post(restURL, payload).done(function (data) {
+        $.post(serviceURL, params).done(function (data) {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
 
@@ -333,6 +326,8 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
         });
+
+        return;
       }
     };
 
@@ -472,10 +467,10 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         $.post(restURL, params).done(function (data) {
           self.domElement.attr('data-objectNumber', data.number);
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
         }).fail(function () {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
       } else if (objectNumber != '') {
         // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by default, in notifications)
@@ -487,11 +482,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           data: state ? '1' : '0'
         }).done(function (data) {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
           $(document).trigger('xwiki:livetable:notifications-filters:toggle', {'row': self.row, 'state': state});
         }).fail(function () {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
       }
     };
@@ -623,7 +618,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.inProgress'))", 'inprogress');
           $.post(serviceURL, {
             action: 'deleteFilterPreference',
-            filterPreferenceName: data.data.filterPreferenceName,
+            filterPreferenceId: data.data.filterPreferenceId,
             csrf: xm.form_token
           }).done(function() {
             notif.hide();
@@ -642,7 +637,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.inProgress'))", 'inprogress');
       $.post(serviceURL, {
         action: 'setFilterPreferenceEnabled',
-        filterPreferenceName: data.data.filterPreferenceName,
+        filterPreferenceId: data.data.filterPreferenceId,
         enabled: state,
         csrf: xm.form_token
       }).done(function() {

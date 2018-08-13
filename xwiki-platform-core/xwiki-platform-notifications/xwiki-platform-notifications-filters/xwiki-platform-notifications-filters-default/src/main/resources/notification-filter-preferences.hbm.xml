@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+"-//Hibernate/Hibernate Mapping DTD//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference"
+         table="notification_filter_preferences">
+
+    <id name="internalId" type="long">
+      <column name="nfp_id" not-null="true" />
+      <generator class="native"/>
+    </id>
+
+    <property name="owner" type="string" column="nfp_owner" index="NFP_OWNER"/>
+
+    <property name="filterName" type="string" column="nfp_filter_name" length="255" index="NFP_FILTER_NAME" />
+
+    <property name="enabled" type="boolean" column="nfp_enabled" />
+
+    <property name="active" type="boolean" column="nfp_active" />
+
+    <property name="filterType" column="nfp_filter_type">
+      <type name="org.hibernate.type.EnumType">
+        <param name="enumClass">org.xwiki.notifications.filters.NotificationFilterType</param>
+        <param name="useNamed">true</param>
+      </type>
+    </property>
+
+    <property name="startingDate" type="timestamp" column="nfp_date" />
+
+    <property name="allEventTypes" type="text" column="nfp_event_types" />
+
+    <property name="user" type="string" column="nfp_user" />
+
+    <property name="pageOnly" type="string" column="nfp_page_only" length="255" />
+
+    <property name="page" type="string" column="nfp_page" length="255" />
+
+    <property name="wiki" type="string" column="nfp_wiki" length="255" />
+
+    <property name="alertEnabled" type="boolean" column="nfp_alert" />
+
+    <property name="emailEnabled" type="boolean" column="nfp_email" />
+
+  </class>
+</hibernate-mapping>

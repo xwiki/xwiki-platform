@@ -123,6 +123,26 @@ public interface NotificationFilter extends Comparable
             NotificationFilterType type, NotificationFormat format);
 
     /**
+     * Filtering expression to use when retrieving notifications.
+     * Note that this filtering expression will not be bound to any notification preference.
+     * @param user the user interested in the notifications
+     * @param filterPreferences the collection of all preferences to take into account
+     * @param type of the expected notification filter
+     * @param format format of the notification
+     * @param preferences list of preferences
+     * @return a filtering expression or null
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    default ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
+            NotificationFormat format, Collection<NotificationPreference> preferences)
+    {
+        return filterExpression(user, filterPreferences, type, format);
+    }
+
+    /**
      * Get the name of the filter. This is useful as {@link NotificationFilterPreference} will be able to be linked to
      * this filter using its name. If the {@link NotificationFilter} is used as a component, consider defining
      * the hint of this component as the name of the filter.

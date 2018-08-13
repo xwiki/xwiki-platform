@@ -2,4 +2,4 @@
 ## Each filter should have its own filter template.
 ## The available context variables are declared in
 ## org.xwiki.notifications.filters.internal.AbstractNotificationFilterDisplayer
-$filter.name
+$filter.id

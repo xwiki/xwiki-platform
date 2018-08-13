@@ -47,7 +47,7 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <ckeditor.version>4.9.2</ckeditor.version>
+    <ckeditor.version>4.10.0</ckeditor.version>
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor-dev-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>

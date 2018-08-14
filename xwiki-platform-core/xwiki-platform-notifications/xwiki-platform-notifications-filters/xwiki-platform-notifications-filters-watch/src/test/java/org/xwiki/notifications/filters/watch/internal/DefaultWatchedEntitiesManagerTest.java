@@ -19,9 +19,6 @@
  */
 package org.xwiki.notifications.filters.watch.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +27,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -67,27 +63,24 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
-        NotificationFilterPreference pref2 = mock(NotificationFilterPreference.class);
-        when(pref2.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Arrays.asList("update"));
-        when(pref2.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref2 = new NotificationFilterPreference();
+        pref2.setEventType("update");
+        pref2.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref2)).thenReturn(true);
 
-        NotificationFilterPreference pref3 = mock(NotificationFilterPreference.class);
-        when(pref3.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref3.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT));
+        NotificationFilterPreference pref3 = new NotificationFilterPreference();
+        pref3.setFilterFormats(Sets.newSet(NotificationFormat.ALERT));
         when(watchedEntityReference.matchExactly(pref3)).thenReturn(true);
 
-        NotificationFilterPreference pref4 = mock(NotificationFilterPreference.class);
-        when(pref4.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref4.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref4 = new NotificationFilterPreference();
+        pref4.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref4)).thenReturn(true);
-        when(pref4.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
-        when(pref4.isEnabled()).thenReturn(false);
-        when(pref4.getFilterPreferenceName()).thenReturn("pref4");
+        pref4.setFilterType(NotificationFilterType.INCLUSIVE);
+        pref4.setEnabled(false);
+        pref4.setId(2000L);
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2, pref3, pref4));
 
@@ -99,7 +92,7 @@ public class DefaultWatchedEntitiesManagerTest
         // Checks
         verify(watchedEntityReference, never()).matchExactly(pref2);
         verify(watchedEntityReference, never()).matchExactly(pref3);
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref4", true);
+        verify(notificationFilterManager).setFilterPreferenceEnabled(2000L, true);
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -111,13 +104,12 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
-        when(pref1.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(pref1.isEnabled()).thenReturn(true);
-        when(pref1.getFilterPreferenceName()).thenReturn("pref1");
+        pref1.setFilterType(NotificationFilterType.EXCLUSIVE);
+        pref1.setEnabled(true);
+        pref1.setId(1L);
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
@@ -127,7 +119,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref1");
+        verify(notificationFilterManager).deleteFilterPreference(1L);
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -139,20 +131,18 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
-        when(pref1.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
-        when(pref1.isEnabled()).thenReturn(true);
-        when(pref1.getFilterPreferenceName()).thenReturn("pref1");
-        NotificationFilterPreference pref2 = mock(NotificationFilterPreference.class);
-        when(pref2.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref2.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        pref1.setFilterType(NotificationFilterType.INCLUSIVE);
+        pref1.setEnabled(true);
+        pref1.setId(3L);
+        NotificationFilterPreference pref2 = new NotificationFilterPreference();
+        pref2.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref2)).thenReturn(true);
-        when(pref2.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(pref2.isEnabled()).thenReturn(true);
-        when(pref2.getFilterPreferenceName()).thenReturn("pref2");
+        pref2.setFilterType(NotificationFilterType.EXCLUSIVE);
+        pref2.setEnabled(true);
+        pref2.setId(4L);
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
 
@@ -162,7 +152,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref2");
+        verify(notificationFilterManager).deleteFilterPreference(4L);
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -174,9 +164,8 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
@@ -200,13 +189,12 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
-        when(pref1.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
-        when(pref1.isEnabled()).thenReturn(true);
-        when(pref1.getFilterPreferenceName()).thenReturn("pref1");
+        pref1.setFilterType(NotificationFilterType.INCLUSIVE);
+        pref1.setEnabled(true);
+        pref1.setId(1L);
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
@@ -216,7 +204,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref1");
+        verify(notificationFilterManager).deleteFilterPreference(1L);
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -228,13 +216,12 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
-        when(pref1.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(pref1.isEnabled()).thenReturn(false);
-        when(pref1.getFilterPreferenceName()).thenReturn("pref1");
+        pref1.setFilterType(NotificationFilterType.EXCLUSIVE);
+        pref1.setEnabled(false);
+        pref1.setId(1L);
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
@@ -244,7 +231,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref1", true);
+        verify(notificationFilterManager).setFilterPreferenceEnabled(1L, true);
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -257,19 +244,18 @@ public class DefaultWatchedEntitiesManagerTest
 
         // Filters
         NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
-        when(pref1.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
-        when(pref1.isEnabled()).thenReturn(true);
-        when(pref1.getFilterPreferenceName()).thenReturn("pref1");
+        pref1.setFilterType(NotificationFilterType.INCLUSIVE);
+        pref1.setEnabled(true);
+        pref1.setId(1L);
         NotificationFilterPreference pref2 = mock(NotificationFilterPreference.class);
-        when(pref2.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref2.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+
+        pref2.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref2)).thenReturn(true);
-        when(pref2.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(pref2.isEnabled()).thenReturn(true);
-        when(pref2.getFilterPreferenceName()).thenReturn("pref2");
+        pref2.setFilterType(NotificationFilterType.EXCLUSIVE);
+        pref2.setEnabled(true);
+        pref2.setId(2L);
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
 
@@ -279,7 +265,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref1");
+        verify(notificationFilterManager).deleteFilterPreference(1L);
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -291,9 +277,8 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class);
-        when(pref1.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(Collections.emptyList());
-        when(pref1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        pref1.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 

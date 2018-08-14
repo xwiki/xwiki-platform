@@ -263,21 +263,21 @@ public class DefaultNotificationFilterManagerTest
     @Test
     public void deleteFilterPreference() throws Exception
     {
-        mocker.getComponentUnderTest().deleteFilterPreference("myFilter");
+        mocker.getComponentUnderTest().deleteFilterPreference(42);
 
-        verify(testProvider, times(1)).deleteFilterPreference(eq("myFilter"));
+        verify(testProvider, times(1)).deleteFilterPreference(eq(42));
     }
 
     @Test
     public void setFilterPreferenceEnabled() throws Exception
     {
-        mocker.getComponentUnderTest().setFilterPreferenceEnabled("myFilter1", true);
-        mocker.getComponentUnderTest().setFilterPreferenceEnabled("myFilter2", false);
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled(100, true);
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled(200, false);
 
         verify(testProvider, times(1)).setFilterPreferenceEnabled(
-                eq("myFilter1"), eq(true));
+                eq(100), eq(true));
         verify(testProvider, times(1)).setFilterPreferenceEnabled(
-                eq("myFilter2"), eq(false));
+                eq(200), eq(false));
     }
 
     @Test

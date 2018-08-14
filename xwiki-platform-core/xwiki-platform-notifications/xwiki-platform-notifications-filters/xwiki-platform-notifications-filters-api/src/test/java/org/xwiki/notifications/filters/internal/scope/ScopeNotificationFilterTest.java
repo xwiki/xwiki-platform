@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -90,23 +88,21 @@ public class ScopeNotificationFilterTest
     private NotificationFilterPreference mockNotificationFilterPreference(String entityStringValue,
             EntityReference resultReference, NotificationFilterType filterType, String eventName)
     {
-        NotificationFilterProperty property;
-        if (resultReference.getType().equals(EntityType.DOCUMENT)) {
-            property = NotificationFilterProperty.PAGE;
-        } else if (resultReference.getType().equals(EntityType.SPACE)) {
-            property = NotificationFilterProperty.SPACE;
-        } else {
-            property = NotificationFilterProperty.WIKI;
+        NotificationFilterPreference preference = new NotificationFilterPreference();
+        if (resultReference.getType() == EntityType.SPACE) {
+            preference.setPage(entityStringValue);
         }
-
-        NotificationFilterPreference preference = mock(NotificationFilterPreference.class);
-        when(preference.getProperties(property)).thenReturn(Collections.singletonList(entityStringValue));
-        when(preference.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
-        when(preference.getProperties(eq(NotificationFilterProperty.EVENT_TYPE))).thenReturn(
-                eventName != null ? Arrays.asList(eventName) : Collections.emptyList());
-        when(preference.getFilterType()).thenReturn(filterType);
-        when(preference.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
-        when(preference.isEnabled()).thenReturn(true);
+        if (resultReference.getType() == EntityType.DOCUMENT) {
+            preference.setPageOnly(entityStringValue);
+        }
+        if (resultReference.getType() == EntityType.WIKI) {
+            preference.setWiki(entityStringValue);
+        }
+        preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
+        preference.setEventType(eventName);
+        preference.setFilterType(filterType);
+        preference.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        preference.setEnabled(true);
 
         when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 

@@ -20,17 +20,14 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.text.StringUtils;
 
 /**
  * Represent a preferences that filter some event type to given scope (a wiki, a space, a page...).
@@ -39,10 +36,8 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  * @version $Id$
  * @since 9.9RC1
  */
-public class ScopeNotificationFilterPreference implements NotificationFilterPreference
+public class ScopeNotificationFilterPreference extends NotificationFilterPreference
 {
-    private NotificationFilterPreference filterPreference;
-
     private EntityReference scopeReference;
 
     private boolean hasParent;
@@ -59,18 +54,15 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
             EntityReferenceResolver<String> entityReferenceResolver)
     {
-        this.filterPreference = filterPreference;
+        super(filterPreference);
 
         // Determine which scope reference to return when needed
-        if (!filterPreference.getProperties(NotificationFilterProperty.PAGE).isEmpty()) {
-            scopeReference = entityReferenceResolver.resolve(
-                    filterPreference.getProperties(NotificationFilterProperty.PAGE).get(0), EntityType.DOCUMENT);
-        } else if (!filterPreference.getProperties(NotificationFilterProperty.SPACE).isEmpty()) {
-            scopeReference = entityReferenceResolver.resolve(
-                    filterPreference.getProperties(NotificationFilterProperty.SPACE).get(0), EntityType.SPACE);
-        } else if (!filterPreference.getProperties(NotificationFilterProperty.WIKI).isEmpty()) {
-            scopeReference = entityReferenceResolver.resolve(
-                    filterPreference.getProperties(NotificationFilterProperty.WIKI).get(0), EntityType.WIKI);
+        if (StringUtils.isNotBlank(filterPreference.getPageOnly())) {
+            scopeReference = entityReferenceResolver.resolve(filterPreference.getPageOnly(), EntityType.DOCUMENT);
+        } else if (StringUtils.isNotBlank(getPage())) {
+            scopeReference = entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
+        } else if (StringUtils.isNotBlank(filterPreference.getWiki())) {
+            scopeReference = entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
         }
     }
 
@@ -83,7 +75,7 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
             EntityReference scopeReference)
     {
-        this.filterPreference = filterPreference;
+        super(filterPreference);
         this.scopeReference = scopeReference;
     }
 
@@ -145,59 +137,5 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public EntityReference getScopeReference()
     {
         return scopeReference;
-    }
-
-    @Override
-    public String getFilterPreferenceName()
-    {
-        return filterPreference.getFilterPreferenceName();
-    }
-
-    @Override
-    public String getFilterName()
-    {
-        return filterPreference.getFilterName();
-    }
-
-    @Override
-    public String getProviderHint()
-    {
-        return filterPreference.getProviderHint();
-    }
-
-    @Override
-    public boolean isEnabled()
-    {
-        return filterPreference.isEnabled();
-    }
-
-    @Override
-    public boolean isActive()
-    {
-        return filterPreference.isActive();
-    }
-
-    @Override
-    public NotificationFilterType getFilterType()
-    {
-        return filterPreference.getFilterType();
-    }
-
-    @Override
-    public Set<NotificationFormat> getFilterFormats()
-    {
-        return filterPreference.getFilterFormats();
-    }
-
-    @Override
-    public Date getStartingDate()
-    {
-        return filterPreference.getStartingDate();
-    }
-
-    @Override
-    public List<String> getProperties(NotificationFilterProperty property)
-    {
-        return filterPreference.getProperties(property);
     }
 }

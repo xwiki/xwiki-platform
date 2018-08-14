@@ -41,6 +41,7 @@ import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.notifications.preferences.internal.XWikiEventTypesEnabler;
+import org.xwiki.text.StringUtils;
 
 /**
  * Default implementation of {@link WatchedEntitiesManager}.
@@ -85,7 +86,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             ).iterator();
         while (iterator.hasNext()) {
             NotificationFilterPreference preference = iterator.next();
-            results.addAll(preference.getProperties(NotificationFilterProperty.USER));
+            results.add(preference.getUser());
         }
         return results;
     }
@@ -145,13 +146,13 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     {
         if (enable) {
             notificationFilterManager.setFilterPreferenceEnabled(
-                    notificationFilterPreference.getFilterPreferenceName(),
+                    notificationFilterPreference.getId(),
                     true);
         } else  {
             // Delete this filter instead of just disabling it, because we don't want to let remaining
             // filters
             notificationFilterManager.deleteFilterPreference(
-                    notificationFilterPreference.getFilterPreferenceName());
+                    notificationFilterPreference.getId());
         }
     }
 
@@ -161,7 +162,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         // A filter preferences object concerning all event is a filter that has no even set and that concern
         // concerns all notification formats.
         return notificationFilterManager.getFilterPreferences(user).stream().filter(
-            filterPreference -> filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
+            filterPreference -> StringUtils.isBlank(filterPreference.getEventType())
             && filterPreference.getFilterFormats().size() == NotificationFormat.values().length
         );
     }

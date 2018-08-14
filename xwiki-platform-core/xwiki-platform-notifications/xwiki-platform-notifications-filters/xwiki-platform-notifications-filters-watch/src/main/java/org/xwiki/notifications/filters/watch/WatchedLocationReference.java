@@ -22,10 +22,7 @@ package org.xwiki.notifications.filters.watch;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -35,14 +32,13 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.StringUtils;
 
 /**
  * Reference of a location to watch.
@@ -98,7 +94,7 @@ public class WatchedLocationReference implements WatchedEntityReference
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
-            && notificationFilterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()) {
+            && StringUtils.isBlank(notificationFilterPreference.getEventType())) {
             ScopeNotificationFilterPreference scope
                     = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
             return entityReference.equals(scope.getScopeReference());
@@ -110,48 +106,43 @@ public class WatchedLocationReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        DefaultNotificationFilterPreference preference = createFilterPreference();
+        NotificationFilterPreference preference = createFilterPreference();
         return new ScopeNotificationFilterPreference(preference, entityReference);
     }
 
     @Override
     public NotificationFilterPreference createExclusiveFilterPreference()
     {
-        DefaultNotificationFilterPreference preference = createFilterPreference();
+        NotificationFilterPreference preference = createFilterPreference();
         preference.setFilterType(NotificationFilterType.EXCLUSIVE);
         return new ScopeNotificationFilterPreference(preference, entityReference);
     }
 
-    private DefaultNotificationFilterPreference createFilterPreference()
+    private NotificationFilterPreference createFilterPreference()
     {
-        DefaultNotificationFilterPreference filterPreference
-                = new DefaultNotificationFilterPreference(Long.toString(new Date().getTime()));
+        NotificationFilterPreference filterPreference = new NotificationFilterPreference();
+        filterPreference.setId(new Date().getTime());
 
         // Fields
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
-        filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
+        filterPreference.setFilterFormats(ALL_NOTIFICATION_FORMATS);
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
 
         // Properties
-        Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-        filterPreference.setProperties(preferenceProperties);
-
-        preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
 
         // Scope value
-        List<String> value = Collections.singletonList(serializedReference);
         switch (entityReference.getType()) {
             case WIKI:
-                preferenceProperties.put(NotificationFilterProperty.WIKI, value);
+                filterPreference.setWiki(serializedReference);
                 break;
             case SPACE:
-                preferenceProperties.put(NotificationFilterProperty.SPACE, value);
+                filterPreference.setPage(serializedReference);
                 break;
             case DOCUMENT:
-                preferenceProperties.put(NotificationFilterProperty.PAGE, value);
+                filterPreference.setPageOnly(serializedReference);
                 break;
             default:
                 break;

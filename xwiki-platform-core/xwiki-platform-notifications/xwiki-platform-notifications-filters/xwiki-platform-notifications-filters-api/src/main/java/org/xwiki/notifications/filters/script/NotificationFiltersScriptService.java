@@ -115,28 +115,28 @@ public class NotificationFiltersScriptService implements ScriptService
 
     /**
      * Delete a filter preference.
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId name of the filter preference
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(long filterPreferenceId) throws NotificationException
     {
 
-        notificationFilterManager.deleteFilterPreference(filterPreferenceName);
+        notificationFilterManager.deleteFilterPreference(filterPreferenceId);
     }
 
     /**
      * Enable or disable a filter preference.
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId id of the filter preference
      * @param enabled either or not the filter preference should be enabled
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException
+    public void setFilterPreferenceEnabled(long filterPreferenceId, boolean enabled) throws NotificationException
     {
-        notificationFilterManager.setFilterPreferenceEnabled(filterPreferenceName, enabled);
+        notificationFilterManager.setFilterPreferenceEnabled(filterPreferenceId, enabled);
     }
 
     /**

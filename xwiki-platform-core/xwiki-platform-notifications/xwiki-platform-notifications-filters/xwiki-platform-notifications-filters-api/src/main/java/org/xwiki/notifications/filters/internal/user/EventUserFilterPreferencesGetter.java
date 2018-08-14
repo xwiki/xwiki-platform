@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.text.StringUtils;
 
 /**
  * Helper to get user preferences for the {@link EventUserFilter}.
@@ -56,7 +56,7 @@ public class EventUserFilterPreferencesGetter
             NotificationFormat format)
     {
         return getPreferences(filterPreferences, format, NotificationFilterType.EXCLUSIVE).anyMatch(
-            pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
+                pref -> StringUtils.equals(pref.getUser(), testUser)
         );
     }
 
@@ -72,7 +72,7 @@ public class EventUserFilterPreferencesGetter
             NotificationFormat format)
     {
         return getPreferences(filterPreferences, format, NotificationFilterType.INCLUSIVE).anyMatch(
-            pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
+                pref -> StringUtils.equals(pref.getUser(), testUser)
         );
     }
 
@@ -117,8 +117,7 @@ public class EventUserFilterPreferencesGetter
 
     private Collection<String> collect(Stream<NotificationFilterPreference> stream)
     {
-        return stream.map(fp -> fp.getProperties(NotificationFilterProperty.USER))
-            .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
+        return stream.map(fp -> fp.getUser()).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
     private Stream<NotificationFilterPreference> getPreferences(
@@ -162,6 +161,6 @@ public class EventUserFilterPreferencesGetter
         // When the list of event types concerned by the filter i
         // s empty, we consider that the filter concerns
         // all events.
-        return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
+        return StringUtils.isBlank(filterPreference.getEventType());
     }
 }

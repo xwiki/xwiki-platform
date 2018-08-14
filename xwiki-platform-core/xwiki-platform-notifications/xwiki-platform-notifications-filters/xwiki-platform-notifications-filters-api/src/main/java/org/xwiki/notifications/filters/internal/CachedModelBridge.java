@@ -104,17 +104,17 @@ public class CachedModelBridge implements ModelBridge
     }
 
     @Override
-    public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(DocumentReference user, long filterPreferenceId) throws NotificationException
     {
-        modelBridge.deleteFilterPreference(user, filterPreferenceName);
+        modelBridge.deleteFilterPreference(user, filterPreferenceId);
         clearCache();
     }
 
     @Override
-    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+    public void setFilterPreferenceEnabled(DocumentReference user, long filterPreferenceId, boolean enabled)
             throws NotificationException
     {
-        modelBridge.setFilterPreferenceEnabled(user, filterPreferenceName, enabled);
+        modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
         clearCache();
     }
 

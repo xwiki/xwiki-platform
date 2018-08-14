@@ -19,11 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.compress.utils.Sets;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,9 +27,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
@@ -80,7 +74,7 @@ public class WatchedUserReference implements WatchedEntityReference
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         return EventUserFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
-                && notificationFilterPreference.getProperties(NotificationFilterProperty.USER).contains(userId)
+                && userId.equals(notificationFilterPreference.getUser())
                 && notificationFilterPreference.getFilterFormats().containsAll(
                         Sets.newHashSet(NotificationFormat.values()));
     }
@@ -88,23 +82,16 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        DefaultNotificationFilterPreference filterPreference
-                = new DefaultNotificationFilterPreference(Long.toString(new Date().getTime()));
+        NotificationFilterPreference filterPreference = new NotificationFilterPreference();
 
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
-        filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
+        filterPreference.setFilterFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(true);
         filterPreference.setStartingDate(new Date());
-
-        // Properties
-        Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-        filterPreference.setProperties(preferenceProperties);
-
-        preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
-        preferenceProperties.put(NotificationFilterProperty.USER, Collections.singletonList(userId));
+        filterPreference.setUser(userId);
 
         return filterPreference;
     }
@@ -112,23 +99,16 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createExclusiveFilterPreference()
     {
-        DefaultNotificationFilterPreference filterPreference
-                = new DefaultNotificationFilterPreference(Long.toString(new Date().getTime()));
+        NotificationFilterPreference filterPreference = new NotificationFilterPreference();
 
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
-        filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
+        filterPreference.setFilterFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
         filterPreference.setStartingDate(new Date());
-
-        // Properties
-        Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-        filterPreference.setProperties(preferenceProperties);
-
-        preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
-        preferenceProperties.put(NotificationFilterProperty.USER, Collections.singletonList(userId));
+        filterPreference.setUser(userId);
 
         return filterPreference;
     }

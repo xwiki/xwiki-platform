@@ -24,28 +24,42 @@
 "-//Hibernate/Hibernate Mapping DTD//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-  <class name="org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference"
+  <class name="org.xwiki.notifications.filters.NotificationFilterPreference"
          table="notifications_filters_preferences">
-    <id name="filterPreferenceName" type="string" unsaved-value="undefined">
-      <column name="nfp_name" length="255" not-null="true" />
+
+    <id name="id" type="long">
+      <column name="nfp_id" not-null="true" />
       <generator class="assigned" />
     </id>
-    <property name="user" type="string" column="nfp_user" index="NFP_USER"/>
-    <property name="enabled" type="boolean" column="nfp_enabled" />
-    <property name="active" type="boolean" column="nfp_active" />
-    <property name="startingDate" type="timestamp" column="nfp_date" index="NFP_STARTING_DATE" />
+
+    <property name="owner" type="string" column="nfp_owner" index="NFP_OWNER"/>
+
     <property name="filterName" type="string" column="nfp_filter_name" length="255" index="NFP_FILTER_NAME" />
-    <property name="filterType" type="integer" column="nfp_filter_type" />
 
-    <set name="filterFormats" table="notifications_filters_preferences_format" lazy="false">
-      <key column="filterPreferenceName" />
-      <element column="format" type="integer" />
-    </set>
+    <property name="enabled" type="boolean" column="nfp_enabled" />
 
-    <map name="properties" table="notifications_filters_preferences_properties" lazy="false">
-      <key column="filterPreferenceName"/>
-      <index column="name" type="integer"/>
-      <element column="value" type="string" length="2000"/>
-    </map>
+    <property name="active" type="boolean" column="nfp_active" />
+
+    <property name="filterType" column="nfp_filter_type">
+      <type name="org.hibernate.type.EnumType">
+        <param name="enumClass">org.xwiki.notifications.filters.NotificationFilterType</param>
+        <param name="useNamed">true</param>
+      </type>
+    </property>
+
+    <property name="startingDate" type="timestamp" column="nfp_date" index="NFP_STARTING_DATE" />
+
+    <property name="eventType" type="string" column="nfp_event_type" length="255" index="NFP_EVENT_TYPE" />
+
+    <property name="user" type="string" column="nfp_user" index="NFP_USER"/>
+
+    <property name="pageOnly" type="string" column="nfp_page_only" length="255" />
+
+    <property name="page" type="string" column="nfp_page" length="255" />
+
+    <property name="alertEnabled" type="boolean" column="nfp_alert" />
+
+    <property name="emailEnabled" type="boolean" column="nfp_email" />
+
   </class>
 </hibernate-mapping>

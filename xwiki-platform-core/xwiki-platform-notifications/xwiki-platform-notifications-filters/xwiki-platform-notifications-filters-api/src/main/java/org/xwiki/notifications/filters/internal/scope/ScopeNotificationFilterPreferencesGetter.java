@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.text.StringUtils;
 
 /**
  * Helper to get all ScopeNotificationFilterPreferencesGetter for a given user.
@@ -94,7 +94,7 @@ public class ScopeNotificationFilterPreferencesGetter
     {
         // When the list of event types concerned by the filter is empty, we consider that the filter concerns
         // all events.
-        return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
+        return StringUtils.isBlank(filterPreference.getEventType());
     }
 
     /**
@@ -104,7 +104,6 @@ public class ScopeNotificationFilterPreferencesGetter
      */
     private boolean matchEventType(NotificationFilterPreference filterPreference, String eventType)
     {
-        return eventType == null
-                || filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(eventType);
+        return eventType == null || eventType.equals(filterPreference.getEventType());
     }
 }

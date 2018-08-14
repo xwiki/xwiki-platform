@@ -275,33 +275,33 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(long filterPreferenceId) throws NotificationException
     {
         try {
             for (NotificationFilterPreferenceProvider provider
                     : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
                             NotificationFilterPreferenceProvider.class)) {
-                provider.deleteFilterPreference(filterPreferenceName);
+                provider.deleteFilterPreference(filterPreferenceId);
             }
 
         } catch (ComponentLookupException e) {
-            logger.info("Failed to remove the filter preference [{}].", filterPreferenceName, e);
+            logger.info("Failed to remove the filter preference [{}].", filterPreferenceId, e);
         }
     }
 
     @Override
-    public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled)
+    public void setFilterPreferenceEnabled(long filterPreferenceId, boolean enabled)
             throws NotificationException
     {
         try {
             for (NotificationFilterPreferenceProvider provider
                     : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
                     NotificationFilterPreferenceProvider.class)) {
-                provider.setFilterPreferenceEnabled(filterPreferenceName, enabled);
+                provider.setFilterPreferenceEnabled(filterPreferenceId, enabled);
             }
 
         } catch (ComponentLookupException e) {
-            logger.info("Failed to enable or disabled the filter preference [{}].", filterPreferenceName, e);
+            logger.info("Failed to enable or disabled the filter preference [{}].", filterPreferenceId, e);
         }
     }
 

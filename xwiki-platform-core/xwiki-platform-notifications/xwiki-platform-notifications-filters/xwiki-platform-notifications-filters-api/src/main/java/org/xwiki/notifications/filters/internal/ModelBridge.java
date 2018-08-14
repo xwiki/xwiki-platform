@@ -60,23 +60,23 @@ public interface ModelBridge
     /**
      * Delete a filter preference.
      * @param user reference of the user concerned by the filter preference
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId name of the filter preference
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException;
+    void deleteFilterPreference(DocumentReference user, long filterPreferenceId) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
      * @param user reference of the user concerned by the filter preference
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId name of the filter preference
      * @param enabled either or not the filter preference should be enabled
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+    void setFilterPreferenceEnabled(DocumentReference user, long filterPreferenceId, boolean enabled)
             throws NotificationException;
 
     /**

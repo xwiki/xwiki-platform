@@ -125,6 +125,7 @@ var CKBUILDER_CONFIG = {
     'xwiki-save': 1,
     'xwiki-source': 1,
     'xwiki-table': 1,
-    'xwiki-upload': 1
+    'xwiki-upload': 1,
+    'xwiki-wysiwygarea': 1
   }
 };

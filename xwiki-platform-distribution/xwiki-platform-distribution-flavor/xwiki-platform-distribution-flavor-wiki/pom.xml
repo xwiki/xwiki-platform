@@ -30,12 +30,12 @@
   <artifactId>xwiki-platform-distribution-flavor-wiki</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Wiki</name>
   <packaging>xar</packaging>
-  <description>Default set of wiki pages containing both content and default applications for XWiki Flavor Sub Wiki</description>
+  <description>${xwiki.extension.distribution.wikiui.summary}</description>
   <properties>
     <xwiki.extension.category>flavor</xwiki.extension.category>
 
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>XWiki Standard Flavor - Sub Wiki</xwiki.extension.name>
+    <xwiki.extension.name>${xwiki.extension.distribution.wikiui.name}</xwiki.extension.name>
 
     <!-- Should be insalled on a wiki but not main wiki -->
     <xwiki.extension.namespaces>[wiki:(?!xwiki$).*]</xwiki.extension.namespaces>

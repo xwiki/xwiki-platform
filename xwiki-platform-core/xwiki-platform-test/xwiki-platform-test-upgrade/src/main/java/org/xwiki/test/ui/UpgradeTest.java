@@ -22,20 +22,29 @@ package org.xwiki.test.ui;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.internal.ExtensionUtils;
+import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.test.po.ExtensionPane;
 import org.xwiki.extension.test.po.ExtensionProgressPane;
 import org.xwiki.extension.test.po.LogItemPane;
 import org.xwiki.extension.test.po.distribution.DistributionStepIcon;
+import org.xwiki.extension.test.po.distribution.ExtensionsDistributionStep;
 import org.xwiki.extension.test.po.distribution.FlavorDistributionStep;
 import org.xwiki.extension.test.po.distribution.ReportDistributionStep;
 import org.xwiki.extension.test.po.distribution.WelcomeDistributionStep;
+import org.xwiki.extension.test.po.flavor.FlavorPane;
+import org.xwiki.extension.test.po.flavor.FlavorPicker;
+import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -54,7 +63,24 @@ public class UpgradeTest extends AbstractTest
 {
     private static final String PREVIOUSFLAVOR_NAME = System.getProperty("previousFlavorName");
 
-    private static final String PREVIOUSFLAVOR_VERSION = System.getProperty("previousFlavorVersion");
+    private static final ExtensionId PREVIOUSFLAVOR_ID =
+        ExtensionIdConverter.toExtensionId(System.getProperty("previousFlavorId"), null);
+
+    private static final String FLAVOR_NAME = System.getProperty("flavorName");
+
+    private static final String FLAVOR_SUMMARY = System.getProperty("flavorSummary");
+
+    private static final ExtensionId FLAVOR_ID =
+        ExtensionIdConverter.toExtensionId(System.getProperty("flavorId"), null);
+
+    private static final List<ExtensionId> KNOW_VALID_FLAVORS_IDS = ExtensionIdConverter
+        .toExtensionIdList(ExtensionUtils.importPropertyStringList(System.getProperty("knowValidFlavors"), true), null);
+
+    private static final Set<String> KNOW_VALID_FLAVORS =
+        KNOW_VALID_FLAVORS_IDS.stream().map(extensionId -> extensionId.getId()).collect(Collectors.toSet());
+
+    private static final Set<String> KNOW_INVALID_FLAVORS =
+        new HashSet<>(ExtensionUtils.importPropertyStringList(System.getProperty("knowInvalidFlavors"), true));
 
     private static final String STEP_ADMIN_NAME = "Admin user";
 
@@ -89,7 +115,7 @@ public class UpgradeTest extends AbstractTest
         // Local Maven repository does not maintain any checksum and we don't want false positive warning in the install
         // log
         properties.setProperty("extension.repositories.localmaven.checksumPolicy", "ignore");
-        
+
         executor.saveXWikiProperties();
 
         /////////////////////
@@ -126,6 +152,11 @@ public class UpgradeTest extends AbstractTest
         // Validate Flavor step
 
         flavorStep();
+
+        ////////////////////
+        // Validate Flavor step
+
+        extensionsStep();
 
         ////////////////////
         // Validate Report step
@@ -188,24 +219,62 @@ public class UpgradeTest extends AbstractTest
         // Check current flavor
         ExtensionPane currentFlavor = flavorStep.getCurrentFlavorExtensionPane();
         assertEquals(PREVIOUSFLAVOR_NAME, currentFlavor.getName());
-        assertEquals(PREVIOUSFLAVOR_VERSION, currentFlavor.getVersion());
+        assertEquals(PREVIOUSFLAVOR_ID.getVersion().getValue(), currentFlavor.getVersion());
         assertEquals("installed-invalid", currentFlavor.getStatus());
 
         // Flavor upgrade
-        // TODO: support more use cases (invalid flavor, no flavor, etc.)
-        flavorStepKnownUpgrade(flavorStep);
+        if (KNOW_VALID_FLAVORS.contains(PREVIOUSFLAVOR_ID.getId())) {
+            flavorStepKnownValidUpgrade(flavorStep);
+        } else if (KNOW_INVALID_FLAVORS.contains(PREVIOUSFLAVOR_ID.getId())) {
+            flavorStepKnownInvalidUpgrade(flavorStep);
+        } else {
+            // TODO
+            fail("Unsupported Flavor step use case");
+        }
+    }
+
+    private void flavorStepKnownValidUpgrade(FlavorDistributionStep flavorStep) throws Exception
+    {
+        upgrade(flavorStep.getKnownValieFlavorUpgradeExtensionPane());
 
         // Go to next step
         flavorStep.clickCompleteStep();
     }
 
-    private void flavorStepKnownUpgrade(FlavorDistributionStep flavorStep) throws Exception
+    private void flavorStepKnownInvalidUpgrade(FlavorDistributionStep flavorStep) throws Exception
     {
+        FlavorPicker flavorPicker = flavorStep.getKnowInvalidFlavorFlavorPicker();
 
-        // Check upgrade flavor
-        ExtensionPane upgradeFlavor = flavorStep.getKnownUpgradeFlavorExtensionPane();
-        assertEquals("XWiki Standard Flavor", upgradeFlavor.getName());
-        assertEquals(getUtil().getVersion(), upgradeFlavor.getVersion());
+        assertFalse(flavorPicker.isInstallFlavorEnabled());
+
+        List<FlavorPane> flavors = flavorPicker.getFlavors();
+
+        assertEquals(1, flavors.size());
+
+        FlavorPane flavor = flavors.get(0);
+
+        assertEquals(FLAVOR_NAME, flavor.getName());
+        assertEquals(FLAVOR_ID.getVersion().getValue(), flavor.getVersion());
+        assertEquals(FLAVOR_SUMMARY, flavor.getSummary());
+        assertEquals("By XWiki Development Team", flavor.getAuthors());
+
+        // Select the flavor
+        flavor.select();
+
+        // Install the flavor
+        FlavorPickerInstallStep flavorInstall = flavorPicker.installSelectedFlavor();
+
+        upgrade(flavorInstall.getFlavorExtensionPane());
+
+        // Go to next step
+        flavorInstall.clickCompleteStep();
+    }
+
+    private void upgrade(ExtensionPane extension)
+    {
+        ExtensionPane upgradeFlavor = extension;
+        assertEquals(FLAVOR_NAME, upgradeFlavor.getName());
+        assertEquals(FLAVOR_ID.getVersion().getValue(), upgradeFlavor.getVersion());
         assertEquals("remote-installed-invalid", upgradeFlavor.getStatus());
 
         // Upgrade the flavor
@@ -244,7 +313,39 @@ public class UpgradeTest extends AbstractTest
         }
 
         assertEquals("installed", upgradeFlavor.getStatus());
+    }
 
+    private void extensionsStep()
+    {
+        ExtensionsDistributionStep extensionsStep = new ExtensionsDistributionStep();
+
+        // Steps
+
+        List<DistributionStepIcon> icons = extensionsStep.getIcons();
+
+        // Make sure the extensions step is active
+        if (!icons.get(2).isActive()) {
+            return;
+        }
+
+        assertTrue(icons.get(0).isDone());
+        assertFalse(icons.get(0).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
+        assertTrue(icons.get(1).isDone());
+        assertFalse(icons.get(1).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
+        assertFalse(icons.get(2).isDone());
+        assertTrue(icons.get(2).isActive());
+        assertEquals(3, icons.get(2).getNumber());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(2).getName());
+
+        // Search for extension update
+        extensionsStep.checkForUpdates();
+
+        // TODO: check some stuff
+
+        // Go to next step
+        extensionsStep.clickCompleteStep();
     }
 
     private void reportStep()

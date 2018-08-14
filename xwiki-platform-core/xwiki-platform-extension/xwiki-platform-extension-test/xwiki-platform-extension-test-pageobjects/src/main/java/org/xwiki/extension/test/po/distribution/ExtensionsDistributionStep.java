@@ -19,40 +19,32 @@
  */
 package org.xwiki.extension.test.po.distribution;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.extension.test.po.ExtensionPane;
-import org.xwiki.extension.test.po.flavor.FlavorPicker;
 
 /**
- * The Flavor step UI.
+ * The Report step UI.
  * 
  * @version $Id$
  * @since 10.7RC1
  */
-public class FlavorDistributionStep extends AbstractDistributionPage
+public class ExtensionsDistributionStep extends AbstractDistributionPage
 {
-    @FindBy(xpath = "//*[@id = 'current-flavor']//form")
-    private WebElement currentFlavorExtension;
+    // TODO: move that in a dedicated PO since that's a EM UI element
+    @FindBy(xpath = "//button[@value='checkForUpdates']")
+    private WebElement checkForUpdates;
 
-    @FindBy(xpath = "//*[@id = 'known-valid-flavor-upgrade']//form")
-    private WebElement knownValidFlavorUpgradeExtension;
-
-    @FindBy(xpath = "//*[@id = 'known-invalid-flavor-upgrade']//form")
-    private WebElement knownInvalidFlavorUpgradePicker;
-
-    public ExtensionPane getCurrentFlavorExtensionPane()
+    // TODO: move that in a dedicated PO since that's actually a EM UI element
+    public ExtensionsDistributionStep checkForUpdates()
     {
-        return new ExtensionPane(this.currentFlavorExtension);
-    }
+        // Click the button
+        this.checkForUpdates.click();
 
-    public ExtensionPane getKnownValieFlavorUpgradeExtensionPane()
-    {
-        return new ExtensionPane(this.knownValidFlavorUpgradeExtension);
-    }
+        // Wait for the result
+        getDriver()
+            .waitUntilElementIsVisible(By.xpath("//div[@class='extensionUpdater']/p[@class='xHint']"));
 
-    public FlavorPicker getKnowInvalidFlavorFlavorPicker()
-    {
-        return new FlavorPicker(this.knownInvalidFlavorUpgradePicker);
+        return new ExtensionsDistributionStep();
     }
 }

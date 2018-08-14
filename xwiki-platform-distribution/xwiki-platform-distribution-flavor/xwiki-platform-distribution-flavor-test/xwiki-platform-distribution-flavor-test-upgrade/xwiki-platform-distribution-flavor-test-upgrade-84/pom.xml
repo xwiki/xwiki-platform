@@ -32,9 +32,10 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From 8.4.6</description>
   <properties>
-    <upgradetest.previousflavor.name>XWiki Enterprise Flavor</upgradetest.previousflavor.name>
+    <upgradetest.previousflavor.name>XWiki Enterprise Flavor - Main Wiki</upgradetest.previousflavor.name>
+    <upgradetest.previousflavor.groupId>org.xwiki.enterprise</upgradetest.previousflavor.groupId>
+    <upgradetest.previousflavor.artifactId>xwiki-enterprise-ui-mainwiki</upgradetest.previousflavor.artifactId>
     <upgradetest.previousflavor.version>8.4.6</upgradetest.previousflavor.version>
-    <upgradetest.previousdata.groupId>org.xwiki.enterprise</upgradetest.previousdata.groupId>
     <upgradetest.previousdata.artifactId>xwiki-enterprise-data-hsqldb</upgradetest.previousdata.artifactId>
   </properties>
   <dependencies>
@@ -64,11 +65,10 @@
         <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
       <!-- Step 4: Execute the tests (they start/stop XWiki) -->
-      <!-- TODO: Not fully ready yet
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-      </plugin> -->
+      </plugin>
     </plugins>
   </build>
 </project>

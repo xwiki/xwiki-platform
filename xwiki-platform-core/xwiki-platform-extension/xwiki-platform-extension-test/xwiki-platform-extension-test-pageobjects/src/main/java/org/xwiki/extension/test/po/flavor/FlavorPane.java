@@ -17,50 +17,57 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.test.po.distribution;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.xwiki.extension.test.po.flavor;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * The Distribution Wizard based page.
+ * Displays a log item.
  * 
  * @version $Id$
- * @since 10.7RC1
+ * @since 4.2M1
  */
-public class AbstractDistributionPage extends BaseElement
+public class FlavorPane extends BaseElement
 {
-    @FindBy(className = "steps")
-    private WebElement icons;
+    /**
+     * The log item container.
+     */
+    private final WebElement container;
 
-    @FindBy(xpath = "//button[@value='COMPLETE_STEP']")
-    private WebElement completeStepButton;
-
-    public List<DistributionStepIcon> getIcons()
+    /**
+     * Creates a new instance.
+     * 
+     * @param container the log item container
+     */
+    public FlavorPane(WebElement container)
     {
-        List<WebElement> listItems = getDriver().findElementsWithoutWaiting(this.icons, By.tagName("li"));
-
-        List<DistributionStepIcon> result = new ArrayList<DistributionStepIcon>(listItems.size());
-
-        for (WebElement listItem : listItems) {
-            result.add(new DistributionStepIcon(listItem));
-        }
-
-        return result;
+        this.container = container;
     }
 
-    public boolean isCompleteStepDisabled()
+    public String getName()
     {
-        return this.completeStepButton.isDisplayed();
+        return getDriver().findElementWithoutWaiting(this.container, By.xpath("./div/div/a")).getText();
     }
 
-    public void clickCompleteStep()
+    public String getVersion()
     {
-        this.completeStepButton.click();
+        return getDriver().findElementWithoutWaiting(this.container, By.xpath("./div/div/small")).getText();
+    }
+
+    public String getAuthors()
+    {
+        return getDriver().findElementWithoutWaiting(this.container, By.xpath(".//p[@class='authors']")).getText();
+    }
+
+    public String getSummary()
+    {
+        return getDriver().findElementWithoutWaiting(this.container, By.xpath(".//p[@class='xHint']")).getText();
+    }
+
+    public void select()
+    {
+        this.container.click();
     }
 }

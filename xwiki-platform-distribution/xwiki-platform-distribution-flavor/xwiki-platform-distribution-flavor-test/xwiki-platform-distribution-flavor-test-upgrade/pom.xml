@@ -39,18 +39,21 @@
     <xwikiExecutionArtifactId>xwiki-platform-distribution-jetty-hsqldb</xwikiExecutionArtifactId>
 
     <!-- The extension containing previous version data -->
-    <upgradetest.previousflavor.name>XWiki Standard Flavor</upgradetest.previousflavor.name>
-    <upgradetest.previousflavor.version>${project.version}</upgradetest.previousflavor.version>
-    <upgradetest.previousdata.groupId>${project.groupId}</upgradetest.previousdata.groupId>
+    <upgradetest.previousflavor.name>${xwiki.extension.distribution.ui.name}</upgradetest.previousflavor.name>
+    <upgradetest.previousflavor.groupId>${xwiki.extension.distribution.ui.groupId}</upgradetest.previousflavor.groupId>
+    <upgradetest.previousflavor.artifactId>${xwiki.extension.distribution.ui.artifactId}</upgradetest.previousflavor.artifactId>
+    <upgradetest.previousflavor.version>${xwiki.extension.distribution.ui.version}</upgradetest.previousflavor.version>
+    <upgradetest.previousflavor.id>${upgradetest.previousflavor.groupId}:${upgradetest.previousflavor.artifactId}/${upgradetest.previousflavor.version}</upgradetest.previousflavor.id>
+    <upgradetest.previousdata.groupId>${upgradetest.previousflavor.groupId}</upgradetest.previousdata.groupId>
     <upgradetest.previousdata.artifactId>xwiki-platform-distribution-flavor-data-hsqldb</upgradetest.previousdata.artifactId>
     <upgradetest.previousdata.version>${upgradetest.previousflavor.version}</upgradetest.previousdata.version>
   </properties>
   <dependencies>
     <!-- Make sure the flavor is available when the test try to download it -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
-      <version>${project.version}</version>
+      <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
+      <artifactId>${xwiki.extension.distribution.ui.artifactId}</artifactId>
+      <version>${xwiki.extension.distribution.ui.version}</version>
       <type>xar</type>
       <scope>test</scope>
     </dependency>
@@ -128,8 +131,28 @@
                 <value>${upgradetest.previousflavor.name}</value>
               </property>
               <property>
-                <name>previousFlavorVersion</name>
-                <value>${upgradetest.previousflavor.version}</value>
+                <name>previousFlavorId</name>
+                <value>${upgradetest.previousflavor.id}</value>
+              </property>
+              <property>
+                <name>flavorName</name>
+                <value>${xwiki.extension.distribution.ui.name}</value>
+              </property>
+              <property>
+                <name>flavorSummary</name>
+                <value>${xwiki.extension.distribution.ui.summary}</value>
+              </property>
+              <property>
+                <name>flavorId</name>
+                <value>${xwiki.extension.distribution.ui.id}</value>
+              </property>
+              <property>
+                <name>knowValidFlavors</name>
+                <value>${xwiki.extension.knownFlavors}</value>
+              </property>
+              <property>
+                <name>knowInvalidFlavors</name>
+                <value>${xwiki.extension.knownInvalidFlavors}</value>
               </property>
             </systemProperties>
           </configuration>

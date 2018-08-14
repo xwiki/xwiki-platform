@@ -45,15 +45,20 @@
     <!-- Flavors known to be valid with the current distribution -->
     <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
     <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
-        org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
+      org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
+      org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
     </xwiki.extension.knownFlavors>
 
     <!-- Flavors known to be incompatible with the current distribution -->
     <xwiki.extension.knownInvalidFlavors>
-        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
-        org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
-        org.xwiki.platform:xwiki-platform-distribution-flavor
+      org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
+      org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
+      org.xwiki.platform:xwiki-platform-distribution-flavor,
+      org.xwiki.manager:xwiki-manager-ui,
+      org.xwiki.manager:xwiki-manager-wiki-administrator,
+      org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
+      com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
+      com.xpn.xwiki.products:xwiki-enterprise-wiki
     </xwiki.extension.knownInvalidFlavors>
 
     <!-- Hibernate configuration -->
@@ -115,10 +120,11 @@
       <!-- Old extensions that we consider now as flavors -->
       org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
       org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
-      org.xwiki.manager:xwiki-enterprise-ui,
+      org.xwiki.manager:xwiki-manager-ui,
       org.xwiki.manager:xwiki-manager-wiki-administrator,
       org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
-      com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator
+      com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
+      com.xpn.xwiki.products:xwiki-enterprise-wiki
     </xwiki.properties.extensions.oldflavors>
     <xwiki.properties.defaultWysiwygEditor />
     <xwiki.properties.additionalproperties />

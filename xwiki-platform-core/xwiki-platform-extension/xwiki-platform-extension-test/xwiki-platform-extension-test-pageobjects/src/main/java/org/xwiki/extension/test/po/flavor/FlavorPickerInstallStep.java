@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.test.po.distribution;
+package org.xwiki.extension.test.po.flavor;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.extension.test.po.ExtensionPane;
-import org.xwiki.extension.test.po.flavor.FlavorPicker;
+import org.xwiki.extension.test.po.distribution.AbstractDistributionPage;
 
 /**
  * The Flavor step UI.
@@ -30,29 +30,13 @@ import org.xwiki.extension.test.po.flavor.FlavorPicker;
  * @version $Id$
  * @since 10.7RC1
  */
-public class FlavorDistributionStep extends AbstractDistributionPage
+public class FlavorPickerInstallStep extends AbstractDistributionPage
 {
-    @FindBy(xpath = "//*[@id = 'current-flavor']//form")
-    private WebElement currentFlavorExtension;
+    @FindBy(xpath = "//*[@id = 'extension.flavor']//form[contains(@class, 'extension-item')]")
+    private WebElement flavorExtension;
 
-    @FindBy(xpath = "//*[@id = 'known-valid-flavor-upgrade']//form")
-    private WebElement knownValidFlavorUpgradeExtension;
-
-    @FindBy(xpath = "//*[@id = 'known-invalid-flavor-upgrade']//form")
-    private WebElement knownInvalidFlavorUpgradePicker;
-
-    public ExtensionPane getCurrentFlavorExtensionPane()
+    public ExtensionPane getFlavorExtensionPane()
     {
-        return new ExtensionPane(this.currentFlavorExtension);
-    }
-
-    public ExtensionPane getKnownValieFlavorUpgradeExtensionPane()
-    {
-        return new ExtensionPane(this.knownValidFlavorUpgradeExtension);
-    }
-
-    public FlavorPicker getKnowInvalidFlavorFlavorPicker()
-    {
-        return new FlavorPicker(this.knownInvalidFlavorUpgradePicker);
+        return new ExtensionPane(this.flavorExtension);
     }
 }

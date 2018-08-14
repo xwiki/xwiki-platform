@@ -100,14 +100,16 @@ def builds = [
       name: 'TestRelease',
       goals: 'clean install',
       profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true',
+      xvnc: false
     )
   },
   'Quality' : {
     build(
       name: 'Quality',
       goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy'
+      profiles: 'quality,legacy',
+      xvnc: false
     )
   }
 ]

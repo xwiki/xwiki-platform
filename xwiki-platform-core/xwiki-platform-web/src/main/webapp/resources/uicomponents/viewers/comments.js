@@ -164,7 +164,6 @@ viewers.Comments = Class.create({
       });
     }
   },
-
   addReplyListenerToComment : function(item) {
     // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
     // Quick fix until Prototype 1.6.1 is integrated.
@@ -243,7 +242,6 @@ viewers.Comments = Class.create({
                   "id" : "Comments",
                   "element": this.container
                 });
-                this.updateCount();
               }
             }.bind(this)
           });
@@ -353,14 +351,6 @@ viewers.Comments = Class.create({
     this.form["XWiki.XWikiComments_comment"].value = "";
     this.cancelPreview(this.form);
   },
-  updateCount : function() {
-    if ($("Commentstab") && $("Commentstab").down(".itemCount")) {
-      $("Commentstab").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
-    }
-    if ($("commentsshortcut") && $("commentsshortcut").down(".itemCount")) {
-      $("commentsshortcut").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
-    }
-  },
   /**
    * Registers a listener that watches for the insertion of the Comments tab and triggers the enhancements.
    * After that, the listener removes itself, since it is no longer needed.
@@ -372,14 +362,6 @@ viewers.Comments = Class.create({
       }
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);
-  },
-  /**
-   * Just a simple message box that is displayed at sending a comment.
-   */
-  createNotification : function(message) {
-    var msg = new Element('div', {"class" : "notification" });
-    msg.update(message);
-    return msg;
   }
 });
 
@@ -395,60 +377,114 @@ function init() {
 return XWiki;
 }(XWiki || {}));
 
-require(['jquery'], function ($) {
+/**
+ * Permalink.
+ */
+require(['jquery'], function($) {
+
   /**
    * Permalink: Events triggered while the permalink modal is displayed.
    */
   $(document).on('show.bs.modal', '#permalinkModal', function (event) {
-    var modal = $(this);
     var button = $(event.relatedTarget);
     var permalinkValue = button.prop('href');
     // Updating the permalink inside modal.
-    modal.find('.form-control').val(permalinkValue);
-    // Go to permalink location.
-    modal.find('input.btn.btn-primary').click( function() {
-      window.location = permalinkValue;
-    });
+    $(this).find('.form-control').val(permalinkValue);
   });
   /**
    * Permalink: Events triggered after the permalink modal is displayed.
    */
   $(document).on('shown.bs.modal', '#permalinkModal', function (event) {
-    var modal = $(this);
     // Autofocus on permalink field.
-    modal.find('.form-control').focus();
+    $(this).find('.form-control').focus();
   })
   /**
-   * Delete: Events triggered after the delete modal is displayed.
+   * Event on permalinkModal button for going to the permalink location.
+   */
+  $(document).on('click','#permalinkModal input.btn-primary',function(){
+    window.location = $('#permalinkModal').find('.form-control').val();
+  });
+});
+
+/**
+ * Delete a comment.
+ */
+require(['jquery', 'xwiki-events-bridge'], function($) {
+  /**
+   * Getting the button that triggers the modal.
    */
   $(document).on('shown.bs.modal' , '#deleteModal', function (event) {
-    var modal = $(this);
-    var button = $(event.relatedTarget);
+    $(this).data ('relatedTarget', $(event.relatedTarget));
+  });
+  /**
+   * Event on deleteModal button.
+   */
+  $(document).on('click','#deleteModal input.btn-danger',function(){
+    var modal = $('#deleteModal');
+    var button = modal.data('relatedTarget');
     /**
      * Ajax request made for deleting the comment.
-     * Delete the HTML element on succes (replace it with a small notification message). Display error message on failure.
+     * Delete the HTML element on succes (replace it with a small notification message).
+     * Display error message on failure.
+     * Disable the delete button before the request is send, so the user cannot resend it in case it takes longer.
      */
-    modal.find('input.btn.btn-danger').click( function(event) {
-      $.ajax({
-        url : button.prop('href'),
-        success : function() {
-          var comment = button.parentsUntil('.reply');
-          // Replace the comment with a "deleted comment" placeholder.
-          comment.replaceWith(createNotification("$services.localization.render('core.viewers.comments.commentDeleted')"));
-          new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.commentDeleted')", 'done');
-        },
-        error: function () {
-          new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.delete.failed')", 'error');
+    $.ajax({
+      url : button.prop('href'),
+      beforeSend : function() {
+        button.prop('disabled', true);
+      },
+      success : function() {
+        var comment = button.parentsUntil('.reply');
+        var commentForm = comment.nextAll('.commentthread').find('form');
+        // If the form is inside this comment's reply thread, move it back to the bottom.
+        if(commentForm.length){
+          commentForm.find('.cancel')[0].click();
         }
-      })
-    });
-  /**
-   * Just a simple message box that is displayed at 'comment deleted' event.
-   */
+        // Replace the comment with a "deleted comment" placeholder.
+        comment.replaceWith(createNotification("$services.localization.render('core.viewers.comments.commentDeleted')"));
+        updateCount();
+        new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.commentDeleted')", 'done');
+        // fire an event for the annotations to know when a comment / annotation is deleted
+        // FIXME: This is not the best way to go because the Annotations system should be in charge of
+        // properly deleting annotations, not the Comments system. Try to find an alternative for the future.
+        if (comment.hasClass('annotation')) {
+          document.trigger("xwiki:annotation:tab:deleted");
+        }
+      },
+      error: function () {
+        // The button is enabled in case of error.
+        button.prop('disabled', false);
+        new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.delete.failed')", 'error');
+      }
+    })
   });
+  /**
+   * Just a simple message box that is used as a placeholder for a deleted comment.
+   */
   var createNotification = function(message) {
     var msg = new Element('div', {'class' : 'notification' });
     msg.update(message);
     return msg;
   };
+  /**
+   * Updating the number of comments in commentsTab and in More actions menu.
+   */
+  var updateCount = function() {
+    var commentsTab = $('#Commentstab').find('.itemCount');
+    var commentsNumber = $('.xwikicomment').size();
+    if(commentsTab) {
+      commentsTab.text("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", commentsNumber));
+    };
+    if($('#tmComment').length){
+      // All the sub-nodes of tmComment are added in a normalized form.
+      $('#tmComment')[0].normalize();
+      var label = " $services.localization.render('docextra.comments') $services.localization.render('docextra.extranb', ['__number__'])";
+      label = label.replace("__number__", commentsNumber);
+      $('#tmComment').contents().last()[0].nodeValue=label;
+    }
+  };
+  // updateCount was moved to jquery from prototype and is fired here when a comment is added.
+  $(document).on('xwiki:docextra:loaded', function(event) {
+    updateCount();
+  });
 });

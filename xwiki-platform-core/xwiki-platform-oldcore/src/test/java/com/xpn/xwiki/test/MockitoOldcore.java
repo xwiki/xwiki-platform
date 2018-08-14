@@ -860,9 +860,9 @@ public class MockitoOldcore
     {
         Environment environment = getMocker().registerMockComponent(Environment.class);
 
-        File temp = new File(new File(System.getProperty("java.io.tmpdir")), "test-" + new Date().getTime());
+        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
 
-        when(environment.getTemporaryDirectory()).thenReturn(new File(temp, "temporary"));
-        when(environment.getPermanentDirectory()).thenReturn(new File(temp, "permanent"));
+        when(environment.getTemporaryDirectory()).thenReturn(new File(testDirectory, "temporary"));
+        when(environment.getPermanentDirectory()).thenReturn(new File(testDirectory, "permanent"));
     }
 }

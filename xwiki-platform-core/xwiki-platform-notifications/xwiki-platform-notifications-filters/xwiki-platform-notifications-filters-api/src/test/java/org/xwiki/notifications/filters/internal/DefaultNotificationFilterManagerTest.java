@@ -265,7 +265,7 @@ public class DefaultNotificationFilterManagerTest
     {
         mocker.getComponentUnderTest().deleteFilterPreference(42);
 
-        verify(testProvider, times(1)).deleteFilterPreference(eq(42));
+        verify(testProvider, times(1)).deleteFilterPreference(eq(42L));
     }
 
     @Test
@@ -275,9 +275,9 @@ public class DefaultNotificationFilterManagerTest
         mocker.getComponentUnderTest().setFilterPreferenceEnabled(200, false);
 
         verify(testProvider, times(1)).setFilterPreferenceEnabled(
-                eq(100), eq(true));
+                eq(100L), eq(true));
         verify(testProvider, times(1)).setFilterPreferenceEnabled(
-                eq(200), eq(false));
+                eq(200L), eq(false));
     }
 
     @Test

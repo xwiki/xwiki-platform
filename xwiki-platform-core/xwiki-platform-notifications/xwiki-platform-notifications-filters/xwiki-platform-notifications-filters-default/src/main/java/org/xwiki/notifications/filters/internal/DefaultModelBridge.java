@@ -44,7 +44,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -190,7 +189,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
+    public void deleteFilterPreference(DocumentReference user, long filterPreferenceId) throws NotificationException
     {
         NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
         if (preference == null) {
@@ -215,11 +214,11 @@ public class DefaultModelBridge implements ModelBridge
         }
     }
 
-    private NotificationFilterPreference getFilterPreference(DocumentReference user, String filterPreferenceName)
+    private NotificationFilterPreference getFilterPreference(DocumentReference user, long filterPreferenceId)
             throws NotificationException
     {
         for (NotificationFilterPreference preference : getInternalFilterPreferences(user)) {
-            if (StringUtils.equals(String.format("%d", preference.getId()), filterPreferenceName)) {
+            if (preference.getId() == filterPreferenceId) {
                 return preference;
             }
         }
@@ -227,10 +226,10 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+    public void setFilterPreferenceEnabled(DocumentReference user, long filterPreferenceId, boolean enabled)
             throws NotificationException
     {
-        NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceName);
+        NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
         if (preference != null && enabled != preference.isEnabled()) {
             preference.setEnabled(enabled);
             saveFilterPreferences(user, Collections.singletonList(preference));

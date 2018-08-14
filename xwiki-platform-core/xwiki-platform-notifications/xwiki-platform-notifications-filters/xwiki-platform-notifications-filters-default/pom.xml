@@ -28,7 +28,7 @@
     <version>10.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-filters-default</artifactId>
-  <name>XWiki Platform - Notifications - Filters - Default bridge</name>
+  <name>XWiki Platform - Notifications - Filters - Default implementation</name>
   <description>Default bridge to oldcore for the notifications filters API module.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>

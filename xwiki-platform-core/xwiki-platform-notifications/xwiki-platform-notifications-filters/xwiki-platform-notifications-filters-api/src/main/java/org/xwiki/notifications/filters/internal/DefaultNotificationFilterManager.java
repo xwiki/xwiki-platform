@@ -183,7 +183,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
             NotificationFilterType filterType, NotificationFormat format)
     {
         return getFilterPreferences(filterPreferences, filter, filterType).filter(
-            preference -> preference.getFilterFormats().contains(format));
+            preference -> preference.getNotificationFormats().contains(format));
     }
 
     @Override
@@ -275,7 +275,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public void deleteFilterPreference(long filterPreferenceId) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
     {
         try {
             for (NotificationFilterPreferenceProvider provider
@@ -290,7 +290,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public void setFilterPreferenceEnabled(long filterPreferenceId, boolean enabled)
+    public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
         try {

@@ -75,7 +75,7 @@ public class WatchedUserReference implements WatchedEntityReference
     {
         return EventUserFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
                 && userId.equals(notificationFilterPreference.getUser())
-                && notificationFilterPreference.getFilterFormats().containsAll(
+                && notificationFilterPreference.getNotificationFormats().containsAll(
                         Sets.newHashSet(NotificationFormat.values()));
     }
 
@@ -87,7 +87,7 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
-        filterPreference.setFilterFormats(Sets.newHashSet(NotificationFormat.values()));
+        filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(true);
         filterPreference.setStartingDate(new Date());
@@ -104,7 +104,7 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
-        filterPreference.setFilterFormats(Sets.newHashSet(NotificationFormat.values()));
+        filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
         filterPreference.setStartingDate(new Date());

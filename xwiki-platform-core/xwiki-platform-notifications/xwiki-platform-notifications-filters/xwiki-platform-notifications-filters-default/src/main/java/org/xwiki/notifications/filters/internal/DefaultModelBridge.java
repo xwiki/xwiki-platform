@@ -44,6 +44,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -135,7 +136,7 @@ public class DefaultModelBridge implements ModelBridge
             context.setWikiId(context.getMainXWiki());
             results =
                     context.getWiki().getStore().search(
-                            "select nfp from DefaultNotificationFilterPreference nfp where nfp.user = ?",
+                            "select nfp from NotificationFilterPreference nfp where nfp.owner = ?",
                             1000, 0, Arrays.asList(serializedUser), context);
         } catch (XWikiException e) {
             throw new NotificationException("error", e);
@@ -189,7 +190,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void deleteFilterPreference(DocumentReference user, long filterPreferenceId) throws NotificationException
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
         NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
         if (preference == null) {
@@ -214,11 +215,11 @@ public class DefaultModelBridge implements ModelBridge
         }
     }
 
-    private NotificationFilterPreference getFilterPreference(DocumentReference user, long filterPreferenceId)
+    private NotificationFilterPreference getFilterPreference(DocumentReference user, String filterPreferenceId)
             throws NotificationException
     {
         for (NotificationFilterPreference preference : getInternalFilterPreferences(user)) {
-            if (preference.getId() == filterPreferenceId) {
+            if (StringUtils.equals(preference.getId(), filterPreferenceId)) {
                 return preference;
             }
         }
@@ -226,7 +227,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void setFilterPreferenceEnabled(DocumentReference user, long filterPreferenceId, boolean enabled)
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
         NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
@@ -255,13 +256,17 @@ public class DefaultModelBridge implements ModelBridge
         try {
             mainHibernateStore.beginTransaction(context);
             Session session = mainHibernateStore.getSession(context);
-            for(NotificationFilterPreference preference : filterPreferences) {
-                preference.setUser(serializedUser);
-                session.saveOrUpdate(preference);
+            for (NotificationFilterPreference preference : filterPreferences) {
+                preference.setOwner(serializedUser);
+                // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
+                // handle extended objects (like ScopeNotificationFilterPreference).
+                // So we create a copy just in case we are not saving a basic NotificationFilterPreference object.
+                session.saveOrUpdate(new NotificationFilterPreference(preference));
             }
             mainHibernateStore.endTransaction(context, true);
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             mainHibernateStore.endTransaction(context, false);
+            throw new NotificationException("Failed to save the notification filter preferences.", e);
         } finally {
             context.setWikiId(oriDatabase);
         }

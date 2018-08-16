@@ -46,7 +46,9 @@ import org.xwiki.notifications.NotificationFormat;
  */
 public class NotificationFilterPreference
 {
-    private long id;
+    private String id;
+
+    private long internalId;
 
     private String owner;
 
@@ -60,7 +62,7 @@ public class NotificationFilterPreference
 
     private NotificationFilterType filterType;
 
-    private Set<NotificationFormat> filterFormats = new HashSet<>();
+    private Set<NotificationFormat> notificationFormats = new HashSet<>();
 
     private Date startingDate;
 
@@ -86,13 +88,14 @@ public class NotificationFilterPreference
     public NotificationFilterPreference(NotificationFilterPreference notificationFilterPreference)
     {
         this.id = notificationFilterPreference.id;
-        this.owner = notificationFilterPreference.filterName;
+        this.internalId = notificationFilterPreference.internalId;
+        this.owner = notificationFilterPreference.owner;
         this.filterName = notificationFilterPreference.filterName;
         this.providerHint = notificationFilterPreference.providerHint;
         this.enabled = notificationFilterPreference.enabled;
         this.active = notificationFilterPreference.active;
         this.filterType = notificationFilterPreference.filterType;
-        this.filterFormats = notificationFilterPreference.filterFormats;
+        this.notificationFormats = notificationFilterPreference.notificationFormats;
         this.startingDate = notificationFilterPreference.startingDate;
         this.eventType = notificationFilterPreference.eventType;
         this.user = notificationFilterPreference.user;
@@ -103,9 +106,20 @@ public class NotificationFilterPreference
         this.emailEnabled = notificationFilterPreference.emailEnabled;
     }
 
-    public void setId(long id)
+    public void setId(String id)
     {
         this.id = id;
+    }
+
+    public long getInternalId()
+    {
+        return internalId;
+    }
+
+    public void setInternalId(long internalId)
+    {
+        this.internalId = internalId;
+        this.id = String.format("NFP_%x", internalId);
     }
 
     public String getOwner()
@@ -143,9 +157,9 @@ public class NotificationFilterPreference
         this.filterType = filterType;
     }
 
-    public void setFilterFormats(Set<NotificationFormat> filterFormats)
+    public void setNotificationFormats(Set<NotificationFormat> filterFormats)
     {
-        this.filterFormats = filterFormats;
+        this.notificationFormats = filterFormats;
         this.alertEnabled = filterFormats.contains(NotificationFormat.ALERT);
         this.emailEnabled = filterFormats.contains(NotificationFormat.EMAIL);
     }
@@ -183,7 +197,7 @@ public class NotificationFilterPreference
     /**
      * @return the unique identifier of the filter preference.
      */
-    public long getId()
+    public String getId()
     {
         return id;
     }
@@ -237,9 +251,9 @@ public class NotificationFilterPreference
     /**
      * @return a set of {@link NotificationFormat} for which the filter should be applied.
      */
-    public Set<NotificationFormat> getFilterFormats()
+    public Set<NotificationFormat> getNotificationFormats()
     {
-        return filterFormats;
+        return notificationFormats;
     }
 
     /**
@@ -286,9 +300,9 @@ public class NotificationFilterPreference
     {
         this.alertEnabled = alertEnabled;
         if (alertEnabled) {
-            this.filterFormats.add(NotificationFormat.ALERT);
+            this.notificationFormats.add(NotificationFormat.ALERT);
         } else {
-            this.filterFormats.remove(NotificationFormat.ALERT);
+            this.notificationFormats.remove(NotificationFormat.ALERT);
         }
     }
 
@@ -301,9 +315,9 @@ public class NotificationFilterPreference
     {
         this.emailEnabled = emailEnabled;
         if (emailEnabled) {
-            this.filterFormats.add(NotificationFormat.EMAIL);
+            this.notificationFormats.add(NotificationFormat.EMAIL);
         } else {
-            this.filterFormats.remove(NotificationFormat.EMAIL);
+            this.notificationFormats.remove(NotificationFormat.EMAIL);
         }
     }
 }

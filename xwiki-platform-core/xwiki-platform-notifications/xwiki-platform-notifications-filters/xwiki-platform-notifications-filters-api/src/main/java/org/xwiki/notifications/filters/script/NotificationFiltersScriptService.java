@@ -120,7 +120,7 @@ public class NotificationFiltersScriptService implements ScriptService
      *
      * @since 9.8RC1
      */
-    public void deleteFilterPreference(long filterPreferenceId) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
     {
 
         notificationFilterManager.deleteFilterPreference(filterPreferenceId);
@@ -134,7 +134,7 @@ public class NotificationFiltersScriptService implements ScriptService
      *
      * @since 9.8RC1
      */
-    public void setFilterPreferenceEnabled(long filterPreferenceId, boolean enabled) throws NotificationException
+    public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException
     {
         notificationFilterManager.setFilterPreferenceEnabled(filterPreferenceId, enabled);
     }

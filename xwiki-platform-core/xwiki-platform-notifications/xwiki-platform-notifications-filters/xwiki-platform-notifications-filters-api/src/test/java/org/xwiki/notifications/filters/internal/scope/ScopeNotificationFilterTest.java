@@ -101,7 +101,7 @@ public class ScopeNotificationFilterTest
         preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         preference.setEventType(eventName);
         preference.setFilterType(filterType);
-        preference.setFilterFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        preference.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         preference.setEnabled(true);
 
         when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);

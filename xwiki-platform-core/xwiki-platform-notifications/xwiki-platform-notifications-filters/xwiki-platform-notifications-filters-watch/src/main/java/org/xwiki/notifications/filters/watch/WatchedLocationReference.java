@@ -107,7 +107,7 @@ public class WatchedLocationReference implements WatchedEntityReference
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
         NotificationFilterPreference preference = createFilterPreference();
-        return new ScopeNotificationFilterPreference(preference, entityReference);
+        return new ScopeNotificationFilterPreference(preference, entityReference, serializedReference);
     }
 
     @Override
@@ -115,21 +115,21 @@ public class WatchedLocationReference implements WatchedEntityReference
     {
         NotificationFilterPreference preference = createFilterPreference();
         preference.setFilterType(NotificationFilterType.EXCLUSIVE);
-        return new ScopeNotificationFilterPreference(preference, entityReference);
+        return new ScopeNotificationFilterPreference(preference, entityReference, serializedReference);
     }
 
     private NotificationFilterPreference createFilterPreference()
     {
         NotificationFilterPreference filterPreference = new NotificationFilterPreference();
-        filterPreference.setId(new Date().getTime());
 
         // Fields
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
-        filterPreference.setFilterFormats(ALL_NOTIFICATION_FORMATS);
+        filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
+        filterPreference.setStartingDate(new Date());
 
         // Properties
 

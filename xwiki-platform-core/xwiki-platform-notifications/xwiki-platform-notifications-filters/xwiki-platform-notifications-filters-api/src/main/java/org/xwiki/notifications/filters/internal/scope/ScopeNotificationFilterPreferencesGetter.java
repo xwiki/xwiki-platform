@@ -83,7 +83,7 @@ public class ScopeNotificationFilterPreferencesGetter
 
     private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)
     {
-        return format == null || filterPreference.getFilterFormats().contains(format);
+        return format == null || filterPreference.getNotificationFormats().contains(format);
     }
 
     /**

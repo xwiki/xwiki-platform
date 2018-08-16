@@ -22,9 +22,7 @@ package org.xwiki.notifications.rest.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -42,9 +40,9 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.SystemUserNotificationFilter;
 import org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
@@ -250,18 +248,25 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         if (StringUtils.isNotBlank(locations)) {
             String[] locationArray = locations.split(FIELD_SEPARATOR);
             for (int i = 0; i < locationArray.length; ++i) {
-                DefaultNotificationFilterPreference pref
-                        = new DefaultNotificationFilterPreference(String.format("%s_%s_%s",
-                        ScopeNotificationFilter.FILTER_NAME, property, i));
+                NotificationFilterPreference pref = new NotificationFilterPreference();
+                pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));
                 pref.setEnabled(true);
                 pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
                 pref.setFilterType(NotificationFilterType.INCLUSIVE);
                 pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.ALERT));
-                Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-                List<String> locationList = new ArrayList<>();
-                locationList.add(locationArray[i].trim());
-                preferenceProperties.put(property, locationList);
-                pref.setProperties(preferenceProperties);
+                switch (property) {
+                    case WIKI:
+                        pref.setWiki(locationArray[i]);
+                        break;
+                    case SPACE:
+                        pref.setPage(locationArray[i]);
+                        break;
+                    case PAGE:
+                        pref.setPageOnly(locationArray[i]);
+                        break;
+                    default:
+                        break;
+                }
                 parameters.filterPreferences.add(
                         new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
             }

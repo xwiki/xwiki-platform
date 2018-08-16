@@ -176,7 +176,7 @@ public interface NotificationFilterManager
      *
      * @since 9.8RC1
      */
-    void deleteFilterPreference(long filterPreferenceId) throws NotificationException;
+    void deleteFilterPreference(String filterPreferenceId) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
@@ -186,7 +186,7 @@ public interface NotificationFilterManager
      *
      * @since 9.8RC1
      */
-    void setFilterPreferenceEnabled(long filterPreferenceId, boolean enabled) throws NotificationException;
+    void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException;
 
     /**
      * Update the start date for every filter preference that the user has.

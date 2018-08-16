@@ -631,7 +631,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.inProgress'))", 'inprogress');
       $.post(serviceURL, {
         action: 'setFilterPreferenceEnabled',
-        filterPreferenceName: data.data.filterPreferenceName,
+        filterPreferenceId: data.data.filterPreferenceId,
         enabled: state,
         csrf: xm.form_token
       }).done(function() {

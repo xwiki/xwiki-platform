@@ -65,7 +65,7 @@ public interface ModelBridge
      *
      * @since 9.8RC1
      */
-    void deleteFilterPreference(DocumentReference user, long filterPreferenceId) throws NotificationException;
+    void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
@@ -76,7 +76,7 @@ public interface ModelBridge
      *
      * @since 9.8RC1
      */
-    void setFilterPreferenceEnabled(DocumentReference user, long filterPreferenceId, boolean enabled)
+    void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException;
 
     /**

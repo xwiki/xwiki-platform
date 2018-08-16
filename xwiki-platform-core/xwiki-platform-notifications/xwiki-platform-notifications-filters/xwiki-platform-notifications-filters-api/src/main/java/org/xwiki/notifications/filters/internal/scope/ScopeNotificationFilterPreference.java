@@ -59,7 +59,7 @@ public class ScopeNotificationFilterPreference extends NotificationFilterPrefere
         // Determine which scope reference to return when needed
         if (StringUtils.isNotBlank(filterPreference.getPageOnly())) {
             scopeReference = entityReferenceResolver.resolve(filterPreference.getPageOnly(), EntityType.DOCUMENT);
-        } else if (StringUtils.isNotBlank(getPage())) {
+        } else if (StringUtils.isNotBlank(filterPreference.getPage())) {
             scopeReference = entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
         } else if (StringUtils.isNotBlank(filterPreference.getWiki())) {
             scopeReference = entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
@@ -73,10 +73,23 @@ public class ScopeNotificationFilterPreference extends NotificationFilterPrefere
      * @param scopeReference the reference of the location concerned by the scope notification filter
      */
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
-            EntityReference scopeReference)
+            EntityReference scopeReference, String serializedReference)
     {
         super(filterPreference);
         this.scopeReference = scopeReference;
+        switch (scopeReference.getType()) {
+            case PAGE:
+                this.setPageOnly(serializedReference);
+                break;
+            case SPACE:
+                this.setPage(serializedReference);
+                break;
+            case WIKI:
+                this.setWiki(serializedReference);
+                break;
+            default:
+                break;
+        }
     }
 
     /**

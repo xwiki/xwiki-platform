@@ -27,9 +27,9 @@
   <class name="org.xwiki.notifications.filters.NotificationFilterPreference"
          table="notifications_filters_preferences">
 
-    <id name="id" type="long">
+    <id name="internalId" type="long">
       <column name="nfp_id" not-null="true" />
-      <generator class="assigned" />
+      <generator class="increment"/>
     </id>
 
     <property name="owner" type="string" column="nfp_owner" index="NFP_OWNER"/>
@@ -56,6 +56,8 @@
     <property name="pageOnly" type="string" column="nfp_page_only" length="255" />
 
     <property name="page" type="string" column="nfp_page" length="255" />
+
+    <property name="wiki" type="string" column="nfp_wiki" length="255" />
 
     <property name="alertEnabled" type="boolean" column="nfp_alert" />
 

@@ -67,13 +67,13 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     }
 
     @Override
-    public void deleteFilterPreference(long filterPreferenceId) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
     {
         modelBridge.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(), filterPreferenceId);
     }
 
     @Override
-    public void setFilterPreferenceEnabled(long filterPreferenceId, boolean enabled)
+    public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
         modelBridge.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),

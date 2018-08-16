@@ -139,7 +139,7 @@ public class EventUserFilterPreferencesGetter
 
     private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)
     {
-        return format == null || filterPreference.getFilterFormats().contains(format);
+        return format == null || filterPreference.getNotificationFormats().contains(format);
     }
 
     private boolean matchFilter(NotificationFilterPreference pref)

@@ -21,11 +21,9 @@ package org.xwiki.notifications.filters.watchlistbridge.internal;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -42,7 +40,6 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 
@@ -130,25 +127,22 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         List<String> values = obj.getListValue(fieldName);
         if (values != null && !values.isEmpty()) {
             for (String value : values) {
-                DefaultNotificationFilterPreference pref = createDefaultNotificationFilterPreference(
-                    String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
-                Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-                preferenceProperties.put(property, Collections.singletonList(value));
-                pref.setProperties(preferenceProperties);
+                NotificationFilterPreference pref = createNotificationFilterPreference(
+                        String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
                 results.add(pref);
             }
         }
     }
 
-    private DefaultNotificationFilterPreference createDefaultNotificationFilterPreference(String name)
+    private NotificationFilterPreference createNotificationFilterPreference(String id)
     {
-        DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(name);
+        NotificationFilterPreference pref = new NotificationFilterPreference();
+        pref.setId(id);
         pref.setEnabled(true);
         pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         pref.setProviderHint(PROVIDER_HINT);
         pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
-        pref.setProperties(new HashMap<>());
         return pref;
     }
 
@@ -160,13 +154,13 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceName)
+    public void deleteFilterPreference(String filterPreferenceId)
     {
         if (!configuration.isEnabled()) {
             return;
         }
 
-        String[] parts = filterPreferenceName.split("_");
+        String[] parts = filterPreferenceId.split("_");
         if (parts.length != 3 || !"watchlist".equals(parts[0])) {
             return;
         }
@@ -190,7 +184,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
                 if (obj == null) {
                     continue;
                 }
-                found |= removeValueFromObject(filterPreferenceName, type, fieldName, obj);
+                found |= removeValueFromObject(filterPreferenceId, type, fieldName, obj);
             }
 
             if (found) {

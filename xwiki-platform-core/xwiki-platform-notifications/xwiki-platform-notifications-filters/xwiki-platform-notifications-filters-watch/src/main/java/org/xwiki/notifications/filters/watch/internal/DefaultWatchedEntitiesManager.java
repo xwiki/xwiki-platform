@@ -35,7 +35,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
@@ -163,7 +162,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         // concerns all notification formats.
         return notificationFilterManager.getFilterPreferences(user).stream().filter(
             filterPreference -> StringUtils.isBlank(filterPreference.getEventType())
-            && filterPreference.getFilterFormats().size() == NotificationFormat.values().length
+            && filterPreference.getNotificationFormats().size() == NotificationFormat.values().length
         );
     }
 

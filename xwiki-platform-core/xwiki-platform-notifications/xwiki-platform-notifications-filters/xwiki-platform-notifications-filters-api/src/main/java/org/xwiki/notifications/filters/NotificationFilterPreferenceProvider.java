@@ -59,7 +59,7 @@ public interface NotificationFilterPreferenceProvider
      * @param filterPreferenceId id of the filter preference
      * @throws NotificationException if an error happens
      */
-    void deleteFilterPreference(long filterPreferenceId) throws NotificationException;
+    void deleteFilterPreference(String filterPreferenceId) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
@@ -69,7 +69,7 @@ public interface NotificationFilterPreferenceProvider
      *
      * @since 9.8RC1
      */
-    void setFilterPreferenceEnabled(long filterPreferenceId, boolean enabled) throws NotificationException;
+    void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException;
 
     /**
      * Update the start date for every notification preference that the user has.

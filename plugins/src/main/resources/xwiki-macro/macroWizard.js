@@ -47,8 +47,15 @@ define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, ed
       syntaxId = (typeof syntaxId === 'string' && syntaxId) || XWiki.docsyntax;
       return editMacroWizard(macroCall, syntaxId);
     } else {
-      syntaxId = (typeof macroCall === 'string' && macroCall) || XWiki.docsyntax;
-      return insertMacroWizard({syntaxId: syntaxId});
+      // The macro wizard can be called passing just the syntax as the first parameter.
+      syntaxId = (typeof macroCall === 'string' && macroCall) ||
+        (typeof syntaxId === 'string' && syntaxId) || XWiki.docsyntax;
+      var data = {syntaxId: syntaxId};
+      if (typeof macroCall === 'object' && macroCall !== null) {
+        // We can pass default macro parameter values to the Insert Macro Wizard.
+        data.macroCall = macroCall;
+      }
+      return insertMacroWizard(data);
     }
   };
 });

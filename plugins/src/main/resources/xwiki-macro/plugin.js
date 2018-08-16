@@ -178,13 +178,27 @@
           // Our custom edit dialog allows the user to change the macro, which means the user can change from an in-line
           // macro to a block macro (or the other way around). As a consequence we may have to replace the existing
           // macro widget (in-line widgets and block widgets are handled differently by the editor).
-          this.insert();
+          this.showMacroWizard(this.data);
         },
         insert: function() {
+          var selectedText = (editor.getSelection().getSelectedText() || '').trim();
+          // Macros that produce block level content shouldn't be inserted inline. But since the user hasn't picked the
+          // macro yet we can only assume that if he selected multiple lines of text then he probably wants to insert a
+          // block level macro. This is a temporary solution until we fix the rendering to stop generating invalid HTML.
+          // See XRENDERING-517: Invalid HTML generated when a macro that is called inline produces block level content
+          var inline = selectedText.indexOf('\n') > 0 ? false : this.inline;
+          this.showMacroWizard({
+            parameters: {},
+            // Prefill the macro content text area with the selected text.
+            content: selectedText,
+            inline: inline
+          });
+        },
+        showMacroWizard: function(input) {
           var widget = this;
           // Show our custom insert/edit dialog.
           require(['macroWizard'], function(macroWizard) {
-            macroWizard(widget.data).done(function(data) {
+            macroWizard(input).done(function(data) {
               macroPlugin.insertOrUpdateMacroWidget(editor, data, widget);
             });
           });

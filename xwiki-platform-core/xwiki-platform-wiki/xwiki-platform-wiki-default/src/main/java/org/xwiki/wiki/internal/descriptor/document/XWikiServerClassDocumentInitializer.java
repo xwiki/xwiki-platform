@@ -183,14 +183,42 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryClassI
     public static final String FIELDPN_SECURE = "Secure";
 
     /**
+     * Form type of field <code>secure</code> for the XWiki class XWiki.XWikiServerClass.
+     * 
+     * @since 10.7RC1
+     */
+    public static final String FIELDFT_SECURE = "select";
+
+    /**
      * Display type of field <code>secure</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDDT_SECURE = "checkbox";
+    public static final String FIELDDT_SECURE = "";
 
     /**
      * Default value of field <code>secure</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final Boolean DEFAULT_SECURE = Boolean.FALSE;
+    public static final Boolean DEFAULT_SECURE = null;
+
+    /**
+     * Name of field <code>port</code> for the XWiki class XWiki.XWikiServerClass.
+     * 
+     * @since 10.7RC1
+     */
+    public static final String FIELD_PORT = "port";
+
+    /**
+     * Pretty name of field <code>port</code> for the XWiki class XWiki.XWikiServerClass.
+     * 
+     * @since 10.7RC1
+     */
+    public static final String FIELDPN_PORT = "Port";
+
+    /**
+     * Display type of field <code>port</code> for the XWiki class XWiki.XWikiServerClass.
+     * 
+     * @since 10.7RC1
+     */
+    public static final String FIELDT_PORT = "integer";
 
     /**
      * Name of field <code>homepage</code> for the XWiki class XWiki.XWikiServerClass.
@@ -234,7 +262,8 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryClassI
         xclass.addStaticListField(FIELD_VISIBILITY, FIELDPN_VISIBILITY, FIELDL_VISIBILITY);
         xclass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
         xclass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
-        xclass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE, DEFAULT_SECURE);
+        xclass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDFT_SECURE, FIELDDT_SECURE, DEFAULT_SECURE);
+        xclass.addNumberField(FIELD_SECURE, FIELDPN_SECURE, 4, FIELDT_PORT);
         xclass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
     }
 

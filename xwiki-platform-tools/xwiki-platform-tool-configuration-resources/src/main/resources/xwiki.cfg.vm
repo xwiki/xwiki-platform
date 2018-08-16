@@ -241,8 +241,10 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #-# The name of the default URL factory that should be used.
 # xwiki.urlfactory.serviceclass=com.xpn.xwiki.web.XWikiURLFactoryServiceImpl
 
-#-# Force the protocol to use in the generated URLs. The right value is taken from the request URL, so setting this
-#-# is not recommended in most cases.
+#-# The default protocol to use when generating an external URL. Can be overwritten in the wiki descriptor ("secure" property).
+#-# If not set, the following is used:
+#-#   * during client request for the current wiki: the protocol from the URL used by the client
+#-#   * for a different wiki or during background tasks (mails, etc.): information come from the wiki descriptor (also fallback on main wiki)
 #-# For example:
 #-# xwiki.url.protocol=https
 # xwiki.url.protocol=

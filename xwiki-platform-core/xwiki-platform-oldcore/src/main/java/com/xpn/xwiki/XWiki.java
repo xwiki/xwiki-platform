@@ -102,6 +102,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.NamespacedComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.job.Job;
@@ -232,6 +233,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
@@ -434,6 +436,8 @@ public class XWiki implements EventListener
     private WikiSkinUtils wikiSkinUtils;
 
     private DocumentRevisionProvider documentRevisionProvider;
+
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private ConfigurationSource getConfiguration()
     {
@@ -720,6 +724,15 @@ public class XWiki implements EventListener
         }
 
         return this.documentRevisionProvider;
+    }
+
+    private WikiDescriptorManager getWikiDescriptorManager()
+    {
+        if (this.wikiDescriptorManager == null) {
+            this.wikiDescriptorManager = Utils.getComponent(WikiDescriptorManager.class);
+        }
+
+        return this.wikiDescriptorManager;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -4612,73 +4625,122 @@ public class XWiki implements EventListener
         return getConfiguration().getProperty("xwiki.encoding", "UTF-8");
     }
 
-    public URL getServerURL(String database, XWikiContext context) throws MalformedURLException
+    public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
     {
-        String serverurl = null;
-
         // In virtual wiki path mode the server is the standard one
         if ("1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
             return null;
         }
 
-        if (database != null) {
-            String db = context.getWikiId();
-            try {
-                context.setWikiId(getDatabase());
-                XWikiDocument doc = getDocument("XWiki.XWikiServer" + StringUtils.capitalize(database), context);
-                BaseObject serverobject = doc.getXObject(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
-                if (serverobject != null) {
-                    String server = serverobject.getStringValue("server");
-                    if (server != null) {
-                        String protocol = getConfiguration().getProperty("xwiki.url.protocol", null);
-                        if (protocol == null) {
-                            int iSecure = serverobject.getIntValue("secure", -1);
-                            // Check the request object if the "secure" property is undefined.
-                            boolean secure = iSecure == 1 || (iSecure < 0 && context.getRequest().isSecure());
-                            protocol = secure ? "https" : "http";
-                        }
-                        long port = context.getURL().getPort();
-                        if (port == 80 || port == 443) {
-                            port = -1;
-                        }
-                        if (port != -1) {
-                            serverurl = protocol + "://" + server + ":" + port + "/";
-                        } else {
-                            serverurl = protocol + "://" + server + "/";
-                        }
-                    }
+        // If main wiki check the main wiki home page configuration
+        if (xcontext.isMainWiki()) {
+            String homepage = getConfiguration().getProperty("xwiki.home");
+            if (StringUtils.isNotEmpty(homepage)) {
+                try {
+                    return new URL(homepage);
+                } catch (MalformedURLException e) {
+                    LOGGER.warn("Invalid main wiki home page URL [{}] configured: {}", homepage,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
-            } catch (Exception ex) {
-            } finally {
-                context.setWikiId(db);
             }
         }
 
-        if (serverurl != null) {
-            return new URL(serverurl);
-        } else {
-            return null;
+        if (wikiId != null) {
+            try {
+                WikiDescriptor wikiDescriptor = getWikiDescriptorManager().getById(wikiId);
+                if (wikiDescriptor != null) {
+                    String server = wikiDescriptor.getDefaultAlias();
+                    if (server != null) {
+                        String protocol = getWikiProtocol(wikiDescriptor, xcontext);
+                        int port = getWikiPort(wikiDescriptor, xcontext);
+
+                        return new URL(protocol, server, port, "");
+                    }
+                }
+            } catch (WikiManagerException e) {
+                LOGGER.error("Failed to get descriptor for wiki [{}]", wikiId, e);
+            }
         }
+
+        return null;
+    }
+
+    private String getWikiProtocol(WikiDescriptor wikiDescriptor, XWikiContext context)
+    {
+        // Try wiki descriptor
+        Boolean secure = wikiDescriptor.isSecure();
+        if (secure != null) {
+            return wikiDescriptor.isSecure() == Boolean.TRUE ? "https" : "http";
+        }
+
+        // Try configuration
+        String protocol = getConfiguration().getProperty("xwiki.url.protocol");
+        if (protocol != null) {
+            return protocol;
+        }
+
+        // Try main wiki
+        try {
+            secure = getWikiDescriptorManager().getMainWikiDescriptor().isSecure();
+
+            if (secure != null) {
+                return secure ? "https" : "http";
+            }
+        } catch (WikiManagerException e) {
+            LOGGER.error("Failed to get main wiki descriptor", e);
+        }
+
+        // If current request is a "real" one keep using the same protocol (moving from one wiki to another for exampe)
+        XWikiRequest request = context.getRequest();
+        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+            return HttpServletUtils.getSourceBaseURL(context.getRequest()).getProtocol();
+        }
+
+        // Default to HTTP
+        return "http";
+    }
+
+    private int getWikiPort(WikiDescriptor wikiDescriptor, XWikiContext context)
+    {
+        // Try wiki descriptor
+        int port = wikiDescriptor.getPort();
+        if (port != -1) {
+            return port;
+        }
+
+        // Try main wiki
+        try {
+            port = getWikiDescriptorManager().getMainWikiDescriptor().getPort();
+
+            if (port != -1) {
+                return port;
+            }
+        } catch (WikiManagerException e) {
+            LOGGER.error("Failed to get main wiki descriptor", e);
+        }
+
+        // If current request is a "real" one keep using the same protocol (moving from one wiki to another for example)
+        XWikiRequest request = context.getRequest();
+        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+            return HttpServletUtils.getSourceBaseURL(context.getRequest()).getPort();
+        }
+
+        // Default to no port
+        return -1;
     }
 
     public String getServletPath(String wikiName, XWikiContext context)
     {
         // unless we are in virtual wiki path mode we should return null
-        if (!context.getMainXWiki().equalsIgnoreCase(wikiName)
+        if (!context.isMainWiki(wikiName)
             && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
-            String database = context.getWikiId();
             try {
-                context.setWikiId(context.getMainXWiki());
-                XWikiDocument doc = getDocument(getServerWikiPage(wikiName), context);
-                BaseObject serverobject = doc.getXObject(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
-                if (serverobject != null) {
-                    String server = serverobject.getStringValue("server");
-                    return "wiki/" + server + "/";
+                WikiDescriptor wikiDescriptor = getWikiDescriptorManager().getById(wikiName);
+                if (wikiDescriptor != null) {
+                    return "wiki/" + wikiDescriptor.getDefaultAlias() + "/";
                 }
             } catch (Exception e) {
                 LOGGER.error("Failed to get URL for provided wiki [" + wikiName + "]", e);
-            } finally {
-                context.setWikiId(database);
             }
         }
 

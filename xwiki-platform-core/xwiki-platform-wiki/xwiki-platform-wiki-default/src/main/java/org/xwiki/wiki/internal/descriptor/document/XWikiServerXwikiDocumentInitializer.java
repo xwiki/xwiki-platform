@@ -19,6 +19,8 @@
  */
 package org.xwiki.wiki.internal.descriptor.document;
 
+import java.net.URL;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -28,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
+import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -97,20 +100,28 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
                 xobject.setLargeStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, "Main wiki");
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE, "Main.WebHome");
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_LANGUAGE, "en");
-                xobject.setIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, 0);
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_STATE, "active");
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_VISIBILITY, "public");
                 xobject.setLargeStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER,
                     XWikiRightService.SUPERADMIN_USER_FULLNAME);
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, "Home");
 
+                // Initialize the alias and the protocol with the input URL
                 Request request = this.container.getRequest();
                 if (request instanceof ServletRequest) {
                     ServletRequest servletRequest = (ServletRequest) request;
-                    xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER,
-                        servletRequest.getHttpServletRequest().getServerName());
+                    URL sourceURL = HttpServletUtils.getSourceBaseURL(servletRequest.getHttpServletRequest());
+                    xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER, sourceURL.getHost());
+                    if (sourceURL.getProtocol().equals("https")) {
+                        // Explicitly set the secure property if the input is HTTPS
+                        xobject.setIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, 1);
+                    }
+                    if (sourceURL.getPort() != -1) {
+                        xobject.setIntValue(XWikiServerClassDocumentInitializer.FIELD_PORT, sourceURL.getPort());
+                    }
                 } else {
                     xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER, "localhost");
+                    xobject.setIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, 0);
                 }
 
                 needsUpdate = true;

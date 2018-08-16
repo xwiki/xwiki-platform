@@ -131,6 +131,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                 descriptor.getId()));
             descriptor.setDescription(mainServerClassObject
                 .getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
+            descriptor
+                .setSecure(mainServerClassObject.getIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, 0) == 1);
+            descriptor.setPort(mainServerClassObject.getIntValue(XWikiServerClassDocumentInitializer.FIELD_PORT, -1));
 
             // load the property groups
             try {
@@ -209,6 +212,8 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                 getFullReference(descriptor.getOwnerId(), descriptor.getId()), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, descriptor.getPrettyName(), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, descriptor.getDescription(), context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_SECURE, descriptor.isSecure() ? 1 : 0, context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_SECURE, descriptor.getPort(), context);
 
             // Create the aliases
             List<String> aliases = descriptor.getAliases();

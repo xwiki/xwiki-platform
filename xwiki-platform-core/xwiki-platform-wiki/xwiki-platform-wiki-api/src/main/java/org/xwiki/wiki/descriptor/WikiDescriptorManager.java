@@ -63,7 +63,7 @@ public interface WikiDescriptorManager
      * Get a wiki from its Id.
      *
      * @param wikiId Id of the wiki to retrieve.
-     * @return The corresponding wiki descriptor of that Id
+     * @return The corresponding wiki descriptor of that Id, null if none exist for this id
      * @throws WikiManagerException if problems occur
      */
     WikiDescriptor getById(String wikiId) throws WikiManagerException;

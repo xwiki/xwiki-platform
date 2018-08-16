@@ -598,10 +598,21 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType, Boolean def)
     {
+        return addBooleanField(fieldName, fieldPrettyName, null, displayType, def);
+    }
+
+    /**
+     * @since 10.7RC1
+     */
+    public boolean addBooleanField(String fieldName, String fieldPrettyName, String formType, String displayType, Boolean def)
+    {
         if (get(fieldName) == null) {
             BooleanClass booleanClass = new BooleanClass();
             booleanClass.setName(fieldName);
             booleanClass.setPrettyName(fieldPrettyName);
+            if (formType != null) {
+                booleanClass.setDisplayFormType(formType);
+            }
             booleanClass.setDisplayType(displayType);
             booleanClass.setObject(this);
             if (def != null) {

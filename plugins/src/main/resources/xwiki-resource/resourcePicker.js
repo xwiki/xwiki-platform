@@ -103,7 +103,7 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
     var resourceDisplay = resourcePicker.find('.resourceDisplay');
     var resourceReferenceInput = resourcePicker.find('input.resourceReference');
     resourceDisplay.on('click', '.remove', function(event) {
-      resourceDisplay.hide().empty();
+      resourceDisplay.addClass('hidden').empty();
       resourceReferenceInput.change();
     });
     resourceDisplay.on('click', 'a', function(event) {
@@ -112,7 +112,7 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
     });
     resourceReferenceInput.change(function(event) {
       // Update the original resource reference input if there's no resource displayed.
-      if (resourceDisplay.is(':hidden')) {
+      if (resourceDisplay.hasClass('hidden')) {
         // We don't fire the selectResource event because we don't need to update the resource picker display.
         resourcePicker.prev('input').val(resourceTypeButton.val() + ':' + resourceReferenceInput.val());
       }
@@ -237,7 +237,7 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
     if (typeof displayer === 'function' && !resourceReference.isNew && (resourceReference.reference.length > 0 ||
         $resource.types[resourceReference.type].allowEmptyReference)) {
       resourceReferenceInput.val('');
-      resourceDisplayContainer.empty().addClass('loading').show();
+      resourceDisplayContainer.empty().addClass('loading').removeClass('hidden');
       displayer(resourceReference).done(function(resourceDisplay) {
         // Empty the container before appending the resource display because we don't cancel the previous (unfinished)
         // display requests. The displayer could handle this itself but we would need to pass additional information
@@ -245,13 +245,13 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
         resourceDisplayContainer.empty().removeClass('loading').attr({
           'data-resourceType': resourceReference.type,
           'data-resourceReference': resourceReference.reference
-        }).append(resourceDisplay).show();
+        }).append(resourceDisplay).removeClass('hidden');
       }).fail(function() {
         resourceReferenceInput.val(resourceReference.reference);
-        resourceDisplayContainer.hide();
+        resourceDisplayContainer.addClass('hidden');
       });
     } else {
-      resourceDisplayContainer.hide().empty();
+      resourceDisplayContainer.addClass('hidden').empty();
       resourceReferenceInput.val(resourceReference.reference);
     }
   };
@@ -262,13 +262,13 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
     if (resourceDisplayContainer.attr('data-resourceType') === data.newValue &&
         !resourceDisplayContainer.is(':empty')) {
       // Restore the selected resource.
-      resourceDisplayContainer.show();
+      resourceDisplayContainer.removeClass('hidden');
       resourcePicker.prev('input').val(resourceDisplayContainer.attr('data-resourceType') + ':' +
         resourceDisplayContainer.attr('data-resourceReference'));
     } else {
       // Clear the selected resource.
       // Hide the resource display but keep its content because we want to restore it later.
-      resourceDisplayContainer.hide();
+      resourceDisplayContainer.addClass('hidden');
       // Update the hidden reference input based on what is available on the resource picker input.
       resourcePicker.find('input.resourceReference').change();
     }

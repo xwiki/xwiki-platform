@@ -63,7 +63,7 @@ public class NotificationPreferenceDocumentInitializer extends AbstractMandatory
         xclass.addTextField("eventType", "Event Type", 64);
         xclass.addStaticListField("format", "Format", 64, false,
                 "alert=Alert|email=E-mail", "input", "|, ");
-        xclass.addBooleanField("notificationEnabled", "Notification Enabled ?", CHECKBOX, false);
+        xclass.addBooleanField("notificationEnabled", "Notification Enabled ?", CHECKBOX, "", false);
         xclass.addDateField("startDate", "Start date", "dd/MM/yyyy HH:mm:ss", 1);
     }
 }

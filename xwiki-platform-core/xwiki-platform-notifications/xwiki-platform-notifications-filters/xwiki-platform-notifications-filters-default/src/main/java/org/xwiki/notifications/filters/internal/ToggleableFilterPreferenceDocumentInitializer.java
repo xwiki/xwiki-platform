@@ -60,6 +60,6 @@ public class ToggleableFilterPreferenceDocumentInitializer extends AbstractManda
     protected void createClass(BaseClass xclass)
     {
         xclass.addTextField("filterName", "Filter name", 64);
-        xclass.addBooleanField("isEnabled", "Is enabled ?", "checkbox", true);
+        xclass.addBooleanField("isEnabled", "Is enabled ?", "checkbox", "", true);
     }
 }

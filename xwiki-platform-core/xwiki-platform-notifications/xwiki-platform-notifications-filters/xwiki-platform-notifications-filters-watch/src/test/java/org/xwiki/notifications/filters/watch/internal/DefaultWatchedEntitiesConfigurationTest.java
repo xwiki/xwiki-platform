@@ -70,7 +70,7 @@ public class DefaultWatchedEntitiesConfigurationTest
     public void getAutomaticWatchMode() throws Exception
     {
         // Default value
-        assertEquals(AutomaticWatchMode.MAJOR, mocker.getComponentUnderTest().getAutomaticWatchMode(CURRENT_USER));
+        assertEquals(AutomaticWatchMode.NONE, mocker.getComponentUnderTest().getAutomaticWatchMode(CURRENT_USER));
 
         // Fallback to the value of the Watchlist
         when(documentAccessBridge.getProperty(
@@ -91,7 +91,7 @@ public class DefaultWatchedEntitiesConfigurationTest
     public void getDefaultAutomaticWatchMode() throws Exception
     {
         // Default value
-        assertEquals(AutomaticWatchMode.MAJOR, mocker.getComponentUnderTest().getDefaultAutomaticWatchMode(CURRENT_WIKI));
+        assertEquals(AutomaticWatchMode.NONE, mocker.getComponentUnderTest().getDefaultAutomaticWatchMode(CURRENT_WIKI));
 
         // Fallback on the watchlist configuration
         when(configurationSource.getProperty("xwiki.plugin.watchlist.automaticwatch")).thenReturn("new");

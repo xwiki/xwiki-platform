@@ -52,7 +52,7 @@
     <hsqldb.version>2.4.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.23</ckeditor.version>
+    <ckeditor.version>1.24</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.10</batik.version>
     <restlet.version>2.3.12</restlet.version>

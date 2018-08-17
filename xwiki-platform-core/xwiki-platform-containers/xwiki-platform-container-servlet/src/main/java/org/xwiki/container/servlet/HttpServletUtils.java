@@ -63,6 +63,37 @@ public final class HttpServletUtils
     }
 
     /**
+     * Try to extract from various http headers the URL ({@code <protocol>://<host>[:<port>]/<path>[?<querystring>]}) as
+     * close as possible to the one used by the client.
+     * <p>
+     * In theory HttpServletRequest#getRequestURL() is supposed to take care of all that but depending on the
+     * application server and its configuration it's not always reliable. One less thing to configure.
+     * 
+     * @param servletRequest the servlet request input
+     * @return the URL as close as possible from what the client used
+     */
+    public static URL getSourceURL(HttpServletRequest servletRequest)
+    {
+        URL baseURL = getSourceBaseURL(servletRequest);
+
+        StringBuilder path = new StringBuilder();
+
+        path.append(servletRequest.getRequestURI());
+
+        if (StringUtils.isNoneEmpty(servletRequest.getQueryString())) {
+            path.append('?');
+            path.append(servletRequest.getQueryString());
+        }
+
+        try {
+            return new URL(baseURL, path.toString());
+        } catch (MalformedURLException e) {
+            // Not really supposed to happen
+            throw new RuntimeException("XWiki received an invalid URL path or query string", e);
+        }
+    }
+
+    /**
      * Try to extract from various http headers the base URL ({@code <protocol>://<host>[:<port>]}) as close as possible
      * to the one used by the client.
      * <p>

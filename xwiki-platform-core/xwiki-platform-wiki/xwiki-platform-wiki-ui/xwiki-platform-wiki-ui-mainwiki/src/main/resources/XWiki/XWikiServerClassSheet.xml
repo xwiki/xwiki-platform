@@ -1,209 +1,230 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc version="1.3" reference="XWiki.XWikiServerClassSheet" locale="">
   <web>XWiki</web>
   <name>XWikiServerClassSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>XWiki.Admin</creator>
+  <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1360852375000</creationDate>
   <parent>XWiki.XWikiServerClass</parent>
-  <author>XWiki.Admin</author>
-  <contentAuthor>XWiki.Admin</contentAuthor>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1534436227000</date>
   <contentUpdateDate>1534436227000</contentUpdateDate>
-  <version>1.2</version>
+  <version>1.1</version>
   <title>#if($doc.getObject('XWiki.XWikiServerClass'))$services.localization.render('platform.wiki.sheet.title', [$doc.name.replaceAll('XWikiServer', '').toLowerCase()])#{else}Sheet for XWikiServerClass#end</title>
   <comment/>
-  <minorEdit>true</minorEdit>
+  <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}&#xd;
-#############################&#xd;
-##        GLOBALS&#xd;
-#############################&#xd;
-#set ($wikiId = $doc.name.replaceAll('XWikiServer', '').toLowerCase())&#xd;
-#set ($wiki = $services.wiki.getById($wikiId))&#xd;
-#set ($descriptorObj = $doc.getObject('XWiki.XWikiServerClass'))&#xd;
-#set ($templateObj = $doc.getObject('WikiManager.WikiTemplateClass'))&#xd;
-#set ($aliases = $doc.getObjects('XWiki.XWikiServerClass'))&#xd;
-#############################&#xd;
-##       CONTROLLER&#xd;
-#############################&#xd;
-#controller()&#xd;
-#macro(controller)&#xd;
-  #if ($doc.fullName == "XWiki.XWikiServerClassSheet" || $doc.fullName == "XWiki.XWikiServerClassTemplate")&#xd;
-    = Document "$doc.name" =&#xd;
-  #elseif ($request.action == 'create' &amp;&amp; "$!request.domain" != '' &amp;&amp; $request.domain.trim().length() > 0)&#xd;
-    #createAlias()&#xd;
-  #elseif ($request.action == 'delete' &amp;&amp; "$!request.domain" != '' &amp;&amp; $request.domain.trim().length() > 0)&#xd;
-    #deleteAlias()&#xd;
-  #elseif ($xcontext.action == 'edit')&#xd;
-    #edit()&#xd;
-  #else&#xd;
-    #view()&#xd;
-  #end&#xd;
-#end&#xd;
-#############################&#xd;
-##         VIEW&#xd;
-#############################&#xd;
-#macro(view)&#xd;
-  #set($adminPageRef = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiPreferences'))&#xd;
-  #set($adminPageLink = "[[$services.localization.render('platform.wiki.sheet.descriptor.admin')>>$adminPageRef]]")&#xd;
-  {{translation key="platform.wiki.sheet.descriptor" parameters="${wiki.id},${adminPageLink}"/}} $adminPageLink&#xd;
-  &#xd;
-  {{toc /}}&#xd;
-  #displaySettings()&#xd;
-  #displayAliases()&#xd;
-  #createAliasForm()&#xd;
-#end&#xd;
-#############################&#xd;
-##         EDIT&#xd;
-#############################&#xd;
-#macro(edit)&#xd;
-  {{toc /}}&#xd;
-  #displaySettings()&#xd;
-  #displayAliases()&#xd;
-#end&#xd;
-#############################&#xd;
-##      CREATE ALIAS&#xd;
-#############################&#xd;
-#macro(createAlias)&#xd;
-  #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})&#xd;
-&#xd;
-    {{error}}{{translation key="notallowed"/}}{{/error}}&#xd;
-&#xd;
-  #elseif (!$wiki.aliases.contains($request.domain))&#xd;
-    #set ($alias = $doc.newObject("XWiki.XWikiServerClass"))&#xd;
-    #set ($discard = $alias.set("server", $request.domain))&#xd;
-    #set ($discard = $alias.set("homepage", "Main.WebHome"))&#xd;
-    #set ($discard = $doc.save())&#xd;
-    $response.sendRedirect($doc.getURL())&#xd;
-  #else&#xd;
-&#xd;
-    {{error}}{{translation key="platform.wiki.sheet.erroraliasalreadynotexists" parameters="$request.domain"/}}{{/error}}&#xd;
-&#xd;
-  #end&#xd;
-#end&#xd;
-#############################&#xd;
-##      DELETE ALIAS&#xd;
-#############################&#xd;
-#macro(deleteAlias)&#xd;
-  #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})&#xd;
-&#xd;
-    {{error}}{{translation key="notallowed"/}}{{/error}}&#xd;
-    &#xd;
-  #elseif ($wiki.aliases.contains($request.domain))&#xd;
-    #set ($alias = $doc.getObject('XWiki.XWikiServerClass', 'server', $request.domain))&#xd;
-    #set ($removed = $doc.removeObject($alias))&#xd;
-    #set ($discard = $doc.save())&#xd;
-    $response.sendRedirect($doc.getURL())&#xd;
-  #else&#xd;
-  &#xd;
-    {{error}}{{translation key="platform.wiki.sheet.erroraliasdoesnotexists" parameters="$request.domain"/}}{{/error}}&#xd;
-    &#xd;
-  #end&#xd;
-#end&#xd;
-#############################&#xd;
-##    DISPLAY SETTINGS&#xd;
-#############################&#xd;
-#macro(displaySettings)&#xd;
-  = {{translation key="platform.wiki.sheet.title.settings"/}} =&#xd;
-  {{html wiki="true" clean="false"}}&#xd;
-  &lt;div class="xform">&#xd;
-  &lt;dl>&#xd;
-    #displayField('wikiprettyname', $descriptorObj)&#xd;
-    #displayField('owner', $descriptorObj)&#xd;
-    #displayField('secure', $descriptorObj)&#xd;
-    #displayField('port', $descriptorObj)&#xd;
-    #displayField('iswikitemplate', $templateObj)&#xd;
-    #displayField('server', $descriptorObj)&#xd;
-    #displayField('description', $descriptorObj)&#xd;
-    #displayField('homepage', $descriptorObj)&#xd;
-  &lt;/dl>&#xd;
-  &lt;/div>&#xd;
-  {{/html}}&#xd;
-#end&#xd;
-#############################&#xd;
-##      DISPLAY FIELD&#xd;
-#############################&#xd;
-#macro(displayField $fieldName $object)&#xd;
-  #if ("$!object" != '')&#xd;
-    &lt;dt>&#xd;
-      #if ($xcontext.action=='edit')&#xd;
-        &lt;label for="${object.xWikiClass.name}_${object.number}_${fieldName}">&#xd;
-      #else&#xd;
-        &lt;label>&#xd;
-      #end&#xd;
-      {{translation key="platform.wiki.sheet.prop.${fieldName}" /}}:&#xd;
-      &lt;/label>&#xd;
-      &lt;span class="xHint">{{translation key="platform.wiki.sheet.desc.${fieldName}" /}}&lt;/span>&#xd;
-    &lt;/dt>&#xd;
-    &lt;dd>$object.get($fieldName)&lt;/dd>&#xd;
-  #end&#xd;
-#end&#xd;
-#############################&#xd;
-##    DISPLAY ALIASES&#xd;
-#############################&#xd;
-#macro(displayAliases)&#xd;
-  = {{translation key="platform.wiki.sheet.title.viewaliases"/}} =&#xd;
-  {{translation key="platform.wiki.sheet.aliases"/}}&#xd;
-  #if ($aliases.size() > 1)&#xd;
-    #foreach ($alias in $aliases)&#xd;
-      #if ($velocityCount > 1)&#xd;
-        == $alias.display('server', 'view') ==&#xd;
-        {{html wiki="true" clean="false"}}&#xd;
-        &lt;div class="xform">&#xd;
-          &lt;dl>&#xd;
-            #displayField('description', $alias)&#xd;
-            #displayField('homepage', $alias)&#xd;
-          &lt;/dl>&#xd;
-        &lt;/div>&#xd;
-        {{/html}}&#xd;
-        #if ($xcontext.action == 'view')&#xd;
-          #deleteButton($alias)&#xd;
-        #end&#xd;
-      #end&#xd;
-    #end &#xd;
-  #end&#xd;
-#end&#xd;
-#############################&#xd;
-##   DELETE ALIAS BUTTON&#xd;
-#############################&#xd;
-#macro(deleteButton $alias)&#xd;
-  #if($xcontext.action == 'view')&#xd;
-&#xd;
-    {{html}}&#xd;
-      &lt;form method="get" action="$doc.getURL('view')">&#xd;
-        &lt;fieldset>&#xd;
-          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />&#xd;
-          &lt;input type="hidden" name="action" value="delete"/>&#xd;
-          &lt;input type="hidden" name="domain" value="$alias.server"/>&#xd;
-          &lt;input type="submit" class="button" value="$services.localization.render('delete')"/>&#xd;
-        &lt;/fieldset>&#xd;
-      &lt;/form>&#xd;
-    {{/html}}&#xd;
-&#xd;
-  #end&#xd;
-#end&#xd;
-#############################&#xd;
-##   CREATE ALIAS FORM&#xd;
-#############################&#xd;
-#macro(createAliasForm)&#xd;
-  = {{translation key="platform.wiki.sheet.title.createnewalias"/}} =&#xd;
-  &#xd;
-  {{html}}&#xd;
-    &lt;form method="get" action="$doc.getURL('view')">&#xd;
-      &lt;fieldset>&#xd;
-        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />&#xd;
-        &lt;input type="hidden" name="action" value="create"/>&#xd;
-        &lt;label for="inputdomain">$services.localization.render('platform.wiki.sheet.prop.server')&lt;/label>:&#xd;
-        &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/>&#xd;
-        &lt;input type="submit" class="button" value="$services.localization.render('create')"/>&#xd;
-      &lt;/fieldset>&#xd;
-    &lt;/form>&#xd;
-  {{/html}}&#xd;
-  &#xd;
-#end&#xd;
+  <content>{{velocity}}
+#############################
+##        GLOBALS
+#############################
+#set ($wikiId = $doc.name.replaceAll('XWikiServer', '').toLowerCase())
+#set ($wiki = $services.wiki.getById($wikiId))
+#set ($descriptorObj = $doc.getObject('XWiki.XWikiServerClass'))
+#set ($templateObj = $doc.getObject('WikiManager.WikiTemplateClass'))
+#set ($aliases = $doc.getObjects('XWiki.XWikiServerClass'))
+#############################
+##       CONTROLLER
+#############################
+#controller()
+#macro(controller)
+  #if ($doc.fullName == "XWiki.XWikiServerClassSheet" || $doc.fullName == "XWiki.XWikiServerClassTemplate")
+    = Document "$doc.name" =
+  #elseif ($request.action == 'create' &amp;&amp; "$!request.domain" != '' &amp;&amp; $request.domain.trim().length() &gt; 0)
+    #createAlias()
+  #elseif ($request.action == 'delete' &amp;&amp; "$!request.domain" != '' &amp;&amp; $request.domain.trim().length() &gt; 0)
+    #deleteAlias()
+  #elseif ($xcontext.action == 'edit')
+    #edit()
+  #else
+    #view()
+  #end
+#end
+#############################
+##         VIEW
+#############################
+#macro(view)
+  #set($adminPageRef = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiPreferences'))
+  #set($adminPageLink = "[[$services.localization.render('platform.wiki.sheet.descriptor.admin')&gt;&gt;$adminPageRef]]")
+  {{translation key="platform.wiki.sheet.descriptor" parameters="${wiki.id},${adminPageLink}"/}} $adminPageLink
+  
+  {{toc /}}
+  #displaySettings()
+  #displayAliases()
+  #createAliasForm()
+#end
+#############################
+##         EDIT
+#############################
+#macro(edit)
+  {{toc /}}
+  #displaySettings()
+  #displayAliases()
+#end
+#############################
+##      CREATE ALIAS
+#############################
+#macro(createAlias)
+  #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+
+    {{error}}{{translation key="notallowed"/}}{{/error}}
+
+  #elseif (!$wiki.aliases.contains($request.domain))
+    #set ($alias = $doc.newObject("XWiki.XWikiServerClass"))
+    #set ($discard = $alias.set("server", $request.domain))
+    #set ($discard = $alias.set("homepage", "Main.WebHome"))
+    #set ($discard = $doc.save())
+    $response.sendRedirect($doc.getURL())
+  #else
+
+    {{error}}{{translation key="platform.wiki.sheet.erroraliasalreadynotexists" parameters="$request.domain"/}}{{/error}}
+
+  #end
+#end
+#############################
+##      DELETE ALIAS
+#############################
+#macro(deleteAlias)
+  #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+
+    {{error}}{{translation key="notallowed"/}}{{/error}}
+    
+  #elseif ($wiki.aliases.contains($request.domain))
+    #set ($alias = $doc.getObject('XWiki.XWikiServerClass', 'server', $request.domain))
+    #set ($removed = $doc.removeObject($alias))
+    #set ($discard = $doc.save())
+    $response.sendRedirect($doc.getURL())
+  #else
+  
+    {{error}}{{translation key="platform.wiki.sheet.erroraliasdoesnotexists" parameters="$request.domain"/}}{{/error}}
+    
+  #end
+#end
+#############################
+##    DISPLAY SETTINGS
+#############################
+#macro(displaySettings)
+  = {{translation key="platform.wiki.sheet.title.settings"/}} =
+  {{html wiki="true" clean="false"}}
+  &lt;div class="xform"&gt;
+  &lt;dl&gt;
+    #displayField('wikiprettyname', $descriptorObj)
+    #displayField('owner', $descriptorObj)
+    #displayField('secure', $descriptorObj)
+    #displayField('port', $descriptorObj)
+    #displayField('iswikitemplate', $templateObj)
+    #displayField('server', $descriptorObj)
+    #displayField('description', $descriptorObj)
+    #displayField('homepage', $descriptorObj)
+  &lt;/dl&gt;
+  &lt;/div&gt;
+  {{/html}}
+#end
+#############################
+##      DISPLAY FIELD
+#############################
+#macro(displayField $fieldName $object)
+  #if ("$!object" != '')
+    &lt;dt&gt;
+      #if ($xcontext.action=='edit')
+        &lt;label for="${object.xWikiClass.name}_${object.number}_${fieldName}"&gt;
+      #else
+        &lt;label&gt;
+      #end
+      {{translation key="platform.wiki.sheet.prop.${fieldName}" /}}:
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;{{translation key="platform.wiki.sheet.desc.${fieldName}" /}}&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;$object.get($fieldName)&lt;/dd&gt;
+  #end
+#end
+#############################
+##    DISPLAY ALIASES
+#############################
+#macro(displayAliases)
+  = {{translation key="platform.wiki.sheet.title.viewaliases"/}} =
+  {{translation key="platform.wiki.sheet.aliases"/}}
+  #if ($aliases.size() &gt; 1)
+    #foreach ($alias in $aliases)
+      #if ($velocityCount &gt; 1)
+        == $alias.display('server', 'view') ==
+        {{html wiki="true" clean="false"}}
+        &lt;div class="xform"&gt;
+          &lt;dl&gt;
+            #displayField('description', $alias)
+            #displayField('homepage', $alias)
+          &lt;/dl&gt;
+        &lt;/div&gt;
+        {{/html}}
+        #if ($xcontext.action == 'view')
+          #deleteButton($alias)
+        #end
+      #end
+    #end 
+  #end
+#end
+#############################
+##   DELETE ALIAS BUTTON
+#############################
+#macro(deleteButton $alias)
+  #if($xcontext.action == 'view')
+
+    {{html}}
+      &lt;form method="get" action="$doc.getURL('view')"&gt;
+        &lt;fieldset&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type="hidden" name="action" value="delete"/&gt;
+          &lt;input type="hidden" name="domain" value="$alias.server"/&gt;
+          &lt;input type="submit" class="button" value="$services.localization.render('delete')"/&gt;
+        &lt;/fieldset&gt;
+      &lt;/form&gt;
+    {{/html}}
+
+  #end
+#end
+#############################
+##   CREATE ALIAS FORM
+#############################
+#macro(createAliasForm)
+  = {{translation key="platform.wiki.sheet.title.createnewalias"/}} =
+  
+  {{html}}
+    &lt;form method="get" action="$doc.getURL('view')"&gt;
+      &lt;fieldset&gt;
+        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+        &lt;input type="hidden" name="action" value="create"/&gt;
+        &lt;label for="inputdomain"&gt;$services.localization.render('platform.wiki.sheet.prop.server')&lt;/label&gt;:
+        &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
+        &lt;input type="submit" class="button" value="$services.localization.render('create')"/&gt;
+      &lt;/fieldset&gt;
+    &lt;/form&gt;
+  {{/html}}
+  
+#end
 {{/velocity}}</content>
 </xwikidoc>

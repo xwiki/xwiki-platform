@@ -83,11 +83,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private StringBuffer requestURL;
 
-    private String authType;
-
     public XWikiServletRequestStub()
     {
-        setHost("");
     }
 
     /**
@@ -96,13 +93,18 @@ public class XWikiServletRequestStub implements XWikiRequest
     public XWikiServletRequestStub(URL requestURL, Map<String, String[]> requestParameters)
     {
         if (requestURL != null) {
-            setScheme(requestURL.getProtocol());
-            setHost(requestURL.getHost());
+            this.protocol = requestURL.getProtocol();
+            this.scheme = requestURL.getProtocol();
 
-            setRequestURI(requestURL.toString());
-            setrequestURL(new StringBuffer(requestURL.toString()));
-        } else {
-            setHost("");
+            this.serverName = requestURL.getHost();
+            this.serverPort = requestURL.getPort();
+
+            this.secure = this.protocol.equalsIgnoreCase("https");
+
+            this.requestURI = requestURL.getPath();
+            this.requestURL = new StringBuffer(requestURL.toString());
+
+            setHost(requestURL.getHost());
         }
 
         this.parameters = clone(requestParameters);
@@ -126,8 +128,6 @@ public class XWikiServletRequestStub implements XWikiRequest
 
         this.requestURI = request.getRequestURI();
         this.requestURL = new StringBuffer(request.getRequestURL());
-
-        this.authType = request.getAuthType();
 
         this.headerNames = new Vector<>();
         this.headers = new LinkedHashMap<>();
@@ -258,7 +258,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getAuthType()
     {
-        return this.authType;
+        return null;
     }
 
     @Override

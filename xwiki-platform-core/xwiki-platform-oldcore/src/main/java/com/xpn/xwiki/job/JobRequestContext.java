@@ -20,12 +20,12 @@
 package com.xpn.xwiki.job;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
@@ -96,12 +96,7 @@ public class JobRequestContext implements Serializable
             XWikiRequest request = xcontext.getRequest();
             if (request != null) {
                 if (request.getRequestURL() != null) {
-                    try {
-                        setRequestUrl(new URL(request.getRequestURL().toString()));
-                    } catch (MalformedURLException e) {
-                        // Log something ? I guess I should never happen (it returns a StringBuffer so that it can be
-                        // modified).
-                    }
+                    setRequestUrl(HttpServletUtils.getSourceURL(request));
                 }
                 if (request.getParameterMap() != null) {
                     setRequestParameters(request.getParameterMap());

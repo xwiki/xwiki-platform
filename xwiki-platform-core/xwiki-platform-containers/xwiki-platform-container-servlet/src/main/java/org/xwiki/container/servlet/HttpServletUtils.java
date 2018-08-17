@@ -65,6 +65,9 @@ public final class HttpServletUtils
     /**
      * Try to extract from various http headers the base URL ({@code <protocol>://<host>[:<port>]}) as close as possible
      * to the one used by the client.
+     * <p>
+     * In theory HttpServletRequest#getRequestURL() is supposed to take care of all that but depending on the
+     * application server and its configuration it's not always reliable. One less thing to configure.
      * 
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used

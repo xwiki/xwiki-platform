@@ -212,8 +212,10 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                 getFullReference(descriptor.getOwnerId(), descriptor.getId()), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, descriptor.getPrettyName(), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, descriptor.getDescription(), context);
-            obj.set(XWikiServerClassDocumentInitializer.FIELD_SECURE, descriptor.isSecure() ? 1 : 0, context);
-            obj.set(XWikiServerClassDocumentInitializer.FIELD_SECURE, descriptor.getPort(), context);
+            Boolean secure = descriptor.isSecure();
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_SECURE,
+                secure != null ? (secure == Boolean.TRUE ? 1 : 0) : -1, context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_PORT, descriptor.getPort(), context);
 
             // Create the aliases
             List<String> aliases = descriptor.getAliases();

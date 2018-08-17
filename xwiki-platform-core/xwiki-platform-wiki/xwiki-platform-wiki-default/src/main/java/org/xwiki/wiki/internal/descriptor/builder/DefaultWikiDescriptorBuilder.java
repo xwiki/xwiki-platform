@@ -122,17 +122,17 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             }
 
             // load properties
-            descriptor.setMainPageReference(referenceResolver.resolve(mainServerClassObject
-                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
-            descriptor.setPrettyName(mainServerClassObject
-                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
-            descriptor.setOwnerId(getFullReference(
-                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER),
-                descriptor.getId()));
-            descriptor.setDescription(mainServerClassObject
-                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
-            descriptor
-                .setSecure(mainServerClassObject.getIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, 0) == 1);
+            descriptor.setMainPageReference(referenceResolver
+                .resolve(mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
+            descriptor.setPrettyName(
+                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
+            descriptor.setOwnerId(
+                getFullReference(mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER),
+                    descriptor.getId()));
+            descriptor.setDescription(
+                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
+            int secure = mainServerClassObject.getIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, -1);
+            descriptor.setSecure(secure != -1 ? secure == 1 : null);
             descriptor.setPort(mainServerClassObject.getIntValue(XWikiServerClassDocumentInitializer.FIELD_PORT, -1));
 
             // load the property groups

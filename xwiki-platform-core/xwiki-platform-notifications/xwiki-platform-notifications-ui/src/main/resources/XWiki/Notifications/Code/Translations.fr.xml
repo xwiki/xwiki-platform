@@ -113,7 +113,7 @@ notifications.settings.filters.preferences.table.name=Nom
 notifications.settings.filters.preferences.table.filterType=Type de filtre
 notifications.settings.filters.preferences.table.eventTypes=Évenements
 notifications.settings.filters.preferences.table.notificationFormats=Formats
-notifications.settings.filters.preferences.table.isEnabled=Est activé?
+notifications.settings.filters.preferences.table.isEnabled=Est activé ?
 notifications.settings.filters.preferences.table._actions=Actions
 
 notifications.menu.header=Notifications
@@ -152,6 +152,8 @@ notifications.settings.events=Événements
 notifications.settings.watch.title=Pages surveillées
 notifications.settings.watch.autowatchmode=Surveillance automatique de pages
 notifications.settings.watch.autowatchmode.hint=Voulez-vous surveiller les pages sur lesquelles vous avez travaillé ?
+### Missing: notifications.settings.watch.forGuest=Log in or register to handle your notification settings.
+### Missing: notifications.settings.watch.disabled=The watched entities are disabled. Please contact your administrator.
 notifications.events.by=Par {0}.
 notifications.events.lastChange=Dernière modification : {0}.
 notifications.events.lastComment=Dernier commentaire : {0}.
@@ -197,6 +199,11 @@ rendering.macro.notificationsApplicationsPreferences.name=Préférences de notif
 rendering.macro.notificationsApplicationsPreferences.description=Affiche les préférences de notification de l'utilisateur courant.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cible
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cible de la macro ("user" pour l’utilisateur courant ou "wiki" pour le wiki courant)
+
+### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
+### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
 
 rendering.macro.notifications.name=Notifications
 rendering.macro.notifications.description=Affiche des notifications liées à l'activité du wiki.

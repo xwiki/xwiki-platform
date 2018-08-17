@@ -118,6 +118,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     {
         this.secure = request.isSecure();
         this.protocol = request.getProtocol();
+        this.scheme = request.getScheme();
         this.serverName = request.getServerName();
         this.serverPort = request.getServerPort();
 

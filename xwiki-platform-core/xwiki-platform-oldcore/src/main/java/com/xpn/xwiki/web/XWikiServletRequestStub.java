@@ -290,7 +290,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public Enumeration<String> getHeaderNames()
     {
-        return this.headerNames.elements();
+        return this.headerNames != null ? this.headerNames.elements() : Collections.emptyEnumeration();
     }
 
     @Override

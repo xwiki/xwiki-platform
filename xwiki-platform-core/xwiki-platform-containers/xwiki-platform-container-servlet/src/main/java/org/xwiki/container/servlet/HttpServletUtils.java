@@ -107,7 +107,7 @@ public final class HttpServletUtils
     {
         StringBuilder builder = new StringBuilder();
 
-        appendProtocol(servletRequest, builder);
+        appendScheme(servletRequest, builder);
 
         builder.append("://");
 
@@ -131,7 +131,7 @@ public final class HttpServletUtils
         }
     }
 
-    private static void appendProtocol(HttpServletRequest request, StringBuilder builder)
+    private static void appendScheme(HttpServletRequest request, StringBuilder builder)
     {
         // RFC 7239, section 4: Forwarded
         String forwarded = request.getHeader(HEADER_FORWARDED);
@@ -151,14 +151,14 @@ public final class HttpServletUtils
         }
 
         // Received scheme
-        String protocol = request.getScheme();
-        if (HTTP.equalsIgnoreCase(protocol) && request.isSecure()) {
+        String scheme = request.getScheme();
+        if (HTTP.equalsIgnoreCase(scheme) && request.isSecure()) {
             // This can happen in reverse proxy mode, if the proxy server receives HTTPS requests and forwards them
             // as HTTP to the internal web server running XWiki.
-            protocol = HTTPS;
+            scheme = HTTPS;
         }
 
-        builder.append(protocol != null ? protocol : HTTP);
+        builder.append(scheme != null ? scheme : HTTP);
     }
 
     private static void appendHostPort(HttpServletRequest request, StringBuilder builder)

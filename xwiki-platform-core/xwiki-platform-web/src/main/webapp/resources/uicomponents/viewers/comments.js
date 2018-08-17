@@ -385,7 +385,7 @@ require(['jquery'], function($) {
   /**
    * Permalink: Events triggered while the permalink modal is displayed.
    */
-  $(document).on('show.bs.modal', '#permalinkModal', function (event) {
+  $(document).on('show.bs.modal', '#permalinkModal', function(event) {
     var button = $(event.relatedTarget);
     var permalinkValue = button.prop('href');
     // Updating the permalink inside modal.
@@ -394,14 +394,14 @@ require(['jquery'], function($) {
   /**
    * Permalink: Events triggered after the permalink modal is displayed.
    */
-  $(document).on('shown.bs.modal', '#permalinkModal', function (event) {
+  $(document).on('shown.bs.modal', '#permalinkModal', function() {
     // Autofocus on permalink field.
     $(this).find('.form-control').focus();
   })
   /**
    * Event on permalinkModal button for going to the permalink location.
    */
-  $(document).on('click','#permalinkModal input.btn-primary',function(){
+  $(document).on('click', '#permalinkModal input.btn-primary', function() {
     window.location = $('#permalinkModal').find('.form-control').val();
   });
 });
@@ -413,13 +413,13 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   /**
    * Getting the button that triggers the modal.
    */
-  $(document).on('shown.bs.modal' , '#deleteModal', function (event) {
-    $(this).data ('relatedTarget', $(event.relatedTarget));
+  $(document).on('shown.bs.modal', '#deleteModal', function(event) {
+    $(this).data('relatedTarget', $(event.relatedTarget));
   });
   /**
    * Event on deleteModal button.
    */
-  $(document).on('click','#deleteModal input.btn-danger',function(){
+  $(document).on('click', '#deleteModal input.btn-danger', function() {
     var modal = $('#deleteModal');
     var button = modal.data('relatedTarget');
     /**
@@ -434,7 +434,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         button.prop('disabled', true);
       },
       success : function() {
-        var comment = button.parentsUntil('.reply');
+        var comment = button.closest('.xwikicomment');
         var commentForm = comment.nextAll('.commentthread').find('form');
         // If the form is inside this comment's reply thread, move it back to the bottom.
         if(commentForm.length){
@@ -451,7 +451,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
           document.trigger("xwiki:annotation:tab:deleted");
         }
       },
-      error: function () {
+      error: function() {
         // The button is enabled in case of error.
         button.prop('disabled', false);
         new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.delete.failed')", 'error');
@@ -475,7 +475,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     if(commentsTab) {
       commentsTab.text("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", commentsNumber));
     };
-    if($('#tmComment').length){
+    if($('#tmComment').length) {
       // All the sub-nodes of tmComment are added in a normalized form.
       $('#tmComment')[0].normalize();
       var label = " $services.localization.render('docextra.comments') $services.localization.render('docextra.extranb', ['__number__'])";
@@ -484,7 +484,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
   };
   // updateCount was moved to jquery from prototype and is fired here when a comment is added.
-  $(document).on('xwiki:docextra:loaded', function(event) {
+  $(document).on('xwiki:docextra:loaded', function() {
     updateCount();
   });
 });

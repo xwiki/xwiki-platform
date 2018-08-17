@@ -201,7 +201,7 @@ public class OldCoreHelper implements AutoCloseable
 
         // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
         // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.
-        this.xcontext.setURL(new URL("http://localhost/xwiki/bin/DummyAction/DumySpace/DummyPage"));
+        this.xcontext.setURL(new URL("http://localhost:8008/xwiki/bin/DummyAction/DumySpace/DummyPage"));
 
         // Use a dummy Request/Response even in daemon mode so that XWiki's initialization can create a Servlet URL
         // Factory and any code requiring those objects will work.

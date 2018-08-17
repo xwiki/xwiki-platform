@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -40,11 +41,13 @@ import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -95,7 +98,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         SchedulerJobClassDocumentInitializer.XWIKI_JOB_CLASSREFERENCE;
 
     private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentCreatedEvent(),
-        new DocumentDeletedEvent(), new DocumentUpdatedEvent());
+        new DocumentDeletedEvent(), new DocumentUpdatedEvent(), new WikiDeletedEvent());
 
     /**
      * Default Quartz scheduler instance.
@@ -646,7 +649,12 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     private String getObjectUniqueId(BaseObject object, XWikiContext context)
     {
-        return context.getWikiId() + ":" + object.getName() + "_" + object.getNumber();
+        return getWikiIdPrefix(context.getWikiId()) + object.getName() + "_" + object.getNumber();
+    }
+
+    private String getWikiIdPrefix(String wikiId)
+    {
+        return wikiId + ":";
     }
 
     @Override
@@ -657,6 +665,33 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
     @Override
     public void onEvent(Event event, Object source, Object data)
+    {
+        if (event instanceof WikiDeletedEvent) {
+            String wikiId = ((WikiDeletedEvent) event).getWikiId();
+            try {
+                onWikiDeletedEvent(wikiId);
+            } catch (SchedulerException e) {
+                LOGGER.error("Failed to remove schedulers for wiki [{}]", wikiId, e);
+            }
+        } else {
+            onDocumentEvent(source, data);
+        }
+    }
+
+    private void onWikiDeletedEvent(String wikiId) throws SchedulerException
+    {
+        Set<JobKey> keys = getScheduler().getJobKeys(GroupMatcher.anyJobGroup());
+
+        String idPrefix = getWikiIdPrefix(wikiId);
+
+        for (JobKey key : keys) {
+            if (key.getName().startsWith(idPrefix)) {
+                getScheduler().deleteJob(key);
+            }
+        }
+    }
+
+    private void onDocumentEvent(Object source, Object data)
     {
         XWikiContext xcontext = (XWikiContext) data;
         XWikiDocument document = (XWikiDocument) source;

@@ -42,7 +42,7 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement notificationsArea;
 
-    @FindBy(css = "li#tmNotifications a[title='Watchlist']")
+    @FindBy(css = "li#tmNotifications a[title='Notifications']")
     private WebElement watchListButton;
 
     @FindBy(css = "li#tmNotifications")

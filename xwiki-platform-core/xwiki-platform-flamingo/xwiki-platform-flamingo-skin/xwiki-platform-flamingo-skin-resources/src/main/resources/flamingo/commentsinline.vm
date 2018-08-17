@@ -186,8 +186,6 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #end
     <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
   </div>## xwikicomment
-  #showPermalinkModal
-  #showDeleteModal
 #end
 ##
 ##
@@ -404,5 +402,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #displayCommentForm()
 #end
   </div> ## comments
+  #showPermalinkModal
+  #showDeleteModal
 </div> ## commentscontent
 #end ## comment == ''

@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -217,11 +218,17 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                         .setCurrentUser(this.serializer.serialize(macroData.getWikiMacro().getAuthorReference()));
                     this.modelContext.setCurrentEntityReference(documentReference);
 
-                    findComponentManager(visibility).unregisterComponent(Macro.class, macroData.getHint());
+                    ComponentManager componentManager = findComponentManager(visibility);
+
+                    // Remove the currently registered component only if it's really the same (might have been
+                    // overwritten but another component)
+                    if (isRegistered(macroData, componentManager)) {
+                        componentManager.unregisterComponent(Macro.class, macroData.getHint());
+                    }
                     this.wikiMacroMap.remove(documentReference);
                 } catch (Exception e) {
                     throw new WikiMacroException(
-                        String.format("Failed to unregister macro [%s] in [%s] for " + "visibility [%s]",
+                        String.format("Failed to unregister macro [%s] in [%s] for visibility [%s]",
                             macroData.getHint(), documentReference, visibility),
                         e);
                 } finally {
@@ -230,13 +237,31 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 }
             } else {
                 throw new WikiMacroException(String.format(
-                    "Unable to unregister macro [%s] in [%s] for visibility " + "[%s] due to insufficient privileges",
+                    "Unable to unregister macro [%s] in [%s] for visibility [%s] due to insufficient privileges",
                     macroData.getWikiMacro().getDescriptor().getId().getId(), documentReference,
                     macroDescriptor.getVisibility()));
             }
         } else {
             throw new WikiMacroException(String.format("Macro in [%s] isn't registered", documentReference));
         }
+    }
+
+    private boolean isRegistered(WikiMacroData macroData, ComponentManager componentManager)
+    {
+        ComponentDescriptor<Macro> descriptor =
+            componentManager.getComponentDescriptor(Macro.class, macroData.getHint());
+        if (descriptor != null && descriptor.getImplementation() == null) {
+            try {
+                WikiMacro registeredWikiMacro = componentManager.getInstance(Macro.class, macroData.getHint());
+
+                return registeredWikiMacro.getDocumentReference()
+                    .equals(macroData.getWikiMacro().getDocumentReference());
+            } catch (ComponentLookupException e) {
+                // Should never happen if there is no implementation
+            }
+        }
+
+        return false;
     }
 
     /**

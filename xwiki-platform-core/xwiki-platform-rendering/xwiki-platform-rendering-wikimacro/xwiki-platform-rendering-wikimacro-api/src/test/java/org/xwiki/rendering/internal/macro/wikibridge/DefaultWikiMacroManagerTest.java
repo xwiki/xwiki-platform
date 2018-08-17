@@ -120,6 +120,9 @@ public class DefaultWikiMacroManagerTest
         when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI)).thenReturn(true);
 
         ComponentManager wikiComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "wiki");
+        DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(Macro.class);
+        componentDescriptor.setRoleHint("testwikimacro");
 
         // Test registration
         WikiMacroManager wikiMacroManager = this.mocker.getComponentUnderTest();
@@ -128,6 +131,10 @@ public class DefaultWikiMacroManagerTest
 
         // Verify that the WikiMacroManager has registered the macro against the wiki CM
         verify(wikiComponentManager).registerComponent(any(DefaultComponentDescriptor.class), eq(wikiMacro));
+
+        when(wikiComponentManager.<Macro>getComponentDescriptor(Macro.class, "testwikimacro"))
+            .thenReturn(componentDescriptor);
+        when(wikiComponentManager.getInstance(Macro.class, "testwikimacro")).thenReturn(wikiMacro);
 
         // Test unregistration
         wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());
@@ -138,7 +145,7 @@ public class DefaultWikiMacroManagerTest
     }
 
     @Test
-    public void registerWikiMacroWhenGlocalVisibilityOnSubWiki() throws Exception
+    public void registerWikiMacroWhenGlobalVisibilityOnSubWiki() throws Exception
     {
         DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
 
@@ -152,6 +159,9 @@ public class DefaultWikiMacroManagerTest
             .thenReturn(false);
 
         ComponentManager wikiComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "wiki");
+        DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(Macro.class);
+        componentDescriptor.setRoleHint("testwikimacro");
 
         // Test registration
         WikiMacroManager wikiMacroManager = this.mocker.getComponentUnderTest();
@@ -159,7 +169,11 @@ public class DefaultWikiMacroManagerTest
         assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
         // Verify that the WikiMacroManager has registered the macro against the wiki CM
-        verify(wikiComponentManager).registerComponent(any(DefaultComponentDescriptor.class), eq(wikiMacro));
+        verify(wikiComponentManager).registerComponent(componentDescriptor, wikiMacro);
+
+        when(wikiComponentManager.<Macro>getComponentDescriptor(Macro.class, "testwikimacro"))
+            .thenReturn(componentDescriptor);
+        when(wikiComponentManager.getInstance(Macro.class, "testwikimacro")).thenReturn(wikiMacro);
 
         // Test unregistration
         wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());
@@ -179,6 +193,9 @@ public class DefaultWikiMacroManagerTest
         when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.USER)).thenReturn(true);
 
         ComponentManager userComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "user");
+        DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(Macro.class);
+        componentDescriptor.setRoleHint("testwikimacro");
 
         // Test registration
         WikiMacroManager wikiMacroManager = this.mocker.getComponentUnderTest();
@@ -187,6 +204,10 @@ public class DefaultWikiMacroManagerTest
 
         // Verify that the WikiMacroManager has registered the macro against the user CM
         verify(userComponentManager).registerComponent(any(DefaultComponentDescriptor.class), eq(wikiMacro));
+
+        when(userComponentManager.<Macro>getComponentDescriptor(Macro.class, "testwikimacro"))
+            .thenReturn(componentDescriptor);
+        when(userComponentManager.getInstance(Macro.class, "testwikimacro")).thenReturn(wikiMacro);
 
         // Test unregistration
         wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());

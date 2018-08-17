@@ -80,9 +80,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         // We are sure the context request is a real servlet request
         // So we force the dummy request with the current host
         if (newContext.getRequest() != null) {
-            XWikiServletRequestStub initialRequest = new XWikiServletRequestStub();
-            initialRequest.setHost(newContext.getRequest().getHeader("x-forwarded-host"));
-            initialRequest.setScheme(newContext.getRequest().getScheme());
+            XWikiServletRequestStub initialRequest = new XWikiServletRequestStub(context.getRequest());
             XWikiServletRequest request = new XWikiServletRequest(initialRequest);
             newContext.setRequest(request);
         }
@@ -119,9 +117,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 
             // We make sure to not share the same Request instance with several threads
             if (this.initialContext.getRequest() != null) {
-                XWikiServletRequestStub stubRequest = new XWikiServletRequestStub();
-                stubRequest.setHost(this.initialContext.getRequest().getHeader("x-forwarded-host"));
-                stubRequest.setScheme(this.initialContext.getRequest().getScheme());
+                XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(this.initialContext.getRequest());
                 XWikiServletRequest request = new XWikiServletRequest(stubRequest);
                 stubContext.setRequest(request);
             }

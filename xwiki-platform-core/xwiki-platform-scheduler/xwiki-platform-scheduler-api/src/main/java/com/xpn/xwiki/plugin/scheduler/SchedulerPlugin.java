@@ -230,10 +230,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
         // We are sure the context request is a real servlet request
         // So we force the dummy request with the current host
-        XWikiServletRequestStub dummy = new XWikiServletRequestStub();
-        dummy.setHost(context.getRequest().getHeader("x-forwarded-host"));
-        dummy.setScheme(context.getRequest().getScheme());
-        dummy.setContextPath(context.getRequest().getContextPath());
+        XWikiServletRequestStub dummy = new XWikiServletRequestStub(context.getRequest());
         XWikiServletRequest request = new XWikiServletRequest(dummy);
         scontext.setRequest(request);
 

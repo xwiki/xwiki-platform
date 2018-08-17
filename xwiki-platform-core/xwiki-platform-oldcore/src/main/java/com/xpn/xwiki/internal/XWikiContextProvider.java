@@ -24,6 +24,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 
@@ -53,6 +56,9 @@ public class XWikiContextProvider implements Provider<XWikiContext>
     @Inject
     private Execution execution;
 
+    @Inject
+    private Container container;
+
     @Override
     public XWikiContext get()
     {
@@ -73,7 +79,17 @@ public class XWikiContextProvider implements Provider<XWikiContext>
 
             if (xcontext == null) {
                 xcontext = this.contextProvider.createStubContext();
+
+                // Set the XWiki context
                 this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+
+                // Set the stub request and the response
+                if (this.container.getRequest() == null) {
+                    this.container.setRequest(new ServletRequest(xcontext.getRequest()));
+                }
+                if (this.container.getResponse() == null) {
+                    this.container.setResponse(new ServletResponse(xcontext.getResponse()));
+                }
             }
         } else {
             xcontext = null;

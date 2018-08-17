@@ -263,7 +263,7 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryClassI
         xclass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
         xclass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
         xclass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDFT_SECURE, FIELDDT_SECURE, DEFAULT_SECURE);
-        xclass.addNumberField(FIELD_SECURE, FIELDPN_SECURE, 4, FIELDT_PORT);
+        xclass.addNumberField(FIELD_PORT, FIELDPN_PORT, 4, FIELDT_PORT);
         xclass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
     }
 

@@ -76,7 +76,7 @@ menu.uix.scope.label=Contexte de visibilité du menu
 menu.uix.scope.hint=Choix du contexte d'affichage du menu.
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=Menu
+rendering.macro.menu.name=Menu
 ### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
 ### Missing: rendering.macro.menu.parameter.id.name=Id
 ### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.

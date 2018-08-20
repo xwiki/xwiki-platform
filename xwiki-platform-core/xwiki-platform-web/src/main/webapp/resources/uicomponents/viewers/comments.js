@@ -413,7 +413,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   /**
    * Getting the button that triggers the modal.
    */
-  $(document).on('shown.bs.modal', '#deleteModal', function(event) {
+  $(document).on('show.bs.modal', '#deleteModal', function(event) {
     $(this).data('relatedTarget', $(event.relatedTarget));
   });
   /**
@@ -422,6 +422,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   $(document).on('click', '#deleteModal input.btn-danger', function() {
     var modal = $('#deleteModal');
     var button = modal.data('relatedTarget');
+    var notification;
     /**
      * Ajax request made for deleting the comment.
      * Delete the HTML element on succes (replace it with a small notification message).
@@ -432,6 +433,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       url : button.prop('href'),
       beforeSend : function() {
         button.prop('disabled', true);
+        notification = new XWiki.widgets.Notification(
+          "$services.localization.render('core.viewers.comments.delete.inProgress')", 'inprogress');
       },
       success : function() {
         var comment = button.closest('.xwikicomment');
@@ -443,7 +446,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         // Replace the comment with a "deleted comment" placeholder.
         comment.replaceWith(createNotification("$services.localization.render('core.viewers.comments.commentDeleted')"));
         updateCount();
-        new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.commentDeleted')", 'done');
+        notification.replace(new XWiki.widgets.Notification(
+          "$services.localization.render('core.viewers.comments.delete.done')", 'done'));
         // fire an event for the annotations to know when a comment / annotation is deleted
         // FIXME: This is not the best way to go because the Annotations system should be in charge of
         // properly deleting annotations, not the Comments system. Try to find an alternative for the future.
@@ -454,7 +458,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       error: function() {
         // The button is enabled in case of error.
         button.prop('disabled', false);
-        new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.delete.failed')", 'error');
+        notification.replace(new XWiki.widgets.Notification(
+          "$services.localization.render('core.viewers.comments.delete.failed')", 'error'));
       }
     })
   });

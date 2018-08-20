@@ -50,8 +50,8 @@ public class CommentsTab extends BaseElement
 
     public boolean isCommentFormShown()
     {
-        WebElement commentForm = getDriver().findElement(
-            By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
+        WebElement commentForm =
+            getDriver().findElement(By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
         return commentForm.isDisplayed();
     }
 
@@ -106,14 +106,12 @@ public class CommentsTab extends BaseElement
      */
     public void deleteCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id
-            + "']//a[contains(@class, 'delete')]")).click();
-        this.confirmDelete = new ConfirmationModal();
-        this.confirmDelete.clickOk();
-        getDriver().waitUntilElementIsVisible(
-            By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"));
-        getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"))
+        // We initialize before so we can remove the animation before the modal is shown
+        this.confirmDelete = new ConfirmationModal(By.id("deleteModal"));
+        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'delete')]"))
             .click();
+        this.confirmDelete.clickOk();
+        waitForNotificationSuccessMessage("Comment deleted");
     }
 
     /**
@@ -124,8 +122,8 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
-            + id + "']//a[contains(@class, 'commentreply')]")).click();
+        getDriver().findElementWithoutWaiting(
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'commentreply')]")).click();
         return getAddCommentForm();
     }
 
@@ -150,8 +148,9 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm editCommentByID(int id)
     {
-        getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
-            + id + "']//a[contains(@class, 'edit')]")).click();
+        getDriver()
+            .findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'edit')]"))
+            .click();
         getDriver().waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
         return new CommentForm(By.className("edit-xcomment"));
     }

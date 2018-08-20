@@ -17,29 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po;
+package org.xwiki.administration.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.ViewPage;
 
-public class ConfirmationModal extends BaseModal
+/**
+ * @version $Id$
+ * @since 3.2M3
+ */
+public class ConfirmationModal extends ViewPage
 {
-    public ConfirmationModal(By selector)
-    {
-        super(selector);
-    }
+    @FindBy(xpath = "//div[@class='buttons']//input[@value='Yes']")
+    private WebElement buttonOk;
+
+    @FindBy(xpath = "//div[@class='buttons']//input[@value='No']")
+    private WebElement buttonCancel;
 
     public void clickOk()
     {
-        WebElement buttonOk = this.container.findElement(By.xpath(".//*[@class='modal-footer']/input[1]"));
-        // System.out.println("test "+buttonOk.getAttribute("class"));
-        buttonOk.click();
-        this.waitForClosed();
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        this.buttonOk.click();
     }
 
     public void clickCancel()
     {
-        this.close();
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        this.buttonCancel.click();
     }
-
 }

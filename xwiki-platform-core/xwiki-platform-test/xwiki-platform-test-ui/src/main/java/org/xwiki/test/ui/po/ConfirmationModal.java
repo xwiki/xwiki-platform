@@ -25,7 +25,7 @@ import org.openqa.selenium.By;
  * Basic confirmation actions performed on a bootstrap modal.
  * 
  * @version $Id$
- * @since 10.7RC1
+ * @since 3.2M3
  */
 public class ConfirmationModal extends BaseModal
 {

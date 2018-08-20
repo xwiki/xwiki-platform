@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Caixa de Texto
 platform.appwithinminutes.classEditorStringFieldName=Linha de Texto
 platform.appwithinminutes.classEditorContentFieldName=Conteúdo
 platform.appwithinminutes.classEditorTitleFieldName=Título
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Deletar
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configurar

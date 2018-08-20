@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Длинный текст
 platform.appwithinminutes.classEditorStringFieldName=Короткий текст
 platform.appwithinminutes.classEditorContentFieldName=Содержимое
 platform.appwithinminutes.classEditorTitleFieldName=Заголовок
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Удалить
 platform.appwithinminutes.classEditorConfigureFieldLabel=Настройка

@@ -152,6 +152,8 @@ notifications.settings.errorFilterWiki=Greška\: morate odabrati wiki, ne strani
 ### Missing: notifications.settings.watch.title=Watched Pages
 ### Missing: notifications.settings.watch.autowatchmode=Automatic page watching
 ### Missing: notifications.settings.watch.autowatchmode.hint=Decide if you wish to watch a page after you have worked on it
+### Missing: notifications.settings.watch.forGuest=Log in or register to handle your notification settings.
+### Missing: notifications.settings.watch.disabled=The watched entities are disabled. Please contact your administrator.
 notifications.events.by=Korisnika {0}.
 notifications.events.lastChange=Posljednja izmjena\: {0}.
 notifications.events.lastComment=Posljednji komentar\: {0}.
@@ -197,6 +199,11 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclus
 ### Missing: rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
 ### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
 ### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+
+### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
+### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
 
 ### Missing: rendering.macro.notifications.name=Notifications
 ### Missing: rendering.macro.notifications.description=Display notifications about events happened on the wiki.

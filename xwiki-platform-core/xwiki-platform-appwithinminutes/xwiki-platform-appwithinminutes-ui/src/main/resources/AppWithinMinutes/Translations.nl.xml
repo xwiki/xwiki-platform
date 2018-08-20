@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Lange Tekst
 platform.appwithinminutes.classEditorStringFieldName=Korte Tekst
 platform.appwithinminutes.classEditorContentFieldName=Inhoud
 platform.appwithinminutes.classEditorTitleFieldName=Titel
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Verwijderen
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configureren

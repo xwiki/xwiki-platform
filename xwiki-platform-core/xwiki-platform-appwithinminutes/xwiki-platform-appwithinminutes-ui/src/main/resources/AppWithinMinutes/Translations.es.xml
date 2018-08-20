@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorNumberFieldName=Número
 ### Missing: platform.appwithinminutes.classEditorStringFieldName=Short Text
 platform.appwithinminutes.classEditorContentFieldName=Contenido
 platform.appwithinminutes.classEditorTitleFieldName=Título
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Borrar
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configurar

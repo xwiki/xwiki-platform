@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Uzun Metin
 platform.appwithinminutes.classEditorStringFieldName=Kısa Metin
 platform.appwithinminutes.classEditorContentFieldName=İçerik
 platform.appwithinminutes.classEditorTitleFieldName=Başlık
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Sil
 platform.appwithinminutes.classEditorConfigureFieldLabel=Yapılandırma

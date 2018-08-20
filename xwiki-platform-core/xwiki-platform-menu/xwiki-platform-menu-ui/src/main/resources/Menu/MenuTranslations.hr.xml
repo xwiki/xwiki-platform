@@ -74,5 +74,17 @@ menu.uix.content.label=Sadržaj UI ekstenzije
 menu.uix.content.hint=Ukoliko ovo vidite, to onda vjerojatno znači da vam je onemogućen Javascript. Trebali biste odabrati istu vrijednost kao za lokaciju prikaza izbornika.
 menu.uix.scope.label=Doseg vidljivosti izbornika
 menu.uix.scope.hint=Naznačava u kojem kontekstu je vidljiv izbornik.
+
+# Menu Macro
+### Missing: rendering.macro.menu.name=Menu
+### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+### Missing: rendering.macro.menu.parameter.id.name=Id
+### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+### Missing: rendering.macro.menu.parameter.type.name=Type
+### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
+### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+
+# Menu WebHome
+### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
 </content>
 </xwikidoc>

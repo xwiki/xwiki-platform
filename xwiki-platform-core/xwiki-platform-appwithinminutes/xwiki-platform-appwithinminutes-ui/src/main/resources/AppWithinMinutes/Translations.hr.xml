@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Dugi tekst
 platform.appwithinminutes.classEditorStringFieldName=Kratki tekst
 platform.appwithinminutes.classEditorContentFieldName=Sadržaj
 platform.appwithinminutes.classEditorTitleFieldName=Naslov
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Obriši
 platform.appwithinminutes.classEditorConfigureFieldLabel=Podesi

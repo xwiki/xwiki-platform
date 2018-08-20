@@ -129,6 +129,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Dlhý text
 platform.appwithinminutes.classEditorStringFieldName=Krátky text
 platform.appwithinminutes.classEditorContentFieldName=Obsah
 platform.appwithinminutes.classEditorTitleFieldName=Názov
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Odstrániť
 platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurovať

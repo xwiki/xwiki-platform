@@ -24,6 +24,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
+/**
+ * The base class for a bootstrap modal.
+ * 
+ * @version $Id$
+ * @since 10.7RC1
+ */
 public class BaseModal extends BaseElement
 {
     protected WebElement container;

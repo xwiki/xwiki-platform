@@ -22,8 +22,10 @@ package org.xwiki.test.ui.po;
 import org.openqa.selenium.By;
 
 /**
+ * Basic confirmation actions performed on a bootstrap modal.
+ * 
  * @version $Id$
- * @since 10.7-rc-1
+ * @since 10.7RC1
  */
 public class ConfirmationModal extends BaseModal
 {

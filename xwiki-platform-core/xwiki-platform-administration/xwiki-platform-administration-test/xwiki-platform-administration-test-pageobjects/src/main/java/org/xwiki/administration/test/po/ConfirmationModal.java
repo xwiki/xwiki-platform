@@ -25,10 +25,10 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * This is the old ConfirmationModal implementation based on Prototype.js
+ * This is the old ConfirmationModal implementation based on Prototype.js.
  * 
  * @version $Id$
- * @since 10.7-rc-1
+ * @since 10.7RC1
  */
 public class ConfirmationModal extends ViewPage
 {

@@ -310,7 +310,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           csrf: xm.form_token
         }
         if (node.data.type == 'wiki') {
-          params['wikis'] = reference;
+          params['wiki'] = reference;
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
           params['space'] = reference.substring(0, reference.length - '.WebHome'.length);
         } else {

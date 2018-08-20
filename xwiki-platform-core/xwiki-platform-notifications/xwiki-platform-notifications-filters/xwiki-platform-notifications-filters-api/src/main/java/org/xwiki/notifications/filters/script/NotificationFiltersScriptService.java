@@ -56,7 +56,8 @@ public class NotificationFiltersScriptService implements ScriptService
     private NotificationFilterManager notificationFilterManager;
 
     @Inject
-    private ModelBridge modelBridge;
+    @Named("cached")
+    private ModelBridge cachedModelBridge;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -164,7 +165,7 @@ public class NotificationFiltersScriptService implements ScriptService
     public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
             String eventType, EntityReference reference) throws NotificationException
     {
-        modelBridge.createScopeFilterPreference(documentAccessBridge.getCurrentUserReference(),
+        cachedModelBridge.createScopeFilterPreference(documentAccessBridge.getCurrentUserReference(),
                 type, formats, eventType, reference);
     }
 }

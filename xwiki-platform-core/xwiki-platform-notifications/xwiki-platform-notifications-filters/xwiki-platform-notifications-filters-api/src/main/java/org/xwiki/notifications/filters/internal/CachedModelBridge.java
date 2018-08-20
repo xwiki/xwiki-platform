@@ -29,7 +29,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -50,13 +58,13 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 @Component
 @Named("cached")
 @Singleton
-public class CachedModelBridge implements ModelBridge
+public class CachedModelBridge implements ModelBridge, Initializable
 {
     private static final String USER_TOGGLEABLE_FILTER_PREFERENCES = "userToggleableFilterPreference";
 
-    private static final String USER_FILTER_PREFERENCES = "userAllNotificationFilterPreferences";
-
     private static final String CONTEXT_KEY_FORMAT = "%s_[%s]";
+
+    private static final String CACHE_NAME = "NotificationsFiltersPreferencesCache";
 
     @Inject
     private ModelBridge modelBridge;
@@ -67,22 +75,38 @@ public class CachedModelBridge implements ModelBridge
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
+    @Inject
+    private CacheManager cacheManager;
+
+    private Cache<Set<NotificationFilterPreference>> cache;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        try {
+            CacheConfiguration configuration = new CacheConfiguration(CACHE_NAME);
+            CacheFactory cacheFactory = cacheManager.getCacheFactory();
+            this.cache = cacheFactory.newCache(configuration);
+        } catch (ComponentLookupException | CacheException e) {
+            throw new InitializationException(
+                    String.format("Failed to initialize the notification filters preferences cache [%s].", CACHE_NAME),
+                    e);
+        }
+    }
+
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
-        // We need to store the user reference in the cache's key, otherwise all users of the same context will share
-        // the same cache, which can happen when a notification email is triggered.
-        final String contextEntry = String.format(CONTEXT_KEY_FORMAT, USER_FILTER_PREFERENCES,
-                serializer.serialize(user));
+        String userId = serializer.serialize(user);
 
-        ExecutionContext context = execution.getContext();
-        Object cachedPreferences = context.getProperty(contextEntry);
-        if (cachedPreferences != null && cachedPreferences instanceof Set) {
-            return (Set<NotificationFilterPreference>) cachedPreferences;
+        Set<NotificationFilterPreference> preferences = cache.get(userId);
+        if (preferences != null) {
+            return preferences;
         }
 
-        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user);
-        context.setProperty(contextEntry, preferences);
+        preferences = modelBridge.getFilterPreferences(user);
+
+        cache.set(userId, preferences);
 
         return preferences;
     }
@@ -110,7 +134,7 @@ public class CachedModelBridge implements ModelBridge
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
         modelBridge.deleteFilterPreference(user, filterPreferenceId);
-        clearCache();
+        clearCache(user);
     }
 
     @Override
@@ -118,7 +142,7 @@ public class CachedModelBridge implements ModelBridge
             throws NotificationException
     {
         modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
-        clearCache();
+        clearCache(user);
     }
 
     @Override
@@ -126,14 +150,14 @@ public class CachedModelBridge implements ModelBridge
             Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
         modelBridge.saveFilterPreferences(user, filterPreferences);
-        clearCache();
+        clearCache(user);
     }
 
     @Override
     public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
     {
         modelBridge.setStartDateForUser(user, startDate);
-        clearCache();
+        clearCache(user);
     }
 
     @Override
@@ -141,14 +165,17 @@ public class CachedModelBridge implements ModelBridge
             Set<NotificationFormat> formats, String eventType, EntityReference reference) throws NotificationException
     {
         modelBridge.createScopeFilterPreference(user, type, formats, eventType, reference);
-        clearCache();
+        clearCache(user);
     }
 
-    private void clearCache()
+    private void clearCache(DocumentReference user)
     {
+        String userId = serializer.serialize(user);
+        cache.remove(userId);
+
         ExecutionContext context = execution.getContext();
         for (String key: new ArrayList<>(context.getProperties().keySet())) {
-            if (key.startsWith(USER_FILTER_PREFERENCES) || key.startsWith(USER_TOGGLEABLE_FILTER_PREFERENCES)) {
+            if (key.startsWith(USER_TOGGLEABLE_FILTER_PREFERENCES)) {
                 context.removeProperty(key);
             }
         }

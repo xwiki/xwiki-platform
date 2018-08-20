@@ -26,6 +26,10 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,6 +39,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -58,6 +63,9 @@ public class CachedModelBridgeTest
     private EntityReferenceSerializer<String> serializer;
     private ExecutionContext executionContext;
     private Map<String, Object> executionContextProperties;
+    private CacheManager cacheManager;
+    private Cache cache;
+    private DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
     @Before
     public void setUp() throws Exception
@@ -65,12 +73,18 @@ public class CachedModelBridgeTest
         modelBridge = mocker.getInstance(ModelBridge.class);
         execution = mocker.getInstance(Execution.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        cacheManager = mocker.getInstance(CacheManager.class);
+        CacheFactory factory = mock(CacheFactory.class);
+        when(cacheManager.getCacheFactory()).thenReturn(factory);
+        cache = mock(Cache.class);
+        when(factory.newCache(any(CacheConfiguration.class))).thenReturn(cache);
+        when(serializer.serialize(user)).thenReturn("xwiki:XWiki.User");
+
         executionContext = mock(ExecutionContext.class);
         when(execution.getContext()).thenReturn(executionContext);
         executionContextProperties = new HashMap<>();
         when(executionContext.getProperties()).thenReturn(executionContextProperties);
         executionContextProperties.put("property1", new Object());
-        executionContextProperties.put("userAllNotificationFilterPreferences_property2", new Object());
         executionContextProperties.put("userToggleableFilterPreference_property3", new Object());
         doAnswer(invocationOnMock -> {
             String property = invocationOnMock.getArgument(0);
@@ -83,14 +97,14 @@ public class CachedModelBridgeTest
     private void verifyClearCache() throws Exception
     {
         assertTrue(executionContextProperties.containsKey("property1"));
-        assertFalse(executionContextProperties.containsKey("userAllNotificationFilterPreferences_property2"));
         assertFalse(executionContextProperties.containsKey("userToggleableFilterPreference_property3"));
+
+        verify(cache).remove(eq("xwiki:XWiki.User"));
     }
 
     @Test
     public void setStartDateForUser() throws Exception
     {
-        DocumentReference user = new DocumentReference("x", "W", "iki");
         Date date = new Date();
         mocker.getComponentUnderTest().setStartDateForUser(user, date);
 

@@ -24,10 +24,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
-/**
- * getTitle(), close() and isVisible() (with protected waitForVisible() and waitForClosed())
- */
-
 public class BaseModal extends BaseElement
 {
     protected WebElement container;
@@ -35,9 +31,8 @@ public class BaseModal extends BaseElement
     public BaseModal(By selector)
     {
         this.container = getDriver().findElement(selector);
-        // The fade effect is deleted from the modal because there isn't an easy
-        // way for waiting on the modal to be shown.
-        // This fade in effect is also not necessary for the test.
+        // The fade effect is deleted from the modal because there isn't an easy way for waiting on the modal to be
+        // shown. This fade in effect is also not necessary for the test.
         String className = this.container.getAttribute("class");
         className = className.replace("fade", "");
         getDriver().executeScript("arguments[0].setAttribute(\"class\",arguments[1])", this.container, className);
@@ -77,5 +72,4 @@ public class BaseModal extends BaseElement
         });
         return this;
     }
-
 }

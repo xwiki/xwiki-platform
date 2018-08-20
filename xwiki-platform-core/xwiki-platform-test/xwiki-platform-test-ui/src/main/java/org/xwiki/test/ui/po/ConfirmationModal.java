@@ -20,8 +20,11 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
+/**
+ * @version $Id$
+ * @since 10.7-rc-1
+ */
 public class ConfirmationModal extends BaseModal
 {
     public ConfirmationModal(By selector)
@@ -31,9 +34,7 @@ public class ConfirmationModal extends BaseModal
 
     public void clickOk()
     {
-        WebElement buttonOk = this.container.findElement(By.xpath(".//*[@class='modal-footer']/input[1]"));
-        // System.out.println("test "+buttonOk.getAttribute("class"));
-        buttonOk.click();
+        this.container.findElement(By.xpath(".//*[@class='modal-footer']/input[1]")).click();
         this.waitForClosed();
     }
 
@@ -41,5 +42,4 @@ public class ConfirmationModal extends BaseModal
     {
         this.close();
     }
-
 }

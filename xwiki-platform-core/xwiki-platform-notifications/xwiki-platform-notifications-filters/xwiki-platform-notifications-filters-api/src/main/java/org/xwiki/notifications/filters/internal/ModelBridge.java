@@ -26,8 +26,11 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -102,4 +105,7 @@ public interface ModelBridge
      * @since 9.11.5
      */
     void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException;
+
+    void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
+            Set<NotificationFormat> formats, String eventType, EntityReference reference) throws NotificationException;
 }

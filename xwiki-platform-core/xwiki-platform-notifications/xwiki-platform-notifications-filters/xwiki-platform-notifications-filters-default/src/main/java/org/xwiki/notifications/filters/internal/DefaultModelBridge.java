@@ -38,12 +38,16 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -136,7 +140,7 @@ public class DefaultModelBridge implements ModelBridge
             context.setWikiId(context.getMainXWiki());
             results =
                     context.getWiki().getStore().search(
-                            "select nfp from NotificationFilterPreference nfp where nfp.owner = ?",
+                            "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = ?",
                             1000, 0, Arrays.asList(serializedUser), context);
         } catch (XWikiException e) {
             throw new NotificationException("error", e);
@@ -289,5 +293,36 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         saveFilterPreferences(user, preferences);
+    }
+
+    @Override
+    public void createScopeFilterPreference(DocumentReference user,
+            NotificationFilterType type, Set<NotificationFormat> formats,
+            String eventType, EntityReference reference) throws NotificationException
+    {
+        DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
+        preference.setFilterType(type);
+        preference.setNotificationFormats(formats);
+        preference.setEventType(eventType);
+        preference.setEnabled(true);
+        preference.setActive(false);
+        preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
+        preference.setStartingDate(new Date());
+
+        switch (reference.getType()) {
+            case WIKI:
+                preference.setWiki(reference.getName());
+                break;
+            case SPACE:
+                preference.setPage(entityReferenceSerializer.serialize(reference));
+                break;
+            case PAGE:
+                preference.setPageOnly(entityReferenceSerializer.serialize(reference));
+                break;
+            default:
+                break;
+        }
+
+        saveFilterPreferences(user, Collections.singletonList(preference));
     }
 }

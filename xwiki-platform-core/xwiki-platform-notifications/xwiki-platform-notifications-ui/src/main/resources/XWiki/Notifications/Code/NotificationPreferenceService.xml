@@ -92,6 +92,25 @@
   #if ("$!exception" != '')
     $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
   #end
+#elseif ("$!request.action" == 'createScopeFilterPreference')
+  #try()
+    #if ($services.csrf.isTokenValid($request.csrf))
+      #set ($reference = '')
+      #if ("$!request.wiki" != '')
+        #set ($reference = $services.model.createWikiReference($request.wiki))
+      #elseif ("$!request.space" != '')
+        #set ($reference = $services.model.resolveSpace($request.space))
+      #elseif ("$!request.page" != '')
+        #set ($reference = $services.model.resolveDocument($request.page))
+      #end
+      $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventType, $reference)
+    #else
+      $response.sendError(401, 'Bad CSRF Token')
+    #end
+  #end
+  #if ("$!exception" != '')
+    $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
+  #end
 #elseif ("$!request.action" == 'setAutoWatchMode' || "$!request.action" == 'setDefaultAutoWatchMode')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))

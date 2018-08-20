@@ -30,10 +30,14 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 
@@ -50,6 +54,9 @@ public class NotificationFiltersScriptService implements ScriptService
 {
     @Inject
     private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private ModelBridge modelBridge;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -152,5 +159,12 @@ public class NotificationFiltersScriptService implements ScriptService
     public void setStartDate(Date startDate) throws NotificationException
     {
         notificationFilterManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
+    }
+
+    public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
+            String eventType, EntityReference reference) throws NotificationException
+    {
+        modelBridge.createScopeFilterPreference(documentAccessBridge.getCurrentUserReference(),
+                type, formats, eventType, reference);
     }
 }

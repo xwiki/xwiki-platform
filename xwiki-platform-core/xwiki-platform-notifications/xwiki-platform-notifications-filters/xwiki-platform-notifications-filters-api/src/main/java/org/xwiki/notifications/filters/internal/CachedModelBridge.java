@@ -33,9 +33,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
  * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
@@ -130,6 +133,14 @@ public class CachedModelBridge implements ModelBridge
     public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
     {
         modelBridge.setStartDateForUser(user, startDate);
+        clearCache();
+    }
+
+    @Override
+    public void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
+            Set<NotificationFormat> formats, String eventType, EntityReference reference) throws NotificationException
+    {
+        modelBridge.createScopeFilterPreference(user, type, formats, eventType, reference);
         clearCache();
     }
 

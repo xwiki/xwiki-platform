@@ -40,7 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>CKEditor.ConfigClass_removePlugins=Plugins désactivés
-CKEditor.ConfigClass_removePlugins.hint=La liste des plugins qui ont été désactivés
+CKEditor.ConfigClass_removePlugins.hint=La liste des plugins qui ont été désactivés.
 CKEditor.ConfigClass_removeButtons=Fonctions désactivées dans la barre d'outils
 CKEditor.ConfigClass_removeButtons.hint=La liste des fonctionnalités désactivées dans la barre d'outils.
 CKEditor.ConfigClass_linkShowAdvancedTab=Lien : Afficher l'onglet Avancé

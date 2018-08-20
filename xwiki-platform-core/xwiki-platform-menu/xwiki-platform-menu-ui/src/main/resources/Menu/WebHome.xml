@@ -48,7 +48,6 @@
 })
 #set ($options = {
   'className': 'Menu.MenuClass',
-  'resultPage': 'Menu.MenuLiveTableResults',
   'translationPrefix': 'menu.livetable.',
   'tagCloud': true,
   'rowCount': 15,

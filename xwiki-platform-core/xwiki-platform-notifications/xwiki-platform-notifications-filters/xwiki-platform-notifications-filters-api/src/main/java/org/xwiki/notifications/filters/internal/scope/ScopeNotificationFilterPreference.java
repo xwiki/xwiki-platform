@@ -20,11 +20,14 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.text.StringUtils;
@@ -36,8 +39,10 @@ import org.xwiki.text.StringUtils;
  * @version $Id$
  * @since 9.9RC1
  */
-public class ScopeNotificationFilterPreference extends NotificationFilterPreference
+public class ScopeNotificationFilterPreference implements NotificationFilterPreference
 {
+    private NotificationFilterPreference filterPreference;
+
     private EntityReference scopeReference;
 
     private boolean hasParent;
@@ -54,7 +59,7 @@ public class ScopeNotificationFilterPreference extends NotificationFilterPrefere
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
             EntityReferenceResolver<String> entityReferenceResolver)
     {
-        super(filterPreference);
+        this.filterPreference = filterPreference;
 
         // Determine which scope reference to return when needed
         if (StringUtils.isNotBlank(filterPreference.getPageOnly())) {
@@ -75,17 +80,17 @@ public class ScopeNotificationFilterPreference extends NotificationFilterPrefere
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
             EntityReference scopeReference, String serializedReference)
     {
-        super(filterPreference);
+        this.filterPreference = filterPreference;
         this.scopeReference = scopeReference;
         switch (scopeReference.getType()) {
             case PAGE:
-                this.setPageOnly(serializedReference);
+                this.filterPreference.setPageOnly(serializedReference);
                 break;
             case SPACE:
-                this.setPage(serializedReference);
+                this.filterPreference.setPage(serializedReference);
                 break;
             case WIKI:
-                this.setWiki(serializedReference);
+                this.filterPreference.setWiki(serializedReference);
                 break;
             default:
                 break;
@@ -150,5 +155,124 @@ public class ScopeNotificationFilterPreference extends NotificationFilterPrefere
     public EntityReference getScopeReference()
     {
         return scopeReference;
+    }
+
+    @Override
+    public String getId()
+    {
+        return filterPreference.getId();
+    }
+
+    @Override
+    public void setId(String id)
+    {
+        this.filterPreference.setId(id);
+    }
+
+    @Override
+    public String getFilterName()
+    {
+        return filterPreference.getFilterName();
+    }
+
+    @Override
+    public String getProviderHint()
+    {
+        return filterPreference.getProviderHint();
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return filterPreference.isEnabled();
+    }
+
+    @Override
+    public boolean isActive()
+    {
+        return filterPreference.isActive();
+    }
+
+    @Override
+    public NotificationFilterType getFilterType()
+    {
+        return filterPreference.getFilterType();
+    }
+
+    @Override
+    public Set<NotificationFormat> getNotificationFormats()
+    {
+        return filterPreference.getNotificationFormats();
+    }
+
+    @Override
+    public Date getStartingDate()
+    {
+        return filterPreference.getStartingDate();
+    }
+
+    @Override
+    public String getEventType()
+    {
+        return filterPreference.getEventType();
+    }
+
+    @Override
+    public String getUser()
+    {
+        return filterPreference.getUser();
+    }
+
+    @Override
+    public String getPageOnly()
+    {
+        return filterPreference.getPageOnly();
+    }
+
+    @Override
+    public String getPage()
+    {
+        return filterPreference.getPage();
+    }
+
+    @Override
+    public String getWiki()
+    {
+        return filterPreference.getWiki();
+    }
+
+    @Override
+    public void setEventType(String eventType)
+    {
+        this.filterPreference.setEventType(eventType);
+    }
+
+    @Override
+    public void setUser(String user)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPageOnly(String pageOnly)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPage(String page)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setWiki(String wiki)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public void setEnabled(boolean enabled)
+    {
+        this.filterPreference.setEnabled(enabled);
     }
 }

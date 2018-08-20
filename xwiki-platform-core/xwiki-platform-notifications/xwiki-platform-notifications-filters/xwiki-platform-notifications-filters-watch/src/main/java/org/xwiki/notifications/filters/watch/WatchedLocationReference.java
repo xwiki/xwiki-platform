@@ -33,6 +33,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
@@ -106,21 +107,21 @@ public class WatchedLocationReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        NotificationFilterPreference preference = createFilterPreference();
+        DefaultNotificationFilterPreference preference = createFilterPreference();
         return new ScopeNotificationFilterPreference(preference, entityReference, serializedReference);
     }
 
     @Override
     public NotificationFilterPreference createExclusiveFilterPreference()
     {
-        NotificationFilterPreference preference = createFilterPreference();
+        DefaultNotificationFilterPreference preference = createFilterPreference();
         preference.setFilterType(NotificationFilterType.EXCLUSIVE);
         return new ScopeNotificationFilterPreference(preference, entityReference, serializedReference);
     }
 
-    private NotificationFilterPreference createFilterPreference()
+    private DefaultNotificationFilterPreference createFilterPreference()
     {
-        NotificationFilterPreference filterPreference = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference filterPreference = new DefaultNotificationFilterPreference();
 
         // Fields
         filterPreference.setEnabled(true);

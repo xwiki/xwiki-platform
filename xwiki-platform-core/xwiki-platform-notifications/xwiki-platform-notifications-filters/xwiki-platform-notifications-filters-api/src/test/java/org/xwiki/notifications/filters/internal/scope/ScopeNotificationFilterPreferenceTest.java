@@ -84,19 +84,19 @@ public class ScopeNotificationFilterPreferenceTest
     private NotificationFilterPreference mockNotificationFilterPreference(String entityReference,
             NotificationFilterProperty property, NotificationFilterType filterType)
     {
-        NotificationFilterPreference preference = new NotificationFilterPreference();
+        NotificationFilterPreference preference = mock(NotificationFilterPreference.class);
 
         if (property == NotificationFilterProperty.PAGE) {
-            preference.setPageOnly(entityReference);
+            when(preference.getPageOnly()).thenReturn(entityReference);
         }
         if (property == NotificationFilterProperty.SPACE) {
-            preference.setPage(entityReference);
+            when(preference.getPage()).thenReturn(entityReference);
         }
         if (property == NotificationFilterProperty.WIKI) {
-            preference.setWiki(entityReference);
+            when(preference.getWiki()).thenReturn(entityReference);
         }
 
-        preference.setFilterType(filterType);
+        when(preference.getFilterType()).thenReturn(filterType);
 
         return preference;
     }

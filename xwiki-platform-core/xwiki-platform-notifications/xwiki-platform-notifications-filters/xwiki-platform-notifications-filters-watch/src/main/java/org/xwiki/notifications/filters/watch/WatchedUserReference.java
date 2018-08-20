@@ -28,6 +28,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
@@ -82,7 +83,7 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        NotificationFilterPreference filterPreference = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference filterPreference = new DefaultNotificationFilterPreference();
 
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
@@ -99,7 +100,7 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createExclusiveFilterPreference()
     {
-        NotificationFilterPreference filterPreference = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference filterPreference = new DefaultNotificationFilterPreference();
 
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);

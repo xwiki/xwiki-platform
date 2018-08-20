@@ -88,21 +88,22 @@ public class ScopeNotificationFilterTest
     private NotificationFilterPreference mockNotificationFilterPreference(String entityStringValue,
             EntityReference resultReference, NotificationFilterType filterType, String eventName)
     {
-        NotificationFilterPreference preference = new NotificationFilterPreference();
+        NotificationFilterPreference preference = mock(NotificationFilterPreference.class);
         if (resultReference.getType() == EntityType.SPACE) {
-            preference.setPage(entityStringValue);
+            when(preference.getPage()).thenReturn(entityStringValue);
         }
         if (resultReference.getType() == EntityType.DOCUMENT) {
-            preference.setPageOnly(entityStringValue);
+            when(preference.getPageOnly()).thenReturn(entityStringValue);
         }
         if (resultReference.getType() == EntityType.WIKI) {
-            preference.setWiki(entityStringValue);
+            when(preference.getWiki()).thenReturn(entityStringValue);
         }
-        preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
-        preference.setEventType(eventName);
-        preference.setFilterType(filterType);
-        preference.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
-        preference.setEnabled(true);
+        when(preference.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
+        when(preference.getEventType()).thenReturn(eventName);
+        when(preference.getFilterType()).thenReturn(filterType);
+        when(preference.getNotificationFormats()).thenReturn(
+                Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(preference.isEnabled()).thenReturn(true);
 
         when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 

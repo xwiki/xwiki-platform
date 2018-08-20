@@ -40,6 +40,7 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 
@@ -136,7 +137,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
 
     private NotificationFilterPreference createNotificationFilterPreference(String id)
     {
-        NotificationFilterPreference pref = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
         pref.setId(id);
         pref.setEnabled(true);
         pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));

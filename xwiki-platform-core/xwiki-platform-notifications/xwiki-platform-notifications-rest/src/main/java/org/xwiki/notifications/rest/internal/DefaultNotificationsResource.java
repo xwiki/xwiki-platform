@@ -40,9 +40,9 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.SystemUserNotificationFilter;
 import org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
@@ -248,7 +248,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         if (StringUtils.isNotBlank(locations)) {
             String[] locationArray = locations.split(FIELD_SEPARATOR);
             for (int i = 0; i < locationArray.length; ++i) {
-                NotificationFilterPreference pref = new NotificationFilterPreference();
+                DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
                 pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));
                 pref.setEnabled(true);
                 pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);

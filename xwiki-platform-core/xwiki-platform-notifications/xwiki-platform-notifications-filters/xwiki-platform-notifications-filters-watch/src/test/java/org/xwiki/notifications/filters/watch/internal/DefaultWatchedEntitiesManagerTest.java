@@ -26,8 +26,8 @@ import org.mockito.internal.util.collections.Sets;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -63,19 +63,19 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
-        NotificationFilterPreference pref2 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref2 = new DefaultNotificationFilterPreference();
         pref2.setEventType("update");
         pref2.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref2)).thenReturn(true);
 
-        NotificationFilterPreference pref3 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref3 = new DefaultNotificationFilterPreference();
         pref3.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT));
         when(watchedEntityReference.matchExactly(pref3)).thenReturn(true);
 
-        NotificationFilterPreference pref4 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref4 = new DefaultNotificationFilterPreference();
         pref4.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref4)).thenReturn(true);
         pref4.setFilterType(NotificationFilterType.INCLUSIVE);
@@ -104,7 +104,7 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
         pref1.setFilterType(NotificationFilterType.EXCLUSIVE);
@@ -131,13 +131,13 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
         pref1.setFilterType(NotificationFilterType.INCLUSIVE);
         pref1.setEnabled(true);
         pref1.setId("pref1");
-        NotificationFilterPreference pref2 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref2 = new DefaultNotificationFilterPreference();
         pref2.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref2)).thenReturn(true);
         pref2.setFilterType(NotificationFilterType.EXCLUSIVE);
@@ -164,14 +164,14 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(false);
 
-        NotificationFilterPreference createdPref = mock(NotificationFilterPreference.class);
+        DefaultNotificationFilterPreference createdPref = mock(DefaultNotificationFilterPreference.class);
         when(watchedEntityReference.createInclusiveFilterPreference()).thenReturn(createdPref);
 
         // Test
@@ -189,7 +189,7 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
         pref1.setFilterType(NotificationFilterType.INCLUSIVE);
@@ -216,7 +216,7 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
         pref1.setFilterType(NotificationFilterType.EXCLUSIVE);
@@ -243,13 +243,13 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref1)).thenReturn(true);
         pref1.setFilterType(NotificationFilterType.INCLUSIVE);
         pref1.setEnabled(true);
         pref1.setId("pref1");
-        NotificationFilterPreference pref2 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref2 = new DefaultNotificationFilterPreference();
 
         pref2.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref2)).thenReturn(true);
@@ -277,14 +277,14 @@ public class DefaultWatchedEntitiesManagerTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Filters
-        NotificationFilterPreference pref1 = new NotificationFilterPreference();
+        DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(true);
 
-        NotificationFilterPreference createdPref = mock(NotificationFilterPreference.class);
+        DefaultNotificationFilterPreference createdPref = mock(DefaultNotificationFilterPreference.class);
         when(watchedEntityReference.createExclusiveFilterPreference()).thenReturn(createdPref);
 
         // Test

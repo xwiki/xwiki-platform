@@ -24,7 +24,7 @@
 "-//Hibernate/Hibernate Mapping DTD//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-  <class name="org.xwiki.notifications.filters.NotificationFilterPreference"
+  <class name="org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference"
          table="notifications_filters_preferences">
 
     <id name="internalId" type="long">

@@ -20,7 +20,6 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.xwiki.notifications.NotificationFormat;
@@ -44,187 +43,29 @@ import org.xwiki.notifications.NotificationFormat;
  * @since 10.7RC1
  * @since 9.11.8
  */
-public class NotificationFilterPreference
+public interface NotificationFilterPreference
 {
-    private String id;
-
-    private long internalId;
-
-    private String owner;
-
-    private String filterName;
-
-    private String providerHint;
-
-    private boolean enabled;
-
-    private boolean active;
-
-    private NotificationFilterType filterType;
-
-    private Set<NotificationFormat> notificationFormats = new HashSet<>();
-
-    private Date startingDate;
-
-    private String eventType;
-
-    private String user;
-
-    private String pageOnly;
-
-    private String page;
-
-    private String wiki;
-
-    private boolean alertEnabled;
-
-    private boolean emailEnabled;
-
-    public NotificationFilterPreference()
-    {
-
-    }
-
-    public NotificationFilterPreference(NotificationFilterPreference notificationFilterPreference)
-    {
-        this.id = notificationFilterPreference.id;
-        this.internalId = notificationFilterPreference.internalId;
-        this.owner = notificationFilterPreference.owner;
-        this.filterName = notificationFilterPreference.filterName;
-        this.providerHint = notificationFilterPreference.providerHint;
-        this.enabled = notificationFilterPreference.enabled;
-        this.active = notificationFilterPreference.active;
-        this.filterType = notificationFilterPreference.filterType;
-        this.notificationFormats = notificationFilterPreference.notificationFormats;
-        this.startingDate = notificationFilterPreference.startingDate;
-        this.eventType = notificationFilterPreference.eventType;
-        this.user = notificationFilterPreference.user;
-        this.pageOnly = notificationFilterPreference.pageOnly;
-        this.page = notificationFilterPreference.page;
-        this.wiki = notificationFilterPreference.wiki;
-        this.alertEnabled = notificationFilterPreference.alertEnabled;
-        this.emailEnabled = notificationFilterPreference.emailEnabled;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
-    public long getInternalId()
-    {
-        return internalId;
-    }
-
-    public void setInternalId(long internalId)
-    {
-        this.internalId = internalId;
-        this.id = String.format("NFP_%x", internalId);
-    }
-
-    public String getOwner()
-    {
-        return owner;
-    }
-
-    public void setOwner(String owner)
-    {
-        this.owner = owner;
-    }
-
-    public void setFilterName(String filterName)
-    {
-        this.filterName = filterName;
-    }
-
-    public void setProviderHint(String providerHint)
-    {
-        this.providerHint = providerHint;
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    public void setActive(boolean active)
-    {
-        this.active = active;
-    }
-
-    public void setFilterType(NotificationFilterType filterType)
-    {
-        this.filterType = filterType;
-    }
-
-    public void setNotificationFormats(Set<NotificationFormat> filterFormats)
-    {
-        this.notificationFormats = filterFormats;
-        this.alertEnabled = filterFormats.contains(NotificationFormat.ALERT);
-        this.emailEnabled = filterFormats.contains(NotificationFormat.EMAIL);
-    }
-
-    public void setStartingDate(Date startingDate)
-    {
-        this.startingDate = startingDate;
-    }
-
-    public void setEventType(String eventType)
-    {
-        this.eventType = eventType;
-    }
-
-    public void setUser(String user)
-    {
-        this.user = user;
-    }
-
-    public void setPageOnly(String pageOnly)
-    {
-        this.pageOnly = pageOnly;
-    }
-
-    public void setPage(String page)
-    {
-        this.page = page;
-    }
-
-    public void setWiki(String wiki)
-    {
-        this.wiki = wiki;
-    }
+    void setId(String id);
 
     /**
      * @return the unique identifier of the filter preference.
      */
-    public String getId()
-    {
-        return id;
-    }
+    String getId();
 
     /**
      * @return the name of the filter corresponding to this preference.
      */
-    public String getFilterName()
-    {
-        return filterName;
-    }
+    String getFilterName();
 
     /**
      * @return the name of the {@link NotificationFilterPreferenceProvider} associated with this preference.
      */
-    public String getProviderHint()
-    {
-        return providerHint;
-    }
+    String getProviderHint();
 
     /**
      * @return true if the current notification preference is enabled.
      */
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
+    boolean isEnabled();
 
     /**
      * A filter preference can either be active or passive. It the preference is active, then it should force the
@@ -235,26 +76,17 @@ public class NotificationFilterPreference
      *
      * @return true if the filter preference is active.
      */
-    public boolean isActive()
-    {
-        return active;
-    }
+    boolean isActive();
 
     /**
      * @return the type of the filter described by this preference.
      */
-    public NotificationFilterType getFilterType()
-    {
-        return filterType;
-    }
+    NotificationFilterType getFilterType();
 
     /**
      * @return a set of {@link NotificationFormat} for which the filter should be applied.
      */
-    public Set<NotificationFormat> getNotificationFormats()
-    {
-        return notificationFormats;
-    }
+    Set<NotificationFormat> getNotificationFormats();
 
     /**
      * @return the date from which the filter preference is enabled.
@@ -262,62 +94,27 @@ public class NotificationFilterPreference
      * @since 10.4
      * @since 9.11.5
      */
-    public Date getStartingDate() {
-        return startingDate;
-    }
+    Date getStartingDate();
 
-    public String getEventType()
-    {
-        return eventType;
-    }
+    String getEventType();
 
-    public String getUser()
-    {
-        return user;
-    }
+    String getUser();
 
-    public String getPageOnly()
-    {
-        return pageOnly;
-    }
+    String getPageOnly();
 
-    public String getPage()
-    {
-        return page;
-    }
+    String getPage();
 
-    public String getWiki()
-    {
-        return wiki;
-    }
+    String getWiki();
 
-    public boolean isAlertEnabled()
-    {
-        return alertEnabled;
-    }
+    void setEventType(String eventType);
 
-    public void setAlertEnabled(boolean alertEnabled)
-    {
-        this.alertEnabled = alertEnabled;
-        if (alertEnabled) {
-            this.notificationFormats.add(NotificationFormat.ALERT);
-        } else {
-            this.notificationFormats.remove(NotificationFormat.ALERT);
-        }
-    }
+    void setUser(String user);
 
-    public boolean isEmailEnabled()
-    {
-        return emailEnabled;
-    }
+    void setPageOnly(String pageOnly);
 
-    public void setEmailEnabled(boolean emailEnabled)
-    {
-        this.emailEnabled = emailEnabled;
-        if (emailEnabled) {
-            this.notificationFormats.add(NotificationFormat.EMAIL);
-        } else {
-            this.notificationFormats.remove(NotificationFormat.EMAIL);
-        }
-    }
+    void setPage(String page);
+
+    void setWiki(String wiki);
+
+    void setEnabled(boolean enabled);
 }

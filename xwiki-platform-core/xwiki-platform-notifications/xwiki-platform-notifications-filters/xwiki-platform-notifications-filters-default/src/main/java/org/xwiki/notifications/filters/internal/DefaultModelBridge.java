@@ -257,11 +257,12 @@ public class DefaultModelBridge implements ModelBridge
             mainHibernateStore.beginTransaction(context);
             Session session = mainHibernateStore.getSession(context);
             for (NotificationFilterPreference preference : filterPreferences) {
-                preference.setOwner(serializedUser);
                 // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
                 // handle extended objects (like ScopeNotificationFilterPreference).
                 // So we create a copy just in case we are not saving a basic NotificationFilterPreference object.
-                session.saveOrUpdate(new NotificationFilterPreference(preference));
+                DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
+                copy.setOwner(serializedUser);
+                session.saveOrUpdate(copy);
             }
             mainHibernateStore.endTransaction(context, true);
         } catch (Exception e) {
@@ -282,7 +283,9 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         for (NotificationFilterPreference preference : preferences) {
-            preference.setStartingDate(startDate);
+            if (preference instanceof DefaultNotificationFilterPreference) {
+                ((DefaultNotificationFilterPreference) preference).setStartingDate(startDate);
+            }
         }
 
         saveFilterPreferences(user, preferences);

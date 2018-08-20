@@ -32,8 +32,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.text.StringUtils;
 
@@ -95,7 +95,7 @@ public class UsersParameterHandler
     private void addFilterPreference(NotificationParameters parameters, List<String> userList)
     {
         for (String userId : userList) {
-            NotificationFilterPreference pref = new NotificationFilterPreference();
+            DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
             pref.setId(String.format("userRestFilters_%s", userId));
             pref.setFilterType(NotificationFilterType.INCLUSIVE);
             pref.setEnabled(true);

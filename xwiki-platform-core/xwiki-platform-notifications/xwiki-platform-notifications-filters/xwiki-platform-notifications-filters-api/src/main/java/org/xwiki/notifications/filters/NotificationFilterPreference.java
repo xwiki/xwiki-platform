@@ -40,13 +40,11 @@ import org.xwiki.notifications.NotificationFormat;
  * is nothing else than a combination of those parameters.
  *
  * @version $Id$
- * @since 10.7RC1
+ * @since 10.8RC1
  * @since 9.11.8
  */
 public interface NotificationFilterPreference
 {
-    void setId(String id);
-
     /**
      * @return the unique identifier of the filter preference.
      */
@@ -90,31 +88,61 @@ public interface NotificationFilterPreference
 
     /**
      * @return the date from which the filter preference is enabled.
-     * @since 10.5RC1
-     * @since 10.4
-     * @since 9.11.5
      */
     Date getStartingDate();
 
+    /**
+     * @return the event type concerned by the preference (can be null to affect all event types)
+     */
     String getEventType();
 
+    /**
+     * @return the user concerned by the preference (can be null)
+     */
     String getUser();
 
+    /**
+     * @return the page concerned by the preference (can be null)
+     */
     String getPageOnly();
 
+    /**
+     * @return the page (and its children) concerned by the preference (can be null)
+     */
     String getPage();
 
+    /**
+     * @return the wiki concerned by the preference (can be null)
+     */
     String getWiki();
 
+    /**
+     * @param eventType the event type concerned by the preference
+     */
     void setEventType(String eventType);
 
+    /**
+     * @param user the user concerned by the preference
+     */
     void setUser(String user);
 
+    /**
+     * @param pageOnly the page concerned by the preference
+     */
     void setPageOnly(String pageOnly);
 
+    /**
+     * @param page the page (and its children) concerned by the preference
+     */
     void setPage(String page);
 
+    /**
+     * @param wiki the wiki concerned by the preference
+     */
     void setWiki(String wiki);
 
+    /**
+     * @param enabled if the preference is enabled or not
+     */
     void setEnabled(boolean enabled);
 }

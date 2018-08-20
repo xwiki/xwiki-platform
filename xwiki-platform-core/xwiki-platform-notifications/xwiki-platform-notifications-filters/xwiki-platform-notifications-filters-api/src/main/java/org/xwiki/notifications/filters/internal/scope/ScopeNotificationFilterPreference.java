@@ -76,6 +76,10 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
      *
      * @param filterPreference the {@link NotificationFilterPreference} to wrap
      * @param scopeReference the reference of the location concerned by the scope notification filter
+     * @param serializedReference the serialized version of the reference described earlier
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
             EntityReference scopeReference, String serializedReference)
@@ -161,12 +165,6 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public String getId()
     {
         return filterPreference.getId();
-    }
-
-    @Override
-    public void setId(String id)
-    {
-        this.filterPreference.setId(id);
     }
 
     @Override
@@ -271,7 +269,8 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
         throw new UnsupportedOperationException();
     }
 
-    @Override public void setEnabled(boolean enabled)
+    @Override
+    public void setEnabled(boolean enabled)
     {
         this.filterPreference.setEnabled(enabled);
     }

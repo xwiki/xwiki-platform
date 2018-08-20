@@ -107,7 +107,7 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String FIELD_STARTING_DATE = "startingDate";
 
-    public static final String ALL_EVENT_TYPES = "allEventTypes";
+    private static final String ALL_EVENT_TYPES = "allEventTypes";
 
     @Inject
     private Provider<XWikiContext> contextProvider;

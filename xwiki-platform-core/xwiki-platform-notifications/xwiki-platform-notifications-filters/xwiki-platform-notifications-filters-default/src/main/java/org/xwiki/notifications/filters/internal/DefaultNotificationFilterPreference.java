@@ -28,23 +28,11 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
- * Define the preference of a notification filter.
+ * Default implementation of {@link NotificationFilterPreference}.
  *
- * This class replaces the previous interface that had the same name.
- *
- * A notification filter preference represents a set of parameters that can be passed to a filter in order to
- * customize it.
- *
- * Example :
- * Let’s say that we have defined a filter based on the wiki users : in order to work, this filter needs to know
- * which wiki users he has to filter, and for which types of events he should be applied.
- *
- * Those wiki users and those event types are like parameters to the filter, a {@link DefaultNotificationFilterPreference}
- * is nothing else than a combination of those parameters.
- *
- * @version $Id$
- * @since 10.7RC1
+ * @since 10.8RC1
  * @since 9.11.8
+ * @version $Id $
  */
 public class DefaultNotificationFilterPreference implements NotificationFilterPreference
 {
@@ -78,20 +66,23 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private String wiki;
 
-    private boolean alertEnabled;
-
-    private boolean emailEnabled;
-
+    /**
+     * Construct an empty DefaultNotificationFilterPreference.
+     */
     public DefaultNotificationFilterPreference()
     {
 
     }
 
+    /**
+     * Construct a DefaultNotificationFilterPreference which is a copy of the given notificationFilterPreference.
+     * @param notificationFilterPreference object to copy
+     */
     public DefaultNotificationFilterPreference(NotificationFilterPreference notificationFilterPreference)
     {
         if (notificationFilterPreference instanceof DefaultNotificationFilterPreference) {
-            this.internalId =( (DefaultNotificationFilterPreference) notificationFilterPreference).internalId;
-            this.owner =( (DefaultNotificationFilterPreference) notificationFilterPreference).owner;
+            this.internalId = ((DefaultNotificationFilterPreference) notificationFilterPreference).internalId;
+            this.owner = ((DefaultNotificationFilterPreference) notificationFilterPreference).owner;
         }
 
         this.id = notificationFilterPreference.getId();
@@ -111,89 +102,138 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.setNotificationFormats(notificationFilterPreference.getNotificationFormats());
     }
 
+    /**
+     * @param id the unique identifier to set
+     */
     public void setId(String id)
     {
         this.id = id;
     }
 
+    /**
+     * @return the internal id used to store the preference
+     */
     public long getInternalId()
     {
         return internalId;
     }
 
+    /**
+     * @param internalId the internal id used to store the preference
+     */
     public void setInternalId(long internalId)
     {
         this.internalId = internalId;
         this.id = String.format("NFP_%x", internalId);
     }
 
+    /**
+     * @return the owner of the preference
+     */
     public String getOwner()
     {
         return owner;
     }
 
+    /**
+     * @param owner the owner of the preference
+     */
     public void setOwner(String owner)
     {
         this.owner = owner;
     }
 
+    /**
+     * @param filterName the name of the filter concerned by the preference
+     */
     public void setFilterName(String filterName)
     {
         this.filterName = filterName;
     }
 
+    /**
+     * @param providerHint the name of the provider that have built this preference
+     */
     public void setProviderHint(String providerHint)
     {
         this.providerHint = providerHint;
     }
 
+    /**
+     * @param enabled if the preference is enabled or not
+     */
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
     }
 
+    /**
+     * @param active if the preference is active or not
+     */
     public void setActive(boolean active)
     {
         this.active = active;
     }
 
+    /**
+     * @param filterType the type of the filter described by this preference.
+     */
     public void setFilterType(NotificationFilterType filterType)
     {
         this.filterType = filterType;
     }
 
+    /**
+     * @param filterFormats a set of {@link NotificationFormat} for which the filter should be applied.
+     */
     public void setNotificationFormats(Set<NotificationFormat> filterFormats)
     {
         this.notificationFormats = filterFormats;
-        this.alertEnabled = filterFormats.contains(NotificationFormat.ALERT);
-        this.emailEnabled = filterFormats.contains(NotificationFormat.EMAIL);
     }
 
+    /**
+     * @param startingDate the date from which the filter preference is enabled.
+     */
     public void setStartingDate(Date startingDate)
     {
         this.startingDate = startingDate;
     }
 
+    /**
+     * @param eventType the event type concerned by the preference
+     */
     public void setEventType(String eventType)
     {
         this.eventType = eventType;
     }
 
+    /**
+     * @param user the user concerned by the preference
+     */
     public void setUser(String user)
     {
         this.user = user;
     }
 
+    /**
+     * @param pageOnly the page concerned by the preference
+     */
     public void setPageOnly(String pageOnly)
     {
         this.pageOnly = pageOnly;
     }
 
+    /**
+     * @param page the page (and its children) concerned by the preference
+     */
     public void setPage(String page)
     {
         this.page = page;
     }
 
+    /**
+     * @param wiki the wiki concerned by the preference
+     */
     public void setWiki(String wiki)
     {
         this.wiki = wiki;
@@ -276,14 +316,19 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         return wiki;
     }
 
+    /**
+     * @return if the alert format is enabled (for storage use)
+     */
     public boolean isAlertEnabled()
     {
-        return alertEnabled;
+        return this.notificationFormats.contains(NotificationFormat.ALERT);
     }
 
+    /**
+     * @param alertEnabled if the alert format is enabled (for storage use)
+     */
     public void setAlertEnabled(boolean alertEnabled)
     {
-        this.alertEnabled = alertEnabled;
         if (alertEnabled) {
             this.notificationFormats.add(NotificationFormat.ALERT);
         } else {
@@ -291,14 +336,19 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         }
     }
 
+    /**
+     * @return if the email format is enabled (for storage used)
+     */
     public boolean isEmailEnabled()
     {
-        return emailEnabled;
+        return this.notificationFormats.contains(NotificationFormat.ALERT);
     }
 
+    /**
+     * @param emailEnabled if the email format is enabled (for storage used)
+     */
     public void setEmailEnabled(boolean emailEnabled)
     {
-        this.emailEnabled = emailEnabled;
         if (emailEnabled) {
             this.notificationFormats.add(NotificationFormat.EMAIL);
         } else {

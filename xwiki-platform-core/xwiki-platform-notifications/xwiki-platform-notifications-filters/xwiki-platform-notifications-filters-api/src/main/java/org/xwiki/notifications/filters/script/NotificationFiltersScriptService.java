@@ -162,6 +162,18 @@ public class NotificationFiltersScriptService implements ScriptService
         notificationFilterManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
     }
 
+    /**
+     * Create a scope notification filter preference for the current user.
+     *
+     * @param type type of the filter preference to create
+     * @param formats formats concerned by the preference
+     * @param eventType the event type concerned by the preference
+     * @param reference the reference of the wiki, the space or the page concerned by the preference
+     * @throws NotificationException if an error occurs
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
     public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
             String eventType, EntityReference reference) throws NotificationException
     {

@@ -56,7 +56,7 @@ public class EventUserFilterPreferencesGetter
             NotificationFormat format)
     {
         return getPreferences(filterPreferences, format, NotificationFilterType.EXCLUSIVE).anyMatch(
-                pref -> StringUtils.equals(pref.getUser(), testUser)
+            pref -> StringUtils.equals(pref.getUser(), testUser)
         );
     }
 
@@ -72,7 +72,7 @@ public class EventUserFilterPreferencesGetter
             NotificationFormat format)
     {
         return getPreferences(filterPreferences, format, NotificationFilterType.INCLUSIVE).anyMatch(
-                pref -> StringUtils.equals(pref.getUser(), testUser)
+            pref -> StringUtils.equals(pref.getUser(), testUser)
         );
     }
 

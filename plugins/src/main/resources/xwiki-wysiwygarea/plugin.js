@@ -44,6 +44,10 @@
         }
         // CKEDITOR.htmlParser.fragment instance
         var documentFragment = event.data.dataValue;
+        if (typeof documentFragment.find !== 'function') {
+          // The root node doesn't have support for finding child elements.
+          return;
+        }
         var heads = documentFragment.find('head', true);
         if (heads.length === 0) {
           // No place to inject the styles.

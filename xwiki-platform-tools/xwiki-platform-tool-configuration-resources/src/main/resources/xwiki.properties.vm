@@ -417,6 +417,9 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Here are the standard properties:
 #-# * user: the user to use to authenticate to the repository
 #-# * password: the password to use to authenticate to the repository
+#-# 
+#-# And here those for "maven" repositories:
+#-# * [Since 10.7RC1] checksumPolicy: what to do when checksum validation fail. Possible values are "fail", "warn" (the default) and "ignore"
 #-#
 #-# Here is an example:
 # extension.repositories=privatemavenid:maven:http://host.com/private/maven/

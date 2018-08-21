@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>10.7-SNAPSHOT</version>
+    <version>10.7-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-listener</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Lifecycle Listener</name>

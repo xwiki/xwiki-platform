@@ -92,7 +92,7 @@ require(['jquery'], function($) {
 
   var updateFlavors = function () {
     // Get base URL
-    var url = "$escapetool.javascript($doc.getURL('view', 'xpage=flavor/picker_flavors'))";
+    var url = "$escapetool.javascript($doc.getURL('get', 'xpage=flavor/picker_flavors'))";
 
     // Add namespace to the URL if needed
     var picker = $('.xwiki-flavor-picker');

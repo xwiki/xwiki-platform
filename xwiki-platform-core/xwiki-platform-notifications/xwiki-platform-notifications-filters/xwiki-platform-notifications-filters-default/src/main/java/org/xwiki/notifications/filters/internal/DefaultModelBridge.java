@@ -121,14 +121,14 @@ public class DefaultModelBridge implements ModelBridge
     @Inject
     private Logger logger;
 
-    private List<NotificationFilterPreference> getInternalFilterPreferences(DocumentReference user)
+    private List<DefaultNotificationFilterPreference> getInternalFilterPreferences(DocumentReference user)
             throws NotificationException
     {
         if (user == null) {
             return Collections.emptyList();
         }
 
-        List<NotificationFilterPreference> results;
+        List<DefaultNotificationFilterPreference> results;
 
         String serializedUser = entityReferenceSerializer.serialize(user);
 
@@ -142,6 +142,10 @@ public class DefaultModelBridge implements ModelBridge
                     context.getWiki().getStore().search(
                             "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = ?",
                             1000, 0, Arrays.asList(serializedUser), context);
+
+            for (DefaultNotificationFilterPreference preference : results) {
+                preference.setProviderHint("userProfile");
+            }
         } catch (XWikiException e) {
             throw new NotificationException("error", e);
         } finally {
@@ -257,21 +261,25 @@ public class DefaultModelBridge implements ModelBridge
         String oriDatabase = context.getWikiId();
         context.setWikiId(context.getMainXWiki());
         XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
+
         try {
-            mainHibernateStore.beginTransaction(context);
-            Session session = mainHibernateStore.getSession(context);
             for (NotificationFilterPreference preference : filterPreferences) {
                 // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
                 // handle extended objects (like ScopeNotificationFilterPreference).
                 // So we create a copy just in case we are not saving a basic NotificationFilterPreference object.
                 DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
                 copy.setOwner(serializedUser);
-                session.saveOrUpdate(copy);
+
+                try {
+                    mainHibernateStore.beginTransaction(context);
+                    Session session = mainHibernateStore.getSession(context);
+                    session.saveOrUpdate(copy);
+                    mainHibernateStore.endTransaction(context, true);
+                } catch (Exception e) {
+                    mainHibernateStore.endTransaction(context, false);
+                    throw new NotificationException("Failed to save the notification filter preferences.", e);
+                }
             }
-            mainHibernateStore.endTransaction(context, true);
-        } catch (Exception e) {
-            mainHibernateStore.endTransaction(context, false);
-            throw new NotificationException("Failed to save the notification filter preferences.", e);
         } finally {
             context.setWikiId(oriDatabase);
         }

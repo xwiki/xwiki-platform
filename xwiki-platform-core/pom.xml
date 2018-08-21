@@ -401,6 +401,69 @@
                     "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.7-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method java.util.Set<org.xwiki.notifications.NotificationFormat> org.xwiki.notifications.filters.NotificationFilterPreference::getFilterFormats()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getFilterFormats",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.6.1",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getFilterPreferenceName()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getFilterPreferenceName",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.6.1",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method java.util.List<java.lang.String> org.xwiki.notifications.filters.NotificationFilterPreference::getProperties(org.xwiki.notifications.filters.NotificationFilterProperty)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getProperties",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.6.1",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.noLongerDefault",
+                    "old": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "new": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "oldModifiers": "public default",
+                    "newModifiers": "public abstract",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getStartingDate",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.6.1",
+                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.7-SNAPSHOT",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.nowAbstract",
+                    "old": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "new": "method java.util.Date org.xwiki.notifications.filters.NotificationFilterPreference::getStartingDate()",
+                    "oldModifiers": "public default",
+                    "newModifiers": "public abstract",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getStartingDate",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.6.1",
+                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.7-SNAPSHOT",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
                   }
                 ]
               }

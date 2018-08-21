@@ -38,7 +38,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 {
     private String id;
 
-    private long internalId;
+    private long internalId = 0;
 
     private String owner;
 

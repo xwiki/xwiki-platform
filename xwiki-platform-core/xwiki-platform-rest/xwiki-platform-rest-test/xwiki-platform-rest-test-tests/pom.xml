@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest-test</artifactId>
-    <version>10.7-rc-1</version>
+    <version>10.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-test-tests</artifactId>
   <name>XWiki Platform - REST - Tests - Functional Tests</name>

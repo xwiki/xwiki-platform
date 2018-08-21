@@ -90,8 +90,9 @@ CKEDITOR.editorConfig = function(config) {
         }
       }
     },
-    // Disable the features that are not well integrated or that are focused more on the presentation than the content.
-    removeButtons: 'Find,Anchor',
+    // Remove the features that are not well integrated or that are focused more on the presentation than the content.
+    // Remove the paste buttons because most of the time they only tell you the shortcut key that needs to be used.
+    removeButtons: 'Find,Anchor,Paste,PasteFromWord,PasteText',
     removePlugins: 'bidi,colorbutton,font,justify,save,specialchar',
     toolbarGroups: [
       {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},

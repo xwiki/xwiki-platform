@@ -37,6 +37,7 @@ import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
@@ -50,6 +51,9 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Singleton
 public class NotificationFilterPreferenceStore
 {
+    @Inject
+    private ActivityStreamConfiguration activityStreamConfiguration;
+
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
@@ -164,11 +168,16 @@ public class NotificationFilterPreferenceStore
         XWikiContext context = contextProvider.get();
 
         // store event in the main database
-        String oriDatabase = context.getWikiId();
-        context.setWikiId(context.getMainXWiki());
-        XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
+        String currentWiki = context.getWikiId();
 
         try {
+            if (activityStreamConfiguration.useMainStore()) {
+                // store event in the main database
+                context.setWikiId(context.getMainXWiki());
+            }
+
+            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
             for (NotificationFilterPreference preference : filterPreferences) {
                 // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
                 // handle extended objects (like ScopeNotificationFilterPreference).
@@ -177,17 +186,19 @@ public class NotificationFilterPreferenceStore
                 copy.setOwner(serializedUser);
 
                 try {
-                    mainHibernateStore.beginTransaction(context);
-                    Session session = mainHibernateStore.getSession(context);
+                    hibernateStore.beginTransaction(context);
+                    Session session = hibernateStore.getSession(context);
                     session.saveOrUpdate(copy);
-                    mainHibernateStore.endTransaction(context, true);
+                    hibernateStore.endTransaction(context, true);
                 } catch (Exception e) {
-                    mainHibernateStore.endTransaction(context, false);
+                    hibernateStore.endTransaction(context, false);
                     throw new NotificationException("Failed to save the notification filter preferences.", e);
                 }
             }
         } finally {
-            context.setWikiId(oriDatabase);
+            if (!currentWiki.equals(context.getWikiId())) {
+                context.setWikiId(currentWiki);
+            }
         }
     }
 }

@@ -48,9 +48,9 @@ CKEditor.ConfigClass_linkShowAdvancedTab.hint=Vous permet de définir les attrib
 CKEditor.ConfigClass_linkShowTargetTab=Lien : Afficher l'onglet Destination
 CKEditor.ConfigClass_linkShowTargetTab.hint=Vous permet de définir l'attribut target du lien, par exemple pour ouvrir le lien dans un nouvel onglet.
 CKEditor.ConfigClass_advanced=Configuration avancée
-CKEditor.ConfigClass_advanced.hint=Vous pouvez écrire un snippet Javascript pour modifier directement l''objet configuration. Cf. à la documentation{1} de {0}CKEditor  pour la list des propriétés de configuration disponibles.
+CKEditor.ConfigClass_advanced.hint=Vous pouvez écrire un snippet Javascript pour modifier directement l''objet configuration. Voir la {0}documentation de CKEditor{1} pour la liste des propriétés de configuration disponibles.
 
-ckeditor.admin.saveComment=La configuration CKEditor a été mise à jour depuis l'Administration
+ckeditor.admin.saveComment=La configuration de CKEditor a été mise à jour depuis l'Administration
 ckeditor.admin.reset=Réinitialiser
 ckeditor.admin.reset.hint=Rétablir la configuration par défaut
 ckeditor.admin.reset.confirmation=Êtes-vous certain de vouloir rétablir la configuration par défaut ? Toutes vos modifications seront perdues.

@@ -33,6 +33,7 @@
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <properties>
+    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
@@ -77,33 +78,52 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${platform.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-ckeditor-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Required to fix conflicts resolution between XWiki & TestContainers -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+      <exclusions>
+        <!-- XWiki uses a more recent version of bytebuddy -->
+        <exclusion>
+          <groupId>net.bytebuddy</groupId>
+          <artifactId>byte-buddy</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- selenium-server requires Guava 23.6-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
+      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
+      here. Note that the version needs to be checked when we change the version of selenium-server -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>23.6-jre</version>
+      <exclusions>
+        <!-- Use the version from TestContainers which is newer -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Download the Gecko Driver used to communicate with Firefox. -->
       <plugin>
-        <groupId>com.googlecode.maven-download-plugin</groupId>
-        <artifactId>download-maven-plugin</artifactId>
-        <version>1.4.0</version>
-        <executions>
-          <execution>
-            <id>download-gecko-driver</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>wget</goal>
-            </goals>
-            <configuration>
-              <url>https://github.com/mozilla/geckodriver/releases/download/v${geckodriver.version}/geckodriver-v${geckodriver.version}-linux64.tar.gz</url>
-              <unpack>true</unpack>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
       <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
            http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
@@ -119,20 +139,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
-           once -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-          <systemPropertyVariables>
-            <webdriver.gecko.driver>${project.build.directory}/geckodriver</webdriver.gecko.driver>
-          </systemPropertyVariables>
-        </configuration>
       </plugin>
     </plugins>
   </build>

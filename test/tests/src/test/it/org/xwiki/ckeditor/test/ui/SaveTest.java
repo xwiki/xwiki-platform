@@ -19,25 +19,54 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import org.junit.Test;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Functional tests for the Save plugin.
+ * Integration tests for the Save plugin.
  * 
  * @version $Id$
  * @since 1.13
  */
-public class SaveTest extends AbstractCKEditorTest
+@UITest
+public class SaveTest
 {
-    @Test
-    public void save()
+    @BeforeAll
+    public static void configure(TestUtils testUtils) throws Exception
     {
-        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(getTestClassName(), getTestMethodName());
+        testUtils.loginAsSuperAdmin();
+
+        // Set default edit mode to WYSIWYG.
+        testUtils.setWikiPreference("editor", "Wysiwyg");
+
+        // Set default WYSIWYG editor to CKEditor.
+        Map<String, String> editorBinding = new HashMap<>();
+        editorBinding.put("dataType", "org.xwiki.rendering.syntax.SyntaxContent#wysiwyg");
+        editorBinding.put("roleHint", "ckeditor");
+        testUtils.addObject(new LocalDocumentReference("XWiki", "XWikiPreferences"), "XWiki.EditorBindingClass",
+            editorBinding);
+
+        // Run the tests as a simple user.
+        testUtils.createUserAndLogin(SaveTest.class.getSimpleName(), "password");
+    }
+
+    @Test
+    public void save(TestInfo testInfo) throws Exception
+    {
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testInfo.getTestClass().get().getSimpleName(),
+            testInfo.getTestMethod().get().getName());
         CKEditor editor = new CKEditor().waitToLoad();
         RichTextAreaElement textArea = editor.getRichTextArea();
         textArea.clear();

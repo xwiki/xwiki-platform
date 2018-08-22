@@ -29,7 +29,7 @@
 
     <id name="internalId" type="long">
       <column name="nfp_id" not-null="true" />
-      <generator class="increment"/>
+      <generator class="native"/>
     </id>
 
     <property name="owner" type="string" column="nfp_owner" index="NFP_OWNER"/>

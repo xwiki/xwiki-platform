@@ -128,7 +128,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         List<String> values = obj.getListValue(fieldName);
         if (values != null && !values.isEmpty()) {
             for (String value : values) {
-                NotificationFilterPreference pref = createNotificationFilterPreference(
+                DefaultNotificationFilterPreference pref = createNotificationFilterPreference(
                         String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
                 switch (property) {
                     case PAGE:
@@ -148,7 +148,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         }
     }
 
-    private NotificationFilterPreference createNotificationFilterPreference(String id)
+    private DefaultNotificationFilterPreference createNotificationFilterPreference(String id)
     {
         DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
         pref.setId(id);

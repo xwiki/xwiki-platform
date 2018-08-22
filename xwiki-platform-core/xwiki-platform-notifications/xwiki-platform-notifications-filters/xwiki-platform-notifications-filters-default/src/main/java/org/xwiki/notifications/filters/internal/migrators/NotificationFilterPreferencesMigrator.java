@@ -122,7 +122,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
             XWikiDocument doc = xwiki.getDocument(user, context);
 
             // Get the old preferences
-            List<NotificationFilterPreference> preferencesToSave = getXObjectsOfUser(doc,
+            List<NotificationFilterPreference> preferencesToSave = convertXObjectsToPreferences(doc,
                     notificationFilterPreferenceClass);
 
             // Save to the new store
@@ -139,7 +139,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
         }
     }
 
-    private List<NotificationFilterPreference> getXObjectsOfUser(XWikiDocument document,
+    private List<NotificationFilterPreference> convertXObjectsToPreferences(XWikiDocument document,
             DocumentReference notificationFilterPreferenceClass)
     {
         List<NotificationFilterPreference> preferencesToConvert = new ArrayList<>();
@@ -148,33 +148,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
         if (preferencesObj != null) {
             for (BaseObject obj : preferencesObj) {
                 if (obj != null) {
-                    DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
-
-                    NotificationFilterType filterType = NotificationFilterType.valueOf(
-                            obj.getStringValue(FIELD_FILTER_TYPE).toUpperCase());
-
-                    Set<NotificationFormat> filterFormats = new HashSet<>();
-                    for (String format : (List<String>) obj.getListValue(FIELD_FILTER_FORMATS)) {
-                        filterFormats.add(NotificationFormat.valueOf(format.toUpperCase()));
-                    }
-
-                    preference.setProviderHint("userProfile");
-                    preference.setFilterName(obj.getStringValue(FIELD_FILTER_NAME));
-                    preference.setEnabled(obj.getIntValue(FIELD_IS_ENABLED, 1) == 1);
-                    preference.setActive(obj.getIntValue(FIELD_IS_ACTIVE, 1) == 1);
-                    preference.setFilterType(filterType);
-                    preference.setNotificationFormats(filterFormats);
-                    preference.setStartingDate(obj.getDateValue(FIELD_STARTING_DATE));
-
-                    Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
-                            createNotificationFilterPropertiesMap(obj);
-
-                    if (!filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE).isEmpty()) {
-                        preference.setEventTypes(
-                                new HashSet<>(filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE)));
-                    }
-
-                    bidule(preferencesToConvert, filterPreferenceProperties, preference);
+                    handleObject(preferencesToConvert, obj);
                 }
             }
         }
@@ -182,34 +156,63 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
         return preferencesToConvert;
     }
 
-    //TODO: yes I will rename this method before merging to master
-    private void bidule(List<NotificationFilterPreference> preferencesToConvert,
-            Map<NotificationFilterProperty, List<String>> filterPreferenceProperties,
-            DefaultNotificationFilterPreference pref)
+    private void handleObject(List<NotificationFilterPreference> preferencesToConvert, BaseObject obj)
     {
+        DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
+
+        NotificationFilterType filterType = NotificationFilterType.valueOf(
+                obj.getStringValue(FIELD_FILTER_TYPE).toUpperCase());
+
+        Set<NotificationFormat> filterFormats = new HashSet<>();
+        for (String format : (List<String>) obj.getListValue(FIELD_FILTER_FORMATS)) {
+            filterFormats.add(NotificationFormat.valueOf(format.toUpperCase()));
+        }
+
+        preference.setProviderHint("userProfile");
+        preference.setFilterName(obj.getStringValue(FIELD_FILTER_NAME));
+        preference.setEnabled(obj.getIntValue(FIELD_IS_ENABLED, 1) == 1);
+        preference.setActive(obj.getIntValue(FIELD_IS_ACTIVE, 1) == 1);
+        preference.setFilterType(filterType);
+        preference.setNotificationFormats(filterFormats);
+        preference.setStartingDate(obj.getDateValue(FIELD_STARTING_DATE));
+
+        handleProperties(preferencesToConvert, obj, preference);
+    }
+
+    private void handleProperties(List<NotificationFilterPreference> preferencesToConvert,
+            BaseObject obj, DefaultNotificationFilterPreference preference)
+    {
+        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
+                createNotificationFilterPropertiesMap(obj);
+
+        if (!filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE).isEmpty()) {
+            preference.setEventTypes(
+                    new HashSet<>(filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE)));
+        }
+
         for (String page : filterPreferenceProperties.get(NotificationFilterProperty.PAGE)) {
-            DefaultNotificationFilterPreference pref1
-                    = new DefaultNotificationFilterPreference(pref);
-            pref1.setPageOnly(page);
-            preferencesToConvert.add(pref1);
+            DefaultNotificationFilterPreference pref
+                    = new DefaultNotificationFilterPreference(preference);
+            pref.setPageOnly(page);
+            preferencesToConvert.add(pref);
         }
         for (String space : filterPreferenceProperties.get(NotificationFilterProperty.SPACE)) {
-            DefaultNotificationFilterPreference pref1
-                    = new DefaultNotificationFilterPreference(pref);
-            pref1.setPage(space);
-            preferencesToConvert.add(pref1);
+            DefaultNotificationFilterPreference pref
+                    = new DefaultNotificationFilterPreference(preference);
+            pref.setPage(space);
+            preferencesToConvert.add(pref);
         }
         for (String wiki : filterPreferenceProperties.get(NotificationFilterProperty.WIKI)) {
-            DefaultNotificationFilterPreference pref1
-                    = new DefaultNotificationFilterPreference(pref);
-            pref1.setWiki(wiki);
-            preferencesToConvert.add(pref1);
+            DefaultNotificationFilterPreference pref
+                    = new DefaultNotificationFilterPreference(preference);
+            pref.setWiki(wiki);
+            preferencesToConvert.add(pref);
         }
         for (String user : filterPreferenceProperties.get(NotificationFilterProperty.USER)) {
-            DefaultNotificationFilterPreference pref1
-                    = new DefaultNotificationFilterPreference(pref);
-            pref1.setUser(user);
-            preferencesToConvert.add(pref1);
+            DefaultNotificationFilterPreference pref
+                    = new DefaultNotificationFilterPreference(preference);
+            pref.setUser(user);
+            preferencesToConvert.add(pref);
         }
         // We don't handle the property APPLICATIONS that is not here anymore
     }
@@ -238,8 +241,8 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
     {
         try {
             Query query = queryManager.createQuery(
-                    "select distinct doc.fullName from Document doc, " +
-                            "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj", Query.XWQL);
+                    "select distinct doc.fullName from Document doc, "
+                            + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj", Query.XWQL);
             for (String fullName : query.<String>execute()) {
                 migrateUser(referenceResolver.resolve(fullName, getXWikiContext().getWikiReference()));
             }

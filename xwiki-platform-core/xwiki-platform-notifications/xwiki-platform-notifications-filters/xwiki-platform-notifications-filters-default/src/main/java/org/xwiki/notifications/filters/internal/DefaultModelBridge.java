@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -33,8 +32,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.hibernate.Session;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -48,14 +45,11 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Default implementation for {@link ModelBridge}.
@@ -73,10 +67,6 @@ public class DefaultModelBridge implements ModelBridge
             )
     );
 
-    private static final DocumentReference NOTIFICATION_FILTER_PREFERENCE_CLASS = new DocumentReference(
-            "NotificationFilterPreferenceClass", NOTIFICATION_CODE_SPACE
-    );
-
     private static final DocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS = new DocumentReference(
             "ToggleableFilterPreferenceClass", NOTIFICATION_CODE_SPACE
     );
@@ -84,30 +74,6 @@ public class DefaultModelBridge implements ModelBridge
     private static final String FIELD_FILTER_NAME = "filterName";
 
     private static final String FIELD_IS_ENABLED = "isEnabled";
-
-    private static final String FIELD_IS_ACTIVE = "isActive";
-
-    private static final String FILTER_PREFERENCE_NAME = "filterPreferenceName";
-
-    private static final String FIELD_APPLICATIONS = "applications";
-
-    private static final String FIELD_EVENT_TYPES = "eventTypes";
-
-    private static final String FIELD_PAGES = "pages";
-
-    private static final String FIELD_SPACES = "spaces";
-
-    private static final String FIELD_WIKIS = "wikis";
-
-    private static final String FIELD_USERS = "users";
-
-    private static final String FIELD_FILTER_TYPE = "filterType";
-
-    private static final String FIELD_FILTER_FORMATS = "filterFormats";
-
-    private static final String FIELD_STARTING_DATE = "startingDate";
-
-    private static final String ALL_EVENT_TYPES = "allEventTypes";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -119,40 +85,12 @@ public class DefaultModelBridge implements ModelBridge
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    private Logger logger;
+    private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
 
     private List<DefaultNotificationFilterPreference> getInternalFilterPreferences(DocumentReference user)
             throws NotificationException
     {
-        if (user == null) {
-            return Collections.emptyList();
-        }
-
-        List<DefaultNotificationFilterPreference> results;
-
-        String serializedUser = entityReferenceSerializer.serialize(user);
-
-        XWikiContext context = contextProvider.get();
-
-        // Search in the main database
-        String oriDatabase = context.getWikiId();
-        try {
-            context.setWikiId(context.getMainXWiki());
-            results =
-                    context.getWiki().getStore().search(
-                            "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = ?",
-                            1000, 0, Arrays.asList(serializedUser), context);
-
-            for (DefaultNotificationFilterPreference preference : results) {
-                preference.setProviderHint("userProfile");
-            }
-        } catch (XWikiException e) {
-            throw new NotificationException("error", e);
-        } finally {
-            context.setWikiId(oriDatabase);
-        }
-
-        return results;
+        return notificationFilterPreferenceStore.getPreferencesOfUser(user);
     }
 
     @Override
@@ -200,45 +138,15 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
-        NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
-        if (preference == null) {
-            return;
-        }
-
-        XWikiContext context = contextProvider.get();
-
-        // store event in the main database
-        String oriDatabase = context.getWikiId();
-        context.setWikiId(context.getMainXWiki());
-        XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
-        try {
-            mainHibernateStore.beginTransaction(context);
-            Session session = mainHibernateStore.getSession(context);
-            session.delete(preference);
-            mainHibernateStore.endTransaction(context, true);
-        } catch (XWikiException e) {
-            mainHibernateStore.endTransaction(context, false);
-        } finally {
-            context.setWikiId(oriDatabase);
-        }
-    }
-
-    private NotificationFilterPreference getFilterPreference(DocumentReference user, String filterPreferenceId)
-            throws NotificationException
-    {
-        for (NotificationFilterPreference preference : getInternalFilterPreferences(user)) {
-            if (StringUtils.equals(preference.getId(), filterPreferenceId)) {
-                return preference;
-            }
-        }
-        return null;
+        notificationFilterPreferenceStore.deleteFilterPreference(user, filterPreferenceId);
     }
 
     @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
-        NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
+        NotificationFilterPreference preference = notificationFilterPreferenceStore.getFilterPreference(user,
+                filterPreferenceId);
         if (preference != null && enabled != preference.isEnabled()) {
             preference.setEnabled(enabled);
             saveFilterPreferences(user, Collections.singletonList(preference));
@@ -249,40 +157,7 @@ public class DefaultModelBridge implements ModelBridge
     public void saveFilterPreferences(DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        if (user == null) {
-            return;
-        }
-
-        String serializedUser = entityReferenceSerializer.serialize(user);
-
-        XWikiContext context = contextProvider.get();
-
-        // store event in the main database
-        String oriDatabase = context.getWikiId();
-        context.setWikiId(context.getMainXWiki());
-        XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
-
-        try {
-            for (NotificationFilterPreference preference : filterPreferences) {
-                // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
-                // handle extended objects (like ScopeNotificationFilterPreference).
-                // So we create a copy just in case we are not saving a basic NotificationFilterPreference object.
-                DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
-                copy.setOwner(serializedUser);
-
-                try {
-                    mainHibernateStore.beginTransaction(context);
-                    Session session = mainHibernateStore.getSession(context);
-                    session.saveOrUpdate(copy);
-                    mainHibernateStore.endTransaction(context, true);
-                } catch (Exception e) {
-                    mainHibernateStore.endTransaction(context, false);
-                    throw new NotificationException("Failed to save the notification filter preferences.", e);
-                }
-            }
-        } finally {
-            context.setWikiId(oriDatabase);
-        }
+        notificationFilterPreferenceStore.saveFilterPreferences(user, filterPreferences);
     }
 
     @Override

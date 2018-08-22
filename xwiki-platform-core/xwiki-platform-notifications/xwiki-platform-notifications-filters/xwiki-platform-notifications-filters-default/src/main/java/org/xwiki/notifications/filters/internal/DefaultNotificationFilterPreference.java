@@ -37,9 +37,11 @@ import org.xwiki.text.StringUtils;
  */
 public class DefaultNotificationFilterPreference implements NotificationFilterPreference
 {
+    private static final String LIST_SEPARATOR = ",";
+
     private String id;
 
-    private long internalId = 0;
+    private long internalId;
 
     private String owner;
 
@@ -378,7 +380,9 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         if (eventTypes.isEmpty()) {
             return "";
         }
-        return StringUtils.join(eventTypes, ",") + ",";
+        // We add a separator (",") at the beginning and at the end so we can make query like
+        // "event.eventTypes LIKE '%,someEventType,%'" without of matching an other event type
+        return LIST_SEPARATOR + StringUtils.join(eventTypes, LIST_SEPARATOR) + LIST_SEPARATOR;
     }
 
     /**
@@ -391,7 +395,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.eventTypes.clear();
 
         if (eventTypes != null) {
-            String[] types = eventTypes.split(",");
+            String[] types = eventTypes.split(LIST_SEPARATOR);
             for (int i = 0; i < types.length; ++i) {
                 if (StringUtils.isNotBlank(types[i])) {
                     this.eventTypes.add(types[i]);

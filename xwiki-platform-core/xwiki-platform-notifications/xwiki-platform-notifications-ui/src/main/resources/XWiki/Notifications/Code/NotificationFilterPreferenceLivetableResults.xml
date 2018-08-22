@@ -134,15 +134,11 @@
           #set ($isEnabled = 'checked = "checked"')
         #end
         #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceId='${preference.id}' $isEnabled $isDisabled /&gt;")
-        #set ($eventType = "$!preference.eventType")
-        #if ($eventType == '')
-          #set ($eventType = '-')
-        #end
         #set ($element = {
           'filterPreferenceId'  : $preference.id,
           'name'                : $display,
           'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
-          'eventTypes'          : $eventType,
+          'eventTypes'          : "#displayNotificationsEventTypeList($preference.eventTypes)",
           'notificationFormats' : "#displayNotificationFormatsList($preference.notificationFormats)",
           'isEnabled'           : $isEnabled,
           'doc_viewable'        : true

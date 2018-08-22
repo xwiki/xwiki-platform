@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -162,9 +163,9 @@ public class CachedModelBridge implements ModelBridge, Initializable
 
     @Override
     public void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
-            Set<NotificationFormat> formats, String eventType, EntityReference reference) throws NotificationException
+            Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference) throws NotificationException
     {
-        modelBridge.createScopeFilterPreference(user, type, formats, eventType, reference);
+        modelBridge.createScopeFilterPreference(user, type, formats, eventTypes, reference);
         clearCache(user);
     }
 

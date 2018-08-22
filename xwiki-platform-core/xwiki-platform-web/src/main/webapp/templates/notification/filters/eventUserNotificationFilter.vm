@@ -2,4 +2,4 @@
 ## Parameters :
 ## $filter : the filter to render
 ## $filterPreference : the preference to use
-#displayUser($filterPreference.getProperties('USER'))
+#displayUser($filterPreference.user)

@@ -210,9 +210,9 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     @Override
-    public String getEventType()
+    public Set<String> getEventTypes()
     {
-        return filterPreference.getEventType();
+        return filterPreference.getEventTypes();
     }
 
     @Override
@@ -240,9 +240,9 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     @Override
-    public void setEventType(String eventType)
+    public void setEventTypes(Set<String> eventTypes)
     {
-        this.filterPreference.setEventType(eventType);
+        this.filterPreference.setEventTypes(eventTypes);
     }
 
     @Override

@@ -92,9 +92,9 @@ public interface NotificationFilterPreference
     Date getStartingDate();
 
     /**
-     * @return the event type concerned by the preference (can be null to affect all event types)
+     * @return the event types concerned by the preference (can be empty to affect all event types)
      */
-    String getEventType();
+    Set<String> getEventTypes();
 
     /**
      * @return the user concerned by the preference (can be null)
@@ -117,9 +117,9 @@ public interface NotificationFilterPreference
     String getWiki();
 
     /**
-     * @param eventType the event type concerned by the preference
+     * @param eventTypes the event types concerned by the preference
      */
-    void setEventType(String eventType);
+    void setEventTypes(Set<String> eventTypes);
 
     /**
      * @param user the user concerned by the preference

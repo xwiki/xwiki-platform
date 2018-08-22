@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.script;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -167,7 +168,7 @@ public class NotificationFiltersScriptService implements ScriptService
      *
      * @param type type of the filter preference to create
      * @param formats formats concerned by the preference
-     * @param eventType the event type concerned by the preference
+     * @param eventTypes the event types concerned by the preference
      * @param reference the reference of the wiki, the space or the page concerned by the preference
      * @throws NotificationException if an error occurs
      *
@@ -175,9 +176,9 @@ public class NotificationFiltersScriptService implements ScriptService
      * @since 9.11.8
      */
     public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
-            String eventType, EntityReference reference) throws NotificationException
+            List<String> eventTypes, EntityReference reference) throws NotificationException
     {
         cachedModelBridge.createScopeFilterPreference(documentAccessBridge.getCurrentUserReference(),
-                type, formats, eventType, reference);
+                type, formats, eventTypes, reference);
     }
 }

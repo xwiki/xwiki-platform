@@ -39,7 +39,6 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLoc
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.stability.Unstable;
-import org.xwiki.text.StringUtils;
 
 /**
  * Reference of a location to watch.
@@ -95,7 +94,7 @@ public class WatchedLocationReference implements WatchedEntityReference
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
-            && StringUtils.isBlank(notificationFilterPreference.getEventType())) {
+            && notificationFilterPreference.getEventTypes().isEmpty()) {
             ScopeNotificationFilterPreference scope
                     = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
             return entityReference.equals(scope.getScopeReference());

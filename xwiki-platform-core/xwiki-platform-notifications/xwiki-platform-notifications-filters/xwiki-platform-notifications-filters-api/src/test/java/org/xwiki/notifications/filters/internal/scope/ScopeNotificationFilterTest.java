@@ -99,7 +99,9 @@ public class ScopeNotificationFilterTest
             when(preference.getWiki()).thenReturn(entityStringValue);
         }
         when(preference.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
-        when(preference.getEventType()).thenReturn(eventName);
+        if (eventName != null) {
+            when(preference.getEventTypes()).thenReturn(Sets.newSet(eventName));
+        }
         when(preference.getFilterType()).thenReturn(filterType);
         when(preference.getNotificationFormats()).thenReturn(
                 Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));

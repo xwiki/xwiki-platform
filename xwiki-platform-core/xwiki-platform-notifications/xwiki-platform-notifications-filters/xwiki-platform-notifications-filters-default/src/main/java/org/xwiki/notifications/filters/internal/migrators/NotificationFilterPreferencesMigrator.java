@@ -169,18 +169,12 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
                     Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
                             createNotificationFilterPropertiesMap(obj);
 
-                    // Here we need to split the map to several notifications (and there can be many)
                     if (!filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE).isEmpty()) {
-                        for (String value : filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE)) {
-                            DefaultNotificationFilterPreference pref
-                                    = new DefaultNotificationFilterPreference(preference);
-                            pref.setEventType(value);
-
-                            bidule(preferencesToConvert, filterPreferenceProperties, pref);
-                        }
-                    } else {
-                        bidule(preferencesToConvert, filterPreferenceProperties, preference);
+                        preference.setEventTypes(
+                                new HashSet<>(filterPreferenceProperties.get(NotificationFilterProperty.EVENT_TYPE)));
                     }
+
+                    bidule(preferencesToConvert, filterPreferenceProperties, preference);
                 }
             }
         }

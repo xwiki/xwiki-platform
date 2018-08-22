@@ -306,12 +306,12 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public void createScopeFilterPreference(DocumentReference user,
             NotificationFilterType type, Set<NotificationFormat> formats,
-            String eventType, EntityReference reference) throws NotificationException
+            List<String> eventTypes, EntityReference reference) throws NotificationException
     {
         DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
         preference.setFilterType(type);
         preference.setNotificationFormats(formats);
-        preference.setEventType(eventType);
+        preference.setEventTypes(new HashSet<>(eventTypes));
         preference.setEnabled(true);
         preference.setActive(false);
         preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);

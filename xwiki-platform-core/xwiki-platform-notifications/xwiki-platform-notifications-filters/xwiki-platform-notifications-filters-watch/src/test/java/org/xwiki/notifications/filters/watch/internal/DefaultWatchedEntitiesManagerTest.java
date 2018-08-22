@@ -67,7 +67,7 @@ public class DefaultWatchedEntitiesManagerTest
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         DefaultNotificationFilterPreference pref2 = new DefaultNotificationFilterPreference();
-        pref2.setEventType("update");
+        pref2.setEventTypes(Sets.newSet("update"));
         pref2.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         when(watchedEntityReference.matchExactly(pref2)).thenReturn(true);
 

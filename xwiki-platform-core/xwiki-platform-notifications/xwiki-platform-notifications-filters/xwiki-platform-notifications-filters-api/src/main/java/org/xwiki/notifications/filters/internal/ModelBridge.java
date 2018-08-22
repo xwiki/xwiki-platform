@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -112,7 +113,7 @@ public interface ModelBridge
      * @param user the user for who the preference will be created
      * @param type type of the filter preference to create
      * @param formats formats concerned by the preference
-     * @param eventType the event type concerned by the preference
+     * @param eventTypes the event types concerned by the preference
      * @param reference the reference of the wiki, the space or the page concerned by the preference
      * @throws NotificationException if an error occurs
      *
@@ -120,5 +121,6 @@ public interface ModelBridge
      * @since 9.11.8
      */
     void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
-            Set<NotificationFormat> formats, String eventType, EntityReference reference) throws NotificationException;
+            Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
+            throws NotificationException;
 }

@@ -47,9 +47,9 @@
       </type>
     </property>
 
-    <property name="startingDate" type="timestamp" column="nfp_date" index="NFP_STARTING_DATE" />
+    <property name="startingDate" type="timestamp" column="nfp_date" />
 
-    <property name="eventType" type="string" column="nfp_event_type" length="255" index="NFP_EVENT_TYPE" />
+    <property name="allEventTypes" type="text" column="nfp_event_types" />
 
     <property name="user" type="string" column="nfp_user" index="NFP_USER"/>
 

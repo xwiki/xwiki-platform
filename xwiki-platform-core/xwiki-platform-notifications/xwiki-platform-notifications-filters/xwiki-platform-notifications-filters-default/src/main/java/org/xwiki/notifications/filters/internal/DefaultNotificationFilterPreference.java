@@ -26,6 +26,7 @@ import java.util.Set;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.text.StringUtils;
 
 /**
  * Default implementation of {@link NotificationFilterPreference}.
@@ -56,7 +57,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private Date startingDate;
 
-    private String eventType;
+    private Set<String> eventTypes = new HashSet<>();
 
     private String user;
 
@@ -93,7 +94,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.filterType = notificationFilterPreference.getFilterType();
         this.notificationFormats = notificationFilterPreference.getNotificationFormats();
         this.startingDate = notificationFilterPreference.getStartingDate();
-        this.eventType = notificationFilterPreference.getEventType();
+        this.eventTypes = new HashSet<>(notificationFilterPreference.getEventTypes());
         this.user = notificationFilterPreference.getUser();
         this.pageOnly = notificationFilterPreference.getPageOnly();
         this.page = notificationFilterPreference.getPage();
@@ -199,41 +200,31 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.startingDate = startingDate;
     }
 
-    /**
-     * @param eventType the event type concerned by the preference
-     */
-    public void setEventType(String eventType)
+    @Override
+    public void setEventTypes(Set<String> eventType)
     {
-        this.eventType = eventType;
+        this.eventTypes = eventType;
     }
 
-    /**
-     * @param user the user concerned by the preference
-     */
+    @Override
     public void setUser(String user)
     {
         this.user = user;
     }
 
-    /**
-     * @param pageOnly the page concerned by the preference
-     */
+    @Override
     public void setPageOnly(String pageOnly)
     {
         this.pageOnly = pageOnly;
     }
 
-    /**
-     * @param page the page (and its children) concerned by the preference
-     */
+    @Override
     public void setPage(String page)
     {
         this.page = page;
     }
 
-    /**
-     * @param wiki the wiki concerned by the preference
-     */
+    @Override
     public void setWiki(String wiki)
     {
         this.wiki = wiki;
@@ -287,9 +278,9 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     @Override
-    public String getEventType()
+    public Set<String> getEventTypes()
     {
-        return eventType;
+        return eventTypes;
     }
 
     @Override
@@ -341,7 +332,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
      */
     public boolean isEmailEnabled()
     {
-        return this.notificationFormats.contains(NotificationFormat.ALERT);
+        return this.notificationFormats.contains(NotificationFormat.EMAIL);
     }
 
     /**
@@ -353,6 +344,39 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
             this.notificationFormats.add(NotificationFormat.EMAIL);
         } else {
             this.notificationFormats.remove(NotificationFormat.EMAIL);
+        }
+    }
+
+    /**
+     * To store a list in hibernate without the need to create a new table, we create this accessor that simply
+     * join the values together, separated by commas.
+     *
+     * @return a unique string containing all event types, separated by commas
+     */
+    public String getAllEventTypes()
+    {
+        if (eventTypes.isEmpty()) {
+            return "";
+        }
+        return StringUtils.join(eventTypes, ",") + ",";
+    }
+
+    /**
+     * Allow to load a list stored in hibernate as a commas-separated list of values.
+     *
+     * @param eventTypes unique string containing all event types, separated by commas
+     */
+    public void setAllEventTypes(String eventTypes)
+    {
+        this.eventTypes.clear();
+
+        if (eventTypes != null) {
+            String[] types = eventTypes.split(",");
+            for (int i = 0; i < types.length; ++i) {
+                if (StringUtils.isNotBlank(types[i])) {
+                    this.eventTypes.add(types[i]);
+                }
+            }
         }
     }
 }

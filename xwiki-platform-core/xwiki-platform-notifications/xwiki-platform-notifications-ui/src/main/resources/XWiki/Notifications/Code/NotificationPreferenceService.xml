@@ -103,7 +103,7 @@
       #elseif ("$!request.page" != '')
         #set ($reference = $services.model.resolveDocument($request.page))
       #end
-      $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventType, $reference)
+      $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference)
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end

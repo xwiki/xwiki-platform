@@ -306,7 +306,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           action: 'createScopeFilterPreference',
           filterType: self.filterTypeSelector.val(),
           filterFormats: self.notificationFormatSelector.val().join(','),
-          eventType: self.eventTypeSelector.val(),
+          eventTypes: self.eventTypeSelector.val().join(','),
           csrf: xm.form_token
         }
         if (node.data.type == 'wiki') {
@@ -986,7 +986,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
               &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.addPreference.eventType.hint'))&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
-              &lt;select id="notificationFilterEventTypeSelector" name="notificationFilterEventTypeSelector" size="1"&gt;
+              &lt;select id="notificationFilterEventTypeSelector" name="notificationFilterEventTypeSelector" size="5" multiple&gt;
                 #foreach ($app in $apps)
                   #set ($type = $app[0])
                   &lt;optgroup label="$escapetool.xml($type.applicationName)"&gt;

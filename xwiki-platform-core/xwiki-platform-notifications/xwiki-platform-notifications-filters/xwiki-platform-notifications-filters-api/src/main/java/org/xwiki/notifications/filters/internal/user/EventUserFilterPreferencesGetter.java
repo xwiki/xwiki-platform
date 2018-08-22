@@ -161,6 +161,6 @@ public class EventUserFilterPreferencesGetter
         // When the list of event types concerned by the filter i
         // s empty, we consider that the filter concerns
         // all events.
-        return StringUtils.isBlank(filterPreference.getEventType());
+        return filterPreference.getEventTypes().isEmpty();
     }
 }

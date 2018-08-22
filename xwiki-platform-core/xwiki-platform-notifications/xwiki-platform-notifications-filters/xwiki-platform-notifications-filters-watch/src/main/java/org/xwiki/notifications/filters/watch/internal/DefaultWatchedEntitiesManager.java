@@ -40,7 +40,6 @@ import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.notifications.preferences.internal.XWikiEventTypesEnabler;
-import org.xwiki.text.StringUtils;
 
 /**
  * Default implementation of {@link WatchedEntitiesManager}.
@@ -161,7 +160,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         // A filter preferences object concerning all event is a filter that has no even set and that concern
         // concerns all notification formats.
         return notificationFilterManager.getFilterPreferences(user).stream().filter(
-            filterPreference -> StringUtils.isBlank(filterPreference.getEventType())
+            filterPreference -> filterPreference.getEventTypes().isEmpty()
             && filterPreference.getNotificationFormats().size() == NotificationFormat.values().length
         );
     }

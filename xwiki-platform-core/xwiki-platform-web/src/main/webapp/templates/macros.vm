@@ -1603,6 +1603,17 @@ $Msz MB##
       class="suggest-propertyValues" multiple="multiple" size="1"
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
     </select>
+  #elseif ($filterType == 'page')
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+      {'type': 'text/css', 'rel': 'stylesheet'}))
+    #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPages.js',
+      {'forceSkinAction' : true, 'language' : $xcontext.locale}))
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
+      #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
+      #if ("$!columnProperties.multiple" != '')multiple="$!escapetool.xml($columnProperties.multiple)"#end
+      class="suggest-pages">
+    </select>
   #end
 #end
 

@@ -200,31 +200,51 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.startingDate = startingDate;
     }
 
-    @Override
-    public void setEventTypes(Set<String> eventType)
+    /**
+     * @param eventTypes the event types concerned by the preference
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public void setEventTypes(Set<String> eventTypes)
     {
-        this.eventTypes = eventType;
+        this.eventTypes = eventTypes;
     }
 
-    @Override
+    /**
+     * @param user the user concerned by the preference
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
     public void setUser(String user)
     {
         this.user = user;
     }
 
-    @Override
+    /**
+     * @param pageOnly the page concerned by the preference
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
     public void setPageOnly(String pageOnly)
     {
         this.pageOnly = pageOnly;
     }
 
-    @Override
+    /**
+     * @param page the page (and its children) concerned by the preference
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
     public void setPage(String page)
     {
         this.page = page;
     }
 
-    @Override
+    /**
+     * @param wiki the wiki concerned by the preference
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
     public void setWiki(String wiki)
     {
         this.wiki = wiki;

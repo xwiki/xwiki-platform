@@ -106,8 +106,7 @@ public class WatchedLocationReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        DefaultNotificationFilterPreference preference = createFilterPreference();
-        return new ScopeNotificationFilterPreference(preference, entityReference, serializedReference);
+        return new ScopeNotificationFilterPreference(createFilterPreference(), resolver);
     }
 
     @Override
@@ -115,7 +114,7 @@ public class WatchedLocationReference implements WatchedEntityReference
     {
         DefaultNotificationFilterPreference preference = createFilterPreference();
         preference.setFilterType(NotificationFilterType.EXCLUSIVE);
-        return new ScopeNotificationFilterPreference(preference, entityReference, serializedReference);
+        return new ScopeNotificationFilterPreference(preference, resolver);
     }
 
     private DefaultNotificationFilterPreference createFilterPreference()

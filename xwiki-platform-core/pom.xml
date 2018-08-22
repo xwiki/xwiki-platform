@@ -464,6 +464,17 @@
                     "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.7-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.Set<java.lang.String> org.xwiki.notifications.filters.NotificationFilterPreference::getEventTypes()",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
+                    "classSimpleName": "NotificationFilterPreference",
+                    "methodName": "getEventTypes",
+                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.7-SNAPSHOT",
+                    "elementKind": "method",
+                    "justification": "NotificationFilterPreference store did not scale"
                   }
                 ]
               }

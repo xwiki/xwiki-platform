@@ -163,7 +163,8 @@ public class CachedModelBridge implements ModelBridge, Initializable
 
     @Override
     public void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
-            Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference) throws NotificationException
+            Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
+            throws NotificationException
     {
         modelBridge.createScopeFilterPreference(user, type, formats, eventTypes, reference);
         clearCache(user);

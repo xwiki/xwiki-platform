@@ -27,8 +27,6 @@ import org.xwiki.notifications.NotificationFormat;
 /**
  * Define the preference of a notification filter.
  *
- * This class replaces the previous interface that had the same name.
- *
  * A notification filter preference represents a set of parameters that can be passed to a filter in order to
  * customize it.
  *
@@ -40,13 +38,14 @@ import org.xwiki.notifications.NotificationFormat;
  * is nothing else than a combination of those parameters.
  *
  * @version $Id$
- * @since 10.8RC1
- * @since 9.11.8
+ * @since 9.7RC1
  */
 public interface NotificationFilterPreference
 {
     /**
      * @return the unique identifier of the filter preference.
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     String getId();
 
@@ -83,66 +82,60 @@ public interface NotificationFilterPreference
 
     /**
      * @return a set of {@link NotificationFormat} for which the filter should be applied.
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     Set<NotificationFormat> getNotificationFormats();
 
     /**
      * @return the date from which the filter preference is enabled.
+     *
+     * @since 10.5RC1
+     * @since 10.4
+     * @since 9.11.5
      */
     Date getStartingDate();
 
     /**
      * @return the event types concerned by the preference (can be empty to affect all event types)
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     Set<String> getEventTypes();
 
     /**
      * @return the user concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     String getUser();
 
     /**
      * @return the page concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     String getPageOnly();
 
     /**
      * @return the page (and its children) concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     String getPage();
 
     /**
      * @return the wiki concerned by the preference (can be null)
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     String getWiki();
 
     /**
-     * @param eventTypes the event types concerned by the preference
-     */
-    void setEventTypes(Set<String> eventTypes);
-
-    /**
-     * @param user the user concerned by the preference
-     */
-    void setUser(String user);
-
-    /**
-     * @param pageOnly the page concerned by the preference
-     */
-    void setPageOnly(String pageOnly);
-
-    /**
-     * @param page the page (and its children) concerned by the preference
-     */
-    void setPage(String page);
-
-    /**
-     * @param wiki the wiki concerned by the preference
-     */
-    void setWiki(String wiki);
-
-    /**
      * @param enabled if the preference is enabled or not
+     * @since 10.8RC1
+     * @since 9.11.8
      */
     void setEnabled(boolean enabled);
 }

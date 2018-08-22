@@ -72,36 +72,6 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     /**
-     * Construct a new ScopeNotificationFilterPreference.
-     *
-     * @param filterPreference the {@link NotificationFilterPreference} to wrap
-     * @param scopeReference the reference of the location concerned by the scope notification filter
-     * @param serializedReference the serialized version of the reference described earlier
-     *
-     * @since 10.8RC1
-     * @since 9.11.8
-     */
-    public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
-            EntityReference scopeReference, String serializedReference)
-    {
-        this.filterPreference = filterPreference;
-        this.scopeReference = scopeReference;
-        switch (scopeReference.getType()) {
-            case PAGE:
-                this.filterPreference.setPageOnly(serializedReference);
-                break;
-            case SPACE:
-                this.filterPreference.setPage(serializedReference);
-                break;
-            case WIKI:
-                this.filterPreference.setWiki(serializedReference);
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
      * @param hasParent either the preference has a parent preference
      */
     public void setHasParent(boolean hasParent)
@@ -237,36 +207,6 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public String getWiki()
     {
         return filterPreference.getWiki();
-    }
-
-    @Override
-    public void setEventTypes(Set<String> eventTypes)
-    {
-        this.filterPreference.setEventTypes(eventTypes);
-    }
-
-    @Override
-    public void setUser(String user)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setPageOnly(String pageOnly)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setPage(String page)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setWiki(String wiki)
-    {
-        throw new UnsupportedOperationException();
     }
 
     @Override

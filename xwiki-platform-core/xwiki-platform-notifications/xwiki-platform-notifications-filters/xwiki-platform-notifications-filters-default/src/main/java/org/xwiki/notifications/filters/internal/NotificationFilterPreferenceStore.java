@@ -104,7 +104,8 @@ public class NotificationFilterPreferenceStore
             context.setWikiId(context.getMainXWiki());
             results =
                     context.getWiki().getStore().search(
-                            "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = ?",
+                            "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = ? "
+                                    + "order by nfp.id",
                             1000, 0, Collections.singletonList(serializedUser), context);
 
             for (DefaultNotificationFilterPreference preference : results) {

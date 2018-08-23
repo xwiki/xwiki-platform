@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,10 @@ public class CachedModelBridge implements ModelBridge, Initializable
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
+        if (user == null) {
+            return Collections.EMPTY_SET;
+        }
+
         String userId = serializer.serialize(user);
 
         Set<NotificationFilterPreference> preferences = cache.get(userId);
@@ -172,6 +177,10 @@ public class CachedModelBridge implements ModelBridge, Initializable
 
     private void clearCache(DocumentReference user)
     {
+        if (user == null) {
+            return;
+        }
+
         String userId = serializer.serialize(user);
         cache.remove(userId);
 

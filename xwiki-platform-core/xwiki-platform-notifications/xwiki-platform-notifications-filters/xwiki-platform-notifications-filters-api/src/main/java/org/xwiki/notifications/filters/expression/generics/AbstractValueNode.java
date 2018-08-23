@@ -20,12 +20,14 @@
 package org.xwiki.notifications.filters.expression.generics;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.xwiki.notifications.filters.expression.EndsWith;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
+import org.xwiki.notifications.filters.expression.InSubQueryNode;
 import org.xwiki.notifications.filters.expression.LesserThanNode;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.StartsWith;
@@ -171,6 +173,22 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     public InNode inStrings(Collection<String> values)
     {
         return in(values.stream().map(s -> new StringValueNode(s)).collect(Collectors.toList()));
+    }
+
+    /**
+     * Helper that allows to create {@link InSubQueryNode} without having to instantiate new objects.
+     *
+     * @param subQuery the sub query in plain HQL language
+     * @param parameters the named parameters for the sub query
+     * @return a {@link InSubQueryNode} where the current object is the first operand and the sub query is the second
+     * operand
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public InSubQueryNode inSubQuery(String subQuery, Map<String, Object> parameters)
+    {
+        return new InSubQueryNode(this, subQuery, parameters);
     }
 
     /**

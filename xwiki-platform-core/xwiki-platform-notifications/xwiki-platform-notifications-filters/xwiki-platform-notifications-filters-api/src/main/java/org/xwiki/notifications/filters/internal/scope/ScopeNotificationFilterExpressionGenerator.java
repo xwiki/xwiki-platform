@@ -20,20 +20,27 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
+import org.xwiki.text.StringUtils;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Generate an {@link ExpressionNode} to handle Scope Notification Filters for a given pair of user / event type.
@@ -51,16 +58,21 @@ public class ScopeNotificationFilterExpressionGenerator
     @Inject
     private LocationOperatorNodeGenerator locationOperatorNodeGenerator;
 
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+
     /**
      * Generate a filter expression for the given user and event type according to the scope notification filter
      * preferences.
      * @param filterPreferences the collection of all preferences
      * @param eventType type of the event on which we are filtering
      * @param format the format of the notification
+     * @param user the user for who we are making the query
      * @return the expression node corresponding to the filter
      */
     public AbstractOperatorNode filterExpression(Collection<NotificationFilterPreference> filterPreferences,
-            String eventType, NotificationFormat format)
+            String eventType, NotificationFormat format, DocumentReference user)
     {
         // The node we construct
         AbstractOperatorNode topNode = null;
@@ -89,6 +101,27 @@ public class ScopeNotificationFilterExpressionGenerator
         // event.location = F
         // etc...
 
+        // Special handling for "page only" filters
+        String subQuery = "SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner "
+                + "AND nfp.filterType = %d AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' "
+                + "AND (nfp.allEventTypes = '' OR nfp.allEventTypes LIKE ',%s,')";
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("owner", serializer.serialize(user));
+
+        String exclusion = String.format(subQuery, NotificationFilterType.EXCLUSIVE.ordinal(), eventType);
+        String inclusion = String.format(subQuery, NotificationFilterType.INCLUSIVE.ordinal(), eventType);
+
+        AbstractOperatorNode pageOnlyExclusionNode = not(value(EventProperty.PAGE).inSubQuery(exclusion, parameters));
+        if (topNode == null) {
+            topNode = pageOnlyExclusionNode;
+        } else {
+            topNode = topNode.and(pageOnlyExclusionNode);
+        }
+
+        AbstractOperatorNode pageOnlyInclusionNode = value(EventProperty.PAGE).inSubQuery(inclusion, parameters);
+        topNode = topNode.or(pageOnlyInclusionNode);
+
         return topNode;
     }
 
@@ -103,6 +136,12 @@ public class ScopeNotificationFilterExpressionGenerator
         while (it.hasNext()) {
             ScopeNotificationFilterPreference pref = it.next();
 
+            // We will handle "page only" filters afterwards (but only for pref that are stored in the database
+            // and loaded by the default user profile)
+            if (isPageOnly(pref)) {
+                continue;
+            }
+
             // For each exclusive filter, we want to generate a query to black list the location with a white list of
             // sub locations.
             // Ex:   "wiki1:Space1" is blacklisted but:
@@ -114,6 +153,10 @@ public class ScopeNotificationFilterExpressionGenerator
 
             // Children are a list of inclusive filters located under the current one.
             for (ScopeNotificationFilterPreference childFilter : pref.getChildren()) {
+                // We will handle "page only" filters afterwards
+                if (isPageOnly(childFilter)) {
+                    continue;
+                }
                 // child filter is something like "event.location = A.B"
                 filterNode = filterNode.or(generateNode(childFilter));
             }
@@ -147,6 +190,11 @@ public class ScopeNotificationFilterExpressionGenerator
         while (it.hasNext()) {
             ScopeNotificationFilterPreference pref = it.next();
 
+            // We will handle "page only" filters afterwards
+            if (isPageOnly(pref)) {
+                continue;
+            }
+
             if (topNode == null) {
                 topNode = generateNode(pref);
             } else {
@@ -158,6 +206,11 @@ public class ScopeNotificationFilterExpressionGenerator
         // topNode OR event.location = D or event.location = E or event.location = F OR...
 
         return topNode;
+    }
+
+    private boolean isPageOnly(ScopeNotificationFilterPreference pref)
+    {
+        return StringUtils.isNotBlank(pref.getPageOnly()) && "userProfile".equals(pref.getProviderHint());
     }
 
     private AbstractOperatorNode generateNode(ScopeNotificationFilterPreference scopeNotificationFilterPreference)

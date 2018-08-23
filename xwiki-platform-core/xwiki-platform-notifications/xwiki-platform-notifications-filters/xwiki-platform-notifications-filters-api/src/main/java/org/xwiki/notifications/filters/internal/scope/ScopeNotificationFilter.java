@@ -90,7 +90,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     {
         return expressionGenerator.filterExpression(filterPreferences,
                 (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE),
-                preference.getFormat());
+                preference.getFormat(), user);
     }
 
     @Override

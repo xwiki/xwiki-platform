@@ -21,6 +21,8 @@ package org.xwiki.notifications.sources.internal;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,11 +37,12 @@ import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
+import org.xwiki.notifications.filters.expression.InSubQueryNode;
 import org.xwiki.notifications.filters.expression.LesserThanNode;
-import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
@@ -278,5 +281,26 @@ public class ExpressionNodeToHQLConverterTest
                         "and status.read = true))",
                 result.getQuery());
         assertEquals("xwiki:XWiki.UserA", result.getQueryParameters().get("userStatusRead"));
+    }
+
+    @Test
+    public void parseWithInSubQueryNode()
+    {
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "userA");
+
+        when(serializer.serialize(user)).thenReturn("xwiki:XWiki.UserA");
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("id", 12345);
+        AbstractNode testAST = new NotNode(
+                new InSubQueryNode(value(EventProperty.GROUP_ID),
+                        "select fb.name in FooBar fb where fb.id = :id", parameters)
+        );
+
+        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+
+        assertEquals(" NOT (event.requestId IN (select fb.name in FooBar fb where fb.id = :id))",
+                result.getQuery());
+        assertEquals(12345, result.getQueryParameters().get("id"));
     }
 }

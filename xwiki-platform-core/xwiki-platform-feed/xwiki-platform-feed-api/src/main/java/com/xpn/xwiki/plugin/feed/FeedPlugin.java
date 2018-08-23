@@ -712,7 +712,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
 
         needsUpdate |= bclass.addTextField("title", "Title", 80);
-        needsUpdate |= bclass.addTextField("author", "Author", 40);
+        needsUpdate |= bclass.addUsersField("author", "Author", 40, false);
         needsUpdate |= bclass.addTextField("feedurl", "Feed URL", 80);
         needsUpdate |= bclass.addTextField("feedname", "Feed Name", 40);
         needsUpdate |= bclass.addTextField("url", "URL", 80);

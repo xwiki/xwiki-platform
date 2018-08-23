@@ -177,8 +177,12 @@
       &lt;dd&gt;
         #set ($template = $doc.getValue('template'))
         #if ($isEditing)
-          &lt;input type="text" id="XWiki.TemplateProviderClass_0_template" name="XWiki.TemplateProviderClass_0_template"
-            class="suggestDocuments" autocomplete="off" value="$!escapetool.xml($template)" /&gt;
+          #set ($pagePickerParams = {
+            'id': "XWiki.TemplateProviderClass_0_template",
+            'name': "XWiki.TemplateProviderClass_0_template",
+            'value': "$!escapetool.xml($template)"
+          })
+          #pagePicker(false $pagePickerParams)
         #elseif ("$!template" != '')
           #set ($templateReference = $services.model.resolveDocument($template))
           #hierarchy($templateReference {

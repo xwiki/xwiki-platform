@@ -85,6 +85,6 @@ rendering.macro.menu.name=Menu
 ### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+menu.description=Ceci est une application simple qui vous permet de créer des menus de navigation à afficher horizontalement comme une barre supérieure après l'en-tête de page ou verticalement dans un panneau latéral.
 </content>
 </xwikidoc>

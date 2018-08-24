@@ -47,7 +47,7 @@ define(['jquery'], function($) {
 
           // Restart the progress if the question timeout is reached
           var timeout = job.questionTimeLeft;
-          if (timeout && timeout > -1) {
+          if (timeout && timeout > -1) {
             setTimeout(function() {
                 refresh(job);
               }, timeout / 1000000); // The JSON contains nanoseconds

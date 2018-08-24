@@ -71,7 +71,7 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
 
     @Inject
     @Named("hidden/document")
-    protected QueryFilter hiddenDocumentQueryFilter;
+    protected Provider<QueryFilter> hiddenDocumentQueryFilterProvider;
 
     @Inject
     private LocalizationContext localizationContext;
@@ -250,7 +250,7 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
             .createQuery("where doc.translation = 0 and doc.space = :space and doc.name <> :defaultDocName", Query.HQL);
         query.addFilter(this.countQueryFilter);
         if (Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"))) {
-            query.addFilter(this.hiddenDocumentQueryFilter);
+            query.addFilter(this.hiddenDocumentQueryFilterProvider.get());
         }
         query.setWiki(documentReference.getWikiReference().getName());
         query.bindValue("space", this.localEntityReferenceSerializer.serialize(documentReference.getParent()));

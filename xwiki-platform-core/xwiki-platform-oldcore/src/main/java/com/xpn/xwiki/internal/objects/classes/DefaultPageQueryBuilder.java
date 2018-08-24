@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.objects.classes;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -59,9 +60,16 @@ public class DefaultPageQueryBuilder implements QueryBuilder<PageClass>
     @Named("viewable")
     private QueryFilter viewableFilter;
 
+    /**
+     * The filter used to show/hide hidden (technical) documents. We use a provider because we need a new instance for
+     * each query execution.
+     * 
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-8160">XWIKI-8160: HiddenDocument query filter can put corrupted
+     *      user documents in the cache (virtual mode)</a>
+     */
     @Inject
     @Named("hidden/document")
-    private QueryFilter hiddenFilter;
+    private Provider<QueryFilter> hiddenFilterProvider;
 
     @Override
     public Query build(PageClass pageClass) throws QueryException
@@ -70,7 +78,7 @@ public class DefaultPageQueryBuilder implements QueryBuilder<PageClass>
         if (StringUtils.isEmpty(pageClass.getSql())) {
             query = this.implicitlyAllowedValuesQueryBuilder.build(pageClass);
             // We can filter hidden documents here because we control how the query is build ('doc' alias is present).
-            query.addFilter(hiddenFilter);
+            query.addFilter(hiddenFilterProvider.get());
             // We don't need the viewable filter here as the query builder already adds its own viewable filter.
             query.addFilter(this.documentFilter);
         } else {

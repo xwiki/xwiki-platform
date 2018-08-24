@@ -107,9 +107,9 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
     }));
   };
 
-  $.fn.suggestUsers = function() {
+  $.fn.suggestUsers = function(options) {
     return this.each(function() {
-      $(this).xwikiSelectize(getSelectizeOptions($(this)));
+      $(this).xwikiSelectize($.extend(getSelectizeOptions($(this)), options));
     });
   };
 });
@@ -158,9 +158,9 @@ define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selecti
     }));
   };
 
-  $.fn.suggestGroups = function() {
+  $.fn.suggestGroups = function(options) {
     return this.each(function() {
-      $(this).xwikiSelectize(getSelectizeOptions($(this)));
+      $(this).xwikiSelectize($.extend(getSelectizeOptions($(this)), options));
     });
   };
 });

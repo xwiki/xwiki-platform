@@ -155,7 +155,11 @@ require(['jquery', 'xwiki-suggestUsers'], function($) {
     modal.find('form').submit(onSubmit);
     modal.find('a.secondary.button').attr('data-dismiss', 'modal');
     modal.find('input[type="submit"]').prop('disabled', true);
-    var shareTarget = modal.find('#shareTarget').suggestUsers();
+    var shareTarget = modal.find('#shareTarget').suggestUsers({
+      // Make it easier for the users to enter email addresses.
+      createOnBlur: true,
+      createFilter: /^.+@.+\..+$/
+    });
     var selectize = shareTarget[0].selectize;
     selectize.on('change', function(value) {
       modal.find('input[type="submit"]').prop('disabled', !value);

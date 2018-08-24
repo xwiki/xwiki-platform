@@ -55,7 +55,7 @@ XWiki.FlavorOrDefaultUIStep = Class.create({
     } else {
       // Enable all step buttons after an extension job is finished.
       stepButtons.invoke('enable');
-      if (this.isFlavorStep || (extension.getId() == '$services.distribution.getUIExtensionId().id'
+      if (this.isFlavorStep || (extension.getId() == '$services.distribution.getUIExtensionId().id'
           && extension.getVersion() == '$services.distribution.getUIExtensionId().version.value')) {
         this._onDefaultUiExtensionStatusChanged(stepButtons, status);
       }

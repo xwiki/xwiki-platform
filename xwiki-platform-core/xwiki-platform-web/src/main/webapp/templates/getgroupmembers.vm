@@ -27,7 +27,7 @@ $response.setContentType('application/json')
   ## The following properties are kept for backward compatibility with XWiki versions older than 2.7.2.
   #set ($oldProperties = {
     'fullname': $member,
-    'prettyname': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
+    'prettyname': "$xwiki.getPlainUserName($member)#if($hasAdmin || $isAdvancedUser) ($member)#end",
     'wikiname': $memberReference.wikiReference.name,
     'memberurl': $xwiki.getURL($memberReference),
     'docurl': $doc.getURL(),
@@ -40,7 +40,7 @@ $response.setContentType('application/json')
     'doc_hasadmin': $xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName),
     'doc_hasedit': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
     'doc_hasdelete': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
-    'member': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
+    'member': "$xwiki.getPlainUserName($member)#if($hasAdmin || $isAdvancedUser) ($member)#end",
     'member_url': $xwiki.getURL($memberReference),
     'doc_delete_url': $doc.getURL('view', $escapetool.url({
       'xpage': 'deletegroupmember',

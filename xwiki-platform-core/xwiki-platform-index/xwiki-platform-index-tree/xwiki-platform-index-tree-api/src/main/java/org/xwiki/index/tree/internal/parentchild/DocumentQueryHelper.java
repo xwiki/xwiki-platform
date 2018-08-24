@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +57,7 @@ public class DocumentQueryHelper
 
     @Inject
     @Named("hidden/document")
-    private QueryFilter hiddenDocumentQueryFilter;
+    private Provider<QueryFilter> hiddenDocumentQueryFilterProvider;
 
     @Inject
     private QueryManager queryManager;
@@ -95,7 +96,7 @@ public class DocumentQueryHelper
             query.bindValue(entry.getKey(), entry.getValue());
         }
         if (Boolean.TRUE.equals(config.get("filterHiddenDocuments"))) {
-            query.addFilter(this.hiddenDocumentQueryFilter);
+            query.addFilter(this.hiddenDocumentQueryFilterProvider.get());
         }
         return query;
     }

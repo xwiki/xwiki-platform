@@ -89,7 +89,7 @@ public class DocumentTreeNode extends org.xwiki.index.tree.internal.nestedpages.
             this.compactEntityReferenceSerializer.serialize(documentReference, documentReference.getParent()));
         query.setWiki(documentReference.getWikiReference().getName());
         if (Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"))) {
-            query.addFilter(this.hiddenDocumentQueryFilter);
+            query.addFilter(this.hiddenDocumentQueryFilterProvider.get());
         }
         return query;
     }

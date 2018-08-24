@@ -75,7 +75,7 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
 
     @Inject
     @Named("hidden/document")
-    protected QueryFilter hiddenDocumentQueryFilter;
+    protected Provider<QueryFilter> hiddenDocumentQueryFilterProvider;
 
     @Inject
     private LocalizationContext localizationContext;
@@ -298,7 +298,7 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
 
         query.addFilter(this.countQueryFilter);
         if (Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"))) {
-            query.addFilter(this.hiddenDocumentQueryFilter);
+            query.addFilter(this.hiddenDocumentQueryFilterProvider.get());
         }
 
         return ((Long) query.execute().get(0)).intValue();

@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +77,7 @@ public class BaseSearchResult extends XWikiResource
 
     @Inject
     @Named("hidden/space")
-    private QueryFilter hiddenSpaceFilter;
+    private Provider<QueryFilter> hiddenSpaceFilterProvider;
 
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
@@ -318,7 +319,7 @@ public class BaseSearchResult extends XWikiResource
             .bindValue("keywords", String.format("%%%s%%", escapedKeywords))
             .bindValue("prefix", String.format("%s%%", escapedKeywords))
             .setWiki(wikiName).setLimit(number).setOffset(start)
-            .addFilter(this.hiddenSpaceFilter).execute();
+            .addFilter(this.hiddenSpaceFilterProvider.get()).execute();
 
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
         for (Object object : queryResult) {

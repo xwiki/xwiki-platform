@@ -105,7 +105,7 @@
     and has no dependence on any type of underlying transactional storage engine.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Test Dependencies -->

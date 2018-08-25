@@ -233,7 +233,7 @@ platform.wiki.create.wizard.step.create=Créer
 platform.wiki.create.wizard.step.creation=Création du wiki
 platform.wiki.create.wizard.step.creation.wait=Merci de patienter pendant la création du wiki.
 platform.wiki.create.wizard.step.creation.complete=Le wiki {0} a été créé avec succès. Vous pouvez dès à présent y accéder.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However error(s) have been generated during that process and you might want to review them.
+platform.wiki.create.wizard.step.creation.errorlog=Des erreurs sont survenues pendant le traitement, vous devriez les examiner.
 platform.wiki.create.wizard.step.creation.error=Le Wiki {0} a été créé mais certains documents n''ont pu être installés. Ce Wiki risque donc de ne pas fonctionner et vous devrez probablement le supprimer.
 platform.wiki.create.wizard.step.creation.go=Accéder au wiki
 
@@ -262,7 +262,7 @@ platform.wiki.sheet.desc.homepage=La page d'accueil du wiki.
 platform.wiki.sheet.prop.wikiprettyname=Nom d'affichage
 platform.wiki.sheet.prop.owner=Gestionnaire
 platform.wiki.sheet.prop.secure=Sécurisé (SSL)
-### Missing: platform.wiki.sheet.prop.port=Port
+platform.wiki.sheet.prop.port=Port
 platform.wiki.sheet.prop.description=Description
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Page d'accueil

@@ -152,7 +152,7 @@ notifications.settings.events=Événements
 notifications.settings.watch.title=Pages surveillées
 notifications.settings.watch.autowatchmode=Surveillance automatique de pages
 notifications.settings.watch.autowatchmode.hint=Voulez-vous surveiller les pages sur lesquelles vous avez travaillé ?
-### Missing: notifications.settings.watch.forGuest=Log in or register to handle your notification settings.
+notifications.settings.watch.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
 ### Missing: notifications.settings.watch.disabled=The watched entities are disabled. Please contact your administrator.
 notifications.events.by=Par {0}.
 notifications.events.lastChange=Dernière modification : {0}.
@@ -202,8 +202,8 @@ rendering.macro.notificationsApplicationsPreferences.parameter.target.descriptio
 
 ### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
 ### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
-### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
-### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cible
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Cible de la macro ("user" pour l'utilisateur courant ou "wiki" pour le wiki courant)
 
 rendering.macro.notifications.name=Notifications
 rendering.macro.notifications.description=Affiche des notifications liées à l'activité du wiki.
@@ -220,18 +220,18 @@ rendering.macro.notifications.parameter.displaySystemEvents.description=Si vrai,
 rendering.macro.notifications.parameter.displayReadEvents.name=Afficher les évènements lus
 rendering.macro.notifications.parameter.displayReadEvents.description=Si vrai, les évènements marqués par l'utilisateur comme lus sont affichés parmi les autres sinon ils sont masqués.
 rendering.macro.notifications.parameter.wikis.name=Wikis
-### Missing: rendering.macro.notifications.parameter.wikis.description=List of wikis (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.wikis.description=Liste des wikis à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
 rendering.macro.notifications.parameter.spaces.name=Espaces
-### Missing: rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.spaces.description=Liste des espaces à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
 rendering.macro.notifications.parameter.pages.name=Pages
-### Missing: rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.pages.description=Liste des pages à prendre en compte (nom complets séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
 rendering.macro.notifications.parameter.displayReadStatus.name=Afficher l'état "lu"
 rendering.macro.notifications.parameter.displayReadStatus.description=Définit si l'état lu ou non lu doit être affiché pour les évènements
 rendering.macro.notifications.parameter.users.name=Utilisateurs
-### Missing: rendering.macro.notifications.parameter.users.description=List of users to consider (comma-separated). Ignored if "useUserPreferences" is set to "true".
+rendering.macro.notifications.parameter.users.description=Liste des utilisateurs à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher uniquement les utilisateurs suivis
 ### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
-### Missing: rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
+rendering.macro.notifications.parameter.displayRSSLink.name=Afficher le lien RSS
 ### Missing: rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
 
 ## Notifications Macro

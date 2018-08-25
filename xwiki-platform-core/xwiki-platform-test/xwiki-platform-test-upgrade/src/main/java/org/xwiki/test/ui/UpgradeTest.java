@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Runs all functional tests found in the classpath.
+ * Validate the Distribution Wizard part of the upgrade process.
  * 
  * @version $Id$
  * @since 10.7RC1

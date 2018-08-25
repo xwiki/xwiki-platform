@@ -70,7 +70,7 @@ skin.sheet.js.addingDone=Le modèle a été ajouté
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=Overridden templates
+skin.sheet.overridedTemplates=Modèles écrasés
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

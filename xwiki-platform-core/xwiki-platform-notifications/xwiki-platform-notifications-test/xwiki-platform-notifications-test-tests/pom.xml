@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-test</artifactId>
-    <version>10.7</version>
+    <version>10.7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test-tests</artifactId>
   <name>XWiki Platform - Notifications - Test - Functional Tests</name>

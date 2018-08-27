@@ -81,8 +81,7 @@
 #if ("$!request.query" != '' &amp;&amp; "$!request.input" != '')
   #getSearchSuggestResults($results)
   #if ($request.media == 'json' || $request.getHeader('Accept') == 'application/json')
-    #set ($discard = $response.setContentType('application/json'))
-    $jsontool.serialize($results)
+    #jsonResponse($results)
   #else
     #serializeResultsAsXML($results)
   #end

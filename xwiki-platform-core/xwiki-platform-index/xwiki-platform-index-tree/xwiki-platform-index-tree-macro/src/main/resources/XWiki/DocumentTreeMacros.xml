@@ -135,8 +135,7 @@
       #getSuggestions($data)
     #end
     #if ($data)
-      #set ($discard = $response.setContentType('application/json'))
-      $jsontool.serialize($data)
+      #jsonResponse($data)
     #else
       $response.sendError(404)
     #end

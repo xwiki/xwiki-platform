@@ -238,8 +238,7 @@
     #end
     #set ($discard = $results.rows.add($row))
   #end
-  #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize($results)
+  #jsonResponse($results)
 #end
 {{/velocity}}</content>
 </xwikidoc>

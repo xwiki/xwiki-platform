@@ -435,11 +435,10 @@
  *#
 #macro(gridresultwithfilter $className $collist $filterfrom $filterwhere $filterParams)
   #if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
-    $response.setContentType('application/json')
     ## Build the JSON in memory (using basic Java data types) so that it can be adjusted before serialization.
     #set($map = {})
     #gridresultwithfilter_buildJSON($className $collist $filterfrom $filterwhere $filterParams $map)
-    $jsontool.serialize($map)
+    #jsonResponse($map)
   #end
 #end
 

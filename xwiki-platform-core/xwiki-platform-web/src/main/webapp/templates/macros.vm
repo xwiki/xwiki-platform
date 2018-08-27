@@ -2558,3 +2558,26 @@ Recursive title display detected!##
     <input type="hidden" name="$!escapetool.xml($parameters.name)" />
   #end
 #end
+
+#**
+ * Serializes the given data as JSON and writes the result on the HTTP response, setting the proper content type and
+ * length.
+ *
+ * @param $data the data to be written as JSON on the HTTP response
+ *#
+#macro (jsonResponse $data)
+  #set ($json = $jsontool.serialize($data))
+  ## We write the output directly to the HTTP response in order to avoid going through the Rendering which executes
+  ## transformations that could break the JSON (e.g. the icon transformation). Another option would be to specify which
+  ## Rendering Transformations to execute in the query string (XWIKI-13167).
+  #set ($discard = $response.setContentType('application/json'))
+  ## Make sure the Character Encoding response header matches the character encoding used to write the response and
+  ## compute its length.
+  #set ($characterEncoding = 'utf-8')
+  #set ($discard = $response.setCharacterEncoding($characterEncoding))
+  #set ($discard = $response.writer.write($json))
+  ## The content length is measured in bytes and one character can use more than one byte.
+  #set ($discard = $response.setContentLength($json.getBytes($characterEncoding).size()))
+  ## Make sure the entire content is send back to the client.
+  #set ($discard = $response.flushBuffer())
+#end

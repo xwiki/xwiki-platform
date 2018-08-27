@@ -25,20 +25,26 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.xwiki.environment.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.file.TemporaryFile;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.includeservletasstring.BufferOutputStream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -46,32 +52,22 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@OldcoreTest
 public class TempResourceActionTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     /**
      * The action being tested.
      */
     private TempResourceAction action;
 
-    /**
-     * The base directory.
-     */
-    private File base;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        base = new File(getClass().getResource("/").toURI());
-        
-        // Configure Servlet Environment defined in AbstractBridgedComponentTestCase so that it returns a good
-        // temporary directory
-        Environment environment = oldcore.getMocker().registerMockComponent(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(base);
-
-        action = new TempResourceAction();
+        this.oldcore.registerMockEnvironment();
+        this.action = new TempResourceAction();
     }
 
     /**
@@ -82,9 +78,10 @@ public class TempResourceActionTest
      */
     private void createEmptyFile(String path) throws IOException
     {
-        File emptyFile = new TemporaryFile(new File(base, path));
+        File emptyFile = new File(this.oldcore.getTemporaryDirectory(), path);
         emptyFile.getParentFile().mkdirs();
         emptyFile.createNewFile();
+        emptyFile.deleteOnExit();
     }
 
     /**
@@ -95,9 +92,9 @@ public class TempResourceActionTest
      */
     private void createFile(String path, String content) throws IOException
     {
-        File file = new TemporaryFile(new File(base, path));
+        File file = new File(this.oldcore.getTemporaryDirectory(), path);
         file.getParentFile().mkdirs();
-        file.createNewFile();
+        file.deleteOnExit();
         FileUtils.write(file, content);
     }
 
@@ -109,7 +106,7 @@ public class TempResourceActionTest
     public void testGetTemporaryFileForBadURI() throws Exception
     {
         createEmptyFile("temp/secret.txt");
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/secret.txt", oldcore.getXWikiContext()));
+        assertNull(action.getTemporaryFile("/xwiki/bin/temp/secret.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -120,7 +117,7 @@ public class TempResourceActionTest
     public void testGetTemporaryFileForRelativeURI() throws Exception
     {
         createEmptyFile("temp/secret.txt");
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/../../module/secret.txt", oldcore.getXWikiContext()));
+        assertNull(action.getTemporaryFile("/xwiki/bin/temp/../../module/secret.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -129,8 +126,8 @@ public class TempResourceActionTest
     @Test
     public void testGetTemporaryFileMissing() throws Exception
     {
-        Assert.assertFalse(new File(base, "temp/module/xwiki/Space/Page/file.txt").exists());
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
+        assertFalse(new File(this.oldcore.getTemporaryDirectory(), "temp/module/xwiki/Space/Page/file.txt").exists());
+        assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -141,7 +138,7 @@ public class TempResourceActionTest
     {
         oldcore.getXWikiContext().setWikiId("wiki");
         createEmptyFile("temp/module/wiki/Space/Page/file.txt");
-        Assert.assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
+        assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -151,8 +148,9 @@ public class TempResourceActionTest
     public void testGetTemporaryFileForOverEncodedURL() throws Exception
     {
         createEmptyFile("temp/officeviewer/xwiki/Sp*ace/Pa-ge/presentation.odp/presentation-slide0.jpg");
-        Assert.assertNotNull(action.getTemporaryFile(
-            "/xwiki/bin/temp/Sp%2Aace/Pa%2Dge/officeviewer/presentation.odp/presentation-slide0.jpg", oldcore.getXWikiContext()));
+        assertNotNull(action.getTemporaryFile(
+            "/xwiki/bin/temp/Sp%2Aace/Pa%2Dge/officeviewer/presentation.odp/presentation-slide0.jpg",
+            oldcore.getXWikiContext()));
     }
 
     /**
@@ -164,7 +162,7 @@ public class TempResourceActionTest
     {
         createEmptyFile("temp/officeviewer/xwiki/Space/Page/"
             + "attach%3Axwiki%3ASpace.Page%40pres%2Fentation.odp/13/presentation-slide0.jpg");
-        Assert.assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/officeviewer/"
+        assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/officeviewer/"
             + "attach:xwiki:Space.Page@pres%2Fentation.odp/13/presentation-slide0.jpg", oldcore.getXWikiContext()));
     }
 
@@ -174,7 +172,6 @@ public class TempResourceActionTest
         XWikiRequest request = mock(XWikiRequest.class);
         XWikiResponse response = mock(XWikiResponse.class);
         BufferOutputStream out = new BufferOutputStream();
-
         oldcore.getXWikiContext().setRequest(request);
         oldcore.getXWikiContext().setResponse(response);
         when(request.getRequestURI()).thenReturn("/xwiki/bin/temp/Space/Page/module/file.txt");
@@ -182,8 +179,8 @@ public class TempResourceActionTest
         oldcore.getXWikiContext().setWikiId("wiki");
         createFile("temp/module/wiki/Space/Page/file.txt", "Hello World!");
         action.render(oldcore.getXWikiContext());
-        Assert.assertArrayEquals("Hello World!".getBytes(), out.getContentsAsByteArray());
-        Mockito.verify(response, Mockito.never()).addHeader("Content-disposition", "attachment; filename*=utf-8''file.txt");
+        assertArrayEquals("Hello World!".getBytes(), out.getContentsAsByteArray());
+        verify(response, never()).addHeader("Content-disposition", "attachment; filename*=utf-8''file.txt");
     }
 
     @Test
@@ -199,10 +196,9 @@ public class TempResourceActionTest
         oldcore.getXWikiContext().setWikiId("wiki");
         createEmptyFile("temp/module/wiki/Space/Page/file.txt");
         action.render(oldcore.getXWikiContext());
-        Mockito.verify(response).addHeader("Content-disposition", "attachment; filename*=utf-8''file.txt");
+        verify(response).addHeader("Content-disposition", "attachment; filename*=utf-8''file.txt");
     }
 
-    @Test(expected=XWikiException.class)
     public void renderWithInvalidPathThrowsException() throws XWikiException
     {
         XWikiRequest request = mock(XWikiRequest.class);
@@ -211,6 +207,6 @@ public class TempResourceActionTest
         oldcore.getXWikiContext().setResponse(response);
         when(request.getRequestURI()).thenReturn("/xwiki/bin/temp/Space/Page/module/nosuchfile.txt");
         oldcore.getXWikiContext().setWikiId("wiki");
-        action.render(oldcore.getXWikiContext());
+        assertThrows(XWikiException.class, () -> action.render(oldcore.getXWikiContext()));
     }
 }

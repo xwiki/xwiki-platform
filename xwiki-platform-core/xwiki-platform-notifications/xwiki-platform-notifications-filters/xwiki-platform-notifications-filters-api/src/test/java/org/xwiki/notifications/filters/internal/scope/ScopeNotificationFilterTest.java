@@ -19,9 +19,11 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -50,6 +52,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -284,5 +287,53 @@ public class ScopeNotificationFilterTest
         when(event4.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
                 mocker.getComponentUnderTest().filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
+    }
+
+    @Test
+    public void testFilterExpressionWithSubQuery() throws Exception
+    {
+        NotificationPreference pref1 = mock(NotificationPreference.class);
+        NotificationPreference pref2 = mock(NotificationPreference.class);
+        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        when(pref1.getProperties()).thenReturn(properties1);
+        when(pref2.getProperties()).thenReturn(properties2);
+        properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "type1");
+        properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "type2");
+
+        List<NotificationPreference> notificationFilterPreferences = Arrays.asList(pref1, pref2);
+
+        DocumentReference pageRef = new DocumentReference("wikiA", "SpaceB", "PageC");
+        NotificationFilterPreference prefγ = mockNotificationFilterPreference("wikiA:SpaceB:PageC",
+                pageRef, NotificationFilterType.INCLUSIVE, null);
+        NotificationFilterPreference prefz = mockNotificationFilterPreference("wikiA:SpaceB:PageD",
+                pageRef, NotificationFilterType.EXCLUSIVE, null);
+
+        Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefγ);
+
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+
+        // Test 1
+        assertEquals(
+                "(TYPE IN (\"type2\", \"type1\") AND PAGE IN " +
+                        "(SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner " +
+                        "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' " +
+                        "AND nfp.allEventTypes = '' AND nfp.alertEnabled = true AND nfp.enabled = true))",
+                mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.INCLUSIVE,
+                NotificationFormat.ALERT, notificationFilterPreferences).toString());
+
+        // Test 2
+        assertNull(mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.EXCLUSIVE,
+                        NotificationFormat.ALERT, notificationFilterPreferences));
+
+        // Test 3
+        filterPreferences = Sets.newSet(prefγ, prefz);
+        assertEquals(
+                "NOT (PAGE IN (SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp " +
+                        "WHERE nfp.owner = :owner AND nfp.filterType = 1 AND nfp.filterName = 'scopeNotificationFilter' " +
+                        "AND nfp.pageOnly <> '' AND nfp.allEventTypes = '' AND nfp.emailEnabled = true " +
+                        "AND nfp.enabled = true))",
+                mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.EXCLUSIVE,
+                        NotificationFormat.EMAIL, notificationFilterPreferences).toString());
     }
 }

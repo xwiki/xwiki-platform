@@ -240,17 +240,6 @@ public class ScopeNotificationFilterExpressionGenerator
     public AbstractOperatorNode filterExpression(Collection<NotificationFilterPreference> filterPreferences,
             NotificationFormat format, NotificationFilterType type, DocumentReference user)
     {
-        // This method is designed to handle one of the main use case of XWiki notifications that used to scale badly.
-        // Because of the auto watch mechanism, users could end-up with hundred of notification filter preferences
-        // to watch given pages.
-        // The corresponding HQL query used to contains hundred of "OR event.page = 'somePage'" and was so big that
-        // Stack Overflows were happening.
-        // So for this very problematic use-case, we have decided not to inject a lot of statements in the HQL query,
-        // but instead to write a sub query so that the database would load the notification filter preferences itself
-        // and do the filtering based on this.
-        // To limit the number of sub queries, we also limit this mechanism to filter preferences that concern all event
-        // types.
-
         // Of course, we don't inject this sub query if there is no preference at all that match the criteria.
         if (!filterPreferences.stream().anyMatch(
                 isAPageOnlyFilterPreferenceThatConcernAllEvents(format, type))) {

@@ -105,7 +105,6 @@ public class ScopeNotificationFilter implements NotificationFilter
             Collection<NotificationFilterPreference> filterPreferences,
             NotificationFilterType type, NotificationFormat format)
     {
-        // We don't handle this use-case anymore
         return filterExpression(user, filterPreferences, type, format, Collections.emptyList());
     }
 
@@ -114,21 +113,24 @@ public class ScopeNotificationFilter implements NotificationFilter
             Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
             NotificationFormat format, Collection<NotificationPreference> preferences)
     {
+        // Generate the node that we may (or not) return afterwards
         AbstractOperatorNode node = expressionGenerator.filterExpression(filterPreferences, format, type, user);
         if (node == null) {
             return null;
         }
 
         if (type == NotificationFilterType.INCLUSIVE) {
+            // In order not to include all watched pages without consideration to the event types, we first collect
+            // the enabled even types.
             Set<String> enabledEventTypes = getEnabledEventTypes(preferences);
             if (!enabledEventTypes.isEmpty()) {
                 return value(EventProperty.TYPE).inStrings(enabledEventTypes).and(node);
-            } else {
-                return null;
             }
         } else {
             return node;
         }
+
+        return null;
     }
 
     private Set<String> getEnabledEventTypes(Collection<NotificationPreference> preferences)

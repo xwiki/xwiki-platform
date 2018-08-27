@@ -246,6 +246,18 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
             for (String fullName : query.<String>execute()) {
                 migrateUser(referenceResolver.resolve(fullName, getXWikiContext().getWikiReference()));
             }
+
+            // Remove the useless class when all user have been migrated (not to trash because the trash might have not
+            // been initialized yet since we are in a migrator).
+            XWikiContext context = this.getXWikiContext();
+            XWiki xwiki = context.getWiki();
+            final DocumentReference notificationFilterPreferenceClass
+                    = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(context.getWikiReference());
+            XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
+            if (!oldClassDoc.isNew()) {
+                xwiki.deleteDocument(oldClassDoc, false, context);
+            }
+
         } catch (Exception e) {
             logger.error("error:", e);
             throw new DataMigrationException("Failed to migrate notification filter preferences.", e);

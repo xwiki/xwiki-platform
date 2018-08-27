@@ -163,7 +163,20 @@
       <artifactId>hibernate-c3p0</artifactId>
       <version>3.6.9.Final</version>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- XWiki is using com.mchange:c3p0. Previous versions of c3p0 were using c3p0:c3p0
+             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
+        <exclusion>
+          <groupId>c3p0</groupId>
+          <artifactId>c3p0</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+    <dependency>
+        <groupId>com.mchange</groupId>
+        <artifactId>c3p0</artifactId>
+        <scope>runtime</scope>
+      </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>

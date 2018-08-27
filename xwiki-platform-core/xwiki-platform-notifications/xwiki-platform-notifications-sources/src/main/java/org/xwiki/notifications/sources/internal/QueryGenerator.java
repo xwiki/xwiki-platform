@@ -285,7 +285,7 @@ public class QueryGenerator
 
         for (NotificationFilter filter : parameters.filters) {
             ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
-                    NotificationFilterType.INCLUSIVE, parameters.format);
+                    NotificationFilterType.INCLUSIVE, parameters.format, parameters.preferences);
             if (node != null && node instanceof AbstractOperatorNode) {
                 if (globalFiltersNode == null) {
                     globalFiltersNode = (AbstractOperatorNode) node;

@@ -188,16 +188,10 @@ public class ScopeNotificationFilterTest
 
         // Test 1
         String result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference).toString();
-        assertEquals("(((((NOT (WIKI = \"wikiA\") OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\"))" +
-                " OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\")) AND (NOT ((WIKI = \"wikiA\" " +
+        assertEquals("(((NOT (WIKI = \"wikiA\") OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\")) " +
+                "OR (WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\")) AND (NOT ((WIKI = \"wikiA\" " +
                 "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC\")) OR (WIKI = \"wikiA\" " +
-                "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\"))) " +
-                "AND NOT (PAGE IN (SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp " +
-                "WHERE nfp.owner = :owner AND nfp.filterType = 1 AND nfp.filterName = 'scopeNotificationFilter' " +
-                "AND nfp.pageOnly <> '' AND (nfp.allEventTypes = '' OR nfp.allEventTypes LIKE ',update,')))) " +
-                "OR PAGE IN (SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner " +
-                "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' " +
-                "AND nfp.pageOnly <> '' AND (nfp.allEventTypes = '' OR nfp.allEventTypes LIKE ',update,')))", result);
+                "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\")))", result);
 
         // Test with wikiA:SpaceE (filtered by β)
         Event event1 = mock(Event.class);
@@ -265,13 +259,7 @@ public class ScopeNotificationFilterTest
 
         // Test 1
         String result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference).toString();
-        assertEquals("(((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") " +
-                "AND NOT (PAGE IN (SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp " +
-                "WHERE nfp.owner = :owner AND nfp.filterType = 1 AND nfp.filterName = 'scopeNotificationFilter' " +
-                "AND nfp.pageOnly <> '' AND (nfp.allEventTypes = '' OR nfp.allEventTypes LIKE ',update,')))) " +
-                "OR PAGE IN (SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner " +
-                "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' " +
-                "AND (nfp.allEventTypes = '' OR nfp.allEventTypes LIKE ',update,')))", result);
+        assertEquals("(WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\")", result);
 
         // Test with wikiA:SpaceE (filtered by γ & ζ)
         Event event1 = mock(Event.class);

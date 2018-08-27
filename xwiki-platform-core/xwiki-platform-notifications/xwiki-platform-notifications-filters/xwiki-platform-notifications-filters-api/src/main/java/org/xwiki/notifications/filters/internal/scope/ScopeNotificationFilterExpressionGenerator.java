@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -100,27 +101,6 @@ public class ScopeNotificationFilterExpressionGenerator
         // OR
         // event.location = F
         // etc...
-
-        // Special handling for "page only" filters
-        String subQuery = "SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner "
-                + "AND nfp.filterType = %d AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' "
-                + "AND (nfp.allEventTypes = '' OR nfp.allEventTypes LIKE ',%s,')";
-
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("owner", serializer.serialize(user));
-
-        String exclusion = String.format(subQuery, NotificationFilterType.EXCLUSIVE.ordinal(), eventType);
-        String inclusion = String.format(subQuery, NotificationFilterType.INCLUSIVE.ordinal(), eventType);
-
-        AbstractOperatorNode pageOnlyExclusionNode = not(value(EventProperty.PAGE).inSubQuery(exclusion, parameters));
-        if (topNode == null) {
-            topNode = pageOnlyExclusionNode;
-        } else {
-            topNode = topNode.and(pageOnlyExclusionNode);
-        }
-
-        AbstractOperatorNode pageOnlyInclusionNode = value(EventProperty.PAGE).inSubQuery(inclusion, parameters);
-        topNode = topNode.or(pageOnlyInclusionNode);
 
         return topNode;
     }
@@ -210,7 +190,14 @@ public class ScopeNotificationFilterExpressionGenerator
 
     private boolean isPageOnly(ScopeNotificationFilterPreference pref)
     {
-        return StringUtils.isNotBlank(pref.getPageOnly()) && "userProfile".equals(pref.getProviderHint());
+        // We make sure we only handle preferences that come from "userProfile" that are actually saved in the database
+        // as NotificationFilterPreferences.
+        // For example, a preference that comes from the watchlist bridge is not stored in the database, so we have to
+        // handle it without using the subquery mechanism that we can see in
+        // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
+        //    NotificationFilterType type, DocumentReference user).
+        return StringUtils.isNotBlank(pref.getPageOnly()) && "userProfile".equals(pref.getProviderHint())
+            && pref.getEventTypes().isEmpty();
     }
 
     private AbstractOperatorNode generateNode(ScopeNotificationFilterPreference scopeNotificationFilterPreference)
@@ -224,5 +211,86 @@ public class ScopeNotificationFilterExpressionGenerator
         }
 
         return filterNode;
+    }
+
+    /**
+     * Global filtering on the query.
+     *
+     * This method is designed to handle one of the main use case of XWiki notifications that used to scale badly.
+     * Because of the auto watch mechanism, users could end-up with hundred of notification filter preferences
+     * to watch given pages.
+     * The corresponding HQL query used to contains hundred of "OR event.page = 'somePage'" and was so big that
+     * Stack Overflows were happening.
+     * So for this very problematic use-case, we have decided not to inject a lot of statements in the HQL query,
+     * but instead to write a sub query so that the database would load the notification filter preferences itself
+     * and do the filtering based on this.
+     * To limit the number of sub queries, we also limit this mechanism to filter preferences that concern all event
+     * types.
+     *
+     * @param filterPreferences all filter preferences
+     * @param format format of the notifications
+     * @param type type of filtering
+     * @param user the user for who we compute the notifications
+     *
+     * @return the expression node to inject in the query
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public AbstractOperatorNode filterExpression(Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format, NotificationFilterType type, DocumentReference user)
+    {
+        // This method is designed to handle one of the main use case of XWiki notifications that used to scale badly.
+        // Because of the auto watch mechanism, users could end-up with hundred of notification filter preferences
+        // to watch given pages.
+        // The corresponding HQL query used to contains hundred of "OR event.page = 'somePage'" and was so big that
+        // Stack Overflows were happening.
+        // So for this very problematic use-case, we have decided not to inject a lot of statements in the HQL query,
+        // but instead to write a sub query so that the database would load the notification filter preferences itself
+        // and do the filtering based on this.
+        // To limit the number of sub queries, we also limit this mechanism to filter preferences that concern all event
+        // types.
+
+        // Of course, we don't inject this sub query if there is no preference at all that match the criteria.
+        if (!filterPreferences.stream().anyMatch(
+                isAPageOnlyFilterPreferenceThatConcernAllEvents(format, type))) {
+            return null;
+        }
+
+        String subQuery = "SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner "
+                + "AND nfp.filterType = %d AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' "
+                + "AND nfp.allEventTypes = '' AND nfp.%s = true AND nfp.enabled = true";
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("owner", serializer.serialize(user));
+
+        String formatParameter = (format == NotificationFormat.ALERT ? "alertEnabled" : "emailEnabled");
+
+        if (type == NotificationFilterType.EXCLUSIVE) {
+            String exclusion = String.format(subQuery, NotificationFilterType.EXCLUSIVE.ordinal(), formatParameter);
+            return not(value(EventProperty.PAGE).inSubQuery(exclusion, parameters));
+        } else {
+            String inclusion = String.format(subQuery, NotificationFilterType.INCLUSIVE.ordinal(), formatParameter);
+            return value(EventProperty.PAGE).inSubQuery(inclusion, parameters);
+        }
+    }
+
+    private Predicate<NotificationFilterPreference> isAPageOnlyFilterPreferenceThatConcernAllEvents(
+            NotificationFormat format, NotificationFilterType type)
+    {
+        return nfp -> isEnabledScopeNotificationFilterPreference(nfp)
+                && doesFilterTypeAndFormatMatch(nfp, format, type)
+                && StringUtils.isNotBlank(nfp.getPageOnly());
+    }
+
+    private boolean isEnabledScopeNotificationFilterPreference(NotificationFilterPreference nfp)
+    {
+        return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName());
+    }
+
+    private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,
+            NotificationFilterType type)
+    {
+        return nfp.getFilterType() == type && nfp.getNotificationFormats().contains(format);
     }
 }

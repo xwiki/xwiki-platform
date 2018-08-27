@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 /**
  * Represents the actions possible on the suggest input widget.
@@ -139,9 +140,10 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement click()
     {
-        // On single selects, the text input isn't visible until the container is focused.
-        this.container.click();
-        this.getTextInput().click();
+        // If we simply click on the container we risk highlighting one of the selected suggestions (because the default
+        // click is performed in the center of the element) and this hides the text input when multiple selection is on.
+        // Safest is to click on the top left corner of the suggest input, before the first selected suggestion.
+        new Actions(getDriver()).moveToElement(this.container, 2, 2).click().build().perform();
         return this;
     }
 

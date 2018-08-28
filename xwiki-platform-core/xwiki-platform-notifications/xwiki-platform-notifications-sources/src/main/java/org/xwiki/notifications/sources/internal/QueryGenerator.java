@@ -148,21 +148,21 @@ public class QueryGenerator
         // Condition 2: handle other preferences
         AbstractOperatorNode preferencesNode = handleEventPreferences(parameters);
 
-        // Condition 3: handle exclusive global notification filters (only if some preferences were enabled)
-        if (preferencesNode != null) {
-            AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(parameters);
-            if (globalExclusiveFiltersNode != null) {
-                preferencesNode = preferencesNode.and(globalExclusiveFiltersNode);
-            }
-        }
-
-        // Condition 4: handle inclusive global notification filters
+        // Condition 3: handle inclusive global notification filters
         AbstractOperatorNode globalInclusiveFiltersNode = handleInclusiveGlobalFilters(parameters);
         if (globalInclusiveFiltersNode != null) {
             if (preferencesNode == null) {
                 preferencesNode = globalInclusiveFiltersNode;
             } else {
                 preferencesNode = preferencesNode.or(globalInclusiveFiltersNode);
+            }
+        }
+
+        // Condition 4: handle exclusive global notification filters (only if some preferences were enabled)
+        if (preferencesNode != null) {
+            AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(parameters);
+            if (globalExclusiveFiltersNode != null) {
+                preferencesNode = preferencesNode.and(globalExclusiveFiltersNode);
             }
         }
 

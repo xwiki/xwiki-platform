@@ -149,7 +149,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
     <div class="commentheader">
       <div>
-      <span class="commentauthor">$!xwiki.getUserName($doc.display('author', 'view', $comment))</span>##
+      <span class="commentauthor">$!xwiki.getUserName($comment.getValue('author'))</span>##
       #set($date = $comment.getProperty('date').value)
 ## Don't indent, otherwise the comma will be misplaced
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
@@ -266,7 +266,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
     <div class="commentheader">
       <div>
-      <span class="commentauthor">$!xwiki.getUserName($doc.display('author', 'view', $comment))</span>##
+      <span class="commentauthor">$!xwiki.getUserName($comment.getValue('author'))</span>##
 ## Don't indent, otherwise the comma will be misplaced
 #set($date = $comment.getProperty('date').value)##
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end

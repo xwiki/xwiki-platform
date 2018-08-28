@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.PageClass;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -55,10 +57,12 @@ public class DBListMetaClass extends ListMetaClass
         sqlClass.setRows(5);
         safeput(sqlClass.getName(), sqlClass);
 
-        StringClass classNameClass = new StringClass(this);
+        PageClass classNameClass = new PageClass(this);
         classNameClass.setName("classname");
         classNameClass.setPrettyName("XWiki Class Name");
         classNameClass.setSize(20);
+        classNameClass.setDisplayType(ListClass.DISPLAYTYPE_INPUT);
+        classNameClass.setMultiSelect(false);
         safeput(classNameClass.getName(), classNameClass);
 
         StringClass idFieldClass = new StringClass(this);

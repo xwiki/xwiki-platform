@@ -521,7 +521,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTextField(String fieldName, String fieldPrettyName, int size)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof StringClass)) {
             StringClass text_class = new StringClass();
             text_class.setName(fieldName);
             text_class.setPrettyName(fieldPrettyName);
@@ -542,7 +542,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addPasswordField(String fieldName, String fieldPrettyName, int size, String storageType)
     {
-        if (get(fieldName) == null) {
+        if (!(get(fieldName) instanceof PasswordClass)) {
             PasswordClass passwordClass = new PasswordClass();
             passwordClass.setName(fieldName);
             passwordClass.setPrettyName(fieldPrettyName);
@@ -561,7 +561,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addEmailField(String fieldName, String fieldPrettyName, int size)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof EmailClass)) {
             EmailClass emailClass = new EmailClass();
             emailClass.setName(fieldName);
             emailClass.setPrettyName(fieldPrettyName);
@@ -577,7 +577,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTimezoneField(String fieldName, String fieldPrettyName, int size)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof TimezoneClass)) {
             TimezoneClass timezoneClass = new TimezoneClass();
             timezoneClass.setName(fieldName);
             timezoneClass.setPrettyName(fieldPrettyName);
@@ -606,7 +606,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String formType, String displayType, Boolean def)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof BooleanClass)) {
             BooleanClass booleanClass = new BooleanClass();
             booleanClass.setName(fieldName);
             booleanClass.setPrettyName(fieldPrettyName);
@@ -652,12 +652,31 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     public boolean addUsersField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
     {
-        if (get(fieldName) == null) {
+        // Set relational storage to false to keep backward compatibility
+        return addUsersField(fieldName, fieldPrettyName, size, multiSelect, false);
+    }
+
+    /**
+     * Adds a users field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @param relationalStorage specifies how the values are being stored
+     * @return true if the field has been added
+     * @since 10.7RC1
+     */
+    public boolean addUsersField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage)
+    {
+        if (!(getField(fieldName) instanceof UsersClass)) {
             UsersClass users_class = new UsersClass();
             users_class.setName(fieldName);
             users_class.setPrettyName(fieldPrettyName);
             users_class.setSize(size);
             users_class.setMultiSelect(multiSelect);
+            users_class.setRelationalStorage(relationalStorage);
             users_class.setObject(this);
             put(fieldName, users_class);
 
@@ -674,7 +693,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addLevelsField(String fieldName, String fieldPrettyName, int size)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof LevelsClass)) {
             LevelsClass levels_class = new LevelsClass();
             levels_class.setName(fieldName);
             levels_class.setPrettyName(fieldPrettyName);
@@ -696,7 +715,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addGroupsField(String fieldName, String fieldPrettyName, int size)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof GroupsClass)) {
             GroupsClass groups_class = new GroupsClass();
             groups_class.setName(fieldName);
             groups_class.setPrettyName(fieldPrettyName);
@@ -851,7 +870,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String values, String displayType, String separators)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof StaticListClass)) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
@@ -877,7 +896,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof NumberClass)) {
             NumberClass number_class = new NumberClass();
             number_class.setName(fieldName);
             number_class.setPrettyName(fieldPrettyName);
@@ -904,7 +923,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addDateField(String fieldName, String fieldPrettyName, String dformat, int emptyIsToday)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof DateClass)) {
             DateClass date_class = new DateClass();
             date_class.setName(fieldName);
             date_class.setPrettyName(fieldPrettyName);
@@ -937,7 +956,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addDBListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String sql)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof DBListClass)) {
             DBListClass list_class = new DBListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
@@ -971,7 +990,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addDBTreeListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String sql)
     {
-        if (get(fieldName) == null) {
+        if (!(getField(fieldName) instanceof DBTreeListClass)) {
             DBTreeListClass list_class = new DBTreeListClass();
             list_class.setName(fieldName);
             list_class.setPrettyName(fieldPrettyName);
@@ -981,6 +1000,91 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             list_class.setSql(sql);
             list_class.setObject(this);
             put(fieldName, list_class);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds a page field to the class.
+     * <p>The input has no multiselect by default.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @return true if the field has been added
+     * @since 10.7RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, false);
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @return true if the field has been added
+     * @since 10.7RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, multiSelect, "");
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @param relationalStorage specifies how the values are being stored
+     * @param sql the optional sql query used for the autosuggest
+     * @return true if the field has been added
+     * @since 10.7RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String sql)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, sql,
+            ListClass.DISPLAYTYPE_INPUT, true);
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @param relationalStorage specifies how the values are being stored
+     * @param sql the optional sql query used for the autosuggest
+     * @param displayType the display type
+     * @param hasPicker enables the autosuggest
+     * @return true if the field has been added
+     * @since 10.7RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String sql, String displayType, boolean hasPicker)
+    {
+        if (!(getField(fieldName) instanceof PageClass)) {
+            PageClass pageClass = new PageClass();
+            pageClass.setName(fieldName);
+            pageClass.setPrettyName(fieldPrettyName);
+            pageClass.setSize(size);
+            pageClass.setMultiSelect(multiSelect);
+            pageClass.setSql(sql);
+            pageClass.setRelationalStorage(relationalStorage);
+            pageClass.setDisplayType(displayType);
+            pageClass.setPicker(hasPicker);
+            pageClass.setObject(this);
+            put(fieldName, pageClass);
 
             return true;
         }

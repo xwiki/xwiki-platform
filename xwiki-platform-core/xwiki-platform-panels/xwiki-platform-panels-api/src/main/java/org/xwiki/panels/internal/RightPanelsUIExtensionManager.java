@@ -19,6 +19,8 @@
  */
 package org.xwiki.panels.internal;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -36,7 +38,7 @@ import org.xwiki.component.annotation.Component;
 public class RightPanelsUIExtensionManager extends AbstractPanelsUIExtensionManager
 {
     @Override
-    protected String getConfiguration()
+    protected List<String> getConfiguration()
     {
         return this.configurationSource.getProperty("rightPanels");
     }

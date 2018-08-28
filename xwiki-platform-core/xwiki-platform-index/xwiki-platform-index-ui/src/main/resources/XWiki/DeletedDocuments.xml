@@ -46,7 +46,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 ##
 #set($columns = ["ddoc.fullName", "ddoc.title", "ddoc.date", "ddoc.deleter", 'ddoc.batchId', 'actions'])
 #set($columnsProperties = {
-    'ddoc.fullName'  : { 'type' : 'text', 'size' : 10 },
+    'ddoc.fullName'  : { 'type' : 'page', 'size' : 10 },
     'ddoc.title'     : { 'type' : 'text', 'filterable' : false, 'sortable' : false },
     'ddoc.date'      : { 'type' : 'date'},
     'ddoc.deleter'   : { 'type' : 'text', 'size' : 10 },

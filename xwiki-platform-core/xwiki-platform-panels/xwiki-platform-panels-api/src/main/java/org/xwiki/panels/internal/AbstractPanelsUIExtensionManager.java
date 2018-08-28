@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -84,19 +83,19 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
      *
      * @return a comma separated list of panel IDs
      */
-    protected abstract String getConfiguration();
+    protected abstract List<String> getConfiguration();
 
     @Override
     public List<UIExtension> get(String extensionPointId)
     {
         List<UIExtension> panels = new ArrayList<UIExtension>();
 
-        String panelConfigurationString = getConfiguration();
+        List<String> panelConfiguration = getConfiguration();
 
         // Verify that there's a panel configuration property defined, and if not don't return any panel extension.
-        if (!StringUtils.isEmpty(panelConfigurationString)) {
+        if (!panelConfiguration.isEmpty()) {
             List<String> panelSerializedReferences = new ArrayList<String>();
-            for (String serializedReference : getConfiguration().split(",")) {
+            for (String serializedReference : panelConfiguration) {
                 panelSerializedReferences.add(serializer.serialize(resolver.resolve(serializedReference.trim())));
             }
 

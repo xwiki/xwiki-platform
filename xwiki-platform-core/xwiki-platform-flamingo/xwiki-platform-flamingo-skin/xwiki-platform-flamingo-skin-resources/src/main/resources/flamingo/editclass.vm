@@ -85,7 +85,16 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
               <dd></dd>
             #else
               <dt><label for="${field.name}_$classprop">${escapetool.xml($propDef.getPrettyName())} $!{propertyDetails.get($classprop)}</label></dt>
-              <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>
+              #if($propDef.type == 'PageClass')
+                #set ($pagePickerParams = {
+                  'id': "${field.name}_${propDef.name}",
+                  'name': "${field.name}_${propDef.name}",
+                  'value': $field.getProperty($propDef.name).value
+                })
+                <dd>#pagePicker(false $pagePickerParams)</dd>
+              #else
+                <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>
+              #end
             #end
           #end
         #end

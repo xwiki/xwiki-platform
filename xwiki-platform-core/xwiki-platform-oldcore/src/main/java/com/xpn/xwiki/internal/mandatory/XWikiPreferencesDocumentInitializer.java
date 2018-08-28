@@ -50,28 +50,28 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
 {
     /**
      * The name of the initialized document.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final String NAME = "XWikiPreferences";
 
     /**
      * The local reference of the initialized document as String.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final String LOCAL_REFERENCE_STRING = XWiki.SYSTEM_SPACE + '.' + NAME;
 
     /**
      * The local reference of the initialized document as String.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final LocalDocumentReference LOCAL_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE, NAME);
 
     /**
      * A regex to match any object reference with initialized class.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final RegexEntityReference OBJECT_REFERENCE = BaseObjectReference.any(LOCAL_REFERENCE_STRING);
@@ -104,14 +104,14 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
     {
         xclass.setCustomMapping("internal");
 
-        xclass.addTextField("parent", "Parent Space", 30);
+        xclass.addPageField("parent", "Parent Space", 30);
         xclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
         xclass.addTextField("default_language", "Default Language", 5);
         xclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
         xclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
         xclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
-        xclass.addTextField("skin", "Skin", 30);
+        xclass.addPageField("skin", "Skin", 30);
         xclass.addDBListField("colorTheme", "Color theme",
             "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
                 + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "
@@ -174,14 +174,15 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addBooleanField("backlinks", "Activate the backlinks", "yesno");
 
         // New fields for the XWiki 1.0 skin
-        xclass.addTextField("leftPanels", "Panels displayed on the left", 60);
-        xclass.addTextField("rightPanels", "Panels displayed on the right", 60);
+        String sql = "select obj.name from BaseObject as obj where obj.className = 'Panels.PanelClass'";
+        xclass.addPageField("leftPanels", "Panels displayed on the left", 60, true, false, sql);
+        xclass.addPageField("rightPanels", "Panels displayed on the right", 60, true, false, sql);
         xclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         xclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
         xclass.addStaticListField("leftPanelsWidth", "Width of the left panel column", "---|Small|Medium|Large");
         xclass.addStaticListField("rightPanelsWidth", "Width of the right panel column", "---|Small|Medium|Large");
         xclass.addTextField("languages", "Supported languages", 30);
-        xclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
+        xclass.addPageField("documentBundles", "Internationalization Document Bundles", 60);
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
 
         // Only used by LDAP authentication service

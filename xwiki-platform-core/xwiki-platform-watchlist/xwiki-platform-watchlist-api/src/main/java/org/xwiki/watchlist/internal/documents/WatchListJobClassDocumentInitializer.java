@@ -83,7 +83,7 @@ public class WatchListJobClassDocumentInitializer extends AbstractMandatoryClass
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField(TEMPLATE_FIELD, "Document holding the notification message template to use", 80);
+        xclass.addPageField(TEMPLATE_FIELD, "Document holding the notification message template to use", 80);
         xclass.addDateField(LAST_FIRE_TIME_FIELD, "Last notifier fire time", "dd/MM/yyyy HH:mm:ss", 1);
     }
 }

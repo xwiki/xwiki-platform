@@ -77,17 +77,17 @@
       <number>2</number>
       <picker>1</picker>
       <prettyName>Exclusions</prettyName>
+      <size>1</size>
       <relationalStorage>1</relationalStorage>
       <separator> </separator>
       <separators/>
-      <size>1</size>
       <sort>none</sort>
       <sql>select doc.fullName, space.name from XWikiDocument doc, XWikiSpace space where doc.space = space.reference and space.parent is null and doc.translation = 0 and doc.name = 'WebHome' order by space.name</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <valueField/>
-      <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </exclusions>
     <inclusions>
       <cache>0</cache>
@@ -102,17 +102,17 @@
       <number>3</number>
       <picker>1</picker>
       <prettyName>Inclusions</prettyName>
+      <size>1</size>
       <relationalStorage>1</relationalStorage>
       <separator> </separator>
       <separators/>
-      <size>1</size>
       <sort>none</sort>
       <sql>select doc.fullName, space.name from XWikiDocument doc, XWikiSpace space where doc.space = space.reference and space.parent is null and doc.translation = 0 and doc.name = 'WebHome' order by space.name</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <valueField/>
-      <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </inclusions>
   </class>
   <object>

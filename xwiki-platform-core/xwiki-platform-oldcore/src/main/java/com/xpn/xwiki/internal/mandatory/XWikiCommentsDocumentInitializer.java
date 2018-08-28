@@ -82,7 +82,7 @@ public class XWikiCommentsDocumentInitializer extends AbstractMandatoryClassInit
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("author", "Author", 30);
+        xclass.addUsersField("author", "Author", 30, false);
         xclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
         xclass.addNumberField("replyto", "Reply To", 5, "integer");
         xclass.addDateField("date", "Date");

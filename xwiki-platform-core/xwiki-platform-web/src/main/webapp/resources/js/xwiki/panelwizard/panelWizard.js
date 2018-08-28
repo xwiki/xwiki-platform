@@ -202,13 +202,31 @@ function onDragEnd(el, x, y) {
   updatePanelLayout();
 }
 
+
+function setInputValues(input, values) {
+  if (!leftPanelsInput || leftPanelsInput.disabled) {
+    return;
+  }
+  var selectize = input.selectize;
+  selectize.clear();
+  values.split(",").each(function(value) {
+    selectize.settings.load(value, function(options) {
+      Array.isArray(options) && options.each(function(option) {
+        var value = option[selectize.settings.valueField];
+        if (selectize.options.hasOwnProperty(value)) {
+          selectize.updateOption(value, option);
+        } else {
+          selectize.addOption(option);
+        }
+      });
+      selectize.addItem(value);
+    });
+  });
+}
+
 var updatePanelLayout = function() {
-  if (leftPanelsInput && !leftPanelsInput.disabled) {
-    leftPanelsInput.value = getBlocNameList(leftPanels);
-  }
-  if (rightPanelsInput && !rightPanelsInput.disabled) {
-    rightPanelsInput.value = getBlocNameList(rightPanels);
-  }
+  setInputValues(leftPanelsInput, getBlocNameList(leftPanels));
+  setInputValues(rightPanelsInput, getBlocNameList(rightPanels));
 };
 
 //------------------
@@ -366,12 +384,26 @@ function save() {
   url += "&showLeftPanels=" + window.showLeftColumn;
   url += "&showRightPanels=" + window.showRightColumn;
   if (window.showLeftColumn) {
-    var leftPanelsList = leftPanelsInput ? leftPanelsInput.value : getBlocNameList(leftPanels);
+    var leftPanelsList = leftPanelsInput ? leftPanelsInput.getValue() : getBlocNameList(leftPanels);
+    if (Array.isArray(leftPanelsList)) {
+      leftPanelsList = leftPanelsList.join(',');
+    }
+    // Happens when the list is empty.
+    if (typeof leftPanelsList !== 'string') {
+      leftPanelsList = "";
+    }
     url += "&leftPanels=" + leftPanelsList;
     url += "&leftPanelsWidth=" + leftPanelsWidthInput.value;
   }
   if (window.showRightColumn) {
-    var rightPanelsList = rightPanelsInput ? rightPanelsInput.value : getBlocNameList(rightPanels);
+    var rightPanelsList = rightPanelsInput ? rightPanelsInput.getValue() : getBlocNameList(rightPanels);
+    if (Array.isArray(rightPanelsList)) {
+      rightPanelsList = rightPanelsList.join(',');
+    }
+    // Happens when the list is empty.
+    if (typeof rightPanelsList !== 'string') {
+      rightPanelsList = "";
+    }
     url += "&rightPanels=" + rightPanelsList;
     url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
   }
@@ -402,7 +434,9 @@ function releasePanels(column) {
 
 function releasePanel(el) {
   el.parentNode.removeChild(el);
-  el.placeholder.parentNode.replaceChild(el, el.placeholder);
+  if (el.placeholder) {
+    el.placeholder.parentNode.replaceChild(el, el.placeholder);
+  }
   el.placeholder = undefined;
 }
 
@@ -434,6 +468,24 @@ function restorePanel(el, column) {
   column.appendChild(el);
 }
 
+function disablePanelInput(panelInput, panelWidthInput) {
+  if (panelInput && panelInput.selectize) {
+    panelInput.selectize.disable();
+  } else if (panelInput) {
+    panelInput.disable();
+  }
+  panelWidthInput.disable();
+}
+
+function enablePanelInput(panelInput, panelWidthInput) {
+  if (panelInput && panelInput.selectize) {
+    panelInput.selectize.enable();
+  } else if (panelInput) {
+    panelInput.enable();
+  }
+  panelWidthInput.enable();
+}
+
 function changePreviewLayout(element, code) {
   document.getElementById("selectedoption").id = "";
   element.id = "selectedoption";
@@ -456,10 +508,8 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthidelefthideright";
       mainContainer.addClassName("hidelefthideright");
-      leftPanelsInput && leftPanelsInput.disable();
-      leftPanelsWidthInput.disable();
-      rightPanelsInput && rightPanelsInput.disable();
-      rightPanelsWidthInput.disable();
+      disablePanelInput(leftPanelsInput, leftPanelsWidthInput);
+      disablePanelInput(rightPanelsInput, rightPanelsWidthInput);
       break;
     case 1:
       //show left; hide right;
@@ -475,10 +525,8 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthideright";
       mainContainer.addClassName("hideright");
-      leftPanelsInput && leftPanelsInput.enable();
-      leftPanelsWidthInput.enable();
-      rightPanelsInput && rightPanelsInput.disable();
-      rightPanelsWidthInput.disable();
+      enablePanelInput(leftPanelsInput, leftPanelsWidthInput);
+      disablePanelInput(rightPanelsInput, rightPanelsWidthInput);
       break;
     case 2:
       //hide left; show right;
@@ -494,10 +542,8 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthideleft";
       mainContainer.addClassName("hideleft");
-      leftPanelsInput && leftPanelsInput.disable();
-      leftPanelsWidthInput.disable();
-      rightPanelsInput && rightPanelsInput.enable();
-      rightPanelsWidthInput.enable();
+      disablePanelInput(leftPanelsInput, leftPanelsWidthInput);
+      enablePanelInput(rightPanelsInput, rightPanelsWidthInput);
       break;
     case 3:
       //show left; show right;
@@ -512,10 +558,8 @@ function changePreviewLayout(element, code) {
         restorePanels(rightPanels);
       }
       mainContainer.addClassName("content");
-      leftPanelsInput && leftPanelsInput.enable();
-      leftPanelsWidthInput.enable();
-      rightPanelsInput && rightPanelsInput.enable();
-      rightPanelsWidthInput.enable();
+      enablePanelInput(leftPanelsInput, leftPanelsWidthInput);
+      enablePanelInput(rightPanelsInput, rightPanelsWidthInput);
       break;
     default:
       // ignore

@@ -89,7 +89,7 @@
         #if ($hasEdit || $hasAdmin)
           ## Delete attachment link.
           ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
-          ## By providing an anchor this behavior is stoped, without altering the URL functionality.
+          ## By providing an anchor this behavior is stopped, without altering the URL functionality.
           #set ($queryString = $escapetool.url({
             'form_token': $services.csrf.token,
             'xredirect': $options.redirect

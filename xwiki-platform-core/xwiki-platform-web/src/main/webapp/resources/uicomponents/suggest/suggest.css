@@ -73,6 +73,7 @@ div.suggestItems div.info {
 
 div.suggestItems div.info span.legend {
   font-weight: normal;
+  padding-right: 5px;
 }
 
 ul.suggestList {

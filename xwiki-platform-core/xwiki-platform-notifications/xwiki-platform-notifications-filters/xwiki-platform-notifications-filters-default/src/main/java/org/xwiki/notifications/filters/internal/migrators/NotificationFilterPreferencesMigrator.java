@@ -239,12 +239,14 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
+        WikiReference currentWiki = getXWikiContext().getWikiReference();
+
         try {
             Query query = queryManager.createQuery(
                     "select distinct doc.fullName from Document doc, "
                             + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj", Query.XWQL);
             for (String fullName : query.<String>execute()) {
-                migrateUser(referenceResolver.resolve(fullName, getXWikiContext().getWikiReference()));
+                migrateUser(referenceResolver.resolve(fullName, currentWiki));
             }
 
             // Remove the useless class when all user have been migrated (not to trash because the trash might have not
@@ -252,7 +254,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
             XWikiContext context = this.getXWikiContext();
             XWiki xwiki = context.getWiki();
             final DocumentReference notificationFilterPreferenceClass
-                    = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(context.getWikiReference());
+                    = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(currentWiki);
             XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
             if (!oldClassDoc.isNew()) {
                 xwiki.deleteDocument(oldClassDoc, false, context);

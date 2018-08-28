@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Filters - Default implementation</name>
   <description>Default bridge to oldcore for the notifications filters API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -54,6 +54,11 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

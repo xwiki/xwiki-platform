@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -402,5 +404,80 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
                 }
             }
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return "DefaultNotificationFilterPreference{"
+                + "id='" + id + '\''
+                + ", internalId=" + internalId
+                + ", owner='" + owner + '\''
+                + ", filterName='" + filterName + '\''
+                + ", providerHint='" + providerHint + '\''
+                + ", enabled=" + enabled
+                + ", active=" + active
+                + ", filterType=" + filterType
+                + ", notificationFormats=" + notificationFormats
+                + ", startingDate=" + startingDate
+                + ", eventTypes=" + eventTypes
+                + ", user='" + user + '\''
+                + ", pageOnly='" + pageOnly + '\''
+                + ", page='" + page + '\''
+                + ", wiki='" + wiki + '\''
+                + '}';
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DefaultNotificationFilterPreference other = (DefaultNotificationFilterPreference) o;
+        EqualsBuilder equalsBuilder = new EqualsBuilder();
+        equalsBuilder.append(internalId, other.internalId)
+            .append(enabled, other.enabled)
+            .append(active, other.active)
+            .append(id, other.id)
+            .append(owner, other.owner)
+            .append(filterName, other.filterName)
+            .append(providerHint, other.providerHint)
+            .append(filterType, other.filterType)
+            .append(notificationFormats, other.notificationFormats)
+            .append(startingDate, other.startingDate)
+            .append(eventTypes, other.eventTypes)
+            .append(user, other.user)
+            .append(pageOnly, other.pageOnly)
+            .append(page, other.page)
+            .append(wiki, other.wiki);
+        return equalsBuilder.isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+        hashCodeBuilder.append(internalId)
+            .append(enabled)
+            .append(active)
+            .append(id)
+            .append(owner)
+            .append(filterName)
+            .append(providerHint)
+            .append(filterType)
+            .append(notificationFormats)
+            .append(startingDate)
+            .append(eventTypes)
+            .append(user)
+            .append(pageOnly)
+            .append(page)
+            .append(wiki);
+        return hashCodeBuilder.toHashCode();
     }
 }

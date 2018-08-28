@@ -30,66 +30,11 @@ viewers.Attachments = Class.create({
   /** Constructor. Adds all the JS improvements of the Attachment area. */
   initialize : function() {
     if ($("attachform")) {
-      // Listeners for AJAX attachment deletion
-      this.addDeleteListener();
       // If the upload form is already visible, enhance it.
       this.prepareForm();
     } else {
       // Otherwise, we wait for a notification for the AJAX loading of the Attachments metadata tab.
       this.addTabLoadListener();
-    }
-  },
-  /**
-   * Ajax attachment deletion.
-   * For all delete buttons, listen to "click", and make ajax request to remove the attachment. Remove the corresponding
-   * HTML element on succes. Display error message (alert) on failure.
-   */
-  addDeleteListener : function() {
-    $$('.attachment a.deletelink').each(function(item) {
-      item.observe('click', function(event) {
-        item.blur();
-        event.stop();
-        if (item.disabled) {
-          // Do nothing if the button was already clicked and it's waiting for a response from the server.
-          return;
-        } else {
-          new XWiki.widgets.ConfirmedAjaxRequest(
-            /* Ajax request URL */
-            item.readAttribute('href') + (Prototype.Browser.Opera ? "" : "&ajax=1"),
-            /* Ajax request parameters */
-            {
-              onCreate : function() {
-                // Disable the button, to avoid a cascade of clicks from impatient users
-                item.disabled = true;
-              },
-              onSuccess : function() {
-                // Remove the corresponding HTML element from the UI and update the attachment count
-                item.up(".attachment").remove();
-                this.updateCount();
-              }.bind(this),
-              onComplete : function() {
-                // In the end: re-inable the button
-                item.disabled = false;
-              }
-            },
-            /* Interaction parameters */
-            {
-               confirmationText: "$services.localization.render('core.viewers.attachments.delete.confirm')",
-               progressMessageText : "$services.localization.render('core.viewers.attachments.delete.inProgress')",
-               successMessageText : "$services.localization.render('core.viewers.attachments.delete.done')",
-               failureMessageText : "$services.localization.render('core.viewers.attachments.delete.failed')"
-            }
-          );
-        }
-      }.bindAsEventListener(this));
-    }.bind(this));
-  },
-  updateCount : function() {
-    if ($("Attachmentstab") && $("Attachmentstab").down(".itemCount")) {
-      $("Attachmentstab").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
-    }
-    if ($("attachmentsshortcut") && $("attachmentsshortcut").down(".itemCount")) {
-      $("attachmentsshortcut").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
     }
   },
   /** Enhance the upload form with JS behaviors. */
@@ -103,8 +48,6 @@ viewers.Attachments = Class.create({
 
     var html5Uploader = this.attachHTML5Uploader(this.form.down("input[type='file']"));
     if (html5Uploader) {
-      this.addDeleteListener = this.addDeleteListener.bindAsEventListener(this);
-      this.form.observe("xwiki:html5upload:done", this.addDeleteListener);
       html5Uploader.hideFormButtons();
     } else {
       this.addInitialRemoveButton();
@@ -213,7 +156,6 @@ viewers.Attachments = Class.create({
   addTabLoadListener : function(event) {
     var listener = function(event) {
       if (event.memo.id == 'Attachments') {
-        this.addDeleteListener();
         this.prepareForm();
         document.stopObserving("xwiki:docextra:loaded", listener);
         delete listener;
@@ -231,3 +173,74 @@ viewers.Attachments = Class.create({
 return XWiki;
 }(XWiki || {}));
 
+/**
+ * Delete attachments from AttachmentsTab.
+ */
+require(['jquery', 'xwiki-events-bridge'], function($) {
+  /**
+   * Getting the button that triggers the modal.
+   */
+  $(document).on('show.bs.modal', '#deleteAttachment', function(event) {
+    $(this).data('relatedTarget', $(event.relatedTarget));
+  });
+  /**
+   * Event on deleteAttachment button.
+   */
+  $(document).on('click', '#deleteAttachment input.btn-danger', function() {
+    var modal = $('#deleteAttachment');
+    var button = modal.data('relatedTarget');
+    var notification;
+    /**
+     * Ajax request made for deleting an attachment. Delete the HTML element on succes. Disable the delete button
+     * before the request is send, so the user cannot resend it in case it takes longer.
+     * Display error message on failure.
+     */
+    $.ajax({
+      url : button.prop('href'),
+      beforeSend : function() {
+        button.prop('disabled', true);
+        notification = new XWiki.widgets.Notification(
+          "$services.localization.render('core.viewers.attachments.delete.inProgress')", 'inprogress');
+      },
+      success : function() {
+        var attachment = button.closest('.attachment');
+        // Remove the corresponding HTML element from the UI and update the attachment count.
+        attachment.remove();
+        updateCount();
+        notification.replace(new XWiki.widgets.Notification(
+          "$services.localization.render('core.viewers.attachments.delete.done')", 'done'));
+      },
+      error: function() {
+        // The button is enabled in case of error.
+        button.prop('disabled', false);
+        notification.replace(new XWiki.widgets.Notification(
+          "$services.localization.render('core.viewers.attachments.delete.failed')", 'error'));
+      }
+    })
+  });
+  /**
+   * Updating the number of files in AttachmentsTab and in More actions menu.
+   */
+  var updateCount = function() {
+    var itemCount = $('#Attachmentstab').find('.itemCount');
+    var attachmentsNumber = $("#Attachmentspane .attachment").size();
+    if(itemCount) {
+      itemCount.text(
+        "$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", attachmentsNumber));
+    };
+    if($('#tmAttachments').length) {
+      // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
+      $('#tmAttachments')[0].normalize();
+      var attachmentsLabel = " $services.localization.render('docextra.attachments') ";
+      var label = attachmentsLabel + "$services.localization.render('docextra.extranb', ['__number__'])";
+      label = label.replace("__number__", attachmentsNumber);
+      $('#tmAttachments').contents().last()[0].nodeValue=label;
+    }
+  };
+  /**
+   * Firing updateCount event when an attachment is successfully uploaded.
+   */
+  $(document).on('xwiki:html5upload:done', function() {
+    updateCount();
+  });
+});

@@ -134,10 +134,10 @@
           <div>$services.localization.render('core.viewers.attachments.delete.confirm')</div>
         </div>
         <div class="modal-footer">
-          <input type="button" class="btn btn-danger"
-            value="$escapetool.xml($services.localization.render('core.viewers.attachments.delete'))" data-dismiss="modal">
-          <input type="button" class="btn btn-default"
-            value="$escapetool.xml($services.localization.render('cancel'))" data-dismiss="modal">
+          <input type="button" class="btn btn-danger"  data-dismiss="modal"
+            value="$escapetool.xml($services.localization.render('core.viewers.attachments.delete'))">
+          <input type="button" class="btn btn-default" data-dismiss="modal"
+            value="$escapetool.xml($services.localization.render('cancel'))">
         </div>
       </div>
     </div>

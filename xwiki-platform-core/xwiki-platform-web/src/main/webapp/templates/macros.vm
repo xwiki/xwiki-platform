@@ -2364,20 +2364,17 @@ $string##
     {'forceSkinAction': true, 'language': $xcontext.locale}))
 #end
 
-#macro (pagePicker_input $multiSelect $parameters)
-  #if ($multiSelect)
-    #set ($discard = $parameters.put('multiple', 'multiple'))
-  #end
+#macro (pagePicker_input $parameters)
   #suggestInput($parameters)
 #end
 
-#macro (pagePicker $multiSelect $parameters)
+#macro (pagePicker $parameters)
   #pagePicker_import
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-pages"))
-  #pagePicker_input($multiSelect $parameters)
+  #pagePicker_input($parameters)
 #end
 
 #**

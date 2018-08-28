@@ -24,28 +24,52 @@ require.config({
   }
 });
 
-define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($, utils) {
+define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   'use strict';
+
+  var pageIcon = $jsontool.serialize($services.icon.getMetaData('page_white'));
 
   var getSelectizeOptions = function(select) {
     return {
       create: true,
       load: function(text, callback) {
-        loadPages(text).done(callback).fail(callback);
+        loadPages(text).done(function(data) {
+          var pages = [];
+          data.searchResults.forEach(function (element) {
+            var label = element.title;
+            var queryString = "";
+            // Separate spaces with " / " and unescape characters. E.g. A\.B.C\\D => A.B / C\D
+            var hint = element.space.replace(/([^\\])\./g, "$1 / ").replace(/\\(.)/g, "$1");
+            if (element.language) {
+              queryString = "language=" + element.language;
+              hint += " (" + element.language + ")";
+            }
+            var url = new XWiki.Document(XWiki.Model.resolve(element.id, XWiki.EntityType.DOCUMENT))
+              .getURL("view", queryString);
+            pages.push({
+              'value': element.pageFullName,
+              'label': label,
+              'icon': pageIcon,
+              'url': url,
+              'hint': hint
+            });
+          });
+          callback(pages);
+        }).fail(callback);
       }
     }
   };
 
   var loadPages = function(text) {
-    // ${request.contextPath}/rest/wikis/query/
-    var pages = $.getJSON(XWiki.currentDocument.getURL('get'), {
-      'xpage': 'pagesuggest',
-      'input': text,
+    // We need to escape backslashes for Solr.
+    text = text.replace(/\\/g, "\\\\");
+    var response = $.getJSON("${request.contextPath}/rest/wikis/query/", {
+      'q': "title:*" + text + "* or fullname:*" + text + "*",
       'limit': 10,
       'media': 'json'
     });
 
-    return pages;
+    return response;
   };
 
   $.fn.suggestPages = function() {

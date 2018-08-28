@@ -13,6 +13,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 <div id="_attachments" class="attachments">
 #template("attachmentslist.vm")
 </div> ## attachments
+#deleteAttachmentModal
 #if($hasEdit || $hasAdmin)
   <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
   <div>

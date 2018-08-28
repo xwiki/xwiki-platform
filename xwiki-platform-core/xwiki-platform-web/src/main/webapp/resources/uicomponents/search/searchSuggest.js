@@ -161,7 +161,7 @@ var XWiki = (function (XWiki) {
         sources : this.sources,
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
         displayValue: true,
-        displayValueText: "$escapetool.javascript($services.localization.render('platform.search.suggestResultLocatedIn'))",
+        displayValueText: "$escapetool.javascript("$services.localization.render('platform.search.suggestResultLocatedIn') ")",
         resultInfoHTML: true,
         timeout: 0,
         width: 500,

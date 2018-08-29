@@ -42,7 +42,7 @@
   <content>admin.email=Email
 admin.email.description=Configurer l'email (général, envoi d'email) et voir  les statuts d'emails.
 admin.emailgeneral=Général
-admin.emailgeneral.description=Configuration des paramètres généraux relatifs aux mails
+admin.emailgeneral.description=Configurez les paramètres avancés de messagerie comme le floutage des adresses mails.
 admin.emailsend=Envoi de mails
 admin.emailsend.description=Configurer les paramètres d'envoi d'emails.
 admin.emailstatus=Status des mails

@@ -60,7 +60,7 @@ appWithinMinutes.wizardStep.name.title=Donnez un nom à votre application
 appWithinMinutes.wizardStep.name.description=Choisissez un nom pour l'application
 appWithinMinutes.wizardStep.structure.name=Structure
 appWithinMinutes.wizardStep.structure.title=Définissez la structure de votre application
-appWithinMinutes.wizardStep.structure.description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
+appWithinMinutes.wizardStep.structure.description=Décrivez les données de l'application
 appWithinMinutes.wizardStep.entries.name=Eléments
 appWithinMinutes.wizardStep.entries.title=Localisez vos entrées
 appWithinMinutes.wizardStep.entries.description=Choisissez où stocker les éléments de votre application
@@ -242,7 +242,7 @@ platform.appwithinminutes.wizardStep2Name=Structure
 #@deprecated appWithinMinutes.wizardStep.structure.title
 platform.appwithinminutes.wizardStep2Title=Définissez la structure de votre application
 #@deprecated appWithinMinutes.wizardStep.structure.description
-platform.appwithinminutes.wizardStep2Description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
+platform.appwithinminutes.wizardStep2Description=Décrivez les données de l'application
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=Présentation
 #@deprecated appWithinMinutes.wizardStep.presentation.title

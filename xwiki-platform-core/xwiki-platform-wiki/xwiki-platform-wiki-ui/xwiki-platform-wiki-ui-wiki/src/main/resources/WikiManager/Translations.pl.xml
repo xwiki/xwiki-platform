@@ -43,8 +43,8 @@
 
 ## MENU
 core.menu.type.wiki=Wiki
-core.menu.watchlist.add.wiki=Śledź wiki
-core.menu.watchlist.remove.wiki=Nie śledź wiki
+core.menu.watchlist.add.wiki=Subskrybuj Wiki
+core.menu.watchlist.remove.wiki=Odsubskrybuj Wiki
 core.menu.admin.wiki=Administrowanie wiki
 
 # WIKI INFORMATION PANEL

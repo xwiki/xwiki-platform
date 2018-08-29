@@ -37,6 +37,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
 import org.xwiki.text.StringUtils;
 
@@ -255,12 +256,16 @@ public class ScopeNotificationFilterExpressionGenerator
 
         String formatParameter = (format == NotificationFormat.ALERT ? "alertEnabled" : "emailEnabled");
 
+        // We need to concat event.wiki with event.page because event.page contains a local serialized value
+        // meanwhile DefaultNotificationFilterPreference stores full reference values
+        AbstractValueNode expression = value(EventProperty.WIKI).concat(value(":")).concat(value(EventProperty.PAGE));
+
         if (type == NotificationFilterType.EXCLUSIVE) {
             String exclusion = String.format(subQuery, NotificationFilterType.EXCLUSIVE.ordinal(), formatParameter);
-            return not(value(EventProperty.PAGE).inSubQuery(exclusion, parameters));
+            return not(expression.inSubQuery(exclusion, parameters));
         } else {
             String inclusion = String.format(subQuery, NotificationFilterType.INCLUSIVE.ordinal(), formatParameter);
-            return value(EventProperty.PAGE).inSubQuery(inclusion, parameters);
+            return expression.inSubQuery(inclusion, parameters);
         }
     }
 

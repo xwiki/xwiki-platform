@@ -51,7 +51,7 @@
 
     <property name="allEventTypes" type="text" column="nfp_event_types" />
 
-    <property name="user" type="string" column="nfp_user" index="NFP_USER"/>
+    <property name="user" type="string" column="nfp_user" />
 
     <property name="pageOnly" type="string" column="nfp_page_only" length="255" />
 

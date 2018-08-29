@@ -315,7 +315,7 @@ public class ScopeNotificationFilterTest
 
         // Test 1
         assertEquals(
-                "(TYPE IN (\"type2\", \"type1\") AND PAGE IN " +
+                "(TYPE IN (\"type2\", \"type1\") AND CONCAT(CONCAT(WIKI, \":\"), PAGE) IN " +
                         "(SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner " +
                         "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' " +
                         "AND nfp.allEventTypes = '' AND nfp.alertEnabled = true AND nfp.enabled = true))",
@@ -329,7 +329,8 @@ public class ScopeNotificationFilterTest
         // Test 3
         filterPreferences = Sets.newSet(prefγ, prefz);
         assertEquals(
-                "NOT (PAGE IN (SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp " +
+                "NOT (CONCAT(CONCAT(WIKI, \":\"), PAGE) IN (SELECT nfp.pageOnly " +
+                        "FROM DefaultNotificationFilterPreference nfp " +
                         "WHERE nfp.owner = :owner AND nfp.filterType = 1 AND nfp.filterName = 'scopeNotificationFilter' " +
                         "AND nfp.pageOnly <> '' AND nfp.allEventTypes = '' AND nfp.emailEnabled = true " +
                         "AND nfp.enabled = true))",

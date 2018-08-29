@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;
+import org.xwiki.notifications.filters.expression.ConcatNode;
 import org.xwiki.notifications.filters.expression.DateValueNode;
 import org.xwiki.notifications.filters.expression.EndsWith;
 import org.xwiki.notifications.filters.expression.EntityReferenceNode;
@@ -217,6 +218,12 @@ public class ExpressionNodeToHQLConverter
             returnValue = String.format(VARIABLE_NAME, mapKey);
         } else if (value instanceof BooleanValueNode) {
             returnValue = ((BooleanValueNode) value).getContent().toString();
+        } else if (value instanceof ConcatNode) {
+            ConcatNode node = (ConcatNode) value;
+            returnValue = String.format("CONCAT(%s, %s)",
+                    parseBlock(node.getLeftOperand(), result),
+                    parseBlock(node.getRightOperand(), result)
+            );
         } else {
             returnValue = StringUtils.EMPTY;
         }

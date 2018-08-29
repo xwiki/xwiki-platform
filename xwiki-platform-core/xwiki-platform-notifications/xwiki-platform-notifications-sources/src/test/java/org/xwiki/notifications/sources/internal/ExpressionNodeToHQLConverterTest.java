@@ -303,4 +303,13 @@ public class ExpressionNodeToHQLConverterTest
                 result.getQuery());
         assertEquals(12345, result.getQueryParameters().get("id"));
     }
+
+    @Test
+    public void parseWithConcatNode()
+    {
+        AbstractNode testAST = value(TEST_VALUE_1).concat(value(TEST_VALUE_2)).concat(value(TEST_VALUE_2));
+        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        assertEquals(String.format("CONCAT(CONCAT(:%s, :%s), :%s)", TEST_VALUE_1_IDENTIFIER,
+                TEST_VALUE_2_IDENTIFIER, TEST_VALUE_2_IDENTIFIER), result.getQuery());
+    }
 }

@@ -92,7 +92,7 @@ def builds = [
     buildFunctionalTest(
       name: 'Flavor Test - Webstandards',
       pom: 'xwiki-platform-distribution-flavor-test-webstandards/pom.xml',
-      mavenOpts: '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
+      mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
   'TestRelease': {
@@ -199,7 +199,7 @@ def build(map)
 {
   node {
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2500m -Xms512m"
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
       if (map.goals) {
         goals = map.goals
       }

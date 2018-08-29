@@ -28,9 +28,9 @@
     <version>10.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-upgrade</artifactId>
-  <name>XWiki Platform - Distribution - Test - Upgrade</name>
+  <name>XWiki Platform - Test - Distribution Upgrade</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Distribution - Test - Upgrade</description>
+  <description>XWiki Platform - Test - Distribution Upgrade</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

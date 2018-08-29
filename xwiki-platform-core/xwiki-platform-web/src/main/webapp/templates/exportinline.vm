@@ -21,10 +21,10 @@
   </dt>
   <dd>
   #set ($userPickerParams = {
-      'id': 'author',
-      'name': 'author',
-      'value': $xcontext.user
-      })
+    'id': 'author',
+    'name': 'author',
+    'value': $xcontext.user
+  })
   #userPicker(false $userPickerParams)
   </dd>
   <dt>

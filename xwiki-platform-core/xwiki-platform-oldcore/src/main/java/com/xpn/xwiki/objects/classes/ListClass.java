@@ -212,9 +212,14 @@ public abstract class ListClass extends PropertyClass
         return (getIntValue("relationalStorage") == 1);
     }
 
-    public void setRelationalStorage(boolean storage)
+    /**
+     * @param relationalStorage if false, the list items will be concatenated into a VARCHAR column on a single row.
+     * Otherwise, items are stored in their own entries in the database. In most cases, this property should have the
+     * same value as the {@code multiSelect} property
+     */
+    public void setRelationalStorage(boolean relationalStorage)
     {
-        setIntValue("relationalStorage", storage ? 1 : 0);
+        setIntValue("relationalStorage", relationalStorage ? 1 : 0);
     }
 
     public boolean isPicker()

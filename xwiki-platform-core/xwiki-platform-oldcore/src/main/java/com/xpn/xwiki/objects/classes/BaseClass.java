@@ -1026,15 +1026,18 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param fieldPrettyName the shown name
      * @param size size of the input
      * @param multiSelect specifies if there can be several values
-     * @param relationalStorage specifies how the values are being stored
-     * @param sql the optional sql query used for the autosuggest
+     * @param relationalStorage sets the {@link PageClass} {@code relationalStorage} property metadata with the
+     * specified value. See {@link PageClass#setRelationalStorage} for more details
+     * @param hqlQuery the optional HQL query to execute to return allowed document references. If null or empty, the
+     * {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass) implicit
+     * page query builder} is used
      * @return true if the field has been added
      * @since 10.8RC1
      */
     public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
-        boolean relationalStorage, String sql)
+        boolean relationalStorage, String hqlQuery)
     {
-        return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, sql,
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, hqlQuery,
             ListClass.DISPLAYTYPE_INPUT, true);
     }
 
@@ -1045,15 +1048,19 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param fieldPrettyName the shown name
      * @param size size of the input
      * @param multiSelect specifies if there can be several values
-     * @param relationalStorage specifies how the values are being stored
-     * @param sql the optional sql query used for the autosuggest
-     * @param displayType the display type
-     * @param hasPicker enables the autosuggest
+     * @param relationalStorage sets the {@link PageClass} {@code relationalStorage} property metadata with the
+     * specified value. See {@link PageClass#setRelationalStorage} for more details
+     * @param hqlQuery the optional HQL query to execute to return allowed document references. If null or empty, the
+     * {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass) implicit
+     * page query builder} is used
+     * @param displayType either {@link ListClass#DISPLAYTYPE_CHECKBOX}, {@link ListClass#DISPLAYTYPE_INPUT},
+     * {@link ListClass#DISPLAYTYPE_RADIO} or {@link ListClass#DISPLAYTYPE_SELECT}
+     * @param hasPicker enables auto suggestion display
      * @return true if the field has been added
      * @since 10.8RC1
      */
     public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
-        boolean relationalStorage, String sql, String displayType, boolean hasPicker)
+        boolean relationalStorage, String hqlQuery, String displayType, boolean hasPicker)
     {
         if (getField(fieldName) == null) {
             PageClass pageClass = new PageClass();
@@ -1061,7 +1068,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             pageClass.setPrettyName(fieldPrettyName);
             pageClass.setSize(size);
             pageClass.setMultiSelect(multiSelect);
-            pageClass.setSql(sql);
+            pageClass.setSql(hqlQuery);
             pageClass.setRelationalStorage(relationalStorage);
             pageClass.setDisplayType(displayType);
             pageClass.setPicker(hasPicker);

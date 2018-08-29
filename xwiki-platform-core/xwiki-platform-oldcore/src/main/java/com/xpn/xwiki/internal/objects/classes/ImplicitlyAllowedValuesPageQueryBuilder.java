@@ -47,6 +47,11 @@ public class ImplicitlyAllowedValuesPageQueryBuilder implements QueryBuilder<Pag
     @Named("implicitlyAllowedValues")
     private QueryBuilder<DBListClass> implicitlyAllowedValuesQueryBuilder;
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see ImplicitlyAllowedValuesDBListQueryBuilder#build(DBListClass)
+     */
     @Override
     public Query build(PageClass pageClass) throws QueryException
     {

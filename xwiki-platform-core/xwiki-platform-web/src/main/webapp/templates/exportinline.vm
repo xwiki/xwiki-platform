@@ -20,12 +20,12 @@
     <span class="xHint">$services.localization.render('administration.section.export.author.hint')</span>
   </dt>
   <dd>
-  #set ($userPickerParams = {
-    'id': 'author',
-    'name': 'author',
-    'value': $xcontext.user
-  })
-  #userPicker(false $userPickerParams)
+    #set ($userPickerParams = {
+      'id': 'author',
+      'name': 'author',
+      'value': $xcontext.user
+    })
+    #userPicker(false $userPickerParams)
   </dd>
   <dt>
     <label for="version">$services.localization.render('export_version')</label>

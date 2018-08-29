@@ -517,13 +517,29 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </phone>
       <skin>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>skin</name>
         <number>19</number>
+        <picker>1</picker>
         <prettyName>skin</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </skin>
       <timezone>
         <customDisplay>{{velocity}}

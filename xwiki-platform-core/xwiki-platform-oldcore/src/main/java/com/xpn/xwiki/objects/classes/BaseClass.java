@@ -988,6 +988,92 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    /**
+     * Adds a page field to the class.
+     * <p>
+     * The input has no multiselect by default.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, false);
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, multiSelect, "");
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @param relationalStorage specifies how the values are being stored
+     * @param sql the optional sql query used for the autosuggest
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String sql)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, sql,
+            ListClass.DISPLAYTYPE_INPUT, true);
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @param relationalStorage specifies how the values are being stored
+     * @param sql the optional sql query used for the autosuggest
+     * @param displayType the display type
+     * @param hasPicker enables the autosuggest
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String sql, String displayType, boolean hasPicker)
+    {
+        if (getField(fieldName) == null) {
+            PageClass pageClass = new PageClass();
+            pageClass.setName(fieldName);
+            pageClass.setPrettyName(fieldPrettyName);
+            pageClass.setSize(size);
+            pageClass.setMultiSelect(multiSelect);
+            pageClass.setSql(sql);
+            pageClass.setRelationalStorage(relationalStorage);
+            pageClass.setDisplayType(displayType);
+            pageClass.setPicker(hasPicker);
+            pageClass.setObject(this);
+            put(fieldName, pageClass);
+
+            return true;
+        }
+
+        return false;
+    }
+
     public void setCustomMapping(String customMapping)
     {
         this.customMapping = customMapping;

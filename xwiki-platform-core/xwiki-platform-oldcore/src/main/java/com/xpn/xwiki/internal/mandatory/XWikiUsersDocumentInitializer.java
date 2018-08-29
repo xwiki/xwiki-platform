@@ -92,7 +92,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
 
         // New fields for the XWiki 1.0 skin
-        xclass.addTextField("skin", "skin", 30);
+        xclass.addPageField("skin", "skin", 30);
         xclass.addTextField("avatar", "Avatar", 30);
         xclass.addTextField("phone", "Phone", 30);
         xclass.addTextAreaField("address", "Address", 40, 3);

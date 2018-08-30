@@ -40,6 +40,8 @@ public class AttachmentsPane extends BaseElement
     @FindBy(xpath = "//input[@value='Add another file']")
     private WebElement addAnotherFile;
 
+    private ConfirmationModal confirmDelete;
+
     /**
      * Fills the URL with the specified file path.
      * 
@@ -92,14 +94,13 @@ public class AttachmentsPane extends BaseElement
      */
     public void deleteAttachmentByFileByName(String attachmentName)
     {
-        getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-                + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
-        getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        getDriver().waitUntilElementDisappears(By
-            .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        getDriver().waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='"
-            + attachmentName + "']"));
+        // We initialize before so we can remove the animation before the modal is shown
+        this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
+        getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
+            + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
+        this.confirmDelete.clickOk();
+        getDriver().waitUntilElementDisappears(
+            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName + "']"));
         getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
     }
 

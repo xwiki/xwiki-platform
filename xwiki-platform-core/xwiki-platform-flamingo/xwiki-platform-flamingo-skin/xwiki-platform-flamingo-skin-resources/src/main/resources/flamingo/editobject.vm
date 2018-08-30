@@ -77,7 +77,7 @@
       #if ($prop.type == 'StringClass')
         #set ($titleField = $prop.name)
         #set ($foundStringProperty = true)
-      #elseif (!$foundAlternativeProperty)
+      #elseif (!$foundAlternativeProperty && $prop.type != 'PasswordClass')
         #set ($titleField = $prop.name)
         #set ($foundAlternativeProperty = true)
       #end
@@ -229,13 +229,8 @@
         #skinExtensionHooks
         #displayClass($class)
       #else
-        #foreach ($prop in $props)
-          #if ($velocityCount==1)
-            #set ($firstField = $prop.name)
-            #break
-          #end
-        #end ## foreach prop
-        #displayObject($newobj $class $props $firstField)
+        #getTitleField($props)
+        #displayObject($newobj $class $props $titleField)
       #end ## is new class
     #end ## xredirect
   #end ## class exists

@@ -43,20 +43,20 @@
 
 ## MENU
 core.menu.type.wiki=Wiki
-### Missing: core.menu.watchlist.add.wiki=Watch Wiki
+core.menu.watchlist.add.wiki=查看Wiki
 ### Missing: core.menu.watchlist.remove.wiki=Unwatch Wiki
 core.menu.admin.wiki=管理Wiki
 
 # WIKI INFORMATION PANEL
-### Missing: platform.wiki.panel.title=Wiki information
+platform.wiki.panel.title=Wiki信息
 
 # MESSAGES
-### Missing: platform.wiki.currentwiki.welcome=Welcome to the {0}{1}{2} wiki.
-### Missing: platform.wiki.currentwiki.currentUserIsOwner=You are the owner of this wiki.
-### Missing: platform.wiki.currentwiki.currentUserIsAdmin=You are an administrator of this wiki.
-### Missing: platform.wiki.currentwiki.joinNeedToLogin=To join this wiki, you need to be logged in.
-### Missing: platform.wiki.currentwiki.currentUserNotMember=You are not a member of this wiki.
-### Missing: platform.wiki.currentwiki.currentuserCanJoin=If you like, you can {0}join this wiki{1}.
+platform.wiki.currentwiki.welcome=欢迎来到{0}{1}{2} Wiki.
+platform.wiki.currentwiki.currentUserIsOwner=你是这个wiki的所有者。
+platform.wiki.currentwiki.currentUserIsAdmin=你是这个Wiki的管理员。
+platform.wiki.currentwiki.joinNeedToLogin=你需要先登录，才能加入这个Wiki。
+platform.wiki.currentwiki.currentUserNotMember=你不是这个Wiki的成员。
+platform.wiki.currentwiki.currentuserCanJoin=如果你喜欢这个Wiki，你可以加入它。
 ### Missing: platform.wiki.currentwiki.currentUserIsMember=You are a member of this wiki.
 ### Missing: platform.wiki.currentwiki.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
 ### Missing: platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, see {0}User Directory{1}.

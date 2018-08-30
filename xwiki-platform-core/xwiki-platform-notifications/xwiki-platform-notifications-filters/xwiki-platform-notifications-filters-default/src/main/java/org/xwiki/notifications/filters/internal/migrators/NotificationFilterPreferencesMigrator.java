@@ -264,7 +264,6 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
             }
 
         } catch (Exception e) {
-            logger.error("error:", e);
             throw new DataMigrationException("Failed to migrate notification filter preferences.", e);
         }
     }

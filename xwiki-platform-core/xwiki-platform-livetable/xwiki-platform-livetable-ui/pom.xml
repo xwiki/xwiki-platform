@@ -36,7 +36,7 @@
   </properties>
   <dependencies>
     <!-- Test dependencies forced in front to workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=536868 -->
-    <!-- TODO: remove when Eclipse 4.9 final is released -->
+    <!-- TODO: Move back to the "Test Dependencies" section when Eclipse 4.9 final is released -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-page</artifactId>
@@ -67,10 +67,12 @@
 
     <!-- Test Dependencies -->
     <dependency>
+      <!-- The LiveTableResults page uses Velocity macros from the macros.vm template which is packaged inside the
+        platform WAR. We need to evaluate the macros.vm template when running the integration tests. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-page</artifactId>
+      <artifactId>xwiki-platform-web</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
+      <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -79,4 +81,36 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- Maven doesn't put the WAR dependencies on the class path so in order for the ClasspathResourceLoader to find
+        the macros.vm template when running the integration tests we need to unpack the WAR in a folder that is included
+        in the class path. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-platform-web</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-web</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                  <includes>templates/*</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

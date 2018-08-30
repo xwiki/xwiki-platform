@@ -66,12 +66,7 @@ public class StubVelocityManager implements VelocityManager, Initializable
     public void initialize() throws InitializationException
     {
         try {
-            // Configure the Velocity Engine not to use the Resource Webapp Loader since we don't
-            // need it and we would need to setup the Container component's ApplicationContext
-            // otherwise.
-            Properties properties = new Properties();
-            properties.setProperty("resource.loader", "file");
-            this.velocityEngine.initialize(properties);
+            this.velocityEngine.initialize(new Properties());
         } catch (XWikiVelocityException e) {
             throw new InitializationException("Failed to initialize Velocity Engine", e);
         }

@@ -40,6 +40,8 @@ public class AttachmentsPane extends BaseElement
     @FindBy(xpath = "//input[@value='Add another file']")
     private WebElement addAnotherFile;
 
+    private ConfirmationModal confirmDelete;
+
     /**
      * Fills the URL with the specified file path.
      * 
@@ -71,8 +73,10 @@ public class AttachmentsPane extends BaseElement
 
     public void clickAttachFiles()
     {
-        this.pane.findElement(By.xpath("//form[@id='AddAttachment']//input[@class='button' and @type='submit' and "
-            + "@value='Attach']")).click();
+        this.pane
+            .findElement(By.xpath(
+                "//form[@id='AddAttachment']//input[@class='button' and @type='submit' and " + "@value='Attach']"))
+            .click();
     }
 
     /**
@@ -92,14 +96,13 @@ public class AttachmentsPane extends BaseElement
      */
     public void deleteAttachmentByFileByName(String attachmentName)
     {
-        getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-                + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
-        getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        getDriver().waitUntilElementDisappears(By
-            .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        getDriver().waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='"
-            + attachmentName + "']"));
+        // We initialize before so we can remove the animation before the modal is shown
+        this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
+        getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
+            + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
+        this.confirmDelete.clickOk();
+        getDriver().waitUntilElementDisappears(
+            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName + "']"));
         getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
     }
 
@@ -108,17 +111,19 @@ public class AttachmentsPane extends BaseElement
      */
     public void deleteFirstAttachment()
     {
-        String tmp = getDriver().findElement(
-            By.xpath("//div[@id='_attachments']/*[1]/div[@class='information']/span[@class='name']")).getText();
-        getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp + "']/../../span[2]/a[@class='deletelink']"))
+        String tmp = getDriver()
+            .findElement(By.xpath("//div[@id='_attachments']/*[1]/div[@class='information']/span[@class='name']"))
+            .getText();
+        getDriver()
+            .findElement(By
+                .xpath("//div[@id='attachmentscontent']//a[text()='" + tmp + "']/../../span[2]/a[@class='deletelink']"))
             .click();
 
         getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        getDriver().waitUntilElementDisappears(By
-            .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        getDriver().waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp
-            + "']/../../span[2]/a[@class='deletelink']"));
+        getDriver().waitUntilElementDisappears(
+            By.xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
+        getDriver().waitUntilElementDisappears(
+            By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp + "']/../../span[2]/a[@class='deletelink']"));
     }
 
     /**
@@ -142,38 +147,36 @@ public class AttachmentsPane extends BaseElement
 
     public String getUploaderOfAttachment(String attachmentName)
     {
-        return getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-                + "']/../../div[@class='meta']/span[@class='publisher']/span[@class='wikilink']")).toString();
+        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
+            + "']/../../div[@class='meta']/span[@class='publisher']/span[@class='wikilink']")).toString();
     }
 
     public String getLatestVersionOfAttachment(String attachmentName)
     {
-        return getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()= '" + attachmentName
-                + "']/../../span[@class='version']/a")).getText();
+        return getDriver()
+            .findElement(By.xpath(
+                "//div[@id='attachmentscontent']//a[text()= '" + attachmentName + "']/../../span[@class='version']/a"))
+            .getText();
     }
 
     public String getSizeOfAttachment(String attachmentName)
     {
-        return getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-                + "']/../../div[@class='meta']/span[@class='size']")).toString().replaceAll("[()]", "");
+        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
+            + "']/../../div[@class='meta']/span[@class='size']")).toString().replaceAll("[()]", "");
 
     }
 
     public String getDateOfLastUpload(String attachmentName)
     {
-        return getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-                + "']/../../div[@class='meta']/span[@class='date']")).toString().replaceFirst("on", "");
+        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
+            + "']/../../div[@class='meta']/span[@class='date']")).toString().replaceFirst("on", "");
     }
 
     public boolean attachmentExistsByFileName(String attachmentName)
     {
         try {
-            getDriver().findElement(
-                By.xpath("//a[@title = 'Download this attachment' and . = '" + attachmentName + "']"));
+            getDriver()
+                .findElement(By.xpath("//a[@title = 'Download this attachment' and . = '" + attachmentName + "']"));
         } catch (NoSuchElementException e) {
             return false;
         }

@@ -112,6 +112,8 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
 
     private void migrateUser(DocumentReference user) throws NotificationException
     {
+        logger.info("Migrate notification filter preferences of user [{}].", user);
+
         XWikiContext context = this.getXWikiContext();
         XWiki xwiki = context.getWiki();
 
@@ -257,6 +259,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
                     = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(currentWiki);
             XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
             if (!oldClassDoc.isNew()) {
+                logger.info("Remove the old notification filter preference class.");
                 xwiki.deleteDocument(oldClassDoc, false, context);
             }
 

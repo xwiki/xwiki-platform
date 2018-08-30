@@ -58,7 +58,7 @@
 
     <!-- Hibernate configuration -->
     <xwiki.db.common.extraMappings>
-      activitystream.hbm.xml,instance.hbm.xml,notifications-filters-preferences.hbm.xml
+      activitystream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
     </xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>

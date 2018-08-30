@@ -171,13 +171,17 @@ public class NotificationFilterPreferenceStore
         // store event in the main database
         String currentWiki = context.getWikiId();
 
+        XWikiHibernateStore hibernateStore = null;
+
         try {
             if (activityStreamConfiguration.useMainStore()) {
                 // store event in the main database
                 context.setWikiId(context.getMainXWiki());
             }
 
-            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+            hibernateStore = context.getWiki().getHibernateStore();
+            hibernateStore.beginTransaction(context);
+            Session session = hibernateStore.getSession(context);
 
             for (NotificationFilterPreference preference : filterPreferences) {
                 // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
@@ -185,17 +189,15 @@ public class NotificationFilterPreferenceStore
                 // So we create a copy just in case we are not saving a basic NotificationFilterPreference object.
                 DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
                 copy.setOwner(serializedUser);
-
-                try {
-                    hibernateStore.beginTransaction(context);
-                    Session session = hibernateStore.getSession(context);
-                    session.saveOrUpdate(copy);
-                    hibernateStore.endTransaction(context, true);
-                } catch (Exception e) {
-                    hibernateStore.endTransaction(context, false);
-                    throw new NotificationException("Failed to save the notification filter preferences.", e);
-                }
+                session.saveOrUpdate(copy);
             }
+
+            hibernateStore.endTransaction(context, true);
+        } catch (Exception e) {
+            if (hibernateStore != null) {
+                hibernateStore.endTransaction(context, false);
+            }
+            throw new NotificationException("Failed to save the notification filter preferences.", e);
         } finally {
             if (!currentWiki.equals(context.getWikiId())) {
                 context.setWikiId(currentWiki);

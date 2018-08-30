@@ -25,7 +25,7 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
   <class name="org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference"
-         table="notifications_filters_preferences">
+         table="notification_filter_preferences">
 
     <id name="internalId" type="long">
       <column name="nfp_id" not-null="true" />

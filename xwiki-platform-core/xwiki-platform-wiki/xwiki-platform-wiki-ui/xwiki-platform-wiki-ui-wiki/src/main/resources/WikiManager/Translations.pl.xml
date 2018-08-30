@@ -43,8 +43,8 @@
 
 ## MENU
 core.menu.type.wiki=Wiki
-core.menu.watchlist.add.wiki=Śledź wiki
-core.menu.watchlist.remove.wiki=Nie śledź wiki
+core.menu.watchlist.add.wiki=Subskrybuj Wiki
+core.menu.watchlist.remove.wiki=Odsubskrybuj Wiki
 core.menu.admin.wiki=Administrowanie wiki
 
 # WIKI INFORMATION PANEL
@@ -64,7 +64,7 @@ platform.wiki.currentwiki.invitationPendingForCurrentWiki=Zostałeś zaproszony 
 platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Poprosiłeś o dołączenie do tej wiki.
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Twoje zapytanie o dołączenie do wiki "{0}" zostało zaakceptowane.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Twoje zapytanie o dołaczenie do wiki "{0}" zostało odrzucone.
-### Missing: platform.wiki.currentwiki.candidateHandledSaveComment=Handled candidate {0} ({1})
+platform.wiki.currentwiki.candidateHandledSaveComment=Obsłużony kandydat {0} ({1})
 platform.wiki.currentwiki.candidateHandledComment=Komentarz
 platform.wiki.currentwiki.candidateAcceptedSuccess=Zapytanie zaakceptowane pomyślnie.
 platform.wiki.currentwiki.candidateRejectedSuccess=Zapytanie odrzucone pomyślnie.
@@ -101,11 +101,11 @@ platform.wiki.currentwiki.invite.username.label=Nazwa użytkownika
 platform.wiki.currentwiki.invite.message.label=Wiadomość
 platform.wiki.currentwiki.invite.button.label=Zaproś
 platform.wiki.currentwiki.candidates.label=Kandydaci
-platform.wiki.currentwiki.candidates.status.label=Status\:
-platform.wiki.currentwiki.candidates.type.label=Typ\:
-platform.wiki.currentwiki.candidates.reviewer.label=Admin\:
-platform.wiki.currentwiki.candidates.reviewermessage.label=Wiadomość admina\:
-platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Prywatny komentarz\:
+platform.wiki.currentwiki.candidates.status.label=Status:
+platform.wiki.currentwiki.candidates.type.label=Typ:
+platform.wiki.currentwiki.candidates.reviewer.label=Admin:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Wiadomość admina:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Prywatny komentarz:
 platform.wiki.currentwiki.candidates.accept.label=Akceptuj
 platform.wiki.currentwiki.candidates.reject.label=Odrzuć
 platform.wiki.currentwiki.candidates.invitation.cancel.label=Wycofaj zaproszenie
@@ -122,18 +122,18 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Wyświetlana nazwa tej wiki
 platform.wiki.currentwiki.prop.description.hint=Krótki opis wiki i jej zastosowania.
 platform.wiki.currentwiki.prop.owner.hint=Użytkownik który ma pełne prawa do tej wiki
 platform.wiki.currentwiki.prop.membershipType.hint=Sposób w jaki użytkownicy mogą dołaczyć do tej wiki.
-platform.wiki.currentwiki.prop.secure.hint=Jeśli właczone, wszystkie zewnętrzne adresy wygenerowane na tej wiki będą się zaczynały od {0}https\://~/~/{1}.
+platform.wiki.currentwiki.prop.secure.hint=Jeśli właczone, wszystkie zewnętrzne adresy wygenerowane na tej wiki będą się zaczynały od {0}https://~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=Nazwa użytkownika do dodania
 platform.wiki.currentwiki.invite.message.hint=Wiadomość która zostanie wysłana użytkownikowi.
 platform.wiki.currentwiki.candidates.hint=Użytkownicy którzy zapytali o zaproszenie lub zostali zaproszeni do wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Zarządzanie ustawieniami takimi jak nazwa wiki, opis, właściciel, typ członkostwa
-admin.xwiki.workspaceusers.description=Zarządzanie członkami wiki\: dodawanie, usuwanie, zapraszanie, akceptowanie i odrzucanie członków wiki.
+admin.xwiki.workspaceusers.description=Zarządzanie członkami wiki: dodawanie, usuwanie, zapraszanie, akceptowanie i odrzucanie członków wiki.
 admin.xwiki.usersconfiguration.title=Konfiguracja
-### Missing: admin.xwiki.members.title=Current Members
+admin.xwiki.members.title=Aktualni członkowie
     
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home
+platform.wiki.drawer.homeWiki=Główna
 </content>
 </xwikidoc>

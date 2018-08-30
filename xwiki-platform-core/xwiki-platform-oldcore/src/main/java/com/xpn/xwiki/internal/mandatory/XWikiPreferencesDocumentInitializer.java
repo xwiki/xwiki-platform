@@ -111,7 +111,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
         xclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
-        xclass.addTextField("skin", "Skin", 30);
+        xclass.addPageField("skin", "Skin", 30);
         xclass.addDBListField("colorTheme", "Color theme",
             "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
                 + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "
@@ -181,7 +181,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addStaticListField("leftPanelsWidth", "Width of the left panel column", "---|Small|Medium|Large");
         xclass.addStaticListField("rightPanelsWidth", "Width of the right panel column", "---|Small|Medium|Large");
         xclass.addTextField("languages", "Supported languages", 30);
-        xclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
+        xclass.addPageField("documentBundles", "Internationalization Document Bundles", 60);
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
 
         // Only used by LDAP authentication service

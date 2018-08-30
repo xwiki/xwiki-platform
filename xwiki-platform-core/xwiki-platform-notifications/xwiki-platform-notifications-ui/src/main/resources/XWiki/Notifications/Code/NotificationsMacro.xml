@@ -301,8 +301,6 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       var promise = $.Deferred();
       var restURL = xm.restURL.substring(0, xm.restURL.indexOf('/rest/')) + '/rest/notifications?media=json';
       $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data) {
-        // Remove loading items
-        self.macro.removeClass('loading');
         // Display the "nothing!" message if there is no notification
         if (data.notifications.length == 0 &amp;&amp; !untilDate) {
           self.displayNoNotification();
@@ -328,6 +326,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
             self.load(lastEventDate);
           });
         }
+        // Remove loading items
+        self.macro.removeClass('loading');
+        // Call the listeners
         promise.resolve(data.notifications);
       });
       return promise;

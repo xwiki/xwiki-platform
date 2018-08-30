@@ -18,9 +18,8 @@
 ## Does the current user have admin rights on the current wiki. We check for admin rights on the wiki preferences page.
 #set ($wikiPreferencesReference = $services.model.resolveDocument('XWiki.XWikiPreferences'))
 #set ($hasGlobalAdmin = $services.security.authorization.hasAccess('admin', $wikiPreferencesReference))
-## Does the current user have programming rights on the current wiki. We check for programming rights on the wiki
-## preferences page.
-#set ($hasProgramming = $services.security.authorization.hasAccess('programming', $wikiPreferencesReference))
+## Does the current user have programming rights
+#set ($hasProgramming = $services.security.authorization.hasAccess('programming', $xcontext.userReference, $NULL))
 ## Does the current user have the right to create new wiki. We check for the create wiki right on the wiki preferences
 ## page.
 #set ($hasCreateWiki = $services.security.authorization.hasAccess('createwiki', $wikiPreferencesReference))

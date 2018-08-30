@@ -115,12 +115,10 @@
     </recipient>
     <sendingUser>
       <cache>0</cache>
-      <classname/>
       <customDisplay/>
       <disabled>0</disabled>
       <displayType>input</displayType>
       <hint/>
-      <idField/>
       <multiSelect>0</multiSelect>
       <name>sendingUser</name>
       <number>3</number>
@@ -131,11 +129,10 @@
       <separator> </separator>
       <separators/>
       <sort>none</sort>
-      <sql/>
       <unmodifiable>0</unmodifiable>
+      <usesList>0</usesList>
       <validationMessage/>
       <validationRegExp/>
-      <valueField/>
       <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
     </sendingUser>
     <sentDate>

@@ -14,7 +14,7 @@
 <div class="xwikidatatitle">
 <a href="" onclick="showhide('xwikicommentscontent'); return false">$services.localization.render('comments')</a>:
 $!comments.size() $services.localization.render('comments') #if($comments.size()>0) $services.localization.render('by')
-$!xwiki.getUserName($doc.display('author','view',$comments.get(0))) ...
+$!xwiki.getUserName($comments.get(0).getValue('author')) ...
 #end
 </div>
 </div>
@@ -24,7 +24,7 @@ $!xwiki.getUserName($doc.display('author','view',$comments.get(0))) ...
 #foreach($comment in $comments)
 #set($count=$count+1)
 <div id="xwikicomment_${count}" class="xwikicomment" >
-$!xwiki.getUserName($doc.display('author','view',$comment))
+$!xwiki.getUserName($comment.getValue('author'))
 #set($date = $doc.display("date","view",$comment))
 #if($date != "")
 $date

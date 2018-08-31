@@ -442,10 +442,12 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
   /**
   * Construct the Toggleable Filter Preference object.
   */
-  return function(domElement, userURL) {
+  return function(domElement, userURL, data, updateCallback) {
     var self               = this;
     self.domElement        = $(domElement);
     self.userURL           = userURL;
+    self.data              = data;
+    self.updateCallback    = updateCallback;
     /**
      * Initialization
      */
@@ -490,6 +492,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         }).done(function (data) {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+          updateCallback(self.data, state);
         }).fail(function () {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
@@ -597,6 +600,24 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
     <property>
       <code>require(['jquery', 'xwiki-meta', 'ToggleableFilterPreference', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ToggleableFilterPreference) {
 
+  var updateFetchedRow = function(data, state) {
+    var fetchedRows = data.table.fetchedRows;
+    for (var i = 0; i &lt; fetchedRows.length; i++) {
+      if (fetchedRows[i] === data.data) {
+        var changedRow = $(fetchedRows[i].isEnabled);
+        if (changedRow.length &gt; 0) {
+          if (state) {
+            changedRow.attr("checked", "checked");
+          } else {
+            changedRow.removeAttr("checked");
+          }
+          fetchedRows[i].isEnabled = changedRow.get(0).outerHTML;
+        }
+        break;
+      }
+    }
+  }
+
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
   var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
@@ -637,6 +658,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       }).done(function() {
         notif.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
+        updateFetchedRow(data, state);
       }).fail(function() {
         notif.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
@@ -644,7 +666,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
     });
     // Enable / Disable action for toggleable filter preferences
     $(data.row).find('.toggleableFilterPreferenceCheckbox').each(function() {
-      new ToggleableFilterPreference(this, userURL);
+      new ToggleableFilterPreference(this, userURL, data, updateFetchedRow);
     });
   });
 

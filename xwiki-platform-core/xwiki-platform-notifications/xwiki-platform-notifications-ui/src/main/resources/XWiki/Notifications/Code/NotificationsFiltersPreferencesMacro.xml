@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1518616102000</creationDate>
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1518621416000</date>
-  <contentUpdateDate>1518616102000</contentUpdateDate>
   <version>1.1</version>
   <title>NotificationsFiltersPreferencesMacro</title>
   <comment/>
@@ -601,7 +598,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
 
   $(document).on('xwiki:livetable:notifications-filters:toggle', function(event, data) {
     var changedRow = $(data.row.isEnabled);
-    if (changedRow.length > 0) {
+    if (changedRow.length &gt; 0) {
       if (data.state) {
         changedRow.attr("checked", "checked");
       } else {

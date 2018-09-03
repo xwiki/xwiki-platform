@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1273961173000</creationDate>
   <parent>Invitation.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1511976572000</date>
-  <contentUpdateDate>1511976572000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.invitation.tools.heading')</title>
   <comment/>

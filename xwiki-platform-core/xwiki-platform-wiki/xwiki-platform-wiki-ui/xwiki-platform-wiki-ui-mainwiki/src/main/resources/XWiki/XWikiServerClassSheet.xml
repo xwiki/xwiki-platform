@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1360852375000</creationDate>
   <parent>XWiki.XWikiServerClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1534436227000</date>
-  <contentUpdateDate>1534436227000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.getObject('XWiki.XWikiServerClass'))$services.localization.render('platform.wiki.sheet.title', [$doc.name.replaceAll('XWikiServer', '').toLowerCase()])#{else}Sheet for XWikiServerClass#end</title>
   <comment/>

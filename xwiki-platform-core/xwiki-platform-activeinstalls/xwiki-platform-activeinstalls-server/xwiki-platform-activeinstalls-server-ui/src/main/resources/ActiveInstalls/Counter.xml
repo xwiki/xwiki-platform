@@ -31,9 +31,6 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1398951564000</creationDate>
-  <date>1399016714000</date>
-  <contentUpdateDate>1398951564000</contentUpdateDate>
   <version>1.1</version>
   <title>Active Installs Counters</title>
   <defaultTemplate/>
@@ -47,7 +44,6 @@
     <mimetype>image/png</mimetype>
     <filesize>24246</filesize>
     <author>xwiki:XWiki.Admin</author>
-    <date>1378812594000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAANQAAARtCAMAAAAaipuEAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJ

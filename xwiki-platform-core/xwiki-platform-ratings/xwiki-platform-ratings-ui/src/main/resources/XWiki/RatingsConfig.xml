@@ -28,11 +28,8 @@
   <translation>0</translation>
   <parent>XWiki.Ratings</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1417681389000</creationDate>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1417709848000</date>
-  <contentUpdateDate>1417702265000</contentUpdateDate>
   <version>1.1</version>
   <title>Ratings Config</title>
   <comment/>

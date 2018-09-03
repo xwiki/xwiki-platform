@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1418135060000</creationDate>
   <parent>XWiki.XWikiPreferences</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1420720635000</date>
-  <contentUpdateDate>1420720635000</contentUpdateDate>
   <version>1.1</version>
   <title>AdminWikiDescriptorSheet</title>
   <comment/>

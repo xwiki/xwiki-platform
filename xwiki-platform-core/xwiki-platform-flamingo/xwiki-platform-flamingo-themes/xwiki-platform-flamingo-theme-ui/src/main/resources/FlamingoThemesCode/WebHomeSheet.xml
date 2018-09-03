@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1414513755000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1414515317000</date>
-  <contentUpdateDate>1414515317000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.flamingo.themes.home.title')</title>
   <comment/>

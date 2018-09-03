@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1404731556000</creationDate>
   <parent>XWiki.DeletedDocuments</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1504192273000</date>
-  <contentUpdateDate>1504188802000</contentUpdateDate>
   <version>1.1</version>
   <title>JSON Generation for the Deleted Documents Livetable</title>
   <comment/>

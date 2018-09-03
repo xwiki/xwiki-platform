@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1317894171000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1513606714000</date>
-  <contentUpdateDate>1513606714000</contentUpdateDate>
   <version>1.1</version>
   <title>#if(!$doc.name.endsWith('Sheet'))$services.localization.render('appWithinMinutes.classEditor.title', [$stringtool.removeEnd($doc.title, 'Class').trim()])#{else}$doc.name#end</title>
   <comment/>
@@ -755,7 +752,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     <filename>arrow-move.png</filename>
     <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1319483586000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sFCwoGAh4PDUEAAAHoSURBVCjPY2CAAotpDxkYGBgYzKc/1fBe9ua05cxnbgxYACMyx272C10pUbYZxuoCVneffXt29vr7XGEBng07YgT/wdQwGXRdhWu4eftm7cHjl4V+/vr9d/v+C28ePbpXuPPAAXYGBgYGg84rCJO1Wy/q6ndcXsXAwMDAmLwluvbU93/cOTvXMTAwMOh3Xpmm03bJB6aWRaHimIaUCOeMZy8/CUkVHYr+9P2H+dev3/8x/WfkVig7Gvr54xd1Qy1R/7eFh7OERbg3M+o1nTjtYqNtwsj4/+/3P3+Y3n7++u/r159MrOwsf///+8/8n4Hh79cvP1gY/v57d+3acy2W58/fVt+882T+9dvP3nz+/OPu399/uY09jJyO7zx3nIWN5fXf33/F1K01ja8fu9rNw8f1jun1dO9dBw5fyf344fOn1zO8g/58+TTnDRM7879fP1+/nOYVzMj479HV/RdauQQ4eh5NcP3NwsDAwMDK+G8DMzPzdt7oZdP+fvum/p6Z8++vjx/EeGOWL/3140c1ExPT0yd97n/Es7aiRgpH0Fwfvo4LT5k2///Pv/zdNw7PqdWcYQtZsUUgA1f4QkjEWLX6szeefstk21HBkrKOhYEQYAqay8Tg0C3O5DeTlYGBgYE1cC6KPAAEFtSlCs4TrgAAAABJRU5ErkJggg==</content>
@@ -765,7 +761,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     <filename>bulletcross.png</filename>
     <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1319483586000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAB3RJTUUH1woQCDkQxGYFbwAAAAlwSFlzAAAewQAAHsEBw2lUUwAAAARnQU1BAACxjwv8YQUAAAHaSURBVHja3VJBa9RAFP5mJroxm3TdrR4sgojHFaGIvVvBo3gWlGr9CUrFXyD4KwQR/A1KD4VW8NBTrnWr6XazLVvbjW4mmcyML9sqG1v17oOXSd7M982X7z1gIqy1/0y5sOhNfrMKwZOlw5eXL3BSZAuLsIWCUQW8t2/GNV45IcTh+vTZX8FGKSR37p5AoPUlIrGWc5s/etz+WZYPHrZBNR4EdvBh7eaYKFf4eus2r/7C0nOLWg225NrdhZHp1fJGxnkoGlNwGg1k0RZkHDOT52guv4NTIchzQwo4CwIwz4PNZAjGwH0fTjAFGUXIerE2qgS/H2MqBNnOzg3uuh95kgineRbCdQFjKDXkl890c18Xo9HcudWVX5iKB+7rV+s6TefUYGCgNLC5CXQ6pTeQvdgcgdcnMRUFR8OQMc44dAGQ22MFBfkgOC/3fj9eUZDeu9+myQjFGY9ABJ6ZobwwJqiRgcIRYX/2evvPCqwNHQKf8j2k29uQ/T4ZppjbbPH6+WnopA61vx9uXb7CLnY2jiuwZBY9kHZ7Zas09dq3StW/d7t6uPGJRoGXLYUlT4jkuAJ1MJzXo3RZDQ+MLbQ/vboiy3p8bdZPoujb6SAQcm9v3m21QCv+k/gB4NkSwe3cC88AAAAASUVORK5CYII=</content>
@@ -775,7 +770,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     <filename>bullettick.png</filename>
     <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1319483586000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAB3RJTUUH1woQCDUr2dijRwAAAAlwSFlzAAAewQAAHsEBw2lUUwAAAARnQU1BAACxjwv8YQUAAAEySURBVHjaY2AYBYzEKgxd4DPx+5/vNgz/GE9uSduTBRNnIlazuJBYnqWOuREnE2cmshwLsZoVZeUZ/gHh65dvGHAakLUr3ubf3/+Hv3/9XrAwZPVEmGZZaWmGX/9+M2xcv43h9rubKN5G8cKf339WyAlJM/z+9adXv1dVk12EKU1KSorhz78/YM233txgtO4ywe2CF9+fimpxajJoK2syC/EIXhMXFWP48/8Pw7aNuxhuv7/JaNFhxLiJ5+B/nLFgPl2HQZBH4L+jthPDv39/wc7evmkPw/WX1xg/zv6BNYxQXMArz8305PIzxo0fN/1X4ldhuHPzHsO151cYOSXZmT4y/PhHVDowWaTF9Orq63+SLDL/b7+9wfj7/2+mzzP/YNWMF/BmsHGIN/MRndAGDgAAvQx64I+NPuAAAAAASUVORK5CYII=</content>

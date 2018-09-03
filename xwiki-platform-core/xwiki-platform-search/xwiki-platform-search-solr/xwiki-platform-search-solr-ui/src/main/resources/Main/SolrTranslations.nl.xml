@@ -57,7 +57,7 @@
 ### Missing: solr.admin.indexing.query.label=Custom query
 ### Missing: solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
 
-solr.sortBy=Sorteren op\:
+solr.sortBy=Sorteren op:
 solr.sortBy.score=Relevantie
 solr.sortBy.title_sort=Titel
 solr.sortBy.date=Datum
@@ -76,7 +76,7 @@ solr.sortOrder.desc=Aflopend
 ### Missing: solr.options.facet.title=Allow extra filtering of the result
 
 ### Missing: solr.result.language=Language
-### Missing: solr.result.locatedIn=Located in
+solr.result.locatedIn=Gevestigd in
 solr.result.author=Gewijzigd door {0} op {1}
 solr.result.mediaType=Bestand van het type {0}
 ### Missing: solr.result.uploadedBy=Uploaded by {0} on {1} ({2})

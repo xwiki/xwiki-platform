@@ -21,12 +21,14 @@ package org.xwiki.test.selenium;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.AdministrationMenu;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 import static org.junit.Assert.*;
 
@@ -232,7 +234,9 @@ public class AdministrationTest extends AbstractXWikiTestCase
         clickButtonAndContinue("//input[@name='action_objectadd']");
         setFieldValue("XWiki.ConfigurableClass_1_displayInSection", "TestSection2");
         setFieldValue("XWiki.ConfigurableClass_1_heading", "Some Other Heading");
-        setFieldValue("XWiki.ConfigurableClass_1_configurationClass", space + "." + page);
+        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
+            .findElementById("XWiki.ConfigurableClass_1_configurationClass"));
+        configurationSuggest.sendKeys(space + "." + page).waitForSuggestions().sendKeys(Keys.ENTER);
         getSelenium().uncheck("XWiki.ConfigurableClass_1_configureGlobally");
         // Set propertiesToShow so that each config only shows half of the properties.
         setFieldValue("XWiki.ConfigurableClass_1_propertiesToShow", "TextArea, Select");
@@ -408,7 +412,9 @@ public class AdministrationTest extends AbstractXWikiTestCase
         expandObject("XWiki.ConfigurableClass", 0);
         setFieldValue("XWiki.ConfigurableClass_0_codeToExecute", codeToExecute);
         setFieldValue("XWiki.ConfigurableClass_0_heading", heading);
-        setFieldValue("XWiki.ConfigurableClass_0_configurationClass", "");
+        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
+            .findElementById("XWiki.ConfigurableClass_0_configurationClass"));
+        configurationSuggest.clear();
         clickEditSaveAndView();
 
         Page restPage = getUtil().rest().get(new LocalDocumentReference("XWiki", "ConfigurableClass"));
@@ -453,7 +459,9 @@ public class AdministrationTest extends AbstractXWikiTestCase
         createConfigurableApplication(space, page, "TestSection1", true);
         open(space, page, "edit", "editor=object");
         expandObject("XWiki.ConfigurableClass", 0);
-        setFieldValue("XWiki.ConfigurableClass_0_configurationClass", "");
+        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
+            .findElementById("XWiki.ConfigurableClass_0_configurationClass"));
+        configurationSuggest.clear();
         setFieldValue("XWiki.ConfigurableClass_0_codeToExecute", test);
         clickEditSaveAndView();
 
@@ -482,7 +490,9 @@ public class AdministrationTest extends AbstractXWikiTestCase
         getSelenium().select("classname", "value=XWiki.ConfigurableClass");
         clickButtonAndContinue("//input[@name='action_objectadd']");
         setFieldValue("XWiki.ConfigurableClass_1_displayInSection", "TestSection1");
-        setFieldValue("XWiki.ConfigurableClass_1_configurationClass", space + "." + page);
+        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
+            .findElementById("XWiki.ConfigurableClass_1_configurationClass"));
+        configurationSuggest.sendKeys(space + "." + page).waitForSuggestions().sendKeys(Keys.ENTER);
         setFieldValue("XWiki.ConfigurableClass_1_propertiesToShow", "TextArea, Select");
         setFieldValue("XWiki.ConfigurableClass_1_codeToExecute", test);
         getSelenium().check("XWiki.ConfigurableClass_1_configureGlobally");
@@ -644,7 +654,9 @@ public class AdministrationTest extends AbstractXWikiTestCase
 
         setFieldValue("XWiki.ConfigurableClass_0_displayInSection", section);
         setFieldValue("XWiki.ConfigurableClass_0_heading", "Some Heading");
-        setFieldValue("XWiki.ConfigurableClass_0_configurationClass", space + "." + page);
+        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
+            .findElementById("XWiki.ConfigurableClass_0_configurationClass"));
+        configurationSuggest.sendKeys(space + "." + page).waitForSuggestions().sendKeys(Keys.ENTER);
         
         // Unfold the XWiki.ConfigurableClass object so that we can modify its properties
         WebElement configurableClassObj = getDriver().findElement(By.id("xobject_XWiki.ConfigurableClass_0"));

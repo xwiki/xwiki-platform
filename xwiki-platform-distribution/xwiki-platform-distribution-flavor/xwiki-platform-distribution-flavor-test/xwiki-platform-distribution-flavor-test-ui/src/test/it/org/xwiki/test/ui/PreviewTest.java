@@ -23,8 +23,10 @@ import static org.junit.Assert.*;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.openqa.selenium.Keys;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
@@ -74,8 +76,9 @@ public class PreviewTest extends AbstractTest
         // Bind the class to the sheet.
         ObjectEditPage objectEditor = ObjectEditPage.gotoPage(getTestClassName(), getTestMethodName() + "Class");
         ObjectEditPane objectEditPane = objectEditor.addObject("XWiki.ClassSheetBinding");
-        objectEditPane.setFieldValue(objectEditPane.byPropertyName("sheet"), getTestClassName() + "."
-            + getTestMethodName() + "Sheet");
+        SuggestInputElement sheetPicker = objectEditPane.getSuggestInput("sheet");
+        sheetPicker.sendKeys(getTestClassName() + "." + getTestMethodName() + "Sheet").waitForSuggestions()
+            .sendKeys(Keys.ENTER);
         objectEditor.clickSaveAndContinue();
 
         // Create the template.

@@ -152,7 +152,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
       });
     };
-    $(document).on('xwiki:livetable:newrow', function (event, data) {
+    $(document).on('xwiki:livetable:displayComplete', function (event, data) {
       // Enable bootstrap switches
       initBootstrapSwitches();
     });

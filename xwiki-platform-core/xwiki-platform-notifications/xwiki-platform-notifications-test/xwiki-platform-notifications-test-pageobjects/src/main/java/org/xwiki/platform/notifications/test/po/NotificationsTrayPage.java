@@ -42,7 +42,7 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement notificationsArea;
 
-    @FindBy(css = "li#tmNotifications a[title='Watchlist']")
+    @FindBy(css = "li#tmNotifications a[title='Notifications']")
     private WebElement watchListButton;
 
     @FindBy(css = "li#tmNotifications")
@@ -53,6 +53,9 @@ public class NotificationsTrayPage extends ViewPage
 
     @FindBy(className = "notification-event-clean")
     private WebElement clearAllLink;
+
+    @FindBy(className = "notifications-toggles")
+    private WebElement toggles;
 
     /**
      * Constructor.
@@ -125,7 +128,7 @@ public class NotificationsTrayPage extends ViewPage
     /**
      * Ensure that the notifications tray is visible.
      */
-    private void showNotificationTray()
+    public void showNotificationTray()
     {
         if (!isMenuOpen()) {
             this.watchListButton.click();
@@ -274,5 +277,103 @@ public class NotificationsTrayPage extends ViewPage
         if (e != null) {
             e.click();
         }
+    }
+
+    private boolean isSwitchOn(String className)
+    {
+        showNotificationTray();
+        return toggles.findElement(By.className(className)).getAttribute(CLASS).contains("bootstrap-switch-on");
+    }
+
+    /**
+     * @return either or not the page is watched
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public boolean isPageOnlyWatched()
+    {
+        return this.isSwitchOn("bootstrap-switch-id-notificationPageOnly");
+    }
+
+    /**
+     * @return either or not the "space" is watched
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public boolean arePageAndChildrenWatched()
+    {
+        return this.isSwitchOn("bootstrap-switch-id-notificationPageAndChildren");
+    }
+
+    /**
+     * @return either or not the wiki is watched
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public boolean isWikiWatched()
+    {
+        return this.isSwitchOn("bootstrap-switch-id-notificationWiki");
+    }
+
+    private void waitUntilWatchedStateAreSaved()
+    {
+        waitForNotificationSuccessMessage("Saved!");
+        getDriver().waitUntilCondition(driver ->
+                toggles.findElement(By.cssSelector("input#notificationPageOnly")).isEnabled()
+                && toggles.findElement(By.cssSelector("input#notificationPageAndChildren")).isEnabled()
+                && toggles.findElement(By.cssSelector("input#notificationWiki")).isEnabled()
+        );
+    }
+
+    /**
+     * Watch or unwatch the current page.
+     * @param watched the desired state
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public void setPageOnlyWatchedState(boolean watched)
+    {
+        showNotificationTray();
+        toggles.findElement(
+                By.cssSelector(".bootstrap-switch-id-notificationPageOnly .bootstrap-switch-label")
+            ).click();
+        getDriver().waitUntilCondition(driver -> isPageOnlyWatched() == watched);
+        waitUntilWatchedStateAreSaved();
+    }
+
+    /**
+     * Watch or unwatch the current "space".
+     * @param watched the desired state
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public void setPageAndChildrenWatchedState(boolean watched)
+    {
+        showNotificationTray();
+        toggles.findElement(
+                By.cssSelector(".bootstrap-switch-id-notificationPageAndChildren .bootstrap-switch-label")
+            ).click();
+        getDriver().waitUntilCondition(driver -> arePageAndChildrenWatched() == watched);
+        waitUntilWatchedStateAreSaved();
+    }
+
+    /**
+     * Watch or unwatch the current wiki.
+     * @param watched the desired state
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public void setWikiWatchedState(boolean watched)
+    {
+        showNotificationTray();
+        toggles.findElement(By.cssSelector(".bootstrap-switch-id-notificationWiki .bootstrap-switch-label")).click();
+        getDriver().waitUntilCondition(driver -> isWikiWatched() == watched);
+        waitUntilWatchedStateAreSaved();
     }
 }

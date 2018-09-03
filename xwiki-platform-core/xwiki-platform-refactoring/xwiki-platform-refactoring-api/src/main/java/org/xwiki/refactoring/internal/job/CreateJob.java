@@ -28,6 +28,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
+import org.xwiki.refactoring.job.OverwriteQuestion;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.security.authorization.Right;
 
@@ -41,6 +42,8 @@ import org.xwiki.security.authorization.Right;
 @Named(RefactoringJobs.CREATE)
 public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<CreateRequest>>
 {
+    private Boolean overwriteAll;
+
     @Override
     public String getType()
     {
@@ -135,8 +138,8 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
     {
         if (request.getSkippedEntities().contains(newDocumentReference)) {
             this.logger.debug("Skipping creation of document [{}], as specified in the request.", newDocumentReference);
-        } else if (this.modelBridge.exists(newDocumentReference)) {
-            // TODO: Ask the user if it's OK to override. For now, just log.
+        } else if (this.modelBridge.exists(newDocumentReference)
+            && (!this.request.isInteractive() || !confirmOverwrite(newDocumentReference, templateDocumentReference))) {
             this.logger.warn("Skipping creation of document [{}] because it already exists.", newDocumentReference);
         } else if (!hasAccess(Right.EDIT, newDocumentReference)) {
             this.logger.error("You are not allowed to create the document [{}].", newDocumentReference);
@@ -150,6 +153,29 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
             this.logger.error("Template document [{}] does not exist.", templateDocumentReference);
         } else {
             this.modelBridge.copy(templateDocumentReference, newDocumentReference);
+        }
+    }
+
+    /*
+     * TODO: Refactor since the same code is used in {@link MoveJob}.
+     */
+    private boolean confirmOverwrite(DocumentReference newDocReference, DocumentReference templateDocumentReference)
+    {
+        if (this.overwriteAll == null) {
+            OverwriteQuestion question = new OverwriteQuestion(templateDocumentReference, newDocReference);
+            try {
+                this.status.ask(question);
+                if (!question.isAskAgain()) {
+                    // Use the same answer for the following overwrite questions.
+                    this.overwriteAll = question.isOverwrite();
+                }
+                return question.isOverwrite();
+            } catch (InterruptedException e) {
+                this.logger.warn("Overwrite question has been interrupted.");
+                return false;
+            }
+        } else {
+            return this.overwriteAll;
         }
     }
 }

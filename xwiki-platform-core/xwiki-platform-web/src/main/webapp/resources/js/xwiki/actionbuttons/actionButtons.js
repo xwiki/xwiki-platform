@@ -55,7 +55,7 @@ actionButtons.EditActions = Class.create({
       'action_save' : "$services.localization.render('core.shortcuts.edit.saveandview')",
       'action_propupdate' : "$services.localization.render('core.shortcuts.edit.saveandview')",
       'action_saveandcontinue' : "$services.localization.render('core.shortcuts.edit.saveandcontinue')"
-    }
+    };
     for (var key in shortcuts) {
       var targetButtons = $$("input[name=" + key + "]");
       if (targetButtons.size() > 0) {
@@ -87,7 +87,7 @@ actionButtons.EditActions = Class.create({
     }
     var commentField = form.comment;
     if (commentField && ($xwiki.isEditCommentSuggested() || $xwiki.isEditCommentMandatory())) {
-      while (commentField.value == '') {
+      while (commentField.value === '') {
         var response = prompt("$services.localization.render('core.comment.prompt')", '');
         if (response === null) {
           return false;
@@ -284,7 +284,7 @@ actionButtons.AjaxSaveAndContinue = Class.create({
   onFailure : function(response) {
     this.savingBox.replace(this.failedBox);
     this.progressBox.replace(this.failedBox);
-    if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+    if (response.statusText === '' /* No response */ || response.status == 12031 /* In IE */) {
       $('ajaxRequestFailureReason').update('Server not responding');
     } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
       // Regard the body of plain text responses as custom status messages.
@@ -298,7 +298,7 @@ actionButtons.AjaxSaveAndContinue = Class.create({
   startStatusReport : function(statusUrl) {
     updateStatus(0);
   },
-  getStatus : function(statusUrl, isContinue, redirectUrl) {
+  getStatus : function(statusUrl, isContinue) {
     new Ajax.Request(statusUrl, {
       method : 'get',
       parameters : { 'media' : 'json' },
@@ -306,24 +306,31 @@ actionButtons.AjaxSaveAndContinue = Class.create({
         var progressOffset = response.responseJSON.progress.offset;
         this.updateStatus(progressOffset);
         if (progressOffset < 1) {
-          // Start polling for status updates, every second.
-          setTimeout(this.getStatus.bind(this, statusUrl, isContinue), 1000);
+          var statusCallback = this.getStatus.bind(this, statusUrl, isContinue);
+          // Check for any questions that the user has to answer.
+          if (response.responseJSON.state == 'WAITING') {
+            this.getQuestion(response.responseJSON.id, statusCallback);
+          } else {
+            // Poll for status updates, every second.
+            setTimeout(statusCallback, 1000);
+          }
         } else {
           // Job complete.
           this.progressBox.replace(this.savedBox);
-          this.maybeRedirect(isContinue);
+          // Redirect if needed, but with a slight timeout for the current AJAX call to finish and avoid a false "failed" event.
+          setTimeout(this.maybeRedirect.bind(this, isContinue), 100);
         }
       }.bindAsEventListener(this),
       on1223 : this.on1223.bindAsEventListener(this),
       on0 : this.on0.bindAsEventListener(this),
       onFailure : this.onFailure.bindAsEventListener(this)
     });
-  }, 
+  },
   updateStatus : function(progressOffset) {
     var stringProgress = "" + (progressOffset * 100);
     var dotIndex = stringProgress.indexOf('.');
     if (dotIndex > -1) {
-      var stringProgress = stringProgress.substring(0, dotIndex + 2);
+      stringProgress = stringProgress.substring(0, dotIndex + 2);
     }
     var newProgressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', stringProgress), "inprogress");
     this.progressBox.replace(newProgressBox);
@@ -355,6 +362,67 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     if (url) {
       window.location = url;
     }
+  },
+  getQuestion : function(jobId, statusCallback) {
+    new Ajax.Request(XWiki.currentDocument.getURL('get'), {
+      method : 'get',
+      parameters : {
+        'xpage' : 'overwritequestion',
+        'jobId' : jobId,
+        'action' : 'getQuestion'
+      },
+      onSuccess : function(response) {
+        this.askOverwriteQuestion(jobId, response.responseJSON, statusCallback);
+      }.bindAsEventListener(this),
+      on1223 : this.on1223.bindAsEventListener(this),
+      on0 : this.on0.bindAsEventListener(this),
+      onFailure : this.onFailure.bindAsEventListener(this)
+    });
+  },
+  askOverwriteQuestion : function(jobId, responseJSON, statusCallback) {
+    // Since we are using bootstrap's modal popups, we need some jQuery goodness at this point.
+    require(['jquery'], function($) {
+      var modalElement = jQuery('#overwriteQuestionModal');
+
+      // Set the source and destination.
+      modalElement.find('.overwrite-question-source').html("<a href='" + responseJSON.sourceURL + "'>" + responseJSON.sourceTitle + "</a>");
+      modalElement.find('.overwrite-question-destination').html("<a href='" + responseJSON.destinationURL + "'>" + responseJSON.destinationTitle + "</a>");
+
+      // Since the form might be disabled, we need to make sure the modal's controls are enabled.
+      modalElement.find('button').prop('disabled', false);
+      modalElement.find('input').prop('disabled', false);
+
+      // Register the click handlers for the modal buttons.
+      modalElement.find('button').on('click', function(e) {
+        var button = e.target;
+        var overwrite = jQuery(button).data('overwrite') === true;
+        var askAgain = jQuery('#overwriteQuestionModal input[type="checkbox"]').prop('checked') == false;
+        this.answerQuestion(jobId, overwrite, askAgain, statusCallback);
+      }.bind(this));
+
+      // Show the modal.
+      modalElement.modal({'backdrop':'static'});
+    }.bind(this));
+  },
+  answerQuestion : function(jobId, overwrite, askAgain, statusCallback) {
+    new Ajax.Request(XWiki.currentDocument.getURL('get'), {
+      method : 'get',
+      parameters : {
+        'xpage' : 'overwritequestion',
+        'jobId' : jobId,
+        'action' : 'answer',
+        'overwrite' : overwrite,
+        'askAgain' : askAgain
+      },
+      on1223 : this.on1223.bindAsEventListener(this),
+      on0 : this.on0.bindAsEventListener(this),
+      onFailure : function(response) {
+        new XWiki.widgets.Notification("Failed to send answer.", "error");
+      },
+      onComplete: function(response) {
+        statusCallback();
+      }.bindAsEventListener(this)
+    });
   }
 });
 

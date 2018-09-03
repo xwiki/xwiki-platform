@@ -33,4 +33,25 @@
       #end
     </span> ## meta-versionSummary
   </div> ## buttons
+  ## Include the overwrite modal dialog that might be needed when copying a template's document hierarchy.
+  #if ("$!request.template" != '')
+    <div class="modal" id="overwriteQuestionModal" tabindex="-1" role="dialog" aria-labelledby="overwriteQuestionModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="overwriteQuestionModalLabel">$services.localization.render('core.editors.save.overwrite.title')</h4>
+          </div>
+          <div class="modal-body">
+            <p>$services.localization.render('core.editors.save.overwrite.destinationExists', ['<span class="overwrite-question-destination"></span>'])</p>
+            <p>$services.localization.render('core.editors.save.overwrite.confirmWithSource', ['<span class="overwrite-question-source"></span>'])</p>
+          </div>
+          <div class="modal-footer">
+            <label class="checkbox-inline"><input type="checkbox"/>$services.localization.render('core.editors.save.overwrite.dontAskAgain')</label>
+            <button type="button" class="btn btn-default" data-dismiss="modal" data-overwrite="true">$services.localization.render('yes')</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" data-overwrite="false">$services.localization.render('no')</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  #end
 #end

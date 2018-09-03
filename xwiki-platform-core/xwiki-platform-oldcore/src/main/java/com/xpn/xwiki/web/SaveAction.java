@@ -278,8 +278,6 @@ public class SaveAction extends PreviewAction
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
 
         CreateRequest request = refactoring.createCreateRequest(Arrays.asList(entityReference));
-        // Set the target document.
-        request.setEntityReferences(Arrays.asList(entityReference));
         // Set the template to use.
         DocumentReferenceResolver<String> resolver =
             Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
@@ -288,6 +286,8 @@ public class SaveAction extends PreviewAction
         // We`ve already created and populated the fields of the target document, focus only on the remaining children
         // specified in the template.
         request.setSkippedEntities(Arrays.asList(entityReference));
+        // Make the request interactive so that the user is asked to overwrite existing files.
+        request.setInteractive(true);
 
         Job createJob = refactoring.create(request);
         if (createJob != null) {

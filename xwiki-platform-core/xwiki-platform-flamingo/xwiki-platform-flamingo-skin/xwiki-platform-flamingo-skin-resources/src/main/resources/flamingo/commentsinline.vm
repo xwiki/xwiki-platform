@@ -141,15 +141,16 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #if ("$!commentSelection" != "")
     #set($isAnnotation = true)
   #end
+  #set ($commentAuthor = $comment.getValue('author'))
   ## An empty comment author means that the comment author is a guest.
   ## This variable should be true only for an authenticate user that matches the comment author.
   ## We don't allow guests to be edit or delete comments because we can't know if they are the comment author.
-  #set ($isUserComment = $comment.author != '' && $services.model.resolveDocument($comment.author, 'user') == $xcontext.userReference)
+  #set ($isUserComment = $commentAuthor != '' && $services.model.resolveDocument($commentAuthor, 'user') == $xcontext.userReference)
   <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
-    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
+    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
       <div>
-      <span class="commentauthor">$!xwiki.getUserName($comment.getValue('author'))</span>##
+      <span class="commentauthor">$!xwiki.getUserName($commentAuthor)</span>##
       #set($date = $comment.getProperty('date').value)
 ## Don't indent, otherwise the comma will be misplaced
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
@@ -260,13 +261,14 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayEditCommentForm $comment)
-  #if($services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference || $hasAdmin)
+  #set ($commentAuthor = $comment.getValue('author'))
+  #if($services.model.resolveDocument($commentAuthor, 'current') == $xcontext.userReference || $hasAdmin)
   <form action="$doc.getURL('commentsave')" method="post" class="edit-xcomment reply">
-    <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
-    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
+    <div id="xwikicomment_${comment.number}" class="xwikicomment#if($commentAuthor == $doc.creator) commentByCreator#end">
+    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
       <div>
-      <span class="commentauthor">$!xwiki.getUserName($comment.getValue('author'))</span>##
+      <span class="commentauthor">$!xwiki.getUserName($commentAuthor)</span>##
 ## Don't indent, otherwise the comma will be misplaced
 #set($date = $comment.getProperty('date').value)##
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end

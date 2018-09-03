@@ -71,10 +71,10 @@ public class ObjectEditPane extends FormElement
     }
 
     /**
-     * @param userPropertyName the name of a property of type List of Users
-     * @return a user picker for a property of type List of Users
+     * @param userPropertyName the name of a property
+     * @return a {@link SuggestInputElement suggest input} for the given property
      */
-    public SuggestInputElement getUserPicker(String userPropertyName)
+    public SuggestInputElement getSuggestInput(String userPropertyName)
     {
         return new SuggestInputElement(
             getDriver().findElementWithoutWaiting(getForm(), byPropertyName(userPropertyName)));

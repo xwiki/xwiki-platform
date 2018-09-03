@@ -340,12 +340,12 @@ public class EditObjectsTest extends AbstractTest
         ObjectEditPage objectEditor = ObjectEditPage.gotoPage(getTestClassName(), getTestMethodName());
         ObjectEditPane object = objectEditor.addObject(className);
         object.openDatePicker("date").setDay("15").close();
-        object.getUserPicker("author").sendKeys("ad").waitForSuggestions().selectByVisibleText("Administrator");
+        object.getSuggestInput("author").sendKeys("ad").waitForSuggestions().selectByVisibleText("Administrator");
 
         // Save, edit again and check the values.
         object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(className).get(0);
         Assert.assertEquals("15", object.openDatePicker("date").getDay());
-        SuggestionElement author = object.getUserPicker("author").getSelectedSuggestions().get(0);
+        SuggestionElement author = object.getSuggestInput("author").getSelectedSuggestions().get(0);
         Assert.assertEquals("Administrator", author.getLabel());
         Assert.assertEquals("XWiki.Admin", author.getValue());
     }

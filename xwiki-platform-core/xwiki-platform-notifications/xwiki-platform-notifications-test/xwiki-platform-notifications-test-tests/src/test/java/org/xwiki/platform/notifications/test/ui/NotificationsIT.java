@@ -511,43 +511,43 @@ public class NotificationsIT extends AbstractTest
         assertEquals(6, preferences.size());
 
         // Filter 0
-        assertEquals("System Filter", preferences.get(0).getFilterName());
-        assertEquals("Hide notifications from the System user", preferences.get(0).getFilterType());
+        assertEquals("Minor Event (Alert)", preferences.get(0).getFilterName());
+        assertEquals("Hide notifications concerning minor changes on pages", preferences.get(0).getFilterType());
         assertTrue(preferences.get(0).getEventTypes().isEmpty());
-        assertEquals(Arrays.asList("Alert", "Email"), preferences.get(0).getFormats());
+        assertEquals(Arrays.asList("Alert"), preferences.get(0).getFormats());
         assertTrue(preferences.get(0).isEnabled());
 
         // Filter 1
-        assertEquals("Read Event Filter (Email)", preferences.get(1).getFilterName());
-        assertEquals("Hide notifications that you have marked as read", preferences.get(1).getFilterType());
+        assertEquals("Minor Event (Email)", preferences.get(1).getFilterName());
+        assertEquals("Hide notifications concerning minor changes on pages", preferences.get(1).getFilterType());
         assertTrue(preferences.get(1).getEventTypes().isEmpty());
         assertEquals(Arrays.asList("Email"), preferences.get(1).getFormats());
-        assertFalse(preferences.get(1).isEnabled());
+        assertTrue(preferences.get(2).isEnabled());
 
         // Filter 2
-        assertEquals("Read Event Filter (Alert)", preferences.get(2).getFilterName());
-        assertEquals("Hide notifications that you have marked as read", preferences.get(2).getFilterType());
+        assertEquals("Own Events Filter", preferences.get(2).getFilterName());
+        assertEquals("Hide notifications about your own activity", preferences.get(2).getFilterType());
         assertTrue(preferences.get(2).getEventTypes().isEmpty());
-        assertEquals(Arrays.asList("Alert"), preferences.get(2).getFormats());
-        assertFalse(preferences.get(2).isEnabled());
+        assertEquals(Arrays.asList("Alert", "Email"), preferences.get(2).getFormats());
+        assertTrue(preferences.get(2).isEnabled());
 
         // Filter 3
-        assertEquals("Minor Event (Alert)", preferences.get(3).getFilterName());
-        assertEquals("Hide notifications concerning minor changes on pages", preferences.get(3).getFilterType());
+        assertEquals("Read Event Filter (Alert)", preferences.get(3).getFilterName());
+        assertEquals("Hide notifications that you have marked as read", preferences.get(3).getFilterType());
         assertTrue(preferences.get(3).getEventTypes().isEmpty());
         assertEquals(Arrays.asList("Alert"), preferences.get(3).getFormats());
-        assertTrue(preferences.get(3).isEnabled());
+        assertFalse(preferences.get(3).isEnabled());
 
         // Filter 4
-        assertEquals("Minor Event (Email)", preferences.get(4).getFilterName());
-        assertEquals("Hide notifications concerning minor changes on pages", preferences.get(4).getFilterType());
+        assertEquals("Read Event Filter (Email)", preferences.get(4).getFilterName());
+        assertEquals("Hide notifications that you have marked as read", preferences.get(4).getFilterType());
         assertTrue(preferences.get(4).getEventTypes().isEmpty());
         assertEquals(Arrays.asList("Email"), preferences.get(4).getFormats());
-        assertTrue(preferences.get(4).isEnabled());
+        assertFalse(preferences.get(4).isEnabled());
 
         // Filter 5
-        assertEquals("Own Events Filter", preferences.get(5).getFilterName());
-        assertEquals("Hide notifications about your own activity", preferences.get(5).getFilterType());
+        assertEquals("System Filter", preferences.get(5).getFilterName());
+        assertEquals("Hide notifications from the System user", preferences.get(5).getFilterType());
         assertTrue(preferences.get(5).getEventTypes().isEmpty());
         assertEquals(Arrays.asList("Alert", "Email"), preferences.get(5).getFormats());
         assertTrue(preferences.get(5).isEnabled());
@@ -562,13 +562,14 @@ public class NotificationsIT extends AbstractTest
 
         // Now let's do some changes (own even filter)
         p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
-        preferences.get(5).setEnabled(false);
+        assertEquals("Own Events Filter", preferences.get(2).getFilterName());
+        preferences.get(2).setEnabled(false);
         getUtil().createPage(getTestClassName(), getTestMethodName(), "", "");
         // Refresh that page
         getUtil().gotoPage(getTestClassName(), getTestMethodName());
         NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
         assertEquals(1, notificationsTrayPage.getNotificationsCount());
-        assertEquals("edited by user1\n" + "moments ago",
+        assertEquals("created by user1\n" + "moments ago",
                 notificationsTrayPage.getNotificationDescription(0));
         assertEquals(getTestMethodName(), notificationsTrayPage.getNotificationPage(0));
 

@@ -97,6 +97,7 @@
     #set ($discard = $elements.add($element))
   #end
 #end
+#set ($elements = $sorttool.sort($elements, ['name']))
 ## Also get the list of available filters for the user
 #set ($filters = $collectionstool.arrayList)
 #set ($discard = $filters.addAll($services.notification.filters.filters))

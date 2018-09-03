@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1431708202000</creationDate>
   <parent>XWiki.AdminSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1514830378000</date>
-  <contentUpdateDate>1514830378000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('extension.history')</title>
   <comment/>

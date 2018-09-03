@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1195803878000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1362041472000</date>
-  <contentUpdateDate>1362041472000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("xe.statistics")</title>
   <comment/>

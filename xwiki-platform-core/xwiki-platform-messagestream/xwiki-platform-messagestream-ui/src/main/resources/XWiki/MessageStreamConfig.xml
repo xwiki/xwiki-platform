@@ -31,9 +31,6 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1300185972000</creationDate>
-  <date>1300230452000</date>
-  <contentUpdateDate>1300230452000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('admin.messagestream')</title>
   <template/>
@@ -48,7 +45,6 @@
     <mimetype>image/png</mimetype>
     <filesize>6017</filesize>
     <author>xwiki:XWiki.Admin</author>
-    <date>1301307326000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAXNklE

@@ -31,9 +31,6 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1342185615000</creationDate>
-  <date>1360753036000</date>
-  <contentUpdateDate>1360753036000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('admin.preferences.title')</title>
   <template/>

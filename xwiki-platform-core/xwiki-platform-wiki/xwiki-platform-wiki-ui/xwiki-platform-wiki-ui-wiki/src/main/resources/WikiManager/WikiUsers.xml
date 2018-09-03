@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1304114838000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1529098211000</date>
-  <contentUpdateDate>1529098211000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.wiki.currentwiki.wikiusers.title')</title>
   <comment/>

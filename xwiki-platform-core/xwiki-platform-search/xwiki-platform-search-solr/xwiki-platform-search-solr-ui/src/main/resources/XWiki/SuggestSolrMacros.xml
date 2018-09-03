@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1392283107000</creationDate>
   <parent>XWiki.SearchCode</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1392294731000</date>
-  <contentUpdateDate>1392294721000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Suggestion Macros</title>
   <comment/>

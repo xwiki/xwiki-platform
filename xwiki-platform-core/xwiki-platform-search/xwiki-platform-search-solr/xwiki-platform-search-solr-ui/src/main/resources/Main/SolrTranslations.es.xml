@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1385047506000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1433258948000</date>
-  <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <comment/>

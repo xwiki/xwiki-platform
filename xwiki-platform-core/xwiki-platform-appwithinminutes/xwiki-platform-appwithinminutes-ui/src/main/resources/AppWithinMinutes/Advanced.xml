@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1319391188000</creationDate>
   <parent>AppWithinMinutes.FormFieldCategoryClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1513606713000</date>
-  <contentUpdateDate>1513606713000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.classEditorAdvancedCategoryName')</title>
   <comment/>

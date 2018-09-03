@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1320049413000</creationDate>
   <parent>XWiki.ExternalLinks</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1320310931000</date>
-  <contentUpdateDate>1320310931000</contentUpdateDate>
   <version>1.1</version>
   <title>JSON Generation for the External Link States LiveTable</title>
   <comment/>

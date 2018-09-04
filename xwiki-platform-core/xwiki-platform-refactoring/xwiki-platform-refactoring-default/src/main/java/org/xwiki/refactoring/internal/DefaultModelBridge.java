@@ -30,9 +30,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -120,9 +120,6 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
-
-    @Inject
-    private Execution execution;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -224,6 +221,23 @@ public class DefaultModelBridge implements ModelBridge
         } else {
             this.logger.warn("We can't create an automatic redirect from [{}] to [{}] because [{}] is missing.",
                 oldReference, newReference, redirectClassReference);
+        }
+    }
+
+    @Override
+    public boolean canOverwriteSilently(DocumentReference documentReference)
+    {
+        try {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+            DocumentReference redirectClassReference =
+                new DocumentReference(REDIRECT_CLASS_REFERENCE, documentReference.getWikiReference());
+            // Overwrite silently the redirect pages.
+            return document.getXObject(redirectClassReference) != null;
+        } catch (XWikiException e) {
+            this.logger.warn("Failed to get document [{}]. Root cause: [{}].", documentReference,
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
         }
     }
 

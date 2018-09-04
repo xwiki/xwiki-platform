@@ -127,7 +127,8 @@ public class NotificationFilterPreferencesMigratorTest
         // Verify
         verify(xwiki).deleteDocument(oldClass, false, xwikicontext);
         verify(userAdoc).removeXObjects(classReference);
-        verify(xwiki).saveDocument(userAdoc, "Migrate NotificationFilterPreferences.", xwikicontext);
+        verify(xwiki).saveDocument(userAdoc, "Migrate notification filter preferences to the new store.",
+                xwikicontext);
 
         verify(modelBridge).saveFilterPreferences(userA, Arrays.asList(
                 createExpectedPreference(Sets.newHashSet("update", "create"),

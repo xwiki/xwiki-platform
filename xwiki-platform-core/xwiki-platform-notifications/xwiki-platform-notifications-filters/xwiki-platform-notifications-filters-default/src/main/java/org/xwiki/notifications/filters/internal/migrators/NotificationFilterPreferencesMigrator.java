@@ -112,7 +112,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
 
     private void migrateUser(DocumentReference user) throws NotificationException
     {
-        logger.info("Migrate notification filter preferences of user [{}].", user);
+        logger.info("Migrating the notification filter preferences of user [{}].", user);
 
         XWikiContext context = this.getXWikiContext();
         XWiki xwiki = context.getWiki();
@@ -121,18 +121,32 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
                 = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
 
         try {
+            logger.info("Loading the current notification filter preferences of user [{}].", user);
             XWikiDocument doc = xwiki.getDocument(user, context);
 
             // Get the old preferences
             List<NotificationFilterPreference> preferencesToSave = convertXObjectsToPreferences(doc,
                     notificationFilterPreferenceClass);
 
-            // Save to the new store
-            modelBridge.saveFilterPreferences(user, preferencesToSave);
+            // Make sure we have not already saved in the database the migrated preferences (it would mean the migration
+            // has already been executed but stopped while the user's page was saving)
+            Set<NotificationFilterPreference> preferencesInTheNewStore = modelBridge.getFilterPreferences(user);
+            if (!modelBridge.getFilterPreferences(user).isEmpty()
+                    && preferencesInTheNewStore.size() == preferencesToSave.size()) {
+                logger.info("It seems the notification filter preferences of user [{}] has already been migrated,"
+                        + " but the old ones have not been removed from the user's page yet. Probably a previous"
+                        + " migration has been run but stopped in the middle of the process.", user);
+            } else {
+                // Save to the new store
+                logger.info("Saving the migrated notification filter preferences of user [{}] in the new store.", user);
+                modelBridge.saveFilterPreferences(user, preferencesToSave);
+            }
 
             // Remove the old xobjects
+            logger.info("Removing the old notification filter preferences in the page of the user [{}] "
+                    + "(please wait, it could be long).", user);
             doc.removeXObjects(notificationFilterPreferenceClass);
-            xwiki.saveDocument(doc, "Migrate NotificationFilterPreferences.", context);
+            xwiki.saveDocument(doc, "Migrate notification filter preferences to the new store.", context);
 
         } catch (Exception e) {
             throw new NotificationException(
@@ -244,6 +258,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
         WikiReference currentWiki = getXWikiContext().getWikiReference();
 
         try {
+            logger.info("Getting the list of the users having notification filter preferences to migrate.");
             Query query = queryManager.createQuery(
                     "select distinct doc.fullName from Document doc, "
                             + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj", Query.XWQL);
@@ -259,7 +274,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
                     = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(currentWiki);
             XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
             if (!oldClassDoc.isNew()) {
-                logger.info("Remove the old notification filter preference class.");
+                logger.info("Removing the old notification filter preference class.");
                 xwiki.deleteDocument(oldClassDoc, false, context);
             }
 

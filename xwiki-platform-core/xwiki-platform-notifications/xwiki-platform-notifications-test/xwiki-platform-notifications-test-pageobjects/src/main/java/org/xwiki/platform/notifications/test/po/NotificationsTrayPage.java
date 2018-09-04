@@ -51,9 +51,6 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(css = "span.notifications-count")
     private WebElement countBadge;
 
-    @FindBy(className = "notification-event-clean")
-    private WebElement clearAllLink;
-
     /**
      * Constructor.
      */
@@ -108,10 +105,11 @@ public class NotificationsTrayPage extends ViewPage
             return;
         } else {
             this.showNotificationTray();
-            if (!this.clearAllLink.isDisplayed()) {
+            WebElement clearAllLink = getDriver().findElement(By.className("notification-event-clean"));
+            if (!clearAllLink.isDisplayed()) {
                 throw new RuntimeException("'Clear All' link is not displayed!");
             }
-            this.clearAllLink.click();
+            clearAllLink.click();
             // Wait for the confirm box to be visible
             getDriver().waitUntilElementIsVisible(By.className("xdialog-content"));
             // Enter is like clicking on "yes"

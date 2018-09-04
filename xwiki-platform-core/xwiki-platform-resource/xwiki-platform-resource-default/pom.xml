@@ -33,6 +33,7 @@
   <description>Default implementation of the Resource API and some default Resources</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>62</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Default Resource Implementation</xwiki.extension.name>
   </properties>

@@ -32,6 +32,7 @@
   <description>Filter stream extension to read and write XAR packages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
 
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Filter XAR module</xwiki.extension.name>

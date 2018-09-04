@@ -33,6 +33,7 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.14</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>19</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

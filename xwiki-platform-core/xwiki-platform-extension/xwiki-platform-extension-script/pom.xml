@@ -33,6 +33,7 @@
   <description>XWiki Platform - Extension - Script</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>15</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <!-- Test dependencies forced in front to workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=536868 -->

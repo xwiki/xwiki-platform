@@ -32,6 +32,7 @@
   <description>Executes a Velocity script and apply current page parser on the result</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>64</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Velocity Macro</xwiki.extension.name>
   </properties>

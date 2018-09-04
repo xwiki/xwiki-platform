@@ -32,6 +32,7 @@
   <description>API for feeds (RSS, ATOM, etc)</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

@@ -32,6 +32,7 @@
   <description>Cache the content of the macro for some time</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>50</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Cache Macro</xwiki.extension.name>
   </properties>

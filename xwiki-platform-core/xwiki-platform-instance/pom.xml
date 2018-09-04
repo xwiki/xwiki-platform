@@ -37,6 +37,7 @@
     <!-- Skipping revapi since xwiki-platform-legacy-instance wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.14</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>25</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

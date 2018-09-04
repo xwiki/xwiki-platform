@@ -31,6 +31,8 @@
   <name>XWiki Platform - Rendering - Macro - Container</name>
   <description>Arrange and decorate its contents according to the parameters</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Container Macro</xwiki.extension.name>
   </properties>

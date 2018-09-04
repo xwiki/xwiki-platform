@@ -34,6 +34,7 @@
     DocumentDisplayer to display the title and the content of XWiki documents.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.34</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>41</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

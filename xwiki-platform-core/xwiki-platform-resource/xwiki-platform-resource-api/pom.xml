@@ -33,6 +33,7 @@
   <description>An abstraction of a XWiki URI (Entity, Template, Skin, etc)</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>32</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Resource API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

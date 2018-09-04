@@ -33,6 +33,7 @@
   <description>XWiki-specific Rendering Configuration Implementation</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>82</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

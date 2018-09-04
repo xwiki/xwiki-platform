@@ -32,6 +32,7 @@
   <description>Collects images from the macro content and display them using a slide-show view</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.97</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>80</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Gallery Macro</xwiki.extension.name>
   </properties>

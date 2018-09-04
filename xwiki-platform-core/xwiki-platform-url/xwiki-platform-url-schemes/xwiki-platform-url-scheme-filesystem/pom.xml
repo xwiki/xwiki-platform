@@ -33,6 +33,7 @@
   <description>URLs to XWiki Resources exported on the filesystem format</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.42</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>11</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Filesystem URL Scheme</xwiki.extension.name>
   </properties>

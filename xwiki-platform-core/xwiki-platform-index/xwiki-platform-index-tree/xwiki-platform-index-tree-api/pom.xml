@@ -33,6 +33,7 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>40</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Document Tree API</xwiki.extension.name>
   </properties>

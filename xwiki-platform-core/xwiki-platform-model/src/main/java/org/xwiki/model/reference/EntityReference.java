@@ -671,14 +671,20 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
                 Object obj = reference.parameters.get(entry.getKey());
                 Object myobj = entry.getValue();
-                if (myobj != null && myobj instanceof Comparable) {
+                if (myobj instanceof Comparable) {
                     if (obj == null) {
                         return 1;
                     }
-                    return ((Comparable) myobj).compareTo(obj);
+
+                    int number = ((Comparable) myobj).compareTo(obj);
+
+                    if (number != 0) {
+                        return number;
+                    }
                 }
             }
         }
+
         return (reference.parameters == null) ? 0 : -1;
     }
 }

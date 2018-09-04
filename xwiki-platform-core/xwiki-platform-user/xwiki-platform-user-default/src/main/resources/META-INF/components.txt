@@ -1,0 +1,4 @@
+org.xwiki.user.internal.group.DefaultGroupManager
+org.xwiki.user.internal.group.GroupCacheInvalidationListener
+org.xwiki.user.internal.group.GroupsCache
+org.xwiki.user.internal.group.MembersCache

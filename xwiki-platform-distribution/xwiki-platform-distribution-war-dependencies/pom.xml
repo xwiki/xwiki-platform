@@ -464,6 +464,19 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- User management -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- LESS CSS Module -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

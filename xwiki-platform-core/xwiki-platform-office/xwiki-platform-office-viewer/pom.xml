@@ -32,6 +32,7 @@
   <description>A module providing support for viewing office documents attached to wiki pages.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>90</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

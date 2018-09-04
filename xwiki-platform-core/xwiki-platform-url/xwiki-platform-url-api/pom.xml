@@ -35,6 +35,7 @@
     <!-- The reason for this low TPC value is because this module is tested using integration tests in the various
          URL Scheme modules -->
     <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>36</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>URL API</xwiki.extension.name>
   </properties>

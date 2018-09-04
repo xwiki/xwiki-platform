@@ -31,6 +31,8 @@
   <name>XWiki Platform - Annotations - Core Services</name>
   <packaging>jar</packaging>
   <properties>
+    <xwiki.pitest.mutationThreshold>49</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>1.0</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

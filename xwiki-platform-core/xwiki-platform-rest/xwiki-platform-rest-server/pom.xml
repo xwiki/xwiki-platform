@@ -33,6 +33,7 @@
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.09</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>20</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

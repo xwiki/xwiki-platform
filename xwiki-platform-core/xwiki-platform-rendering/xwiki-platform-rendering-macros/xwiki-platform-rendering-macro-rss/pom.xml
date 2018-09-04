@@ -32,6 +32,7 @@
   <description>Displays the contents of a RSS feed</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>33</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>RSS Macro</xwiki.extension.name>
   </properties>

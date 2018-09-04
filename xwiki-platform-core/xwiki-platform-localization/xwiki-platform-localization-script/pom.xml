@@ -33,6 +33,7 @@
   <description>Provide script oriented APIs to manipulate translations</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>58</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

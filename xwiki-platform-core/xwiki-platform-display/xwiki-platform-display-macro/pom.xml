@@ -34,6 +34,7 @@
     <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

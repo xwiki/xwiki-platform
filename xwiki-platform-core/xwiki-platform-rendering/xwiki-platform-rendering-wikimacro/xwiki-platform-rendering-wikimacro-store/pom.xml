@@ -32,6 +32,7 @@
   <description>Defines the ability to store macros into wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>45</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Name to display by the Extension Manager -->

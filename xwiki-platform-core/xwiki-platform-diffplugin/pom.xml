@@ -32,6 +32,7 @@
   <description>Old diff plugin</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>88</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

@@ -33,6 +33,7 @@
     class and document sheets.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>85</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

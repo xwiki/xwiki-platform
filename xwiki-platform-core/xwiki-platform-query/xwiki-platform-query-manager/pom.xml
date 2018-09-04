@@ -32,6 +32,7 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>55</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Query API</xwiki.extension.name>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->

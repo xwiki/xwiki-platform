@@ -33,6 +33,7 @@
   <description>XWiki Platform - Localization - Source - JAR</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>91</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

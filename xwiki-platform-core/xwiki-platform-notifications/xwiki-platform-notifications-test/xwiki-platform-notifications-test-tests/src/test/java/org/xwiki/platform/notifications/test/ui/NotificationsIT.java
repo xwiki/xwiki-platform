@@ -108,6 +108,8 @@ public class NotificationsIT extends AbstractTest
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
         p.disableAllParameters();
+        // Enable own filter
+        p.getNotificationFilterPreferences().get(2).setEnabled(true);
 
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
@@ -336,7 +338,6 @@ public class NotificationsIT extends AbstractTest
     @Test
     public void testNotificationsEmails() throws Exception
     {
-
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         NotificationsUserProfilePage p;
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
@@ -522,7 +523,7 @@ public class NotificationsIT extends AbstractTest
         assertEquals("Hide notifications concerning minor changes on pages", preferences.get(1).getFilterType());
         assertTrue(preferences.get(1).getEventTypes().isEmpty());
         assertEquals(Arrays.asList("Email"), preferences.get(1).getFormats());
-        assertTrue(preferences.get(2).isEnabled());
+        assertTrue(preferences.get(1).isEnabled());
 
         // Filter 2
         assertEquals("Own Events Filter", preferences.get(2).getFilterName());
@@ -557,127 +558,137 @@ public class NotificationsIT extends AbstractTest
     public void testOwnEventFilter() throws Exception
     {
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
 
-        // Now let's do some changes (own even filter)
-        p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
-        assertEquals("Own Events Filter", preferences.get(2).getFilterName());
-        preferences.get(2).setEnabled(false);
-        getUtil().createPage(getTestClassName(), getTestMethodName(), "", "");
-        // Refresh that page
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
-        NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
-        assertEquals(1, notificationsTrayPage.getNotificationsCount());
-        assertEquals("created by user1\n" + "moments ago",
-                notificationsTrayPage.getNotificationDescription(0));
-        assertEquals(getTestMethodName(), notificationsTrayPage.getNotificationPage(0));
+        try {
+            NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
 
-        // Go back to enable the own even filter
-        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        preferences = p.getNotificationFilterPreferences();
-        assertEquals("Own Events Filter", preferences.get(5).getFilterName());
-        assertFalse(preferences.get(5).isEnabled());
-        preferences.get(5).setEnabled(true);
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
-        notificationsTrayPage = new NotificationsTrayPage();
-        assertEquals(0, notificationsTrayPage.getNotificationsCount());
+            // Now let's do some changes (own even filter)
+            p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
+            assertEquals("Own Events Filter", preferences.get(2).getFilterName());
+            preferences.get(2).setEnabled(false);
+            getUtil().createPage(getTestClassName(), getTestMethodName(), "", "");
+            // Refresh that page
+            getUtil().gotoPage(getTestClassName(), getTestMethodName());
+            NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
+            assertEquals(1, notificationsTrayPage.getNotificationsCount());
+            assertEquals("created by user1\n" + "moments ago",
+                    notificationsTrayPage.getNotificationDescription(0));
+            assertEquals(getTestMethodName(), notificationsTrayPage.getNotificationPage(0));
 
-        // Clean up
-        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.OFF);
-        getUtil().rest().deletePage(getTestClassName(), getTestClassName());
+            // Go back to enable the own even filter
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            preferences = p.getNotificationFilterPreferences();
+            assertEquals("Own Events Filter", preferences.get(2).getFilterName());
+            assertFalse(preferences.get(2).isEnabled());
+            preferences.get(2).setEnabled(true);
+            getUtil().gotoPage(getTestClassName(), getTestMethodName());
+            notificationsTrayPage = new NotificationsTrayPage();
+            assertEquals(0, notificationsTrayPage.getNotificationsCount());
+        } finally {
+            // Clean up
+            getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
+        }
     }
 
     @Test
     public void testWatchedPages() throws Exception
     {
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
 
-        // Enable the notifications
-        p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
-        preferences.get(5).setEnabled(false);
+        try {
+            NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
 
-        // Create a page
-        getUtil().createPage(getTestClassName(), getTestMethodName(), "", "");
-        NotificationsTrayPage trayPage = new NotificationsTrayPage();
-        trayPage.showNotificationTray();
+            // Enable the notifications
+            p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
 
-        // Check if the page is watched
-        assertTrue(trayPage.isPageOnlyWatched());
-        assertTrue(trayPage.arePageAndChildrenWatched());
-        assertTrue(trayPage.isWikiWatched());
+            // Create a page
+            getUtil().createPage(getTestClassName(), getTestMethodName(), "", "");
+            NotificationsTrayPage trayPage = new NotificationsTrayPage();
+            trayPage.showNotificationTray();
 
-        // Unwatch the wiki
-        trayPage.setWikiWatchedState(false);
-        // Verify all other buttons are updated
-        assertFalse(trayPage.isPageOnlyWatched());
-        assertFalse(trayPage.arePageAndChildrenWatched());
+            // Check if the page is watched
+            assertTrue(trayPage.isPageOnlyWatched());
+            assertTrue(trayPage.arePageAndChildrenWatched());
+            assertTrue(trayPage.isWikiWatched());
 
-        // Watch the space
-        trayPage.setPageAndChildrenWatchedState(true);
-        // Verify the other button is updated
-        assertTrue(trayPage.isPageOnlyWatched());
+            // Unwatch the wiki
+            trayPage.setWikiWatchedState(false);
+            // Verify all other buttons are updated
+            assertFalse(trayPage.isPageOnlyWatched());
+            assertFalse(trayPage.arePageAndChildrenWatched());
 
-        // Unwatch the page
-        trayPage.setPageOnlyWatchedState(false);
-        // Verify the whole status
-        assertFalse(trayPage.isPageOnlyWatched());
-        assertTrue(trayPage.arePageAndChildrenWatched());
-        assertFalse(trayPage.isWikiWatched());
+            // Watch the space
+            trayPage.setPageAndChildrenWatchedState(true);
+            // Verify the other button is updated
+            assertTrue(trayPage.isPageOnlyWatched());
 
-        // Go back to the preferences
-        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        preferences = p.getNotificationFilterPreferences();
-        assertEquals(9, preferences.size());
+            // Unwatch the page
+            trayPage.setPageOnlyWatchedState(false);
+            // Verify the whole status
+            assertFalse(trayPage.isPageOnlyWatched());
+            assertTrue(trayPage.arePageAndChildrenWatched());
+            assertFalse(trayPage.isWikiWatched());
 
-        // Filter 6
-        assertTrue(preferences.get(6).getFilterName().contains("Wiki"));
-        assertEquals("", preferences.get(6).getLocation());
-        assertEquals("Exclusive", preferences.get(6).getFilterType());
-        assertTrue(preferences.get(6).getEventTypes().isEmpty());
-        assertEquals(Arrays.asList("Email", "Alert"), preferences.get(6).getFormats());
-        assertTrue(preferences.get(6).isEnabled());
+            // Go back to the preferences
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
+            assertEquals(9, preferences.size());
 
-        // Filter 7
-        assertTrue(preferences.get(7).getFilterName().contains("Page and children"));
-        assertEquals(getTestClassName()+".WebHome", preferences.get(7).getLocation());
-        assertEquals("Inclusive", preferences.get(7).getFilterType());
-        assertTrue(preferences.get(7).getEventTypes().isEmpty());
-        assertEquals(Arrays.asList("Email", "Alert"), preferences.get(7).getFormats());
-        assertTrue(preferences.get(7).isEnabled());
+            // Filter 6
+            assertTrue(preferences.get(6).getFilterName().contains("Wiki"));
+            assertEquals("", preferences.get(6).getLocation());
+            assertEquals("Exclusive", preferences.get(6).getFilterType());
+            assertTrue(preferences.get(6).getEventTypes().isEmpty());;
+            assertTrue(preferences.get(6).getFormats().containsAll(Arrays.asList("Email", "Alert")));
+            assertTrue(preferences.get(6).isEnabled());
 
-        // Filter 8
-        assertTrue(preferences.get(8).getFilterName().contains("Page only"));
-        assertEquals(getTestClassName()+"."+getTestMethodName(), preferences.get(8).getLocation());
-        assertEquals("Exclusive", preferences.get(8).getFilterType());
-        assertTrue(preferences.get(8).getEventTypes().isEmpty());
-        assertEquals(Arrays.asList("Email", "Alert"), preferences.get(8).getFormats());
-        assertTrue(preferences.get(8).isEnabled());
+            // Filter 7
+            assertTrue(preferences.get(7).getFilterName().contains("Page and children"));
+            assertEquals(getTestClassName() + ".WebHome", preferences.get(7).getLocation());
+            assertEquals("Inclusive", preferences.get(7).getFilterType());
+            assertTrue(preferences.get(7).getEventTypes().isEmpty());
+            assertTrue(preferences.get(7).getFormats().containsAll(Arrays.asList("Email", "Alert")));
+            assertTrue(preferences.get(7).isEnabled());
 
-        // Delete these new filters
-        preferences.get(8).delete();
-        // The livetable page is refreshed so we need to load back the filter preferences
-        p.getNotificationFilterPreferences().get(7).delete();
-        p.getNotificationFilterPreferences().get(6).delete();
+            // Filter 8
+            assertTrue(preferences.get(8).getFilterName().contains("Page only"));
+            assertEquals(getTestClassName() + "." + getTestMethodName(), preferences.get(8).getLocation());
+            assertEquals("Exclusive", preferences.get(8).getFilterType());
+            assertTrue(preferences.get(8).getEventTypes().isEmpty());
+            assertTrue(preferences.get(8).getFormats().containsAll(Arrays.asList("Email", "Alert")));
+            assertTrue(preferences.get(8).isEnabled());
 
-        // Verify it's all like the beginning
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
-        trayPage = new NotificationsTrayPage();
-        trayPage.showNotificationTray();
-        assertTrue(trayPage.isPageOnlyWatched());
-        assertTrue(trayPage.arePageAndChildrenWatched());
-        assertTrue(trayPage.isWikiWatched());
+            // Delete these new filters
+            preferences.get(8).delete();
+            // The livetable page is refreshed so we need to load back the filter preferences
+            p.getNotificationFilterPreferences().get(7).delete();
+            p.getNotificationFilterPreferences().get(6).delete();
 
-        // Go back to the preferences
-        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        preferences = p.getNotificationFilterPreferences();
-        assertEquals(6, preferences.size());
+            // Verify it's all like the beginning
+            getUtil().gotoPage(getTestClassName(), getTestMethodName());
+            trayPage = new NotificationsTrayPage();
+            trayPage.showNotificationTray();
+            assertTrue(trayPage.isPageOnlyWatched());
+            assertTrue(trayPage.arePageAndChildrenWatched());
+            assertTrue(trayPage.isWikiWatched());
 
-        // Clean up
-        p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.OFF);
-        getUtil().rest().deletePage(getTestClassName(), getTestClassName());
+            // Go back to the preferences
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            preferences = p.getNotificationFilterPreferences();
+            assertEquals(6, preferences.size());
+
+        } finally {
+            // Clean up
+            getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
+
+            NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
+            while (preferences.size() > 6) {
+                preferences.get(preferences.size() - 1).delete();
+                // Reload teh livetable
+                preferences = p.getNotificationFilterPreferences();
+            }
+        }
     }
 }

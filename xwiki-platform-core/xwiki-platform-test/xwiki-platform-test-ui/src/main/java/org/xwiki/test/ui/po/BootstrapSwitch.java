@@ -123,4 +123,15 @@ public class BootstrapSwitch
             click();
         }
     }
+
+    /**
+     * @return either or not the input is enabled (meaning we can click on it)
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public boolean isEnabled()
+    {
+        return webElement.findElement(By.tagName("input")).isEnabled();
+    }
 }

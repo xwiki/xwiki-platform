@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.stability.Unstable;
+import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -57,11 +58,29 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(className = "notifications-toggles")
     private WebElement toggles;
 
+    private BootstrapSwitch pageOnlyWatchedSwitch;
+
+    private BootstrapSwitch pageAndChildrenWatchedSwitch;
+
+    private BootstrapSwitch wikiWatchedSwitch;
+
     /**
      * Constructor.
      */
     public NotificationsTrayPage()
     {
+        pageOnlyWatchedSwitch = new BootstrapSwitch(
+                toggles.findElement(By.className("bootstrap-switch-id-notificationPageOnly")),
+                getDriver()
+        );
+        pageAndChildrenWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationPageAndChildren")),
+            getDriver()
+        );
+        wikiWatchedSwitch = new BootstrapSwitch(
+                toggles.findElement(By.className("bootstrap-switch-id-notificationWiki")),
+                getDriver()
+        );
     }
 
     /**
@@ -279,12 +298,6 @@ public class NotificationsTrayPage extends ViewPage
         }
     }
 
-    private boolean isSwitchOn(String className)
-    {
-        showNotificationTray();
-        return toggles.findElement(By.className(className)).getAttribute(CLASS).contains("bootstrap-switch-on");
-    }
-
     /**
      * @return either or not the page is watched
      *
@@ -293,7 +306,8 @@ public class NotificationsTrayPage extends ViewPage
      */
     public boolean isPageOnlyWatched()
     {
-        return this.isSwitchOn("bootstrap-switch-id-notificationPageOnly");
+        showNotificationTray();
+        return pageOnlyWatchedSwitch.getState() == BootstrapSwitch.State.ON;
     }
 
     /**
@@ -304,7 +318,8 @@ public class NotificationsTrayPage extends ViewPage
      */
     public boolean arePageAndChildrenWatched()
     {
-        return this.isSwitchOn("bootstrap-switch-id-notificationPageAndChildren");
+        showNotificationTray();
+        return pageAndChildrenWatchedSwitch.getState() == BootstrapSwitch.State.ON;
     }
 
     /**
@@ -315,65 +330,62 @@ public class NotificationsTrayPage extends ViewPage
      */
     public boolean isWikiWatched()
     {
-        return this.isSwitchOn("bootstrap-switch-id-notificationWiki");
+        showNotificationTray();
+        return wikiWatchedSwitch.getState() == BootstrapSwitch.State.ON;
     }
 
     private void waitUntilWatchedStateAreSaved()
     {
         waitForNotificationSuccessMessage("Saved!");
         getDriver().waitUntilCondition(driver ->
-                toggles.findElement(By.cssSelector("input#notificationPageOnly")).isEnabled()
-                && toggles.findElement(By.cssSelector("input#notificationPageAndChildren")).isEnabled()
-                && toggles.findElement(By.cssSelector("input#notificationWiki")).isEnabled()
+                pageOnlyWatchedSwitch.isEnabled()
+                && pageAndChildrenWatchedSwitch.isEnabled()
+                && wikiWatchedSwitch.isEnabled()
         );
     }
 
     /**
      * Watch or unwatch the current page.
      * @param watched the desired state
+     * @throws Exception if the expected state cannot be set
      *
      * @since 10.8RC1
      * @since 9.11.8
      */
-    public void setPageOnlyWatchedState(boolean watched)
+    public void setPageOnlyWatchedState(boolean watched) throws Exception
     {
         showNotificationTray();
-        toggles.findElement(
-                By.cssSelector(".bootstrap-switch-id-notificationPageOnly .bootstrap-switch-label")
-            ).click();
-        getDriver().waitUntilCondition(driver -> isPageOnlyWatched() == watched);
+        pageOnlyWatchedSwitch.setState(watched ? BootstrapSwitch.State.ON : BootstrapSwitch.State.OFF);
         waitUntilWatchedStateAreSaved();
     }
 
     /**
      * Watch or unwatch the current "space".
      * @param watched the desired state
+     * @throws Exception if the expected state cannot be set
      *
      * @since 10.8RC1
      * @since 9.11.8
      */
-    public void setPageAndChildrenWatchedState(boolean watched)
+    public void setPageAndChildrenWatchedState(boolean watched) throws Exception
     {
         showNotificationTray();
-        toggles.findElement(
-                By.cssSelector(".bootstrap-switch-id-notificationPageAndChildren .bootstrap-switch-label")
-            ).click();
-        getDriver().waitUntilCondition(driver -> arePageAndChildrenWatched() == watched);
+        pageAndChildrenWatchedSwitch.setState(watched ? BootstrapSwitch.State.ON : BootstrapSwitch.State.OFF);
         waitUntilWatchedStateAreSaved();
     }
 
     /**
      * Watch or unwatch the current wiki.
      * @param watched the desired state
+     * @throws Exception if the expected state cannot be set
      *
      * @since 10.8RC1
      * @since 9.11.8
      */
-    public void setWikiWatchedState(boolean watched)
+    public void setWikiWatchedState(boolean watched) throws Exception
     {
         showNotificationTray();
-        toggles.findElement(By.cssSelector(".bootstrap-switch-id-notificationWiki .bootstrap-switch-label")).click();
-        getDriver().waitUntilCondition(driver -> isWikiWatched() == watched);
+        wikiWatchedSwitch.setState(watched ? BootstrapSwitch.State.ON : BootstrapSwitch.State.OFF);
         waitUntilWatchedStateAreSaved();
     }
 }

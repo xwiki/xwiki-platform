@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.test.ui.XWikiWebDriver;
+import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.ConfirmationBox;
 
 /**
@@ -39,11 +40,7 @@ public class NotificationFilterPreference
 {
     private static final String LIST_HTML_TAG = "li";
 
-    private static final String CLASS_HTML_ATTRIBUTE = "class";
-
     private NotificationsUserProfilePage parentPage;
-
-    private XWikiWebDriver driver;
 
     private WebElement livetableRow;
 
@@ -55,7 +52,7 @@ public class NotificationFilterPreference
 
     private List<String> formats = new ArrayList<>();
 
-    private WebElement enabledSwitch;
+    private BootstrapSwitch enabledSwitch;
 
     /**
      * Construct a NotificationFilterPreference.
@@ -68,7 +65,6 @@ public class NotificationFilterPreference
     {
         this.parentPage = parentPage;
         this.livetableRow = webElement;
-        this.driver = driver;
 
         this.filterName = webElement.findElement(By.className("name")).getText();
         this.filterType = webElement.findElement(By.className("filterType")).getText();
@@ -88,7 +84,10 @@ public class NotificationFilterPreference
             this.formats.add(format.getText());
         }
 
-        enabledSwitch = webElement.findElement(By.className("isEnabled")).findElement(By.className("bootstrap-switch"));
+        enabledSwitch = new BootstrapSwitch(
+                webElement.findElement(By.className("isEnabled")).findElement(By.className("bootstrap-switch")),
+                driver
+        );
     }
 
     /**
@@ -128,7 +127,7 @@ public class NotificationFilterPreference
      */
     public boolean isEnabled()
     {
-        return enabledSwitch.getAttribute(CLASS_HTML_ATTRIBUTE).contains("bootstrap-switch-on");
+        return enabledSwitch.getState() == BootstrapSwitch.State.ON;
     }
 
     /**
@@ -141,8 +140,7 @@ public class NotificationFilterPreference
             return;
         }
 
-        this.enabledSwitch.findElement(By.className("bootstrap-switch-label")).click();
-        this.driver.waitUntilCondition(driver -> isEnabled() == enabled);
+        this.enabledSwitch.click();
         this.parentPage.waitForNotificationSuccessMessage("Saved!");
     }
 

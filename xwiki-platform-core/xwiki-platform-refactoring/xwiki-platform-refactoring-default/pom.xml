@@ -31,8 +31,8 @@
   <name>XWiki Platform - Refactoring - Default Implementation</name>
   <description>XWiki Platform - Refactoring - Default Implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>83</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -26,9 +26,10 @@ import java.util.Locale;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,7 +39,10 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,12 +53,16 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -70,42 +78,55 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentTest
 public class DefaultModelBridgeTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ModelBridge> mocker =
-        new MockitoComponentMockingRule<>(DefaultModelBridge.class);
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension();
 
-    private XWikiContext xcontext = mock(XWikiContext.class);
+    @InjectMockComponents
+    private DefaultModelBridge modelBridge;
 
-    private XWiki xwiki = mock(XWiki.class);
+    @Mock
+    private XWikiContext xcontext;
 
-    @Before
-    public void configure() throws Exception
+    @Mock
+    private XWiki xwiki;
+
+    @BeforeEach
+    public void configure(MockitoComponentManager mocker) throws Exception
     {
         when(this.xcontext.getWiki()).thenReturn(xwiki);
 
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
 
-        EntityReferenceProvider entityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
+        EntityReferenceProvider entityReferenceProvider = mocker.getInstance(EntityReferenceProvider.class);
         when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new DocumentReference("what", "ever", "WebHome"));
         when(entityReferenceProvider.getDefaultReference(EntityType.SPACE))
             .thenReturn(new SpaceReference("whatever", "Main"));
     }
 
+    private void assertLog(Level level, String message, Object... arguments)
+    {
+        ILoggingEvent log = this.logCapture.getLogEvent(0);
+        assertEquals(level, log.getLevel());
+        assertEquals(message, log.getMessage());
+        assertArrayEquals(arguments, log.getArgumentArray());
+    }
+
     @Test
-    public void create() throws Exception
+    public void create(MockitoComponentManager mocker) throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
 
-        this.mocker.getComponentUnderTest().create(documentReference);
+        this.modelBridge.create(documentReference);
 
         verify(this.xcontext.getWiki()).saveDocument(document, this.xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been created.", documentReference);
+        assertLog(Level.INFO, "Document [{}] has been created.", documentReference);
     }
 
     @Test
@@ -117,10 +138,8 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true,
             this.xcontext)).thenReturn(true);
 
-        assertTrue(this.mocker.getComponentUnderTest().copy(sourceReference, copyReference));
-
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been copied to [{}].", sourceReference,
-            copyReference);
+        assertTrue(this.modelBridge.copy(sourceReference, copyReference));
+        assertLog(Level.INFO, "Document [{}] has been copied to [{}].", sourceReference, copyReference);
     }
 
     @Test
@@ -131,10 +150,10 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
         when(sourceDocument.getTranslation()).thenReturn(1);
 
-        this.mocker.getComponentUnderTest().delete(sourceReference);
+        this.modelBridge.delete(sourceReference);
 
         verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, this.xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been deleted.", sourceReference);
+        assertLog(Level.INFO, "Document [{}] has been deleted.", sourceReference);
     }
 
     @Test
@@ -146,11 +165,10 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
         when(sourceDocument.getTranslation()).thenReturn(0);
 
-        this.mocker.getComponentUnderTest().delete(sourceReference);
+        this.modelBridge.delete(sourceReference);
 
         verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, this.xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been deleted with all its translations.",
-            sourceReference);
+        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations.", sourceReference);
     }
 
     @Test
@@ -166,36 +184,34 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
         when(oldDocument.getXObject(eq(redirectClassReference), anyInt())).thenReturn(mock(BaseObject.class));
 
-        this.mocker.getComponentUnderTest().createRedirect(oldReference, newReference);
+        this.modelBridge.createRedirect(oldReference, newReference);
 
         verify(oldDocument).setHidden(true);
         verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", this.xcontext);
-        verify(this.mocker.getMockedLogger()).info("Created automatic redirect from [{}] to [{}].", oldReference,
-            newReference);
+        assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
     }
 
     @Test
-    public void getDocumentReferences() throws Exception
+    public void getDocumentReferences(MockitoComponentManager mocker) throws Exception
     {
         SpaceReference spaceReference = new SpaceReference("wiki", "Space");
 
         Query query = mock(Query.class);
-        QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
+        QueryManager queryManager = mocker.getInstance(QueryManager.class);
         when(queryManager.createQuery(any(), any())).thenReturn(query);
 
         EntityReferenceSerializer<String> localEntityReferenceSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+            mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localEntityReferenceSerializer.serialize(spaceReference)).thenReturn("Space");
 
         when(query.execute()).thenReturn(Arrays.<Object>asList("Page"));
 
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "explicit");
+            mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "explicit");
         DocumentReference documentReference = new DocumentReference("Page", spaceReference);
         when(explicitDocumentReferenceResolver.resolve("Page", spaceReference)).thenReturn(documentReference);
 
-        assertEquals(Arrays.asList(documentReference),
-            this.mocker.getComponentUnderTest().getDocumentReferences(spaceReference));
+        assertEquals(Arrays.asList(documentReference), this.modelBridge.getDocumentReferences(spaceReference));
 
         verify(query).setWiki(spaceReference.getWikiReference().getName());
         verify(query).bindValue("space", "Space");
@@ -203,7 +219,7 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void updateParentFields() throws Exception
+    public void updateParentFields(MockitoComponentManager mocker) throws Exception
     {
         DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
@@ -223,19 +239,22 @@ public class DefaultModelBridgeTest
         XWikiDocument child2Document = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(child2Reference, this.xcontext)).thenReturn(child2Document);
 
-        this.mocker.getComponentUnderTest().updateParentField(oldParentReference, newParentReference);
+        this.modelBridge.updateParentField(oldParentReference, newParentReference);
 
-        verify(mockProgressManager).pushLevelProgress(2, this.mocker.getComponentUnderTest());
+        verify(mockProgressManager).pushLevelProgress(2, this.modelBridge);
 
         verify(child1Document).setParentReference(newParentReference);
         verify(this.xcontext.getWiki()).saveDocument(child1Document, "Updated parent field.", true, this.xcontext);
 
         verify(child2Document).setParentReference(newParentReference);
         verify(this.xcontext.getWiki()).saveDocument(child1Document, "Updated parent field.", true, this.xcontext);
+
+        assertLog(Level.INFO, "Document parent fields updated from [{}] to [{}] for [{}] documents.",
+            oldParentReference, newParentReference, 2);
     }
 
     @Test
-    public void updateParentFieldsNoChildren() throws Exception
+    public void updateParentFieldsNoChildren(MockitoComponentManager mocker) throws Exception
     {
         DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
@@ -248,7 +267,7 @@ public class DefaultModelBridgeTest
 
         JobProgressManager mockProgressManager = mocker.getInstance(JobProgressManager.class);
 
-        this.mocker.getComponentUnderTest().updateParentField(oldParentReference, newParentReference);
+        this.modelBridge.updateParentField(oldParentReference, newParentReference);
 
         verify(mockProgressManager, never()).pushLevelProgress(anyInt(), any());
         verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), eq("Updated parent field."),
@@ -262,11 +281,11 @@ public class DefaultModelBridgeTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.singletonMap("title", "foo"));
+        this.modelBridge.update(documentReference, Collections.singletonMap("title", "foo"));
 
         verify(document).setTitle("foo");
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+        assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 
     @Test
@@ -277,11 +296,11 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.modelBridge.update(documentReference, Collections.emptyMap());
 
         verify(document).setParentReference(new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome"));
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+        assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 
     @Test
@@ -292,11 +311,11 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.modelBridge.update(documentReference, Collections.emptyMap());
 
         verify(document).setParentReference(new DocumentReference("wiki", "Path", "WebHome"));
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+        assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 
     @Test
@@ -307,15 +326,15 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.modelBridge.update(documentReference, Collections.emptyMap());
 
         verify(document).setParentReference(new DocumentReference("wiki", "Main", "WebHome"));
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+        assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 
     @Test
-    public void dontUpdateParentWhenLegacyMode() throws Exception
+    public void dontUpdateParentWhenLegacyMode(MockitoComponentManager mocker) throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -325,7 +344,7 @@ public class DefaultModelBridgeTest
         ParentChildConfiguration parentChildConfiguration = mocker.getInstance(ParentChildConfiguration.class);
         when(parentChildConfiguration.isParentChildMechanismEnabled()).thenReturn(true);
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.modelBridge.update(documentReference, Collections.emptyMap());
 
         verify(document, never()).setParentReference(any(DocumentReference.class));
         verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
@@ -344,7 +363,7 @@ public class DefaultModelBridgeTest
 
         this.xcontext.setWikiId("carol");
 
-        assertEquals(backLinks, this.mocker.getComponentUnderTest().getBackLinkedReferences(documentReference, "bob"));
+        assertEquals(backLinks, this.modelBridge.getBackLinkedReferences(documentReference, "bob"));
 
         verify(this.xcontext).setWikiId("bob");
         verify(this.xcontext).setWikiId("carol");
@@ -363,9 +382,10 @@ public class DefaultModelBridgeTest
 
         when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
 
-        assertTrue(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+        assertTrue(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
 
         verify(xwiki).restoreFromRecycleBin(deletedDocumentId, "Restored from recycle bin", xcontext);
+        assertLog(Level.INFO, "Document [{}] has been restored", documentReference);
     }
 
     @Test
@@ -375,9 +395,9 @@ public class DefaultModelBridgeTest
 
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(null);
 
-        assertFalse(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
 
-        verify(mocker.getMockedLogger()).error("Deleted document with ID [{}] does not exist.", deletedDocumentId);
+        assertLog(Level.ERROR, "Deleted document with ID [{}] does not exist.", deletedDocumentId);
 
         verify(xwiki, never()).restoreFromRecycleBin(any(), any(), any());
     }
@@ -397,10 +417,10 @@ public class DefaultModelBridgeTest
 
         when(xwiki.exists(documentReference, xcontext)).thenReturn(true);
 
-        assertFalse(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
 
-        verify(mocker.getMockedLogger()).error(
-            "Document [{}] with ID [{}] can not be restored. Document already exists", fullName, deletedDocumentId);
+        assertLog(Level.ERROR, "Document [{}] with ID [{}] can not be restored. Document already exists", fullName,
+            deletedDocumentId);
 
         verify(xwiki, never()).restoreFromRecycleBin(any(), any(), any());
     }
@@ -423,9 +443,10 @@ public class DefaultModelBridgeTest
 
         when(xwiki.exists(translationDocumentReference, xcontext)).thenReturn(false);
 
-        assertTrue(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+        assertTrue(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
 
         verify(xwiki).restoreFromRecycleBin(deletedDocumentId, "Restored from recycle bin", xcontext);
+        assertLog(Level.INFO, "Document [{}] has been restored", translationDocumentReference);
 
         // Make sure that the main document is not checked for existence, but the translated document which we actually
         // want to restore.
@@ -456,7 +477,7 @@ public class DefaultModelBridgeTest
         when(xwiki.getRightService()).thenReturn(rightService);
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        assertTrue(mocker.getComponentUnderTest().canRestoreDeletedDocument(deletedDocumentId, userReferenceToCheck));
+        assertTrue(this.modelBridge.canRestoreDeletedDocument(deletedDocumentId, userReferenceToCheck));
 
         // Verify that the rights were checked with the specified user as context user.
         verify(xcontext).setUserReference(userReferenceToCheck);
@@ -489,11 +510,10 @@ public class DefaultModelBridgeTest
         when(xwiki.getRightService()).thenReturn(rightService);
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
 
-        assertFalse(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, true));
+        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, true));
 
-        verify(mocker.getMockedLogger()).error("You are not allowed to restore document [{}] with ID [{}]",
-            documentReference, deletedDocumentId);
-
+        assertLog(Level.ERROR, "You are not allowed to restore document [{}] with ID [{}]", documentReference,
+            deletedDocumentId);
         verify(xwiki, never()).restoreFromRecycleBin(any(), any(), any());
     }
 
@@ -515,10 +535,25 @@ public class DefaultModelBridgeTest
         when(recycleBin.getAllDeletedDocuments(batchId, false, xcontext, true)).thenReturn(deletedDocuments);
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
-        List<Long> result = mocker.getComponentUnderTest().getDeletedDocumentIds(batchId);
+        List<Long> result = this.modelBridge.getDeletedDocumentIds(batchId);
 
         assertNotNull(result);
         assertEquals(deletedDocuments.length, result.size());
         assertThat(result, containsInAnyOrder(id1, id2));
+    }
+
+    @Test
+    public void canOverwriteSilently() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
+
+        assertFalse(this.modelBridge.canOverwriteSilently(documentReference));
+
+        DocumentReference redirectClassReference = new DocumentReference("wiki", "XWiki", "RedirectClass");
+        when(document.getXObject(redirectClassReference)).thenReturn(mock(BaseObject.class));
+
+        assertTrue(this.modelBridge.canOverwriteSilently(documentReference));
     }
 }

@@ -190,7 +190,8 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
             // Step 1: Delete the destination document if needed.
             this.progressManager.startStep(this);
             if (this.modelBridge.exists(newReference)) {
-                if (this.request.isInteractive() && !confirmOverwrite(oldReference, newReference)) {
+                if (this.request.isInteractive() && !this.modelBridge.canOverwriteSilently(newReference)
+                    && !confirmOverwrite(oldReference, newReference)) {
                     this.logger.warn(
                         "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
                         oldReference, newReference);
@@ -257,7 +258,9 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
             OverwriteQuestion question = new OverwriteQuestion(source, destination);
             try {
                 this.status.ask(question);
-                if (!question.isAskAgain()) {
+                if (this.status.isCanceled()) {
+                    return false;
+                } else if (!question.isAskAgain()) {
                     // Use the same answer for the following overwrite questions.
                     this.overwriteAll = question.isOverwrite();
                 }

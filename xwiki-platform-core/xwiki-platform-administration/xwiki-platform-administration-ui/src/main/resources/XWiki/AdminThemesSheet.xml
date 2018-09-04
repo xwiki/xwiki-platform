@@ -211,7 +211,7 @@ $xwiki.jsx.use('XWiki.AdminThemesSheet')
    */
   var customizeSkin = new CustomizeButton(
     $('label.skin a'),
-    $('input[name="XWiki.XWikiPreferences_0_skin"]'),
+    $('select[name="XWiki.XWikiPreferences_0_skin"]'),
     'view'
   );
 });

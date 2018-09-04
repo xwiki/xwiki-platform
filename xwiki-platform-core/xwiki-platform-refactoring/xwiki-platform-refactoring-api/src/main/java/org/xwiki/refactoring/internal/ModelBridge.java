@@ -79,6 +79,18 @@ public interface ModelBridge
     void createRedirect(DocumentReference oldReference, DocumentReference newReference);
 
     /**
+     * Checks if the specified document can be overwritten silently, without asking the user.
+     *
+     * @param documentReference the document to check
+     * @return {@code true} if the specified document can be overwritten silently, {@code false} if the user needs to be
+     *         asked
+     * @see #createRedirect(DocumentReference, DocumentReference)
+     * @since 10.8RC1
+     * @since 10.7.1
+     */
+    boolean canOverwriteSilently(DocumentReference documentReference);
+
+    /**
      * @param reference a document reference
      * @return {@code true} if the specified document exists, {@code false} otherwise
      */

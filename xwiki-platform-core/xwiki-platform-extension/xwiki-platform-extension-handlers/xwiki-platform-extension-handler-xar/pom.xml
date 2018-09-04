@@ -33,8 +33,8 @@
   <description>XWiki Platform - Extension - Handler - XAR</description>
   <properties>
     <!-- TODO: Add unit tests ASAP to bring the ratio back to 0.70! -->
-    <xwiki.jacoco.instructionRatio>0.52</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>46</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>47</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

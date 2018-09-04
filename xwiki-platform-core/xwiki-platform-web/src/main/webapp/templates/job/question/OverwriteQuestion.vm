@@ -1,0 +1,81 @@
+###
+### Template used to ask for confirmation to overwrite the target page when performing a refactoring operation such as
+### copy, rename or move.
+###
+#template('job/question/macros.vm')
+#template('hierarchy_macros.vm')
+
+#questionHeader()
+
+#set ($jobStatus = $job.status)
+#set ($question = $jobStatus.question)
+#set ($sourceDocument = $xwiki.getDocument($question.source))
+#set ($destinationDocument = $xwiki.getDocument($question.destination))
+#set ($destinationPath = "#hierarchy($question.destination {
+  'excludeSelf': true,
+  'local': $question.source.wikiReference.equals($question.destination.wikiReference),
+  'plain': true
+})")
+#set ($destinationPath = $destinationPath.trim())
+#if ($destinationPath == '')
+  #set ($destinationPath = '/')
+#end
+
+#macro (displayDocumentSummary $document $title)
+  <div class="col-sm-6">
+    <h5>
+      $services.icon.renderHTML('file-white')
+      <a href="$document.getURL()">$escapetool.xml($services.localization.render($title))</a>
+    </h5>
+    <div>
+      $services.localization.render('job.question.OverwriteQuestion.lastAuthor',
+        [$xwiki.getUserName($document.authorReference)])
+    </div>
+    <div>
+      $services.localization.render('job.question.OverwriteQuestion.lastModified',
+        [$xwiki.formatDate($document.date)])
+    </div>
+  </div>
+#end
+
+<div class="panel panel-warning overwriteQuestion xform">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      $services.icon.renderHTML('warning')
+      $escapetool.xml($services.localization.render('job.question.OverwriteQuestion.title',
+        [$destinationDocument.plainTitle]))
+    </h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      $escapetool.xml($services.localization.render('job.question.OverwriteQuestion.message', [$destinationPath]))
+    </p>
+    <div class="row form-group">
+      #displayDocumentSummary($destinationDocument 'job.question.OverwriteQuestion.destination')
+      #displayDocumentSummary($sourceDocument 'job.question.OverwriteQuestion.source')
+    </div>
+    <div>
+      <label>
+        <input type="checkbox" name="qproperty_askAgain" value="false" />
+        $escapetool.xml($services.localization.render('job.question.OverwriteQuestion.applyToAll'))
+      </label>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <p class="buttons-question">
+      <button class="btn btn-warning btAnswerConfirm" name="qproperty_overwrite" value="true">
+        $escapetool.xml($services.localization.render('job.question.OverwriteQuestion.replace'))
+      </button>
+      <button class="btn btn-default btAnswerConfirm" name="qproperty_overwrite" value="false">
+        $escapetool.xml($services.localization.render('job.question.OverwriteQuestion.skip'))
+      </button>
+      #if ($jobStatus.cancelable)
+        <button class="btn btn-link btAnswerCancel" name="qproperty_overwrite" value="false">
+          $escapetool.xml($services.localization.render('job.question.button.cancel'))
+        </button>
+      #end
+    </p>
+  </div>
+</div>
+
+#questionFooter()

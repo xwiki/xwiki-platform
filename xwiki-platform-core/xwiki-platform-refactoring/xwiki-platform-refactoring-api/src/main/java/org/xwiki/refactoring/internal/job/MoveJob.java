@@ -258,7 +258,9 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
             OverwriteQuestion question = new OverwriteQuestion(source, destination);
             try {
                 this.status.ask(question);
-                if (!question.isAskAgain()) {
+                if (this.status.isCanceled()) {
+                    return false;
+                } else if (!question.isAskAgain()) {
                     // Use the same answer for the following overwrite questions.
                     this.overwriteAll = question.isOverwrite();
                 }

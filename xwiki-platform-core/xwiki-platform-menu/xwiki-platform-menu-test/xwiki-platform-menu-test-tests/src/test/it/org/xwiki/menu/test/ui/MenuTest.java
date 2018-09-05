@@ -22,6 +22,7 @@ package org.xwiki.menu.test.ui;
 import java.util.Arrays;
 
 import org.junit.Test;
+import org.xwiki.application.test.po.ApplicationIndexHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
 import org.xwiki.menu.test.po.MenuEntryEditPage;
 import org.xwiki.menu.test.po.MenuHomePage;
@@ -57,7 +58,13 @@ public class MenuTest extends AbstractTest
 
         // Verify that the menu app is displayed in the Applications Panel
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
-        ViewPage vp = applicationPanel.clickApplication("Menu");
+
+        // By default the Menu app is blacklisted from the application panel, even for superadmin user
+        assertFalse(applicationPanel.containsApplication("Menu"));
+
+        ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
+        assertTrue(applicationIndexHomePage.containsApplication("Menu"));
+        ViewPage vp = applicationIndexHomePage.clickApplication("Menu");
 
         // Verify we're on the right page!
         assertEquals(MenuHomePage.getSpace(), vp.getMetaDataValue("space"));
@@ -65,16 +72,16 @@ public class MenuTest extends AbstractTest
 
         // Now log out to verify that the Menu entry is not displayed for guest users
         getUtil().forceGuestUser();
-        // Navigate again to the Application Menu page to perform the verification
-        applicationPanel = ApplicationsPanel.gotoPage();
-        assertFalse(applicationPanel.containsApplication("Menu"));
-
-        // Log in as superadmin again
-        getUtil().login("superadmin", "pass");
+        // Navigate again to the Application Index page to perform the verification
+        applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
+        assertFalse(applicationIndexHomePage.containsApplication("Menu"));
     }
 
     private void verifyMenuCreationInLeftPanelWithCurrentWikiVisibility()
     {
+        // Log in as superadmin again
+        getUtil().login("superadmin", "pass");
+
         DocumentReference menu1Reference = new DocumentReference("xwiki", Arrays.asList("Menu", "menu1"), "WebHome");
         getUtil().deletePage(menu1Reference);
 

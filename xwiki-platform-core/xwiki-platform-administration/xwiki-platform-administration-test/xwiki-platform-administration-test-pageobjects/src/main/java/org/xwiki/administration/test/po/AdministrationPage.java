@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.po;
 
+import org.xwiki.menu.test.po.MenuHomePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.ViewPage;
@@ -122,6 +123,12 @@ public class AdministrationPage extends ViewPage
     {
         this.menu.expandCategoryWithId("edit").getSectionById("WYSIWYG").click();
         return new WYSIWYGEditorAdministrationSectionPage();
+    }
+
+    public MenuHomePage clickMenuSection()
+    {
+        this.menu.expandCategoryWithId("lf").getSectionById("menu.name").click();
+        return new MenuHomePage();
     }
 
     /**

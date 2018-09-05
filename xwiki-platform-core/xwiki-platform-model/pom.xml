@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Model (Wiki, Space, Document, etc)</description>
   <properties>
-    <xwiki.pitest.mutationThreshold>70</xwiki.pitest.mutationThreshold>
-    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>72</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

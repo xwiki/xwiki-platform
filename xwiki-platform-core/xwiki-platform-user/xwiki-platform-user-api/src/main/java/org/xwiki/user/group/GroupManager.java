@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Fast access to group membership.
@@ -31,12 +32,13 @@ import org.xwiki.model.reference.DocumentReference;
  * @since 10.8RC1
  */
 @Role
+@Unstable
 public interface GroupManager
 {
     /**
      * Search groups the passed user or group is member of.
      * <p>
-     * {code wikis} controls where to search for the groups and {@code recurse} onlty the direct group should be
+     * {code wikis} controls where to search for the groups and {@code recurse} only the direct group should be
      * returned or the whole hierarchy.
      * 
      * @param member the group member (user or group)

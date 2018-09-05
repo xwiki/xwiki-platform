@@ -19,12 +19,15 @@
  */
 package org.xwiki.user.group;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Any exception raised in the group manager.
  *
  * @version $Id$
  * @since 10.8RC1
  */
+@Unstable
 public class GroupException extends Exception
 {
     /**

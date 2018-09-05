@@ -34,8 +34,13 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>User Profile Application</xwiki.extension.name>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-user-ui</xwiki.extension.features>
+    <xwiki.extension.features>
+      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+      org.xwiki.platform:xwiki-platform-user-ui,
+
+      <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
+      org.xwiki.contrib.membership:application-membership-profile
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

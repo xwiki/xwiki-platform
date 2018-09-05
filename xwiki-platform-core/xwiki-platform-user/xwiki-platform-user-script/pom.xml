@@ -33,6 +33,11 @@
   <description>XWiki Platform - Script</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+
+    <xwiki.extension.features>
+      <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
+      org.xwiki.contrib.membership:application-membership-script
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

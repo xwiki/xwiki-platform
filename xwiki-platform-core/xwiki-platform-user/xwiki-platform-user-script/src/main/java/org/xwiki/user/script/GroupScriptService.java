@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.group.WikiTarget;
@@ -41,6 +42,7 @@ import org.xwiki.user.group.WikiTarget;
 @Component
 @Named(GroupScriptService.ROLEHINT)
 @Singleton
+@Unstable
 public class GroupScriptService implements ScriptService
 {
     /**
@@ -54,7 +56,7 @@ public class GroupScriptService implements ScriptService
     /**
      * Search groups the passed user or group is member of.
      * <p>
-     * {code wikis} controls where to search for the groups and {@code recurse} onlty the direct group should be
+     * {code wikis} controls where to search for the groups and {@code recurse} only the direct group should be
      * returned or the whole hierarchy.
      * 
      * @param member the group member (user or group)

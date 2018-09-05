@@ -33,6 +33,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -59,6 +62,9 @@ public class NotificationFilterPreferenceStore
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private QueryManager queryManager;
 
     /**
      * Get the notification preference that corresponds to the given id and user.
@@ -92,32 +98,30 @@ public class NotificationFilterPreferenceStore
             return Collections.emptyList();
         }
 
-        List<DefaultNotificationFilterPreference> results;
-
         String serializedUser = entityReferenceSerializer.serialize(user);
 
         XWikiContext context = contextProvider.get();
 
-        // Search in the main database
-        String oriDatabase = context.getWikiId();
         try {
-            context.setWikiId(context.getMainXWiki());
-            results =
-                    context.getWiki().getStore().search(
-                            "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = ? "
-                                    + "order by nfp.id",
-                            1000, 0, Collections.singletonList(serializedUser), context);
+            Query query = queryManager.createQuery(
+                    "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner "
+                            + "order by nfp.id", Query.HQL);
+            query.bindValue("owner", serializedUser);
+            if (activityStreamConfiguration.useMainStore()) {
+                query.setWiki(context.getMainXWiki());
+            }
+            List<DefaultNotificationFilterPreference> results = query.execute();
 
             for (DefaultNotificationFilterPreference preference : results) {
                 preference.setProviderHint("userProfile");
             }
-        } catch (XWikiException e) {
-            throw new NotificationException("error", e);
-        } finally {
-            context.setWikiId(oriDatabase);
-        }
 
-        return results;
+            return results;
+        } catch (QueryException e) {
+            throw new NotificationException(String.format(
+                    "Error while loading the notification filter preferences of the user [%s].", serializedUser),
+                e);
+        }
     }
 
     /**
@@ -137,17 +141,24 @@ public class NotificationFilterPreferenceStore
 
         // store event in the main database
         String oriDatabase = context.getWikiId();
+
+        if (activityStreamConfiguration.useMainStore()) {
+            context.setWikiId(context.getMainXWiki());
+        }
+
         context.setWikiId(context.getMainXWiki());
-        XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
+        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
         try {
-            mainHibernateStore.beginTransaction(context);
-            Session session = mainHibernateStore.getSession(context);
+            hibernateStore.beginTransaction(context);
+            Session session = hibernateStore.getSession(context);
             session.delete(preference);
-            mainHibernateStore.endTransaction(context, true);
+            hibernateStore.endTransaction(context, true);
         } catch (XWikiException e) {
-            mainHibernateStore.endTransaction(context, false);
+            hibernateStore.endTransaction(context, false);
         } finally {
-            context.setWikiId(oriDatabase);
+            if (!context.getWikiId().equals(oriDatabase)) {
+                context.setWikiId(oriDatabase);
+            }
         }
     }
 

@@ -2545,8 +2545,10 @@ Recursive title display detected!##
     #set ($values = $parameters.value)
   #elseif ($parameters.multiple)
     #set ($values = $stringtool.split($parameters.value, $parameters.getOrDefault('separators', '|,')))
-  #else
+  #elseif ("$!parameters.value" != '')
     #set ($values = [$parameters.value])
+  #else
+    #set ($values = [])
   #end
   <select $stringtool.join($attributes, ' ')>
     #foreach ($selectedValue in $values)

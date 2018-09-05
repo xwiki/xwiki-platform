@@ -19,46 +19,40 @@
  */
 package org.xwiki.lesscss.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Test class for {@link org.xwiki.lesscss.internal.LESSConfiguration}.
- *
  */
-public class LESSConfigurationTest {
+@ComponentTest
+public class LESSConfigurationTest
+{
+    @InjectMockComponents
+    private LESSConfiguration lessConfiguration;
 
-    @Rule
-    public MockitoComponentMockingRule<LESSConfiguration> mocker =
-            new MockitoComponentMockingRule<>(LESSConfiguration.class);
-
-    private ConfigurationSource xwikiPropertiesSource;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.xwikiPropertiesSource = this.mocker.getInstance(ConfigurationSource.class);
-    }
+    @MockComponent
+    private ConfigurationSource configurationSource;
 
     @Test
     public void maxSimultaneousCompilations() throws Exception
     {
-        when(xwikiPropertiesSource.getProperty("lesscss.maximumSimultaneousCompilations", 4)).thenReturn(4);
-        mocker.getComponentUnderTest().getMaximumSimultaneousCompilations();
-        verify(xwikiPropertiesSource).getProperty("lesscss.maximumSimultaneousCompilations", 4);
+        when(configurationSource.getProperty("lesscss.maximumSimultaneousCompilations", 4)).thenReturn(4);
+        lessConfiguration.getMaximumSimultaneousCompilations();
+        verify(configurationSource).getProperty("lesscss.maximumSimultaneousCompilations", 4);
     }
 
     @Test
     public void generateSourceMaps() throws Exception
     {
-        when(xwikiPropertiesSource.getProperty("lesscss.generateInlineSourceMaps", false)).thenReturn(false);
-        mocker.getComponentUnderTest().isGenerateInlineSourceMaps();
-        verify(xwikiPropertiesSource).getProperty("lesscss.generateInlineSourceMaps", false);
+        when(configurationSource.getProperty("lesscss.generateInlineSourceMaps", false)).thenReturn(false);
+        lessConfiguration.isGenerateInlineSourceMaps();
+        verify(configurationSource).getProperty("lesscss.generateInlineSourceMaps", false);
     }
 }

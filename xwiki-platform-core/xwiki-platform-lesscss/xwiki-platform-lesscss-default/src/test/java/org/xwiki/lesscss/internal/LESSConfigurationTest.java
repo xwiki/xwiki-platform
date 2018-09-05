@@ -25,8 +25,7 @@ import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -50,16 +49,16 @@ public class LESSConfigurationTest {
     @Test
     public void maxSimultaneousCompilations() throws Exception
     {
-        when(xwikiPropertiesSource.getProperty("lesscss.maximumSimultaneousCompilations",4)).thenReturn(4);
-        int i = mocker.getComponentUnderTest().getMaximumSimultaneousCompilations();
-        assertEquals(4,i);
+        when(xwikiPropertiesSource.getProperty("lesscss.maximumSimultaneousCompilations", 4)).thenReturn(4);
+        mocker.getComponentUnderTest().getMaximumSimultaneousCompilations();
+        verify(xwikiPropertiesSource).getProperty("lesscss.maximumSimultaneousCompilations", 4);
     }
 
     @Test
     public void generateSourceMaps() throws Exception
     {
-        when(xwikiPropertiesSource.getProperty("lesscss.generateInlineSourceMaps", false)).thenReturn(true);
-        boolean b  = mocker.getComponentUnderTest().isGenerateInlineSourceMaps();
-        assertTrue(b);
+        when(xwikiPropertiesSource.getProperty("lesscss.generateInlineSourceMaps", false)).thenReturn(false);
+        mocker.getComponentUnderTest().isGenerateInlineSourceMaps();
+        verify(xwikiPropertiesSource).getProperty("lesscss.generateInlineSourceMaps", false);
     }
 }

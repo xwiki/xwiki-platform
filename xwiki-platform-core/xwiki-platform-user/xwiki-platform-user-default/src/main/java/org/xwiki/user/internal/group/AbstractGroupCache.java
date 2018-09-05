@@ -79,12 +79,15 @@ public abstract class AbstractGroupCache implements Initializable, CacheEntryLis
 
         /**
          * @param direct the direct entities.
+         * @return the new unmodificable list
          */
-        public void setDirect(Collection<DocumentReference> direct)
+        public Collection<DocumentReference> setDirect(Collection<DocumentReference> direct)
         {
             this.direct = Collections.unmodifiableCollection(direct);
 
             addToIndex(this.key, direct);
+
+            return this.direct;
         }
 
         /**
@@ -97,12 +100,15 @@ public abstract class AbstractGroupCache implements Initializable, CacheEntryLis
 
         /**
          * @param all the recursive entities.
+         * @return the new unmodificable list
          */
-        public void setAll(Collection<DocumentReference> all)
+        public Collection<DocumentReference> setAll(Collection<DocumentReference> all)
         {
             this.all = Collections.unmodifiableCollection(all);
 
             addToIndex(this.key, all);
+
+            return this.all;
         }
     }
 

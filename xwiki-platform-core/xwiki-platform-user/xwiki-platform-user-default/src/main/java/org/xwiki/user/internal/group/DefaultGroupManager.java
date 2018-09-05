@@ -166,21 +166,20 @@ public class DefaultGroupManager implements GroupManager
             }
 
             // Calculate groups
-            groups = getGroups(reference, wikiTarget);
+            groups = getGroups(reference, cacheWikis);
 
             if (recurse) {
                 // Recursively resolve sub-groups
                 Collection<DocumentReference> resolvedGroups = groups;
                 for (DocumentReference member : groups) {
-                    Collection<DocumentReference> subGroups = getGroups(member, wikiTarget, true);
+                    Collection<DocumentReference> subGroups = getGroups(member, cacheWikis, true);
 
                     resolvedGroups = addElements(subGroups, resolvedGroups, resolvedGroups == groups);
                 }
-                groups = resolvedGroups;
 
-                entry.setAll(groups);
+                groups = entry.setAll(resolvedGroups);
             } else {
-                entry.setDirect(groups);
+                groups = entry.setDirect(groups);
             }
 
             return groups;
@@ -244,9 +243,9 @@ public class DefaultGroupManager implements GroupManager
         Collection<DocumentReference> references;
 
         if (recurse) {
-            references = entry.getDirect();
-        } else {
             references = entry.getAll();
+        } else {
+            references = entry.getDirect();
         }
 
         return references;
@@ -286,11 +285,10 @@ public class DefaultGroupManager implements GroupManager
 
                         resolvedMembers = addElements(subMembers, resolvedMembers, resolvedMembers == members);
                     }
-                    members = resolvedMembers;
 
-                    entry.setAll(members);
+                    members = entry.setAll(resolvedMembers);
                 } else {
-                    entry.setDirect(members);
+                    members = entry.setDirect(members);
                 }
 
                 return members;

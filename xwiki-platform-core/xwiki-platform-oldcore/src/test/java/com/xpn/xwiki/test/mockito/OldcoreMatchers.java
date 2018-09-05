@@ -60,6 +60,17 @@ public class OldcoreMatchers
     }
 
     /**
+     * Match a {@link XWikiContext} parameter containing the passed wiki identifier.
+     * 
+     * @param wikiId the wiki identifier to match
+     * @return since 10.8RC1
+     */
+    public static XWikiContext isContextWiki(String wikiId)
+    {
+        return argThat(new XWikiContextMatcher(wikiId));
+    }
+
+    /**
      * Any <code>XWikiDocument</code>.
      * 
      * @since 7.3RC1

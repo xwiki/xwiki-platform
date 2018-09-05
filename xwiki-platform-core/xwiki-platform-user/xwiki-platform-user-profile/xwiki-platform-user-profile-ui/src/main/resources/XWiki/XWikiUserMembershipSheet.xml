@@ -1,0 +1,130 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.XWikiUserMembershipSheet" locale="">
+  <web>XWiki</web>
+  <name>XWikiUserMembershipSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>xwiki:XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
+#set($obj = $doc.getObject('XWiki.XWikiUsers'))
+#if(!$obj)
+  = {{translation key="xe.admin.users.sheet"/}} =
+
+  {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}##
+#elseif ($xcontext.action == 'get')
+  #if ($xcontext.isMainWiki())
+    ## Main wiki users can be located in any wiki
+    #set($groups = $services.user.group.getGroupsFromAllWikis($xcontext.userReference))
+  #else
+    ## Subwiki users are usually located only in the local wiki
+    #set($groups = $services.user.group.getGroupsFromMemberWiki($xcontext.userReference))
+  #end
+  ## Filter
+  #set($filterValue = "$!{request.get('group')}")
+  #if ($filterValue != '')
+    #set ($filteredGroups = [])
+    #foreach($group in $groups)
+      #set($groupString = $services.model.serialize($group, 'default'))
+      #if ($groupString.toLowerCase().contains($filterValue.toLowerCase()))
+        #set($void = $filteredGroups.add($group))
+      #end
+    #end
+  #else
+    #set ($filteredGroups = $groups)
+  #end
+  #if ($filteredGroups.size() &gt; 0)
+    #set ($filteredGroups = $sorttool.sort($filteredGroups))
+    #set($order = "$!request.sort")
+    #if ($order == 'group' &amp;&amp; $request.get('dir').toLowerCase() == 'desc')
+      ## Reverse order
+      #set($descGroups = [])
+      #set($max = $filteredGroups.size() - 1)
+      #foreach($i in [ $max ..  0 ])
+        #set($void = $descGroups.add($filteredGroups[$i]))
+      #end
+      #set($filteredGroups = $descGroups)
+    #end
+    #set($offset = $mathtool.toInteger($request.get('offset')))
+    ## Offset starts from 0 in velocity and 1 in javascript
+    #set($offset = $offset - 1)
+    #if (!$offset || $offset &lt; 0)
+      #set($offset = 0)
+    #end
+    #set($limit = $mathtool.toInteger($request.get('limit')))
+    #if (!$limit || $limit &lt; 0)
+      #set ($limit = 15)
+    #end
+    #set($toIndex = $offset + $limit)
+    #if ($toIndex &gt; $filteredGroups.size())
+      #set($toIndex = $filteredGroups.size())
+    #end
+    #set($subGroups = $filteredGroups.subList($offset, $toIndex))
+  #else
+    #set($subGroups = [])
+  #end
+  #set($rows = [])
+  #foreach ($group in $subGroups)
+    #set($void = $rows.add({
+        'doc_viewable' : true,
+        'group' : $group.name,
+        'group_url' : $xwiki.getURL($group)
+      }))
+  #end
+  #set($result = {
+      'totalrows' : $filteredGroups.size(),
+      'returnedrows' : $subGroups.size(),
+      'offset' : $mathtool.add($offset, 1),
+      'reqNo' : $numbertool.toNumber($request.reqNo),
+      'rows': $rows
+    })
+  $jsontool.serialize($result)
+  $response.setContentType('application/json')
+#else
+  = {{translation key="user.profile.groups.title"/}}
+
+  {{translation key="user.profile.groups.description"/}}
+
+  #set($columns = [ 'group' ])
+  #set($columnsProperties = {
+      'group' : { 'type' : 'text', 'link' : 'field' }
+    })
+  #set($options = {
+      'translationPrefix' : 'user.profile.groups.table.',
+      'resultPage' : $doc.fullName,
+      'extraParams' : '&amp;sheet=XWiki.XWikiUserMembershipSheet'
+    })
+  #livetable("user.profile.group.table" $columns $columnsProperties $options)
+#end## User object exists
+{{/velocity}}</content>
+</xwikidoc>

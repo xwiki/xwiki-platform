@@ -24,19 +24,26 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-user</artifactId>
     <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user</artifactId>
-  <name>XWiki Platform - User - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - User - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-user-api</module>
-    <module>xwiki-platform-user-default</module>
-    <module>xwiki-platform-user-directory</module>
-    <module>xwiki-platform-user-profile</module>
-    <module>xwiki-platform-user-script</module>
-  </modules>
+  <artifactId>xwiki-platform-user-script</artifactId>
+  <name>XWiki Platform - User - Script</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Script</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -469,10 +469,10 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         $.post(restURL, params).done(function (data) {
           self.domElement.attr('data-objectNumber', data.number);
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
         }).fail(function () {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
       } else if (objectNumber != '') {
         // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by default, in notifications)
@@ -484,10 +484,10 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           data: state ? '1' : '0'
         }).done(function (data) {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
         }).fail(function () {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
       }
     };

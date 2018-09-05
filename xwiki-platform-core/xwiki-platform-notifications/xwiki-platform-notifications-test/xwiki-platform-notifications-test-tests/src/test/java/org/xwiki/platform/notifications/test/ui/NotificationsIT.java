@@ -659,6 +659,14 @@ public class NotificationsIT extends AbstractTest
             assertTrue(preferences.get(8).getFormats().containsAll(Arrays.asList("Email", "Alert")));
             assertTrue(preferences.get(8).isEnabled());
 
+            // Disable filter 6
+            preferences.get(6).setEnabled(false);
+            // Refresh the page
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            preferences = p.getNotificationFilterPreferences();
+            // Verify the change have been saved
+            assertFalse(preferences.get(6).isEnabled());
+
             // Delete these new filters
             preferences.get(8).delete();
             // The livetable page is refreshed so we need to load back the filter preferences

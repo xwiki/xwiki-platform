@@ -133,15 +133,16 @@ public class NotificationFilterPreference
     /**
      * Enable or disable the current filter.
      * @param enabled either or not the filter must be enabled
+     * @throws Exception if the expected state cannot be set
      */
-    public void setEnabled(boolean enabled)
+    public void setEnabled(boolean enabled) throws Exception
     {
         if (isEnabled() == enabled) {
             return;
         }
 
-        this.enabledSwitch.click();
-        this.parentPage.waitForNotificationSuccessMessage("Saved!");
+        this.enabledSwitch.setState(enabled ? BootstrapSwitch.State.ON : BootstrapSwitch.State.OFF);
+        this.parentPage.waitForNotificationSuccessMessage("Filter preference saved!");
     }
 
     /**

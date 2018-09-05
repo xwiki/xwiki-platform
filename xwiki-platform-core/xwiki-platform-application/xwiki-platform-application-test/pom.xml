@@ -24,32 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-administration-test</artifactId>
+    <artifactId>xwiki-platform-application</artifactId>
     <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
-  <name>XWiki Platform - Administration - Page Objects</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Administration - Page Objects</description>
+  <artifactId>xwiki-platform-application-test</artifactId>
+  <name>XWiki Platform - Application - Tests - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Application - Tests - Parent POM</description>
   <properties>
-    <!-- None of the classes is valid -->
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
+         runtime code -->
+    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-index-tree-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-menu-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-application-test-pageobjects</module>
+  </modules>
 </project>

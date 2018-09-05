@@ -24,31 +24,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-administration-test</artifactId>
+    <artifactId>xwiki-platform-application-test</artifactId>
     <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
-  <name>XWiki Platform - Administration - Page Objects</name>
+  <artifactId>xwiki-platform-application-test-pageobjects</artifactId>
+  <name>XWiki Platform - Application - Tests - Page Objects</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Administration - Page Objects</description>
-  <properties>
-    <!-- None of the classes is valid -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
+  <description>XWiki Platform - Application - Tests - Page Objects</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
+      <artifactId>xwiki-platform-application-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-index-tree-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-menu-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-appwithinminutes-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

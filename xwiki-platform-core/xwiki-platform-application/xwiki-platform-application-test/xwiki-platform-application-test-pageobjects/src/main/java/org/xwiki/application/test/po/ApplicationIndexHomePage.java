@@ -17,37 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.menu.test.po;
+package org.xwiki.application.test.po;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.By;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
+import org.xwiki.test.ui.po.ViewPage;
 
-/**
- * Represents the Menu.WebHome page.
- * 
- * @version $Id$
- * @since 10.6RC1
- */
-public class MenuHomePage extends ApplicationHomePage
+public class ApplicationIndexHomePage extends ApplicationHomePage
 {
     /**
-     * Go to the home page of the Menu application.
+     * Go to the home page of the Application Index application.
      */
-    public static MenuHomePage gotoPage()
+    public static ApplicationIndexHomePage gotoPage()
     {
-        ApplicationHomePage.gotoPage("Menu");
-        return new MenuHomePage();
+        ApplicationHomePage.gotoPage("Applications");
+        return new ApplicationIndexHomePage();
     }
 
-    public static String getSpace()
+    public boolean containsApplication(String applicationName)
     {
-        return "Menu";
+        return getDriver().findElementsWithoutWaiting(By.xpath(
+                "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]")).size() == 1;
     }
 
-    public static String getPage()
+    public ViewPage clickApplication(String applicationName)
     {
-        return "WebHome";
+        getDriver().findElementWithoutWaiting(By.xpath(
+                "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]")).click();
+        return new ViewPage();
     }
 }

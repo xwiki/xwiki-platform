@@ -43,7 +43,7 @@
 #set($class = $doc.getObject('XWiki.MyClass').xWikiClass)
 #foreach($prop in $class.properties)
   ; $doc.displayPrettyName($prop.name)
-  : $doc.display($prop.getName())
+  : $doc.display($prop.name)
 #end
 {{/velocity}}</content>
 </xwikidoc>

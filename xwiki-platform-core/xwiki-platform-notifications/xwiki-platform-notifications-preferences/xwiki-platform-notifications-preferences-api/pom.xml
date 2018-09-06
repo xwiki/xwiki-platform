@@ -32,6 +32,7 @@
   <description>Handle notifications user preferences</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>62</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

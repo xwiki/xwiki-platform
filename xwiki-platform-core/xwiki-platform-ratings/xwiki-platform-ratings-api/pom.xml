@@ -33,6 +33,7 @@
   <description>API to rate wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.03</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>3</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

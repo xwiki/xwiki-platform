@@ -32,7 +32,7 @@
   <description>Default bridge to oldcore for the Event Stream API module.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>93</xwiki.pitest.mutationThreshold>
+    <xwiki.pitest.mutationThreshold>90</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

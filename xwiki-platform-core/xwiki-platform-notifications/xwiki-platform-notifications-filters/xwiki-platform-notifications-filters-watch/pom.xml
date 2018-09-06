@@ -31,6 +31,7 @@
   <name>XWiki Platform - Notifications - Filters - Watch</name>
   <properties>
     <xwiki.jacoco.instructionRatio>0.35</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>31</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

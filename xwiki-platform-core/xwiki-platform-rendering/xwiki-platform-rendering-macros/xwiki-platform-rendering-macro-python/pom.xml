@@ -34,9 +34,6 @@
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Python Macro</xwiki.extension.name>
-
-    <!-- Error when launching pit-test: no mutation found -->
-    <xwiki.pitest.skip>true</xwiki.pitest.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -63,16 +60,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <!-- Skip pit/descartes for now as it's failing on this module, see: https://github.com/STAMP-project/pitest-descartes/issues/72 -->
-      <plugin>
-      <groupId>org.pitest</groupId>
-      <artifactId>pitest-maven</artifactId>
-      <configuration>
-        <skip>true</skip>
-      </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

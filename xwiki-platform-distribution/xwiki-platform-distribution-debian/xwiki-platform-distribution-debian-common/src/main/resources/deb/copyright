@@ -1,0 +1,6 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+License: ${debian.license}
+
+Files: *
+Copyright: ${project.inceptionYear}-${current.year} ${project.organization.name}
+License: ${debian.license}

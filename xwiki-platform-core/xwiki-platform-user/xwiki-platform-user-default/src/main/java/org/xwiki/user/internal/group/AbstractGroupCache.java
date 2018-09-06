@@ -32,8 +32,8 @@ import javax.inject.Inject;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.event.AbstractCacheEntryListener;
 import org.xwiki.cache.event.CacheEntryEvent;
-import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -47,7 +47,7 @@ import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
  * @version $Id$
  * @since 10.8RC1
  */
-public abstract class AbstractGroupCache implements Initializable, CacheEntryListener<GroupCacheEntry>
+public abstract class AbstractGroupCache extends AbstractCacheEntryListener<GroupCacheEntry> implements Initializable
 {
     private static final int DEFAULT_CAPACITY = 500;
 
@@ -311,27 +311,12 @@ public abstract class AbstractGroupCache implements Initializable, CacheEntryLis
     }
 
     @Override
-    public void cacheEntryAdded(CacheEntryEvent<GroupCacheEntry> event)
-    {
-        // Don't care
-    }
-
-    @Override
-    public void cacheEntryModified(CacheEntryEvent<GroupCacheEntry> event)
-    {
-        // Don't care
-    }
-
-    @Override
     public void cacheEntryRemoved(CacheEntryEvent<GroupCacheEntry> event)
     {
         String key = event.getEntry().getKey();
         GroupCacheEntry entry = event.getEntry().getValue();
 
-        // Workaround https://jira.xwiki.org/browse/XCOMMONS-1484
-        if (entry != null) {
-            cleanIndex(key, entry.getDirect());
-            cleanIndex(key, entry.getAll());
-        }
+        cleanIndex(key, entry.getDirect());
+        cleanIndex(key, entry.getAll());
     }
 }

@@ -34,10 +34,12 @@ import org.xwiki.eventstream.EventStream;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
+import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 
 /**
@@ -60,6 +62,12 @@ public class BridgeEventStream implements EventStream
 
     @Inject
     private EventConverter eventConverter;
+
+    @Inject
+    private ActivityStreamConfiguration activityStreamConfiguration;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public void addEvent(Event e)
@@ -113,6 +121,11 @@ public class BridgeEventStream implements EventStream
         }
         q.setLimit(query.getLimit());
         q.setOffset(query.getOffset());
+
+        if (activityStreamConfiguration.useMainStore()) {
+            q.setWiki(wikiDescriptorManager.getMainWikiId());
+        }
+
         List<ActivityEvent> events = q.execute();
         return convertActivitiesToEvents(events);
     }

@@ -34,11 +34,6 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-application-ui</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-appwithinminutes-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>

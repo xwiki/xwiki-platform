@@ -293,6 +293,6 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
     public XWikiDBVersion getVersion()
     {
         // Migrator introduced in XWiki 9.11.8 but also in 10.8RC1... Hope it's gonna be ok
-        return new XWikiDBVersion(1008000);
+        return new XWikiDBVersion(911800);
     }
 }

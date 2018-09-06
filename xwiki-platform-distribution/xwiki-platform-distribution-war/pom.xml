@@ -133,12 +133,16 @@
                  XAR files (not our format, some other format! See https://jira.codehaus.org/browse/MWAR-281). The
                  reason we have XAR files in our dependencies is because we've added them in order to automatically
                  bundle all JAR files which are dependencies of XAR modules!
+               - Exclude all META-INF directories not at the top level of the WAR. The Servlet spec mentions that
+                 META-INF needs to be placed at the top and some Servlet Containers such as WildFly check this and
+                 report an error if it's not the case (see https://jira.xwiki.org/browse/XWIKI-15567).
           -->
           <packagingExcludes>
             WEB-INF/lib/commons-logging-*.jar,
             %regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar],
             WEB-INF/lib/stax-api-*.jar,
-            WEB-INF/extensions/*.xar
+            WEB-INF/extensions/*.xar,
+            */**/META-INF/**
           </packagingExcludes>
         </configuration>
       </plugin>

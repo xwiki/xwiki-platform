@@ -33,6 +33,7 @@
   <description>API to store mails and their statuses</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.46</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>54</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Sender Storage API</xwiki.extension.name>
   </properties>

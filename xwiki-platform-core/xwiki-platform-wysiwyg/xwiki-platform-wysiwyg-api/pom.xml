@@ -33,6 +33,7 @@
   <description>Generic API for all WYSIWYG content editors.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>24</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

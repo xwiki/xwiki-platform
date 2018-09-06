@@ -32,6 +32,7 @@
   <description>XWiki Platform - Mail Sender</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>41</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

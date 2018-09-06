@@ -32,6 +32,7 @@
   <description>Handle the filters that can be applied on notifications</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>48</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications Filters API</xwiki.extension.name>
   </properties>

@@ -33,6 +33,7 @@
   <properties>
     <checkstyle.suppressions.location>${basedir}/src/main/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>42</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

@@ -33,6 +33,7 @@
     <description>XWiki Platform - Extension - Version Check</description>
     <properties>
         <xwiki.jacoco.instructionRatio>0.08</xwiki.jacoco.instructionRatio>
+        <xwiki.pitest.mutationThreshold>21</xwiki.pitest.mutationThreshold>
     </properties>
     <dependencies>
         <dependency>
@@ -59,4 +60,3 @@
         </dependency>
     </dependencies>
 </project>
-

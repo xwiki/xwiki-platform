@@ -32,6 +32,7 @@
   <description>Navigates through ZIPs attached to documents and create links to files in them</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>65</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

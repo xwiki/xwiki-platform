@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.user;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -34,7 +33,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -91,33 +89,39 @@ public class EventUserFilterTest
         NotificationFilterPreference p1 = mock(NotificationFilterPreference.class);
         when(p1.isEnabled()).thenReturn(true);
         when(p1.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
-        when(p1.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_A,
-                SERIALIZED_USER_B));
+        when(p1.getUser()).thenReturn(SERIALIZED_USER_A);
         when(p1.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(p1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(p1.getNotificationFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+
+        NotificationFilterPreference p1bis = mock(NotificationFilterPreference.class);
+        when(p1bis.isEnabled()).thenReturn(true);
+        when(p1bis.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
+        when(p1bis.getUser()).thenReturn(SERIALIZED_USER_B);
+        when(p1bis.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
+        when(p1bis.getNotificationFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         NotificationFilterPreference p2 = mock(NotificationFilterPreference.class);
         when(p2.isEnabled()).thenReturn(true);
         when(p2.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
-        when(p2.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_C));
+        when(p2.getUser()).thenReturn(SERIALIZED_USER_C);
         when(p2.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(p2.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(p2.getNotificationFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         NotificationFilterPreference p3 = mock(NotificationFilterPreference.class);
         when(p3.isEnabled()).thenReturn(false);
         when(p3.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
-        when(p3.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_D));
+        when(p3.getUser()).thenReturn(SERIALIZED_USER_D);
         when(p3.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(p3.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(p3.getNotificationFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         NotificationFilterPreference p4 = mock(NotificationFilterPreference.class);
         when(p4.isEnabled()).thenReturn(true);
         when(p4.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
-        when(p4.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_E));
+        when(p4.getUser()).thenReturn(SERIALIZED_USER_E);
         when(p4.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(p4.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.EMAIL));
+        when(p4.getNotificationFormats()).thenReturn(Sets.newSet(NotificationFormat.EMAIL));
 
-        return Sets.newSet(p1, p2, p3, p4);
+        return Sets.newSet(p1, p1bis, p2, p3, p4);
     }
 
     @Test

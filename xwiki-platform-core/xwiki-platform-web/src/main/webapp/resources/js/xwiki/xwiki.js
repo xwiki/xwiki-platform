@@ -1120,11 +1120,12 @@ shortcut = new Object({
             var newListener = new keypress.Listener(target);
 
             if (group === this._listeners.disabled_in_inputs) {
-                // Disable the created listener when focus goes on an input or textarea field
+                // Disable the created listener when focus goes on an input, a textarea field or on the
+                // CodeMirror div (syntax highlighting).
                 jQuery(document)
-                    .on('focus', 'input, textarea',
+                    .on('focus', 'input, textarea, .CodeMirror-code',
                         function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea',
+                    .on('blur', 'input, textarea, .CodeMirror-code',
                         function() { newListener.listen(); });
             }
 

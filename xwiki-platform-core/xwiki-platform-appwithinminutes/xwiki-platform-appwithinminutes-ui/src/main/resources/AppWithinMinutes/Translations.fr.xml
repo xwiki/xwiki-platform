@@ -183,7 +183,7 @@ platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=La dat
 platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=Une liste d'actions qui peuvent être exécutées sur une entrée de l'application, comme "Supprimer" ou "Modifier"
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Pièces jointes
-platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Une colonne qui affiche les liens vers les fichiers attachées à la page de cette entrée.
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Une colonne qui affiche les liens vers les fichiers attachés à la page
 platform.appwithinminutes.liveTableEditorImagesColumnName=Images
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Une colonne spéciale qui affiche les images attachées à la page de l'entrée
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
@@ -226,7 +226,7 @@ platform.appwithinminutes.appNamePreviewDataSpaceLabel=Espace des données de l'
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Espace
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Le nom de l'espace qui contient l'entrée de l'application
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nom complet de la page
-platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Le nom de la page qui contient l'entrée, préfixée par le nom de l'espace.
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Le nom de la page qui contient l'entrée, préfixé par le nom de l'espace
 
 #@deprecated appWithinMinutes.wizardStep.name.name
 platform.appwithinminutes.wizardStep1Name=Nom

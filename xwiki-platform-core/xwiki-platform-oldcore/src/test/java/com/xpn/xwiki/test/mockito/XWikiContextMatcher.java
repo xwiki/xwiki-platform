@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,11 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package com.xpn.xwiki.test.mockito;
 
-<!-- Required to tell WildFly to not do CDI bean parsing and try to do implicit deployment of them since XWiki doesn't
-     use CDI -->
-<jboss xmlns="urn:jboss:1.0">
-  <weld xmlns="urn:jboss:weld:1.0" require-bean-descriptor="true"/>
-</jboss>
+import org.mockito.ArgumentMatcher;
+import org.mockito.internal.matchers.Equality;
+
+import com.xpn.xwiki.XWikiContext;
+
+/**
+ * Match a XWikiContext parameter with a wiki id.
+ * 
+ * @version $Id$
+ * @since 10.8RC1
+ */
+public class XWikiContextMatcher implements ArgumentMatcher<XWikiContext>
+{
+    private final String wikiId;
+
+    public XWikiContextMatcher(String wikiId)
+    {
+        this.wikiId = wikiId;
+    }
+
+    @Override
+    public boolean matches(XWikiContext argument)
+    {
+        return argument != null && Equality.areEqual(this.wikiId, argument.getWikiId());
+    }
+}

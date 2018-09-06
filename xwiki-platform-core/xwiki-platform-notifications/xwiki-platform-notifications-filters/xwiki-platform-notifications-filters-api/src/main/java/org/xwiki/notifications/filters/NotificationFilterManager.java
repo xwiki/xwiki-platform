@@ -171,22 +171,22 @@ public interface NotificationFilterManager
 
     /**
      * Delete a filter preference.
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId id of the filter preference
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void deleteFilterPreference(String filterPreferenceName) throws NotificationException;
+    void deleteFilterPreference(String filterPreferenceId) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId id of the filter preference
      * @param enabled either or not the filter preference should be enabled
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException;
+    void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException;
 
     /**
      * Update the start date for every filter preference that the user has.

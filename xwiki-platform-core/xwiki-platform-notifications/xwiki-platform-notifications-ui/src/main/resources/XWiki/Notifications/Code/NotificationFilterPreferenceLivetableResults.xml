@@ -82,7 +82,7 @@
     #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
     #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
     #set ($element = {
-      'filterPreferenceName': $name,
+      'filterPreferenceId'  : $name,
       'name'                : $name,
       'filterType'          : $services.localization.render("notifications.filters.description.$filter.name"),
       'eventTypes'          : "#displayNotificationsEventTypeList($filter.eventTypes)",
@@ -94,6 +94,7 @@
     #set ($discard = $elements.add($element))
   #end
 #end
+#set ($elements = $sorttool.sort($elements, ['name']))
 ## Also get the list of available filters for the user
 #set ($filters = $collectionstool.arrayList)
 #set ($discard = $filters.addAll($services.notification.filters.filters))
@@ -102,12 +103,12 @@
 #foreach ($filter in $filters)
   #set ($filtersPreferences = $collectionstool.arrayList)
   #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter)))
-  #set ($filtersPreferences = $sorttool.sort($filtersPreferences, ['filterPreferenceName']))
+  #set ($filtersPreferences = $sorttool.sort($filtersPreferences, ['id']))
   #foreach ($preference in $filtersPreferences)
-    #set ($pages = $preference.getProperties('PAGE'))
-    #set ($spaces = $preference.getProperties('SPACE'))
-    #if (!$displayHiddenDocument &amp;&amp; ($pages.size() == 1 &amp;&amp; $xwiki.getDocument($pages[0]).isHidden() 
-      || $spaces.size() == 1 &amp;&amp; $xwiki.getDocument($services.model.resolveSpace($spaces[0], 'default')).isHidden()))
+    #set ($page = $preference.pageOnly)
+    #set ($space = $preference.page)
+    #if (!$displayHiddenDocument &amp;&amp; ($stringtool.isNotBlank($page) &amp;&amp; $xwiki.getDocument($page).isHidden()
+      || $stringtool.isNotBlank($space) &amp;&amp; $xwiki.getDocument($services.model.resolveSpace($space, 'default')).isHidden()))
       ## Don't display a preference for an hidden page or space.
       ## Why? If a user has the autowatch option enabled and create a new hidden document (for example, when she creates an application with AWM, hidden code pages are created as well),
       ## we don't want to pollute the livetable with these hidden pages that the user don't know about. Moreover, the notifications will filter events concerning hidden pages,
@@ -124,19 +125,19 @@
         #set ($isEnabled = '')
         #set ($isDisabled = '')
         ## The watchlist bridge does not handle disabling a specific filter
-        #if ($preference.filterPreferenceName.startsWith('watchlist_'))
+        #if ($preference.id.startsWith('watchlist_'))
           #set ($isDisabled = 'disabled = "disabled"')
         #end
         #if ($preference.isEnabled())
           #set ($isEnabled = 'checked = "checked"')
         #end
-        #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled $isDisabled /&gt;")
+        #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceId='${preference.id}' $isEnabled $isDisabled /&gt;")
         #set ($element = {
-          'filterPreferenceName': $preference.filterPreferenceName,
+          'filterPreferenceId'  : $preference.id,
           'name'                : $display,
           'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
-          'eventTypes'          : "#displayNotificationsEventTypeList($preference.getProperties('EVENT_TYPE'))",
-          'notificationFormats' : "#displayNotificationFormatsList($preference.getFilterFormats())",
+          'eventTypes'          : "#displayNotificationsEventTypeList($preference.eventTypes)",
+          'notificationFormats' : "#displayNotificationFormatsList($preference.notificationFormats)",
           'isEnabled'           : $isEnabled,
           'doc_viewable'        : true
         })

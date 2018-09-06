@@ -94,7 +94,7 @@
       #else
         #set ($URL = "${URLhost}/releases/${URLgroup}/${URLartifact}/$URLversion/${URLartifact}-${URLversion}.xar")
       #end
-      #warning($services.localization.render('admin.defaultwikinotinstalled', ["<a href='$URL'>$URL</a>"]))
+      #warning($services.localization.render('admin.defaultwikinotinstalled_useflavor'))
     #else
       ## More than 6 pages in the wiki and Admin app not installed, probably an upgrade.
       #warning($services.localization.render('admin.adminappnotinstalled', ['<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application">http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application</a>']))

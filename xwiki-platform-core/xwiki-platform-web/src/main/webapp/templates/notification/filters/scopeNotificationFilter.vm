@@ -4,24 +4,23 @@
 ## $filterPreference : the preference to use
 #template('hierarchy_macros.vm')
 
-#set ($pageProperty = $filterPreference.getProperties('PAGE'))
-#set ($spaceProperty = $filterPreference.getProperties('SPACE'))
-#set ($wikiProperty = $filterPreference.getProperties('WIKI'))
+#set ($page = $filterPreference.pageOnly)
+#set ($space = $filterPreference.page)
+#set ($wiki = $filterPreference.wiki)
 
-#if (!$pageProperty.isEmpty())
-  #set ($entityReference = $services.model.resolveDocument($pageProperty.get(0)))
+#if ($stringtool.isNotBlank($page))
+  #set ($entityReference = $services.model.resolveDocument($page))
   #set ($scopeIcon = 'page')
   #set ($scopeText = $escapetool.xml($services.localization.render('notifications.filters.preferences.scopeNotificationFilter.page')))
-#elseif (!$spaceProperty.isEmpty())
-  #set ($entityReference = $services.model.resolveSpace($spaceProperty.get(0)))
+#elseif ($stringtool.isNotBlank($space))
+  #set ($entityReference = $services.model.resolveSpace($space))
   #set ($scopeIcon = 'chart-organisation')
   #set ($scopeText = $escapetool.xml($services.localization.render('notifications.filters.preferences.scopeNotificationFilter.space')))
-#else
-  #set ($entityReference = $services.model.createWikiReference($wikiProperty.get(0)))
+#elseif ($stringtool.isNotBlank($wiki))
+  #set ($entityReference = $services.model.createWikiReference($wiki))
   #set ($scopeIcon = 'wiki')
   #set ($scopeText = $escapetool.xml($services.localization.render('notifications.filters.preferences.scopeNotificationFilter.wiki')))
 #end
-
 
 $services.icon.renderHTML($scopeIcon)&nbsp;$scopeText
 #hierarchy($entityReference, {'limit': 5, 'plain': false, 'local': false, 'displayTitle': false})

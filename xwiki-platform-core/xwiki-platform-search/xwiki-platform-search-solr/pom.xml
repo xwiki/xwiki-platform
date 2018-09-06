@@ -92,6 +92,23 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
+          <!-- Exclude by default some Codehale Metric reporters and instrumenters since 1) we don't need them by
+               default (they take up disk space and load time when deploying the XWiki WAR) and 2) some of them like
+               the metrics-jetty9 one have a runtime dependency on a certain version of Jetty and won't work on other
+               servlet container or with different jetty versions...
+               See https://forum.xwiki.org/t/xwiki-10-7-war-failure-to-deploy-on-wildfly-14-0/3545 -->
+          <exclusion>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-ganglia</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-graphite</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jetty9</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- Make sure we use the right version of Restlet. -->

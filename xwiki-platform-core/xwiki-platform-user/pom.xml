@@ -33,7 +33,10 @@
   <description>XWiki Platform - User - Parent POM</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-user-api</module>
+    <module>xwiki-platform-user-default</module>
     <module>xwiki-platform-user-directory</module>
     <module>xwiki-platform-user-profile</module>
+    <module>xwiki-platform-user-script</module>
   </modules>
 </project>

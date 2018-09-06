@@ -20,6 +20,9 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,10 +36,14 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Define a notification filter based on a scope in the wiki.
@@ -90,7 +97,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     {
         return expressionGenerator.filterExpression(filterPreferences,
                 (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE),
-                preference.getFormat());
+                preference.getFormat(), user);
     }
 
     @Override
@@ -98,8 +105,45 @@ public class ScopeNotificationFilter implements NotificationFilter
             Collection<NotificationFilterPreference> filterPreferences,
             NotificationFilterType type, NotificationFormat format)
     {
-        // We don't handle this use-case anymore
+        return filterExpression(user, filterPreferences, type, format, Collections.emptyList());
+    }
+
+    @Override
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
+            NotificationFormat format, Collection<NotificationPreference> preferences)
+    {
+        // Generate the node that we may (or not) return afterwards
+        AbstractOperatorNode node = expressionGenerator.filterExpression(filterPreferences, format, type, user);
+        if (node == null) {
+            return null;
+        }
+
+        if (type == NotificationFilterType.INCLUSIVE) {
+            // In order not to include all watched pages without consideration to the event types, we first collect
+            // the enabled even types.
+            Set<String> enabledEventTypes = getEnabledEventTypes(preferences);
+            if (!enabledEventTypes.isEmpty()) {
+                return value(EventProperty.TYPE).inStrings(enabledEventTypes).and(node);
+            }
+        } else {
+            return node;
+        }
+
         return null;
+    }
+
+    private Set<String> getEnabledEventTypes(Collection<NotificationPreference> preferences)
+    {
+        Set<String> enabledEventTypes = new HashSet<>();
+        for (NotificationPreference preference : preferences) {
+            Object value = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
+            if (value == null || !(value instanceof String)) {
+                continue;
+            }
+            enabledEventTypes.add((String) value);
+        }
+        return enabledEventTypes;
     }
 
     @Override

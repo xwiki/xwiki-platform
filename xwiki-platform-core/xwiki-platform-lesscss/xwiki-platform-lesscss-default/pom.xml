@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>Default implementation for XWiki Platform - LESS CSS - Default Implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>86</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>87</xwiki.pitest.mutationThreshold>
      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
      <xwiki.extension.features>
      <!-- only used in 6.2M1 -->

@@ -19,20 +19,13 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -93,19 +86,19 @@ public class ScopeNotificationFilterPreferenceTest
     {
         NotificationFilterPreference preference = mock(NotificationFilterPreference.class);
 
-        when(preference.getProperties(property)).thenReturn(Collections.singletonList(entityReference));
+        if (property == NotificationFilterProperty.PAGE) {
+            when(preference.getPageOnly()).thenReturn(entityReference);
+        }
+        if (property == NotificationFilterProperty.SPACE) {
+            when(preference.getPage()).thenReturn(entityReference);
+        }
+        if (property == NotificationFilterProperty.WIKI) {
+            when(preference.getWiki()).thenReturn(entityReference);
+        }
+
         when(preference.getFilterType()).thenReturn(filterType);
 
         return preference;
-    }
-
-    @Test
-    public void getProperties() throws Exception
-    {
-        List<String> appProperties = Arrays.asList("app1", "app2");
-        when(p1.getProperties(NotificationFilterProperty.APPLICATION)).thenReturn(appProperties);
-
-        assertEquals(appProperties, sp1.getProperties(NotificationFilterProperty.APPLICATION));
     }
 
     @Test
@@ -113,15 +106,6 @@ public class ScopeNotificationFilterPreferenceTest
     {
         assertEquals(NotificationFilterType.INCLUSIVE, sp1.getFilterType());
         assertEquals(NotificationFilterType.EXCLUSIVE, sp2.getFilterType());
-    }
-
-    @Test
-    public void getFilterFormats() throws Exception
-    {
-        Set<NotificationFormat> formats = Sets.newSet(NotificationFormat.EMAIL);
-        when(p1.getFilterFormats()).thenReturn(formats);
-
-        assertEquals(formats, sp1.getFilterFormats());
     }
 
     @Test

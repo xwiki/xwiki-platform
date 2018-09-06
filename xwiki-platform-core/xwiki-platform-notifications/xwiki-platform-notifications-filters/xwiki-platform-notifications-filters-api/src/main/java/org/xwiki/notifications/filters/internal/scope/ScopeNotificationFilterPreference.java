@@ -29,8 +29,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.text.StringUtils;
 
 /**
  * Represent a preferences that filter some event type to given scope (a wiki, a space, a page...).
@@ -62,29 +62,13 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
         this.filterPreference = filterPreference;
 
         // Determine which scope reference to return when needed
-        if (!filterPreference.getProperties(NotificationFilterProperty.PAGE).isEmpty()) {
-            scopeReference = entityReferenceResolver.resolve(
-                    filterPreference.getProperties(NotificationFilterProperty.PAGE).get(0), EntityType.DOCUMENT);
-        } else if (!filterPreference.getProperties(NotificationFilterProperty.SPACE).isEmpty()) {
-            scopeReference = entityReferenceResolver.resolve(
-                    filterPreference.getProperties(NotificationFilterProperty.SPACE).get(0), EntityType.SPACE);
-        } else if (!filterPreference.getProperties(NotificationFilterProperty.WIKI).isEmpty()) {
-            scopeReference = entityReferenceResolver.resolve(
-                    filterPreference.getProperties(NotificationFilterProperty.WIKI).get(0), EntityType.WIKI);
+        if (StringUtils.isNotBlank(filterPreference.getPageOnly())) {
+            scopeReference = entityReferenceResolver.resolve(filterPreference.getPageOnly(), EntityType.DOCUMENT);
+        } else if (StringUtils.isNotBlank(filterPreference.getPage())) {
+            scopeReference = entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
+        } else if (StringUtils.isNotBlank(filterPreference.getWiki())) {
+            scopeReference = entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
         }
-    }
-
-    /**
-     * Construct a new ScopeNotificationFilterPreference.
-     *
-     * @param filterPreference the {@link NotificationFilterPreference} to wrap
-     * @param scopeReference the reference of the location concerned by the scope notification filter
-     */
-    public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
-            EntityReference scopeReference)
-    {
-        this.filterPreference = filterPreference;
-        this.scopeReference = scopeReference;
     }
 
     /**
@@ -148,9 +132,9 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     @Override
-    public String getFilterPreferenceName()
+    public String getId()
     {
-        return filterPreference.getFilterPreferenceName();
+        return filterPreference.getId();
     }
 
     @Override
@@ -184,9 +168,9 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     @Override
-    public Set<NotificationFormat> getFilterFormats()
+    public Set<NotificationFormat> getNotificationFormats()
     {
-        return filterPreference.getFilterFormats();
+        return filterPreference.getNotificationFormats();
     }
 
     @Override
@@ -196,8 +180,38 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     @Override
-    public List<String> getProperties(NotificationFilterProperty property)
+    public Set<String> getEventTypes()
     {
-        return filterPreference.getProperties(property);
+        return filterPreference.getEventTypes();
+    }
+
+    @Override
+    public String getUser()
+    {
+        return filterPreference.getUser();
+    }
+
+    @Override
+    public String getPageOnly()
+    {
+        return filterPreference.getPageOnly();
+    }
+
+    @Override
+    public String getPage()
+    {
+        return filterPreference.getPage();
+    }
+
+    @Override
+    public String getWiki()
+    {
+        return filterPreference.getWiki();
+    }
+
+    @Override
+    public void setEnabled(boolean enabled)
+    {
+        this.filterPreference.setEnabled(enabled);
     }
 }

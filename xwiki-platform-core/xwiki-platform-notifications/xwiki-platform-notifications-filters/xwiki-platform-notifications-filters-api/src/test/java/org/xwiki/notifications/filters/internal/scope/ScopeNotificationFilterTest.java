@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal.scope;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -300,6 +301,10 @@ public class ScopeNotificationFilterTest
         when(pref2.getProperties()).thenReturn(properties2);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "type1");
         properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "type2");
+        when(pref1.isNotificationEnabled()).thenReturn(true);
+        when(pref2.isNotificationEnabled()).thenReturn(true);
+        when(pref1.getStartDate()).thenReturn(new Date(0));
+        when(pref2.getStartDate()).thenReturn(new Date(100000L));
 
         List<NotificationPreference> notificationFilterPreferences = Arrays.asList(pref1, pref2);
 
@@ -315,7 +320,9 @@ public class ScopeNotificationFilterTest
 
         // Test 1
         assertEquals(
-                "(TYPE IN (\"type2\", \"type1\") AND CONCAT(CONCAT(WIKI, \":\"), PAGE) IN " +
+                "(((TYPE = \"type1\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
+                        "OR (TYPE = \"type2\" AND DATE >= \"Thu Jan 01 01:01:40 CET 1970\")) " +
+                        "AND CONCAT(CONCAT(WIKI, \":\"), PAGE) IN " +
                         "(SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner " +
                         "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' " +
                         "AND nfp.allEventTypes = '' AND nfp.alertEnabled = true AND nfp.enabled = true))",

@@ -21,8 +21,6 @@ package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -122,9 +120,9 @@ public class ScopeNotificationFilter implements NotificationFilter
         if (type == NotificationFilterType.INCLUSIVE) {
             // In order not to include all watched pages without consideration to the event types, we first collect
             // the enabled even types.
-            Set<String> enabledEventTypes = getEnabledEventTypes(preferences);
-            if (!enabledEventTypes.isEmpty()) {
-                return value(EventProperty.TYPE).inStrings(enabledEventTypes).and(node);
+            AbstractOperatorNode enabledEventTypes = getEnabledEventTypes(preferences);
+            if (enabledEventTypes != null) {
+                return enabledEventTypes.and(node);
             }
         } else {
             return node;
@@ -133,17 +131,24 @@ public class ScopeNotificationFilter implements NotificationFilter
         return null;
     }
 
-    private Set<String> getEnabledEventTypes(Collection<NotificationPreference> preferences)
+    private AbstractOperatorNode getEnabledEventTypes(Collection<NotificationPreference> preferences)
     {
-        Set<String> enabledEventTypes = new HashSet<>();
+        AbstractOperatorNode topNode = null;
+
         for (NotificationPreference preference : preferences) {
-            Object value = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-            if (value == null || !(value instanceof String)) {
-                continue;
+            Object eventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
+            if (preference.isNotificationEnabled() && eventType != null && eventType instanceof String) {
+                AbstractOperatorNode node = value(EventProperty.TYPE).eq(value((String) eventType))
+                        .and(value(EventProperty.DATE).greaterThan(value(preference.getStartDate())));
+                if (topNode == null) {
+                    topNode = node;
+                } else {
+                    topNode = topNode.or(node);
+                }
             }
-            enabledEventTypes.add((String) value);
         }
-        return enabledEventTypes;
+
+        return topNode;
     }
 
     @Override

@@ -28,7 +28,6 @@ import org.xwiki.menu.test.po.MenuEntryEditPage;
 import org.xwiki.menu.test.po.MenuHomePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

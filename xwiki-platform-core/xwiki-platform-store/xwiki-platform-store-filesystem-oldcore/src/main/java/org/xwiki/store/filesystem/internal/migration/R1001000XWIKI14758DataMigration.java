@@ -53,7 +53,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Named("R1001000XWIKI14758")
 @Singleton
-public class R1000000XWIKI14758DataMigration extends AbstractHibernateDataMigration
+public class R1001000XWIKI14758DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)

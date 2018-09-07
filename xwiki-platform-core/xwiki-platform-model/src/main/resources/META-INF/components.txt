@@ -23,6 +23,7 @@ org.xwiki.model.internal.reference.DefaultStringPageReferenceResolver
 org.xwiki.model.internal.reference.DefaultStringSpaceReferenceResolver
 org.xwiki.model.internal.reference.DefaultSpaceReferenceProvider
 org.xwiki.model.internal.reference.DefaultWikiReferenceProvider
+org.xwiki.model.internal.reference.EntityReferenceFactory
 org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver
 org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver
 org.xwiki.model.internal.reference.ExplicitReferencePageReferenceResolver

@@ -39,13 +39,13 @@ import static org.junit.Assert.assertTrue;
 public class MenuInAdministrationTestIT extends AbstractTest
 {
     @Test
-    public void verifyMenuIsAvailableInAdministration()
+    public void verifyMenuIsAvailableInAdministration() throws Exception
     {
         // Log in as superadmin
-        getUtil().login("superadmin", "pass");
+        getUtil().loginAsSuperAdmin();
 
         DocumentReference menu1Reference = new DocumentReference("xwiki", Arrays.asList("Menu", "menu1"), "WebHome");
-        getUtil().deletePage(menu1Reference);
+        getUtil().rest().delete(menu1Reference);
 
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
 

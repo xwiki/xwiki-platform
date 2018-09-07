@@ -53,7 +53,7 @@ public class MenuTestIT extends AbstractTest
     private void verifyMenuInApplicationsIndex()
     {
         // Log in as superadmin
-        getUtil().login("superadmin", "pass");
+        getUtil().loginAsSuperAdmin();
 
         ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
 
@@ -74,7 +74,7 @@ public class MenuTestIT extends AbstractTest
     private void verifyMenuCreationInLeftPanelWithCurrentWikiVisibility()
     {
         // Log in as superadmin again
-        getUtil().login("superadmin", "pass");
+        getUtil().loginAsSuperAdmin();
 
         DocumentReference menu1Reference = new DocumentReference("xwiki", Arrays.asList("Menu", "menu1"), "WebHome");
         getUtil().deletePage(menu1Reference);

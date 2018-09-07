@@ -23,7 +23,14 @@ import org.openqa.selenium.By;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
 import org.xwiki.test.ui.po.ViewPage;
 
-public class ApplicationIndexHomePage extends ApplicationHomePage
+/**
+ * Represents the Applications.WebHome page.
+ *
+ * @version $id$
+ * @since 10.8RC1
+ *
+ */
+public class ApplicationIndexHomePage extends ViewPage
 {
     /**
      * Go to the home page of the Application Index application.

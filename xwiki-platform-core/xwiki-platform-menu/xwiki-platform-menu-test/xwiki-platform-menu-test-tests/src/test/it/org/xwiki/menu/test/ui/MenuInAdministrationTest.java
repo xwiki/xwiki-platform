@@ -55,8 +55,8 @@ public class MenuInAdministrationTest extends AbstractTest
         MenuHomePage menuPage = administrationPage.clickMenuSection();
 
         // check that we are still in the administration
-        assertEquals("XWiki", menuPage.getMetaDataValue("space"));
-        assertEquals("XWikiPreferences", menuPage.getMetaDataValue("page"));
+        assertEquals(AdministrationPage.getSpace(), menuPage.getMetaDataValue("space"));
+        assertEquals(AdministrationPage.getPage(), menuPage.getMetaDataValue("page"));
 
         // Create a menu entry
         EntryNamePane pane = menuPage.clickAddNewEntry();
@@ -64,7 +64,7 @@ public class MenuInAdministrationTest extends AbstractTest
         pane.clickAdd();
 
         // check that we are now on the menu app
-        assertEquals("Menu.menu1", menuPage.getMetaDataValue("space"));
+        assertEquals(MenuHomePage.getSpace() + ".menu1", menuPage.getMetaDataValue("space"));
         assertEquals("WebHome", menuPage.getMetaDataValue("page"));
         MenuEntryEditPage meep = new MenuEntryEditPage();
 

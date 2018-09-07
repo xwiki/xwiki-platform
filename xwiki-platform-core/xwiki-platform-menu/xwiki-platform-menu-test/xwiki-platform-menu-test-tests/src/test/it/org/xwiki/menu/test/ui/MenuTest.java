@@ -20,14 +20,16 @@
 package org.xwiki.menu.test.ui;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.application.test.po.ApplicationIndexHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
 import org.xwiki.menu.test.po.MenuEntryEditPage;
 import org.xwiki.menu.test.po.MenuHomePage;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -47,22 +49,21 @@ public class MenuTest extends AbstractTest
     @Test
     public void verifyMenu()
     {
-        verifyMenuInApplicationsPanel();
+        //verifyMenuInApplicationsIndex();
         verifyMenuCreationInLeftPanelWithCurrentWikiVisibility();
     }
 
-    private void verifyMenuInApplicationsPanel()
+    private void verifyMenuInApplicationsIndex()
     {
         // Log in as superadmin
         getUtil().login("superadmin", "pass");
 
-        // Verify that the menu app is displayed in the Applications Panel
-        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
-
-        // By default the Menu app is blacklisted from the application panel, even for superadmin user
-        assertFalse(applicationPanel.containsApplication("Menu"));
-
         ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
+        List<WebElement> elementsWithoutWaiting = getDriver().findElementsWithoutWaiting(By.xpath(
+                "//a/span[@class=\"application-label\" and contains(text(), 'Menu')]"));
+
+        System.out.println("NUmber of Menu elements : " + elementsWithoutWaiting.size());
+
         assertTrue(applicationIndexHomePage.containsApplication("Menu"));
         ViewPage vp = applicationIndexHomePage.clickApplication("Menu");
 

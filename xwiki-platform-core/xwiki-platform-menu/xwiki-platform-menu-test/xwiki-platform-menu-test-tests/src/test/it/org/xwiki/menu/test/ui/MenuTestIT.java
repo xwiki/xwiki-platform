@@ -20,11 +20,8 @@
 package org.xwiki.menu.test.ui;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.application.test.po.ApplicationIndexHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
 import org.xwiki.menu.test.po.MenuEntryEditPage;
@@ -59,8 +56,6 @@ public class MenuTestIT extends AbstractTest
         getUtil().login("superadmin", "pass");
 
         ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
-        List<WebElement> elementsWithoutWaiting = getDriver().findElementsWithoutWaiting(By.xpath(
-                "//a/span[@class=\"application-label\" and contains(text(), 'Menu')]"));
 
         assertTrue(applicationIndexHomePage.containsApplication("Menu"));
         ViewPage vp = applicationIndexHomePage.clickApplication("Menu");

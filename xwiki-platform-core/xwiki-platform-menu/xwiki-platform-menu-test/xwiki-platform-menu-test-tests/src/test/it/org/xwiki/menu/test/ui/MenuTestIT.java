@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 10.6RC1
  */
-public class MenuTest extends AbstractTest
+public class MenuTestIT extends AbstractTest
 {
     @Test
     public void verifyMenu()
@@ -61,8 +61,6 @@ public class MenuTest extends AbstractTest
         ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
         List<WebElement> elementsWithoutWaiting = getDriver().findElementsWithoutWaiting(By.xpath(
                 "//a/span[@class=\"application-label\" and contains(text(), 'Menu')]"));
-
-        System.out.println("NUmber of Menu elements : " + elementsWithoutWaiting.size());
 
         assertTrue(applicationIndexHomePage.containsApplication("Menu"));
         ViewPage vp = applicationIndexHomePage.clickApplication("Menu");

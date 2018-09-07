@@ -52,6 +52,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Add application deps which is optional to check integration in application index-->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-application-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -28,6 +28,7 @@ import org.xwiki.menu.test.po.MenuEntryEditPage;
 import org.xwiki.menu.test.po.MenuHomePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +37,7 @@ import static org.junit.Assert.assertTrue;
  * Test to check that the Menu app is available through the administration and can be used to add new entries
  *
  */
-public class MenuInAdministrationTest extends AbstractTest
+public class MenuInAdministrationTestIT extends AbstractTest
 {
     @Test
     public void verifyMenuIsAvailableInAdministration()
@@ -52,7 +53,10 @@ public class MenuInAdministrationTest extends AbstractTest
         // check that the look & feel category contains a Menu section
         assertTrue(administrationPage.hasSection("Look & Feel", "Menu"));
 
-        MenuHomePage menuPage = administrationPage.clickMenuSection();
+        administrationPage.clickSection("Look & Feel", "Menu");
+
+        // after having clicked on the menu section, we are in the menu home page
+        MenuHomePage menuPage = new MenuHomePage();
 
         // check that we are still in the administration
         assertEquals(AdministrationPage.getSpace(), menuPage.getMetaDataValue("space"));

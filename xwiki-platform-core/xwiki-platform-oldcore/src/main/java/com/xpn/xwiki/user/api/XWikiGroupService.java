@@ -235,6 +235,23 @@ public interface XWikiGroupService
         Boolean orderAsc, XWikiContext context) throws XWikiException;
 
     /**
+     * Filters the members of the specified group using the given text and counts the results.
+     *
+     * @param group the group whose members are going to be counted
+     * @param filter the text used to filter the group members
+     * @param xcontext the XWiki context
+     * @return the number of group members that match the given text filter
+     * @throws XWikiException if counting the group members fails
+     * @see #getAllMatchedMembersNamesForGroup(String, String, int, int, Boolean, XWikiContext)
+     * @since 10.8RC1
+     */
+    default int countAllMatchedMembersNamesForGroup(String group, String filter, XWikiContext xcontext)
+        throws XWikiException
+    {
+        return getAllMatchedMembersNamesForGroup(group, filter, 0, 0, null, xcontext).size();
+    }
+
+    /**
      * Return the number of groups containing provided member.
      *
      * @param member the name of the member (user or group).

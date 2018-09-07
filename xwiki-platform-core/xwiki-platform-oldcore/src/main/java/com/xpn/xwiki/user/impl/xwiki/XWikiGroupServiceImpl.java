@@ -652,25 +652,43 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     {
         StringBuilder queryString = new StringBuilder();
 
-        // Add from clause
+        // Add from clause.
         queryString.append(" FROM BaseObject as obj, StringProperty as field");
 
-        // Add where clause
-        queryString.append(" WHERE obj.name=:groupdocname "
-            + "and obj.className=:groupclassname and obj.id=field.id.id");
+        // Add where clause. Select all group members.
+        queryString.append(" WHERE obj.name = :groupdocname and obj.className = :groupclassname")
+            .append(" and obj.id = field.id.id and field.id.name = 'member'");
         parameterValues.put("groupdocname", groupFullName);
         parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);
 
-        // Note: We should normally be able to use the 3-argument trim() function which defaults to the whitesapce
-        // char to be trimmed. However because of https://hibernate.atlassian.net/browse/HHH-8295 this raises a
-        // warning in the XWiki console. Once this is fixed in Hibernate we can start using the 3-argument function
-        // again.
-        queryString.append(" and (trim(both ' ' from field.value)<>'' or "
-            + "(trim(both ' ' from field.value) is not null and '' is null))");
-
         if (matchField != null) {
-            queryString.append(" and lower(field.value) like :matchfield");
+            // Filter the members that match the given string.
+            // Match users from the same wiki.
+            String matchedUsers = "select userDoc.fullName " + "from XWikiDocument userDoc, BaseObject as userObj,"
+                + " StringProperty as userFirstName, StringProperty as userLastName "
+                + "where userDoc.fullName = userObj.name and userObj.className = 'XWiki.XWikiUsers'"
+                + " and userObj.id = userFirstName.id.id and userFirstName.id.name = 'first_name'"
+                + " and userObj.id = userLastName.id.id and userLastName.id.name = 'last_name'"
+                + " and (lower(userDoc.name) like :matchfield or"
+                + " concat(concat(lower(userFirstName.value), ' '), lower(userLastName.value)) like :matchfield)";
+            // Match groups from the same wiki.
+            String matchedGroups =
+                "select distinct(groupDoc.fullName) " + "from XWikiDocument groupDoc, BaseObject as groupObj "
+                    + "where groupDoc.fullName = groupObj.name and groupObj.className = 'XWiki.XWikiGroups'"
+                    + " and (lower(groupDoc.name) like :matchfield or lower(groupDoc.title) like :matchfield)";
+            // Match also the field value because we can have members from a different wiki and we should at least be
+            // able to filter them by their reference.
+            queryString.append(" and (lower(field.value) like :matchfield or field.value in (").append(matchedUsers)
+                .append(") or field.value in (").append(matchedGroups).append("))");
             parameterValues.put("matchfield", HQLLIKE_ALL_SYMBOL + matchField.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+        } else {
+            // Filter out empty values.
+            // Note: We should normally be able to use the 3-argument trim() function which defaults to the whitesapce
+            // char to be trimmed. However because of https://hibernate.atlassian.net/browse/HHH-8295 this raises a
+            // warning in the XWiki console. Once this is fixed in Hibernate we can start using the 3-argument function
+            // again.
+            queryString.append(" and (trim(both ' ' from field.value) <> '' or "
+                + "(trim(both ' ' from field.value) is not null and '' is null))");
         }
 
         // Add order by clause
@@ -798,34 +816,52 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
         Boolean orderAsc, XWikiContext context) throws XWikiException
     {
-        // TODO: add cache mechanism.
-        XWikiDocument groupDocument = new XWikiDocument(this.currentMixedDocumentReferenceResolver.resolve(group));
+        DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(group);
+        String localGroupReference = this.localWikiEntityReferenceSerializer.serialize(groupReference);
 
-        Map<String, Object> parameterValues = new HashMap<String, Object>();
-        // //////////////////////////////////////
-        // Create the query string
-        StringBuilder queryString = new StringBuilder("SELECT field.value");
-
-        queryString.append(' ').append(
-            createMatchGroupMembersWhereClause(groupDocument.getFullName(), matchField, orderAsc, parameterValues));
+        Map<String, Object> parameters = new HashMap<>();
+        StringBuilder statement = new StringBuilder("SELECT field.value ")
+            .append(createMatchGroupMembersWhereClause(localGroupReference, matchField, orderAsc, parameters));
 
         try {
-            // //////////////////////////////////////
-            // Create the query
-            QueryManager qm = context.getWiki().getStore().getQueryManager();
+            QueryManager queryManager = context.getWiki().getStore().getQueryManager();
+            Query query = queryManager.createQuery(statement.toString(), Query.HQL);
 
-            Query query = qm.createQuery(queryString.toString(), Query.HQL);
-
-            for (Map.Entry<String, Object> entry : parameterValues.entrySet()) {
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
                 query.bindValue(entry.getKey(), entry.getValue());
             }
 
             query.setOffset(start);
             query.setLimit(nb);
-
-            query.setWiki(groupDocument.getDocumentReference().getWikiReference().getName());
+            query.setWiki(groupReference.getWikiReference().getName());
 
             return query.execute();
+        } catch (QueryException ex) {
+            throw new XWikiException(0, 0, ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public int countAllMatchedMembersNamesForGroup(String group, String filter, XWikiContext xcontext)
+        throws XWikiException
+    {
+        DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(group);
+        String localGroupReference = this.localWikiEntityReferenceSerializer.serialize(groupReference);
+
+        Map<String, Object> parameters = new HashMap<>();
+        StringBuilder statement = new StringBuilder("select count(field.value) ")
+            .append(createMatchGroupMembersWhereClause(localGroupReference, filter, null, parameters));
+
+        try {
+            QueryManager queryManager = xcontext.getWiki().getStore().getQueryManager();
+            Query query = queryManager.createQuery(statement.toString(), Query.HQL);
+            query.setWiki(groupReference.getWikiReference().getName());
+
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                query.bindValue(entry.getKey(), entry.getValue());
+            }
+
+            return ((Long) query.execute().get(0)).intValue();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }

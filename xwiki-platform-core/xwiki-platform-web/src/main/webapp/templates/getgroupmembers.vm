@@ -5,8 +5,8 @@ $response.setContentType('application/json')
 #set ($order = "$!request.dir" != 'desc')
 ##
 #set ($rm = $xwiki.rightsmanager)
-#if ($request.member && !$request.member.trim().equals(''))
-  #set ($count = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, $order).size())
+#if (!$stringutils.isBlank($request.member))
+  #set ($count = $rm.countAllMatchedMembersNamesForGroup($doc.fullName, $request.member))
   #set ($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit,
     $mathtool.sub($offset, 1), $order))
 #else

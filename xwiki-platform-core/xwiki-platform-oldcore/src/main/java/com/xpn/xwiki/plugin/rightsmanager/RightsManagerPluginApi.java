@@ -275,6 +275,25 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
     }
 
     /**
+     * Filters the members of the specified group using the given text and counts the results.
+     *
+     * @param group the group whose members are going to be counted
+     * @param filter the text used to filter the group members
+     * @return the number of group members that match the given text filter
+     * @see #getAllMatchedMembersNamesForGroup(String, String, int, int, Boolean)
+     * @since 10.8RC1
+     */
+    public int countAllMatchedMembersNamesForGroup(String group, String filter)
+    {
+        try {
+            return RightsManager.getInstance().countAllMatchedMembersNamesForGroup(group, filter, this.context);
+        } catch (XWikiException e) {
+            logError("Failed to count the group members that match a given text filter.", e);
+            return 0;
+        }
+    }
+
+    /**
      * Return the number of groups containing provided member.
      *
      * @param member the name of the member (user or group).

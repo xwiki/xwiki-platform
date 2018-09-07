@@ -1,7 +1,7 @@
 ###
 ### Rename document template
 ###
-#if (!$xwiki.checkAccess($doc.fullName, 'delete'))
+#if (!$xwiki.checkAccess($doc.fullName, 'delete') && "$!request.renameId" == '')
   #template("accessdenied.vm")
 #elseif ($xcontext.action == 'get' && "$!request.renameId" != '')
   ## AJAX request for rename status update.

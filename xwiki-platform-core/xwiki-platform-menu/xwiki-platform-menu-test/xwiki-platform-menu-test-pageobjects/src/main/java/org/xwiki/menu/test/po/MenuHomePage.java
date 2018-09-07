@@ -23,6 +23,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the Menu.WebHome page.

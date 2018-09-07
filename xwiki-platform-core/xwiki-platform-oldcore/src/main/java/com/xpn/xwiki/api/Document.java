@@ -936,7 +936,7 @@ public class Document extends Api
     /**
      * Get the URL of this document.
      *
-     * @return the URL to view this document, this will be a relitive URL for example: /xwiki/bin/view/Main/WebHome
+     * @return the URL to view this document, this will be a relative URL for example: /xwiki/bin/view/Main/WebHome
      * @see #getExternalURL() for an absolute URL which can used outside of the site.
      */
     public String getURL()
@@ -974,7 +974,7 @@ public class Document extends Api
      *
      * @return the full URL of the document, sutable for use at external websites for example:
      *         http://www.xwiki.org/xwiki/bin/view/Main/WebHome
-     * @see #getURL() for a reletive URL which can only be used inside of the site.
+     * @see #getURL() for a relative URL which can only be used inside of the site.
      */
     public String getExternalURL()
     {

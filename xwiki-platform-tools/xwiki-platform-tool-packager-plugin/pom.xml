@@ -36,6 +36,7 @@
    </description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>4</xwiki.pitest.mutationThreshold>
 
     <!-- It might be causing issue with this plugin build but not sure why and it's quite random -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>

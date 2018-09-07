@@ -30,6 +30,9 @@ import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -38,6 +41,8 @@ import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.search.SearchSource;
+import org.xwiki.rest.model.jaxb.Hierarchy;
+import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
 import org.xwiki.rest.resources.objects.ObjectResource;
@@ -78,6 +83,9 @@ public class BaseSearchResult extends XWikiResource
     @Inject
     @Named("hidden/space")
     private Provider<QueryFilter> hiddenSpaceFilterProvider;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
@@ -281,6 +289,23 @@ public class BaseSearchResult extends XWikiResource
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
                     searchResult.getLinks().add(pageLink);
+
+                    Hierarchy hierarchy = new Hierarchy();
+                    for (EntityReference entityReference : doc.getDocumentReference().getReversedReferenceChain()) {
+                        HierarchyItem hierarchyItem = new HierarchyItem();
+                        Document document = xwikiApi.getDocument(entityReference);
+                        if (entityReference instanceof SpaceReference || entityReference instanceof DocumentReference) {
+                            hierarchyItem.setLabel(document.getPlainTitle());
+                        } else {
+                            hierarchyItem.setLabel(entityReference.getName());
+                        }
+                        hierarchyItem.setName(entityReference.getName());
+                        hierarchyItem.setType(entityReference.getType().getLowerCase());
+                        hierarchyItem.setEntityReference(entityReferenceSerializer.serialize(entityReference));
+                        hierarchyItem.setUrl(document.getURL());
+                        hierarchy.withItems(hierarchyItem);
+                    }
+                    searchResult.setHierarchy(hierarchy);
 
                     result.add(searchResult);
                 }

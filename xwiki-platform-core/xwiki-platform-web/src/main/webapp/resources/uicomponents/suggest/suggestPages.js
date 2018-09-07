@@ -36,16 +36,14 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
         loadPages(text).done(function(data) {
           var pages = [];
           data.searchResults.forEach(function (element) {
-            var label = element.title;
-            var queryString = "";
-            // Separate spaces with " / " and unescape characters. E.g. A\.B.C\\D => A.B / C\D
-            var hint = element.space.replace(/([^\\])\./g, "$1 / ").replace(/\\(.)/g, "$1");
-            if (element.language) {
-              queryString = "language=" + element.language;
-              hint += " (" + element.language + ")";
+            var hierarchy = element.hierarchy.elements;
+            var label = hierarchy.pop();
+            if (element.pageName === 'WebHome') {
+              label = hierarchy.pop();
             }
-            var url = new XWiki.Document(XWiki.Model.resolve(element.id, XWiki.EntityType.DOCUMENT))
-              .getURL("view", queryString);
+            var hint = hierarchy.join(' / ');
+            var doc = new XWiki.Document(XWiki.Model.resolve(element.id, XWiki.EntityType.DOCUMENT))
+            var url = doc.getURL("view");
             pages.push({
               'value': element.pageFullName,
               'label': label,
@@ -61,15 +59,8 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   };
 
   var loadPages = function(text) {
-    // We need to escape backslashes for Solr.
-    text = text.replace(/\\/g, "\\\\");
-    var response = $.getJSON("${request.contextPath}/rest/wikis/query/", {
-      'q': "title:*" + text + "* or fullname:*" + text + "*",
-      'limit': 10,
-      'media': 'json'
-    });
-
-    return response;
+    var url = XWiki.Document.WikiSearchURLStub.replace("__wiki__", XWiki.Document.currentWiki);
+    return $.getJSON(url, 'q=' + text + '&scope=name&scope=title&number=10&media=json');
   };
 
   $.fn.suggestPages = function() {

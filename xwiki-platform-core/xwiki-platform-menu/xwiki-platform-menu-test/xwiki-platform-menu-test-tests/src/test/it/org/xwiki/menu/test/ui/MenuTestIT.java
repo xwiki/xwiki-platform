@@ -46,7 +46,7 @@ public class MenuTestIT extends AbstractTest
     @Test
     public void verifyMenu()
     {
-        //verifyMenuInApplicationsIndex();
+        verifyMenuInApplicationsIndex();
         verifyMenuCreationInLeftPanelWithCurrentWikiVisibility();
     }
 

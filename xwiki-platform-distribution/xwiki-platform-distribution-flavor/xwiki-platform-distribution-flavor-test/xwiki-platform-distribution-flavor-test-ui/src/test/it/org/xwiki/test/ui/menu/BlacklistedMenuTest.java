@@ -33,7 +33,7 @@ public class BlacklistedMenuTest extends AbstractTest
     public void verifyMenuIsBlacklisted()
     {
         // Log in as superadmin
-        getUtil().login("superadmin", "pass");
+        getUtil().login("Admin", "admin");
 
         // Verify that the menu app is displayed in the Applications Panel
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();

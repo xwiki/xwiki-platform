@@ -50,7 +50,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-panels-ui</artifactId>
       <version>${project.version}</version>
-      <optional>true</optional>
       <type>xar</type>
     </dependency>
     <!-- Add application deps which is optional to check integration in application index-->
@@ -58,7 +57,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-application-ui</artifactId>
       <version>${project.version}</version>
-      <optional>true</optional>
       <type>xar</type>
     </dependency>
     <!-- Test dependencies -->

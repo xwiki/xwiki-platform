@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.migrators;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,9 +29,11 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -43,26 +46,28 @@ import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.migration.DataMigrationException;
-import com.xpn.xwiki.store.migration.XWikiDBVersion;
-import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
+ * Migrate notification filter preferences stored as XObject in the user's profiles to the new store.
+ *
  * @version $Id$
  * @since 10.8RC1
+ * @since 9.11.8
  */
 @Component
-@Named("R108000NotificationFilterPreferenceMigration")
+@Named("NotificationFilterPreferencesMigrator")
 @Singleton
-public class NotificationFilterPreferencesMigrator extends AbstractHibernateDataMigration
+public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 {
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
             new SpaceReference("Notifications",
@@ -108,13 +113,27 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
     private DocumentReferenceResolver<String> referenceResolver;
 
     @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
     private Logger logger;
+
+    /**
+     * Construct the migrator.
+     */
+    public NotificationFilterPreferencesMigrator()
+    {
+        super("NotificationFilterPreferencesMigrator", Collections.singletonList(new ApplicationReadyEvent()));
+    }
 
     private void migrateUser(DocumentReference user) throws NotificationException
     {
         logger.info("Migrating the notification filter preferences of user [{}].", user);
 
-        XWikiContext context = this.getXWikiContext();
+        XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationFilterPreferenceClass
@@ -253,46 +272,52 @@ public class NotificationFilterPreferencesMigrator extends AbstractHibernateData
     }
 
     @Override
-    protected void hibernateMigrate() throws DataMigrationException, XWikiException
+    public void onEvent(Event event, Object source, Object data)
     {
-        WikiReference currentWiki = getXWikiContext().getWikiReference();
+        try {
+            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                migrateWiki(wikiId);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to migrate notification filter preferences.", e);
+        }
+    }
 
+    private void migrateWiki(String wikiId)
+    {
+        WikiReference wikiReference = new WikiReference(wikiId);
+
+        final DocumentReference notificationFilterPreferenceClass
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(wikiReference);
+
+        // Don't execute the migration if the old class has already been deleted.
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+        if (!xwiki.exists(notificationFilterPreferenceClass, context)) {
+            logger.info("Wiki [{}] has already been migrated.", wikiId);
+            return;
+        }
+
+        // Otherwise, let's do the migration
         try {
             logger.info("Getting the list of the users having notification filter preferences to migrate.");
             Query query = queryManager.createQuery(
                     "select distinct doc.fullName from Document doc, "
-                            + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj", Query.XWQL);
+                            + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj",
+                    Query.XWQL);
             for (String fullName : query.<String>execute()) {
-                migrateUser(referenceResolver.resolve(fullName, currentWiki));
+                migrateUser(referenceResolver.resolve(fullName, wikiReference));
             }
 
             // Remove the useless class when all user have been migrated (not to trash because the trash might have not
             // been initialized yet since we are in a migrator).
-            XWikiContext context = this.getXWikiContext();
-            XWiki xwiki = context.getWiki();
-            final DocumentReference notificationFilterPreferenceClass
-                    = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(currentWiki);
             XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
             if (!oldClassDoc.isNew()) {
                 logger.info("Removing the old notification filter preference class.");
                 xwiki.deleteDocument(oldClassDoc, false, context);
             }
-
         } catch (Exception e) {
-            throw new DataMigrationException("Failed to migrate notification filter preferences.", e);
+            logger.error("Failed to migrate notification filter preferences on wiki [{}].", wikiReference.getName(), e);
         }
-    }
-
-    @Override
-    public String getDescription()
-    {
-        return "Move NotificationFilterPreferenceClass XObjects to the new store";
-    }
-
-    @Override
-    public XWikiDBVersion getVersion()
-    {
-        // Migrator introduced in XWiki 9.11.8 but also in 10.8RC1... Hope it's gonna be ok
-        return new XWikiDBVersion(911800);
     }
 }

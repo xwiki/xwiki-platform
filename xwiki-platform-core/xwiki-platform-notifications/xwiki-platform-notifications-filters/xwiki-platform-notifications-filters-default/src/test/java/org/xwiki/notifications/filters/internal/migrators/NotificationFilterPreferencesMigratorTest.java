@@ -92,6 +92,7 @@ public class NotificationFilterPreferencesMigratorTest
     {
         Query query = mock(Query.class);
         when(queryManager.createQuery(anyString(), anyString())).thenReturn(query);
+        when(query.setWiki("xwiki")).thenReturn(query);
         when(query.execute()).thenReturn(Arrays.asList("XWiki.UserA"));
 
         WikiReference wikiReference = new WikiReference("xwiki");

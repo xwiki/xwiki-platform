@@ -305,7 +305,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
             Query query = queryManager.createQuery(
                     "select distinct doc.fullName from Document doc, "
                             + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj",
-                    Query.XWQL);
+                    Query.XWQL).setWiki(wikiId);
             for (String fullName : query.<String>execute()) {
                 migrateUser(referenceResolver.resolve(fullName, wikiReference));
             }
@@ -314,7 +314,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
             // been initialized yet since we are in a migrator).
             XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
             if (!oldClassDoc.isNew()) {
-                logger.info("Removing the old notification filter preference class.");
+                logger.info("Removing the old notification filter preference class on wiki [{}].", wikiId);
                 xwiki.deleteDocument(oldClassDoc, false, context);
             }
         } catch (Exception e) {

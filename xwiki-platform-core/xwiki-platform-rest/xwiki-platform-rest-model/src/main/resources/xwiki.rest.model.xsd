@@ -625,7 +625,6 @@
       <element name="label" type="string"></element>
       <element name="name" type="string"></element>
       <element name="type" type="string"></element>
-      <element name="entityReference" type="string"></element>
       <element name="url" type="string"></element>
     </sequence>
 

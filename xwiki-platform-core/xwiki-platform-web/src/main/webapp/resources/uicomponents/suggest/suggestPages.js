@@ -36,14 +36,17 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
         loadPages(text).done(function(data) {
           var pages = [];
           data.searchResults.forEach(function (element) {
-            var hierarchy = element.hierarchy.elements;
-            var label = hierarchy.pop();
+            var hierarchy = element.hierarchy.items;
+            var label = hierarchy.pop().label;
             if (element.pageName === 'WebHome') {
-              label = hierarchy.pop();
+              label = hierarchy.pop().label;
             }
-            var hint = hierarchy.join(' / ');
+            var hint = hierarchy
+              .filter(function(element) { return element.type === 'space'; })
+              .map(function(element) { return element.label; })
+              .join(' / ');
             var doc = new XWiki.Document(XWiki.Model.resolve(element.id, XWiki.EntityType.DOCUMENT))
-            var url = doc.getURL("view");
+            var url = doc.getURL();
             pages.push({
               'value': element.pageFullName,
               'label': label,
@@ -59,8 +62,13 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   };
 
   var loadPages = function(text) {
-    var url = XWiki.Document.WikiSearchURLStub.replace("__wiki__", XWiki.Document.currentWiki);
-    return $.getJSON(url, 'q=' + text + '&scope=name&scope=title&number=10&media=json');
+    var scopes = ['name', 'title'];
+    return $.getJSON(XWiki.Document.getRestSearchURL(), $.param({
+      'q': text,
+      'scope': scopes,
+      'number': 10,
+      'media': 'json'
+    }, true));
   };
 
   $.fn.suggestPages = function() {

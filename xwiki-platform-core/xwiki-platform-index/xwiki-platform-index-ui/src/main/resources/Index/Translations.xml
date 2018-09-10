@@ -36,7 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Spaces
+  <content>###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 10.7
+#######################################
+index.spacesMacro.title=Spaces
 index.spacesMacro.spaceIndex.title=See Space Index
 index.spacesMacro.spaceIndex.alt=Space Index
 index.spacesMacro.spaceAdministration.title=See Space Administration
@@ -44,7 +55,9 @@ index.spacesMacro.spaceAdministration.alt=Administer Space
 index.spacesMacro.createSpace.link=Create a new space
 index.spacesMacro.createSpace.defaultSpaceName=Space name
 index.spacesMacro.createSpace.submit=Create
-</content>
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>Index.Translations</name>
     <number>0</number>

@@ -24,11 +24,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -40,13 +41,13 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.text.StringUtils;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -61,13 +62,13 @@ public class NotificationFilterPreferencesMigratorTest
 {
     @Rule
     public final MockitoComponentMockingRule<NotificationFilterPreferencesMigrator> mocker =
-            new MockitoComponentMockingRule<>(NotificationFilterPreferencesMigrator.class, HibernateDataMigration.class,
-                    "R108000NotificationFilterPreferenceMigration");
+            new MockitoComponentMockingRule<>(NotificationFilterPreferencesMigrator.class);
 
     private ModelBridge modelBridge;
     private QueryManager queryManager;
     private DocumentReferenceResolver<String> referenceResolver;
-    private Execution execution;
+    private Provider<XWikiContext> contextProvider;
+    private WikiDescriptorManager wikiDescriptorManager;
     private XWikiContext xwikicontext;
     private XWiki xwiki;
 
@@ -77,13 +78,13 @@ public class NotificationFilterPreferencesMigratorTest
         modelBridge = mocker.getInstance(ModelBridge.class);
         queryManager = mocker.getInstance(QueryManager.class);
         referenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        execution = mocker.getInstance(Execution.class);
-        ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        contextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xwikicontext = mock(XWikiContext.class);
-        when(executionContext.getProperty("xwikicontext")).thenReturn(xwikicontext);
+        when(contextProvider.get()).thenReturn(xwikicontext);
         xwiki = mock(XWiki.class);
         when(xwikicontext.getWiki()).thenReturn(xwiki);
+        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("xwiki"));
     }
 
     @Test
@@ -120,9 +121,10 @@ public class NotificationFilterPreferencesMigratorTest
         XWikiDocument oldClass = mock(XWikiDocument.class);
         when(xwiki.getDocument(notificationFilterPreferenceClass, xwikicontext)).thenReturn(oldClass);
         when(oldClass.isNew()).thenReturn(false);
+        when(xwiki.exists(notificationFilterPreferenceClass, xwikicontext)).thenReturn(true);
 
         // Test
-        mocker.getComponentUnderTest().migrate();
+        mocker.getComponentUnderTest().onEvent(new ApplicationReadyEvent(), null, null);
 
         // Verify
         verify(xwiki).deleteDocument(oldClass, false, xwikicontext);

@@ -199,7 +199,7 @@ public class DefaultModelBridge implements ModelBridge
             case SPACE:
                 preference.setPage(entityReferenceSerializer.serialize(reference));
                 break;
-            case PAGE:
+            case DOCUMENT:
                 preference.setPageOnly(entityReferenceSerializer.serialize(reference));
                 break;
             default:

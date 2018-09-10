@@ -70,6 +70,47 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <!-- Get the current year -->
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <executions>
+              <execution>
+                  <id>timestamp-property</id>
+                  <goals>
+                      <goal>timestamp-property</goal>
+                  </goals>
+                  <phase>validate</phase>
+                  <configuration>
+                      <name>current.year</name>
+                      <pattern>yyyy</pattern>
+                  </configuration>
+              </execution>
+          </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>xwiki-platform-tool-configuration-resources</id>
+                    <phase>process-resources</phase>
+
+                    <configuration>
+                        <resourceBundles>
+                            <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
+                            <resourceBundle>org.xwiki.platform:xwiki-platform-tool-configuration-resources:${platform.version}</resourceBundle>
+                            <resourceBundle>org.xwiki.platform:xwiki-platform-distribution-resources:${platform.version}</resourceBundle>
+                        </resourceBundles>
+                        <properties>
+                            <debianLicense>${debian.license}</debianLicense>
+                            <!-- The value of ${current.year} is not interpreted here... -->
+                            <currentYear>2018</currentYear>
+                        </properties>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
           <artifactId>jdeb</artifactId>
           <groupId>org.vafer</groupId>
           <version>${jdeb.version}</version>

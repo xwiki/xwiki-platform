@@ -51,35 +51,7 @@
     </dependency>
   </dependencies>
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources/deb</directory>
-        <includes>
-          <include>copyright</include>
-        </includes>
-        <filtering>true</filtering>
-        <targetPath>${project.build.directory}/deb</targetPath>
-      </resource>
-    </resources>
     <plugins>
-      <plugin>
-        <!-- Get the current year -->
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>timestamp-property</id>
-            <goals>
-              <goal>timestamp-property</goal>
-            </goals>
-            <phase>validate</phase>
-            <configuration>
-              <name>current.year</name>
-              <pattern>yyyy</pattern>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <!-- Generate extension descriptor -->
       <plugin>
         <groupId>org.xwiki.commons</groupId>
@@ -160,7 +132,7 @@
             </data>
             <!-- Copyright file -->
             <data>
-              <src>${project.build.directory}/deb</src>
+              <src>${project.build.directory}/maven-shared-archive-resources</src>
               <type>directory</type>
               <includes>copyright</includes>
               <mapper>

@@ -1950,7 +1950,8 @@ public class XWiki implements EventListener
     public XWikiDocument getDocument(DocumentReference reference, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(
-            reference.getLocale() != null ? new DocumentReference(reference, null) : reference, reference.getLocale());
+            reference.getLocale() != null ? new DocumentReference(reference, (Locale) null) : reference,
+            reference.getLocale());
 
         doc.setContentDirty(true);
 

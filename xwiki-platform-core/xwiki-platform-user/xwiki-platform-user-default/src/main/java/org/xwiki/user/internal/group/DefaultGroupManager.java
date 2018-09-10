@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -73,6 +74,9 @@ public class DefaultGroupManager implements GroupManager
     @Inject
     private DocumentReferenceResolver<String> resolver;
 
+    @Inject
+    private EntityReferenceFactory referenceFactory;
+
     private Collection<String> getSearchWikis(DocumentReference reference, WikiTarget wikiTarget, boolean resolve)
         throws GroupException
     {
@@ -104,7 +108,7 @@ public class DefaultGroupManager implements GroupManager
         return cacheWikis;
     }
 
-    private Collection<String> getSearchWikis(DocumentReference reference, Collection<?> wikiTarget)
+    private Collection<String> getSearchWikis(DocumentReference reference, Collection<?> wikiTarget, boolean resolve)
     {
         Collection<String> searchWikis = new TreeSet<>();
 
@@ -113,6 +117,8 @@ public class DefaultGroupManager implements GroupManager
                 searchWikis.add((String) wiki);
             } else if (wiki instanceof WikiReference) {
                 searchWikis.add(((WikiReference) wiki).getName());
+            } else if (wiki instanceof WikiTarget) {
+                searchWikis.addAll(getSearchWikis(reference, wikiTarget, resolve));
             }
         }
 
@@ -131,7 +137,7 @@ public class DefaultGroupManager implements GroupManager
         } else if (wikiTarget instanceof WikiReference) {
             cacheWikis = Collections.singleton(((WikiReference) wikiTarget).getName());
         } else if (wikiTarget instanceof Collection && !((Collection) wikiTarget).isEmpty()) {
-            cacheWikis = getSearchWikis(reference, (Collection) wikiTarget);
+            cacheWikis = getSearchWikis(reference, (Collection) wikiTarget, resolve);
         } else if (wikiTarget == null) {
             cacheWikis = getSearchWikis(reference, WikiTarget.ALL, resolve);
         } else {
@@ -226,7 +232,10 @@ public class DefaultGroupManager implements GroupManager
             try {
                 xcontext.setWikiId(wiki);
 
-                groups.addAll(groupService.getAllGroupsReferencesForMember(reference, -1, 0, xcontext));
+                for (DocumentReference groupReference : groupService.getAllGroupsReferencesForMember(reference, -1, 0,
+                    xcontext)) {
+                    groups.add(this.referenceFactory.getReference(groupReference));
+                }
             } catch (XWikiException e) {
                 throw new GroupException(
                     "Failed to get all groups for member [" + reference + "] in wiki [" + wiki + "]", e);
@@ -315,7 +324,7 @@ public class DefaultGroupManager implements GroupManager
         Set<DocumentReference> members = new LinkedHashSet<>();
 
         for (String memberString : memberStrings) {
-            members.add(this.resolver.resolve(memberString, reference));
+            members.add(this.referenceFactory.getReference(this.resolver.resolve(memberString, reference)));
         }
 
         return members;

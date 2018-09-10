@@ -109,6 +109,18 @@ public class LocalDocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
+     * Clone an LocalDocumentReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public LocalDocumentReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * Create a relative space reference in from a list of space names.
      *
      * @param spaceNames the list of space name from root to child
@@ -123,6 +135,16 @@ public class LocalDocumentReference extends AbstractLocalizedEntityReference
         }
 
         return spaceReference;
+    }
+
+    @Override
+    public LocalDocumentReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new LocalDocumentReference(this, newParent);
     }
 
     @Override

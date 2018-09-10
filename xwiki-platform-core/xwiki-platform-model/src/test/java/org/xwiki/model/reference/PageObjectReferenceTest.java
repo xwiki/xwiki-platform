@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -81,5 +82,17 @@ public class PageObjectReferenceTest
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid parent reference [Wiki wiki] in an object reference", expected.getMessage());
         }
+    }
+
+    @Test
+    public void testReplaceParent()
+    {
+        PageObjectReference reference =
+            new PageObjectReference("object", new PageReference("wiki", "space", "page"))
+                .replaceParent(new PageReference("wiki2", "space2", "page2"));
+
+        assertEquals(new PageObjectReference("object", new PageReference("wiki2", "space2", "page2")), reference);
+
+        assertSame(reference, reference.replaceParent(reference.getParent()));
     }
 }

@@ -63,6 +63,18 @@ public class ObjectReference extends EntityReference
     }
 
     /**
+     * Clone an ObjectReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public ObjectReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * Deprecated constructor.
      * 
      * @param wiki wiki where the parent document of the object is
@@ -120,7 +132,21 @@ public class ObjectReference extends EntityReference
     @Override
     public ObjectReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new ObjectReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public ObjectReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new ObjectReference(this, newParent);
     }
 
     /**

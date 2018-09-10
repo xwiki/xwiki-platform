@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -386,7 +387,30 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void replaceParent()
+    public void testReplaceParent1()
+    {
+        Map<String, Serializable> map1 = getParamMap(3);
+        Map<String, Serializable> map2 = getParamMap(2);
+        Map<String, Serializable> map3 = getParamMap(1);
+
+        EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null, map3);
+
+        EntityReference space = new EntityReference("space", EntityType.SPACE, wiki, map2);
+        EntityReference space2 =
+            new EntityReference("space2", EntityType.SPACE, new EntityReference("wiki2", EntityType.WIKI));
+
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space, map1);
+        EntityReference referenceSpace2 = reference.replaceParent(space2);
+
+        assertNotSame(reference, referenceSpace2);
+        assertTrue(checkParamMap(referenceSpace2, map1));
+        assertSame(space2, referenceSpace2.getParent());
+
+        assertSame(reference.replaceParent(space), reference);
+    }
+
+    @Test
+    public void replaceParent2()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -414,6 +438,31 @@ public class EntityReferenceTest
 
         assertSame(reference.replaceParent(wiki, wiki), reference);
         assertSame(reference.replaceParent(space, space), reference);
+    }
+
+    @Test
+    public void replaceUnknownParent2()
+    {
+        EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
+        EntityReference wiki2 = new EntityReference("wiki2", EntityType.WIKI);
+
+        EntityReference space = new EntityReference("space", EntityType.SPACE, wiki);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> space.replaceParent(new EntityReference("nowiki", EntityType.WIKI), wiki2));
+
+        assertEquals(
+            "The old reference [Wiki nowiki] does not belong to the parents chain of the reference [Wiki wiki]",
+            e.getMessage());
+    }
+
+    @Test
+    public void constructorCloneNullReference()
+    {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new EntityReference(null,
+            new EntityReference("wiki", EntityType.WIKI), new EntityReference("wiki2", EntityType.WIKI)));
+
+        assertEquals("Cloned reference must not be null", e.getMessage());
     }
 
     @Test

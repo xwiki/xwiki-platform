@@ -440,7 +440,24 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (oldParent == newParent) {
             return this;
         }
+
         return new EntityReference(this, oldParent, newParent);
+    }
+
+    /**
+     * Return a clone of this reference, but with its parent replaced by the passed one.
+     *
+     * @param newParent the new parent that will replace the parent
+     * @return a new reference with a amended parent chain
+     * @since 10.8RC1
+     */
+    public EntityReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new EntityReference(this, newParent);
     }
 
     /**
@@ -455,6 +472,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (newParent == null) {
             return this;
         }
+
         return new EntityReference(this, null, newParent);
     }
 
@@ -471,6 +489,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (oldParent == null) {
             return this;
         }
+
         return new EntityReference(this, oldParent, null);
     }
 

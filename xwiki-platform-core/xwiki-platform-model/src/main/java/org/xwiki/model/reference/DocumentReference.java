@@ -212,6 +212,18 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
+     * Clone an DocumentReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public DocumentReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Overridden in order to verify the validity of the passed parent.
@@ -316,7 +328,21 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     @Override
     public DocumentReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new DocumentReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public DocumentReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new DocumentReference(this, newParent);
     }
 
     /**

@@ -66,6 +66,18 @@ public class PageObjectReference extends EntityReference
     }
 
     /**
+     * Clone an PageObjectReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public PageObjectReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Overridden to check the type to be an object type.
@@ -110,7 +122,21 @@ public class PageObjectReference extends EntityReference
     @Override
     public PageObjectReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new PageObjectReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public PageObjectReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new PageObjectReference(this, newParent);
     }
 
     /**

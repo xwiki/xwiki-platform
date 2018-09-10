@@ -1473,7 +1473,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (reference != null) {
             // Retro compatibility, make sure <code>this.documentReference</code> does not contain the Locale (for now)
             DocumentReference referenceWithoutLocale =
-                reference.getLocale() != null ? new DocumentReference(reference, null) : reference;
+                reference.getLocale() != null ? new DocumentReference(reference, (Locale) null) : reference;
 
             if (!referenceWithoutLocale.equals(getDocumentReference())) {
                 setDocumentReferenceInternal(referenceWithoutLocale);

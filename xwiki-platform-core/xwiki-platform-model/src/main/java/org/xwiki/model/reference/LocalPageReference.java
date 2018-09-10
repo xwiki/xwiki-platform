@@ -106,6 +106,18 @@ public class LocalPageReference extends AbstractLocalizedEntityReference
     }
 
     /**
+     * Clone an DocumentVersionReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public LocalPageReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Overridden in order to verify the validity of the passed parent.
@@ -142,6 +154,16 @@ public class LocalPageReference extends AbstractLocalizedEntityReference
         }
 
         super.setType(type);
+    }
+
+    @Override
+    public LocalPageReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new LocalPageReference(this, newParent);
     }
 
     @Override

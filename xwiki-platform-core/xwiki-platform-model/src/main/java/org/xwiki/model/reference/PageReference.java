@@ -177,6 +177,18 @@ public class PageReference extends AbstractLocalizedEntityReference
         super(localPageReference, null, wikiReference);
     }
 
+    /**
+     * Clone an PageReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public PageReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
     static List<String> toList(String inputPageName, String... inputPageNames)
     {
         List<String> pageNames = new ArrayList<>(inputPageNames.length + 1);
@@ -242,7 +254,21 @@ public class PageReference extends AbstractLocalizedEntityReference
     @Override
     public PageReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new PageReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public PageReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new PageReference(this, newParent);
     }
 
     /**

@@ -23,7 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link PageAttachmentReference}.
@@ -35,37 +36,39 @@ public class PageAttachmentReferenceTest
     @Test
     public void testInvalidType()
     {
-        try {
-            new PageAttachmentReference(new EntityReference("filename", EntityType.PAGE));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new PageAttachmentReference(new EntityReference("filename", EntityType.PAGE)));
 
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid type [PAGE] for an attachment reference", expected.getMessage());
-        }
+        assertEquals("Invalid type [PAGE] for an attachment reference", e.getMessage());
     }
 
     @Test
     public void testInvalidNullParent()
     {
-        try {
-            new PageAttachmentReference("filename", null);
+        IllegalArgumentException e =
+            assertThrows(IllegalArgumentException.class, () -> new PageAttachmentReference("filename", null));
 
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [null] in an attachment reference", expected.getMessage());
-        }
+        assertEquals("Invalid parent reference [null] in an attachment reference", e.getMessage());
     }
 
     @Test
     public void testInvalidParentType()
     {
-        try {
-            new PageAttachmentReference(
-                new EntityReference("filename", EntityType.PAGE_ATTACHMENT, new WikiReference("wiki")));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageAttachmentReference(
+            new EntityReference("filename", EntityType.PAGE_ATTACHMENT, new WikiReference("wiki"))));
 
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [Wiki wiki] in an attachment reference", expected.getMessage());
-        }
+        assertEquals("Invalid parent reference [Wiki wiki] in an attachment reference", e.getMessage());
+    }
+
+    @Test
+    public void testReplaceParent()
+    {
+        PageAttachmentReference reference =
+            new PageAttachmentReference("file", new PageReference("wiki", "space", "page"))
+                .replaceParent(new PageReference("wiki2", "space2", "page2"));
+
+        assertEquals(new PageAttachmentReference("file", new PageReference("wiki2", "space2", "page2")), reference);
+
+        assertSame(reference, reference.replaceParent(reference.getParent()));
     }
 }

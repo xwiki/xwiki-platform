@@ -142,6 +142,18 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
     }
 
     /**
+     * Clone an AbstractLocalizedEntityReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public AbstractLocalizedEntityReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * Set the locale of this reference.
      *
      * @param locale the locale of this document reference

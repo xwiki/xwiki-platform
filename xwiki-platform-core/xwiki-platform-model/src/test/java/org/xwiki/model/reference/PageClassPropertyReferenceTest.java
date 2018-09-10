@@ -23,7 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit test for the Object reference ({@link PageClassPropertyReference}).
@@ -47,25 +48,19 @@ public class PageClassPropertyReferenceTest
     @Test
     public void testInvalidType()
     {
-        try {
-            new PageClassPropertyReference(new EntityReference("propertyName", EntityType.PAGE));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new PageClassPropertyReference(new EntityReference("propertyName", EntityType.PAGE)));
 
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid type [PAGE] for a class property reference", expected.getMessage());
-        }
+        assertEquals("Invalid type [PAGE] for a class property reference", e.getMessage());
     }
 
     @Test
     public void testInvalidNullParent()
     {
-        try {
-            new PageClassPropertyReference(new EntityReference("className", EntityType.PAGE_CLASS_PROPERTY));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new PageClassPropertyReference(new EntityReference("className", EntityType.PAGE_CLASS_PROPERTY)));
 
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [null] in a class property reference", expected.getMessage());
-        }
+        assertEquals("Invalid parent reference [null] in a class property reference", e.getMessage());
     }
 
     /**
@@ -74,13 +69,22 @@ public class PageClassPropertyReferenceTest
     @Test
     public void testInvalidParentType()
     {
-        try {
-            new PageClassPropertyReference(new EntityReference("className", EntityType.PAGE_CLASS_PROPERTY,
-                new EntityReference("wiki", EntityType.WIKI)));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new PageClassPropertyReference(new EntityReference("className", EntityType.PAGE_CLASS_PROPERTY,
+                new EntityReference("wiki", EntityType.WIKI))));
 
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [Wiki wiki] in a class property reference", expected.getMessage());
-        }
+        assertEquals("Invalid parent reference [Wiki wiki] in a class property reference", e.getMessage());
+    }
+
+    @Test
+    public void testReplaceParent()
+    {
+        PageClassPropertyReference reference =
+            new PageClassPropertyReference("prop", new PageReference("wiki", "space", "page"))
+                .replaceParent(new PageReference("wiki2", "space2", "page2"));
+
+        assertEquals(new PageClassPropertyReference("prop", new PageReference("wiki2", "space2", "page2")), reference);
+
+        assertSame(reference, reference.replaceParent(reference.getParent()));
     }
 }

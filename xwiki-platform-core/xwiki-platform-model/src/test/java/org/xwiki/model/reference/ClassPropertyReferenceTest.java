@@ -27,12 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Unit test for the Block reference ({@link BlockReference}).
- *
+ * Unit test for the Object reference ({@link ClassPropertyReference}).
+ * 
  * @version $Id$
- * @since 6.0M1
  */
-public class BlockReferenceTest
+public class ClassPropertyReferenceTest
 {
     /**
      * Ensures the equivalence of constructors.
@@ -40,29 +39,29 @@ public class BlockReferenceTest
     @Test
     public void testConstructors()
     {
-        BlockReference reference = new BlockReference(new EntityReference("Block", EntityType.BLOCK));
-        assertEquals(reference, new BlockReference("Block"));
-
-        reference = new BlockReference(
-            new EntityReference("Block", EntityType.BLOCK, new EntityReference("Page", EntityType.DOCUMENT,
+        ClassPropertyReference reference = new ClassPropertyReference(new EntityReference("ClassProperty",
+            EntityType.CLASS_PROPERTY, new EntityReference("Document", EntityType.DOCUMENT,
                 new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
-        assertEquals(reference, new BlockReference("Block", new DocumentReference("wiki", "Space", "Page")));
-
-        reference = new BlockReference(new EntityReference("Block", EntityType.BLOCK,
-            new EntityReference("ObjectProperty", EntityType.OBJECT_PROPERTY,
-                new EntityReference("Object", EntityType.OBJECT, new EntityReference("Page", EntityType.DOCUMENT,
-                    new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))))));
-        assertEquals(reference, new BlockReference("Block",
-            new ObjectPropertyReference("wiki", "Space", "Page", "Object", "ObjectProperty")));
+        assertEquals(reference,
+            new ClassPropertyReference("ClassProperty", new DocumentReference("wiki", "Space", "Document")));
     }
 
     @Test
     public void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new BlockReference(new EntityReference("Block", EntityType.DOCUMENT)));
+            () -> new ClassPropertyReference(new EntityReference("propertyName", EntityType.PAGE)));
 
-        assertEquals("Invalid type [DOCUMENT] for a block reference", e.getMessage());
+        assertEquals("Invalid type [PAGE] for a class property reference", e.getMessage());
+    }
+
+    @Test
+    public void testInvalidNullParent()
+    {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new ClassPropertyReference(new EntityReference("className", EntityType.CLASS_PROPERTY)));
+
+        assertEquals("Invalid parent reference [null] in a class property reference", e.getMessage());
     }
 
     /**
@@ -71,19 +70,20 @@ public class BlockReferenceTest
     @Test
     public void testInvalidParentType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new BlockReference(
-            new EntityReference("Block", EntityType.BLOCK, new EntityReference("Object", EntityType.OBJECT))));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ClassPropertyReference(
+            new EntityReference("className", EntityType.CLASS_PROPERTY, new EntityReference("wiki", EntityType.WIKI))));
 
-        assertEquals("Invalid parent reference [Object Object] in a block reference", e.getMessage());
+        assertEquals("Invalid parent reference [Wiki wiki] in a class property reference", e.getMessage());
     }
 
     @Test
     public void testReplaceParent()
     {
-        BlockReference reference = new BlockReference("Block", new DocumentReference("wiki", "space", "page"))
-            .replaceParent(new DocumentReference("wiki2", "space2", "page2"));
+        ClassPropertyReference reference =
+            new ClassPropertyReference("prop", new DocumentReference("wiki", "space", "page"))
+                .replaceParent(new DocumentReference("wiki2", "space2", "page2"));
 
-        assertEquals(new BlockReference("Block", new DocumentReference("wiki2", "space2", "page2")), reference);
+        assertEquals(new ClassPropertyReference("prop", new DocumentReference("wiki2", "space2", "page2")), reference);
 
         assertSame(reference, reference.replaceParent(reference.getParent()));
     }

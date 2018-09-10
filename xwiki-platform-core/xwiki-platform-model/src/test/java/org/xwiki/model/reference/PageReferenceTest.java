@@ -26,7 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link org.xwiki.model.reference.PageReference}.
@@ -48,35 +49,28 @@ public class PageReferenceTest
     @Test
     public void testInvalidType()
     {
-        try {
-            new PageReference(new EntityReference("page", EntityType.DOCUMENT));
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid type [DOCUMENT] for a page reference", expected.getMessage());
-        }
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new PageReference(new EntityReference("page", EntityType.DOCUMENT)));
+
+        assertEquals("Invalid type [DOCUMENT] for a page reference", e.getMessage());
     }
 
     @Test
     public void testInvalidNullParent()
     {
-        try {
-            new PageReference("page", (WikiReference) null);
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [null] in a page reference", expected.getMessage());
-        }
+        IllegalArgumentException e =
+            assertThrows(IllegalArgumentException.class, () -> new PageReference("page", (WikiReference) null));
+
+        assertEquals("Invalid parent reference [null] in a page reference", e.getMessage());
     }
 
     @Test
     public void testInvalidParentType()
     {
-        try {
-            new PageReference(
-                new EntityReference("page", EntityType.PAGE, new EntityReference("document", EntityType.DOCUMENT)));
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [Document document] in a page reference", expected.getMessage());
-        }
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageReference(
+            new EntityReference("page", EntityType.PAGE, new EntityReference("document", EntityType.DOCUMENT))));
+
+        assertEquals("Invalid parent reference [Document document] in a page reference", e.getMessage());
     }
 
     @Test
@@ -101,5 +95,16 @@ public class PageReferenceTest
     {
         assertEquals(new PageReference("wiki", "space", "page"),
             new PageReference(new LocalPageReference("space", "page"), new WikiReference("wiki")));
+    }
+
+    @Test
+    public void testReplaceParent()
+    {
+        PageReference reference = new PageReference("wiki", "space", "page").replaceParent(
+            new EntityReference("space2", EntityType.PAGE, new EntityReference("wiki2", EntityType.WIKI)));
+
+        assertEquals(new PageReference("wiki2", "space2", "page"), reference);
+
+        assertSame(reference, reference.replaceParent(reference.getParent()));
     }
 }

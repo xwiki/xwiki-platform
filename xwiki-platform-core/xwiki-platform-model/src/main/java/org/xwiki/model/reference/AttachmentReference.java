@@ -58,6 +58,18 @@ public class AttachmentReference extends EntityReference
     }
 
     /**
+     * Clone an AttachmentReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public AttachmentReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * Create a new attachment reference based on the attachment name and the parent document reference.
      *
      * @param fileName the name of the attachment
@@ -120,6 +132,20 @@ public class AttachmentReference extends EntityReference
     @Override
     public AttachmentReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new AttachmentReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public AttachmentReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new AttachmentReference(this, newParent);
     }
 }

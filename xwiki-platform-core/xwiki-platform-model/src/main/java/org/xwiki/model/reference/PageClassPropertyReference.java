@@ -67,6 +67,18 @@ public class PageClassPropertyReference extends EntityReference
     }
 
     /**
+     * Clone an PageClassPropertyReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public PageClassPropertyReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Overridden to check the type to be a property type.
@@ -111,6 +123,20 @@ public class PageClassPropertyReference extends EntityReference
     @Override
     public PageClassPropertyReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new PageClassPropertyReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public PageClassPropertyReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new PageClassPropertyReference(this, newParent);
     }
 }

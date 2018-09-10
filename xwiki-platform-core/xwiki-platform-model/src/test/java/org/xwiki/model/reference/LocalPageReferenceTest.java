@@ -23,34 +23,22 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit tests for {@link LocalDocumentReference}.
+ * Unit tests for {@link LocalPageReference}.
  *
  * @version $Id$
- * @since 5.0M1
  */
-public class LocalDocumentReferenceTest
+public class LocalPageReferenceTest
 {
-    @Test
-    public void verifyLocalDocumentReferenceProperties()
-    {
-        LocalDocumentReference reference = new LocalDocumentReference("space", "page");
-        assertEquals("space", reference.getParent().getName());
-        assertNull(reference.getParent().getParent());
-        assertTrue(reference instanceof EntityReference);
-    }
-
     @Test
     public void testReplaceParent()
     {
-        LocalDocumentReference reference =
-            new LocalDocumentReference("space", "page").replaceParent(new EntityReference("space2", EntityType.SPACE));
+        LocalPageReference reference =
+            new LocalPageReference("space", "page").replaceParent(new EntityReference("space2", EntityType.PAGE));
 
-        assertEquals(new LocalDocumentReference("space2", "page"), reference);
+        assertEquals(new LocalPageReference("space2", "page"), reference);
 
         assertSame(reference, reference.replaceParent(reference.getParent()));
     }

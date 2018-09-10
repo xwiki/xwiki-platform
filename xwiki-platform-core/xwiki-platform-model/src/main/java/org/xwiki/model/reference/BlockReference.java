@@ -84,6 +84,18 @@ public class BlockReference extends EntityReference
     }
 
     /**
+     * Clone an BlockReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public BlockReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Overridden to check the type to be an block type.
@@ -131,6 +143,20 @@ public class BlockReference extends EntityReference
     @Override
     public BlockReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new BlockReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public BlockReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new BlockReference(this, newParent);
     }
 }

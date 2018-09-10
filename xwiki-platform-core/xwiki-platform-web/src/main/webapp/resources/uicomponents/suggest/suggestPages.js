@@ -28,6 +28,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   'use strict';
 
   var pageIcon = $jsontool.serialize($services.icon.getMetaData('page_white'));
+  var webHome = "$!services.model.getEntityReference('DOCUMENT', 'default').name" || 'WebHome';
 
   var getSelectizeOptions = function(select) {
     return {
@@ -38,7 +39,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
           data.searchResults.forEach(function (element) {
             var hierarchy = element.hierarchy.items;
             var label = hierarchy.pop().label;
-            if (element.pageName === 'WebHome') {
+            if (element.pageName === webHome) {
               label = hierarchy.pop().label;
             }
             var hint = hierarchy

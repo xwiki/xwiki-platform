@@ -54,6 +54,8 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class ScopeNotificationFilterExpressionGenerator
 {
+    private final static String USER_PROFILE_PROVIDER_HINT = "userProfile";
+
     @Inject
     private ScopeNotificationFilterPreferencesGetter scopeNotificationFilterPreferencesGetter;
 
@@ -62,7 +64,6 @@ public class ScopeNotificationFilterExpressionGenerator
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
-
 
     /**
      * Generate a filter expression for the given user and event type according to the scope notification filter
@@ -197,7 +198,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // handle it without using the subquery mechanism that we can see in
         // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
         //    NotificationFilterType type, DocumentReference user).
-        return StringUtils.isNotBlank(pref.getPageOnly()) && "userProfile".equals(pref.getProviderHint())
+        return StringUtils.isNotBlank(pref.getPageOnly()) && USER_PROFILE_PROVIDER_HINT.equals(pref.getProviderHint())
             && pref.getEventTypes().isEmpty();
     }
 
@@ -227,6 +228,9 @@ public class ScopeNotificationFilterExpressionGenerator
      * and do the filtering based on this.
      * To limit the number of sub queries, we also limit this mechanism to filter preferences that concern all event
      * types.
+     *
+     * NOTE: this work only with user's preferences stocked in the database. It does not support the use-case of
+     * the notifications macro, when the preferences are created on the fly based on the macro parameters!
      *
      * @param filterPreferences all filter preferences
      * @param format format of the notifications
@@ -279,7 +283,10 @@ public class ScopeNotificationFilterExpressionGenerator
 
     private boolean isEnabledScopeNotificationFilterPreference(NotificationFilterPreference nfp)
     {
-        return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName());
+        // This optimization can only works on preferences stored by the user, that's why we add a condition
+        // on the provider hint.
+        return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
+                && nfp.getProviderHint().equals(USER_PROFILE_PROVIDER_HINT);
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

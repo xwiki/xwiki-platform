@@ -300,7 +300,8 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
         // Otherwise, let's do the migration
         try {
-            logger.info("Getting the list of the users having notification filter preferences to migrate.");
+            logger.info("Getting the list of the users having notification filter preferences to migrate on wiki [{}].",
+                    wikiId);
             Query query = queryManager.createQuery(
                     "select distinct doc.fullName from Document doc, "
                             + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj",

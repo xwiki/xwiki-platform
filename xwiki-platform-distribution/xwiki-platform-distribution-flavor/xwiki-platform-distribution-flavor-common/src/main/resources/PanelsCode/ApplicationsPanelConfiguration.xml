@@ -118,7 +118,7 @@
       </applicationId>
     </class>
     <property>
-      <applicationId>platform.panels.MenuApplication</applicationId>
+      <applicationId>platform.menu.MenuApplication</applicationId>
     </property>
   </object>
   <object>

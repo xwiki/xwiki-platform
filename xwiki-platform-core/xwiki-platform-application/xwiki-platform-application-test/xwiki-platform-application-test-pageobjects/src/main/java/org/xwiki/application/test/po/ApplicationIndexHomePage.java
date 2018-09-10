@@ -20,7 +20,6 @@
 package org.xwiki.application.test.po;
 
 import org.openqa.selenium.By;
-import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -32,25 +31,29 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ApplicationIndexHomePage extends ViewPage
 {
+
     /**
      * Go to the home page of the Application Index application.
      */
     public static ApplicationIndexHomePage gotoPage()
     {
-        ApplicationHomePage.gotoPage("Applications");
+        getUtil().gotoPage("Applications", "WebHome");
         return new ApplicationIndexHomePage();
+    }
+
+    private static By applicationElement(String applicationName) {
+        return By.xpath(
+                "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]");
     }
 
     public boolean containsApplication(String applicationName)
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath(
-                "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]")).size() == 1;
+        return getDriver().hasElementWithoutWaiting(applicationElement(applicationName));
     }
 
     public ViewPage clickApplication(String applicationName)
     {
-        getDriver().findElementWithoutWaiting(By.xpath(
-                "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]")).click();
+        getDriver().findElementWithoutWaiting(applicationElement(applicationName)).click();
         return new ViewPage();
     }
 }

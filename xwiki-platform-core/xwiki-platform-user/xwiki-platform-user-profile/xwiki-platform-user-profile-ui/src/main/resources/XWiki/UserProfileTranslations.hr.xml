@@ -43,5 +43,9 @@ XWiki.XWikiUsers_editor.hint=Odaberite koji uređivač će biti zadani, poništa
 XWiki.XWikiUsers_usertype.hint=Odaberite koji će biti zadani tip korisnika. Napredni korisnici imaju pristup višestrukim mogućnostima uređivanja, izradi terminalnih stranica itd.
 XWiki.XWikiUsers_extensionConflictSetup.hint=Naznačite želite li da Upravitelj ekstenzija od vas zatraži da potvrdite zadana pravila za rješavanje konflikata (na primjer, recite Upravitelju ekstenzija da vas upita što učiniti ukoliko je dokument koji se nadograđuje uklonjen iz wikija).
 userprofile.default=Zadano
+### Missing: user.profile.groups.title=My Groups
+### Missing: user.profile.groups.description=Here are listed all the groups your user belongs to.
+### Missing: user.profile.groups.table.group=Group
+### Missing: platform.core.profile.category.groups=My Groups
 </content>
 </xwikidoc>

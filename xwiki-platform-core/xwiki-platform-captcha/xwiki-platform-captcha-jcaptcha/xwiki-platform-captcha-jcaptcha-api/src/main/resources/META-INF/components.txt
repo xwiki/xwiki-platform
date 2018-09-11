@@ -1,0 +1,3 @@
+org.xwiki.captcha.internal.JCaptchaCaptcha
+org.xwiki.captcha.internal.JCaptchaResourceReferenceHandler
+org.xwiki.captcha.internal.CaptchaServiceManager

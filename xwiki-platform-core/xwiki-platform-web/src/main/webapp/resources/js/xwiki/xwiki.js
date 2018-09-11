@@ -183,7 +183,7 @@ Object.extend(XWiki, {
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
-     // Use Ajax.Updater to display the requested pane (extraID) : comments, attachments, etc.
+     // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
      // On complete :
      //   1. Call dhtmlSwitch()
      //   2. If the function call has been triggered by an event : reset location.href to #extraID
@@ -193,12 +193,53 @@ Object.extend(XWiki, {
             window.activeDocExtraPane.className="invisible";
         }
         $("docextrapanes").className="loading";
-        new Ajax.Updater(
-                extraID + "pane",
-                window.docgeturl + '?xpage=xpart&vm=' + extraTemplate,
+
+        // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
+        let maybeMinifyRequestParameter = '';
+        let requestMinify = window.location.search.toQueryParams().minify;
+        if (requestMinify && requestMinify == 'false') {
+          maybeMinifyRequestParameter = '&minify=false';
+        }
+
+        new Ajax.Request(
+          window.docgeturl + '?xpage=xpart&vm=' + extraTemplate + maybeMinifyRequestParameter,
                 {
                     method: 'get',
-                    evalScripts: true,
+                    onSuccess: function(response) {
+                      // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
+                      // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.
+
+                      var head = document.body.previous('head');
+                      let html = response.responseText;
+
+                      // Use a temporary "container" to parse and process the HTML response.
+                      var container = new Element('div');
+                      container.innerHTML = html;
+
+                      // Insert link elements in head, if not already there.
+                      container.select('link').each(function(link) {
+                        let existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
+                        if (existingElements.length == 0) {
+                          head.insert(new Element('link', {rel: "stylesheet", type: link.type, href: link.readAttribute('href')}));
+                        }
+                        // Strip links from the result, since they are now in head.
+                        link.remove();
+                      });
+
+                      container.select('script').each(function(script) {
+                        // Insert external scripts in head, if not already there.
+                        if (script.src) {
+                          let existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
+                          if (existingElements.length == 0) {
+                            head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
+                          }
+                        }
+                      });
+
+                      // Replace the element's content with the temporary container's content, while also evaluating any inline scripts.
+                      // Note: This also does stripScripts internally, but it's OK now, since we have already added the necessary external scripts to head.
+                      $(extraID + "pane").update(container.innerHTML);
+                    },
                     onComplete: function(transport){
                       $("docextrapanes").className="";
 

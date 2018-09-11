@@ -175,6 +175,18 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-jcaptcha-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
   </dependencies>
 
   <build>

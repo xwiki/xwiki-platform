@@ -22,6 +22,8 @@ package com.xpn.xwiki.web;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.captcha.Captcha;
+import org.xwiki.captcha.CaptchaConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -115,28 +117,30 @@ public class CommentAddAction extends XWikiAction
     }
 
     /**
-     * Checks the request parameter captcha_answer against the captcha module. This makes xwiki-core dependant on
-     * xwiki-captcha and should be removed as soon as possible.
+     * Checks the request and validates the CAPTCHA answer, if needed, against the CAPTCHA module. This makes xwiki-core
+     * dependent on xwiki-captcha and should be removed as soon as possible.
      *
-     * @param context The XWikiContext for getting the request and whether guest comment requires a captcha.
-     * @return true if the captcha answer is correct or if no captcha answer and captcha is not required.
-     * @throws XWikiException if something goes wrong in the captcha module.
+     * @param context The XWikiContext for getting the request and whether guest comment requires a CAPTCHA
+     * @return true if the CAPTCHA answer is correct or if CAPTCHA is not required
+     * @throws XWikiException if something goes wrong in the CAPTCHA module
      * @since 2.3M1
      */
     private boolean checkCaptcha(XWikiContext context) throws XWikiException
     {
-        String answer = context.getRequest().get("captcha_answer");
-        if (answer != null && answer.length() > 0) {
-            org.xwiki.captcha.CaptchaVerifier cv =
-                Utils.getComponent(org.xwiki.captcha.CaptchaVerifier.class, context.getRequest().get("captcha_type"));
+        if (context.getWiki().getSpacePreferenceAsInt("guest_comment_requires_captcha", 0, context) == 1) {
+            CaptchaConfiguration captchaConfiguration =
+                Utils.getComponent(org.xwiki.captcha.CaptchaConfiguration.class);
+            String defaultCaptchaName = captchaConfiguration.getDefaultName();
             try {
-                return cv.isAnswerCorrect(cv.getUserId(context.getRequest()), answer);
+                Captcha captcha = Utils.getComponent(org.xwiki.captcha.Captcha.class, defaultCaptchaName);
+
+                return captcha.isValid();
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Exception while attempting to verify captcha", e);
+                    String.format("Exception while attempting to verify CAPTCHA of type [%s]", defaultCaptchaName), e);
             }
         } else {
-            return (context.getWiki().getSpacePreferenceAsInt("guest_comment_requires_captcha", 0, context) != 1);
+            return true;
         }
     }
 }

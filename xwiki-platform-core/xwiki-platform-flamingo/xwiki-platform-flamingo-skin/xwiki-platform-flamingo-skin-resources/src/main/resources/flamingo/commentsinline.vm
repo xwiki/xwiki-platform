@@ -228,33 +228,32 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 #macro(displayCaptcha)
   <div id='commentCaptcha'>
-  ## We only want to hide the captcha if we're sure the user has javascript, if this is an ajax call then it's a safe bet.
-  #if($hideCaptcha)
-    <script type='text/javascript'>
-    $('commentCaptcha').style.display = "none";
-    var handler = function() {
-      var captchaDiv = $('commentCaptcha');
-      var image = new Element('img', {'src' : '$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()', 'alt' : '$escapetool.javascript($services.localization.render("core.captcha.image.alternateText"))'});
-      captchaDiv.insertBefore(image, captchaDiv.firstChild);
-      Event.observe(image, 'load', function() {
-        Effect.SlideDown('commentCaptcha', { duration: 0.7 });
-      });
-      Event.stopObserving($('${xCommentClass}_comment'), 'focus', handler);
-    }.bind(this);
-    Event.observe($('${xCommentClass}_comment'), 'focus', handler);
-    </script>
-  #else
-    <img src='$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()' alt='$services.localization.render("core.captcha.image.alternateText")' />
-  #end
-  <input type='hidden' name='captcha_type' value='image'/>
-  <br/>
-  <label for='captcha_answer'>$services.localization.render('core.captcha.image.instruction')</label>
-  <br/>
-  <input id='captcha_answer' name='captcha_answer' type='text'>
-  #if($captchaAnswerWrong)
-    <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$services.localization.render('core.captcha.captchaAnswerIsWrong')</span>
-  #end
-  <div class="wikimodel-emptyline"></div>
+    <div class="row">
+      <div class="col-xs-12">
+        <label>$services.localization.render('core.captcha.instruction')</label>
+      </div>
+      <div class="xform col-xs-12 col-sm-6">
+        $services.captcha.default.display()
+      </div>
+    </div>
+    ## We only want to hide the captcha if we're sure the user has javascript, if this is an ajax call then it's a safe bet.
+    #if($hideCaptcha)
+      <script type='text/javascript'>
+        $('commentCaptcha').style.display = "none";
+        var handler = function() {
+          var captchaDiv = $('commentCaptcha');
+          Effect.SlideDown('commentCaptcha', { duration: 0.7 });
+          Event.stopObserving($('${xCommentClass}_comment'), 'focus', handler);
+        }.bind(this);
+        Event.observe($('${xCommentClass}_comment'), 'focus', handler);
+      </script>
+      ## Since each CAPTCHA displayer can have its own JS+CSS, we need to make sure that, when comments are shown with AJAX, those resources are also included.
+      #skinExtensionHooks()
+    #end
+    #if($captchaAnswerWrong)
+      <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$services.localization.render('core.captcha.captchaAnswerIsWrong')</span>
+    #end
+    <div class="wikimodel-emptyline"></div>
   </div>
 #end
 ##

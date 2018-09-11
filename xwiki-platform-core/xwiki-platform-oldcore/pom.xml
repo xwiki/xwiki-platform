@@ -402,7 +402,7 @@
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-captcha</artifactId>
+      <artifactId>xwiki-platform-captcha-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

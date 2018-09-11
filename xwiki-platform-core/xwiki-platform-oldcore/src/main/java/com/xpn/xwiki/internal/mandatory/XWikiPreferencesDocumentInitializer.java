@@ -50,28 +50,28 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
 {
     /**
      * The name of the initialized document.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final String NAME = "XWikiPreferences";
 
     /**
      * The local reference of the initialized document as String.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final String LOCAL_REFERENCE_STRING = XWiki.SYSTEM_SPACE + '.' + NAME;
 
     /**
      * The local reference of the initialized document as String.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final LocalDocumentReference LOCAL_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE, NAME);
 
     /**
      * A regex to match any object reference with initialized class.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final RegexEntityReference OBJECT_REFERENCE = BaseObjectReference.any(LOCAL_REFERENCE_STRING);
@@ -160,7 +160,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
         // Captcha for guest comments
-        xclass.addBooleanField("guest_comment_requires_captcha", "Enable CAPTCHA in Comments for Unregistered Users",
+        xclass.addBooleanField("guest_comment_requires_captcha", "Enable CAPTCHA in comments for unregistered users",
             "select");
 
         // Document editing

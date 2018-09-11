@@ -317,57 +317,30 @@
   #end
   *********###
   ##
-  ## To disable the captcha on this page, comment out the next two entries.
-  ## The captcha image, not an input field but still defined the same way.
-  #if($captchaservice
+  ## To disable the CAPTCHA on this page, comment out the next entry.
+  ## The CAPTCHA, not really an input field but still defined the same way.
+  #if($services.captcha
       &amp;&amp; !$invited
       &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest"
       &amp;&amp; $requireCaptcha)
-    ## Empty label field used for padding.
-    ## Empty 'name' field overriddes name="captcha_image" with "" so name is not specified at all.
-    #set($field =
-      {'name' : 'captcha_image',
-        'label' : "&lt;span class='hidden'&gt;$services.localization.render('core.captcha.image.label')&lt;/span&gt;",
-        'tag' : 'img',
-        'params' : {
-          'src' : $doc.getURL('imagecaptcha'),
-          'alt' : $services.localization.render('core.captcha.image.alternateText', [$services.localization.render('core.register.submit')]),
-          'name' : ''
-        }
-      })
-    #set($discard = $fields.add($field))
-    ## The captcha field, mandatory, programmatically checked to make sure the captcha is right
-    ## Not checked by javascript because javascript can't check the captcha and the Ok message because it passes the
+    ## The CAPTCHA field, programmatically checked to make sure the CAPTCHA is right.
+    ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
     ## mandatory test is misleading.
-    ## and not filled back in if there is an error ('noReturn')
+    ## Also, not filled back in if there is an error ('noReturn').
     #set($field =
-      {'name' : 'captcha_answer',
-        'label' : $services.localization.render('core.captcha.image.instruction'),
-        'params' : {
-          'type' : 'text',
-          'size' : '60'
-        },
+      {'name' : 'captcha_placeholder',
+        'label' : $services.localization.render('core.captcha.instruction'),
+        'type'  : 'html',
+        'html'  : "$!{services.captcha.default.display()}",
         'validate' : {
-          'mandatory' : {
-            'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong'),
-            'noscript' : true
-          },
           'programmaticValidation' : {
-            'code' : '#checkCaptcha($request, $request.get("captcha_answer"))',
+            'code' : '#if (!$services.captcha.default.isValid())failed#end',
             'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong')
           }
         },
         'noReturn' : true
       })
     #set($discard = $fields.add($field))
-  #end
-  ##
-  ## Checks the captcha answer; used by programmaticValidation above.
-  #macro(checkCaptcha, $request, $answer)
-    #set($cv = $captchaservice.getCaptchaVerifier('image'))
-    #if(!$cv.isAnswerCorrect($cv.getUserId($request), $answer))
-      failed
-    #end
   #end
   ##
   ## Pass the name of the template to $xwiki.createUser so any contained information will be passed in.
@@ -539,7 +512,7 @@
       #set($validate = $field.get('validate'))
       #set($error = '')
       #set($value = $request.get($fieldName))
-      #if($value &amp;&amp; $value != '')
+      #if("$!value" != '' || $field.get('type') == 'html')
         ##
         ## mustMatch validation
         #if($error == '' &amp;&amp; $validate.get('mustMatch'))
@@ -740,19 +713,24 @@
       #else
         #set($tag = 'input')
       #end
-      &lt;dd&gt;&lt;$tag id="$fieldName" ##
-      #set($params = $field.get('params'))
-      ## If no name parameter is spacified, then we use the field name
-      #if(!$params.get('name'))
-        #set($discard = $params.put('name', $fieldName))
-      #end
-      #foreach($entry in $params.entrySet())
-        ## If a parameter is specified as '' then we don't include it.
-        #if($entry.getValue() != '')
-          $entry.getKey()="$escapetool.xml($entry.getValue())" ##
+      &lt;dd&gt;
+      #if ($field.get('type') == 'html')
+        $field.get('html')
+      #elseif ($field.get('type') == 'tag' || "$!{field.get('type')}" == '')
+        &lt;$tag id="$fieldName" ##
+        #set($params = $field.get('params'))
+        ## If no name parameter is spacified, then we use the field name
+        #if(!$params.get('name'))
+          #set($discard = $params.put('name', $fieldName))
         #end
+        #foreach($entry in $params.entrySet())
+          ## If a parameter is specified as '' then we don't include it.
+          #if($entry.getValue() != '')
+            $entry.getKey()="$escapetool.xml($entry.getValue())" ##
+          #end
+        #end
+        &gt;&lt;/$tag&gt;
       #end
-      &gt;&lt;/$tag&gt;
       #if($field.get('error'))
         &lt;span ##
         #foreach($entry in $failureMessageParams.entrySet())
@@ -929,7 +907,9 @@
       <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </defaultRedirect>
     <heading>
+      <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>heading</name>
       <number>1</number>
       <picker>0</picker>
@@ -941,7 +921,9 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </heading>
     <liveValidation_defaultFieldOkMessage>
+      <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>liveValidation_defaultFieldOkMessage</name>
       <number>4</number>
       <picker>0</picker>
@@ -953,10 +935,12 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </liveValidation_defaultFieldOkMessage>
     <liveValidation_enabled>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>liveValidation_enabled</name>
       <number>3</number>
       <prettyName>Enable Javascript field validation</prettyName>
@@ -966,10 +950,12 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </liveValidation_enabled>
     <loginButton_autoLogin_enabled>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>loginButton_autoLogin_enabled</name>
       <number>6</number>
       <prettyName>Enable automatic login</prettyName>
@@ -979,10 +965,12 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </loginButton_autoLogin_enabled>
     <loginButton_enabled>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>loginButton_enabled</name>
       <number>5</number>
       <prettyName>Enable login button</prettyName>
@@ -992,8 +980,11 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </loginButton_enabled>
     <registrationSuccessMessage>
+      <contenttype>---</contenttype>
+      <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
+      <hint/>
       <name>registrationSuccessMessage</name>
       <number>9</number>
       <picker>0</picker>
@@ -1006,21 +997,26 @@
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </registrationSuccessMessage>
     <requireCaptcha>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>requireCaptcha</name>
       <number>8</number>
-      <prettyName>Require captcha to register</prettyName>
+      <prettyName>Require CAPTCHA to register</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </requireCaptcha>
     <welcomeMessage>
+      <contenttype>---</contenttype>
+      <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
+      <hint/>
       <name>welcomeMessage</name>
       <number>2</number>
       <picker>0</picker>

@@ -211,7 +211,8 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
         if (!attachFile.exists()) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
-                "The attachment could not be found in the filesystem attachment store (" + attachFile + ").\n");
+                String.format("The attachment [%s] could not be found in the filesystem attachment store.",
+                    attachFile));
         }
 
         FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);

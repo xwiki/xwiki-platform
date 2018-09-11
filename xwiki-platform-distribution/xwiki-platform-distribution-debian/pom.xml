@@ -67,7 +67,6 @@
         <version>${jdeb.version}</version>
       </extension>
     </extensions>
-    <pluginManagement>
       <plugins>
         <plugin>
           <!-- Get the current year -->
@@ -104,12 +103,15 @@
                         <properties>
                             <debianLicense>${debian.license}</debianLicense>
                             <!-- The value of ${current.year} is not interpreted here... -->
-                            <currentYear>2018</currentYear>
+                            <currentYear>${current.year}</currentYear>
                         </properties>
                     </configuration>
                 </execution>
             </executions>
         </plugin>
+  </plugins>
+    <pluginManagement>
+      <plugins>
         <plugin>
           <artifactId>jdeb</artifactId>
           <groupId>org.vafer</groupId>

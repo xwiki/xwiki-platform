@@ -33,7 +33,8 @@ import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.AttachmentsPane;
+import org.xwiki.attachment.test.po.AttachmentsPane;
+import org.xwiki.attachment.test.po.PageWithAttachmentPane;
 import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DeletingPage;
@@ -142,8 +143,9 @@ public class OfficeImporterTest extends AbstractTest
         deletePage();
 
         // Test power point file
-        resultPage = importFile("/msoffice.97-2003/Test.ppt");
-        AttachmentsPane attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        importFile("/msoffice.97-2003/Test.ppt");
+        PageWithAttachmentPane page = new PageWithAttachmentPane();
+        AttachmentsPane attachmentsPane = page.openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
@@ -162,8 +164,9 @@ public class OfficeImporterTest extends AbstractTest
         deletePage();
 
         // Test ODP file
-        resultPage = importFile("/ooffice.3.0/Test.odp");
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        importFile("/ooffice.3.0/Test.odp");
+        page = new PageWithAttachmentPane();
+        attachmentsPane = page.openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));

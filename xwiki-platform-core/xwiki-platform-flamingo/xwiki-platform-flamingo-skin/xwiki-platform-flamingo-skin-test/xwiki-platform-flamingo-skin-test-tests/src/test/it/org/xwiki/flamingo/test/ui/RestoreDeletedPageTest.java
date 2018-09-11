@@ -23,9 +23,10 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.xwiki.attachment.test.po.AttachmentsPane;
+import org.xwiki.attachment.test.po.PageWithAttachmentPane;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
@@ -53,8 +54,9 @@ public class RestoreDeletedPageTest extends AbstractTest
         getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
 
         // Create a new page.
-        ViewPage page = getUtil().createPage(getTestClassName(), getTestMethodName(), "Once upon a time..", "A story");
+        getUtil().createPage(getTestClassName(), getTestMethodName(), "Once upon a time..", "A story");
 
+        PageWithAttachmentPane page = new PageWithAttachmentPane();
         // Add an attachment.
         page.openAttachmentsDocExtraPane().setFileToUpload(getClass().getResource("/SmallAttachment.txt").getPath());
 
@@ -64,7 +66,8 @@ public class RestoreDeletedPageTest extends AbstractTest
         deletingPage.waitUntilIsTerminated();
 
         // Restore the page.
-        page = deletingPage.getDeletePageOutcomePage().clickRestore();
+        deletingPage.getDeletePageOutcomePage().clickRestore();
+        page = new PageWithAttachmentPane();
 
         // Check the page title and content.
         assertEquals("A story", page.getDocumentTitle());

@@ -71,6 +71,12 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-attachment-test-pageobjects</artifactId>
+          <version>10.8-SNAPSHOT</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

@@ -66,13 +66,6 @@ public class ViewPage extends BasePage
         return new HistoryPane();
     }
 
-    public AttachmentsPane openAttachmentsDocExtraPane()
-    {
-        getDriver().findElement(By.id("Attachmentslink")).click();
-        waitForDocExtraPaneActive("attachments");
-        return new AttachmentsPane();
-    }
-
     /** @return does this page exist. */
     public boolean exists()
     {

@@ -24,22 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-attachment-test</artifactId>
     <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-attachment</artifactId>
-  <name>XWiki Platform - Attachment - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Modules for managing attachments</description>
-  <modules>
-    <module>xwiki-platform-attachment-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-attachment-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-attachment-test-pageobjects</artifactId>
+  <name>XWiki Platform - Attachment - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Attachment - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

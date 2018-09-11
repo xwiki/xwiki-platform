@@ -30,9 +30,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.attachment.test.po.AttachmentsPane;
+import org.xwiki.attachment.test.po.PageWithAttachmentPane;
 import org.xwiki.tag.test.po.AddTagsPane;
 import org.xwiki.tag.test.po.TaggablePage;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.FormElement;
@@ -134,8 +135,9 @@ public class CompareVersionsTest extends AbstractTest
         addTagsPane.add();
         taggablePage.removeTag("foo");
 
+        PageWithAttachmentPane pageWithAttachmentPane = new PageWithAttachmentPane();
         // Attach files.
-        AttachmentsPane attachmentsPane = testPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = pageWithAttachmentPane.openAttachmentsDocExtraPane();
         // TODO: Update this code when we (re)add support for uploading multiple files at once.
         for (String fileName : new String[] {"SmallAttachment.txt", "SmallAttachment2.txt", "SmallAttachment.txt"}) {
             attachmentsPane.setFileToUpload(this.getClass().getResource('/' + fileName).getPath());

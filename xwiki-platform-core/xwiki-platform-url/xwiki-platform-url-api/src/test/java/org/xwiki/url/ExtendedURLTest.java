@@ -26,12 +26,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.resource.CreateResourceReferenceException;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link ExtendedURL}.
@@ -95,12 +98,10 @@ public class ExtendedURLTest
     public void withInvalidPrefix() throws Exception
     {
         URL url = new URL("http://localhost:8080/some/path");
-        try {
+        Throwable exception = assertThrows(CreateResourceReferenceException.class, () -> {
             new ExtendedURL(url, "/xwiki");
-            fail("Should have thrown an exception here");
-        } catch (CreateResourceReferenceException e) {
-            assertEquals("URL Path [/some/path] doesn't start with [/xwiki]", e.getMessage());
-        }
+        });
+        assertEquals("URL Path [/some/path] doesn't start with [/xwiki]", exception.getMessage());
     }
 
     @Test
@@ -114,13 +115,11 @@ public class ExtendedURLTest
     @Test
     public void invalidURL() throws Exception
     {
-        try {
+        Throwable exception = assertThrows(CreateResourceReferenceException.class, () -> {
             // Invalid URL since the space in the page name isn't encoded.
             new ExtendedURL(new URL("http://host/xwiki/bin/view/space/page name"), null);
-            fail("Should have thrown an exception here");
-        } catch (CreateResourceReferenceException expected) {
-            assertEquals("Invalid URL [http://host/xwiki/bin/view/space/page name]", expected.getMessage());
-        }
+        });
+        assertEquals("Invalid URL [http://host/xwiki/bin/view/space/page name]", exception.getMessage());
     }
 
     @Test

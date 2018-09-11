@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 10.6RC1
  */
-public class MenuTestIT extends AbstractTest
+public class MenuIT extends AbstractTest
 {
     @Test
     public void verifyMenu() throws Exception

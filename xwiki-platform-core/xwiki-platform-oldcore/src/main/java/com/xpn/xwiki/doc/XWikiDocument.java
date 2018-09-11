@@ -99,6 +99,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
@@ -565,6 +566,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private ContextualLocalizationManager localization;
 
+    private EntityReferenceFactory entityReferenceFactory;
+
     /**
      * The document structure expressed as a tree of Block objects. We store it for performance reasons since parsing is
      * a costly operation that we don't want to repeat whenever some code ask for the XDOM information.
@@ -769,6 +772,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return this.progress;
+    }
+
+    private EntityReferenceFactory getEntityReferenceFactory()
+    {
+        if (this.entityReferenceFactory == null) {
+            try {
+                this.entityReferenceFactory = Utils.getRootComponentManager().getInstance(EntityReferenceFactory.class);
+            } catch (ComponentLookupException e) {
+                // Not a big deal
+            }
+        }
+
+        return this.entityReferenceFactory;
+    }
+
+    private <E extends EntityReference> E intern(E reference)
+    {
+        EntityReferenceFactory factory =  getEntityReferenceFactory();
+
+        return factory != null ? factory.getReference(reference) : reference;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -997,8 +1020,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Ensure we always return absolute document references for the parent since we always want well-constructed
         // references and since we store the parent reference as relative internally.
         if (this.parentReferenceCache == null && getRelativeParentReference() != null) {
-            this.parentReferenceCache = getExplicitReferenceDocumentReferenceResolver()
-                .resolve(getRelativeParentReference(), getDocumentReference());
+            this.parentReferenceCache = intern(getExplicitReferenceDocumentReferenceResolver()
+                .resolve(getRelativeParentReference(), getDocumentReference()));
         }
 
         return this.parentReferenceCache;
@@ -1039,7 +1062,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setParentReference(EntityReference parentReference)
     {
         if (!Objects.equals(getRelativeParentReference(), parentReference)) {
-            this.parentReference = parentReference;
+            this.parentReference = intern(parentReference);
 
             // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
             this.parentReferenceCache = null;
@@ -1406,7 +1429,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public PageReference getPageReference()
     {
         if (this.pageReferenceCache == null) {
-            this.pageReferenceCache = getPageReferenceResolver().resolve(getDocumentReference());
+            this.pageReferenceCache = intern(getPageReferenceResolver().resolve(getDocumentReference()));
         }
 
         return this.pageReferenceCache;
@@ -1420,7 +1443,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public PageReference getPageReferenceWithLocale()
     {
         if (this.pageReferenceWithLocaleCache == null) {
-            this.pageReferenceWithLocaleCache = new PageReference(getPageReference(), getLocale());
+            this.pageReferenceWithLocaleCache = intern(new PageReference(getPageReference(), getLocale()));
         }
 
         return this.pageReferenceWithLocaleCache;
@@ -1433,7 +1456,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public DocumentReference getDocumentReferenceWithLocale()
     {
         if (this.documentReferenceWithLocaleCache == null) {
-            this.documentReferenceWithLocaleCache = new DocumentReference(this.documentReference, getLocale());
+            this.documentReferenceWithLocaleCache = intern(new DocumentReference(this.documentReference, getLocale()));
         }
 
         return this.documentReferenceWithLocaleCache;
@@ -1483,7 +1506,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private void setDocumentReferenceInternal(DocumentReference reference)
     {
-        this.documentReference = reference;
+        this.documentReference = intern(reference);
 
         setMetaDataDirty(true);
 
@@ -1693,7 +1716,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setMetaDataDirty(true);
         }
 
-        this.authorReference = authorReference;
+        this.authorReference = intern(authorReference);
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
@@ -1742,7 +1765,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setMetaDataDirty(true);
         }
 
-        this.contentAuthorReference = contentAuthorReference;
+        this.contentAuthorReference = intern(contentAuthorReference);
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.contentAuthorReference != null
@@ -1791,7 +1814,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setMetaDataDirty(true);
         }
 
-        this.creatorReference = creatorReference;
+        this.creatorReference = intern(creatorReference);
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.creatorReference != null && this.creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {

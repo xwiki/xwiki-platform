@@ -70,9 +70,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 {
     private static final LocalDocumentReference USERCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
-    /** Needed for accessing the XWikiContext. */
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    @Named("readonly")
+    private Provider<XWikiContext> readonlyContextProvider;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the

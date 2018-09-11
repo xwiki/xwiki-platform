@@ -49,6 +49,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -226,6 +227,12 @@ public class MockitoOldcore
                 this.mockContextualAuthorizationManager =
                     getMocker().registerMockComponent(ContextualAuthorizationManager.class);
             }
+        }
+
+        // Make sure to provide a EntityReferenceFactory
+        if (!getMocker().hasComponent(EntityReferenceFactory.class)) {
+            EntityReferenceFactory factory = getMocker().registerMockComponent(EntityReferenceFactory.class);
+            when(factory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
         }
 
         // Make sure a default ConfigurationSource is available

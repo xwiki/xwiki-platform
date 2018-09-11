@@ -50,7 +50,7 @@ import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
  */
 public abstract class AbstractGroupCache extends AbstractCacheEntryListener<GroupCacheEntry> implements Initializable
 {
-    private static final int DEFAULT_CAPACITY = 500;
+    private static final int DEFAULT_CAPACITY = 1000;
 
     /**
      * An entry of the group cache.

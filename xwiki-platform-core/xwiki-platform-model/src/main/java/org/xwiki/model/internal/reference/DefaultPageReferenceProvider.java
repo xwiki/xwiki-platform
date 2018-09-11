@@ -46,6 +46,9 @@ public class DefaultPageReferenceProvider implements Provider<PageReference>
     @Inject
     private Provider<WikiReference> wikiReferenceProvider;
 
+    @Inject
+    private EntityReferenceFactory factory;
+
     /**
      * We can cache the default document since it's configurable only at xwiki.properties level which require a restart
      * to be modified.
@@ -61,7 +64,7 @@ public class DefaultPageReferenceProvider implements Provider<PageReference>
             // Add wiki
             reference = reference.appendParent(this.wikiReferenceProvider.get());
 
-            this.cachedReference = new PageReference(reference);
+            this.cachedReference = this.factory.getReference(new PageReference(reference));
         }
 
         return this.cachedReference;

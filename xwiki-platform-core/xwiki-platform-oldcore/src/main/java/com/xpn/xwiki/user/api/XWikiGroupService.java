@@ -37,10 +37,22 @@ public interface XWikiGroupService
 {
     void init(XWiki xwiki, XWikiContext context) throws XWikiException;
 
+    /**
+     * @deprecated since 10.8RC1, use GroupManager component instead
+     */
+    @Deprecated
     void initCache(XWikiContext context) throws XWikiException;
 
+    /**
+     * @deprecated since 10.8RC1, use GroupManager component instead
+     */
+    @Deprecated
     void initCache(int iCapacity, XWikiContext context) throws XWikiException;
 
+    /**
+     * @deprecated since 10.8RC1, use GroupManager component instead
+     */
+    @Deprecated
     void flushCache();
 
     /**
@@ -176,6 +188,8 @@ public interface XWikiGroupService
 
     /**
      * Get all groups containing provided member in the provided member wiki.
+     * <p>
+     * Since 10.8RC1 it's recommended to use org.xwiki.user.group.GroupManager unless you want to bypass the cache.
      *
      * @param member the name of the member (user or group).
      * @param nb the maximum number of result to return.
@@ -191,6 +205,8 @@ public interface XWikiGroupService
 
     /**
      * Get all groups containing provided member in the current wiki.
+     * <p>
+     * Since 10.8RC1 it's recommended to use org.xwiki.user.group.GroupManager unless you want to bypass the cache.
      *
      * @param memberReference the member. Can be either user or group.
      * @param limit the maximum number of result to return.
@@ -205,6 +221,8 @@ public interface XWikiGroupService
 
     /**
      * Get all members provided group contains.
+     * <p>
+     * Since 10.8RC1 it's recommended to use org.xwiki.user.group.GroupManager unless you want to bypass the cache.
      *
      * @param group the name of the group.
      * @param nb the maximum number of result to return.
@@ -253,6 +271,8 @@ public interface XWikiGroupService
 
     /**
      * Return the number of groups containing provided member.
+     * <p>
+     * Since 10.8RC1 it's recommended to use org.xwiki.user.group.GroupManager unless you want to bypass the cache.
      *
      * @param member the name of the member (user or group).
      * @param context the XWiki context.
@@ -265,6 +285,8 @@ public interface XWikiGroupService
 
     /**
      * Return the number of members provided group contains.
+     * <p>
+     * Since 10.8RC1 it's recommended to use org.xwiki.user.group.GroupManager unless you want to bypass the cache.
      *
      * @param group the name of the group.
      * @param context the XWiki context.

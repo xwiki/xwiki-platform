@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -91,6 +92,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     @Inject
+    private EntityReferenceFactory referenceFactory;
+
+    @Inject
     private Logger logger;
 
     private String getFullReference(String userId, String wikiId)
@@ -122,8 +126,8 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             }
 
             // load properties
-            descriptor.setMainPageReference(referenceResolver
-                .resolve(mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
+            descriptor.setMainPageReference(this.referenceFactory.getReference(referenceResolver
+                .resolve(mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE))));
             descriptor.setPrettyName(
                 mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
             descriptor.setOwnerId(

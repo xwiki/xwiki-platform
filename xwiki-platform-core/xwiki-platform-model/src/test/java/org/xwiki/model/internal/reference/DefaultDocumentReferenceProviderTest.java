@@ -19,7 +19,6 @@
  */
 package org.xwiki.model.internal.reference;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +32,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -43,6 +43,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class DefaultDocumentReferenceProviderTest implements TestConstants
 {
+    @MockComponent
+    private EntityReferenceFactory entityReferenceFactory;
+
     @MockComponent
     private EntityReferenceProvider entityProvider;
 
@@ -58,6 +61,7 @@ public class DefaultDocumentReferenceProviderTest implements TestConstants
         when(this.entityProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT_REFERENCE);
         when(this.spaceProvider.get())
             .thenReturn(new SpaceReference(DEFAULT_SPACE_REFERENCE.appendParent(DEFAULT_WIKI_REFERENCE)));
+        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
     }
 
     @Test

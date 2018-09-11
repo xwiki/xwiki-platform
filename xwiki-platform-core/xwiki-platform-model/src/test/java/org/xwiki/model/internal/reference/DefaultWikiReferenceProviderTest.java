@@ -29,6 +29,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,6 +41,9 @@ import static org.mockito.Mockito.when;
 public class DefaultWikiReferenceProviderTest implements TestConstants
 {
     @MockComponent
+    private EntityReferenceFactory entityReferenceFactory;
+
+    @MockComponent
     private EntityReferenceProvider entityProvider;
 
     @InjectMockComponents
@@ -49,6 +53,7 @@ public class DefaultWikiReferenceProviderTest implements TestConstants
     public void beforeEach()
     {
         when(this.entityProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
+        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
     }
 
     @Test

@@ -46,6 +46,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -101,6 +102,9 @@ import static org.mockito.Mockito.when;
 public class XWikiMockitoTest
 {
     @MockComponent
+    private EntityReferenceFactory entityReferenceFactory;
+
+    @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
 
     @MockComponent
@@ -132,6 +136,8 @@ public class XWikiMockitoTest
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(StoreConfiguration.class);
         this.componentManager.registerMockComponent(WikiDescriptorManager.class);
+
+        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
 
         Utils.setComponentManager(this.componentManager);
         xwiki = new XWiki();
@@ -270,10 +276,9 @@ public class XWikiMockitoTest
         AttachmentRecycleBinStore attachmentRecycleBinStore = mock(AttachmentRecycleBinStore.class);
         xwiki.setAttachmentRecycleBinStore(attachmentRecycleBinStore);
 
-        DocumentReference reference = document.getDocumentReference();
+        XWikiDocument emptyDocument = new XWikiDocument(document.getDocumentReference());
         this.componentManager.registerMockComponent(ContextualLocalizationManager.class);
-        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context)))
-            .thenReturn(new XWikiDocument(reference));
+        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(emptyDocument);
 
         xwiki.rollback(document, revision, context);
 

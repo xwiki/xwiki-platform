@@ -452,7 +452,9 @@ public final class RightsManager
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -468,7 +470,9 @@ public final class RightsManager
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing user name.
      * @throws XWikiException error when browsing groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -520,7 +524,9 @@ public final class RightsManager
      * @param context the XWiki context.
      * @return the number of groups.
      * @throws XWikiException error when getting number of users.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public int countAllGroupsNamesForMember(String member, XWikiContext context) throws XWikiException
     {
         return context.getWiki().getGroupService(context).countAllGroupsNamesForMember(member, context);
@@ -533,7 +539,9 @@ public final class RightsManager
      * @param context the XWiki context.
      * @return the number of members.
      * @throws XWikiException error when getting number of groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException
     {
         return context.getWiki().getGroupService(context).countAllMembersNamesForGroup(group, context);

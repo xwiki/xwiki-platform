@@ -43,7 +43,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 2.5M1
  */
-public class AttachmentTest extends AbstractTest
+public class AttachmentIT extends AbstractTest
 {
     @Rule
     public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());

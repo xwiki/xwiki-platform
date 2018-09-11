@@ -95,18 +95,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Only execute AllITs and not individual tests. We do this to avoid having to start/stop XWiki and the
-          browser several times -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllITs.java</include>
-          </includes>
-
-        </configuration>
-      </plugin>
     </plugins>
   </build>
   <profiles>

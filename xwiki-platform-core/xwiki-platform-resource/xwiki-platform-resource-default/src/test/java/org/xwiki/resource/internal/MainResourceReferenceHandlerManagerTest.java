@@ -32,6 +32,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -47,7 +49,7 @@ import static org.mockito.Mockito.*;
 public class MainResourceReferenceHandlerManagerTest
 {
     @InjectMockComponents
-    public MainResourceReferenceHandlerManager handlerManager;
+    private MainResourceReferenceHandlerManager handlerManager;
 
     @Test
     public void handleWithOrder(ComponentManager componentManager) throws Exception
@@ -74,5 +76,23 @@ public class MainResourceReferenceHandlerManagerTest
 
         // Verify that the second Action is called (since it has a higher priority).
         verify(beforeTestHandler).handle(same(reference), any(ResourceReferenceHandlerChain.class));
+    }
+
+    @Test
+    public void matches()
+    {
+        ResourceReferenceHandler resourceReferenceHandler1 = mock(ResourceReferenceHandler.class);
+        ResourceReferenceHandler resourceReferenceHandler2 = mock(ResourceReferenceHandler.class);
+        ResourceType resourceType1 = new ResourceType("test1");
+        ResourceType resourceType2 = new ResourceType("test2");
+
+        when(resourceReferenceHandler1.getSupportedResourceReferences()).thenReturn(Arrays.asList(resourceType1));
+        when(resourceReferenceHandler2.getSupportedResourceReferences()).thenReturn(Arrays.asList(resourceType1, resourceType2));
+
+        assertTrue(handlerManager.matches(resourceReferenceHandler1, resourceType1));
+        assertFalse(handlerManager.matches(resourceReferenceHandler1, resourceType2));
+
+        assertTrue(handlerManager.matches(resourceReferenceHandler2, resourceType1));
+        assertTrue(handlerManager.matches(resourceReferenceHandler2, resourceType2));
     }
 }

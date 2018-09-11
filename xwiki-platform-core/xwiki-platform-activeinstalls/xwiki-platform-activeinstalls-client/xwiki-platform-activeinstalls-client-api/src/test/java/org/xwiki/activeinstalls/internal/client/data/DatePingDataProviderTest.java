@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.activeinstalls.internal.client;
+package org.xwiki.activeinstalls.internal.client.data;
 
 import java.util.Map;
 import java.util.UUID;
@@ -53,6 +53,14 @@ public class DatePingDataProviderTest
     @Rule
     public MockitoComponentMockingRule<DatePingDataProvider> mocker =
         new MockitoComponentMockingRule<>(DatePingDataProvider.class);
+
+    @Test
+    public void constructSearchJson() {
+        String instanceId = "c5471b1d-bc03-4e35-b11e-ac89db67a3a1";
+        String searchJson = DatePingDataProvider.constructSearchJSON(instanceId);
+        String expectedResult = "{\"query\":{\"term\":{\"instanceId\":\"c5471b1d-bc03-4e35-b11e-ac89db67a3a1\"}},\"aggs\":{\"firstPingDate\":{\"min\":{\"field\":\"_timestamp\"}},\"serverTime\":{\"min\":{\"script\":\"time()\"}}}}";
+        assertEquals(expectedResult, searchJson);
+    }
 
     @Test
     public void provideMapping() throws Exception

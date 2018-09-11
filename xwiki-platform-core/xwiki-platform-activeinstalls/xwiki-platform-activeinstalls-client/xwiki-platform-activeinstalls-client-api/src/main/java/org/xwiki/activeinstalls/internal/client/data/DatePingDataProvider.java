@@ -133,7 +133,7 @@ public class DatePingDataProvider implements PingDataProvider
         return jsonMap;
     }
 
-    private String constructSearchJSON(String instanceId)
+    protected static String constructSearchJSON(String instanceId)
     {
         Map<String, Object> jsonMap = new HashMap<>();
 

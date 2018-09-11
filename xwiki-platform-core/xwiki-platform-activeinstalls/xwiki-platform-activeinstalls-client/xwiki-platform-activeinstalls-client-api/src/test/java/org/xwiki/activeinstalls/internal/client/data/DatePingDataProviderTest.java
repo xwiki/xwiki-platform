@@ -17,18 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.activeinstalls.internal.client;
+package org.xwiki.activeinstalls.internal.client.data;
 
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.activeinstalls.internal.JestClientManager;
-import org.xwiki.activeinstalls.internal.client.data.DatePingDataProvider;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -37,7 +37,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,16 +48,43 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M1
  */
+@ComponentTest
 public class DatePingDataProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DatePingDataProvider> mocker =
-        new MockitoComponentMockingRule<>(DatePingDataProvider.class);
+    @InjectMockComponents
+    public DatePingDataProvider provider;
 
     @Test
-    public void provideMapping() throws Exception
+    public void constructSearchJson()
     {
-        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        String instanceId = "c5471b1d-bc03-4e35-b11e-ac89db67a3a1";
+        String searchJson = provider.constructSearchJSON(instanceId);
+        String expectedResult = "{"
+                + "\"query\":{"
+                    + "\"term\":{"
+                        + "\"instanceId\":\"c5471b1d-bc03-4e35-b11e-ac89db67a3a1\""
+                    + "}"
+                + "},"
+                + "\"aggs\":{"
+                    + "\"firstPingDate\":{"
+                        + "\"min\":{"
+                            + "\"field\":\"_timestamp\""
+                        + "}"
+                    + "},"
+                    + "\"serverTime\":{"
+                        + "\"min\":{"
+                            + "\"script\":\"time()\""
+                        + "}"
+                    + "}"
+                + "}"
+        + "}";
+        assertEquals(expectedResult, searchJson);
+    }
+
+    @Test
+    public void provideMapping()
+    {
+        Map<String, Object> mapping = provider.provideMapping();
         assertEquals(2, mapping.size());
 
         Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("sinceDays");
@@ -70,10 +97,10 @@ public class DatePingDataProviderTest
     }
 
     @Test
-    public void provideData() throws Exception
+    public void provideData(ComponentManager componentManager) throws Exception
     {
         InstanceId id = new InstanceId(UUID.randomUUID().toString());
-        InstanceIdManager idManager = this.mocker.getInstance(InstanceIdManager.class);
+        InstanceIdManager idManager = componentManager.getInstance(InstanceIdManager.class);
         when(idManager.getInstanceId()).thenReturn(id);
 
         JestClient client = mock(JestClient.class);
@@ -105,10 +132,10 @@ public class DatePingDataProviderTest
         searchResult.setSucceeded(true);
         when(client.execute(any(Search.class))).thenReturn(searchResult);
 
-        JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
+        JestClientManager jestManager = componentManager.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(client);
 
-        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        Map<String, Object> data = provider.provideData();
         assertEquals(2, data.size());
         assertEquals(4L, data.get("sinceDays"));
         assertEquals(1392854400000L, data.get("firstPingDate"));

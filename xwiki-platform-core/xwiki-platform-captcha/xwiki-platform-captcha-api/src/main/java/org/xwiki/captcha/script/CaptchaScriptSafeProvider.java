@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,34 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.captcha.script;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>10.8-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-captcha</artifactId>
-  <name>XWiki Platform - CAPTCHA - Parent POM</name>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-captcha-api</module>
-    <module>xwiki-platform-captcha-ui</module>
-    <module>xwiki-platform-captcha-default</module>
-  </modules>
-  <description>Offers API and configuration to generate and validate CAPTCHAs.</description>
-</project>
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.xwiki.captcha.Captcha;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.stability.Unstable;
+
+/**
+ * Script safe provider for {@link Captcha} instances.
+ *
+ * @version $Id$
+ * @since 10.8RC1
+ */
+@Unstable
+@Component
+public class CaptchaScriptSafeProvider implements ScriptSafeProvider<Captcha>
+{
+    @Inject
+    private Logger logger;
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S> S get(Captcha unsafe)
+    {
+        return (S) new WrappedScriptCaptcha(unsafe, this, logger);
+    }
+}

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,21 +18,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-captcha</artifactId>
     <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-captcha</artifactId>
-  <name>XWiki Platform - CAPTCHA - Parent POM</name>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-captcha-api</module>
-    <module>xwiki-platform-captcha-ui</module>
-    <module>xwiki-platform-captcha-default</module>
-  </modules>
-  <description>Offers API and configuration to generate and validate CAPTCHAs.</description>
+  <artifactId>xwiki-platform-captcha-default</artifactId>
+  <name>XWiki Platform - CAPTCHA - Default Implementation</name>
+  <description>Default implementation for some components, like the Configuration, which may need old-core and need to be outside of api in order to avoid dependency cycles.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

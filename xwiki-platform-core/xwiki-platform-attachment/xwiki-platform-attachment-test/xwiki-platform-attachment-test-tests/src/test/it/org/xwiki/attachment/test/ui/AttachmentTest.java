@@ -55,7 +55,9 @@ public class AttachmentTest extends AbstractTest
     @Before
     public void setUp() throws Exception
     {
+        getUtil().loginAsSuperAdmin();
         getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
+        getUtil().forceGuestUser();
     }
 
     @Test

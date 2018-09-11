@@ -22,6 +22,12 @@ package org.xwiki.attachment.test.po;
 import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.ViewPage;
 
+/**
+ * Represents a ViewPage with an attachment pane.
+ *
+ * @version $Id$
+ * @since 10.8-rc-1
+ */
 public class PageWithAttachmentPane extends ViewPage
 {
     public AttachmentsPane openAttachmentsDocExtraPane()

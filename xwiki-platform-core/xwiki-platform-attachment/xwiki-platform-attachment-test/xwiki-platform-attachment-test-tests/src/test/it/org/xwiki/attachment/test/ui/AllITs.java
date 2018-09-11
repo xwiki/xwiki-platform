@@ -26,7 +26,7 @@ import org.xwiki.test.ui.PageObjectSuite;
  * Runs all functional tests found in the classpath. This allows to start/stop XWiki only once.
  *
  * @version $Id$
- * @since 5.0M2
+ * @since 10.8-rc-1
  */
 @RunWith(PageObjectSuite.class)
 public class AllITs

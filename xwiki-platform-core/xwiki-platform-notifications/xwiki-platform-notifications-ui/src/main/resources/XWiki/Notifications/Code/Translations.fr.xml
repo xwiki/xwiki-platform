@@ -41,7 +41,7 @@ notifications.filters.cancel=Annuler
 notifications.filters.submit=Enregistrer
 notifications.filters.type.label=Type de filtre :
 notifications.filters.type.hint=Comment le filtre doit agir sur un évènement à l'endroit indiqué
-notifications.filters.location.label=Périmètre du filtre
+notifications.filters.location.label=Périmètre du filtre :
 notifications.filters.location.hint=Quelle partie du wiki doit être concernée par le filtre ?
 
 ## Advanced filters options
@@ -128,7 +128,7 @@ notifications.settings.menu.hint=Le menu de notifications est situé en haut à 
 notifications.settings.email=E-Mail
 notifications.settings.email.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
 notifications.settings.email.disabled=Les notifications par mails sont désactivées. Veuillez contacter votre administrateur.
-notifications.settings.email.hint=Un email vous est envoyé régulièrement contenant le résumé de ce qui s'est passé dans le wiki.
+notifications.settings.email.hint=Un email vous est envoyé régulièrement avec une synthèse de l'activité du wiki.
 notifications.settings.email.title=Préférences d'email
 notifications.settings.email.frequency=Fréquence de l'email
 notifications.settings.email.frequency.hint=Choisissez à quelle fréquence vous souhaitez recevoir un email avec le résumé de ce qui s'est passé dans le wiki.
@@ -197,8 +197,8 @@ rendering.macro.notificationsApplicationsPreferences.description=Affiche les pr�
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cible
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cible de la macro ("user" pour l’utilisateur courant ou "wiki" pour le wiki courant)
 
-### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
-### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+rendering.macro.notificationsAutoWatchPreferences.name=Préférences pour les notifications d'abonnement automatique
+rendering.macro.notificationsAutoWatchPreferences.description=Affiche les préférences de l'utilisateur pour les notifications d'abonnement automatique aux pages.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cible
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Cible de la macro ("user" pour l'utilisateur courant ou "wiki" pour le wiki courant)
 
@@ -229,7 +229,7 @@ rendering.macro.notifications.parameter.users.description=Liste des utilisateurs
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher uniquement les utilisateurs suivis
 ### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
 rendering.macro.notifications.parameter.displayRSSLink.name=Afficher le lien RSS
-### Missing: rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
+rendering.macro.notifications.parameter.displayRSSLink.description=Affiche un lien vers le flux RSS de la macro courante.
 
 ## Notifications Macro
 notifications.macro.noWatchedUsers=Vous ne suivez personne.

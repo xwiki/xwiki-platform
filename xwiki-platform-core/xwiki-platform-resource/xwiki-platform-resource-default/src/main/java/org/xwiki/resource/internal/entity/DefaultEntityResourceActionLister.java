@@ -71,21 +71,27 @@ public class DefaultEntityResourceActionLister implements EntityResourceActionLi
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
 
-    @Override
-    public void initialize() throws InitializationException
+    protected SAXBuilder createSAXBuilder()
     {
-        // Parse the Struts config file (struts-config.xml) to extract all available actions
-        List<String> actionNames = new ArrayList<>();
         SAXBuilder builder = new SAXBuilder();
 
         // Make sure we don't require an Internet Connection to parse the Struts config file!
         builder.setEntityResolver(new EntityResolver() {
             @Override public InputSource resolveEntity(String publicId, String systemId)
-                throws SAXException, IOException
+                    throws SAXException, IOException
             {
                 return new InputSource(new StringReader(""));
             }
         });
+
+        return builder;
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Parse the Struts config file (struts-config.xml) to extract all available actions
+        List<String> actionNames = new ArrayList<>();
 
         // Step 1: Get a stream on the Struts config file if it exists
         InputStream strutsConfigStream = this.environment.getResourceAsStream(getStrutsConfigResource());
@@ -94,7 +100,7 @@ public class DefaultEntityResourceActionLister implements EntityResourceActionLi
             // Step 2: Parse the Strust config file, looking for action names
             Document document;
             try {
-                document = builder.build(strutsConfigStream);
+                document = createSAXBuilder().build(strutsConfigStream);
             } catch (JDOMException | IOException e) {
                 throw new InitializationException(
                     String.format("Failed to parse Struts Config file [%s]", getStrutsConfigResource()), e);

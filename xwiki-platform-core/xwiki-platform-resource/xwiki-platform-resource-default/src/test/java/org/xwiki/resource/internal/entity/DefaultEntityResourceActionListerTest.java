@@ -19,11 +19,18 @@
  */
 package org.xwiki.resource.internal.entity;
 
+import java.io.IOException;
+import java.io.StringReader;
+
 import javax.inject.Provider;
 
+import org.jdom2.input.SAXBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.environment.Environment;
@@ -31,6 +38,8 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.mockito.Mockito.*;
@@ -66,5 +75,12 @@ public class DefaultEntityResourceActionListerTest
             EntityResourceAction.class), "testaction");
 
         assertThat(this.mocker.getComponentUnderTest().listActions(), hasItems("view", "edit", "get", "testaction"));
+    }
+
+    @Test
+    public void createSAXBuilder() throws Exception
+    {
+        SAXBuilder saxBuilder = this.mocker.getComponentUnderTest().createSAXBuilder();
+        assertNotNull(saxBuilder.getEntityResolver().resolveEntity("foo", "bar"));
     }
 }

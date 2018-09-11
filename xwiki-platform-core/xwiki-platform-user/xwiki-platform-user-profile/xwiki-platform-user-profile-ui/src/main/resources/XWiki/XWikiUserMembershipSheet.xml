@@ -45,10 +45,10 @@
 #elseif ($xcontext.action == 'get')
   #if ($xcontext.isMainWiki())
     ## Main wiki users can be located in any wiki
-    #set($groups = $services.user.group.getGroupsFromAllWikis($xcontext.userReference))
+    #set($groups = $services.user.group.getGroupsFromAllWikis($doc.documentReference))
   #else
     ## Subwiki users are usually located only in the local wiki
-    #set($groups = $services.user.group.getGroupsFromMemberWiki($xcontext.userReference))
+    #set($groups = $services.user.group.getGroupsFromMemberWiki($doc.documentReference))
   #end
   ## Filter
   #set($filterValue = "$!{request.get('group')}")

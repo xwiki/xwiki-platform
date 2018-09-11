@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>API to store instance UUID and send regular pings notifying that the instance is alive</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>69</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>79</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Installs Client API</xwiki.extension.name>
   </properties>

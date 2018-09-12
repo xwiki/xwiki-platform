@@ -776,7 +776,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private EntityReferenceFactory getEntityReferenceFactory()
     {
-        if (this.entityReferenceFactory == null) {
+        if (this.entityReferenceFactory == null && Utils.getRootComponentManager() != null) {
             try {
                 this.entityReferenceFactory = Utils.getRootComponentManager().getInstance(EntityReferenceFactory.class);
             } catch (ComponentLookupException e) {

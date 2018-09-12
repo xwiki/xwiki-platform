@@ -79,7 +79,7 @@ public class CaptchaScriptService implements ScriptService
      * @param captchaName the name of the CAPTCHA implementation to get
      * @return the CAPTCHA implementation
      */
-    public WrappedScriptCaptcha get(String captchaName)
+    public Captcha get(String captchaName)
     {
         try {
             return safeProvider.get(getCaptcha(captchaName));
@@ -105,7 +105,7 @@ public class CaptchaScriptService implements ScriptService
     /**
      * @return the configured CAPTCHA implementation to use by default
      */
-    public WrappedScriptCaptcha getDefault()
+    public Captcha getDefault()
     {
         return get(getDefaultCaptchaName());
     }

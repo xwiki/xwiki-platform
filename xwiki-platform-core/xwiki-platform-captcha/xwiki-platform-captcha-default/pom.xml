@@ -29,6 +29,10 @@
   <artifactId>xwiki-platform-captcha-default</artifactId>
   <name>XWiki Platform - CAPTCHA - Default Implementation</name>
   <description>Default implementation for some components, like the Configuration, which may need old-core and need to be outside of api in order to avoid dependency cycles.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>CAPTCHA API - Default Implementation</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

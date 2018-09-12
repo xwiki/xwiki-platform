@@ -20,6 +20,7 @@
 package org.xwiki.captcha.script;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
@@ -35,12 +36,12 @@ import org.xwiki.stability.Unstable;
  */
 @Unstable
 @Component
+@Singleton
 public class CaptchaScriptSafeProvider implements ScriptSafeProvider<Captcha>
 {
     @Inject
     private Logger logger;
 
-    @SuppressWarnings("unchecked")
     @Override
     public <S> S get(Captcha unsafe)
     {

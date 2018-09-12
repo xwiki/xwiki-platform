@@ -195,8 +195,8 @@ Object.extend(XWiki, {
         $("docextrapanes").className="loading";
 
         // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
-        let maybeMinifyRequestParameter = '';
-        let requestMinify = window.location.search.toQueryParams().minify;
+        var maybeMinifyRequestParameter = '';
+        var requestMinify = window.location.search.toQueryParams().minify;
         if (requestMinify && requestMinify == 'false') {
           maybeMinifyRequestParameter = '&minify=false';
         }
@@ -210,7 +210,7 @@ Object.extend(XWiki, {
                       // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.
 
                       var head = document.body.previous('head');
-                      let html = response.responseText;
+                      var html = response.responseText;
 
                       // Use a temporary "container" to parse and process the HTML response.
                       var container = new Element('div');
@@ -218,7 +218,7 @@ Object.extend(XWiki, {
 
                       // Insert link elements in head, if not already there.
                       container.select('link').each(function(link) {
-                        let existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
+                        var existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
                         if (existingElements.length == 0) {
                           head.insert(new Element('link', {rel: "stylesheet", type: link.type, href: link.readAttribute('href')}));
                         }
@@ -229,7 +229,7 @@ Object.extend(XWiki, {
                       container.select('script').each(function(script) {
                         // Insert external scripts in head, if not already there.
                         if (script.src) {
-                          let existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
+                          var existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
                           if (existingElements.length == 0) {
                             head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
                           }

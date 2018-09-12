@@ -41,6 +41,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
     /**
      * @param captcha the {@link Captcha} to wrap for Script API access
      * @param safeProvider the provider making the conversion to the safe version
+     * @param logger the logging component
      */
     public WrappedScriptCaptcha(Captcha captcha, ScriptSafeProvider<Captcha> safeProvider, Logger logger)
     {
@@ -59,13 +60,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
      */
     public String display()
     {
-        try {
-            return getWrapped().display();
-        } catch (Exception e) {
-            getLogger().error("Failed to display captcha", e);
-        }
-
-        return null;
+        return display(null);
     }
 
     /**
@@ -90,13 +85,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
      */
     public boolean isValid()
     {
-        try {
-            return getWrapped().isValid();
-        } catch (Exception e) {
-            getLogger().error("Failed to validate captcha", e);
-        }
-
-        return false;
+        return isValid(null);
     }
 
     /**

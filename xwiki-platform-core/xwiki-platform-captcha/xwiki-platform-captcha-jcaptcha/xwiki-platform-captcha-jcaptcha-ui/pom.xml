@@ -28,6 +28,10 @@
   <artifactId>xwiki-platform-captcha-jcaptcha-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - CAPTCHA - JCaptcha - UI</name>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>JCaptcha Application</xwiki.extension.name>
+  </properties>
   <dependencies>
      <dependency>
       <groupId>org.xwiki.platform</groupId>

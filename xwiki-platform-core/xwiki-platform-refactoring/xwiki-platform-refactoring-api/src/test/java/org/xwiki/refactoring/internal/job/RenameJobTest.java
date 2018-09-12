@@ -115,7 +115,7 @@ public class RenameJobTest extends AbstractMoveJobTest
         run(createRequest(aliceReference, bobReference));
 
         // We verify that job fetches the space children.
-        verify(this.modelBridge, atLeastOnce()).getDocumentReferences(aliceReference);
+        verify(this.modelBridge, times(2)).getDocumentReferences(aliceReference);
     }
 
     @Test

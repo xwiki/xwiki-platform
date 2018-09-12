@@ -34,7 +34,6 @@ import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -82,12 +81,13 @@ public class RestoreJobTest extends AbstractJobTest
 
         RestoreRequest request = createRequest();
         request.setDeletedDocumentIds(Arrays.asList(deletedDocumentId));
+        request.setCheckRights(true);
         run(request);
 
         verifyContext();
 
         // Verify that the specified document is restored.
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId, request.isCheckRights());
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId, true);
     }
 
     @Test
@@ -107,8 +107,8 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the individual documents from the batch are restored.
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId1, request.isCheckRights());
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId2, request.isCheckRights());
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId1, false);
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId2, false);
     }
 
     @Test
@@ -136,10 +136,10 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that each document is restored exactly 1 time.
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId1, request.isCheckRights());
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId2, request.isCheckRights());
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdB, request.isCheckRights());
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdC, request.isCheckRights());
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId1, false);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId2, false);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdB, false);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdC, false);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class RestoreJobTest extends AbstractJobTest
         }
 
         // Verify that the document is not restored.
-        verify(this.modelBridge, never()).restoreDeletedDocument(deletedDocumentId, request.isCheckRights());
+        verify(this.modelBridge, never()).restoreDeletedDocument(deletedDocumentId, false);
     }
 
     private RestoreRequest createRequest()

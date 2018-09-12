@@ -49,9 +49,15 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link RefactoringScriptService}.
@@ -111,12 +117,13 @@ public class RefactoringScriptServiceTest
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "move"), request.getValue().getId().subList(0, 2));
         assertEquals(RefactoringJobs.MOVE, request.getValue().getJobType());
         assertEquals(this.userReference, request.getValue().getUserReference());
-        assertEquals(false, request.getValue().isDeep());
-        assertEquals(true, request.getValue().isDeleteSource());
-        assertEquals(true, request.getValue().isUpdateLinks());
-        assertEquals(true, request.getValue().isAutoRedirect());
-        assertEquals(false, request.getValue().isInteractive());
-        assertEquals(true, request.getValue().isCheckRights());
+        assertFalse(request.getValue().isDeep());
+        assertTrue(request.getValue().isDeleteSource());
+        assertTrue(request.getValue().isUpdateLinks());
+        assertTrue(request.getValue().isUpdateParentField());
+        assertTrue(request.getValue().isAutoRedirect());
+        assertFalse(request.getValue().isInteractive());
+        assertTrue(request.getValue().isCheckRights());
     }
 
     @Test
@@ -190,6 +197,8 @@ public class RefactoringScriptServiceTest
 
         assertEquals(RefactoringJobs.COPY, request.getValue().getJobType());
         assertFalse(request.getValue().isDeleteSource());
+        assertFalse(request.getValue().isAutoRedirect());
+        assertFalse(request.getValue().isUpdateParentField());
     }
 
     @Test
@@ -207,6 +216,8 @@ public class RefactoringScriptServiceTest
         assertEquals(Arrays.asList(spaceReference), request.getValue().getEntityReferences());
         assertEquals(new SpaceReference("Bob", spaceReference.getParent()), request.getValue().getDestination());
         assertFalse(request.getValue().isDeleteSource());
+        assertFalse(request.getValue().isAutoRedirect());
+        assertFalse(request.getValue().isUpdateParentField());
     }
 
     @Test

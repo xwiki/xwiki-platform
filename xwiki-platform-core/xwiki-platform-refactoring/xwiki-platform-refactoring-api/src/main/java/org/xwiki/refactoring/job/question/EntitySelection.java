@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.job.question;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
@@ -73,5 +75,28 @@ public class EntitySelection
     public void setSelected(boolean selected)
     {
         isSelected = selected;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(3, 13).append(getEntityReference()).append(isSelected).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        EntitySelection entitySelection = (EntitySelection) object;
+        return new EqualsBuilder().append(getEntityReference(), entitySelection.getEntityReference())
+            .append(isSelected(), entitySelection.isSelected()).isEquals();
     }
 }

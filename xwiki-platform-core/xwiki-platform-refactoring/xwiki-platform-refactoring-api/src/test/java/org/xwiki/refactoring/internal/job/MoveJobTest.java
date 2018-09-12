@@ -19,28 +19,41 @@
  */
 package org.xwiki.refactoring.internal.job;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.job.GroupedJob;
 import org.xwiki.job.Job;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.LinkRefactoring;
+import org.xwiki.refactoring.internal.job.AbstractEntityJob.Visitor;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link MoveJob}.
@@ -194,6 +207,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(oldReference);
         verify(this.modelBridge).createRedirect(oldReference, newReference);
+        verify(this.modelBridge).updateParentField(oldReference, newReference);
     }
 
     @Test
@@ -236,11 +250,22 @@ public class MoveJobTest extends AbstractMoveJobTest
         when(this.modelBridge.exists(source)).thenReturn(true);
         DocumentReference destination = new DocumentReference("wiki", "C", "WebHome");
 
+        when(this.modelBridge.copy(source, new DocumentReference("wiki", "C", "B"))).thenReturn(true);
+
         MoveRequest request = createRequest(source, destination);
         request.setCheckRights(false);
+        request.setAutoRedirect(false);
+        request.setUpdateLinks(false);
         run(request);
 
-        verify(this.modelBridge).copy(source, new DocumentReference("wiki", "C", "B"));
+        verify(this.modelBridge).delete(source);
+        verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
+
+        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
+        verify(linkRefactoring, never()).renameLinks(any(DocumentReference.class), any(DocumentReference.class),
+            any(DocumentReference.class));
+        verify(linkRefactoring, never()).updateRelativeLinks(any(DocumentReference.class),
+            any(DocumentReference.class));
     }
 
     @Test
@@ -248,8 +273,8 @@ public class MoveJobTest extends AbstractMoveJobTest
     {
         DocumentReference spaceHome = new DocumentReference("chess", Arrays.asList("A", "B", "C"), "WebHome");
         DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
-        when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference())).thenReturn(
-            Arrays.asList(docFromSpace));
+        when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference()))
+            .thenReturn(Arrays.asList(docFromSpace));
         when(this.modelBridge.exists(docFromSpace)).thenReturn(true);
 
         WikiReference newWiki = new WikiReference("tennis");
@@ -260,6 +285,10 @@ public class MoveJobTest extends AbstractMoveJobTest
         run(request);
 
         verify(this.modelBridge).copy(docFromSpace, new DocumentReference("tennis", "C", "X"));
+
+        ObservationManager observationManager = this.mocker.getInstance(ObservationManager.class);
+        verify(observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
+            eq(Collections.singletonMap(docFromSpace, new EntitySelection(docFromSpace))));
     }
 
     @Test
@@ -305,5 +334,101 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
         verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
+    }
+
+    @Test
+    public void getGroupPath() throws Exception
+    {
+        DocumentReference alice = new DocumentReference("chess", Arrays.asList("A", "B"), "C");
+        DocumentReference bob = new DocumentReference("chess", Arrays.asList("A", "B"), "D");
+        DocumentReference carol = new DocumentReference("chess", Arrays.asList("A", "E"), "F");
+
+        MoveRequest request = new MoveRequest();
+        request.setEntityReferences(Arrays.asList(alice, bob));
+        request.setDestination(carol);
+
+        GroupedJob job = (GroupedJob) getMocker().getComponentUnderTest();
+        job.initialize(request);
+
+        assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "A")), job.getGroupPath());
+
+        request.setUpdateLinksOnFarm(true);
+        job.initialize(request);
+
+        assertEquals(new JobGroupPath(Arrays.asList("refactoring")), job.getGroupPath());
+    }
+
+    @Test
+    public void cancelMove() throws Throwable
+    {
+        DocumentReference sourceReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Source");
+        when(this.modelBridge.exists(sourceReference)).thenReturn(true);
+        DocumentReference destinationReference = new DocumentReference("wiki", "Destination", "WebHome");
+        MoveRequest request = createRequest(sourceReference, destinationReference);
+        request.setCheckRights(false);
+
+        ObservationManager observationManager = this.mocker.getInstance(ObservationManager.class);
+        doAnswer((Answer<Void>) invocation -> {
+            DocumentsDeletingEvent event = invocation.getArgument(0);
+            event.cancel();
+            return null;
+        }).when(observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class), any(Map.class));
+
+        run(request);
+
+        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
+    }
+
+    @Test
+    public void checkEntitySelection() throws Throwable
+    {
+        DocumentReference sourceReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Source");
+        when(this.modelBridge.exists(sourceReference)).thenReturn(true);
+        DocumentReference destinationReference = new DocumentReference("wiki", "Destination", "WebHome");
+        MoveRequest request = createRequest(sourceReference, destinationReference);
+        request.setCheckRights(false);
+
+        ObservationManager observationManager = this.mocker.getInstance(ObservationManager.class);
+        doAnswer((Answer<Void>) invocation -> {
+            Map<EntityReference, EntitySelection> concernedEntities =
+                (Map<EntityReference, EntitySelection>) invocation.getArgument(2);
+            concernedEntities.get(sourceReference).setSelected(false);
+            return null;
+        }).when(observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class), any(Map.class));
+
+        run(request);
+
+        verify(this.modelBridge, never()).copy(eq(sourceReference), any(DocumentReference.class));
+    }
+
+    @Test
+    public void visitDocuments() throws Exception
+    {
+        SpaceReference sourceReference = new SpaceReference("wiki", "Path", "To", "Space");
+        SpaceReference destinationReference = new SpaceReference("wiki", "Other", "Space");
+        SpaceReference nestedSpaceReference = new SpaceReference("WebPreferences", sourceReference);
+        DocumentReference one = new DocumentReference("WebPreference", nestedSpaceReference);
+        DocumentReference two = new DocumentReference("WebHome", nestedSpaceReference);
+        DocumentReference three = new DocumentReference("ZZZ", sourceReference);
+        DocumentReference four = new DocumentReference("WebPreferences", sourceReference);
+        DocumentReference five = new DocumentReference("AAA", sourceReference);
+        DocumentReference six = new DocumentReference("WebHome", sourceReference);
+        when(this.modelBridge.getDocumentReferences(sourceReference))
+            .thenReturn(Arrays.asList(one, two, three, four, five, six));
+
+        MoveJob job = ((MoveJob) getMocker().getComponentUnderTest());
+        job.initialize(createRequest(sourceReference, destinationReference));
+
+        List<DocumentReference> visitedPages = new ArrayList<>();
+        job.visitDocuments(sourceReference, new Visitor<DocumentReference>()
+        {
+            @Override
+            public void visit(DocumentReference node)
+            {
+                visitedPages.add(node);
+            }
+        });
+
+        assertEquals(Arrays.asList(five, six, two, one, three, four), visitedPages);
     }
 }

@@ -96,7 +96,7 @@ public class RestoreRequest extends AbstractRequest
      */
     public void setCheckRights(boolean checkRights)
     {
-        setProperty(CHECK_RIGHTS, true);
+        setProperty(CHECK_RIGHTS, checkRights);
 
     }
 

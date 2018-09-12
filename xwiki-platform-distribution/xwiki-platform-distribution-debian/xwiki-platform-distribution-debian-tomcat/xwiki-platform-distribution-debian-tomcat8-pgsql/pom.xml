@@ -31,4 +31,7 @@
   <name>XWiki Platform - Distribution - Debian - Tomcat 8 - Postgres SQL</name>
   <packaging>deb</packaging>
   <description>XWiki Tomcat/PostgreSQL</description>
+  <properties>
+    <debian.package>xwiki-tomcat8-pgsql</debian.package>
+  </properties>
 </project>

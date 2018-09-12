@@ -31,6 +31,9 @@
   <name>XWiki Platform - Distribution - Debian - Tomcat 8 - Common</name>
   <packaging>deb</packaging>
   <description>XWiki Tomcat 8 common package</description>
+  <properties>
+    <debian.package>xwiki-tomcat8-common</debian.package>
+  </properties>
   <build>
     <plugins>
       <!-- Produce deb package -->
@@ -38,7 +41,7 @@
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
         <configuration>
-          <dataSet>
+          <dataSet combine.children="append">
             <data>
               <src>${project.basedir}/src/deb/resources/</src>
               <type>directory</type>

@@ -3,4 +3,4 @@ License: ${debianLicense}
 
 Files: *
 Copyright: ${project.inceptionYear}-${currentYear} ${project.organization.name}
-License: ${debianLicense}
+License: ${debianLicenseFilename}

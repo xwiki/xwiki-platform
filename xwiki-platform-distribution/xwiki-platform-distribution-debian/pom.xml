@@ -41,6 +41,7 @@
     <jdeb.version>1.6</jdeb.version>
     <debian.maintainer>XWiki Team (devs@xwiki.org)</debian.maintainer>
     <debian.license>LGPL 2.1</debian.license>
+    <debian.licenseFilename>LGPL-2.1</debian.licenseFilename>
     <xwiki.debian.description>
  XWiki is a free wiki software platform written in Java with a design emphasis
  on extensibility.
@@ -102,6 +103,7 @@
                         </resourceBundles>
                         <properties>
                             <debianLicense>${debian.license}</debianLicense>
+                            <debianLicenseFilename>${debian.licenseFilename}</debianLicenseFilename>
                             <!-- The value of ${current.year} is not interpreted here... -->
                             <currentYear>${current.year}</currentYear>
                         </properties>
@@ -109,7 +111,7 @@
                 </execution>
             </executions>
         </plugin>
-  </plugins>
+      </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -118,6 +120,19 @@
           <version>${jdeb.version}</version>
           <configuration>
             <snapshotExpand>true</snapshotExpand>
+              <dataSet>
+                  <!-- Copyright file -->
+                  <data>
+                      <src>${project.build.directory}/maven-shared-archive-resources</src>
+                      <type>directory</type>
+                      <includes>copyright</includes>
+                      <mapper>
+                          <type>perm</type>
+                          <strip>1</strip>
+                          <prefix>/usr/share/doc/${debian.package}/</prefix>
+                      </mapper>
+                  </data>
+              </dataSet>
           </configuration>
         </plugin>
       </plugins>

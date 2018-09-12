@@ -31,4 +31,7 @@
   <name>XWiki Platform - Distribution - Debian - Tomcat 7 - MySQL</name>
   <packaging>deb</packaging>
   <description>XWiki Tomcat/MySQL based package</description>
+  <properties>
+    <debian.package>xwiki-tomcat7-mysql</debian.package>
+  </properties>
 </project>

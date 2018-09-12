@@ -21,24 +21,37 @@ package org.xwiki.observation.remote;
 
 import java.util.Arrays;
 
-import org.jmock.Expectations;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.remote.test.AbstractROMTestCase;
 import org.xwiki.observation.remote.test.TestEvent;
+import org.xwiki.test.annotation.AllComponents;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+/**
+ * Integration test checking that event are well converted and transported from one cluster member to another.
+ * 
+ * @version $Id$
+ */
+@AllComponents
 public class TCPROMTest extends AbstractROMTestCase
 {
-    static class Unserializable { }
+    static class Unserializable
+    {
+    }
 
     @Override
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        super.setUp();
+        super.beforeEach();
 
         System.setProperty("jgroups.bind_addr", "localhost");
 
@@ -47,39 +60,23 @@ public class TCPROMTest extends AbstractROMTestCase
         rom.startChannel("tcp");
     }
 
-    @After
-    public void tearDown() throws Exception
-    {
-        this.mockery.assertIsSatisfied();
-    }
-
     /**
      * Validate sharing a simple Serializable event between two instances of {@link RemoteObservationManager}.
      */
     @Test
     public void testSerializableEvent() throws InterruptedException
     {
-        final EventListener localListener = this.mockery.mock(EventListener.class, "local");
-        final EventListener remoteListener = this.mockery.mock(EventListener.class, "remote");
+        EventListener localListener = mock(EventListener.class, "local");
+        EventListener remoteListener = mock(EventListener.class, "remote");
 
-        final TestEvent event = new TestEvent();
+        TestEvent event = new TestEvent();
 
-        final Unserializable unserializable = new Unserializable();
+        Unserializable unserializable = new Unserializable();
 
-        this.mockery.checking(new Expectations()
-        {{
-                allowing(localListener).getName();
-                will(returnValue("mylistener"));
-                allowing(remoteListener).getName();
-                will(returnValue("mylistener"));
-                allowing(localListener).getEvents();
-                will(returnValue(Arrays.asList(event)));
-                allowing(remoteListener).getEvents();
-                will(returnValue(Arrays.asList(event)));
-                oneOf(localListener).onEvent(with(same(event)), with(equal("some source")), with(equal("some data")));
-                oneOf(localListener).onEvent(with(same(event)), with(same(unserializable)), with(same(unserializable)));
-                oneOf(remoteListener).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));
-            }});
+        when(localListener.getName()).thenReturn("mylistener");
+        when(remoteListener.getName()).thenReturn("mylistener");
+        when(localListener.getEvents()).thenReturn(Arrays.asList(event));
+        when(remoteListener.getEvents()).thenReturn(Arrays.asList(event));
 
         getObservationManager1().addListener(localListener);
         getObservationManager2().addListener(remoteListener);
@@ -90,5 +87,9 @@ public class TCPROMTest extends AbstractROMTestCase
 
         // Make sure JGroups has enough time to send the message
         Thread.sleep(1000);
+
+        verify(localListener).onEvent(same(event), eq("some source"), eq("some data"));
+        verify(localListener).onEvent(same(event), same(unserializable), same(unserializable));
+        verify(remoteListener).onEvent(eq(event), eq("some source"), eq("some data"));
     }
 }

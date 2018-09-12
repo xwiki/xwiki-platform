@@ -154,7 +154,7 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
         }
 
         // Default
-        return AutomaticWatchMode.NONE;
+        return AutomaticWatchMode.MAJOR;
     }
 
     private DocumentReference getAbsoluteClassReference(DocumentReference user)

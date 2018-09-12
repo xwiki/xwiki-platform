@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Observation - Remote</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>80</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>88</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

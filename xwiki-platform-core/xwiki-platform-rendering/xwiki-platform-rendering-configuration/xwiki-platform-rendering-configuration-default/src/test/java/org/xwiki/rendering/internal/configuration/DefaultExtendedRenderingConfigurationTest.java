@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.configuration;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,9 +34,11 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -60,13 +63,12 @@ public class DefaultExtendedRenderingConfigurationTest
     @InjectMockComponents
     private DefaultExtendedRenderingConfiguration defaultExtendedRenderingConfiguration;
 
-    @BeforeEach
+    @BeforeComponent
     public void setup() throws Exception
     {
         Provider<ComponentManager> contextComponentManagerProvider = this.componentManager.registerMockComponent(
                 new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(contextComponentManagerProvider.get()).thenReturn(this.componentManager);
-        ReflectionUtils.setFieldValue(defaultExtendedRenderingConfiguration, "componentManagerProvider", contextComponentManagerProvider);
     }
 
     @Test

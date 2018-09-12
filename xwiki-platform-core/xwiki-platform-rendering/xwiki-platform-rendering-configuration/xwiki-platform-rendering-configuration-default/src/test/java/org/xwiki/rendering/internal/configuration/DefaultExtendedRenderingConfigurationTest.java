@@ -67,7 +67,7 @@ public class DefaultExtendedRenderingConfigurationTest
     public void setup() throws Exception
     {
         Provider<ComponentManager> contextComponentManagerProvider = this.componentManager.registerMockComponent(
-                new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(contextComponentManagerProvider.get()).thenReturn(this.componentManager);
     }
 

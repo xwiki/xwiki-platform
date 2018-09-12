@@ -91,7 +91,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
     /**
      * @param parameters the CAPTCHA override parameters
      * @return {@code true} if the answer is valid; {@code false} otherwise or if an exception occurs
-     * @see Captcha#isValid(Map))
+     * @see Captcha#isValid(Map)
      */
     public boolean isValid(Map<String, Object> parameters)
     {

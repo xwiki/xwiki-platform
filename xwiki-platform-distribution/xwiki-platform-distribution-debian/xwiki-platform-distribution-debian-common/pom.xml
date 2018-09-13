@@ -40,6 +40,7 @@
     <xwiki.properties.environment.permanentDirectory>/var/lib/xwiki/data</xwiki.properties.environment.permanentDirectory>
 
     <xwiki.extension.features>xwiki</xwiki.extension.features>
+    <debian.package>xwiki-common</debian.package>
   </properties>
   <dependencies>
     <dependency>
@@ -104,7 +105,7 @@
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
         <configuration>
-          <dataSet>
+          <dataSet combine.children="append">
             <data>
               <src>${war.path}</src>
               <type>directory</type>

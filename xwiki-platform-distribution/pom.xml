@@ -40,6 +40,7 @@
     <module>xwiki-platform-distribution-flavor</module>
     <module>xwiki-platform-distribution-debian</module>
     <module>xwiki-platform-distribution-fedora</module>
+    <module>xwiki-platform-distribution-resources</module>
   </modules>
   <properties>
     <!-- Flavors known to be valid with the current distribution -->

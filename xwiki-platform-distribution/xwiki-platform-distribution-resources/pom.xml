@@ -24,14 +24,41 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
+    <artifactId>xwiki-platform-distribution</artifactId>
     <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-debian-tomcat8-pgsql</artifactId>
-  <name>XWiki Platform - Distribution - Debian - Tomcat 8 - Postgres SQL</name>
-  <packaging>deb</packaging>
-  <description>XWiki Tomcat/PostgreSQL</description>
-  <properties>
-    <debian.package>xwiki-tomcat8-pgsql</debian.package>
-  </properties>
+  <artifactId>xwiki-platform-distribution-resources</artifactId>
+  <name>XWiki Platform - Distribution - XWiki Resources</name>
+  <packaging>jar</packaging>
+  <description>
+    XWiki copyright resource for all debian distribution.
+  </description>
+  <build>
+    <plugins>
+      <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-remote-resources-plugin</artifactId>
+       <executions>
+         <execution>
+           <goals>
+             <goal>bundle</goal>
+           </goals>
+         </execution>
+       </executions>
+      </plugin>
+      <!-- Add specific excludes for this module for license checks -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Exclude Velocity generated files ending with "vm" since they end with vm but their contents are not
+                 Velocity templates and the license plugin would validate their licenses against the vm style.
+                 TODO: use native extensions instead of "*.vm" -->
+            <exclude>**/copyright.vm</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

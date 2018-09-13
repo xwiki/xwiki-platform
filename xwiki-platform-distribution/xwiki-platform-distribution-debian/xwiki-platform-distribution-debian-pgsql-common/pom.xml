@@ -41,6 +41,7 @@
     <xwiki.db.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
     <xwiki.db.hbm.virtualMode>schema</xwiki.db.hbm.virtualMode>
+    <debian.package>xwiki-pgsql-debian</debian.package>
   </properties>
   <build>
     <plugins>
@@ -55,7 +56,7 @@
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
         <configuration>
-          <dataSet>
+          <dataSet combine.children="append">
             <data>
               <src>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</src>
               <type>file</type>

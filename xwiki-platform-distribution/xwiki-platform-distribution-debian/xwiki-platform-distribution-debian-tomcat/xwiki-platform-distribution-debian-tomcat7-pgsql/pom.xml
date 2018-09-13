@@ -31,4 +31,7 @@
   <name>XWiki Platform - Distribution - Debian - Tomcat 7 - Postgres SQL</name>
   <packaging>deb</packaging>
   <description>XWiki Tomcat/PostgreSQL</description>
+  <properties>
+    <debian.package>xwiki-tomcat7-pgsql</debian.package>
+  </properties>
 </project>

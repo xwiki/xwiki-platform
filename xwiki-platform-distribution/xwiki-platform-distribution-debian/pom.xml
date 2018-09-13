@@ -91,15 +91,18 @@
       <plugin>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+
           <executions>
               <execution>
-                  <id>xwiki-platform-tool-configuration-resources</id>
+                  <id>xwiki-platform-distribution-resources</id>
                   <phase>process-resources</phase>
+                  <goals>
+                    <goal>process</goal>
+                  </goals>
 
                   <configuration>
                       <resourceBundles>
                           <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
-                          <resourceBundle>org.xwiki.platform:xwiki-platform-tool-configuration-resources:${platform.version}</resourceBundle>
                           <resourceBundle>org.xwiki.platform:xwiki-platform-distribution-resources:${platform.version}</resourceBundle>
                       </resourceBundles>
                       <properties>
@@ -163,19 +166,19 @@
           <configuration>
             <snapshotExpand>true</snapshotExpand>
             <controlDir>${debian.controlDir}</controlDir>
-              <dataSet>
-                  <!-- Copyright file -->
-                  <data>
-                      <src>${project.build.directory}/maven-shared-archive-resources</src>
-                      <type>directory</type>
-                      <includes>copyright</includes>
-                      <mapper>
-                          <type>perm</type>
-                          <strip>1</strip>
-                          <prefix>/usr/share/doc/${debian.package}/</prefix>
-                      </mapper>
-                  </data>
-              </dataSet>
+            <dataSet>
+                <!-- Copyright file -->
+                <data>
+                    <src>${project.build.directory}/maven-shared-archive-resources</src>
+                    <type>directory</type>
+                    <includes>copyright</includes>
+                    <mapper>
+                        <type>perm</type>
+                        <strip>1</strip>
+                        <prefix>/usr/share/doc/${debian.package}/</prefix>
+                    </mapper>
+                </data>
+            </dataSet>
           </configuration>
         </plugin>
       </plugins>

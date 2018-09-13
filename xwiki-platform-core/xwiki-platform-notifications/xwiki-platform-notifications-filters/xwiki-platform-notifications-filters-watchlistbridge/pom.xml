@@ -33,6 +33,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications - Watchlist Bridge Module</xwiki.extension.name>
+    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

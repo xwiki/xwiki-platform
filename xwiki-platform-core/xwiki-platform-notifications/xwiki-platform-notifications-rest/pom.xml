@@ -30,6 +30,9 @@
   <artifactId>xwiki-platform-notifications-rest</artifactId>
   <name>XWiki Platform - Notifications - REST</name>
   <description>REST API for the notifications</description>
+  <properties>
+    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

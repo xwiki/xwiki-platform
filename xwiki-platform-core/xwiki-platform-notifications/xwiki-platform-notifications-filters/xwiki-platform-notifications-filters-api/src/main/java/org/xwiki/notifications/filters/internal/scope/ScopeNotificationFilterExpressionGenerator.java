@@ -54,7 +54,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class ScopeNotificationFilterExpressionGenerator
 {
-    private final static String USER_PROFILE_PROVIDER_HINT = "userProfile";
+    private static final String USER_PROFILE_PROVIDER_HINT = "userProfile";
 
     @Inject
     private ScopeNotificationFilterPreferencesGetter scopeNotificationFilterPreferencesGetter;
@@ -252,8 +252,10 @@ public class ScopeNotificationFilterExpressionGenerator
         }
 
         String subQuery = "SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner "
-                + "AND nfp.filterType = %d AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' "
-                + "AND nfp.allEventTypes = '' AND nfp.%s = true AND nfp.enabled = true";
+                + "AND nfp.filterType = %d AND nfp.filterName = 'scopeNotificationFilter' "
+                + "AND nfp.pageOnly IS NOT NULL AND nfp.pageOnly <> '' "
+                + "AND (nfp.allEventTypes = '' OR nfp.allEventTypes IS NULL) "
+                + "AND nfp.%s = true AND nfp.enabled = true";
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("owner", serializer.serialize(user));

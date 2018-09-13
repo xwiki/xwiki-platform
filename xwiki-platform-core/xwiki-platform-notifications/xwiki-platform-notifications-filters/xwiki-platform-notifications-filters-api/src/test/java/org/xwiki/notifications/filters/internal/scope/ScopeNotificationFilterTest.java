@@ -118,6 +118,8 @@ public class ScopeNotificationFilterTest
 
         when(serializer.serialize(eq(resultReference))).thenReturn(entityStringValue);
 
+        when(preference.getProviderHint()).thenReturn("userProfile");
+
         return preference;
     }
 
@@ -324,8 +326,10 @@ public class ScopeNotificationFilterTest
                         "OR (TYPE = \"type2\" AND DATE >= \"Thu Jan 01 01:01:40 CET 1970\")) " +
                         "AND CONCAT(CONCAT(WIKI, \":\"), PAGE) IN " +
                         "(SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner " +
-                        "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' AND nfp.pageOnly <> '' " +
-                        "AND nfp.allEventTypes = '' AND nfp.alertEnabled = true AND nfp.enabled = true))",
+                        "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' " +
+                        "AND nfp.pageOnly IS NOT NULL AND nfp.pageOnly <> '' " +
+                        "AND (nfp.allEventTypes = '' OR nfp.allEventTypes IS NULL) " +
+                        "AND nfp.alertEnabled = true AND nfp.enabled = true))",
                 mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.INCLUSIVE,
                 NotificationFormat.ALERT, notificationFilterPreferences).toString());
 
@@ -339,8 +343,9 @@ public class ScopeNotificationFilterTest
                 "NOT (CONCAT(CONCAT(WIKI, \":\"), PAGE) IN (SELECT nfp.pageOnly " +
                         "FROM DefaultNotificationFilterPreference nfp " +
                         "WHERE nfp.owner = :owner AND nfp.filterType = 1 AND nfp.filterName = 'scopeNotificationFilter' " +
-                        "AND nfp.pageOnly <> '' AND nfp.allEventTypes = '' AND nfp.emailEnabled = true " +
-                        "AND nfp.enabled = true))",
+                        "AND nfp.pageOnly IS NOT NULL AND nfp.pageOnly <> '' " +
+                        "AND (nfp.allEventTypes = '' OR nfp.allEventTypes IS NULL) " +
+                        "AND nfp.emailEnabled = true AND nfp.enabled = true))",
                 mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.EXCLUSIVE,
                         NotificationFormat.EMAIL, notificationFilterPreferences).toString());
     }

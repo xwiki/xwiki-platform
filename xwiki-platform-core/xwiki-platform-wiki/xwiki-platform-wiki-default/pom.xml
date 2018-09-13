@@ -83,9 +83,10 @@
 
     <!-- Test Dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <type>pom</type>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

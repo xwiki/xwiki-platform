@@ -60,6 +60,13 @@
     <debian.homepage>http://www.xwiki.org</debian.homepage>
     <debian.controlDir>${project.build.directory}/maven-deb-control-directory</debian.controlDir>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-resources</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <extensions>
       <!-- Needed to add support for the "deb" packaging -->

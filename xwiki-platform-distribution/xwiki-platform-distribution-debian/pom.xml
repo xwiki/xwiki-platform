@@ -58,6 +58,7 @@
     </debian.description>
     <debian.bugs>https://jira.xwiki.org</debian.bugs>
     <debian.homepage>http://www.xwiki.org</debian.homepage>
+    <debian.controlDir>${project.build.directory}/maven-deb-control-directory</debian.controlDir>
   </properties>
   <build>
     <extensions>
@@ -111,6 +112,47 @@
               </execution>
           </executions>
       </plugin>
+      <!-- Copy the entire deb/control directory in order to be able to add/remove files from it -->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-deb-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${debian.controlDir}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/deb/control</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+
+          <!-- We need to wait that the copyright file has been processed before adding it to the deb/control -->
+          <execution>
+            <id>copy-copyright</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${debian.controlDir}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/maven-shared-archive-resources</directory>
+                  <includes>
+                    <include>copyright</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -120,6 +162,7 @@
           <version>${jdeb.version}</version>
           <configuration>
             <snapshotExpand>true</snapshotExpand>
+            <controlDir>${debian.controlDir}</controlDir>
               <dataSet>
                   <!-- Copyright file -->
                   <data>

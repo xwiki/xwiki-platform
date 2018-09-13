@@ -29,6 +29,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
@@ -49,6 +51,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.query.internal.DefaultQueryParameter;
+import org.xwiki.tree.Tree;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -70,6 +73,8 @@ import com.xpn.xwiki.util.Util;
  */
 public class ExportAction extends XWikiAction
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportAction.class);
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -114,7 +119,26 @@ public class ExportAction extends XWikiAction
             name = context.getDoc().getFullName();
         }
 
-        Collection<DocumentReference> pageList = resolvePagesToExport(request.getParameterValues("pages"), context);
+        String[] checkedPages = request.getParameterValues("pages");
+        String[] uncheckedPages = null;
+        String checkedPagesRequestValue = request.get("checked-pages");
+        String uncheckedPagesRequestValue = request.get("unchecked-pages");
+        String otherPagesRequestValue = request.get("other-pages");
+
+        boolean otherPages = false;
+        if (!StringUtils.isEmpty(otherPagesRequestValue)) {
+            otherPages = Boolean.valueOf(otherPagesRequestValue);
+        }
+
+        if (!StringUtils.isEmpty(uncheckedPagesRequestValue)) {
+            uncheckedPages = uncheckedPagesRequestValue.split("&");
+        }
+
+        if (!StringUtils.isEmpty(checkedPagesRequestValue)) {
+            checkedPages = checkedPagesRequestValue.split("&");
+        }
+
+        Collection<DocumentReference> pageList = resolvePagesToExport(otherPages, checkedPages, uncheckedPages, context);
         if (pageList.isEmpty()) {
             return null;
         }
@@ -136,8 +160,7 @@ public class ExportAction extends XWikiAction
         return null;
     }
 
-    private Collection<DocumentReference> resolvePagesToExport(String[] pages, XWikiContext context)
-        throws XWikiException
+    private Collection<DocumentReference> resolvePages(String[] pages, XWikiContext context) throws XWikiException
     {
         List<DocumentReference> pageList = new ArrayList<>();
         if (pages == null || pages.length == 0) {
@@ -179,7 +202,7 @@ public class ExportAction extends XWikiAction
             }
 
             DocumentReferenceResolver<String> resolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+                    Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
 
             QueryManager queryManager = Utils.getComponent(QueryManager.class);
 
@@ -197,7 +220,7 @@ public class ExportAction extends XWikiAction
                     for (String docName : docsNames) {
                         String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
                         if (context.getWiki().getRightService().hasAccessLevel(
-                            "view", context.getUser(), pageReference, context))
+                                "view", context.getUser(), pageReference, context))
                         {
                             pageList.add(resolver.resolve(pageReference));
                         }
@@ -205,13 +228,59 @@ public class ExportAction extends XWikiAction
                 }
             } catch (QueryException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                    "Failed to resolve pages to export", e);
+                        "Failed to resolve pages to export", e);
             } finally {
                 context.setWikiId(database);
             }
         }
-
         return pageList;
+    }
+
+    /**
+     * Resolve the set of pages to export based on choices made in a paginated tree
+     * @param otherPages if true, the pagination was not completely resolved and the "other pages" checkbox
+     *                  was checked: the hidden pages should be taken into account
+     * @param checkedPages gives the name of the pages purposely selected (only used if otherPages is false)
+     * @param uncheckedPages gives the name of the pages purposely deselected (only used if otherPages is true)
+     * @param context the context of the request
+     * @return the collection of document reference to export
+     */
+    private Collection<DocumentReference> resolvePagesToExport(boolean otherPages, String[] checkedPages, String[] uncheckedPages, XWikiContext context)
+        throws XWikiException
+    {
+        if (otherPages) {
+            // if other pages is selected, we select all but the unchecked pages
+            XWikiDocument doc = context.getDoc();
+
+            // use the document tree to get all the pages
+            Tree nestedpages = Utils.getComponent(Tree.class, "nestedPages");
+            String nodeId = "document:" + doc.getDocumentReference().toString();
+            int childCount = nestedpages.getChildCount(nodeId);
+            List<String> children = nestedpages.getChildren(nodeId, 0, childCount);
+
+            // result as obtained as nodeId with "document:" as prefix
+            List<String> formattedReferences = new ArrayList<>();
+            for (String child : children) {
+                int index = "document:".length();
+                formattedReferences.add(child.substring(index));
+            }
+
+            // we need to add the current document also
+            formattedReferences.add(doc.getDocumentReference().toString());
+            // get the document references
+            Collection<DocumentReference> childrenReferences = this.resolvePages(formattedReferences.toArray(new String[0]), context);
+
+            // if we have unchecked pages, we remove them from the list of references
+            if (uncheckedPages != null && uncheckedPages.length > 0) {
+                Collection<DocumentReference> uncheckedDocuments = this.resolvePages(uncheckedPages, context);
+                childrenReferences.removeAll(uncheckedDocuments);
+            }
+
+            return childrenReferences;
+        } else {
+            // if other pages is not selected, we select only the checked pages
+            return this.resolvePages(checkedPages, context);
+        }
     }
 
     private String export(String format, XWikiContext context) throws XWikiException, IOException
@@ -268,8 +337,26 @@ public class ExportAction extends XWikiAction
         String licence = request.get("licence");
         String version = request.get("version");
         String name = request.get("name");
-        String[] pages = request.getParameterValues("pages");
-        boolean all = ArrayUtils.isEmpty(pages);
+        String[] checkedPages = request.getParameterValues("pages");
+        String[] uncheckedPages = null;
+        String checkedPagesRequestValue = request.get("checked-pages");
+        String uncheckedPagesRequestValue = request.get("unchecked-pages");
+        String otherPagesRequestValue = request.get("other-pages");
+
+        boolean all = ArrayUtils.isEmpty(checkedPages) && StringUtils.isEmpty(otherPagesRequestValue) && StringUtils.isEmpty(checkedPagesRequestValue);
+
+        boolean otherPages = false;
+        if (!StringUtils.isEmpty(otherPagesRequestValue)) {
+            otherPages = Boolean.valueOf(otherPagesRequestValue);
+        }
+
+        if (!StringUtils.isEmpty(uncheckedPagesRequestValue)) {
+            uncheckedPages = uncheckedPagesRequestValue.split("&");
+        }
+
+        if (!StringUtils.isEmpty(checkedPagesRequestValue)) {
+            checkedPages = checkedPagesRequestValue.split("&");
+        }
 
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");
@@ -300,7 +387,7 @@ public class ExportAction extends XWikiAction
                 entities.includes(new WikiReference(context.getWikiId()));
             } else {
                 // Find all page references and add them for processing
-                Collection<DocumentReference> pageList = resolvePagesToExport(pages, context);
+                Collection<DocumentReference> pageList = resolvePagesToExport(otherPages, checkedPages, uncheckedPages, context);
                 for (DocumentReference page : pageList) {
                     entities.includes(page);
                 }
@@ -390,8 +477,8 @@ public class ExportAction extends XWikiAction
             if (all) {
                 export.backupWiki();
             } else {
-                if (pages != null) {
-                    for (String pageName : pages) {
+                if (checkedPages != null) {
+                    for (String pageName : checkedPages) {
                         String defaultAction = request.get("action_" + pageName);
                         int iAction;
                         try {

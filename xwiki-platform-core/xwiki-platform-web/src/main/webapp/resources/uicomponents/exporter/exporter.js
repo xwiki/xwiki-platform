@@ -99,7 +99,11 @@ require([
    */
   require(['tree'], function () {
     $(document).ready(function () {
-      
+      var form = $('#export-form');
+      var checkedPagesInput = $('#checked-pages');
+      var uncheckedPagesInput = $('#unchecked-pages');
+      var otherPages = $('#other-pages');
+
       /**
        * Save the default url
        */
@@ -176,36 +180,90 @@ require([
          * Update the URL of the export buttons according to the tree 
          */
          $('#exportModal #exportModelOtherCollapse a.btn').click(function(event) {
+          event.preventDefault();
           var button = $(this);
           var url = button.data('url').clone();
-          var checkedNodes = treeReference.get_checked(true);
-          if (url.params === undefined) {
-            url.params = {'pages': []};
-          }
-          
-          url.params.pages = [];
-          for (var i = 0; i < checkedNodes.length; ++i) {
-            var node = checkedNodes[i];
-            var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
-            url.params.pages.push(XWiki.Model.serialize(pageReference));
-            // In case the page coudl have children
-            if (pageReference.getName() == 'WebHome') {
-              // The node could be checked but not loaded
-              if (node.state.loaded == false) {
-                // In that case, we need to add all children using a wildcard.
-                var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent);
-                url.params.pages.push(XWiki.Model.serialize(spaceReference));
-              }
-              // Special behaviour for the XAR export
-              if (url.params.format == 'xar') {
-                // Also add the WebPreferences
-                var webPreferencesReference = new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT, 
-                  pageReference.parent);
-                url.params.pages.push(XWiki.Model.serialize(webPreferencesReference));
-              }
+
+          var checkedPages = [];
+          var uncheckedPages = [];
+
+          // we go through all nodes to detect checked and unchecked nodes
+          // (jsTree does not provide an immediate API to get unchecked nodes)
+          $(treeReference.get_json(tree, {
+              flat: true
+          })).each( function () {
+            var node = treeReference.get_node(this.id);
+
+            // the node is checked
+            if (treeReference.is_checked(node)) {
+                // if the node is pagination then we should set the otherPages attribute
+                if (node.data.type == "pagination") {
+                    otherPages.attr('value', 'true');
+                } else {
+                    var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+                    checkedPages.push(XWiki.Model.serialize(pageReference));
+                    // In case the page coudl have children
+                    if (pageReference.getName() == 'WebHome') {
+                        // The node could be checked but not loaded
+                        if (node.state.loaded == false) {
+                            // In that case, we need to add all children using a wildcard.
+                            var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent);
+                            checkedPages.push(XWiki.Model.serialize(spaceReference));
+                        }
+                        // Special behaviour for the XAR export
+                        if (url.params.format == 'xar') {
+                            // Also add the WebPreferences
+                            var webPreferencesReference = new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT,
+                                pageReference.parent);
+                            checkedPages.push(XWiki.Model.serialize(webPreferencesReference));
+                        }
+                    }
+                }
+            // the node is unchecked
+            } else {
+                // if the node is pagination then we should set the otherPages attribute
+                if (node.data.type == "pagination") {
+                    otherPages.attr('value', 'false');
+                } else {
+                    var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+                    uncheckedPages.push(XWiki.Model.serialize(pageReference));
+                    // In case the page coudl have children
+                    if (pageReference.getName() == 'WebHome') {
+                        // The node could be checked but not loaded
+                        if (node.state.loaded == false) {
+                            // In that case, we need to add all children using a wildcard.
+                            var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT,
+                                pageReference.parent);
+                            uncheckedPages.push(XWiki.Model.serialize(spaceReference));
+                        }
+                    }
+                }
             }
+          });
+
+          var aggregatePageNames = function (arrayOfNames) {
+              var finalValue = "";
+              for (var i = 0; i < arrayOfNames.length; i++) {
+                  finalValue += arrayOfNames[i];
+
+                  if (i < arrayOfNames.length - 1) {
+                      finalValue += "&";
+                  }
+              }
+              return finalValue;
+          };
+
+          checkedPagesInput.attr('value', aggregatePageNames(checkedPages));
+          uncheckedPagesInput.attr('value', aggregatePageNames(uncheckedPages));
+
+          // pages are given through the input, not through the URL
+          if (url.params !== undefined) {
+              url.params.pages = [];
           }
-          button.attr('href', url.serialize());
+
+          // put the right action for the form
+          form.attr('action', url.serialize());
+          form.submit();
         });
       });
     });

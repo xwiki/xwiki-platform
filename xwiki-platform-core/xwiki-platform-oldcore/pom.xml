@@ -399,6 +399,21 @@
       <artifactId>xwiki-platform-template-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- ExportAction -->
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-api</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

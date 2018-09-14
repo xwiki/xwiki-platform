@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.captcha=Captcha
+  <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=Default CAPTCHA
 captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.</content>
   <object>

@@ -24,8 +24,7 @@ import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
@@ -39,12 +38,16 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.test.annotation.AllComponents;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.web.ExportAction}.
@@ -52,10 +55,12 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  * @version $Id$
  * @since 6.3M2
  */
+@OldcoreTest
+@AllComponents
 public class ExportActionTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    public MockitoOldcore oldcore;
 
     @Test
     public void exportFullSpaceUsingWildcardsAsXAR() throws Exception

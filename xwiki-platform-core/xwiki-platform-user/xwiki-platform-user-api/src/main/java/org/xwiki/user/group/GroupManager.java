@@ -58,6 +58,8 @@ public interface GroupManager
         throws GroupException;
 
     /**
+     * Retrieve the users and groups which are the members of the passed group.
+     * 
      * @param group the group for which to return the members
      * @param recurse false if only the direct members should be returned, true to take into account groups of groups
      * @return the members of the passed group

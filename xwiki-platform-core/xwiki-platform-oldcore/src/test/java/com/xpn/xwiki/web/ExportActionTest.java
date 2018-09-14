@@ -36,15 +36,19 @@ import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.tree.Tree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -134,5 +138,93 @@ public class ExportActionTest
             new DocumentReference("xwiki", "Space", "Page1")));
         assertEquals(true, properties.getValue().getEntities().matches(
             new DocumentReference("xwiki", "Space", "Page2")));
+    }
+
+    @Test
+    public void exportXARSpaceUsingUncheckedPagesAndOtherPagesArgument() throws Exception
+    {
+        // Scenario:
+        // From the Space.Page1 containing 2 children pages,
+        // "other pages" is checked and
+        // Space.Page1 and Space.Page2 are unchecked
+        // only the remaining Space.Page3 should be exported
+        ExportAction action = new ExportAction();
+
+        XWikiContext context = oldcore.getXWikiContext();
+        context.setDoc(new XWikiDocument(new DocumentReference("xwiki", "Space", "Page1")));
+
+        // Make it a XAR export
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(request.get("format")).thenReturn("xar");
+        context.setRequest(request);
+
+        // Set other request parameters
+        when(request.get("name")).thenReturn("myexport");
+        // Export all pages in the "Space" space
+        when(request.get("other-pages")).thenReturn("true");
+        when(request.get("unchecked-pages")).thenReturn("Space.Page1&Space.Page2");
+
+        // Make the current user have programming rights
+        when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
+
+        // Query Manager-related mocking
+        QueryManager queryManager = oldcore.getMocker().registerMockComponent(QueryManager.class);
+        Query query = mock(Query.class);
+        when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
+        when(query.setWiki("xwiki")).thenReturn(query);
+        when(query.bindValues(any(List.class))).thenReturn(query);
+        when(query.execute()).thenReturn(Arrays.asList("Space.Page1", "Space.Page2", "Space.Page3"));
+
+        // Tree nested pages mocking
+        Tree nestedPages = oldcore.getMocker().registerMockComponent(Tree.class, "nestedPages");
+        when(nestedPages.getChildCount("document:Space.Page1")).thenReturn(2);
+        when(nestedPages.getChildren("document:Space.Page1", 0, 2)).thenReturn(Arrays.asList("document:Space.Page2", "Space.Page3"));
+
+        // Register some mock resolver to resolve passed page references
+        when(oldcore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "xwiki:Space.Page1", context))
+                .thenReturn(true);
+        when(oldcore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "xwiki:Space.Page2", context))
+                .thenReturn(true);
+        when(oldcore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "xwiki:Space.Page3", context))
+                .thenReturn(true);
+        DocumentReferenceResolver<String> resolver =
+                oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        when(resolver.resolve("xwiki:Space.Page1")).thenReturn(new DocumentReference("xwiki", "Space", "Page1"));
+        when(resolver.resolve("xwiki:Space.Page2")).thenReturn(new DocumentReference("xwiki", "Space", "Page2"));
+        when(resolver.resolve("xwiki:Space.Page3")).thenReturn(new DocumentReference("xwiki", "Space", "Page3"));
+
+
+        // Register some mock filters so that the export does nothing.
+        InputFilterStreamFactory inputFilterStreamFactory = oldcore.getMocker().registerMockComponent(
+                InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
+        when(inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(mock(InputFilterStream.class));
+        BeanOutputFilterStreamFactory beanOutputFilterStreamFactory = mock(BeanOutputFilterStreamFactory.class);
+        oldcore.getMocker().registerComponent(OutputFilterStreamFactory.class,
+                FilterStreamType.XWIKI_XAR_CURRENT.serialize(), beanOutputFilterStreamFactory);
+        when(beanOutputFilterStreamFactory.createOutputFilterStream(any(XAROutputProperties.class))).thenReturn(
+                mock(BeanOutputFilterStream.class));
+
+        // Set response stream
+        XWikiResponse response = mock(XWikiResponse.class);
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        context.setResponse(response);
+
+        String result = action.render(oldcore.getXWikiContext());
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Verify that the parameters passed to the input stream factory are defining the correct pages
+        ArgumentCaptor<DocumentInstanceInputProperties> properties =
+                ArgumentCaptor.forClass(DocumentInstanceInputProperties.class);
+        verify(inputFilterStreamFactory).createInputFilterStream(properties.capture());
+        assertEquals(false, properties.getValue().isVerbose());
+        assertEquals(false, properties.getValue().isWithJRCSRevisions());
+        assertEquals(false, properties.getValue().isWithRevisions());
+        assertEquals(true, properties.getValue().getEntities().matches(
+                new DocumentReference("xwiki", "Space", "Page3")));
     }
 }

@@ -30,6 +30,7 @@
   <name>XWiki Platform - CAPTCHA - API</name>
   <description>Offers API to generate and validate CAPTCHA.</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CAPTCHA API</xwiki.extension.name>
   </properties>

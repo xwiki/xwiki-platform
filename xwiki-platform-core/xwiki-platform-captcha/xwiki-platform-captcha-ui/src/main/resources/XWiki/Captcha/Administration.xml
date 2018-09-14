@@ -67,10 +67,10 @@
 
 (% class='row' %)(((
 (% class='col-xs-12 col-lg-7' %)(((
-#set ($captchaAdministration = $services.uix.getExtensions('org.xwiki.captcha', {'select' : "$!{services.captcha.defaultCaptchaName}"})[0])
-#if ($captchaAdministration)
+#set ($captchaImplementationAdministrations = $services.uix.getExtensions('org.xwiki.captcha', {'select' : "$!{services.captcha.defaultCaptchaName}"}))
+#if ($captchaImplementationAdministrations.size() &gt; 0)
   === Configure $services.localization.render("captcha.${services.captcha.defaultCaptchaName}") ===
-  $services.rendering.render($captchaAdministration.execute(), $doc.syntax)
+  $services.rendering.render($captchaImplementationAdministrations[0].execute(), $doc.syntax)
 #end
 )))
 (% class='col-xs-12 col-lg-5 well' %)(((

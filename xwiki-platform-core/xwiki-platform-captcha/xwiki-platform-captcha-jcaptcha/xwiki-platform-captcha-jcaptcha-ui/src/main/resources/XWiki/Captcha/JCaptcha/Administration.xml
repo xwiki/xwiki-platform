@@ -78,10 +78,14 @@
       &lt;label for='XWiki.Captcha.JCaptcha.ConfigurationClass_0_type'&gt;$configClass.type.translatedPrettyName&lt;/label&gt;
       &lt;span class='xHint'&gt;$configClass.type.hint&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;{{/html}} $configDoc.display('type', 'edit') {{html clean="false"}}&lt;/dd&gt;
+    &lt;dd&gt;{{/html}}
+
+    $configDoc.display('type', 'edit')
+
+    {{html clean="false"}}&lt;/dd&gt;
 
     &lt;dt&gt;
-      &lt;label for='XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine'&gt;$configClass.engine.translatedPrettyName&lt;/label&gt;
+      &lt;label&gt;$configClass.engine.translatedPrettyName&lt;/label&gt;
       &lt;span class='xHint'&gt;$configClass.engine.hint&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
@@ -98,7 +102,7 @@
             #end
           #end
           &lt;div class="engine $type #if ($currentType != $type)hidden#end radio"&gt;
-            &lt;label &gt;
+            &lt;label&gt;
               &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" value="$engine" $maybeChecked /&gt;
               $services.localization.render("captcha.jcaptcha.engine.$engine")
             &lt;/label&gt;
@@ -106,12 +110,14 @@
         #end
       #end
       &lt;div class="jcaptcha radio"&gt;
-        &lt;label class="custom"&gt;
-          ## Note: Using the same name for the "custom" option to 
-          &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" class="customActivator" #if ($isCustom)checked="checked"#end /&gt;
-          Custom:
+        &lt;div class="custom"&gt;
+          &lt;label&gt;
+            ## Note: Using the same input name for the "custom" option
+            &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" class="customActivator" #if ($isCustom)checked="checked"#end /&gt;
+            Custom:
+          &lt;/label&gt;
           &lt;input type="text" class="customEngine" #if ($isCustom)checked="checked" value="$currentEngine"#end /&gt;
-        &lt;/label&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
@@ -122,8 +128,7 @@
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
-{{/velocity}}
-</content>
+{{/velocity}}</content>
   <object>
     <name>XWiki.Captcha.JCaptcha.Administration</name>
     <number>0</number>
@@ -340,7 +345,7 @@
     </property>
     <property>
       <code>/* Extend the custom engine input to the right. */
-label.custom {
+div.custom {
   display: flex;
   align-items: center;
 }

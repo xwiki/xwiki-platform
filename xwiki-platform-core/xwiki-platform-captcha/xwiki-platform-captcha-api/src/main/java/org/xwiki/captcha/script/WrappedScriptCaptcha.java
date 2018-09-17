@@ -34,7 +34,7 @@ import org.xwiki.stability.Unstable;
  * @since 10.8RC1
  */
 @Unstable
-public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
+public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha> implements Captcha
 {
     private Logger logger;
 
@@ -58,6 +58,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
      * @return the displayed wrapped CAPTCHA or {@code null} in case of an exception
      * @see Captcha#display()
      */
+    @Override
     public String display()
     {
         return display(null);
@@ -68,6 +69,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
      * @return the displayed wrapped CAPTCHA or {@code null} in case of an exception
      * @see Captcha#display(Map)
      */
+    @Override
     public String display(Map<String, Object> parameters)
     {
         try {
@@ -83,6 +85,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
      * @return {@code true} if the answer is valid; {@code false} otherwise or if an exception occurs
      * @see Captcha#isValid()
      */
+    @Override
     public boolean isValid()
     {
         return isValid(null);
@@ -93,6 +96,7 @@ public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha>
      * @return {@code true} if the answer is valid; {@code false} otherwise or if an exception occurs
      * @see Captcha#isValid(Map)
      */
+    @Override
     public boolean isValid(Map<String, Object> parameters)
     {
         try {

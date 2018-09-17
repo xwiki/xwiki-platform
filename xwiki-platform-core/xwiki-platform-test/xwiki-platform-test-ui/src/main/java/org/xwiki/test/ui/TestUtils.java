@@ -986,7 +986,7 @@ public class TestUtils
         }
         builder.append(StringUtils.join(escapedPath, '/'));
 
-        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
+        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download", "export").contains(action);
         if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
             builder.append('?');
         }

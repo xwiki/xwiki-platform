@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -117,7 +118,7 @@ public class ExportAction extends XWikiAction
         private String name;
         private String description;
 
-        public ExportArguments(XWikiContext context)
+        ExportArguments(XWikiContext context)
         {
             XWikiRequest request = context.getRequest();
 
@@ -197,7 +198,8 @@ public class ExportAction extends XWikiAction
                 try {
                     pattern = URLDecoder.decode(pages[i], context.getRequest().getCharacterEncoding());
                 } catch (UnsupportedEncodingException e) {
-                    throw new XWikiException(MODULE_XWIKI_EXPORT, ERROR_XWIKI_UNKNOWN, e.getMessage());
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
+                        "Failed to resolve pages to export", e);
                 }
 
                 String wikiName;
@@ -296,7 +298,12 @@ public class ExportAction extends XWikiAction
             DocumentReferenceResolver<String> resolver =
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
             for (String child : children) {
-                formattedReferences.add(child.substring(index));
+                try {
+                    formattedReferences.add(URLEncoder.encode(child.substring(index), context.getRequest().getCharacterEncoding()));
+                } catch (UnsupportedEncodingException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
+                        "Failed to resolve pages to export", e);
+                }
             }
 
             // we need to add the current document also
@@ -373,9 +380,7 @@ public class ExportAction extends XWikiAction
 
         ExportArguments exportArguments = new ExportArguments(context);
 
-        // export all: if no pages are checked, or if "other pages" is checked and nothing is unchecked
-        boolean all = ArrayUtils.isEmpty(exportArguments.checkedPages)
-            || (exportArguments.otherPages && ArrayUtils.isEmpty(exportArguments.uncheckedPages));
+        boolean all = ArrayUtils.isEmpty(exportArguments.checkedPages);
 
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");

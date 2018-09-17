@@ -54,7 +54,7 @@
 #if ($services.notification.areEmailsEnabled())
 (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
 (((
-  (% id="notifications.settings.email.title" %)
+  (% id="Hnotifications.settings.email.title" %)
   = {{translation key="notifications.settings.email.title" /}} =
   {{notificationsEmailPreferences /}}
 )))
@@ -65,7 +65,7 @@
 #if ($services.notification.watch.isEnabled())
 (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
 (((
-  (% id="notifications.settings.watch.title" %)
+  (% id="Hnotifications.settings.watch.title" %)
   = {{translation key="notifications.settings.watch.title' /}} =
   {{notificationsAutoWatchPreferences /}}
 )))
@@ -75,7 +75,7 @@
 ######################################################
 (% class="profile-section highlighted-profile-section column full" %)
 (((
-  (% id="notifications.settings.applications.title" %)
+  (% id="Hnotifications.settings.applications.title" %)
   = {{translation key="notifications.settings.applications.title" /}} =
   {{notificationsApplicationsPreferences /}}
 )))
@@ -84,7 +84,7 @@
 ######################################################
 (% class="profile-section highlighted-profile-section column full" %)
 (((
-  (% id="notifications.settings.filters.preferences.title" %)
+  (% id="Hnotifications.settings.filters.preferences.title" %)
   = {{translation key="notifications.settings.filters.preferences.title" /}} =
   {{notificationsFiltersPreferences /}}
 )))

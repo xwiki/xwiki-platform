@@ -56,6 +56,6 @@ Disallow: /xwiki/bin/export/
 Disallow: /xwiki/bin/import/
 Disallow: /xwiki/bin/get/
 Disallow: /xwiki/bin/distribution/
-Disallow: /xwiki/bin/imagecaptcha/
+Disallow: /xwiki/bin/jcaptcha/
 Disallow: /xwiki/bin/unknown/
 Disallow: /xwiki/bin/webjars/

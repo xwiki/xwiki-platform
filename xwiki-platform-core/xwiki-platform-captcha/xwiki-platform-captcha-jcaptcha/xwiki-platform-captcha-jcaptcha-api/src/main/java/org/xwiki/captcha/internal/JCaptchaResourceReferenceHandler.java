@@ -62,9 +62,6 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceHandler<EntityResourceAction>
 {
-    /**
-     *
-     */
     private static final String FREETTS_PROPERTIES_KEY = "freetts.voices";
 
     private static final EntityResourceAction ACTION = new EntityResourceAction("jcaptcha");

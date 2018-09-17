@@ -39,5 +39,6 @@
   </properties>
   <modules>
     <module>xwiki-platform-flamingo-skin-test-tests</module>
+    <module>xwiki-platform-flamingo-skin-test-pageobjects</module>
   </modules>
 </project>

@@ -4,103 +4,120 @@
  * Add export modal
  *#
 #macro(exportModal)
-  <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title" id="exportModalLabel">$services.localization.render('core.menu.export')</h4>
-        </div>
-        <div class="modal-body">
-          <div class="panel-group" id="exportModelAccordion" role="tablist" aria-multiselectable="true">
-            #set($exportExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.menu.export.buttons'))
+  <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="exportModalLabel">$services.localization.render('core.menu.export')</h4>
+      </div>
+      <div class="modal-body">
+        <div class="panel-group" id="exportModelAccordion" role="tablist" aria-multiselectable="true">
+          #set($exportExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.menu.export.buttons'))
             #displayOfficeFormats($exportExtensions)
             #displayOtherFormats($exportExtensions)
-          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 #end
 ##
 #macro (displayOfficeFormats $exportExtensions)
   <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="exportModalHeadingOffice">
-      <h4 class="panel-title">
-        <a role="button" data-toggle="collapse" data-parent="#exportModelAccordion" href="#exportModelOfficeCollapse" aria-expanded="true" aria-controls="exportModelOfficeCollapse">
-          $escapetool.xml($services.localization.render('core.exporter.headings.officeFormats'))
-        </a>
-      </h4>
-    </div>
-    <div id="exportModelOfficeCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="exportModalHeadingOffice">
-      <div class="panel-body">
-        <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.pdf')</a>
-        #if("$!{services.officemanager.serverState}" == 'Connected')
-          <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.odt')</a>
-          <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.rtf')</a>
+  <div class="panel-heading" role="tab" id="exportModalHeadingOffice">
+    <h4 class="panel-title">
+      <a role="button" data-toggle="collapse" data-parent="#exportModelAccordion" href="#exportModelOfficeCollapse"
+         aria-expanded="true" aria-controls="exportModelOfficeCollapse">
+        $escapetool.xml($services.localization.render('core.exporter.headings.officeFormats'))
+      </a>
+    </h4>
+  </div>
+  <div id="exportModelOfficeCollapse" class="panel-collapse collapse in" role="tabpanel"
+       aria-labelledby="exportModalHeadingOffice">
+    <div class="panel-body">
+      <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")"
+         class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.pdf')</a>
+      #if("$!{services.officemanager.serverState}" == 'Connected')
+        <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")"
+           class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.odt')</a>
+        <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")"
+           class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.rtf')</a>
+      #end
+      #foreach ($exportExtension in $exportExtensions)
+        #if ($exportExtension.parameters.category == 'office')
+          $services.rendering.render($exportExtension.execute(), 'html/5.0')
         #end
-        #foreach ($exportExtension in $exportExtensions)
-          #if ($exportExtension.parameters.category == 'office')
-            $services.rendering.render($exportExtension.execute(), 'html/5.0')
-          #end
-        #end
-      </div>
+      #end
     </div>
   </div>
+</div>
 #end
 ##
 #macro (displayOtherFormats $exportExtensions)
   <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="exportModalHeadingOther">
-      <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#exportModelAccordion" href="#exportModelOtherCollapse" aria-expanded="false" aria-controls="exportModelOtherCollapse">
-          $escapetool.xml($services.localization.render('core.exporter.headings.otherFormats'))
-        </a>
-      </h4>
-    </div>
-    <div id="exportModelOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
-      <div class="panel-body">
-          <form method="post" id="export-form">
-              <input type="hidden" id="checked-pages" name="checked-pages" />
-              <input type="hidden" id="unchecked-pages" name="unchecked-pages" />
-              <input type="hidden" id="other-pages" name="other-pages" value="false" />
+  <div class="panel-heading" role="tab" id="exportModalHeadingOther">
+    <h4 class="panel-title">
+      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#exportModelAccordion"
+         href="#exportModelOtherCollapse" aria-expanded="false" aria-controls="exportModelOtherCollapse">
+        $escapetool.xml($services.localization.render('core.exporter.headings.otherFormats'))
+      </a>
+    </h4>
+  </div>
+  <div id="exportModelOtherCollapse" class="panel-collapse collapse" role="tabpanel"
+       aria-labelledby="exportModalHeadingOther">
+    <div class="panel-body">
+      <form method="post" id="export-form">
+        <input type="hidden" id="checked-pages" name="checked-pages"/>
+        <input type="hidden" id="unchecked-pages" name="unchecked-pages"/>
+        <input type="hidden" id="other-pages" name="other-pages" value="false"/>
 
-            #if ($doc.name == 'WebHome')
-              #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
-                <div class="row">
-                    <div class="col-xs-6">
-                        <p>$escapetool.xml($services.localization.render('core.exporter.selectPages'))</p>
-                    </div>
-                    <div class="col-xs-6">
-                        <p class="text-right"><a href="#" class="tree_select_all">$escapetool.xml($services.localization.render('core.exporter.selectAll'))</a> / <a href="#" class="tree_select_none">$escapetool.xml($services.localization.render('core.exporter.selectNone'))</a></p>
-                    </div>
-                </div>
-                <div class="exportModalTreeContainer">
-                ## We put readOnly to false to enable the contextmenu, that we will replace afterwards
-                  #documentTree({
-                    'checkboxes' : true,
-                    'root': "document:$doc.documentReference",
-                    'showRoot': true,
-                    'showAttachments': false,
-                    'showTranslations': false,
-                    'readOnly': false
-                  })
-                </div>
-            #end
-              <a href="$doc.getURL('export', "format=html")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.html')</a>
-            #if($hasAdmin && $services.xar.isXARExportAvailable())
-              #set($exportURL = "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,'default'))")
-              #if ($doc.name == 'WebHome')
-              ## When nested page also export WebPreferences which contain among other things the right of this entity
-                #set($exportURL = "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,'default'))}.WebPreferences")
-              #end
-                <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.xar')</a>
-            #end
-            #foreach ($exportExtension in $exportExtensions)
-              $services.rendering.render($exportExtension.execute(), 'html/5.0')
-            #end
-          </form>
-      </div>
+        #if ($doc.name == 'WebHome')
+          #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
+          <div class="row">
+            <div class="col-xs-6">
+              <p>$escapetool.xml($services.localization.render('core.exporter.selectPages'))</p>
+            </div>
+            <div class="col-xs-6">
+              <p class="text-right"><a href="#" class="tree_select_all">$escapetool.xml($services.localization.render(
+                'core.exporter.selectAll'))</a> / <a href="#"
+                                                     class="tree_select_none">$escapetool.xml($services.localization.render(
+                'core.exporter.selectNone'))</a></p>
+            </div>
+          </div>
+          <div class="exportModalTreeContainer">
+            ## We put readOnly to false to enable the contextmenu, that we will replace afterwards
+            #documentTree({
+              'checkboxes' : true,
+              'root': "document:$doc.documentReference",
+              'showRoot': true,
+              'showAttachments': false,
+              'showTranslations': false,
+              'readOnly': false
+            })
+          </div>
+        #end
+        <a href="$doc.getURL('export', "format=html")" class="btn btn-primary"
+           rel="nofollow">$services.localization.render('core.menu.export.html')</a>
+        #if($hasAdmin && $services.xar.isXARExportAvailable())
+          #set($exportURL =
+            "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,
+              'default'))")
+          #if ($doc.name == 'WebHome')
+            ## When nested page also export WebPreferences which contain among other things the right of this entity
+            #set($exportURL =
+              "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,
+                'default'))}.WebPreferences")
+          #end
+          <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary"
+             rel="nofollow">$services.localization.render('core.menu.export.xar')</a>
+        #end
+        #foreach ($exportExtension in $exportExtensions)
+          $services.rendering.render($exportExtension.execute(), 'html/5.0')
+        #end
+      </form>
     </div>
   </div>
+</div>
 #end

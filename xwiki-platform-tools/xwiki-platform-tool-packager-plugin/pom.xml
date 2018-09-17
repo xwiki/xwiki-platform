@@ -303,6 +303,29 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- CAPTCHA API used by oldcore in CommentsAdd and RegisterAction -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- CAPTCHA Default module used to avoid cyclic dependency on oldcore but needed to access the configuration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- JCaptcha implementation used as default CAPTCHA implementation -->
+    <!-- TODO: Update the code that uses the CAPTCHA API to also handle the case when no implementation is available
+               and make the JCaptcha implementation optional (i.e. not bundled). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-jcaptcha-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

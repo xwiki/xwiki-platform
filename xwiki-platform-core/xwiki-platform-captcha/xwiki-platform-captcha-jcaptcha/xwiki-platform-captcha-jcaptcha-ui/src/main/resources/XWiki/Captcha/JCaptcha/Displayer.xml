@@ -43,7 +43,7 @@
 #set ($engine = $captchaParameters.engine)
 {{html clean='false'}}
 #if ($type == 'image')
-  &lt;img src='$doc.getURL('jcaptcha', "type=image&amp;engine=${escapetool.url($engine)}")' class='captcha captcha-challenge' /&gt;
+  &lt;img src='$doc.getURL('jcaptcha', "type=image&amp;engine=${escapetool.url($engine)}")' class='captcha captcha-challenge' alt="$services.localization.render('captcha.jcaptcha.displayer.image.alt')" /&gt;
 #elseif ($type == 'sound')
   ## Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1129121 on Firefox is to use a "cache busting" parameter to force a GET every time.
   &lt;audio src='$doc.getURL('jcaptcha', "type=sound&amp;engine=${escapetool.url($engine)}&amp;cache-buster=${datetool.date.time}")' class="captcha captcha-challenge"&gt;

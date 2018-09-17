@@ -37,6 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>captcha.jcaptcha=JCaptcha
+captcha.jcaptcha.displayer.image.alt=Image CAPTCHA
 captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=Your browser does not support the audio element.
 captcha.jcaptcha.displayer.audio.play=Listen
 captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha is not properly configured

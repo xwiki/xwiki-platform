@@ -39,8 +39,6 @@
   <content>{{velocity}}
 #set($obj = $doc.getObject('XWiki.XWikiUsers'))
 #if(!$obj)
-  = {{translation key="xe.admin.users.sheet"/}} =
-
   {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}##
 #elseif ($xcontext.action == 'get')
   #if ($xcontext.isMainWiki())

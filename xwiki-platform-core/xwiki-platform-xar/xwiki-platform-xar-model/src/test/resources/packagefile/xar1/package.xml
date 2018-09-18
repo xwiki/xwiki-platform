@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+<infos/>
+<name>space.page</name>
+<description></description>
+<licence>LGPL</licence>
+<author>XWiki</author>
+<version>1.0.0</version>
+<backupPack>false</backupPack>
+<preserveVersion>false</preserveVersion>
+<files>
+  <file language="" defaultAction="1" type="type0">a.page</file>
+  <file language="en" defaultAction="2" type="type1">a.en</file>
+  <file language="" defaultAction="1" type="type0">x.page</file>
+  <file language="en" defaultAction="2" type="type1">x.en</file>
+</files>
+</package>

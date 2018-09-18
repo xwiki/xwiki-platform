@@ -278,10 +278,7 @@ public class XarPackage
             XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction, entryType);
 
             // Register entry
-            this.entries.put(xarEntry, xarEntry);
-
-            // Update existing package file entry name
-            updatePackageFile(xarEntry);
+            putEntry(xarEntry);
         }
     }
 
@@ -479,8 +476,13 @@ public class XarPackage
     {
         XarEntry entry = new XarEntry(reference, entryName, action);
 
-        this.entries.put(reference, entry);
-        this.packageFiles.put(reference, entry);
+        putEntry(entry);
+    }
+
+    private void putEntry(XarEntry entry)
+    {
+        this.entries.put(entry, entry);
+        this.packageFiles.put(entry, entry);
     }
 
     /**
@@ -658,13 +660,6 @@ public class XarPackage
     {
         if (this.entries.containsKey(packageFile)) {
             this.entries.put(packageFile, packageFile);
-        }
-    }
-
-    private void updatePackageFile(XarEntry xarEntry)
-    {
-        if (this.packageFiles.containsKey(xarEntry)) {
-            this.packageFiles.put(xarEntry, xarEntry);
         }
     }
 

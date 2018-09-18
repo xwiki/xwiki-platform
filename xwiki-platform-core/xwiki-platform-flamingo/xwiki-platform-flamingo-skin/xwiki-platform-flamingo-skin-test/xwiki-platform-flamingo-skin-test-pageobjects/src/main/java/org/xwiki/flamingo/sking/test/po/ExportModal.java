@@ -20,6 +20,7 @@
 package org.xwiki.flamingo.sking.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
 
 public class ExportModal extends BaseModal
@@ -32,6 +33,12 @@ public class ExportModal extends BaseModal
     public OtherFormatView openOtherFormatView()
     {
         getDriver().findElementByLinkText("Other Formats").click();
+        getDriver().waitUntilElementHasAttributeValue(By.id("exportModelOtherCollapse"), "class", "panel-collapse collapse in");
         return new OtherFormatView();
+    }
+
+    public WebElement getContainer()
+    {
+        return container;
     }
 }

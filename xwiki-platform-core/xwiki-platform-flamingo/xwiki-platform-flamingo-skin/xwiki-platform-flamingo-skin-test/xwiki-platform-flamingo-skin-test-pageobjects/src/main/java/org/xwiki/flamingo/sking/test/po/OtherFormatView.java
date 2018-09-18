@@ -34,7 +34,7 @@ public class OtherFormatView extends BaseElement
 
     public TreeElement getTreeElement()
     {
-        WebElement element = getDriver().findElement(By.className("xtree"));
+        WebElement element = getDriver().findElement(By.className("exportModalTreeContainer")).findElement(By.className("xtree"));
         return new TreeElement(element);
     }
 

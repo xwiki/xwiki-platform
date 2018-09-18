@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-pgsql-common</artifactId>
   <name>XWiki Platform - Distribution - Debian - Postgres SQL - Common</name>

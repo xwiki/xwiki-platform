@@ -159,7 +159,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getEventTypes",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -192,7 +191,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getId",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -203,7 +201,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getNotificationFormats",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -214,7 +211,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getPage",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -225,7 +221,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getPageOnly",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -251,7 +246,6 @@
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getStartingDate",
                     "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.7",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -266,7 +260,6 @@
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getStartingDate",
                     "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.7",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -277,7 +270,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getUser",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -288,7 +280,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "getWiki",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   },
@@ -299,7 +290,6 @@
                     "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreference",
                     "classSimpleName": "NotificationFilterPreference",
                     "methodName": "setEnabled",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-filters-api:jar:10.8-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "NotificationFilterPreference store did not scale"
                   }

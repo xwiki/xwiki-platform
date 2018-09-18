@@ -82,7 +82,7 @@
     ## notifiers) and we want to exclude them also.
     #if ($documentCount < 6)
       ## Less than 6 pages in the wiki, probably a fresh install.
-      #set ($URL = "https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/EmptyWiki/")
+      #set ($URL = "https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/EmptyWiki")
       #warning($services.localization.render('admin.defaultwikinotinstalled_useflavor', ["$URL"]))
     #else
       ## More than 6 pages in the wiki and Admin app not installed, probably an upgrade.

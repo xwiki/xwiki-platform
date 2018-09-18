@@ -19,7 +19,7 @@
       ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
       ## defined at this point, we tap into the standard annotation class, and do not load again the
       ## config document. This however should not happen.
-      #set ($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
+      #set ($annotationCount = $services.annotations.getAnnotations($doc).size())
     #end
     #set ($discard = $docextras.add(['Annotations', 'annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $services.localization.render('core.shortcuts.view.annotations')]))
   #end

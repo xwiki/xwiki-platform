@@ -64,7 +64,7 @@
     #if ($annotationConfigObject.getProperty('activated').value != 0 && !$annotationConfigObject.getProperty('exceptionSpaces').value.contains($doc.space))
       #set ($showannotations = true)
       #set ($annotationClass = $annotationConfigObject.getProperty('annotationClass').value)
-      #set ($annotationCount = $doc.getObjects($annotationClass).size())
+      #set ($annotationCount = $services.annotations.getAnnotations($doc).size())
     #end
   #end
 #end

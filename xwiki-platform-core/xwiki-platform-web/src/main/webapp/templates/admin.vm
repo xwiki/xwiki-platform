@@ -83,7 +83,7 @@
     #if ($documentCount < 6)
       ## Less than 6 pages in the wiki, probably a fresh install.
       #set ($URL = "https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/What%20to%20do%20with%20an%20empty%20XWiki/")
-      #warning($services.localization.render('admin.defaultwikinotinstalled_useflavor', ["<a href='$URL'>$URL</a>"]))
+      #warning($services.localization.render('admin.defaultwikinotinstalled_useflavor', ["$URL"]))
     #else
       ## More than 6 pages in the wiki and Admin app not installed, probably an upgrade.
       #warning($services.localization.render('admin.adminappnotinstalled', ['<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application">http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application</a>']))

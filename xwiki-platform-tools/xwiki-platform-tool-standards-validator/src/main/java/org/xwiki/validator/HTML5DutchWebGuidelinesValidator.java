@@ -62,14 +62,6 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
 
-    /**
-     * Constructor.
-     */
-    public HTML5DutchWebGuidelinesValidator()
-    {
-        super();
-    }
-
     @Override
     public String getName()
     {
@@ -986,8 +978,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd9s1()
     {
-        assertFalse(Type.ERROR, "rpd9s1.attr", getElement(ELEM_BODY).getElementsByAttribute(STYLE).isEmpty());
-        assertFalse(Type.ERROR, "rpd9s1.tag", getElement(ELEM_BODY).getElementsByTag(STYLE).isEmpty());
+        assertTrue(Type.ERROR, "rpd9s1.attr", getElement(ELEM_BODY).getElementsByAttribute(STYLE).isEmpty());
+        assertTrue(Type.ERROR, "rpd9s1.tag", getElement(ELEM_BODY).getElementsByTag(STYLE).isEmpty());
     }
 
     /**
@@ -1368,7 +1360,6 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd13s18()
     {
-        String exprString = "//input[@type='reset']";
         boolean hasResetForm = false;
         for (Element input : getElement(ELEM_BODY).getElementsByTag(ELEM_INPUT)) {
             if ("reset".equals(input.attr(ATTR_TYPE))) {

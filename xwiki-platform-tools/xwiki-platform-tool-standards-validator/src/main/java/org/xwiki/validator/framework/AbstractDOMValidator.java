@@ -371,7 +371,7 @@ public abstract class AbstractDOMValidator extends AbstractXMLValidator
      */
     public NodeListIterable getElements(Collection<String> tagNames)
     {
-        String exprString = StringUtils.join(tagNames, "|" + XPATH_CATCHALL);
+        String exprString = XPATH_CATCHALL + StringUtils.join(tagNames, "|" + XPATH_CATCHALL);
         return new NodeListIterable((NodeList) evaluate(this.document, exprString, XPathConstants.NODESET));
     }
 

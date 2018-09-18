@@ -19,12 +19,14 @@
  */
 package org.xwiki.validator;
 
+import java.io.InputStream;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test class for {@link org.xwiki.validator.XWikiValidator}.
@@ -34,25 +36,41 @@ import static org.junit.Assert.assertTrue;
  */
 public class XWikiValidatorTest
 {
+    private XWikiValidator validator;
+
+    @BeforeEach
+    public void beforeEach() throws Exception
+    {
+        this.validator = new XWikiValidator();
+    }
+
+    private void validate(InputStream document) throws Exception
+    {
+        this.validator.setHTML5Document(document);
+        this.validator.validate();
+    }
+
+    // Tests
+
     @Test
     public void testValid() throws Exception
     {
-        XWikiValidator validator = new XWikiValidator();
-        validator.setDocument(getClass().getResourceAsStream("/xwiki-valid.html"));
-        List<ValidationError> errors = validator.validate();
+        validate(getClass().getResourceAsStream("/xwiki-valid.html"));
+        List<ValidationError> errors = this.validator.getErrors();
         assertTrue(errors.isEmpty());
     }
 
     @Test
     public void testInvalid() throws Exception
     {
-        XWikiValidator validator = new XWikiValidator();
-        validator.setDocument(getClass().getResourceAsStream("/xwiki-invalid.html"));
-        List<ValidationError> errors = validator.validate();
-        assertEquals(errors, validator.getErrors());
-        assertEquals(1, errors.size());
+        validate(getClass().getResourceAsStream("/xwiki-invalid.html"));
+        List<ValidationError> errors = this.validator.validate();
+        assertEquals(errors, this.validator.getErrors());
+        assertEquals(3, errors.size());
         assertEquals("Found rendering error", errors.get(0).getMessage());
-        validator.clear();
-        assertTrue(validator.getErrors().isEmpty());
+        assertEquals("A h1 heading with empty id (\"H\") has been found", errors.get(1).getMessage());
+        assertEquals("A h2 heading with empty id (\"H\") has been found", errors.get(2).getMessage());
+        this.validator.clear();
+        assertTrue(this.validator.getErrors().isEmpty());
     }
 }

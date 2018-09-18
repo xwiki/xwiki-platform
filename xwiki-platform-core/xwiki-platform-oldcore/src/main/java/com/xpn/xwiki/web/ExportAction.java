@@ -163,8 +163,7 @@ public class ExportAction extends XWikiAction
 
         ExportArguments exportArguments = new ExportArguments(context);
 
-        Collection<DocumentReference> pageList =
-            resolvePagesToExport(exportArguments, context);
+        Collection<DocumentReference> pageList = resolvePagesToExport(exportArguments, context);
         if (pageList.isEmpty()) {
             return null;
         }
@@ -268,6 +267,26 @@ public class ExportAction extends XWikiAction
         return pageList;
     }
 
+    private List<String> allChildren(Tree nestedPages, String nodeId)
+    {
+        int childCount = nestedPages.getChildCount(nodeId);
+        List<String> result = nestedPages.getChildren(nodeId, 0, childCount);
+
+        List<String> childToRetrieve = new ArrayList<>();
+        for (String child : result) {
+            childCount = nestedPages.getChildCount(child);
+            if (childCount > 0) {
+                childToRetrieve.add(child);
+            }
+        }
+
+        for (String child : childToRetrieve) {
+            result.addAll(this.allChildren(nestedPages, child));
+        }
+
+        return result;
+    }
+
     /**
      * Resolve the set of pages to export based on choices made in a paginated tree
      *
@@ -286,10 +305,9 @@ public class ExportAction extends XWikiAction
             // use the document tree to get all the pages
             Tree nestedPages = Utils.getComponent(Tree.class, "nestedPages");
             String nodeId = TREE_DOCUMENT_PREFIX + doc.getDocumentReference().toString();
-            int childCount = nestedPages.getChildCount(nodeId);
 
-            // TODO: Need to check how it works for the nested pages
-            List<String> children = nestedPages.getChildren(nodeId, 0, childCount);
+            // get children recursively to also get the nested pages
+            List<String> children = allChildren(nestedPages, nodeId);
 
             // result as obtained as nodeId with "document:" as prefix
             List<String> formattedReferences = new ArrayList<>();

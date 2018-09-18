@@ -8,7 +8,7 @@ set -e
 #########################
 
 ## Make sure tomcat is able to write in the data folder
-chown tomcat7.tomcat7 /var/lib/xwiki/data
+chown -R tomcat7.tomcat7 /var/lib/xwiki/data
 
 #########################
 # Configuration

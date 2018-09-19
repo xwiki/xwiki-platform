@@ -22,11 +22,12 @@ package org.xwiki.menu.test.ui;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.application.test.po.ApplicationIndexHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
 import org.xwiki.menu.test.po.MenuEntryEditPage;
 import org.xwiki.menu.test.po.MenuHomePage;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
@@ -43,23 +44,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 10.6RC1
  */
 @UITest
-public class MenuTest
+public class MenuIT
 {
     @Test
-    public void verifyMenu(TestUtils setup)
+    public void verifyMenu(TestUtils setup) throws Exception
     {
-        verifyMenuInApplicationsPanel(setup);
+        verifyMenuInApplicationsIndex(setup);
         verifyMenuCreationInLeftPanelWithCurrentWikiVisibility(setup);
+        verifyMenuIsAvailableInAdministration(setup);
     }
 
-    private void verifyMenuInApplicationsPanel(TestUtils setup)
+    private void verifyMenuInApplicationsIndex(TestUtils setup)
     {
         // Log in as superadmin
         setup.loginAsSuperAdmin();
 
-        // Verify that the menu app is displayed in the Applications Panel
-        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
-        ViewPage vp = applicationPanel.clickApplication("Menu");
+        ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
+
+        assertTrue(applicationIndexHomePage.containsApplication("Menu"));
+        ViewPage vp = applicationIndexHomePage.clickApplication("Menu");
 
         // Verify we're on the right page!
         assertEquals(MenuHomePage.getSpace(), vp.getMetaDataValue("space"));
@@ -67,16 +70,16 @@ public class MenuTest
 
         // Now log out to verify that the Menu entry is not displayed for guest users
         setup.forceGuestUser();
-        // Navigate again to the Application Menu page to perform the verification
-        applicationPanel = ApplicationsPanel.gotoPage();
-        assertFalse(applicationPanel.containsApplication("Menu"));
-
-        // Log in as superadmin again for the rest of the tests
-        setup.loginAsSuperAdmin();
+        // Navigate again to the Application Index page to perform the verification
+        applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
+        assertFalse(applicationIndexHomePage.containsApplication("Menu"));
     }
 
     private void verifyMenuCreationInLeftPanelWithCurrentWikiVisibility(TestUtils setup)
     {
+        // Log in as superadmin again
+        setup.loginAsSuperAdmin();
+
         DocumentReference menu1Reference = new DocumentReference("xwiki", Arrays.asList("Menu", "menu1"), "WebHome");
         setup.deletePage(menu1Reference);
 
@@ -101,5 +104,51 @@ public class MenuTest
         // Verify that the menu is displayed inside left panels
         mhp = MenuHomePage.gotoPage();
         assertTrue(mhp.hasLeftPanel("menu1"));
+    }
+
+    private void verifyMenuIsAvailableInAdministration(TestUtils setup) throws Exception
+    {
+        // Log in as superadmin
+        setup.loginAsSuperAdmin();
+
+        DocumentReference menu1Reference = new DocumentReference("xwiki", Arrays.asList("Menu", "menu1"), "WebHome");
+        setup.rest().delete(menu1Reference);
+
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+
+        // check that the look & feel category contains a Menu section
+        assertTrue(administrationPage.hasSection("Look & Feel", "Menu"));
+
+        administrationPage.clickSection("Look & Feel", "Menu");
+
+        // after having clicked on the menu section, we are in the menu home page
+        MenuHomePage menuPage = new MenuHomePage();
+
+        // check that we are still in the administration
+        assertEquals(AdministrationPage.getSpace(), menuPage.getMetaDataValue("space"));
+        assertEquals(AdministrationPage.getPage(), menuPage.getMetaDataValue("page"));
+
+        // Create a menu entry
+        EntryNamePane pane = menuPage.clickAddNewEntry();
+        pane.setName("menu1");
+        pane.clickAdd();
+
+        // check that we are now on the menu app
+        assertEquals(MenuHomePage.getSpace() + ".menu1", menuPage.getMetaDataValue("space"));
+        assertEquals("WebHome", menuPage.getMetaDataValue("page"));
+        MenuEntryEditPage meep = new MenuEntryEditPage();
+
+        // Set the menu location to be left panels and the visibility to be WIKI
+        meep.setLocation("Inside a Left Panel");
+        meep.setVisibility("Current Wiki");
+        meep.clickSaveAndView();
+
+        // Now modify the Left Panels list to include the new menu since this is not automatic for the moment
+        setup.updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0,
+            "leftPanels", "Panels.Applications,Panels.Navigation,Menu.menu1.WebHome");
+
+        // Verify that the menu is displayed inside left panels
+        administrationPage = AdministrationPage.gotoPage();
+        assertTrue(administrationPage.hasLeftPanel("menu1"));
     }
 }

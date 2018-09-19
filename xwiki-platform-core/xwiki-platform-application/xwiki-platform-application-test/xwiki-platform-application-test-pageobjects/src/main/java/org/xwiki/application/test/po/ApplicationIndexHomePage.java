@@ -25,7 +25,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Represents the Applications.WebHome page.
  *
- * @version $id$
+ * @version $Id$
  * @since 10.8
  *
  */

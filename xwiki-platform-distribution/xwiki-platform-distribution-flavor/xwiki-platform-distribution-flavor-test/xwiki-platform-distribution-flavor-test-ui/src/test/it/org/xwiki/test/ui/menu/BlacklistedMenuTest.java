@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Add specific test for menu related to this flavor.
  *
- * @version $id$
+ * @version $Id$
  * @since 10.8
  */
 public class BlacklistedMenuTest extends AbstractTest

@@ -242,6 +242,8 @@ viewers.Comments = Class.create({
                   "id" : "Comments",
                   "element": this.container
                 });
+                // Notify any displayed CAPTCHA that it was reloaded and it might need to reinitialize its JS.
+                this.container.fire('xwiki:captcha:reloaded');
               }
             }.bind(this)
           });

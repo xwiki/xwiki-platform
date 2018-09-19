@@ -43,7 +43,6 @@ public class DatabaseContainerExecutor
     /**
      * @param database the database to build and start
      * @return the Docker container instance
-     * @throws Exception if an error occurred during the build or start
      */
     public JdbcDatabaseContainer execute(Database database)
     {

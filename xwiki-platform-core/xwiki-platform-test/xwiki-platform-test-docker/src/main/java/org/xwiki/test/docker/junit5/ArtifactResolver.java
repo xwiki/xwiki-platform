@@ -82,11 +82,12 @@ public final class ArtifactResolver
      * Resolve the passed artifact (will resolve against the remote and local repositories and ensure that the file is
      * available on the local file system). Example usage:
      * <p>
-     * <code><pre>
+     * Example usage:
+     * <pre><code>
      * Artifact resourceArtifact =
      *     new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
      *     "jar", "10.7-SNAPSHOT");
-     * </pre></code>
+     * </code></pre>
      *
      * @param artifact the artifact to resolve (will resolve against the remote and local repositories and ensure that
      * the file is available on the local file system)
@@ -150,7 +151,7 @@ public final class ArtifactResolver
             long t1 = System.currentTimeMillis();
             DependencyNode node = this.repositoryResolver.getSystem().collectDependencies(
                 this.repositoryResolver.getSession(), collectRequest).getRoot();
-            LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
+            LOGGER.debug("collect = {} ms", (System.currentTimeMillis() - t1));
 
             node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
 
@@ -158,7 +159,7 @@ public final class ArtifactResolver
             t1 = System.currentTimeMillis();
             DependencyResult result = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
-            LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
+            LOGGER.debug("resolve = {} ms", (System.currentTimeMillis() - t1));
             if (!result.getCollectExceptions().isEmpty()) {
                 sendError(artifact, result.getCollectExceptions());
             }

@@ -330,6 +330,7 @@
     #set($field =
       {'name' : 'captcha_placeholder',
         'label' : $services.localization.render('core.captcha.instruction'),
+        'skipLabelFor' : true,
         'type'  : 'html',
         'html'  : "$!{services.captcha.default.display()}",
         'validate' : {
@@ -417,7 +418,7 @@
   #if(!$registrationDone)
     $welcomeMessage
 
-    {{html wiki=false}}
+    {{html wiki=false clean="false"}}
       &lt;form id="register" action="$xwiki.relativeRequestURL" method="post" class="xform half"&gt;
       &lt;div&gt;
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
@@ -696,7 +697,7 @@
       #set($fieldName = $field.get('name'))
       #if($field.get('label'))
         #set($label = $field.get('label'))
-        &lt;dt&gt;&lt;label for="$fieldName"&gt;$label
+        &lt;dt&gt;&lt;label #if (!$field.get('skipLabelFor'))for="$fieldName"#end&gt;$label
         #if($field.get('validate').get('mandatory'))
           &lt;span ##
           #foreach($entry in $fieldMandatoryStar.entrySet())
@@ -707,16 +708,16 @@
           &lt;/label&gt;
         &lt;/dt&gt;
       #end
-      ## If no tag then default tag is &lt;input&gt;
-      #if($field.get('tag'))
-        #set($tag = $field.get('tag'))
-      #else
-        #set($tag = 'input')
-      #end
       &lt;dd&gt;
       #if ($field.get('type') == 'html')
         $field.get('html')
       #elseif ($field.get('type') == 'tag' || "$!{field.get('type')}" == '')
+        ## If no tag then default tag is &lt;input&gt;
+        #if($field.get('tag'))
+          #set($tag = $field.get('tag'))
+        #else
+          #set($tag = 'input')
+        #end
         &lt;$tag id="$fieldName" ##
         #set($params = $field.get('params'))
         ## If no name parameter is spacified, then we use the field name
@@ -729,7 +730,11 @@
             $entry.getKey()="$escapetool.xml($entry.getValue())" ##
           #end
         #end
-        &gt;&lt;/$tag&gt;
+        ## Close the opened tag in a way that is valid for its type (i.e. with "/&gt;" or with "&gt;&lt;/tag&gt;").
+        #if ($tag == 'input')
+          #set ($voidTag = true)
+        #end
+        #if ($voidTag)/#end&gt;#if (!$voidTag)&lt;/$tag&gt;#end
       #end
       #if($field.get('error'))
         &lt;span ##

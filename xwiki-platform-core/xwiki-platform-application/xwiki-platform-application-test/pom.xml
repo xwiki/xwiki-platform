@@ -24,23 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-application</artifactId>
     <version>10.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-application</artifactId>
-  <name>XWiki Platform - Application - Parent POM</name>
+  <artifactId>xwiki-platform-application-test</artifactId>
+  <name>XWiki Platform - Application - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Application - Parent POM</description>
+  <description>XWiki Platform - Application - Tests - Parent POM</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
+         runtime code -->
+    <xwiki.clover.skip>true</xwiki.clover.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-application-ui</module>
+    <module>xwiki-platform-application-test-pageobjects</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-application-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

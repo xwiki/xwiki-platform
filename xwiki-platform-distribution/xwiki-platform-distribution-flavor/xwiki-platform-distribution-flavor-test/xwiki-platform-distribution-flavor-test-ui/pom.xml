@@ -50,6 +50,16 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-menu-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-application-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Used by several tests to send mails -->
     <dependency>

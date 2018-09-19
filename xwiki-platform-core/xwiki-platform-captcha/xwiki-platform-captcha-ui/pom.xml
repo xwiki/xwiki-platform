@@ -28,7 +28,7 @@
   <artifactId>xwiki-platform-captcha-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - CAPTCHA - UI</name>
-  <description>Offers Administration UI to configure the default CAPTCHA.</description>
+  <description>Configure which CAPTCHA implementation should your wiki use.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CAPTCHA Application</xwiki.extension.name>

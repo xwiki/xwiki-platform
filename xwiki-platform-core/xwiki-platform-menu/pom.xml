@@ -34,6 +34,15 @@
   <modules>
     <module>xwiki-platform-menu-ui</module>
   </modules>
+  <dependencies>
+    <!-- Display macro is used to be injected in administration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
   <profiles>
     <profile>
       <id>integration-tests</id>

@@ -22,7 +22,6 @@ package org.xwiki.test.docker.junit5;
 import java.io.File;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -30,20 +29,32 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BrowserWebDriverContainer;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.XWikiWatchdog;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
- * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests, to start/start XWiki
- * automatically and start/stop Browsers automatically.
+ * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that peforms the
+ * following tasks.
+ * <ul>
+ * <li>create a minimal XWiki WAR</li>
+ * <li>start a database</li>
+ * <li>start a servlet container and deploy xwiki in it</li>
+ * <li>provision XAR dependencies from the test inside the running xwiki</li>
+ * <li>start a browser automatically</li>
+ * </ul>
+ *
  * <p>
  * Example:
  * <pre><code>
@@ -61,46 +72,71 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * }
  * </code></pre>
  *
- *
  * @version $Id$
  * @since 10.6RC1
  */
 public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback,
     AfterEachCallback, ParameterResolver
 {
-    private static final String URL_PREFIX_PROPERTY = "xwiki.test.baseURL";
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
+
+    private static final int TIMEOUT_SECONDS = 1;
 
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(XWikiDockerExtension.class);
 
+    private static final String SUPERADMIN = "superadmin";
+
+    private WARBuilder builder = new WARBuilder();
+
+    private XWikiWatchdog watchodg = new XWikiWatchdog();
+
+    private ExtensionInstaller installer = new ExtensionInstaller();
+
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
+        // Only start DB, create WAR, start Servlet engine and provision XWiki only if XWiki is not already
+        // started locally. This allows running the tests with a custom XWiki setup and also allows faster development
+        // turn around time when testing.
+        if (this.watchodg.isXWikiStarted("http://localhost:8080", TIMEOUT_SECONDS).timedOut) {
+            // XWiki is not started
+            LOGGER.info("XWiki is not started, starting all...");
+
+            // Build the XWiki WAR
+            LOGGER.info("-> Building custom XWiki WAR...");
+            UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
+            File targetWARDirectory = new File("./target/xwiki");
+            // If the directory exists, skip the rebuilding of the XWiki WAR, allowing to re-run the test faster
+            if (!targetWARDirectory.exists()) {
+                time(() -> {
+                    this.builder.build(uiTestAnnotation.database(), targetWARDirectory);
+                });
+            } else {
+                LOGGER.info("->   Directory exists, don't rebuild WAR to save time!");
+            }
+
+            // Start the Database
+            LOGGER.info("-> Starting database...");
+            startDatabase(extensionContext);
+
+            // Start the Servlet Engine
+            LOGGER.info("-> Starting Servlet container...");
+            time(() -> {
+                startServletEngine(extensionContext, targetWARDirectory);
+            });
+
+            // Provision XWiki by installing all required extensions.
+            LOGGER.info("-> Provision XAR extensions for test...");
+            time(() -> {
+                provisionExtensions(extensionContext);
+            });
+        } else {
+            LOGGER.info("XWiki is already started, using running instance to execute the tests...");
+        }
+
         // Start the Browser (this creates and initializes the PersistentTestContext, XWikiWebDriver objects)
         startBrowser(extensionContext);
-
-        // Start XWiki
-        // TODO: in the future, refactor XWikiExecutor so that it becomes an interface and so that we can have
-        // various implementations, including one using Docker to start/stop XWiki.
-        PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
-        for (XWikiExecutor executor : testContext.getExecutors()) {
-            executor.start();
-        }
-
-        // Since the browser is running inside a Docker container, it needs to access the host where XWiki is running.
-        // Thus it cannot access it with "localhost" since that points to the Docker container itself. Thus we need
-        // to find one IP (we use the first IP, hoping that it'll be a good one).
-        // We do this only if the "xwiki.test.baseURL" system property has not already been defined, thus allowing
-        // user override.
-        // Note that this system property is used by the XWikiExecutor code to start/stop XWiki.
-        if (System.getProperty(URL_PREFIX_PROPERTY) == null) {
-            testContext.getUtil().setURLPrefix("http://" + getHost());
-        }
-
-        // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
-        // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
-        // Note that this requires a running XWiki instance.
-        testContext.getUtil().recacheSecretToken();
     }
 
     @Override
@@ -148,25 +184,20 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
     }
 
     @Override
-    public void afterAll(ExtensionContext extensionContext) throws Exception
+    public void afterAll(ExtensionContext extensionContext)
     {
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
-
-        // Stop XWiki
-        for (XWikiExecutor executor : testContext.getExecutors()) {
-            executor.stop();
-        }
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);
     }
 
-    private void startBrowser(ExtensionContext extensionContext)
+    private BrowserWebDriverContainer startBrowser(ExtensionContext extensionContext)
     {
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
-            .withDesiredCapabilities(uiTestAnnotation.value().getCapabilities())
+            .withDesiredCapabilities(uiTestAnnotation.browser().getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
@@ -174,9 +205,10 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
 
         webDriverContainer.start();
 
-        LoggerFactory.getLogger(this.getClass()).info("VNC server address = " + webDriverContainer.getVncAddress());
+        LOGGER.info("VNC server address = " + webDriverContainer.getVncAddress());
 
-        // Store it so that we can stop it later on
+        // Store it so that we can retrieve it later on.
+        // Note that we don't need to stop it as this is taken care of by TestContainers
         saveBrowserWebDriverContainer(extensionContext, webDriverContainer);
 
         // Construct the XWikiWebDriver instance and save it in case it needs to be injected as a test method parameter.
@@ -186,6 +218,43 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         // Initialize the test context
         PersistentTestContext testContext = initializePersistentTestContext(xwikiWebDriver);
         savePersistentTestContext(extensionContext, testContext);
+
+        // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
+        // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
+        // Note that this requires a running XWiki instance.
+        testContext.getUtil().setURLPrefix("http://xwikiweb:8080/xwiki");
+        testContext.getUtil().recacheSecretToken();
+
+        return webDriverContainer;
+    }
+
+    private JdbcDatabaseContainer startDatabase(ExtensionContext extensionContext)
+    {
+        UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
+        DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
+        return executor.execute(uiTestAnnotation.database());
+    }
+
+    private GenericContainer startServletEngine(ExtensionContext extensionContext, File sourceWARDirectory)
+        throws Exception
+    {
+        UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
+        ServletContainerExecutor executor = new ServletContainerExecutor();
+        GenericContainer servletContainer = executor.execute(uiTestAnnotation.servletEngine(), sourceWARDirectory);
+
+        String xwikiURL = String.format("http://%s:%s/xwiki", servletContainer.getContainerIpAddress(),
+            servletContainer.getMappedPort(8080));
+        saveXWikiURL(extensionContext, xwikiURL);
+        LOGGER.info("XWiki ping URL = " + xwikiURL);
+
+        return servletContainer;
+    }
+
+    private void provisionExtensions(ExtensionContext context) throws Exception
+    {
+        // Install extensions in the running XWiki
+        String xwikiRESTURL = String.format("%s/rest", loadXWikiURL(context));
+        this.installer.installExtensions(xwikiRESTURL, SUPERADMIN, "pass", SUPERADMIN);
     }
 
     private void saveXWikiWebDriver(ExtensionContext context, XWikiWebDriver xwikiWebDriver)
@@ -218,10 +287,22 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         store.put(BrowserWebDriverContainer.class, container);
     }
 
+    private void saveXWikiURL(ExtensionContext context, String xwikiURL)
+    {
+        ExtensionContext.Store store = getStore(context);
+        store.put(String.class, xwikiURL);
+    }
+
     private BrowserWebDriverContainer loadBrowserWebDriverContainer(ExtensionContext context)
     {
         ExtensionContext.Store store = getStore(context);
         return store.get(BrowserWebDriverContainer.class, BrowserWebDriverContainer.class);
+    }
+
+    private String loadXWikiURL(ExtensionContext context)
+    {
+        ExtensionContext.Store store = getStore(context);
+        return store.get(String.class, String.class);
     }
 
     private void savePersistentTestContext(ExtensionContext context, PersistentTestContext testContext)
@@ -268,8 +349,19 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         }
     }
 
-    private String getHost()
+    private static void time(Runnable r) throws Exception
     {
-        return SystemUtils.IS_OS_LINUX ? "172.17.0.1" : "host.docker.internal";
+        if (LOGGER.isDebugEnabled()) {
+            long start = System.currentTimeMillis();
+            r.run();
+            LOGGER.debug("->   Time = {} ms", (System.currentTimeMillis() - start));
+        } else {
+            r.run();
+        }
+    }
+
+    private interface Runnable
+    {
+        void run() throws Exception;
     }
 }

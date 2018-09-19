@@ -19,43 +19,31 @@
  */
 package org.xwiki.test.docker.junit5;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 /**
- * Marks a test as being a functional UI Test.
+ * The database to use for the UI tests.
  *
  * @version $Id$
- * @since 10.6RC1
+ * @since 10.9RC1
  */
-@Documented
-@Retention(RUNTIME)
-@Target({ TYPE, METHOD, ANNOTATION_TYPE })
-@ExtendWith(XWikiDockerExtension.class)
-public @interface UITest
+public enum Database
 {
     /**
-     * @return the browser to use, see {@link Browser}
+     * Represents the MySQL database.
      */
-    Browser browser() default Browser.SYSTEM;
+    MYSQL,
 
     /**
-     * @return the database to use, see {@link Database}
-     * @since 10.9RC1
+     * Represents the HyperSQL database.
      */
-    Database database() default Database.MYSQL;
+    HSQLDB,
 
     /**
-     * @return the Servlet Engine to use, see {@link ServletEngine}
-     * @since 10.9RC1
+     * Represents the PostgreSQL database.
      */
-    ServletEngine servletEngine() default ServletEngine.TOMCAT;
+    POSTGRESQL,
+
+    /**
+     * Represents the Oracle database.
+     */
+    ORACLE
 }

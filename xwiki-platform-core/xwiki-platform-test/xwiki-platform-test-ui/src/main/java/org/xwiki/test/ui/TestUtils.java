@@ -935,9 +935,22 @@ public class TestUtils
      */
     public String getBaseURL()
     {
-        return TestUtils.urlPrefix + ":"
-            + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
-            + XWikiExecutor.DEFAULT_CONTEXT + "/";
+        String baseURL;
+
+        // If the URL has the port specified then consider it's a full URL
+        if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
+            baseURL = TestUtils.urlPrefix;
+        } else {
+            baseURL = TestUtils.urlPrefix + ":"
+                + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
+                + XWikiExecutor.DEFAULT_CONTEXT;
+        }
+
+        if (!baseURL.endsWith("/")) {
+            baseURL = baseURL + "/";
+        }
+
+        return baseURL;
     }
 
     /**

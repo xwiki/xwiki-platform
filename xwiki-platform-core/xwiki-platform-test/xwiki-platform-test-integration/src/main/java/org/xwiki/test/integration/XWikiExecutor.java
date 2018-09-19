@@ -39,10 +39,6 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.exec.environment.EnvironmentUtils;
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -113,7 +109,7 @@ public class XWikiExecutor
 
     private String executionDirectory;
 
-    private Map<String, String> environment = new HashMap<String, String>();
+    private Map<String, String> environment = new HashMap<>();
 
     private DefaultExecuteResultHandler startedProcessHandler;
 
@@ -129,14 +125,7 @@ public class XWikiExecutor
      */
     private boolean managed;
 
-    public class Response
-    {
-        public boolean timedOut;
-
-        public byte[] responseBody;
-
-        public int responseCode;
-    }
+    private XWikiWatchdog watchdog = new XWikiWatchdog();
 
     public XWikiExecutor(int index)
     {
@@ -241,7 +230,7 @@ public class XWikiExecutor
         if (VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
             LOGGER.info("Checking if an XWiki server is already started at [{}]", getURL());
             // First, verify if XWiki is started. If it is then don't start it again.
-            this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
+            this.wasStarted = !this.watchdog.isXWikiStarted(getURL(), 15).timedOut;
         }
 
         if (!this.wasStarted) {
@@ -323,7 +312,7 @@ public class XWikiExecutor
         // Wait till the main page becomes available which means the server is started fine
         LOGGER.info("Checking that XWiki is up and running...");
 
-        Response response = isXWikiStarted(getURL(), TIMEOUT_SECONDS);
+        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), TIMEOUT_SECONDS);
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
                 TIMEOUT_SECONDS, response.responseCode, new String(response.responseBody));
@@ -333,57 +322,6 @@ public class XWikiExecutor
         } else {
             LOGGER.info("Server is answering to [{}]... cool", getURL());
         }
-    }
-
-    public Response isXWikiStarted(String url, int timeout) throws Exception
-    {
-        HttpClient client = new HttpClient();
-
-        boolean connected = false;
-        long startTime = System.currentTimeMillis();
-        Response response = new Response();
-        response.timedOut = false;
-        response.responseCode = -1;
-        response.responseBody = new byte[0];
-        while (!connected && !response.timedOut) {
-            GetMethod method = new GetMethod(url);
-
-            // Don't retry automatically since we're doing that in the algorithm below
-            method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-                new DefaultHttpMethodRetryHandler(0, false));
-            // Set a socket timeout to ensure the server has no chance of not answering to our request...
-            method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 10000);
-
-            try {
-                // Execute the method.
-                response.responseCode = client.executeMethod(method);
-
-                // We must always read the response body.
-                response.responseBody = method.getResponseBody();
-
-                if (DEBUG) {
-                    LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url, response.responseCode,
-                        new String(response.responseBody));
-                }
-
-                // check the http response code is either not an error, either "unauthorized"
-                // (which is the case for products that deny view for guest, for example).
-                connected = (response.responseCode < 400 || response.responseCode == 401);
-            } catch (Exception e) {
-                // Do nothing as it simply means the server is not ready yet...
-            } finally {
-                // Release the connection.
-                method.releaseConnection();
-            }
-            Thread.sleep(500L);
-            response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
-        }
-
-        if (response.timedOut) {
-            LOGGER.info("No server is responding on [{}] after [{}] seconds", url, timeout);
-        }
-
-        return response;
     }
 
     public void stop() throws Exception

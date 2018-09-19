@@ -115,7 +115,7 @@ public class ClassPropertyValuesResourceImplTest
     public void getClassPropertyValuesUnauthorized() throws Exception
     {
         try {
-            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"));
+            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
             fail();
         } catch (WebApplicationException expected) {
             assertEquals(Status.UNAUTHORIZED.getStatusCode(), expected.getResponse().getStatus());
@@ -128,7 +128,7 @@ public class ClassPropertyValuesResourceImplTest
         when(this.authorization.hasAccess(Right.VIEW, this.propertyReference)).thenReturn(true);
 
         try {
-            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"));
+            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
             fail();
         } catch (WebApplicationException expected) {
             assertEquals(Status.NOT_FOUND.getStatusCode(), expected.getResponse().getStatus());
@@ -146,7 +146,8 @@ public class ClassPropertyValuesResourceImplTest
         when(propertyValuesProvider.getValues(this.propertyReference, 6, "one", "two")).thenReturn(values);
 
         assertSame(values,
-            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("one", "two")));
+            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("one", "two"),
+                false));
 
         assertEquals(1, values.getLinks().size());
         Link propertyLink = values.getLinks().get(0);

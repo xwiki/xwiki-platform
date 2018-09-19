@@ -26,7 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -67,6 +70,9 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
     protected EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
+    protected DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
     @Named("text")
     private QueryFilter textFilter;
 
@@ -90,6 +96,31 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         } catch (Exception e) {
             throw new XWikiRestException(e);
         }
+    }
+
+    @Override
+    public PropertyValues getValue(ClassPropertyReference propertyReference, Object... filterParameters)
+        throws XWikiRestException
+    {
+        String filter = "";
+        if (filterParameters.length > 0 && filterParameters[0] != null) {
+            filter = filterParameters[0].toString();
+        }
+        if (StringUtils.isEmpty(filter)) {
+            return new PropertyValues();
+        }
+
+        PropertyValues propertyValues = new PropertyValues();
+        DocumentReference documentReference = documentReferenceResolver.resolve(filter, EntityType.DOCUMENT);
+        if (documentReference != null) {
+            PropertyValue value =
+                this.getValueFromQueryResult(documentReference, getPropertyDefinition(propertyReference));
+            if (value != null) {
+                value.setValue(filter);
+                propertyValues.getPropertyValues().add(value);
+            }
+        }
+        return propertyValues;
     }
 
     @SuppressWarnings("unchecked")

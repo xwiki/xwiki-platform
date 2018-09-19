@@ -47,6 +47,7 @@ public interface ClassPropertyValuesResource
         @PathParam("className") String className,
         @PathParam("propertyName") String propertyName,
         @QueryParam("limit") @DefaultValue("100") Integer limit,
-        @QueryParam("fp") List<String> filterParameters
+        @QueryParam("fp") List<String> filterParameters,
+        @QueryParam("exactMatch") @DefaultValue("false") Boolean isExactMatch
     ) throws XWikiRestException;
 }

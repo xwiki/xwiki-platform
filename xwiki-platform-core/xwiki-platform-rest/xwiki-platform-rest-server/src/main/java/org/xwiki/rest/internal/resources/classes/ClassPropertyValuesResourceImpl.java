@@ -67,7 +67,7 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
 
     @Override
     public PropertyValues getClassPropertyValues(String wikiName, String className, String propertyName, Integer limit,
-        List<String> filterParameters) throws XWikiRestException
+        List<String> filterParameters, Boolean isExactMatch) throws XWikiRestException
     {
         DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
         ClassPropertyReference classPropertyReference = new ClassPropertyReference(propertyName, classReference);
@@ -84,8 +84,13 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
         propertyLink.setHref(propertyURI.toString());
         propertyLink.setRel(Relations.PROPERTY);
 
-        PropertyValues propertyValues =
-            this.propertyValuesProvider.getValues(classPropertyReference, limit, filterParameters.toArray());
+        PropertyValues propertyValues;
+        if (isExactMatch) {
+            propertyValues = this.propertyValuesProvider.getValue(classPropertyReference, filterParameters.toArray());
+        } else {
+            propertyValues = this.propertyValuesProvider
+                .getValues(classPropertyReference, limit, filterParameters.toArray());
+        }
         propertyValues.getLinks().add(propertyLink);
 
         return propertyValues;

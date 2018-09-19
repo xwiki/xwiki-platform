@@ -35,20 +35,27 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
       'properties', encodeURIComponent(select.attr('data-propertyName')),
       'values'
     ].join('/');
-    return {
-      create: true,
-      load: function(text, callback) {
-        $.getJSON(loadURL, {
-          'fp': text,
-          'limit': 10
-        }).then(function(response) {
+
+    var getLoad = function(getOptions) {
+      return function(text, callback) {
+        $.getJSON(loadURL, getOptions(text)).then(function(response) {
           if (response && $.isArray(response.propertyValues)) {
             return response.propertyValues.map(getSuggestion);
           } else {
             return [];
           }
         }).done(callback).fail(callback);
-      }
+      };
+    }
+
+    return {
+      create: true,
+      load: getLoad(function(text) {
+        return { 'fp': text, 'limit': 10 }
+      }),
+      loadSelected: getLoad(function(text) {
+        return { 'fp': text, 'exactMatch': true }
+      })
     };
   };
 

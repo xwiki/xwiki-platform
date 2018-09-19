@@ -46,10 +46,183 @@
 #end
 #hasGroupRight('edit' $hasEditGroupRight)
 #hasGroupRight('delete' $hasDeleteGroupRight)
-{{/velocity}}
 
-{{velocity}}
-### MANAGE CANDIDACIES ###
+#macro (displayInviteWikiUserForm)
+  &lt;form id='inviteUserForm' class='xform' method='post'&gt;
+    &lt;h2&gt;$services.localization.render('platform.wiki.currentwiki.member.add')&lt;/h2&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for='userInput'&gt;
+          $services.localization.render('platform.wiki.currentwiki.invite.username.label')
+        &lt;/label&gt;
+        &lt;span class='xHint'&gt;
+          $services.localization.render('platform.wiki.currentwiki.invite.username.hint')
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        ## The workspace can accept only global users.
+        #set ($userPickerParams = {
+          'id': 'userInput',
+          'name': 'name',
+          'data-userScope': 'GLOBAL_ONLY'
+        })
+        #userPicker(true $userPickerParams)
+      &lt;/dd&gt;
+      &lt;dt&gt;
+        &lt;label for='message'&gt;
+          $services.localization.render('platform.wiki.currentwiki.invite.message.label')
+        &lt;/label&gt;
+        &lt;span class='xHint'&gt;
+          $services.localization.render('platform.wiki.currentwiki.invite.message.hint')
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;textarea name='message'&gt;&lt;/textarea&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;p class="buttons"&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input type="submit" id="addMembers" class="button"
+          value="$services.localization.render('xe.admin.groups.addUser.submit')" /&gt;
+      &lt;/span&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input id='inviteUserButton' type='submit' class='button' name='inviteUser'
+          value="$services.localization.render('platform.wiki.currentwiki.invite.button.label')"/&gt;
+      &lt;/span&gt;
+    &lt;/p&gt;
+    &lt;div class="hidden"&gt;
+      &lt;input type='hidden' name='form_token' value='$!services.csrf.getToken()' /&gt;
+      &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
+      &lt;input type='hidden' name='section' value='Users'/&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+#end
+
+#macro (displayWikiMembers)
+  &lt;div class='xform'&gt;
+    &lt;h2&gt;$services.localization.render('admin.xwiki.members.title')&lt;/h2&gt;
+  &lt;/div&gt;
+  #set ($columnOptions = {
+    "member" : {'type': 'text', 'html': true},
+    'scope': {'filterable': false, 'sortable': false, 'html': true},
+    "_actions" : {
+      'actions': ['delete'],
+      'actionCallbacks': {'delete': 'table.deleteRow(i);'},
+      'ajaxActions': {'delete': true},
+      'filterable': false
+     }
+  })
+  #set ($columns = ['member'])
+  #if ($services.wiki.user.userScope != 'LOCAL_ONLY')
+    #set ($discard = $columns.add('scope'))
+  #end
+  #if ($hasDeleteGroupRight)
+    #set ($discard = $columns.add('_actions'))
+  #end
+  #livetable('groupusers', $columns, $columnOptions, {
+    'url': $groupDoc.getURL('view', 'xpage=getgroupmembers'),
+    'translationPrefix': 'xe.admin.groups.',
+    'javascriptName': 'editgrouptable',
+    'outputOnlyHtml': true
+  })
+#end
+
+#macro (displayWikiCandidateMembers)
+  &lt;div id='candidates' class='xform'&gt;
+    &lt;h2&gt;$services.localization.render('platform.wiki.currentwiki.candidates.label')&lt;/h2&gt;
+    #set ($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
+    #set ($candidateMembers = $groupDoc.getObjects($candidateClass))
+    #if ($candidateMembers.isEmpty())
+      &lt;p&gt;$services.localization.render('platform.wiki.currentwiki.candidates.empty')&lt;/p&gt;
+    #else
+      &lt;div class='xHint'&gt;$services.localization.render('platform.wiki.currentwiki.candidates.hint')&lt;/div&gt;
+      #foreach ($candidateMember in $candidateMembers)
+        #displayWikiCandidateMember($candidateMember)
+      #end
+    #end
+  &lt;/div&gt;
+#end
+
+#macro (displayWikiCandidateMember $candidateMember)
+  #set ($userFullName = $candidateMember.userName)
+  #set ($userURL = $xwiki.getURL($userFullName))
+  #set ($userComment = $candidateMember.getProperty('userComment').getValue())
+  #set ($status = $candidateMember.getProperty('status').getValue())
+  #set ($type = $candidateMember.getProperty('type').getValue())
+  &lt;div class='candidate'&gt;
+    &lt;div class='candidateAvatar'&gt;&lt;a href="$userURL"&gt;#mediumUserAvatar("$!{userFullName}")&lt;/a&gt;&lt;/div&gt;
+    &lt;div class='candidateDetails'&gt;
+      &lt;form class='xformInline' method='post'&gt;
+        &lt;div class='candidateNameAndComment'&gt;
+          $xwiki.getUserName($candidateMember.userName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
+        &lt;/div&gt;
+        &lt;div class='date xHint'&gt;
+          #if ($candidateMember.getProperty('date').value)
+            $candidateMember.date
+          #end
+        &lt;/div&gt;
+        &lt;div class='candidateStatus'&gt;
+          &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.status.label')&lt;/label&gt; $candidateMember.status
+        &lt;/div&gt;
+        &lt;div class='candidateType'&gt;
+          &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.type.label')&lt;/label&gt; $candidateMember.type
+        &lt;/div&gt;
+        #if ($status != 'pending' || $type == 'invitation')
+        &lt;div class='reviewer'&gt;
+          &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.reviewer.label')&lt;/label&gt; $xwiki.getUserName($candidateMember.reviewer)
+        &lt;/div&gt;
+        #end
+        &lt;div class='reviewerComment'&gt;
+          &lt;label&gt;
+              $services.localization.render('platform.wiki.currentwiki.candidates.reviewermessage.label')
+          &lt;/label&gt;
+          #if($status == 'pending' &amp;&amp; $type == 'request')
+            &lt;textarea name='reviewerComment'/&gt;
+          #else
+            &lt;span class='reviewerCommentSpan'&gt;$!{candidateMember.getProperty('reviewerComment').getValue()}&lt;/span&gt;
+          #end
+        &lt;/div&gt;
+        &lt;div class='reviewerPrivateComment'&gt;
+          &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.reviewerprivatecomment.label')&lt;/label&gt;
+          #if($status == 'pending' &amp;&amp; $type == 'request')
+            &lt;textarea name='reviewerPrivateComment'/&gt;
+          #else
+            &lt;span class='reviewerPrivateCommentSpan'&gt;$!{candidateMember.getProperty('reviewerPrivateComment').getValue()}&lt;/span&gt;
+          #end
+        &lt;/div&gt;
+        &lt;div class='date xHint'&gt;
+          #if ($candidateMember.getProperty('resolutionDate').value)
+            $candidateMember.resolutionDate
+          #end
+        &lt;/div&gt;
+        &lt;div class='reviewerActions'&gt;
+          #if ($status == 'pending' &amp;&amp; $type == 'request')
+          &lt;span class='buttonwrapper acceptUserButton'&gt;
+            &lt;input type='submit' class='button' name='acceptUser'
+              value="$services.localization.render('platform.wiki.currentwiki.candidates.accept.label')"/&gt;
+          &lt;/span&gt;
+          &lt;/span class='buttonwrapper rejectUserButton'&gt;
+            &lt;input type='submit' class='button secondary' name='rejectUser'
+              value="$services.localization.render('platform.wiki.currentwiki.candidates.reject.label')"/&gt;
+          &lt;/span&gt;
+          #end
+          #if ($status == 'pending' &amp;&amp; $type == 'invitation')
+          &lt;/span class='buttonwrapper cancelInvitationButton'&gt;
+            &lt;input type='submit' class='button' name='cancelInvitation'
+              value="$services.localization.render('platform.wiki.currentwiki.candidates.invitation.cancel.label')"/&gt;
+          &lt;/span&gt;
+          #end
+        &lt;/div&gt;
+        &lt;input type='hidden' name='candidateNumber' value='$candidateMember.number'/&gt;
+        &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
+        &lt;input type='hidden' name='section' value='Users'/&gt;
+        &lt;input type='hidden' name='form_token' value='$!services.csrf.token' /&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+    &lt;div class='clearfloats'&gt;&lt;/div&gt;
+  &lt;/div&gt;
+#end
+
 #macro (printException $exception)
 
   #if($exception.message)
@@ -59,6 +232,10 @@
   #end
 
 #end
+{{/velocity}}
+
+{{velocity}}
+### MANAGE CANDIDACIES ###
 #set ($candidateClass = 'WikiManager.WikiCandidateMemberClass')
 #set ($xwikiGroupsClass = 'XWiki.XWikiGroups')
 #set ($messageStream = $services.messageStream)
@@ -125,7 +302,7 @@
       #foreach ($name in $names)
         #if ($members.contains($name))
           #set ($discard = $alreadyMembers.add($name))
-          
+
           {{error}}$services.localization.render('platform.wiki.currentwiki.inviteUserAlreadyMember', [$xwiki.getUserName($name, false)]){{/error}}
 
         #end
@@ -178,13 +355,13 @@
           #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.invitationCancelNotification'))
           #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userId))
           #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-          
+
           {{info}}{{translation key="platform.wiki.currentwiki.invitationCancelSuccess"/}}{{/info}}
-          
+
         #else
-        
+
           {{error}}{{translation key="platform.wiki.currentwiki.invitationCancelFailure"/}}{{/error}}
-          
+
         #end
       #end
     #end
@@ -193,22 +370,23 @@
     {{warning}}
       {{translation key="platform.wiki.csrf.error" /}}
     {{/warning}}
-    
+
   #end
 #end
 ### MEMBERSHIP TYPE AND USER SCOPE ###
+#set($discard = $xwiki.ssx.use('XWiki.XWikiGroupSheet'))
 #set($discard = $xwiki.jsx.use('WikiManager.WikiUsers'))
 #set($userConfRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUserConfiguration'))
 #set($userConfDoc = $xwiki.getDocument($userConfRef))
 #set($userConfObj = $userConfDoc.getObject('WikiManager.WikiUserClass'))
 #if("$!userConfDoc.getValue('membershipType', $userConfObj)" == '')
   ## set a default value for membershipType
-  #set($discard = $userConfObj.set('membershipType', 'invite')) 
+  #set($discard = $userConfObj.set('membershipType', 'invite'))
 #end
 #set($updateWikiUserReference = $services.model.createDocumentReference('', 'WikiManager', 'UpdateWikiUser'))
 #set($redirectURL = $doc.getExternalURL($xcontext.action, $request.queryString))
 {{html clean="false" wiki="true"}}
-  &lt;form id='setUserConfigurationForm' class='xform half' action="$xwiki.getURL($updateWikiUserReference)" method='POST'&gt;
+  &lt;form id='setUserConfigurationForm' class='xform' action="$xwiki.getURL($updateWikiUserReference)" method='POST'&gt;
     &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
     &lt;h2&gt;$services.localization.render('admin.xwiki.usersconfiguration.title')&lt;/h2&gt;
     &lt;dl&gt;
@@ -229,168 +407,31 @@
       &lt;/span&gt;
     &lt;/p&gt;
 {{/html}}
-#set($redirectURL = $doc.getExternalURL($xcontext.action, $request.queryString))
+
 {{html clean="false"}}
     &lt;div class="hidden"&gt;
+      #set ($redirectURL = $doc.getExternalURL($xcontext.action, $request.queryString))
       &lt;input type='hidden' name='xredirect' value="$redirectURL" /&gt;
     &lt;/div&gt;
   &lt;/form&gt;
-{{/html}}
 
-## CANDIDACIES AND MEMBERS MANAGEMENT UI
-## This part is enabled only if we allow glocal users
-#if("$!services.wiki.user.userScope" != 'LOCAL_ONLY')
-#if($hasEditGroupRight)
-{{html}}
-#set ($discard = $xwiki.ssx.use('WikiManager.WikiUsers'))
-&lt;form id='inviteUserForm' class='xform half' method='post'&gt;
-  &lt;h2&gt;$services.localization.render('platform.wiki.currentwiki.member.add')&lt;/h2&gt;
-  &lt;dl&gt;
-    &lt;dt&gt;
-      &lt;label for='userInput'&gt;$services.localization.render('platform.wiki.currentwiki.invite.username.label')&lt;/label&gt;
-      &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.currentwiki.invite.username.hint')&lt;/span&gt;
-    &lt;/dt&gt;
-    &lt;dd&gt;
-      ## The workspace can accept only global users.
-      #set ($userPickerParams = {
-        'id': 'userInput',
-        'name': 'name',
-        'data-userScope': 'GLOBAL_ONLY'
-      })
-      #userPicker(true $userPickerParams)
-    &lt;/dd&gt;
-    &lt;dt&gt;
-      &lt;label for='message'&gt;$services.localization.render('platform.wiki.currentwiki.invite.message.label')&lt;/label&gt;
-      &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.currentwiki.invite.message.hint')&lt;/span&gt;
-    &lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;textarea name='message'&gt;&lt;/textarea&gt;
-    &lt;/dd&gt;
-  &lt;/dl&gt;
-  &lt;p class="buttons"&gt;
-    &lt;span class='buttonwrapper'&gt;
-      &lt;input type="submit" id="addMembers" class="button" value="$services.localization.render('xe.admin.groups.addUser.submit')" /&gt;
-    &lt;/span&gt;
-    &lt;span class='buttonwrapper'&gt;
-      &lt;input id='inviteUserButton' type='submit' class='button' name='inviteUser' value="$services.localization.render('platform.wiki.currentwiki.invite.button.label')"/&gt;
-    &lt;/span&gt;
-  &lt;/p&gt;
-  &lt;div class="hidden"&gt;
-    &lt;input type='hidden' name='form_token' value='$!services.csrf.getToken()' /&gt;
-    &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
-    &lt;input type='hidden' name='section' value='Users'/&gt;
-  &lt;/div&gt;
-&lt;/form&gt;
-{{/html}}
-#end
+  ## CANDIDACIES AND MEMBERS MANAGEMENT UI
+  ## This part is enabled only if we allow glocal users
+  #if ("$!services.wiki.user.userScope" != 'LOCAL_ONLY')
+    #if ($hasEditGroupRight)
+      #set ($discard = $xwiki.ssx.use('WikiManager.WikiUsers'))
+      #displayInviteWikiUserForm
+    #end
+    #displayWikiMembers
+    #displayWikiCandidateMembers
+  #end
 
-{{html}}
-  &lt;div class='xform'&gt;
-    &lt;h2&gt;$services.localization.render('admin.xwiki.members.title')&lt;/h2&gt;
-  &lt;/div&gt;
+  #if ("$!services.wiki.user.userScope" != 'GLOBAL_ONLY')
+    &lt;div class='xform'&gt;
+      &lt;h2&gt;$services.localization.render('admin.xwiki.users.title')&lt;/h2&gt;
+    &lt;/div&gt;
+  #end
 {{/html}}
-#set($columnOptions = {
-  "member" : {'link': 'auto', 'type': 'text'},
-  '_avatar' : { 'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false },
-  "_actions" : {
-    'actions': ['delete'],
-    'actionCallbacks': {'delete': 'table.deleteRow(i);'},
-    'ajaxActions': {'delete': true}
-   }
-})
-#if($hasDeleteGroupRight)
-  #set($columns = ['_avatar', 'member', '_actions'])
-#else
-  #set($columns = ['_avatar', 'member'])
-#end
-##
-#livetable('groupusers', $columns, $columnOptions, {'url' : "${groupDoc.getURL('view', 'xpage=getgroupmembers')}", 'translationPrefix' : 'xe.admin.groups.', 'javascriptName' : 'editgrouptable'})
-##
-{{html}}
-&lt;div id='candidates' class='xform'&gt;
-&lt;h2&gt;$services.localization.render('platform.wiki.currentwiki.candidates.label')&lt;/h2&gt;
-&lt;div class='xHint'&gt;$services.localization.render('platform.wiki.currentwiki.candidates.hint')&lt;/div&gt;
-#set ($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
-#set ($candidateMembers = $groupDoc.getObjects($candidateClass))
-#foreach ($candidateMember in $candidateMembers)
-  #set ($userFullName = $candidateMember.userName)
-  #set ($userURL = $xwiki.getURL($userFullName))
-  #set ($userComment = $candidateMember.getProperty('userComment').getValue())
-  #set ($status = $candidateMember.getProperty('status').getValue())
-  #set ($type = $candidateMember.getProperty('type').getValue())
-&lt;div class='candidate'&gt;
-  &lt;div class='candidateAvatar'&gt;&lt;a href="$userURL"&gt;#mediumUserAvatar("$!{userFullName}")&lt;/a&gt;&lt;/div&gt;
-  &lt;div class='candidateDetails'&gt;
-    &lt;form class='xformInline' method='post'&gt;
-      &lt;div class='candidateNameAndComment'&gt;
-        $xwiki.getUserName($candidateMember.userName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
-      &lt;/div&gt;
-      &lt;div class='date xHint'&gt;
-        #if ($candidateMember.getProperty('date').value)
-          $candidateMember.date
-        #end
-      &lt;/div&gt;
-      &lt;div class='candidateStatus'&gt;
-        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.status.label')&lt;/label&gt; $candidateMember.status
-      &lt;/div&gt;
-      &lt;div class='candidateType'&gt;
-        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.type.label')&lt;/label&gt; $candidateMember.type
-      &lt;/div&gt;
-      #if ($status != 'pending' || $type == 'invitation')
-      &lt;div class='reviewer'&gt;
-        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.reviewer.label')&lt;/label&gt; $xwiki.getUserName($candidateMember.reviewer)
-      &lt;/div&gt;
-      #end
-      &lt;div class='reviewerComment'&gt;
-        &lt;label&gt;
-            $services.localization.render('platform.wiki.currentwiki.candidates.reviewermessage.label')
-        &lt;/label&gt;
-        #if($status == 'pending' &amp;&amp; $type == 'request')
-          &lt;textarea name='reviewerComment'/&gt;
-        #else
-          &lt;span class='reviewerCommentSpan'&gt;$!{candidateMember.getProperty('reviewerComment').getValue()}&lt;/span&gt;
-        #end
-      &lt;/div&gt;
-      &lt;div class='reviewerPrivateComment'&gt;
-        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.reviewerprivatecomment.label')&lt;/label&gt;
-        #if($status == 'pending' &amp;&amp; $type == 'request')
-          &lt;textarea name='reviewerPrivateComment'/&gt;
-        #else
-          &lt;span class='reviewerPrivateCommentSpan'&gt;$!{candidateMember.getProperty('reviewerPrivateComment').getValue()}&lt;/span&gt;
-        #end
-      &lt;/div&gt;
-      &lt;div class='date xHint'&gt;
-        #if ($candidateMember.getProperty('resolutionDate').value)
-          $candidateMember.resolutionDate
-        #end
-      &lt;/div&gt;
-      &lt;div class='reviewerActions'&gt;
-        #if ($status == 'pending' &amp;&amp; $type == 'request')
-        &lt;span class='buttonwrapper acceptUserButton'&gt;
-          &lt;input type='submit' class='button' value="$services.localization.render('platform.wiki.currentwiki.candidates.accept.label')" name='acceptUser'/&gt;
-        &lt;/span&gt;
-        &lt;/span class='buttonwrapper rejectUserButton'&gt;
-          &lt;input type='submit' class='button secondary' value="$services.localization.render('platform.wiki.currentwiki.candidates.reject.label')" name='rejectUser'/&gt;
-        &lt;/span&gt;
-        #end
-        #if ($status == 'pending' &amp;&amp; $type == 'invitation')
-        &lt;/span class='buttonwrapper cancelInvitationButton'&gt;
-          &lt;input type='submit' class='button' value="$services.localization.render('platform.wiki.currentwiki.candidates.invitation.cancel.label')" name='cancelInvitation'/&gt;
-        &lt;/span&gt;
-        #end
-      &lt;/div&gt;
-      &lt;input type='hidden' name='candidateNumber' value='$candidateMember.number'/&gt;
-      &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
-      &lt;input type='hidden' name='section' value='Users'/&gt;
-      &lt;input type='hidden' name='form_token' value='$!services.csrf.getToken()' /&gt;
-    &lt;/form&gt;
-  &lt;/div&gt;
-  &lt;div class='clearfloats'&gt;&lt;/div&gt;
-&lt;/div&gt;
-#end
-&lt;/div&gt;
-{{/html}}
-#end
 {{/velocity}}</content>
   <object>
     <name>WikiManager.WikiUsers</name>

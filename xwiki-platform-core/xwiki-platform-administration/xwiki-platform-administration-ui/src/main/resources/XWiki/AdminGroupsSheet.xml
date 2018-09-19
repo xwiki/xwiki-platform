@@ -36,81 +36,159 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-##
-## FIXME: Rewrite this entire code since it is very old and does everything by hand, making it hard to maintain.
-##
-{{html}}
-### Globally administrate the groups in a wiki.
-#set($formname = "update")
-#set($saveaction = "save")
-##
-## Inject needed JS and CSS files
-##
-#set($ok = $xwiki.jsfx.use("js/xwiki/lightbox/lightbox.js", true))
-#set($ok = $xwiki.ssfx.use("js/xwiki/lightbox/lightbox.css", true))
-#set($ok = $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true))
-#set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
-#set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
-#set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
-#set($ok = $xwiki.jsx.use('XWiki.AdminGroupsSheet'))
+  <content>{{velocity output="false"}}
+#macro (createGroupModal)
+  &lt;form action="" class="modal xform" id="createGroupModal" tabindex="-1" role="dialog"
+      aria-labelledby="createGroupModal-label" data-backdrop="static" data-keyboard="false"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;h4 class="modal-title" id="createGroupModal-label"&gt;
+            $escapetool.xml($services.localization.render('rightsmanager.creategroup'))
+          &lt;/h4&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;div class="hidden"&gt;
+            &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
+            &lt;input type="hidden" name="template" value="XWiki.XWikiGroupTemplate" /&gt;
+          &lt;/div&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;
+              &lt;label for="createGroupModal-groupName" class="sr-only"&gt;
+                $escapetool.xml($services.localization.render('xe.admin.groups.name'))
+              &lt;/label&gt;
+            &lt;/dt&gt;
+            &lt;dd class="form-group has-feedback"&gt;
+              &lt;input type="text" class="form-control" id="createGroupModal-groupName" name="name" autocomplete="off"
+                placeholder="$escapetool.xml($services.localization.render('xe.admin.groups.name'))" /&gt;
+              &lt;span class="form-control-feedback loading hidden" aria-hidden="true"&gt;&lt;/span&gt;
+              &lt;span class="form-control-feedback success hidden" aria-hidden="true"&gt;$services.icon.renderHTML('check')&lt;/span&gt;
+              &lt;span class="form-control-feedback error hidden" aria-hidden="true"&gt;$services.icon.renderHTML('cross')&lt;/span&gt;
+              &lt;span class="help-block hidden"&gt;&lt;/span&gt;
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="submit" class="btn btn-primary"&gt;
+            $escapetool.xml($services.localization.render('create'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+#end
+
+#macro (editGroupModal)
+  &lt;div class="modal" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModal-label"
+      data-backdrop="static" data-keyboard="false"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;h4 class="modal-title" id="editGroupModal-label"&gt;
+            $escapetool.xml($services.localization.render('xe.admin.groups.editGroup'))
+          &lt;/h4&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (deleteGroupModal)
+  &lt;div class="modal" id="deleteGroupModal" tabindex="-1" role="dialog" aria-labelledby="deleteGroupModal-label"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;h4 class="modal-title" id="deleteGroupModal-label"&gt;
+            $escapetool.xml($services.localization.render('xe.admin.groups.deleteGroup'))
+          &lt;/h4&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeletegroup')))
+          &lt;p&gt;$message.replace('__name__', '&lt;span class="groupName"&gt;&lt;/span&gt;')&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="submit" class="btn btn-danger" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('delete'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (groupScopeFilter)
+  &lt;select name="wiki"&gt;
+    &lt;option selected="selected" value="local"&gt;
+      $escapetool.xml($services.localization.render('xe.admin.groups.local'))
+    &lt;/option&gt;
+    &lt;option value="global"&gt;
+      $escapetool.xml($services.localization.render('xe.admin.groups.global'))
+    &lt;/option&gt;
+    &lt;option value="both"&gt;
+      $escapetool.xml($services.localization.render('xe.admin.groups.both'))
+    &lt;/option&gt;
+  &lt;/select&gt;
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($discard = $xwiki.ssx.use('XWiki.AdminGroupsSheet'))
+#set ($discard = $xwiki.jsx.use('XWiki.AdminGroupsSheet'))
 ## The following are needed when editing a group (e.g. for adding new members).
 #userPicker_import()
+#set ($discard = $xwiki.ssx.use('XWiki.XWikiGroupSheet'))
 #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
-#if($xcontext.database != "xwiki")
-  #set($mainwk = false)
-#else
-  #set($mainwk = true)
+#set ($columnOptions = {
+  'name': {'type': 'text', 'html': true, 'sortable': false},
+  'members': {'filterable': false, 'sortable': false},
+  'scope': {'type': 'list', 'sortable': false},
+  '_actions': {
+    'actions': ['edit', 'delete'],
+    'labels': {
+      'delete': $services.localization.render('platform.livetable._actions.delete')
+    },
+    'filterable': false
+   }
+})
+#set ($columns = ['name', 'members', '_actions'])
+#set ($liveTableOptions = {
+  'url': $doc.getURL('view', 'xpage=getgroups'),
+  'translationPrefix': 'xe.admin.groups.',
+  'outputOnlyHtml': true
+})
+#if (!$xcontext.isMainWiki())
+  #set ($discard = $columns.add(2, 'scope'))
+  ## We use the top filters option to show only the local groups by default because the JavaScript code from the sheet
+  ## is executed after the livetable is loaded. The JavaScript code removes the top filters and updates the scope filter
+  ## afterwards.
+  #set ($liveTableOptions.topFilters = "#groupScopeFilter")
 #end
-&lt;div id="xwikieditcontent"&gt;
-  &lt;table id="groupstable" class="xwiki-livetable"&gt;
-    &lt;tr&gt;
-      &lt;td class="xwiki-livetable-pagination"&gt;
-        &lt;span id="groupstable-limits" class="xwiki-livetable-limits"&gt;&lt;/span&gt;
-        &lt;span id="groupstable-ajax-loader" class="xwiki-livetable-loader"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" /&gt;$services.localization.render('platform.livetable.loading')&lt;/span&gt;
-        &lt;span class="pagination"&gt;
-          &lt;span id="groupstable-pagination-text" class="xwiki-livetable-pagination-text"&gt;$services.localization.render('platform.livetable.paginationPage')&lt;/span&gt;
-          &lt;span id="groupstable-pagination" class="xwiki-livetable-pagination-content" &gt;&lt;/span&gt;
-        &lt;/span&gt;
-      &lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td class="xwiki-livetable-display-container"&gt;
-        &lt;table class="xwiki-livetable-display"&gt;
-          &lt;thead class="xwiki-livetable-display-header"&gt;
-            &lt;tr&gt;
-              &lt;th class="xwiki-livetable-display-header-text" scope="col"&gt;$services.localization.render('xe.admin.groups.groupname')&lt;/th&gt;
-              &lt;th class="xwiki-livetable-display-header-text" scope="col"&gt;$services.localization.render('xe.admin.groups.members')&lt;/th&gt;
-              &lt;th class="xwiki-livetable-display-header-text" scope="col"&gt;$services.localization.render('xe.admin.groups.manage')&lt;/th&gt;
-            &lt;/tr&gt;
-            &lt;tr id="groupstable-filters" class="xwiki-livetable-display-filters"&gt;
-              &lt;td class="xwiki-livetable-display-header-filter"&gt;&lt;label for="name" class="hidden"&gt;$services.localization.render('xe.admin.groups.filter.groupName')&lt;/label&gt;&lt;input id="name" name="name" type="text" class="filter"/&gt;&lt;/td&gt;
-              &lt;td class="xwiki-livetable-display-header-filter"&gt;&lt;/td&gt;
-              &lt;td class="xwiki-livetable-display-header-filter"&gt;
-              #if (!$mainwk)
-                &lt;label for="wiki" class="hidden"&gt;$services.localization.render('xe.admin.groups.filter.scope')&lt;/label&gt;
-                &lt;select name="wiki" class="filter"&gt;
-                  &lt;option value="local" selected="selected"&gt;$services.localization.render('xe.admin.groups.local')&lt;/option&gt;
-                  &lt;option value="global"&gt;$services.localization.render('xe.admin.groups.global')&lt;/option&gt;
-                  &lt;option value="both"&gt;$services.localization.render('xe.admin.groups.both')&lt;/option&gt;
-                &lt;/select&gt;
-              #else
-                &lt;input type="hidden" value="local" name="wiki" /&gt;
-              #end
-              &lt;/td&gt;
-            &lt;/tr&gt;
-          &lt;/thead&gt;
-          &lt;tbody id="groupstable-display" class="xwiki-livetable-display-body"&gt;&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
-        &lt;/table&gt;
-      &lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td id="tdAddNewUserOrGroup"&gt;
-        &lt;span class="buttonwrapper"&gt;&lt;a href="#" id="addNewGroup"&gt;$services.localization.render('rightsmanager.addnewgroup')&lt;/a&gt;&lt;/span&gt;
-      &lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/table&gt;
-&lt;/div&gt; ## xwikieditcontent
+{{html clean="false"}}
+#livetable('groupstable' $columns $columnOptions $liveTableOptions)
+&lt;p&gt;
+  &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createGroupModal"&gt;
+    $escapetool.xml($services.localization.render('rightsmanager.creategroup'))
+  &lt;/button&gt;
+&lt;/p&gt;
+#createGroupModal
+#editGroupModal
+#deleteGroupModal
 {{/html}}
 {{/velocity}}</content>
   <object>
@@ -195,34 +273,191 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
-  /**
-   * Callback for the livetable.
-   */
-  var livetableCallback = function(row, i, table) {
-    return displayGroups(row, i, table, "$!{services.csrf.getToken()}");
+      <code>define('bootstrap-form-validation', ['jquery'], function($) {
+  return {
+    resetValidation: function(formControl) {
+      var formGroup = formControl.closest('.form-group');
+      formGroup.removeClass('has-success has-error has-warning');
+      formGroup.find('.form-control-feedback').addClass('hidden');
+      formGroup.find('.help-block').addClass('hidden').empty();
+    },
+    setLoading: function(formControl) {
+      this.resetValidation(formControl);
+      formControl.closest('.form-group').find('.form-control-feedback.loading').removeClass('hidden');
+    },
+    setSuccess: function(formControl) {
+      this.resetValidation(formControl);
+      formControl.closest('.form-group').addClass('has-success').find('.form-control-feedback.success')
+        .removeClass('hidden');
+    },
+    setError: function(formControl, message) {
+      this.resetValidation(formControl);
+      formControl.closest('.form-group').addClass('has-error')
+        .find('.form-control-feedback.error').removeClass('hidden').end()
+        .find('.help-block').removeClass('hidden').text(message);
+    }
+  };
+});
+
+//
+// Group Creation
+//
+require(['jquery', 'bootstrap-form-validation'], function($, validation) {
+  var createGroupModal = $('#createGroupModal');
+  var createGroupButton = createGroupModal.find('button.btn-primary');
+  createGroupModal.on('shown.bs.modal', function() {
+    // Reset the form each time the modal is shown.
+    createGroupModal.trigger('reset');
+    createGroupModal.find('.form-control').each(function() {
+      validation.resetValidation($(this));
+    }).first().focus();
+    createGroupButton.prop('disabled', true);
+  });
+
+  // Group name validation.
+  var groupNameTimeout;
+  var groupNameInput = createGroupModal.find('input[name="name"]');
+  groupNameInput.on('input', function() {
+    clearTimeout(groupNameTimeout);
+    createGroupButton.prop('disabled', true);
+    validation.resetValidation(groupNameInput);
+    if (groupNameInput.val() !== '') {
+      validation.setLoading(groupNameInput);
+      groupNameTimeout = setTimeout(function() {
+        var groupName = groupNameInput.val();
+        var groupURL = new XWiki.Document(groupName, 'XWiki').getRestURL();
+        $.get(groupURL).done(function() {
+          // A document with the specified name already exists.
+          var message = $jsontool.serialize($services.localization.render('rightsmanager.groupexist'))
+            .replace('__name__', groupName);
+          validation.setError(groupNameInput, message);
+        }).fail(function(response) {
+          if (response.status === 404) {
+            // The document does not exist, so we can use it.
+            validation.setSuccess(groupNameInput);
+            createGroupButton.prop('disabled', false);
+          } else {
+            // Something else happened. This was not intended.
+            var message = $jsontool.serialize($services.localization.render(
+              'platform.core.rightsManagement.ajaxFailure'));
+            validation.setError(groupNameInput, message);
+          }
+        });
+      }, 500);
+    }
+  });
+
+  createGroupModal.submit(function(event) {
+    event.preventDefault();
+    var data = createGroupModal.serializeArray();
+    data.push({name: 'ajax', value: 1});
+    var groupName = groupNameInput.val();
+    var createGroupURL = new XWiki.Document(groupName, 'XWiki').getURL('save');
+    // Disable the form to prevent it from being submitted twice.
+    createGroupModal.find(':input').prop('disabled', true);
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('xe.admin.groups.create.inProgress')),
+      'inprogress'
+    );
+    $.post(createGroupURL, data).done(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.groups.create.done')),
+        'done'
+      ));
+      // Close the modal and refresh the groups live table.
+      createGroupModal.modal('hide');
+      window.livetable_groupstable.refresh();
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.groups.create.failed')),
+        'error'
+      ));
+    }).always(function() {
+      // Re-enable the form.
+      createGroupModal.find(':input').prop('disabled', false);
+    });
+  });
+});
+
+//
+// Scope Filtering
+//
+require(['jquery'], function($) {
+  var options = $('#groupstable').prev('.tipfilters').remove().find('select[name="wiki"]').html();
+  var scopeFilter = $('#groupstable .xwiki-livetable-display-filters select[name="scope"]')
+  scopeFilter.attr('name', 'wiki').html(options);
+});
+
+require(['jquery', 'xwiki-meta'], function($, xm) {
+  var groupsLiveTable = window.livetable_groupstable;
+
+  var getRowIndex = function(element) {
+    var groupURL = element.closest('tr').find('a.group-name').attr('href');
+    for (var i = 0; i &lt; groupsLiveTable.fetchedRows.length; i++) {
+      var rowData = groupsLiveTable.fetchedRows[i];
+      if (rowData &amp;&amp; rowData.doc_url === groupURL) {
+        return i;
+      }
+    }
+    return -1;
   };
 
-  var startup = function() {
-    // URL to get the groups for displaying them in the ajax-based table
-    var livetableDataURL = XWiki.currentDocument.getURL('get', 'xpage=getgroups');
-    // Initialize the livetable. FIXME: Just use the "modern" livetable macro.
-    var ta = new XWiki.widgets.LiveTable(livetableDataURL, 'groupstable', livetableCallback);
+  //
+  // Group Editing
+  //
 
-    // Register the click listener for the Add New Group button.
-    var groupsDocument = new XWiki.Document('XWikiGroups', 'XWiki');
-    var addnewurl = groupsDocument.getURL('get', 'xpage=addnewgroup');
-    var saveurl = groupsDocument.getURL('view');
-    var redirecturl = new XWiki.Document('XWikiPreferences', 'XWiki').getURL('admin', 'editor=' + XWiki.editor + '&amp;section=Groups');
-    $('#addNewGroup').on('click', makeAddHandler(addnewurl, saveurl, redirecturl));
-  }
+  var editGroupModal = $('#editGroupModal');
+  $('#groupstable').on('click', 'a.actionedit', function(event) {
+    event.preventDefault();
+    var rowIndex = getRowIndex($(this));
+    var rowData = groupsLiveTable.fetchedRows[rowIndex];
+    var groupReference = XWiki.Model.resolve(rowData.doc_fullName, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
+    var groupDocument = new XWiki.Document(groupReference);
+    var editGroupURL = groupDocument.getURL('edit', 'xpage=plain');
+    editGroupModal.find('.modal-body').empty().addClass('loading').load(editGroupURL, function() {
+      this.removeClass('loading');
+      $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+    });
+    editGroupModal.modal('show');
+  });
 
-  // Initialization
-  if ((typeof(XWiki) != 'undefined') &amp;&amp; (typeof(XWiki.widgets) != 'undefined') &amp;&amp; (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
-    startup();
-  } else {
-    $(document).on('xwiki:livetable:loading', startup);
-  }
+  editGroupModal.on('hide.bs.modal', function() {
+    groupsLiveTable.refresh();
+  });
+
+  //
+  // Group Deletion
+  //
+
+  var deleteGroupModal = $('#deleteGroupModal');
+  $('#groupstable').on('click', 'a.actiondelete', function(event) {
+    event.preventDefault();
+    var rowIndex = getRowIndex($(this));
+    var rowData = groupsLiveTable.fetchedRows[rowIndex];
+    var groupReference = rowData.doc_fullName;
+    if (XWiki.currentWiki !== rowData.doc_wiki) {
+      groupReference = XWiki.Model.resolve(groupReference, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
+      groupReference = XWiki.Model.serialize(groupReference);
+    }
+    deleteGroupModal.data({
+      'groupReference': groupReference,
+      'rowIndex': rowIndex
+    }).modal('show');
+  });
+
+  deleteGroupModal.on('show.bs.modal', function() {
+    deleteGroupModal.find('.groupName').text(deleteGroupModal.data('groupReference'));
+  });
+
+  deleteGroupModal.find('.btn-danger').click(function() {
+    $.post('', {
+      xpage: 'deleteuorg',
+      docname: deleteGroupModal.data('groupReference'),
+      form_token: xm.form_token
+    }).done(function() {
+      groupsLiveTable.deleteRow(deleteGroupModal.data('rowIndex'));
+    });
+  });
 });</code>
     </property>
     <property>
@@ -232,7 +467,139 @@
       <parse>1</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.AdminGroupsSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>1e6539da-e9e3-41ef-a9c0-43a6c2cd920d</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/**
+ * Create Group Modal
+ */
+
+#createGroupModal dl,
+#createGroupModal dd:last-child {
+  margin-bottom: 0;
+}
+
+#createGroupModal .help-block {
+  font-size: smaller;
+}
+
+/**
+ * Delete Group Modal
+ */
+
+#deleteGroupModal .groupName {
+  font-weight: bolder;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

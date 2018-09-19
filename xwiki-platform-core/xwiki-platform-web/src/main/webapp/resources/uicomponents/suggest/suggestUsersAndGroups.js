@@ -75,7 +75,13 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
       load: function(text, callback) {
         loadUsers(select.attr('data-userScope'), {
           'input': text,
-          'limit': 10
+          'limit': 10,
+        }).done(callback).fail(callback);
+      },
+      loadSelected: function(text, callback) {
+        loadUsers(select.attr('data-userScope'), {
+          'input': text,
+          'exactMatch': true
         }).done(callback).fail(callback);
       }
     };
@@ -127,6 +133,12 @@ define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selecti
         loadGroups(select.attr('data-userScope'), {
           'input': text,
           'limit': 10
+        }).done(callback).fail(callback);
+      },
+      loadSelected: function(text, callback) {
+        loadGroups(select.attr('data-userScope'), {
+          'input': text,
+          'exactMatch': true
         }).done(callback).fail(callback);
       }
     };

@@ -243,7 +243,7 @@ require([
           });
 
           var aggregatePageNames = function (arrayOfNames) {
-            return arrayOfNames.map(name => encodeURIComponent(name)).join("&");
+            return arrayOfNames.map(function (name) { return encodeURIComponent(name); }).join("&");
           };
 
           checkedPagesInput.val(aggregatePageNames(checkedPages));

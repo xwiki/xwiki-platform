@@ -248,7 +248,7 @@
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
     </property>
     <property>
-      <name>platform.panels.MenuApplication</name>
+      <name>platform.menu.MenuApplication</name>
     </property>
     <property>
       <parameters>label=Menu

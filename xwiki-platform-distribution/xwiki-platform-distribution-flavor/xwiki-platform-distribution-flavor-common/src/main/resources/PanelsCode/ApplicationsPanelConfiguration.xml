@@ -95,6 +95,34 @@
   </object>
   <object>
     <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>5</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>6722e567-fbdf-4ebf-a85d-116ab12f158e</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.menu.MenuApplication</applicationId>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
     <number>2</number>
     <className>PanelsCode.ApplicationsPanelBlackListClass</className>
     <guid>dbae2a33-4d65-462d-99c1-779a2fb42c65</guid>

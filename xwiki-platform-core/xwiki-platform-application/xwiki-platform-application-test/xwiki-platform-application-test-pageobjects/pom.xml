@@ -24,23 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <artifactId>xwiki-platform-application-test</artifactId>
+    <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-application</artifactId>
-  <name>XWiki Platform - Application - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Application - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-application-ui</module>
-  </modules>
-
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-application-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-application-test-pageobjects</artifactId>
+  <name>XWiki Platform - Application - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Application - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

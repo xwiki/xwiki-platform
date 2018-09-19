@@ -5,8 +5,9 @@ Priority: optional
 Architecture: all
 Depends: xwiki-common (= [[version]]), tomcat7
 Provides: xwiki-tomcat-common
+Replaces: xwiki-tomcat-common, xwiki-enterprise-tomcat-common
+Conflicts: xwiki-tomcat-common, xwiki-enterprise-tomcat-common
 Suggests: xwiki-tomcat7-mysql | xwiki-tomcat7-pgsql
-Conflicts: xwiki-enterprise-tomcat7-common
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

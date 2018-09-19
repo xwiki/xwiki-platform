@@ -5,9 +5,9 @@ Priority: optional
 Architecture: all
 Depends: xwiki-common (= [[version]]), mysql-server | default-mysql-server | mariadb-server, libmysql-java (>= 5.1.4), dbconfig-common
 Provides: xwiki-database
+Replaces: xwiki-database, xwiki-enterprise-database
+Conflicts: xwiki-database, xwiki-enterprise-database
 Suggests: xwiki-tomcat7-mysql | xwiki-tomcat8-mysql
-Replaces: xwiki-database
-Conflicts: xwiki-enterprise-database, xwiki-enterprise-mysql-common
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

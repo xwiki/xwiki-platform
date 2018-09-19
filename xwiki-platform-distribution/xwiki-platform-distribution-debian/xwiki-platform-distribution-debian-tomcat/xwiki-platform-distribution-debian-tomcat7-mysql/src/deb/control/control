@@ -4,7 +4,9 @@ Section: java
 Priority: optional
 Architecture: all
 Depends: xwiki-tomcat7-common (= [[version]]), xwiki-mysql-common (= [[version]])
-Conflicts: xwiki-enterprise-tomcat7-mysql
+Provides: xwiki-tomcat-database
+Replaces: xwiki-tomcat-database, xwiki-enterprise-tomcat7-mysql, xwiki-enterprise-tomcat8-mysql, xwiki-enterprise-tomcat7-pgsql, xwiki-enterprise-tomcat8-pgsql, xwiki-tomcat7-pgsql, xwiki-tomcat8-mysql, xwiki-tomcat8-pgsql
+Conflicts: xwiki-tomcat-database, xwiki-enterprise-tomcat7-mysql, xwiki-enterprise-tomcat8-mysql, xwiki-enterprise-tomcat7-pgsql, xwiki-enterprise-tomcat8-pgsql, xwiki-tomcat7-pgsql, xwiki-tomcat8-mysql, xwiki-tomcat8-pgsql
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

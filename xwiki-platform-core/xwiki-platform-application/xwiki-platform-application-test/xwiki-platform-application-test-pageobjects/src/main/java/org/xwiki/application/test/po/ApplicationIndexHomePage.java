@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the Applications.WebHome page.
  *
  * @version $id$
- * @since 10.8RC1
+ * @since 10.9RC1
  *
  */
 public class ApplicationIndexHomePage extends ViewPage

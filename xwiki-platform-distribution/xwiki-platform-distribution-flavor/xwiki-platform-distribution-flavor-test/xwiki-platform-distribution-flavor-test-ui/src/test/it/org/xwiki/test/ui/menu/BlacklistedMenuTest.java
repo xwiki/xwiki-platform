@@ -27,6 +27,12 @@ import org.xwiki.test.ui.AbstractTest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Add specific test for menu related to this flavor.
+ *
+ * @version $id$
+ * @since 10.9RC1
+ */
 public class BlacklistedMenuTest extends AbstractTest
 {
     @Test

@@ -23,6 +23,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
 
+/**
+ * Represents the Export modal
+ *
+ * @version $Id$
+ * @since 10.8
+ */
 public class ExportModal extends BaseModal
 {
     public ExportModal()

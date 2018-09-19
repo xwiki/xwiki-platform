@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,7 +61,6 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
  * @since 6.3M2
  */
 @OldcoreTest
-@AllComponents
 public class ExportActionTest
 {
     @InjectMockitoOldcore
@@ -160,9 +160,10 @@ public class ExportActionTest
 
         // Set other request parameters
         when(request.get("name")).thenReturn("myexport");
+        when(request.getCharacterEncoding()).thenReturn("UTF-8");
         // Export all pages in the "Space" space
         when(request.get("other-pages")).thenReturn("true");
-        when(request.get("unchecked-pages")).thenReturn("Space.Page1&Space.Page2");
+        when(request.get("unchecked-pages")).thenReturn(URLEncoder.encode("Space.Page1&Space.Page2", "UTF-8"));
 
         // Make the current user have programming rights
         when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);

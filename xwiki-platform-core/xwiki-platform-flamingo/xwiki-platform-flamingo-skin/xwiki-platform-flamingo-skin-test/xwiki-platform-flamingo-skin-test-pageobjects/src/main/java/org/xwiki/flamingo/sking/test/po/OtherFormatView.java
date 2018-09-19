@@ -25,6 +25,12 @@ import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.EntityTreeElement;
 import org.xwiki.tree.test.po.TreeElement;
 
+/**
+ * Represents the opened panel "Other Formats" in the modal export
+ *
+ * @version $Id$
+ * @since 10.8
+ */
 public class OtherFormatView extends BaseElement
 {
     public boolean isTreeAvailable()

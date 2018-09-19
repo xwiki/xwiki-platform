@@ -118,7 +118,7 @@ public class ExportAction extends XWikiAction
         private String name;
         private String description;
 
-        ExportArguments(XWikiContext context)
+        ExportArguments(XWikiContext context) throws XWikiException
         {
             XWikiRequest request = context.getRequest();
 
@@ -133,7 +133,7 @@ public class ExportAction extends XWikiAction
             String checkedPagesParam = request.get("checked-pages");
 
             if (!StringUtils.isEmpty(checkedPagesParam)) {
-                this.checkedPages = checkedPagesParam.split("&");
+                this.checkedPages = retrievePages(checkedPagesParam, context);
             } else {
                 this.checkedPages = pagesParam;
             }
@@ -143,8 +143,22 @@ public class ExportAction extends XWikiAction
 
             this.uncheckedPages = null;
             if (!StringUtils.isEmpty(request.get("unchecked-pages"))) {
-                this.uncheckedPages = request.get("unchecked-pages").split(PAGE_SEPARATOR);
+                this.uncheckedPages = this.retrievePages(request.get("unchecked-pages"), context);
             }
+        }
+
+        private String[] retrievePages(String parameterValue, XWikiContext context) throws XWikiException
+        {
+            List<String> listOfPages = new ArrayList<>();
+            for (String page : parameterValue.split(PAGE_SEPARATOR)) {
+                try {
+                    listOfPages.add(URLDecoder.decode(page, context.getRequest().getCharacterEncoding()));
+                } catch (UnsupportedEncodingException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
+                        "Failed to resolve pages to export", e);
+                }
+            }
+            return listOfPages.toArray(new String[0]);
         }
     }
 
@@ -185,6 +199,9 @@ public class ExportAction extends XWikiAction
         return null;
     }
 
+    /**
+     * Resolve the pages in the given context and return their references
+     */
     private Collection<DocumentReference> resolvePages(String[] pages, XWikiContext context) throws XWikiException
     {
         List<DocumentReference> pageList = new ArrayList<>();
@@ -193,13 +210,7 @@ public class ExportAction extends XWikiAction
         } else {
             Map<String, Object[]> wikiQueries = new HashMap<>();
             for (int i = 0; i < pages.length; ++i) {
-                String pattern = null;
-                try {
-                    pattern = URLDecoder.decode(pages[i], context.getRequest().getCharacterEncoding());
-                } catch (UnsupportedEncodingException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                        "Failed to resolve pages to export", e);
-                }
+                String pattern = pages[i];
 
                 String wikiName;
                 if (pattern.contains(":")) {
@@ -267,6 +278,11 @@ public class ExportAction extends XWikiAction
         return pageList;
     }
 
+    /**
+     * Returns recursively all children under the given node in the given tree
+     * @param nestedPages a tree containing the given nodeId
+     * @param nodeId the node from which getting all the children
+     */
     private List<String> allChildren(Tree nestedPages, String nodeId)
     {
         int childCount = nestedPages.getChildCount(nodeId);
@@ -316,12 +332,7 @@ public class ExportAction extends XWikiAction
             DocumentReferenceResolver<String> resolver =
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
             for (String child : children) {
-                try {
-                    formattedReferences.add(URLEncoder.encode(child.substring(index), context.getRequest().getCharacterEncoding()));
-                } catch (UnsupportedEncodingException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                        "Failed to resolve pages to export", e);
-                }
+                formattedReferences.add(child.substring(index));
             }
 
             // we need to add the current document also

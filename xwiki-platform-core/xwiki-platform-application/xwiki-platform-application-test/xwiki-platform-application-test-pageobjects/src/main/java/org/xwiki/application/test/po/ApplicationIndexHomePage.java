@@ -41,7 +41,8 @@ public class ApplicationIndexHomePage extends ViewPage
         return new ApplicationIndexHomePage();
     }
 
-    private static By applicationElement(String applicationName) {
+    private static By applicationElement(String applicationName)
+    {
         return By.xpath(
                 "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]");
     }

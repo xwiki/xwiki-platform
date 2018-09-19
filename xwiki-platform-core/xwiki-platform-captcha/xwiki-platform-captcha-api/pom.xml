@@ -27,7 +27,7 @@
   </parent>
   <artifactId>xwiki-platform-captcha-api</artifactId>
   <name>XWiki Platform - CAPTCHA - API</name>
-  <description>Offers API to generate and validate CAPTCHA.</description>
+  <description>API to generate and validate CAPTCHAs.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>7</xwiki.pitest.mutationThreshold>

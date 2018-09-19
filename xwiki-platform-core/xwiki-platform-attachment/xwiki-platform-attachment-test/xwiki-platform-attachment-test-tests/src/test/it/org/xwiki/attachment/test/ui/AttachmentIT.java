@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui;
+package org.xwiki.attachment.test.ui;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
@@ -26,9 +26,12 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.xwiki.attachment.test.po.AttachmentsPane;
+import org.xwiki.attachment.test.po.PageWithAttachmentPane;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.AdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -40,7 +43,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 2.5M1
  */
-public class AttachmentTest extends AbstractTest
+public class AttachmentIT extends AbstractTest
 {
     @Rule
     public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
@@ -52,7 +55,9 @@ public class AttachmentTest extends AbstractTest
     @Before
     public void setUp() throws Exception
     {
+        getUtil().loginAsSuperAdmin();
         getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
+        getUtil().forceGuestUser();
     }
 
     @Test
@@ -63,8 +68,10 @@ public class AttachmentTest extends AbstractTest
     })
     public void testUploadDownloadTwoAttachmentsInParallel()
     {
-        ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), null,
+        getUtil().createPage(getTestClassName(), getTestMethodName(), null,
             getTestClassName() + "#" + getTestMethodName());
+
+        PageWithAttachmentPane vp = new PageWithAttachmentPane();
 
         // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
         // view mode) is fixed.
@@ -96,8 +103,10 @@ public class AttachmentTest extends AbstractTest
         @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")})
     public void testUploadDownloadTwoAttachmentsInSequence()
     {
-        ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), null,
+        getUtil().createPage(getTestClassName(), getTestMethodName(), null,
             getTestClassName() + "#" + getTestMethodName());
+
+        PageWithAttachmentPane vp = new PageWithAttachmentPane();
 
         // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
         // view mode) is fixed.
@@ -139,9 +148,10 @@ public class AttachmentTest extends AbstractTest
         // Prepare the page to display the GIF image. We explicitly set the width to a value greater than the actual
         // image width because we want the code that resizes the image on the server side to be executed (even if the
         // image is not actually resized).
-        ViewPage viewPage = getUtil().createPage(getClass().getSimpleName(), getTestMethodName(),
+        getUtil().createPage(getClass().getSimpleName(), getTestMethodName(),
             String.format("[[image:image.gif||width=%s]]", (20 + RandomUtils.nextInt(0, 200))), getTestClassName());
 
+        PageWithAttachmentPane viewPage = new PageWithAttachmentPane();
         // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
         // view mode) is fixed.
         viewPage.waitForDocExtraPaneActive("comments");

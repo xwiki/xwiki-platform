@@ -24,22 +24,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <artifactId>xwiki-platform-attachment</artifactId>
+    <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-attachment</artifactId>
-  <name>XWiki Platform - Attachment - Parent POM</name>
+  <artifactId>xwiki-platform-attachment-test</artifactId>
+  <name>XWiki Platform - Attachment - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Modules for managing attachments</description>
+  <description>XWiki Platform - Attachment - Tests - Parent POM</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
+         runtime code -->
+    <xwiki.clover.skip>true</xwiki.clover.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-attachment-ui</module>
+    <module>xwiki-platform-attachment-test-pageobjects</module>
+    <module>xwiki-platform-attachment-test-tests</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-attachment-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

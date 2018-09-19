@@ -24,30 +24,31 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <artifactId>xwiki-platform-attachment-test</artifactId>
+    <version>10.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo-skin-test-tests</artifactId>
-  <name>XWiki Platform - Flamingo - Skin - Test - Functional Tests</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
+  <artifactId>xwiki-platform-attachment-test-tests</artifactId>
+  <name>XWiki Platform - Attachment - Tests - Functional Tests</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Flamingo - Skin - Test - Functional Tests</description>
+  <description>XWiki Platform - Attachment - Functional Tests</description>
   <properties>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
-    <!-- Note: We depend on the POM of xwiki-platform-flamingo-skin-resources in order to include its transitive
-         depenencies in the generated XWiki runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-      <type>pom</type>
+      <artifactId>xwiki-platform-attachment-ui</artifactId>
       <version>${project.version}</version>
+      <type>xar</type>
     </dependency>
-    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>
@@ -71,16 +72,14 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
-      <dependency>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-attachment-test-pageobjects</artifactId>
-          <version>10.8-SNAPSHOT</version>
-          <scope>test</scope>
-      </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
       <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
            https://jira.xwiki.org/browse/XWIKI-7683 -->
       <plugin>
@@ -95,18 +94,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
-           browser several times -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-
-        </configuration>
       </plugin>
     </plugins>
   </build>

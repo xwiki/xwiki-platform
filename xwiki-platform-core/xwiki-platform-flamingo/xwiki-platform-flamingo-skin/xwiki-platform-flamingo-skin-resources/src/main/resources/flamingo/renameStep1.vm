@@ -53,7 +53,7 @@
         ##   to manage.
         ## In the future we'll offer a config option to define the default behavior, see
         ## http://jira.xwiki.org/browse/XWIKI-13384
-        #set ($checked = $request.autoRedirect && $request.autoRedirect == 'true')
+        #set ($checked = $request.autoRedirect == 'true')
         <dt>
           <label>
             <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />

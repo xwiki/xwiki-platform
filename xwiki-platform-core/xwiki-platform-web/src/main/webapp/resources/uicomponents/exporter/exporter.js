@@ -100,9 +100,8 @@ require([
   require(['tree'], function () {
     $(document).ready(function () {
       var form = $('#export-form');
-      var checkedPagesInput = $('#checked-pages');
-      var uncheckedPagesInput = $('#unchecked-pages');
-      var otherPages = $('#other-pages');
+      var includingPagesInput = $('#including-export-pages');
+      var excludingPagesInput = $('#excluding-export-pages');
 
       /**
        * Save the default url
@@ -129,6 +128,7 @@ require([
 
         // Check all by default
         treeReference.check_all();
+
 
         /**
          * Modifying the context menu
@@ -177,15 +177,71 @@ require([
         });
 
         /**
-         * Update the URL of the export buttons according to the tree
+         * Update the form of the export according to the tree
+         *
+         * The general idea is to try keeping only the main spaces and put them with a joker-like (%) on the URL
+         * argument. The deselected pages will be then put in the "excluding-export-pages" input form.
+         *
+         * Now in case of the pagination is deselected, we should not use a joker for the request: for that specific
+         * case we put the pages in the "including-export-pages" input form.
          */
         $('#exportModal #exportModelOtherCollapse a.btn').click(function (event) {
           event.preventDefault();
           var button = $(this);
           var url = button.data('url').clone();
 
-          var checkedPages = [];
-          var uncheckedPages = [];
+          // by default the pages URL attribute is empty
+          if (url.params !== undefined) {
+            url.params.pages = [];
+          } else {
+            url.params = {pages: []};
+          }
+
+          // to store the list of pages ordered by their parent space
+          // it will be used in case a space is "excluded" meaning the joker won't be used
+          var includingPagesBySpace = {};
+
+          // the deselected pages that the user does not want to export
+          var excludingPages = [];
+
+          // the spaces for which the user deselected the pagination node
+          // in that case we must not use the joker in the request to avoid retrieving all pages
+          var excludedSpaces = [];
+
+          var excludeSpace = function(space) {
+
+            // if we exclude a space we need to remove it from the pages URL param
+            // we will use the "including-export-pages" input form
+            url.params.pages = url.params.pages.filter(function (elem) {
+              return elem !== space;
+            });
+            excludedSpaces.push(space);
+          };
+
+          var isSpaceExcluded = function (space) {
+            for (var i = 0; i < excludedSpaces.length; i++) {
+              if (excludedSpaces[i] === space) {
+                return true;
+              }
+            }
+            return false;
+          };
+
+          // In case the node is a pagination node, we have to split the id to retrieve its references:
+          // example of id: pagination:document:xwiki:Main.WebHome
+          var retrieveReferenceFromPaginationId = function (paginationNodeId) {
+            var tokens = paginationNodeId.split(":");
+
+            var result = "";
+            for (var i = 2; i < tokens.length; i++) {
+              result += tokens[i];
+
+              if (i < tokens.length -1 ) {
+                result += ":";
+              }
+            }
+            return result;
+          };
 
           // we go through all nodes to detect checked and unchecked nodes
           // (jsTree does not provide an immediate API to get unchecked nodes)
@@ -194,49 +250,62 @@ require([
           })).each(function () {
             var node = treeReference.get_node(this.id);
 
+            var nodeId = node.data.id;
+
+            if (node.data.type === "pagination") {
+              nodeId = retrieveReferenceFromPaginationId(node.id);
+            }
+
+            var pageReference = XWiki.Model.resolve(nodeId, XWiki.EntityType.DOCUMENT);
+            var spaceReference = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent));
+
+
             // the node is checked
             if (treeReference.is_checked(node)) {
-              // if the node is pagination then we should set the otherPages attribute
-              if (node.data.type == "pagination") {
-                otherPages.val('true');
-              } else {
-                var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
-                checkedPages.push(XWiki.Model.serialize(pageReference));
-                // In case the page could have children
-                if (pageReference.getName() == 'WebHome') {
-                  // The node could be checked but not loaded
-                  if (node.state.loaded == false) {
-                    // In that case, we need to add all children using a wildcard.
-                    var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT,
-                      pageReference.parent);
-                    checkedPages.push(XWiki.Model.serialize(spaceReference));
+
+              // if it's pagination we don't process it: we should have already put the main space with a joker
+              // when processing the parent node
+              if (node.data.type !== "pagination") {
+
+                // In case the page have children: it's a parent node, we process it to be used in pages param
+                if (treeReference.is_parent(node)) {
+
+                  if (!isSpaceExcluded(spaceReference)) {
+                    url.params.pages.push(spaceReference);
                   }
-                  // Special behaviour for the XAR export
-                  if (url.params.format == 'xar') {
-                    // Also add the WebPreferences
-                    var webPreferencesReference = new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT,
-                      pageReference.parent);
-                    checkedPages.push(XWiki.Model.serialize(webPreferencesReference));
+
+                  // we put the WebHome page to avoid loosing it in case the space is excluded later
+                  if (includingPagesBySpace[spaceReference] === undefined) {
+                    includingPagesBySpace[spaceReference] = [];
                   }
+                  includingPagesBySpace[spaceReference].push(XWiki.Model.serialize(pageReference));
+                  includingPagesBySpace[spaceReference].push(XWiki.Model.serialize(new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT, pageReference.parent)));
+
+                // if it's not a parent, we fill the list of includingPages in case the space is excluded in
+                // a next node
+                } else {
+
+                  // we need to retrieve the parent space
+                  var parentNode = treeReference.get_node(treeReference.get_parent(node));
+                  var parentPageReference = XWiki.Model.resolve(parentNode.data.id, XWiki.EntityType.DOCUMENT);
+                  var parentSpaceReference = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, parentPageReference.parent));
+
+                  if (includingPagesBySpace[parentSpaceReference] === undefined) {
+                    includingPagesBySpace[parentSpaceReference] = [];
+                  }
+                  includingPagesBySpace[parentSpaceReference].push(XWiki.Model.serialize(pageReference));
                 }
               }
-              // the node is unchecked
+            // the node is unchecked
             } else {
-              // if the node is pagination then we should set the otherPages attribute
-              if (node.data.type == "pagination") {
-                otherPages.val('false');
+
+              // if it's a pagination node: it means the space must be excluded
+              if (node.data.type === "pagination") {
+                excludeSpace(spaceReference);
               } else {
-                var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
-                uncheckedPages.push(XWiki.Model.serialize(pageReference));
-                // In case the page could have children
-                if (pageReference.getName() == 'WebHome') {
-                  // The node could be unchecked but not loaded
-                  if (node.state.loaded == false) {
-                    // In that case, we need to add all children using a wildcard.
-                    var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT,
-                      pageReference.parent);
-                    uncheckedPages.push(XWiki.Model.serialize(spaceReference));
-                  }
+                // In case the page have children, it won't be include with a joker, so we're safe.
+                if (!treeReference.is_parent(node)) {
+                  excludingPages.push(XWiki.Model.serialize(pageReference));
                 }
               }
             }
@@ -246,13 +315,18 @@ require([
             return arrayOfNames.map(function (name) { return encodeURIComponent(name); }).join("&");
           };
 
-          checkedPagesInput.val(aggregatePageNames(checkedPages));
-          uncheckedPagesInput.val(aggregatePageNames(uncheckedPages));
+          excludingPagesInput.val(aggregatePageNames(excludingPages));
 
-          // pages are given through the input, not through the URL
-          if (url.params !== undefined) {
-            url.params.pages = [];
+          // we only include pages that have an excluded parent space
+          var includingPages = [];
+          for (var space in includingPagesBySpace) {
+            if (isSpaceExcluded(space)) {
+              includingPagesBySpace[space].forEach(function (elem) {
+                includingPages.push(elem);
+              });
+            }
           }
+          includingPagesInput.val(aggregatePageNames(includingPages));
 
           // put the right action for the form
           form.attr('action', url.serialize());

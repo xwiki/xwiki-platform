@@ -400,14 +400,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- ExportAction -->
-
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tree-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

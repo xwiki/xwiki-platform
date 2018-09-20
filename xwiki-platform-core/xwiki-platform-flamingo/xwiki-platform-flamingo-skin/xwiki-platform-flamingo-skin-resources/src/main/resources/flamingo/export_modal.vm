@@ -69,9 +69,8 @@
        aria-labelledby="exportModalHeadingOther">
     <div class="panel-body">
       <form method="post" id="export-form">
-        <input type="hidden" id="checked-pages" name="checked-pages"/>
-        <input type="hidden" id="unchecked-pages" name="unchecked-pages"/>
-        <input type="hidden" id="other-pages" name="other-pages" value="false"/>
+        <input type="hidden" id="including-export-pages" name="including-export-pages"/>
+        <input type="hidden" id="excluding-export-pages" name="excluding-export-pages"/>
 
         #if ($doc.name == 'WebHome')
           #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))

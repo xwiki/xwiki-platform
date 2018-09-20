@@ -60,18 +60,18 @@ public class OtherFormatView extends BaseElement
         return getDriver().findElement(By.id("export-form"));
     }
 
-    public WebElement getCheckedPagesField()
+    public WebElement getExcludingPagesField()
     {
-        return getDriver().findElement(By.id("checked-pages"));
+        return getDriver().findElement(By.id("excluding-export-pages"));
     }
 
-    public WebElement getUncheckedPagesField()
+    public WebElement getIncludingPagesField()
     {
-        return getDriver().findElement(By.id("unchecked-pages"));
+        return getDriver().findElement(By.id("including-export-pages"));
     }
 
-    public WebElement getOtherPagesField()
+    public WebElement getSelectNoneLink()
     {
-        return getDriver().findElement(By.id("other-pages"));
+        return getDriver().findElementByLinkText("none");
     }
 }

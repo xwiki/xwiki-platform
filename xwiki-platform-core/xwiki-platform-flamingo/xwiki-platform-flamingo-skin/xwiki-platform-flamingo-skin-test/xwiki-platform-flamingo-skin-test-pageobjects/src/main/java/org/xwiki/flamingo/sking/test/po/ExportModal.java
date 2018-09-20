@@ -34,12 +34,13 @@ public class ExportModal extends BaseModal
     public ExportModal()
     {
         super(By.id("exportModal"));
+        getDriver().waitUntilElementIsVisible(By.id("exportModal"));
     }
 
     public OtherFormatView openOtherFormatView()
     {
         getDriver().findElementByLinkText("Other Formats").click();
-        getDriver().waitUntilElementHasAttributeValue(By.id("exportModelOtherCollapse"), "class", "panel-collapse collapse in");
+        getDriver().waitUntilElementIsVisible(By.id(("export-form")));
         return new OtherFormatView();
     }
 

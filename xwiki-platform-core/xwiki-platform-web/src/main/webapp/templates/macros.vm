@@ -218,13 +218,34 @@ $xwiki.getUserName("xwiki:${username}")
  * Displays the user avatar and name, linked to the user profile page.
  *
  * @param arg could be either a string, a reference or a list of them
+ * @param options various configuration options; default values are {
+ *   showAlias: false, // whether to show the user alias or not
+ *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
+ *   wrapAvatar: false // whether to wrap the avatar image with a span or not
+ * }
  *#
-#macro (displayUser $arg)
-  #if ($arg.iterator())
+#macro (displayUser $arg $options)
+  #set ($isList = $arg.iterator())
+  #if ($isList)
     #set ($usersList = $arg)
   #else
     #set ($usersList = [$arg])
   #end
+  #set ($macro.options = {
+    'showAlias': false,
+    'useInlineHTML': false,
+    'wrapAvatar': false
+  })
+  #set ($discard = $macro.options.putAll($options))
+  #set ($usersTag = 'ul')
+  #set ($userTag = 'li')
+  #if ($macro.options.useInlineHTML)
+    #set ($usersTag = 'span')
+    #set ($userTag = 'span')
+  #elseif (!$isList)
+    #set ($userTag = 'div')
+  #end
+  #set ($types = $collectionstool.set)
   #set ($output = [])
   #foreach ($user in $usersList)
     ## Since we accept both a String or an EntityReference as input, we first check if we have an Entity Reference
@@ -233,60 +254,64 @@ $xwiki.getUserName("xwiki:${username}")
     #if (!$userReference)
       #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
     #end
-    #getUserAvatarURL($userReference $avatarURL 30)
-    #set ($escapedUserName = $escapetool.xml($xwiki.getPlainUserName($userReference)))
+    #set ($userAlias = $userReference.name)
+    #if ($userAlias == $services.model.getEntityReference('DOCUMENT', 'default'))
+      #set ($userAlias = $userReference.lastSpaceReference.name)
+    #end
+    #set ($userDocument = $xwiki.getDocument($userReference))
+    #if ($userDocument.getObject('XWiki.XWikiGroups'))
+      #set ($type = 'group')
+      #set ($userName = $userDocument.plainTitle)
+      #if ("$!userName" == '')
+        #set ($userName = $userAlias)
+      #end
+    #else
+      #set ($type = 'user')
+      #set ($userName = $xwiki.getPlainUserName($userReference))
+    #end
+    #set ($discard = $types.add("${type}s"))
+    #set ($userAliasDisplay = '')
+    #if ($macro.options.showAlias && $userAlias != $userName)
+      #set ($userAliasDisplay = "<span class=""${type}-alias"">" + $escapetool.xml($userAlias) + '</span>')
+    #end
+    #set ($escapedUserName = $escapetool.xml($userName))
+    #getUserAvatarURL($userReference $avatarURL 120)
+    #set ($avatarWrapperStart = '')
+    #set ($avatarWrapperEnd = '')
+    #if ($macro.options.wrapAvatar)
+      #set ($avatarWrapperStart = "<span class=""${type}-avatar-wrapper"">")
+      #set ($avatarWrapperEnd = '</span>')
+    #end
     ## We avoid the whitespace because the users are displayed as inline blocks.
     #set ($discard = $output.addAll([
-      '<li class="user">',
-        "<img class=""user-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
-        "<a class=""user-name"" href=""$escapetool.xml($xwiki.getURL($userReference))"">$escapedUserName</a>",
-      '</li>'
+      "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
+        $avatarWrapperStart,
+          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
+        $avatarWrapperEnd,
+        "<a class=""${type}-name"" href=""$escapetool.xml($xwiki.getURL($userReference))"">$escapedUserName</a>",
+        $userAliasDisplay,
+      "</$userTag>"
     ]))
   #end
-  #if ($output.size() > 0)
-    <ul class="users">$stringtool.join($output, '')</ul>
+  #if ($isList && $output.size() > 0)
+    #set ($discard = $output.add(0, "<$usersTag class=""$stringtool.join($types, ' ')"">"))
+    #set ($discard = $output.add("</$usersTag>"))
   #end
+  $stringtool.join($output, '')
 #end
 
 #**
  * Displays the group avatar and name, linked to the group profile page.
  *
  * @param arg could be either a string, a reference or a list of them
+ * @param options various configuration options; default values are {
+ *   showAlias: false, // whether to show the group alias or not
+ *   useInlineHTML: false, // whether to use in-line HTML elements to display the group or not
+ *   wrapAvatar: false // whether to wrap the avatar image with a span or not
+ * }
  *#
-#macro (displayGroup $arg)
-  #if ($arg.iterator())
-    #set ($groupsList = $arg)
-  #else
-    #set ($groupsList = [$arg])
-  #end
-  #set ($output = [])
-  #foreach ($group in $groupsList)
-    ## Since we accept both a String or an EntityReference as input, we first check if we have an Entity Reference
-    ## to a Document and if not then we resolve the String to convert it to a Document Reference.
-    #set ($groupReference = $group.extractReference('DOCUMENT'))
-    #if (!$groupReference)
-      #set ($groupReference = $services.model.resolveDocument($group, 'group/current'))
-    #end
-    #set ($groupName = $xwiki.getDocument($groupReference).plainTitle)
-    #if ("$!groupName" == '')
-      #set ($groupName = $groupReference.name)
-      #if ($groupName == $services.model.getEntityReference('DOCUMENT', 'default'))
-        #set ($groupName = $groupReference.lastSpaceReference.name)
-      #end
-    #end
-    #set ($escapedGroupName = $escapetool.xml($groupName))
-    #getUserAvatarURL($groupReference $avatarURL 30)
-    ## We avoid the whitespace because the groups are displayed as inline blocks.
-    #set ($discard = $output.addAll([
-      '<li class="group">',
-        "<img class=""group-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedGroupName"" />",
-        "<a class=""group-name"" href=""$escapetool.xml($xwiki.getURL($groupReference))"">$escapedGroupName</a>",
-      '</li>'
-    ]))
-  #end
-  #if ($output.size() > 0)
-    <ul class="groups">$stringtool.join($output, '')</ul>
-  #end
+#macro (displayGroup $arg $options)
+  #displayUser($arg $options)
 #end
 
 

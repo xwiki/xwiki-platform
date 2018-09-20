@@ -349,30 +349,6 @@ body &gt; .selectize-dropdown {
   vertical-align: middle;
 }
 
-#groupusers td.member .member-avatar {
-  display: inline-block;
-  height: 32px;
-  line-height: 32px;
-  margin-right: 8px;
-  text-align: center;
-  width: 32px;
-}
-#groupusers td.member img {
-  border-radius: 4px;
-  max-height: 32px;
-  max-width: 32px;
-}
-
-#groupusers .member-alias {
-  color: $theme.textSecondaryColor;
-}
-#groupusers .member-alias:before {
-  content: '(';
-}
-#groupusers .member-alias:after {
-  content: ')';
-}
-
 #groupusers td.type,
 #groupusers td.scope {
   color: $theme.textSecondaryColor;

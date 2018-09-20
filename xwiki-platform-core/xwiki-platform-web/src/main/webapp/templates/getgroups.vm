@@ -38,7 +38,7 @@
     'username': $group.name,
     'fullname': $group.fullName,
     'wikiname': $wikiName,
-    'userurl': $xwiki.getURL($group.fullName),
+    'userurl': $group.getURL(),
     'usersaveurl': $group.getURL('save'),
     'userinlineurl': $group.getURL('edit', 'xpage=plain'),
     'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Groups')
@@ -51,14 +51,14 @@
   #set ($discard = $row.putAll({
     'doc_fullName': $group.fullName,
     'doc_wiki': $group.wiki,
-    'doc_url': $xwiki.getURL($group.documentReference),
+    'doc_url': $group.getURL(),
     'doc_viewable': $services.security.authorization.hasAccess('view', $group.documentReference),
     'doc_hasadmin': $xwiki.hasAdminRights(),
     'doc_hasedit': $services.security.authorization.hasAccess('edit', $group.documentReference),
-    'doc_edit_url': $xwiki.getURL($group.documentReference, 'edit'),
+    'doc_edit_url': $group.getURL('edit'),
     'doc_hasdelete': $services.security.authorization.hasAccess('delete', $group.documentReference),
-    'doc_delete_url': $xwiki.getURL($group.documentReference, 'delete'),
-    'name': "#displayGroup($group.documentReference)",
+    'doc_delete_url': $group.getURL('delete'),
+    'name': "#displayGroup($group.documentReference {'wrapAvatar': true})",
     'members': $xwiki.rightsmanager.countAllMembersNamesForGroup($group.documentReference),
     'scope': $services.localization.render("xe.admin.groups.$scope")
   }))

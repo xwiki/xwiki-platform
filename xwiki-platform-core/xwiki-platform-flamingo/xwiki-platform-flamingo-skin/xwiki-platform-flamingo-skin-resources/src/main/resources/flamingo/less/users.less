@@ -34,6 +34,30 @@ li.group {
   white-space: nowrap;
 }
 
+.user .user-avatar-wrapper,
+.group .group-avatar-wrapper {
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  margin-right: .3em;
+  text-align: center;
+  width: 18px;
+}
+
+.xwiki-livetable .user-avatar-wrapper,
+.xwiki-livetable .group-avatar-wrapper {
+  height: 32px;
+  line-height: 32px;
+  margin-right: .5em;
+  width: 32px;
+}
+
+.user .user-avatar-wrapper .user-avatar,
+.group .group-avatar-wrapper .group-avatar {
+  margin-right: 0;
+  vertical-align: middle;
+}
+
 .user .user-avatar,
 .group .group-avatar {
   margin-right: .3em;
@@ -45,4 +69,24 @@ li.group {
   max-height: 18px;
   max-width: 18px;
   vertical-align: text-top;
+}
+
+.xwiki-livetable img.user-avatar,
+.xwiki-livetable img.group-avatar {
+  max-height: 32px;
+  max-width: 32px;
+}
+
+.user .user-alias,
+.group .group-alias {
+  color: @text-muted;
+  margin-left: .3em;
+}
+.user .user-alias:before,
+.group .group-alias:before {
+  content: '(';
+}
+.user .user-alias:after,
+.group .group-alias:after {
+  content: ')';
 }

@@ -569,6 +569,13 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     </property>
     <property>
       <code>/**
+ * Groups Live Table
+ */
+#groupstable td[data-title] {
+  vertical-align: middle;
+}
+
+/**
  * Create Group Modal
  */
 

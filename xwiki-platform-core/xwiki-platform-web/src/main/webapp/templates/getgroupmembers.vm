@@ -1,14 +1,4 @@
 #template('xwikivars.vm')
-#macro (displayGroupMember $member)
-  #set ($memberReference = $services.model.resolveDocument($member))
-  #set ($memberName = $xwiki.getPlainUserName($member))
-  <span class="member-avatar">#mediumUserAvatar($member)</span><a class="member-name"
-    data-reference="$escapetool.xml($member)" href="$xwiki.getURL($memberReference)">$escapetool.xml($memberName)</a>
-  #if ($memberName != $memberReference.name && ($hasAdmin || $isAdvancedUser))
-    <span class="member-alias">$escapetool.xml($memberReference.name)</span>
-  #end
-#end
-$response.setContentType('application/json')
 #set ($offset = $mathtool.toInteger($request.offset))
 #set ($limit = $mathtool.toInteger($request.limit))
 #set ($order = "$!request.dir" != 'desc')
@@ -31,7 +21,9 @@ $response.setContentType('application/json')
   'rows': []
 })
 #foreach ($member in $members)
-  #set ($memberDisplay = "#displayGroupMember($member)")
+  #set ($memberReference = $services.model.resolveDocument($member))
+  #set ($showAlias = $hasAdmin || $isAdvancedUser)
+  #set ($memberDisplay = "#displayUser($memberReference {'showAlias': $showAlias, 'wrapAvatar': true})")
   #set ($isUser = $xwiki.getDocument($memberReference).getObject('XWiki.XWikiUsers'))
   #set ($isGroup = $xwiki.getDocument($memberReference).getObject('XWiki.XWikiGroups'))
   #set ($type = [])
@@ -55,7 +47,7 @@ $response.setContentType('application/json')
   #set ($grayed = $memberReference.equals($xcontext.userReference) && $doc.fullName == 'XWiki.XWikiAdminGroup')
   #set ($oldProperties = {
     'fullname': $member,
-    'prettyname': "$memberName#if ($hasAdmin || $isAdvancedUser) ($member)#end",
+    'prettyname': "$xwiki.getPlainUserName($member)#if ($hasAdmin || $isAdvancedUser) ($member)#end",
     'wikiname': $memberReference.wikiReference.name,
     'memberurl': $xwiki.getURL($memberReference),
     'docurl': $doc.getURL(),
@@ -89,4 +81,4 @@ $response.setContentType('application/json')
   #set ($discard = $data.putAll($liveTableData))
   #set ($discard = $json.rows.add($data))
 #end
-$jsontool.serialize($json)
+#jsonResponse($json)

@@ -27,7 +27,6 @@
   </parent>
   <artifactId>xwiki-platform-captcha-jcaptcha</artifactId>
   <name>XWiki Platform - CAPTCHA - JCaptcha - Parent POM</name>
-  <description>CAPTCHA implementation using JCaptcha</description>
   <packaging>pom</packaging>
   <modules>
     <module>xwiki-platform-captcha-jcaptcha-api</module>

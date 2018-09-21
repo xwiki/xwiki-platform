@@ -49,6 +49,7 @@ import org.xwiki.stability.Unstable;
 public class CaptchaScriptService implements ScriptService
 {
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject

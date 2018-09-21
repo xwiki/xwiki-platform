@@ -20,11 +20,14 @@
 package org.xwiki.captcha.script.internal;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.captcha.script.CaptchaScriptService;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -32,7 +35,9 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -68,10 +73,20 @@ public class CaptchaScriptServiceTest
     @Test
     public void getCaptchaNames(MockitoComponentManager componentManager) throws Exception
     {
-        componentManager.registerMockComponent(Captcha.class, "captcha1");
-        componentManager.registerMockComponent(Captcha.class, "captcha2");
-        componentManager.registerMockComponent(Captcha.class, "captcha3");
+        // An instance map of mock instances.
+        Map<String, Object> instanceMap = new HashMap<>();
+        instanceMap.put("captcha1", mock(Captcha.class));
+        instanceMap.put("captcha2", mock(Captcha.class));
+        instanceMap.put("captcha3", mock(Captcha.class));
+
+        // Mock the "context" CM call to return the mocked instances map, to make sure we're explicitly using the
+        // correct CM (in this case, not the test's default CM).
+        ComponentManager mockContextComponentManager = componentManager.getInstance(ComponentManager.class, "context");
+        when(mockContextComponentManager.getInstanceMap(Captcha.class)).thenReturn(instanceMap);
 
         assertEquals(Arrays.asList("captcha1", "captcha2", "captcha3"), captchaScriptService.getCaptchaNames());
+
+        // Double check that we've not used the default CM to mock the instances.
+        assertNotEquals(componentManager.getInstanceMap(Captcha.class), instanceMap);
     }
 }

@@ -38,7 +38,7 @@
   <hidden>false</hidden>
   <content>{{velocity}}
 #set ($columnsProperties = {
-  'doc.name': {"type":"text","size":10,"link":"view"},
+  'doc.location': {},
   'doc.date': {"type":"date","size":10},
   'doc.author': {"type":"text","size":10,"link":"author"},
   '_actions': {"sortable":false,"filterable":false,"html":true,"actions":["edit","delete"]}
@@ -52,7 +52,7 @@
   'selectedColumn': 'doc.name',
   'defaultOrder': 'asc'
 })
-#set ($columns = ['doc.name', 'doc.date', 'doc.author', '_actions'])
+#set ($columns = ['doc.location', 'doc.date', 'doc.author', '_actions'])
 #livetable('menu' $columns $columnsProperties $options)
 {{/velocity}}</content>
   <object>

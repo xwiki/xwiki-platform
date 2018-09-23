@@ -33,20 +33,19 @@
   <description>The dependencies of the WAR as a separate pom to be reusable in other distributions.</description>
   <dependencies>
     <!-- ********************************************************************** -->
-    <!-- Generic templates and web resources dependencies -->
+    <!-- Depend on the minimal WAR -->
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-web</artifactId>
+      <artifactId>xwiki-platform-distribution-war-minimaldependencies</artifactId>
       <version>${project.version}</version>
-      <type>war</type>
+      <scope>runtime</scope>
+      <type>pom</type>
     </dependency>
-    <!-- Refactoring API implementation -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-refactoring-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
+    <!-- ********************************************************************** -->
+    <!-- Generic templates and web resources dependencies -->
+
     <!-- Annotations modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -86,12 +85,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-component-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
@@ -99,13 +92,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-logging-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Security Script Services -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -159,13 +145,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-component-wiki</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- REST module -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -236,18 +215,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-configuration-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-transformation-icon</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -433,37 +400,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Logging Dependencies. Ensures all logging goes through SLF4J and Logback. -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-logging-logback</artifactId>
-      <version>${commons.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Configuration -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-configuration-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Security -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- User management -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -477,20 +413,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- LESS CSS Module -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-lesscss-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- URL -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-scheme-standard</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Active Installs -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -499,12 +421,6 @@
       <scope>runtime</scope>
     </dependency>
     <!-- Localization -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-source-legacy</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-macro</artifactId>
@@ -552,55 +468,14 @@
     <!-- Wiki Module -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-workspaces-migrator</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-    </dependency>
-    <!-- Servlets for Resource API -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource-servlet</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <!-- Mailsender -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-storage</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Filesystem attachment storage -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- Edit API Implementation -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-edit-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- Wysiwyg -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -615,12 +490,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-filter-stream-xar</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-xar-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -658,21 +527,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-image-plugin</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- CAPTCHA API used by oldcore in CommentsAdd and RegisterAction -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-captcha-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- CAPTCHA Default module used to avoid cyclic dependency on oldcore but needed to access the configuration -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-captcha-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -735,13 +589,6 @@
     <!-- ********************************************************************** -->
     <!-- Plugins, hard to install as extensions (we need to get rid of all that) -->
 
-    <!-- Skin Extension -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-skin-skinx</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Feed -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -776,7 +623,10 @@
 
     <!-- Skins
          Note: even though the dependency plugin below doesn't need explicit dependencies set to work it's a best
-         practice to put them here since they are real dependencies -->
+         practice to put them here since they are real dependencies
+
+         Note: This dependency is already present in the minimal war but it's not inherited (most likely because of
+         the zip type) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>

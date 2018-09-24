@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-graphviz</artifactId>
-    <version>10.8</version>
+    <version>10.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-graphviz-oldcore</artifactId>
   <name>XWiki Platform - GraphViz - Old Core</name>

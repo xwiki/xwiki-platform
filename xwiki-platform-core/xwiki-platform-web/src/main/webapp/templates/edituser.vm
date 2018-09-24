@@ -1,29 +1,22 @@
 #template("xwikivars.vm")
 #skinExtensionHooks
-<div>
-<form name="edituser" method="post">
-#set($force = $!request.get("force"))
-#if (($doc.getLocked()==true)&&(!$force))
-<div>
-$services.localization.render('doclockedby') $xwiki.getUserName($doc.getLockingUser()).
-<br />
-<a href="javascript:window.lb.lbLoadForm('$doc.getURL("edit", "$!request.getQueryString()&force=1")')">$services.localization.render('forcelock')</a>
-</div>
+#if ($doc.locked && !$request.force)
+  <p>$services.localization.render('doclockedby') $xwiki.getUserName($doc.lockingUser).</p>
+  <p>
+    <a href="$doc.getURL('edit', 'force=1')" class="forceLock">
+      $services.localization.render('forcelock')
+    </a>
+  </p>
 #else
-<div class="clear">
-#foreach($class in $doc.xWikiClasses)
-#set( $nb = $doc.getObjectNumbers("${class.name}"))
-<input type="hidden" name="${class.name}_nb" value="$nb" />
+  <form id="edituser" action="$doc.getURL('save', 'ajax=1')">
+    <div class="hidden">
+      <input type="hidden" name="form_token" value="$!services.csrf.token" />
+    </div>
+    $cdoc.getRenderedContent()
+  </form>
 #end
-$cdoc.getRenderedContent()
-</div>
-#end
-## CSRF prevention
-<div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-</form>
-## add link to the complete profile of the user
-$services.localization.render('rightsmanager.edituserprofile')&nbsp;&nbsp;<a href="$doc.getURL()">$services.localization.render('rightsmanager.userprofile')</a>
-<br /><br />
-<span class="buttonwrapper"><input class="button" type="submit" name="formactionsave" value="$services.localization.render('save')" onclick=" window.lb.lbSaveForm();"/></span>
-<span class="buttonwrapper"><input class="button secondary" type="submit" name="formactioncancel" value="$services.localization.render('cancel')" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
-</div>
+## Add a link to the complete user profile.
+<p>
+  $services.localization.render('rightsmanager.edituserprofile')
+  <a href="$doc.getURL()">$services.localization.render('rightsmanager.userprofile')</a>.
+</p>

@@ -82,6 +82,23 @@
     'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Users'),
     'grayed': $grayed
   })
+  #if ($user.wiki == $xcontext.mainWikiName)
+    #set ($scope = 'global')
+  #else
+    #set ($scope = 'local')
+  #end
+  #set ($discard = $row.putAll({
+    'doc_fullName': $user.fullName,
+    'doc_wiki': $user.wiki,
+    'doc_url': $user.getURL(),
+    'doc_viewable': $services.security.authorization.hasAccess('view', $user.documentReference),
+    'doc_hasadmin': $xwiki.hasAdminRights(),
+    'doc_hasedit': $services.security.authorization.hasAccess('edit', $user.documentReference),
+    'doc_edit_url': $user.getURL('edit'),
+    'doc_hasdelete': $services.security.authorization.hasAccess('delete', $user.documentReference),
+    'doc_delete_url': $user.getURL('delete'),
+    'scope': $services.localization.render("xe.admin.groups.$scope")
+  }))
   #set ($discard = $data.rows.add($row))
 #end
 #jsonResponse($data)

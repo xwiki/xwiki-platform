@@ -172,8 +172,6 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
     container.find('.suggest-groups').suggestGroups();
   };
 
-  // We listen to xwiki:dom:loaded because the old lightbox widget that is still used in the administration triggers it
-  // instead of xwiki:dom:updated.
-  $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
+  $(document).on('xwiki:dom:updated', init);
   XWiki.domIsLoaded && init();
 });

@@ -301,15 +301,17 @@ XWiki.widgets.LiveTable = Class.create({
     });
     this.clearDisplay();
 
-    for (var i = off; i <= f; i++) {
-      if (this.fetchedRows[i]) {
-        var elem = this.handler(this.fetchedRows[i], i, this);
-        this.displayNode.appendChild(elem);
+    for (var rowIndex = off; rowIndex <= f; rowIndex++) {
+      var rowData = this.fetchedRows[rowIndex];
+      if (rowData) {
+        var rowElement = this.handler(rowData, rowIndex, this);
+        rowElement.writeAttribute('data-index', rowIndex);
+        this.displayNode.appendChild(rowElement);
         var memo = {
-          "data": this.fetchedRows[i],
-          "row":elem,
-          "table":this,
-          "tableId":this.domNodeName
+          "data": rowData,
+          "row": rowElement,
+          "table": this,
+          "tableId": this.domNodeName
         };
         // 1. Named event (for code interested by that table only)
         document.fire("xwiki:livetable:" + this.domNodeName + ":newrow", memo);

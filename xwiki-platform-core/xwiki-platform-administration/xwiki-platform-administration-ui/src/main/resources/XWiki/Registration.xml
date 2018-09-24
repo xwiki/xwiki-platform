@@ -396,10 +396,6 @@
       $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
     #end
   #end
-  ## If this is true, then assume the registration page is being viewed inside of a lightbox
-  #if($request.get('xpage'))
-    #set($assumeLightbox = true)
-  #end
   ##
   ## Display the heading
   $heading
@@ -418,54 +414,28 @@
   #if(!$registrationDone)
     $welcomeMessage
 
-    {{html wiki=false clean="false"}}
+    {{html clean="false"}}
       &lt;form id="register" action="$xwiki.relativeRequestURL" method="post" class="xform half"&gt;
-      &lt;div&gt;
-      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-      #set ($userDirectoryReference = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
-      #if ($xwiki.exists($userDirectoryReference))
-        &lt;input type="hidden" name="parent" value="$!{services.model.serialize($userDirectoryReference, 'default')}" /&gt;
-      #end
-      #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
-      &lt;div class="wikimodel-emptyline"&gt;&lt;/div&gt;
-      &lt;span class="buttonwrapper"&gt;
-      #if($assumeLightbox)
-        ## LightBox detected...
-        &lt;script type="text/javascript"&gt;
-          ## Make the X button not reload the page. (overriding LbClose)
-          window.lb.lbClose = function() {
-            this.lbHide();
-            this.lbClearData();
-            ##return false;
-          }
-          ## Post the form entry to the page and load the result. (we override lbSaveForm)
-          window.lb.lbSaveForm = function() {
-            var formParams = Form.serialize(this.form);
-            Form.disable(this.form);
-            var ajaxRequest = new Ajax.Request(this.saveUrl, {
-              parameters: formParams,
-              asynchronous: false
-            });
-            window.lb.lbFormDataLoaded(ajaxRequest.transport);
-          }
-        &lt;/script&gt;
-        ## It doesn't really matter where these are, the scripts will be relocated to the head.
-        &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin --&gt;
-        &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin --&gt;
-        ##
-        &lt;input class="button" type="submit" value="$services.localization.render('save')" onclick="window.lb.lbSaveForm();"/&gt;
-        &lt;/span&gt;#* End ButtonWrapper then start another...*#&lt;span class="buttonwrapper"&gt;
-        &lt;input class="button secondary" type="button" value="$services.localization.render("cancel")" onclick="window.lb.lbClose();"/&gt;
-      #else
-        ## Not using the LightBox
-        &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;
-      #end
-      &lt;/span&gt;## ButtonWrapper
-      &lt;/div&gt;
+        &lt;div class="hidden"&gt;
+          #if ($request.xpage == 'registerinline')
+            #skinExtensionHooks
+          #end
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          #set ($userDirectoryReference = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
+          #if ($xwiki.exists($userDirectoryReference))
+            &lt;input type="hidden" name="parent" value="$!{services.model.serialize($userDirectoryReference, 'default')}" /&gt;
+          #end
+        &lt;/div&gt;
+        #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
+        &lt;p class="buttons"&gt;
+          &lt;span class="buttonwrapper"&gt;
+            &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;
+          &lt;/span&gt;
+        &lt;/p&gt;
+        #if ($useLiveValidation)
+          #generateJavascript($fields)
+        #end
       &lt;/form&gt;
-      #if($useLiveValidation)
-        #generateJavascript($fields)
-      #end
     {{/html}}
 
     ##
@@ -474,23 +444,6 @@
       [[{{translation key="xe.admin.registration.youCanConfigureRegistrationHere"/}}&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]]
       {{html}}&lt;a href="$xwiki.getURL($documentName, 'edit', 'editor=wiki')"&gt;$services.localization.render('xe.admin.registration.youCanConfigureRegistrationFieldsHere')&lt;/a&gt;{{/html}}
     #end
-  ## If the registration is done (successful) and we detect the Lightbox simply send the user back to the original page.
-  #elseif($assumeLightbox)
-    {{html clean=false wiki=false}}
-      &lt;script type="text/javascript"&gt;
-          var url = window.lb.redirectUrl;
-          window.lb.lbClose;
-          if (url != undefined) {
-            if(window.location.pathname + window.location.search == url) {
-              ## Under certain circumstances (bug) Opera will not load a page if the location is the same as the current page.
-              ## In these cases, location.reload() doesn't work either, the only solution (I could find) was to change the URL.
-              window.location.href = url + "&amp;";
-            } else {
-              window.location.href = url;
-            }
-          }
-      &lt;/script&gt;
-    {{/html}}
   #end
 #else
   ## The registration is not allowed on the subwiki
@@ -667,7 +620,7 @@
           &lt;/div&gt;
         &lt;/form&gt;
         ## We don't want autoLogin if we are administrators adding users...
-        #if($autoLogin &amp;&amp; !$assumeLightbox)
+        #if ($autoLogin &amp;&amp; $request.xpage != 'registerinline')
           &lt;script type='text/javascript'&gt;
             document.observe('xwiki:dom:loaded', function() {
               document.forms['loginForm'].submit();
@@ -758,7 +711,7 @@
 #macro(generateJavascript, $fields)
   &lt;script type='text/javascript'&gt;
   /* &lt;![CDATA[ */
-  document.observe('xwiki:dom:loaded', function() {
+  var initRegistrationFormValidation = function() {
   ##
   #foreach($field in $fields)
     #if($field.get('validate') &amp;&amp; $field.get('name'))
@@ -809,6 +762,13 @@
       #end##if contains js validateable fields.
     #end##if validate
   #end##loop
+    };
+    document.observe('xwiki:dom:loaded', initRegistrationFormValidation);
+    document.observe('xwiki:dom:updated', function(event) {
+      var container = (event &amp;&amp; event.memo &amp;&amp; event.memo.elements &amp;&amp; event.memo.elements[0]) || $('body');
+      if (container.down('form#register')) {
+        initRegistrationFormValidation();
+      }
     });// ]]&gt;
     &lt;/script&gt;
 #end##macro

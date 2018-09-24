@@ -86,7 +86,7 @@
 
 #macro (editGroupModal)
   &lt;div class="modal" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModal-label"
-      data-backdrop="static" data-keyboard="false"&gt;
+      data-backdrop="static" data-keyboard="false" data-liveTable="#groupstable" data-liveTableAction="edit"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -104,7 +104,8 @@
 #end
 
 #macro (deleteGroupModal)
-  &lt;div class="modal" id="deleteGroupModal" tabindex="-1" role="dialog" aria-labelledby="deleteGroupModal-label"&gt;
+  &lt;div class="modal" id="deleteGroupModal" tabindex="-1" role="dialog" aria-labelledby="deleteGroupModal-label"
+       data-liveTable="#groupstable" data-liveTableAction="delete"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -180,7 +181,9 @@
   #set ($liveTableOptions.topFilters = "#groupScopeFilter")
 #end
 {{html clean="false"}}
-#livetable('groupstable' $columns $columnOptions $liveTableOptions)
+&lt;div class="medium-avatars"&gt;
+  #livetable('groupstable' $columns $columnOptions $liveTableOptions)
+&lt;/div&gt;
 &lt;p&gt;
   &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createGroupModal"&gt;
     $escapetool.xml($services.localization.render('rightsmanager.creategroup'))
@@ -388,29 +391,49 @@ require(['jquery'], function($) {
   scopeFilter.attr('name', 'wiki').html(options);
 });
 
-require(['jquery', 'xwiki-meta'], function($, xm) {
-  var groupsLiveTable = window.livetable_groupstable;
+//
+// Live Table Modals
+//
 
-  var getRowIndex = function(element) {
-    var groupURL = element.closest('tr').find('a.group-name').attr('href');
-    for (var i = 0; i &lt; groupsLiveTable.fetchedRows.length; i++) {
-      var rowData = groupsLiveTable.fetchedRows[i];
-      if (rowData &amp;&amp; rowData.doc_url === groupURL) {
-        return i;
-      }
+define('xwiki-livetable-modal', ['jquery', 'bootstrap'], function($) {
+  $.fn.bindActionToModal = function(action, modal) {
+    var actionToModal = action;
+    if (typeof action === 'string') {
+      var actionToModal = {};
+      actionToModal[action] = modal;
     }
-    return -1;
+    return this.each(function() {
+      var liveTableElement = $(this);
+      var liveTable = window['livetable_' + liveTableElement.attr('id')];
+      $.each(actionToModal, function(action, modal) {
+        liveTableElement.on('click', 'a.action' + action, function(event) {
+          event.preventDefault();
+          var actionTrigger = $(this);
+          var row = actionTrigger.closest('tr');
+          var rowIndex = parseInt(row.attr('data-index'));
+          $(modal).data({
+            rowData: liveTable.fetchedRows[rowIndex],
+            rowIndex: rowIndex,
+            liveTable: liveTable
+          }).modal('show');
+        });
+      });
+    });
   };
 
+  $('.modal[data-liveTable]').each(function() {
+    var modal = $(this);
+    $(modal.attr('data-liveTable')).bindActionToModal(modal.attr('data-liveTableAction'), modal);
+  });
+});
+
+require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
   //
   // Group Editing
   //
-
   var editGroupModal = $('#editGroupModal');
-  $('#groupstable').on('click', 'a.actionedit', function(event) {
-    event.preventDefault();
-    var rowIndex = getRowIndex($(this));
-    var rowData = groupsLiveTable.fetchedRows[rowIndex];
+  editGroupModal.on('show.bs.modal', function() {
+    var rowData = editGroupModal.data('rowData');
     var groupReference = XWiki.Model.resolve(rowData.doc_fullName, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
     var groupDocument = new XWiki.Document(groupReference);
     var editGroupURL = groupDocument.getURL('edit', 'xpage=plain');
@@ -418,44 +441,29 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       this.removeClass('loading');
       $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
     });
-    editGroupModal.modal('show');
-  });
-
-  editGroupModal.on('hide.bs.modal', function() {
-    groupsLiveTable.refresh();
+  }).on('hide.bs.modal', function() {
+    editGroupModal.data('liveTable').refresh();
   });
 
   //
   // Group Deletion
   //
-
   var deleteGroupModal = $('#deleteGroupModal');
-  $('#groupstable').on('click', 'a.actiondelete', function(event) {
-    event.preventDefault();
-    var rowIndex = getRowIndex($(this));
-    var rowData = groupsLiveTable.fetchedRows[rowIndex];
+  deleteGroupModal.on('show.bs.modal', function() {
+    var rowData = deleteGroupModal.data('rowData');
     var groupReference = rowData.doc_fullName;
     if (XWiki.currentWiki !== rowData.doc_wiki) {
       groupReference = XWiki.Model.resolve(groupReference, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
       groupReference = XWiki.Model.serialize(groupReference);
     }
-    deleteGroupModal.data({
-      'groupReference': groupReference,
-      'rowIndex': rowIndex
-    }).modal('show');
-  });
-
-  deleteGroupModal.on('show.bs.modal', function() {
-    deleteGroupModal.find('.groupName').text(deleteGroupModal.data('groupReference'));
-  });
-
-  deleteGroupModal.find('.btn-danger').click(function() {
+    deleteGroupModal.find('.groupName').text(groupReference);
+  }).find('.btn-danger').click(function() {
     $.post('', {
       xpage: 'deleteuorg',
-      docname: deleteGroupModal.data('groupReference'),
+      docname: deleteGroupModal.find('.groupName').text(),
       form_token: xm.form_token
     }).done(function() {
-      groupsLiveTable.deleteRow(deleteGroupModal.data('rowIndex'));
+      deleteGroupModal.data('liveTable').deleteRow(deleteGroupModal.data('rowIndex'));
     });
   });
 });</code>

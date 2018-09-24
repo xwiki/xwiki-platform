@@ -236,7 +236,9 @@ $xwiki.getUserName("xwiki:${username}")
     'useInlineHTML': false,
     'wrapAvatar': false
   })
-  #set ($discard = $macro.options.putAll($options))
+  #if ($options.entrySet())
+    #set ($discard = $macro.options.putAll($options))
+  #end
   #set ($usersTag = 'ul')
   #set ($userTag = 'li')
   #if ($macro.options.useInlineHTML)

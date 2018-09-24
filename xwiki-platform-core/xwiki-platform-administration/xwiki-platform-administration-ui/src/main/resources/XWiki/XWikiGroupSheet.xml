@@ -37,10 +37,10 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+{{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('XWiki.XWikiGroupSheet'))
 ## Keep testing the inline action for backward compatibility with existing groups.
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-  {{html}}
   #if ($request.xpage == 'plain')
     ## AJAX request.
     #set ($wrapperTag = 'form')
@@ -72,7 +72,6 @@
       &lt;/span&gt;
     &lt;/div&gt;
   &lt;/$wrapperTag&gt;
-  {{/html}}##
 #end
 #set ($columnOptions = {
   'member': {'type': 'text', 'html': true},
@@ -93,11 +92,15 @@
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
   #set ($discard = $columns.add('_actions'))
 #end
-#livetable('groupusers' $columns $columnOptions {
-  'url': $doc.getURL('view', 'xpage=getgroupmembers'),
-  'translationPrefix': 'xe.admin.groups.',
-  'javascriptName': 'editgrouptable'
-})
+&lt;div class="medium-avatars"&gt;
+  #livetable('groupusers' $columns $columnOptions {
+    'url': $doc.getURL('view', 'xpage=getgroupmembers'),
+    'translationPrefix': 'xe.admin.groups.',
+    'javascriptName': 'editgrouptable',
+    'outputOnlyHtml': true
+  })
+&lt;/div&gt;
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>XWiki.XWikiGroupSheet</name>

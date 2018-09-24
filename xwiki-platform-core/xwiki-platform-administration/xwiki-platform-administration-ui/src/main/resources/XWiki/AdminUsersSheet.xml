@@ -53,16 +53,16 @@
 
 #macro (displayUsersLiveTable)
   #set ($columnOptions = {
-    'username': {'type': 'text', 'link': 'auto', 'sortable': false},
-    'firstname': {'type': 'text', 'sortable': false},
-    'lastname': {'type': 'text', 'sortable': false},
+    'name': {'type': 'text', 'sortable': false, 'html': true},
+    'first_name': {'type': 'text', 'sortable': false},
+    'last_name': {'type': 'text', 'sortable': false},
     'scope': {'type': 'list', 'sortable': false},
     '_actions': {
       'actions': ['edit', 'delete'],
       'filterable': false
      }
   })
-  #set ($columns = ['username', 'firstname', 'lastname', '_actions'])
+  #set ($columns = ['name', 'first_name', 'last_name', '_actions'])
   #set ($liveTableOptions = {
     'url': $doc.getURL('view', 'xpage=getusers'),
     'translationPrefix': 'xe.admin.users.',
@@ -75,7 +75,9 @@
     ## afterwards.
     #set ($liveTableOptions.topFilters = "#userScopeFilter")
   #end
-  #livetable('userstable' $columns $columnOptions $liveTableOptions)
+  &lt;div class="medium-avatars"&gt;
+    #livetable('userstable' $columns $columnOptions $liveTableOptions)
+  &lt;/div&gt;
   &lt;p&gt;
     &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createUserModal"&gt;
       $escapetool.xml($services.localization.render('rightsmanager.addnewuser'))
@@ -184,6 +186,7 @@
   ##
   #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
   #set ($discard = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
+  #set ($discard = $xwiki.ssx.use("XWiki.AdminUsersSheet"))
   #set ($discard = $xwiki.jsx.use("XWiki.AdminUsersSheet"))
 
   {{html clean="false"}}
@@ -433,6 +436,132 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     </property>
     <property>
       <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.AdminUsersSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4023eda6-fbf6-4111-9975-8d0b0883e760</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/**
+ * Users Live Table
+ */
+#userstable td[data-title] {
+  vertical-align: middle;
+}
+
+/**
+ * Delete User Modal
+ */
+
+#deleteUserModal .userName {
+  font-weight: bolder;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

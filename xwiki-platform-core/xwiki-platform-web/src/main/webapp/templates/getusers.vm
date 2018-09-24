@@ -1,3 +1,13 @@
+#macro (displayUserAliasWithAvatar $userReference)
+  <div class="user" data-reference="$escapetool.xml($userReference)">
+    <span class="user-avatar-wrapper">
+      #getUserAvatarURL($userReference $avatarURL 120)
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+    </span>
+    <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
+  </div>
+#end
+
 #### get all the request parameters which are filters
 #set ($params = $request.getParameterMap())
 #set ($keys = $params.keySet())
@@ -70,6 +80,7 @@
     #set ($wikiName = 'local')
   #end
   #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
+  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9RC1
   #set ($row = {
     'username': $user.name,
     'fullname': $user.fullName,
@@ -97,6 +108,9 @@
     'doc_edit_url': $user.getURL('edit'),
     'doc_hasdelete': $services.security.authorization.hasAccess('delete', $user.documentReference),
     'doc_delete_url': $user.getURL('delete'),
+    'name': "#displayUserAliasWithAvatar($user.documentReference)",
+    'first_name': $userObject.getValue('first_name'),
+    'last_name': $userObject.getValue('last_name'),
     'scope': $services.localization.render("xe.admin.groups.$scope")
   }))
   #set ($discard = $data.rows.add($row))

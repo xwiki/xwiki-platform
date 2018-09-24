@@ -98,6 +98,9 @@
   #else
     #set ($scope = 'local')
   #end
+  ## Prevent users from deleting themselves.
+  #set ($hasDelete = $xcontext.userReference != $user.documentReference
+    && $services.security.authorization.hasAccess('delete', $user.documentReference))
   #set ($discard = $row.putAll({
     'doc_fullName': $user.fullName,
     'doc_wiki': $user.wiki,
@@ -106,7 +109,7 @@
     'doc_hasadmin': $xwiki.hasAdminRights(),
     'doc_hasedit': $services.security.authorization.hasAccess('edit', $user.documentReference),
     'doc_edit_url': $user.getURL('edit'),
-    'doc_hasdelete': $services.security.authorization.hasAccess('delete', $user.documentReference),
+    'doc_hasdelete': $hasDelete,
     'doc_delete_url': $user.getURL('delete'),
     'name': "#displayUserAliasWithAvatar($user.documentReference)",
     'first_name': $userObject.getValue('first_name'),

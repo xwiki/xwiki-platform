@@ -149,7 +149,7 @@
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
           &lt;h4 class="modal-title" id="deleteUserModal-label"&gt;
-            $escapetool.xml($services.localization.render('xe.admin.groups.deleteGroup'))
+            $escapetool.xml($services.localization.render('xe.admin.users.deleteUser'))
           &lt;/h4&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;

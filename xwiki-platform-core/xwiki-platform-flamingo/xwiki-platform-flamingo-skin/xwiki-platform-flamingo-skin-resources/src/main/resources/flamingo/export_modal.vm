@@ -69,9 +69,6 @@
        aria-labelledby="exportModalHeadingOther">
     <div class="panel-body">
       <form method="post" id="export-form">
-        <input type="hidden" id="including-export-pages" name="including-export-pages"/>
-        <input type="hidden" id="excluding-export-pages" name="excluding-export-pages"/>
-
         #if ($doc.name == 'WebHome')
           #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
           <div class="row">
@@ -100,16 +97,8 @@
         <a href="$doc.getURL('export', "format=html")" class="btn btn-primary"
            rel="nofollow">$services.localization.render('core.menu.export.html')</a>
         #if($hasAdmin && $services.xar.isXARExportAvailable())
-          #set($exportURL =
-            "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,
-              'default'))")
-          #if ($doc.name == 'WebHome')
-            ## When nested page also export WebPreferences which contain among other things the right of this entity
-            #set($exportURL =
-              "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,
-                'default'))}.WebPreferences")
-          #end
-          <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary"
+          #set($exportURL = "format=xar&amp;name=$escapetool.url($doc.fullName)")
+          <a href="$doc.getURL('export', "$exportURL")" class="btn btn-primary"
              rel="nofollow">$services.localization.render('core.menu.export.xar')</a>
         #end
         #foreach ($exportExtension in $exportExtensions)

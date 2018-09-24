@@ -53,8 +53,6 @@ public class XARExportTest extends AbstractTest
         exportXARAll();
         exportXARLotOfSelectedFiles();
         exportXARWithUnselect();
-        exportXARWithUnselectMorePages();
-        exportXARSelectOnePage();
     }
 
     private void setupPages() throws Exception
@@ -68,6 +66,14 @@ public class XARExportTest extends AbstractTest
         for (int i = 0; i < 100; i++) {
             String name = "Foo_" + i;
             DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Foo", name), "WebHome");
+            if (!getUtil().rest().exists(documentReference)) {
+                getUtil().rest().savePage(documentReference);
+            }
+        }
+
+        for (int i = 0; i < 20; i++) {
+            String name = "Foo_10_"+i;
+            DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Foo", "Foo_10", name), "WebHome");
             if (!getUtil().rest().exists(documentReference)) {
                 getUtil().rest().savePage(documentReference);
             }
@@ -97,10 +103,16 @@ public class XARExportTest extends AbstractTest
 
         otherFormatView.clickExportAsXARButton();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&pages=xwiki%3AFoo.%25");
+        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
         assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
-        assertTrue(otherFormatView.getExcludingPagesField().getAttribute("value").isEmpty());
-        assertTrue(otherFormatView.getIncludingPagesField().getAttribute("value").isEmpty());
+
+        List<String> expectedPages = new ArrayList<>();
+        expectedPages.add("xwiki%3AFoo.%25");
+        assertEquals(expectedPages, otherFormatView.getPagesValues());
+
+        List<String> expectedExcludes = new ArrayList<>();
+        expectedExcludes.add("");
+        assertEquals(expectedExcludes, otherFormatView.getExcludesValues());
         getUtil().forceGuestUser();
     }
 
@@ -148,10 +160,16 @@ public class XARExportTest extends AbstractTest
 
         otherFormatView.clickExportAsXARButton();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&pages=xwiki%3AFoo.%25");
+        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
         assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
-        assertTrue(otherFormatView.getExcludingPagesField().getAttribute("value").isEmpty());
-        assertTrue(otherFormatView.getIncludingPagesField().getAttribute("value").isEmpty());
+
+        List<String> expectedPages = new ArrayList<>();
+        expectedPages.add("xwiki%3AFoo.%25");
+        assertEquals(expectedPages, otherFormatView.getPagesValues());
+
+        List<String> expectedExcludes = new ArrayList<>();
+        expectedExcludes.add("");
+        assertEquals(expectedExcludes, otherFormatView.getExcludesValues());
 
         getUtil().forceGuestUser();
     }
@@ -179,79 +197,33 @@ public class XARExportTest extends AbstractTest
 
         assertEquals(16, root.getChildren().size());
 
-        TreeNodeElement node5 = root.getChildren().get(5);
-        TreeNodeElement node11 = root.getChildren().get(11);
+        TreeNodeElement node2 = root.getChildren().get(2);
+        TreeNodeElement node4 = root.getChildren().get(4);
+        TreeNodeElement node6 = root.getChildren().get(6);
+
 
         // nodes are ordered using alphabetical order:
         // 1 -> Foo_1
         // 2 -> Foo_10
         // ...
-        // 5 -> Foo_13
+        // 4 -> Foo_12
+        // 6 -> Foo_14
 
-        node5.deselect();
+        node4.deselect();
+        node6.deselect();
+        node2.open().waitForIt();
 
-        // 11 -> Foo_19
-        node11.deselect();
+        // the DOM is rebuilt
+        node2 = root.getChildren().get(2);
 
-        // 12 -> Foo_2
-        // 13 -> Foo_20
+        assertEquals(16, node2.getChildren().size());
+        node2.deselect();
 
-        otherFormatView.clickExportAsXARButton();
+        // 1 -> Foo_10/Foo_10_1
+        node2.getChildren().get(1).select();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&pages=xwiki%3AFoo.%25");
-        assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
-
-        String excludingPages = "xwiki%3AFoo.Foo_13.WebHome&xwiki%3AFoo.Foo_19.WebHome";
-        assertEquals(excludingPages, otherFormatView.getExcludingPagesField().getAttribute("value"));
-
-        assertTrue(otherFormatView.getIncludingPagesField().getAttribute("value").isEmpty());
-
-        getUtil().forceGuestUser();
-    }
-
-    /*
-        Scenario: Export a XAR after unselecting some pages and the "More pages" node
-     */
-    public void exportXARWithUnselectMorePages()
-    {
-        getUtil().loginAsSuperAdmin();
-        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
-
-        ExportModal exportModal = new ExportModal();
-        OtherFormatView otherFormatView = exportModal.openOtherFormatView();
-        assertTrue(otherFormatView.isTreeAvailable());
-        assertTrue(otherFormatView.isExportAsXARButtonAvailable());
-
-        TreeElement treeElement = otherFormatView.getTreeElement();
-        List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
-        assertEquals(1, topLevelNodes.size());
-
-        TreeNodeElement root = topLevelNodes.get(0);
-        root = root.open().waitForIt();
-
-        assertEquals(16, root.getChildren().size());
-
-        TreeNodeElement node5 = root.getChildren().get(5);
-        TreeNodeElement node11 = root.getChildren().get(11);
-        TreeNodeElement nodeMoreElement = root.getChildren().get(15);
-
-        // nodes are ordered using alphabetical order:
-        // 1 -> Foo_1
-        // 2 -> Foo_10
-        // ...
-        // 5 -> Foo_13
-
-        node5.deselect();
-
-        // 11 -> Foo_19
-        node11.deselect();
-
-        // 12 -> Foo_2
-        // 13 -> Foo_20
-
-        nodeMoreElement.deselect();
-
+        // 2 -> Foo_10/Foo_10_15
+        node2.getChildren().get(7).select();
 
 
         otherFormatView.clickExportAsXARButton();
@@ -259,78 +231,17 @@ public class XARExportTest extends AbstractTest
         String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
         assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
 
-        String includingPages = "xwiki%3AFoo.WebHome&xwiki%3AFoo.WebPreferences&xwiki%3AFoo.Foo_0.WebHome&xwiki%3AFoo.Foo_1.WebHome"
-            + "&xwiki%3AFoo.Foo_10.WebHome&xwiki%3AFoo.Foo_11.WebHome&xwiki%3AFoo.Foo_12.WebHome"
-            + "&xwiki%3AFoo.Foo_14.WebHome&xwiki%3AFoo.Foo_15.WebHome&xwiki%3AFoo.Foo_16.WebHome"
-            + "&xwiki%3AFoo.Foo_17.WebHome&xwiki%3AFoo.Foo_18.WebHome&xwiki%3AFoo.Foo_2.WebHome"
-            + "&xwiki%3AFoo.Foo_20.WebHome&xwiki%3AFoo.Foo_21.WebHome";
-        assertEquals(includingPages, otherFormatView.getIncludingPagesField().getAttribute("value"));
-        String excludingPages = "xwiki%3AFoo.Foo_13.WebHome&xwiki%3AFoo.Foo_19.WebHome";
-        assertEquals(excludingPages, otherFormatView.getExcludingPagesField().getAttribute("value"));
+        List<String> expectedPages = new ArrayList<>();
+        expectedPages.add("xwiki%3AFoo.%25");
+        expectedPages.add("xwiki%3AFoo.Foo_10.Foo_10_1.WebHome&xwiki%3AFoo.Foo_10.Foo_10_15.WebHome");
 
-        getUtil().forceGuestUser();
-    }
+        List<String> expectedExcludes = new ArrayList<>();
+        expectedExcludes.add("xwiki%3AFoo.Foo_10.%25&xwiki%3AFoo.Foo_12.WebHome&xwiki%3AFoo.Foo_14.WebHome");
+        // we must keep the same number of argument as for pages
+        expectedExcludes.add("");
 
-    /*
-        Scenario: Export a XAR after clicking select none and selecting one page
-     */
-    public void exportXARSelectOnePage()
-    {
-        getUtil().loginAsSuperAdmin();
-        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
-
-        ExportModal exportModal = new ExportModal();
-        OtherFormatView otherFormatView = exportModal.openOtherFormatView();
-        assertTrue(otherFormatView.isTreeAvailable());
-        assertTrue(otherFormatView.isExportAsXARButtonAvailable());
-
-        TreeElement treeElement = otherFormatView.getTreeElement();
-        List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
-        assertEquals(1, topLevelNodes.size());
-
-        TreeNodeElement root = topLevelNodes.get(0);
-        root = root.open().waitForIt();
-
-        assertEquals(16, root.getChildren().size());
-
-        TreeNodeElement node5 = root.getChildren().get(5);
-        TreeNodeElement node11 = root.getChildren().get(11);
-        TreeNodeElement nodeMoreElement = root.getChildren().get(15);
-
-        otherFormatView.getSelectNoneLink().click();
-
-        // nodes are ordered using alphabetical order:
-        // 1 -> Foo_1
-        // 2 -> Foo_10
-        // ...
-        // 5 -> Foo_13
-
-        node5.select();
-
-        // 11 -> Foo_19
-        node11.select();
-
-        // 12 -> Foo_2
-        // 13 -> Foo_20
-
-
-
-        otherFormatView.clickExportAsXARButton();
-
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
-        assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
-
-        String includingPages = "xwiki%3AFoo.Foo_13.WebHome&xwiki%3AFoo.Foo_19.WebHome";
-
-        String excludingPages = "xwiki%3AFoo.Foo_0.WebHome&xwiki%3AFoo.Foo_1.WebHome"
-            + "&xwiki%3AFoo.Foo_10.WebHome&xwiki%3AFoo.Foo_11.WebHome&xwiki%3AFoo.Foo_12.WebHome"
-            + "&xwiki%3AFoo.Foo_14.WebHome&xwiki%3AFoo.Foo_15.WebHome&xwiki%3AFoo.Foo_16.WebHome"
-            + "&xwiki%3AFoo.Foo_17.WebHome&xwiki%3AFoo.Foo_18.WebHome&xwiki%3AFoo.Foo_2.WebHome"
-            + "&xwiki%3AFoo.Foo_20.WebHome&xwiki%3AFoo.Foo_21.WebHome";
-
-        assertEquals(includingPages, otherFormatView.getIncludingPagesField().getAttribute("value"));
-        assertEquals(excludingPages, otherFormatView.getExcludingPagesField().getAttribute("value"));
+        assertEquals(expectedPages, otherFormatView.getPagesValues());
+        assertEquals(expectedExcludes, otherFormatView.getExcludesValues());
 
         getUtil().forceGuestUser();
     }

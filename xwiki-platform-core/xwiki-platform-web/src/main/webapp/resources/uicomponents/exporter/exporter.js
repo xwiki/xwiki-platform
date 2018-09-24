@@ -100,8 +100,6 @@ require([
   require(['tree'], function () {
     $(document).ready(function () {
       var form = $('#export-form');
-      var includingPagesInput = $('#including-export-pages');
-      var excludingPagesInput = $('#excluding-export-pages');
 
       /**
        * Save the default url
@@ -177,18 +175,120 @@ require([
         });
 
         /**
+         * This function is called recursively to process each parent node in order to built properly the list of list
+         * of pages to includes (i.e. pages parameter of export) and pages to excludes (i.e. excludes parameter of
+         * export).
+         * FTR the parameters are ordered as the first element of pages is linked to the first element of excludes.
+         *
+         * @param rootNode: the parent node to process
+         * @param arrayOfPages: a list of list of pages to includes
+         * @param arrayOfExcludes: a list of list of pages to excludes relatively to their included pages
+         */
+        var processLevel = function(rootNode, arrayOfPages, arrayOfExcludes) {
+
+          // set default value for pagination
+          var isPaginationExisting = false;
+          var isPaginationChecked = false;
+
+          var nodeId = rootNode.data.id;
+
+          var pageReference = XWiki.Model.resolve(nodeId, XWiki.EntityType.DOCUMENT);
+          var pageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent));
+
+          var nodeWithChildren = [];
+          var includedPages = [];
+          var excludedPages = [];
+
+          // first we need to put the root node in the right list
+          if (!treeReference.is_checked(rootNode)) {
+            excludedPages.push(XWiki.Model.serialize(pageReference));
+          } else {
+            includedPages.push(XWiki.Model.serialize(pageReference));
+          }
+
+          // then process its children
+          rootNode.children.forEach(function (nodeDom) {
+
+            var node = treeReference.get_node(nodeDom);
+            var subNodeId = node.data.id;
+            var subPageReference;
+
+            // if the node does not have children (easy case)
+            if (treeReference.is_leaf(node)) {
+
+              // pagination node is actually a leaf node
+              if (node.data.type === "pagination") {
+                isPaginationExisting = true;
+                isPaginationChecked = treeReference.is_checked(node);
+
+              // standard document node
+              } else {
+                subPageReference = XWiki.Model.serialize(XWiki.Model.resolve(subNodeId, XWiki.EntityType.DOCUMENT));
+
+                // the page ref in the right list
+                if (treeReference.is_checked(node)) {
+                  includedPages.push(subPageReference);
+                } else {
+                  excludedPages.push(subPageReference);
+                }
+              }
+
+            // if the node has children
+            } else {
+              subPageReference = XWiki.Model.resolve(subNodeId, XWiki.EntityType.DOCUMENT);
+              var subPageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, subPageReference.parent));
+
+              // if it's not loaded, we'll manage the entire space
+              if (!treeReference.is_loaded(node)) {
+
+                // put the space in the right list
+                if (treeReference.is_checked(node)) {
+                  includedPages.push(subPageJoker);
+                } else {
+                  excludedPages.push(subPageJoker);
+                }
+              } else {
+                // in that case the page will be managed within its own space, so we need to exclude it
+                // in the current context to avoid selecting it in the request
+                // e.g. I'm in Foo.% I selected Foo.Bar but only some of its children:
+                // I need Foo.Bar.% to be excluded in the request with Foo.%
+                // then another part of the request will select Foo.Bar.X, X being the selected children.
+                excludedPages.push(subPageJoker);
+                nodeWithChildren.push(node);
+              }
+            }
+          });
+
+          // if we don't have a pagination node, or we have one and it's checked:
+          // we manage the export with exporting the space and excluding stuff that needs to be
+          if (!isPaginationExisting || (isPaginationExisting && isPaginationChecked)) {
+            includedPages = [ pageJoker ];
+            arrayOfPages.push(includedPages);
+            arrayOfExcludes.push(excludedPages);
+
+          // a pagination exists but it's not checked:
+          // we need to manage the export by specifying exactly what we includes, we don't need to specify excludes
+          } else {
+            arrayOfPages.push(includedPages);
+            arrayOfExcludes.push([]);
+          }
+
+          // we call the same function for the children
+          nodeWithChildren.forEach(function (node) {
+            processLevel(node, arrayOfPages, arrayOfExcludes);
+          });
+        };
+
+        /**
          * Update the form of the export according to the tree
          *
-         * The general idea is to try keeping only the main spaces and put them with a joker-like (%) on the URL
-         * argument. The deselected pages will be then put in the "excluding-export-pages" input form.
-         *
-         * Now in case of the pagination is deselected, we should not use a joker for the request: for that specific
-         * case we put the pages in the "including-export-pages" input form.
          */
         $('#exportModal #exportModelOtherCollapse a.btn').click(function (event) {
           event.preventDefault();
           var button = $(this);
           var url = button.data('url').clone();
+          var pages = [];
+          var excludes = [];
 
           // by default the pages URL attribute is empty
           if (url.params !== undefined) {
@@ -197,136 +297,38 @@ require([
             url.params = {pages: []};
           }
 
-          // to store the list of pages ordered by their parent space
-          // it will be used in case a space is "excluded" meaning the joker won't be used
-          var includingPagesBySpace = {};
+          // get the rootNode of the tree
+          var rootNodeId = treeReference.get_node("#").children[0];
+          var rootNode = treeReference.get_node(rootNodeId);
 
-          // the deselected pages that the user does not want to export
-          var excludingPages = [];
+          // process starting by the rootNode and build arrays of pages and excludes
+          processLevel(rootNode, pages, excludes);
 
-          // the spaces for which the user deselected the pagination node
-          // in that case we must not use the joker in the request to avoid retrieving all pages
-          var excludedSpaces = [];
-
-          var excludeSpace = function(space) {
-
-            // if we exclude a space we need to remove it from the pages URL param
-            // we will use the "including-export-pages" input form
-            url.params.pages = url.params.pages.filter(function (elem) {
-              return elem !== space;
-            });
-            excludedSpaces.push(space);
-          };
-
-          var isSpaceExcluded = function (space) {
-            for (var i = 0; i < excludedSpaces.length; i++) {
-              if (excludedSpaces[i] === space) {
-                return true;
-              }
-            }
-            return false;
-          };
-
-          // In case the node is a pagination node, we have to split the id to retrieve its references:
-          // example of id: pagination:document:xwiki:Main.WebHome
-          var retrieveReferenceFromPaginationId = function (paginationNodeId) {
-            var tokens = paginationNodeId.split(":");
-
-            var result = "";
-            for (var i = 2; i < tokens.length; i++) {
-              result += tokens[i];
-
-              if (i < tokens.length -1 ) {
-                result += ":";
-              }
-            }
-            return result;
-          };
-
-          // we go through all nodes to detect checked and unchecked nodes
-          // (jsTree does not provide an immediate API to get unchecked nodes)
-          $(treeReference.get_json(tree, {
-            flat: true
-          })).each(function () {
-            var node = treeReference.get_node(this.id);
-
-            var nodeId = node.data.id;
-
-            if (node.data.type === "pagination") {
-              nodeId = retrieveReferenceFromPaginationId(node.id);
-            }
-
-            var pageReference = XWiki.Model.resolve(nodeId, XWiki.EntityType.DOCUMENT);
-            var spaceReference = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent));
-
-
-            // the node is checked
-            if (treeReference.is_checked(node)) {
-
-              // if it's pagination we don't process it: we should have already put the main space with a joker
-              // when processing the parent node
-              if (node.data.type !== "pagination") {
-
-                // In case the page have children: it's a parent node, we process it to be used in pages param
-                if (treeReference.is_parent(node)) {
-
-                  if (!isSpaceExcluded(spaceReference)) {
-                    url.params.pages.push(spaceReference);
-                  }
-
-                  // we put the WebHome page to avoid loosing it in case the space is excluded later
-                  if (includingPagesBySpace[spaceReference] === undefined) {
-                    includingPagesBySpace[spaceReference] = [];
-                  }
-                  includingPagesBySpace[spaceReference].push(XWiki.Model.serialize(pageReference));
-                  includingPagesBySpace[spaceReference].push(XWiki.Model.serialize(new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT, pageReference.parent)));
-
-                // if it's not a parent, we fill the list of includingPages in case the space is excluded in
-                // a next node
-                } else {
-
-                  // we need to retrieve the parent space
-                  var parentNode = treeReference.get_node(treeReference.get_parent(node));
-                  var parentPageReference = XWiki.Model.resolve(parentNode.data.id, XWiki.EntityType.DOCUMENT);
-                  var parentSpaceReference = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, parentPageReference.parent));
-
-                  if (includingPagesBySpace[parentSpaceReference] === undefined) {
-                    includingPagesBySpace[parentSpaceReference] = [];
-                  }
-                  includingPagesBySpace[parentSpaceReference].push(XWiki.Model.serialize(pageReference));
-                }
-              }
-            // the node is unchecked
-            } else {
-
-              // if it's a pagination node: it means the space must be excluded
-              if (node.data.type === "pagination") {
-                excludeSpace(spaceReference);
-              } else {
-                // In case the page have children, it won't be include with a joker, so we're safe.
-                if (!treeReference.is_parent(node)) {
-                  excludingPages.push(XWiki.Model.serialize(pageReference));
-                }
-              }
-            }
-          });
-
+          // useful to create quickly the right String given an array of page names
           var aggregatePageNames = function (arrayOfNames) {
             return arrayOfNames.map(function (name) { return encodeURIComponent(name); }).join("&");
           };
 
-          excludingPagesInput.val(aggregatePageNames(excludingPages));
+          // we clean the form from old hidden pages (in case we click several times on the export button)
+          $("input[name='pages']").remove();
+          $("input[name='excludes']").remove();
 
-          // we only include pages that have an excluded parent space
-          var includingPages = [];
-          for (var space in includingPagesBySpace) {
-            if (isSpaceExcluded(space)) {
-              includingPagesBySpace[space].forEach(function (elem) {
-                includingPages.push(elem);
-              });
-            }
+          // create on the fly the hidden inputs
+          for (var i = 0; i < pages.length; i++) {
+            $('<input>').attr({
+              type: 'hidden',
+              name: 'pages',
+              value: aggregatePageNames(pages[i])
+            }).appendTo(form);
           }
-          includingPagesInput.val(aggregatePageNames(includingPages));
+
+          for (var i = 0; i < excludes.length; i++) {
+            $('<input>').attr({
+              type: 'hidden',
+              name: 'excludes',
+              value: aggregatePageNames(excludes[i])
+            }).appendTo(form);
+          }
 
           // put the right action for the form
           form.attr('action', url.serialize());

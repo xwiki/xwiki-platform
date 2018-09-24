@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,11 +40,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.internal.DefaultQueryParameter;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import com.xpn.xwiki.XWikiContext;
@@ -79,7 +83,8 @@ public class ExportActionTest
         // Set other request parameters
         when(request.get("name")).thenReturn("myexport");
         // Export all pages in the "Space" space
-        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%"});
+        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%25"});
+        when(request.getCharacterEncoding()).thenReturn("UTF-8");
 
         // Make the current user have programming rights
         when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
@@ -132,11 +137,12 @@ public class ExportActionTest
         ArgumentCaptor<DocumentInstanceInputProperties> properties =
             ArgumentCaptor.forClass(DocumentInstanceInputProperties.class);
         verify(inputFilterStreamFactory).createInputFilterStream(properties.capture());
-        assertEquals(false, properties.getValue().isVerbose());
-        assertEquals(false, properties.getValue().isWithJRCSRevisions());
-        assertEquals(false, properties.getValue().isWithRevisions());
-        assertEquals(true, properties.getValue().getEntities().matches(page1Ref));
-        assertEquals(true, properties.getValue().getEntities().matches(page2Ref));
+        assertFalse(properties.getValue().isVerbose());
+        assertFalse(properties.getValue().isWithJRCSRevisions());
+        assertFalse(properties.getValue().isWithRevisions());
+
+        assertTrue(properties.getValue().getEntities().matches(page1Ref));
+        assertTrue(properties.getValue().getEntities().matches(page2Ref));
     }
 
     @Test
@@ -161,8 +167,8 @@ public class ExportActionTest
         when(request.get("name")).thenReturn("myexport");
         when(request.getCharacterEncoding()).thenReturn("UTF-8");
         // Export all pages in the "Space" space
-        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%"});
-        when(request.get("excluding-export-pages")).thenReturn(URLEncoder.encode("Space.Page1&Space.Page2", "UTF-8"));
+        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%25", "Foo.%25&Bar.Baz.%25"});
+        when(request.getParameterValues("excludes")).thenReturn(new String[] { "Space.Page1&Space.Page2", "Bar.Baz.WebHome" });
 
         // Make the current user have programming rights
         when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
@@ -170,10 +176,13 @@ public class ExportActionTest
         // Query Manager-related mocking
         QueryManager queryManager = oldcore.getMocker().registerMockComponent(QueryManager.class);
         Query query = mock(Query.class);
+        String where = "where ( doc.fullName like ? and doc.fullName not like ? and doc.fullName not like ? ) "
+            + "or ( doc.fullName like ? or doc.fullName like ? and doc.fullName not like ? ) ";
         when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
         when(query.setWiki("xwiki")).thenReturn(query);
-        when(query.bindValues(any(List.class))).thenReturn(query);
-        when(query.execute()).thenReturn(Arrays.asList("Space.Page1", "Space.Page2", "Space.Page3"));
+
+        when(query.bindValues(anyList())).thenReturn(query);
+        when(query.execute()).thenReturn(Arrays.asList("Space.Page3"));
 
         // Register some mock resolver to resolve passed page references
         AuthorizationManager authorizationManager = oldcore.getMocker().registerMockComponent(AuthorizationManager.class);
@@ -219,9 +228,16 @@ public class ExportActionTest
         ArgumentCaptor<DocumentInstanceInputProperties> properties =
                 ArgumentCaptor.forClass(DocumentInstanceInputProperties.class);
         verify(inputFilterStreamFactory).createInputFilterStream(properties.capture());
-        assertEquals(false, properties.getValue().isVerbose());
-        assertEquals(false, properties.getValue().isWithJRCSRevisions());
-        assertEquals(false, properties.getValue().isWithRevisions());
-        assertEquals(true, properties.getValue().getEntities().matches(page3Ref));
+
+        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        verify(queryManager).createQuery(argument.capture(), eq(Query.HQL));
+
+        assertEquals(where, argument.getValue());
+        assertFalse(properties.getValue().isVerbose());
+        assertFalse(properties.getValue().isWithJRCSRevisions());
+        assertFalse(properties.getValue().isWithRevisions());
+        assertTrue(properties.getValue().getEntities().matches(page3Ref));
+        assertFalse(properties.getValue().getEntities().matches(page1Ref));
+        assertFalse(properties.getValue().getEntities().matches(page2Ref));
     }
 }

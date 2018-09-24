@@ -19,6 +19,10 @@
  */
 package org.xwiki.flamingo.sking.test.po;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -60,14 +64,18 @@ public class OtherFormatView extends BaseElement
         return getDriver().findElement(By.id("export-form"));
     }
 
-    public WebElement getExcludingPagesField()
-    {
-        return getDriver().findElement(By.id("excluding-export-pages"));
+    public List<String> getPagesValues() {
+        return getForm()
+            .findElements(By.xpath(".//input[@type = 'hidden' and @name = 'pages']")).stream().map(webElement -> {
+                return webElement.getAttribute("value");
+        }).collect(Collectors.toList());
     }
 
-    public WebElement getIncludingPagesField()
-    {
-        return getDriver().findElement(By.id("including-export-pages"));
+    public List<String> getExcludesValues() {
+        return getForm()
+            .findElements(By.xpath(".//input[@type = 'hidden' and @name = 'excludes']")).stream().map(webElement -> {
+                return webElement.getAttribute("value");
+            }).collect(Collectors.toList());
     }
 
     public WebElement getSelectNoneLink()

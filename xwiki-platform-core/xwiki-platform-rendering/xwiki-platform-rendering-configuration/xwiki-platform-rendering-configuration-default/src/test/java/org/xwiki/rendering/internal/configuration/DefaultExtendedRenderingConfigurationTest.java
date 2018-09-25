@@ -99,6 +99,15 @@ public class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
+    public void isImageDimensionsIncludedInImageURL2() throws Exception
+    {
+        ConfigurationSource source = componentManager.getInstance(ConfigurationSource.class);
+        when(source.getProperty("rendering.imageDimensionsIncludedInImageURL", true)).thenReturn(true);
+
+        assertTrue(this.defaultExtendedRenderingConfiguration.isImageDimensionsIncludedInImageURL());
+    }
+
+    @Test
     public void getConfiguredAndDisabledSyntaxesWhenNoConfigXObjectAndExistingXWikiCfgProperty() throws Exception
     {
         ConfigurationSource renderingSource = componentManager.getInstance(ConfigurationSource.class, "rendering");

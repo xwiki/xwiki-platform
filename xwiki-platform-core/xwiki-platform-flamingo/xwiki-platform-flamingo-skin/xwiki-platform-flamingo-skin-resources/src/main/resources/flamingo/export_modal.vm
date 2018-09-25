@@ -90,7 +90,8 @@
               'showRoot': true,
               'showAttachments': false,
               'showTranslations': false,
-              'readOnly': false
+              'readOnly': false,
+              'filterHiddenDocuments': false
             })
           </div>
         #end

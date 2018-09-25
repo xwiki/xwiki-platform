@@ -317,21 +317,21 @@ require([
           $("input[name='excludes']").remove();
 
           // create on the fly the hidden inputs
-          for (var i = 0; i < pages.length; i++) {
+          pages.forEach(function (elem) {
             $('<input>').attr({
               type: 'hidden',
               name: 'pages',
-              value: encodeURIComponent(pages[i])
+              value: elem
             }).appendTo(form);
-          }
+          });
 
-          for (var i = 0; i < excludes.length; i++) {
+          excludes.forEach(function (elem) {
             $('<input>').attr({
               type: 'hidden',
               name: 'excludes',
-              value: aggregatePageNames(excludes[i])
+              value: aggregatePageNames(elem)
             }).appendTo(form);
-          }
+          });
 
           // put the right action for the form
           form.attr('action', url.serialize());

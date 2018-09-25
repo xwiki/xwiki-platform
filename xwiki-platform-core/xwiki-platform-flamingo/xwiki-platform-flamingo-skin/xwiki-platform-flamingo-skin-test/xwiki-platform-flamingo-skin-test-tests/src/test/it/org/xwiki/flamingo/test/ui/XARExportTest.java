@@ -107,7 +107,7 @@ public class XARExportTest extends AbstractTest
         assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();
-        expectedPages.add("xwiki%3AFoo.%25");
+        expectedPages.add("xwiki:Foo.%");
         assertEquals(expectedPages, otherFormatView.getPagesValues());
 
         List<String> expectedExcludes = new ArrayList<>();
@@ -164,7 +164,7 @@ public class XARExportTest extends AbstractTest
         assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();
-        expectedPages.add("xwiki%3AFoo.%25");
+        expectedPages.add("xwiki:Foo.%");
         assertEquals(expectedPages, otherFormatView.getPagesValues());
 
         List<String> expectedExcludes = new ArrayList<>();
@@ -232,9 +232,9 @@ public class XARExportTest extends AbstractTest
         assertEquals(postURL, otherFormatView.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();
-        expectedPages.add("xwiki%3AFoo.%25");
-        expectedPages.add("xwiki%3AFoo.Foo_10.Foo_10_1.WebHome");
-        expectedPages.add("xwiki%3AFoo.Foo_10.Foo_10_15.WebHome");
+        expectedPages.add("xwiki:Foo.%");
+        expectedPages.add("xwiki:Foo.Foo_10.Foo_10_1.WebHome");
+        expectedPages.add("xwiki:Foo.Foo_10.Foo_10_15.WebHome");
 
         List<String> expectedExcludes = new ArrayList<>();
         expectedExcludes.add("xwiki%3AFoo.Foo_10.%25&xwiki%3AFoo.Foo_12.WebHome&xwiki%3AFoo.Foo_14.WebHome");

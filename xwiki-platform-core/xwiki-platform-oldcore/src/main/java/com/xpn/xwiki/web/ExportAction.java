@@ -31,10 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
@@ -55,7 +52,6 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.query.internal.DefaultQueryParameter;
-import org.xwiki.query.internal.DocumentQueryFilter;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -79,8 +75,9 @@ import com.xpn.xwiki.util.Util;
  */
 public class ExportAction extends XWikiAction
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExportAction.class);
-    private static final String TREE_DOCUMENT_PREFIX = "document:";
+    /**
+     * Used to separate page arguments in excludes parameter
+     */
     private static String PAGE_SEPARATOR = "&";
 
     @Override
@@ -228,8 +225,8 @@ public class ExportAction extends XWikiAction
     private String extractWikiName(String pattern, XWikiContext context)
     {
         String wikiName;
-        if (pattern.contains(":")) {
-            int index = pattern.indexOf(':');
+        int index = pattern.indexOf(':');
+        if (index > 0) {
             wikiName = pattern.substring(0, index);
         } else {
             wikiName = context.getWikiId();
@@ -269,7 +266,7 @@ public class ExportAction extends XWikiAction
                 boolean newWhere = false;
                 if (!wikiQueries.containsKey(wikiName)) {
                     Object[] query = new Object[2];
-                    query[0] = where = new StringBuffer("where ");
+                    query[0] = where = new StringBuffer("where ( ");
                     query[1] = params = new ArrayList<>();
                     wikiQueries.put(wikiName, query);
                     newWhere = true;
@@ -279,10 +276,7 @@ public class ExportAction extends XWikiAction
                     params = (List<QueryParameter>) query[1];
                 }
 
-                if (i == 0 || newWhere) {
-                    where.append("( ");
-                }
-                if (i > 0 && !newWhere) {
+                if (!newWhere) {
                     where.append("or ( ");
                 }
 
@@ -293,9 +287,14 @@ public class ExportAction extends XWikiAction
                     for (int j = 0; j < excludedPages.size(); j++) {
                         String excludePage = excludedPages.get(j);
 
-
                         // useless
-                        wikiName = this.extractWikiName(excludePage, context);
+                        String localwikiName = this.extractWikiName(excludePage, context);
+
+                        if (!localwikiName.equals(wikiName)) {
+                            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
+                                String.format("The excludes argument [%s] makes reference to another wiki than its "
+                                    + "attached pages argument [%s]", excludePage, includePage));
+                        }
 
                         if (excludePage.startsWith(wikiName+":")) {
                             excludePage = excludePage.substring(wikiName.length() + 1);
@@ -332,8 +331,8 @@ public class ExportAction extends XWikiAction
                     List<String> docsNames = dbQuery.setWiki(wikiName).bindValues(params).execute();
 
                     for (String docName : docsNames) {
-                        String pageReferenceStr = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
-                        DocumentReference pageReference = resolver.resolve(pageReferenceStr);
+                        WikiReference wikiReference = new WikiReference(wikiName);
+                        DocumentReference pageReference = resolver.resolve(docName, wikiReference);
 
                         if (authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), pageReference)) {
                             pageList.add(pageReference);

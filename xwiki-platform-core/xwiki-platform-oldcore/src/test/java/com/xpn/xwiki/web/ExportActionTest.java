@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,23 +36,30 @@ import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.query.internal.DefaultQueryParameter;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.web.ExportAction}.
@@ -196,10 +201,11 @@ public class ExportActionTest
 
         DocumentReferenceResolver<String> resolver =
                 oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        when(resolver.resolve("xwiki:Space.Page1")).thenReturn(page1Ref);
-        when(resolver.resolve("xwiki:Space.Page2")).thenReturn(page2Ref);
-        when(resolver.resolve("xwiki:Space.Page3")).thenReturn(page3Ref);
 
+        WikiReference wikiReference = new WikiReference("xwiki");
+        when(resolver.resolve("Space.Page1", wikiReference)).thenReturn(page1Ref);
+        when(resolver.resolve("Space.Page2", wikiReference)).thenReturn(page2Ref);
+        when(resolver.resolve("Space.Page3", wikiReference)).thenReturn(page3Ref);
 
         // Register some mock filters so that the export does nothing.
         InputFilterStreamFactory inputFilterStreamFactory = oldcore.getMocker().registerMockComponent(

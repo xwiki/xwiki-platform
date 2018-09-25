@@ -311,13 +311,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     var createUserModalBody = createUserModal.find('.modal-body').empty().addClass('loading');
     $.get(createUserURL, function(html) {
       var createUserForm = $('&lt;div/&gt;').html(html).find('form#register').removeClass('half');
+      // Use the modal button instead of the form submit button.
+      createUserForm.find('p.buttons').remove();
       createUserModalBody.removeClass('loading').append(createUserForm);
       $(document).trigger('xwiki:dom:updated', {'elements': createUserModalBody.toArray()});
-      if (createUserForm.size() &gt; 0) {
-        // Use the modal button instead of the form submit button.
-        createUserForm.find('p.buttons').remove();
-        createUserButton.prop('disabled', false);
-      }
+      createUserForm.find(':input').filter(':visible').first().focus();
+      createUserButton.prop('disabled', createUserForm.size() === 0);
     });
   }).on('click', '.btn-primary', function(event) {
     var createUserForm = createUserModal.find('form#register');
@@ -369,9 +368,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     editUserModal.find('.modal-body').empty().addClass('loading').load(editUserURL, parameters, function() {
       this.removeClass('loading');
       $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
-      if (editUserModal.find('form').size() &gt; 0) {
-        saveButton.prop('disabled', false);
-      }
+      var editUserForm = editUserModal.find('form#edituser');
+      editUserForm.find(':input').filter(':visible').first().focus();
+      saveButton.prop('disabled', editUserForm.size() === 0);
     });
   };
 

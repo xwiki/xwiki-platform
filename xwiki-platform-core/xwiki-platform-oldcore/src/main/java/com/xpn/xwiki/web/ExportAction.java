@@ -150,9 +150,9 @@ public class ExportAction extends XWikiAction
             this.includedPages = Arrays.asList(pages);
             this.excludedPages = this.extractArguments(excludes, context, true);
 
-            if (!this.excludedPages.isEmpty() && this.includedPages.size() != this.excludedPages.size()) {
+            if (!this.excludedPages.isEmpty() && this.includedPages.size() < this.excludedPages.size()) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                    "You should have the same number of excluded pages arguments. See the export documentation.");
+                    "You cannot more excludes argument than pages argument. See the export documentation.");
             }
         }
 
@@ -256,7 +256,7 @@ public class ExportAction extends XWikiAction
                 String includePage = arguments.includedPages.get(i);
                 List<String> excludedPages = Collections.emptyList();
 
-                if (!arguments.excludedPages.isEmpty()) {
+                if (i < arguments.excludedPages.size()) {
                     excludedPages = arguments.excludedPages.get(i);
                 }
 

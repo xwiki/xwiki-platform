@@ -329,7 +329,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       'inprogress'
     );
     $.post(createUserForm.attr('action'), createUserForm.serialize()).done(function(html) {
-      var errorMessage = $('&lt;div/&gt;').html(html).find('.errormessage');
+      var errorMessage = $('&lt;div/&gt;').html(html).find('.errormessage, .LV_validation_message.LV_invalid');
       if (errorMessage.size() &gt; 0) {
         createUserButton.prop('disabled', false);
         notification.replace(new XWiki.widgets.Notification(errorMessage.text(), 'error'));

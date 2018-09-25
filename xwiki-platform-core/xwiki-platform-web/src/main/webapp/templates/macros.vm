@@ -1288,7 +1288,7 @@ $Msz MB##
     #set ($selectedTags = [])
   #end
   #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
-  #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
+  #set ($topfilters = $options.topFilters)
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
   #set ($queryFilters = $options.queryFilters)

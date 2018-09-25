@@ -94,16 +94,9 @@ public class DefaultExtendedRenderingConfigurationTest
     {
         ConfigurationSource source = componentManager.getInstance(ConfigurationSource.class);
         when(source.getProperty("rendering.imageDimensionsIncludedInImageURL", true)).thenReturn(false);
-
         assertFalse(this.defaultExtendedRenderingConfiguration.isImageDimensionsIncludedInImageURL());
-    }
 
-    @Test
-    public void isImageDimensionsIncludedInImageURL2() throws Exception
-    {
-        ConfigurationSource source = componentManager.getInstance(ConfigurationSource.class);
         when(source.getProperty("rendering.imageDimensionsIncludedInImageURL", true)).thenReturn(true);
-
         assertTrue(this.defaultExtendedRenderingConfiguration.isImageDimensionsIncludedInImageURL());
     }
 

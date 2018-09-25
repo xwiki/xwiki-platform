@@ -263,14 +263,17 @@ require([
           // we manage the export with exporting the space and excluding stuff that needs to be
           if (!isPaginationExisting || (isPaginationExisting && isPaginationChecked)) {
             includedPages = [ pageJoker ];
-            arrayOfPages.push(includedPages);
+            arrayOfPages.push(pageJoker);
             arrayOfExcludes.push(excludedPages);
 
           // a pagination exists but it's not checked:
           // we need to manage the export by specifying exactly what we includes, we don't need to specify excludes
           } else {
-            arrayOfPages.push(includedPages);
-            arrayOfExcludes.push([]);
+            includedPages.forEach(function (elem) {
+                arrayOfPages.push(elem);
+                arrayOfExcludes.push([]);
+              }
+            );
           }
 
           // we call the same function for the children
@@ -318,7 +321,7 @@ require([
             $('<input>').attr({
               type: 'hidden',
               name: 'pages',
-              value: aggregatePageNames(pages[i])
+              value: encodeURIComponent(pages[i])
             }).appendTo(form);
           }
 

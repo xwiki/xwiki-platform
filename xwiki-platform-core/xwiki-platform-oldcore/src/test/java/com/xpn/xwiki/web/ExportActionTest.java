@@ -167,8 +167,8 @@ public class ExportActionTest
         when(request.get("name")).thenReturn("myexport");
         when(request.getCharacterEncoding()).thenReturn("UTF-8");
         // Export all pages in the "Space" space
-        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%25", "Foo.%25&Bar.Baz.%25"});
-        when(request.getParameterValues("excludes")).thenReturn(new String[] { "Space.Page1&Space.Page2", "Bar.Baz.WebHome" });
+        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%25", "Foo.%25", "Bar.Baz.%25"});
+        when(request.getParameterValues("excludes")).thenReturn(new String[] { "Space.Page1&Space.Page2", "", "Bar.Baz.WebHome" });
 
         // Make the current user have programming rights
         when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
@@ -177,7 +177,7 @@ public class ExportActionTest
         QueryManager queryManager = oldcore.getMocker().registerMockComponent(QueryManager.class);
         Query query = mock(Query.class);
         String where = "where ( doc.fullName like ? and doc.fullName not like ? and doc.fullName not like ? ) "
-            + "or ( doc.fullName like ? or doc.fullName like ? and doc.fullName not like ? ) ";
+            + "or ( doc.fullName like ? ) or ( doc.fullName like ? and doc.fullName not like ? ) ";
         when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
         when(query.setWiki("xwiki")).thenReturn(query);
 

@@ -233,11 +233,13 @@ public class XARExportTest extends AbstractTest
 
         List<String> expectedPages = new ArrayList<>();
         expectedPages.add("xwiki%3AFoo.%25");
-        expectedPages.add("xwiki%3AFoo.Foo_10.Foo_10_1.WebHome&xwiki%3AFoo.Foo_10.Foo_10_15.WebHome");
+        expectedPages.add("xwiki%3AFoo.Foo_10.Foo_10_1.WebHome");
+        expectedPages.add("xwiki%3AFoo.Foo_10.Foo_10_15.WebHome");
 
         List<String> expectedExcludes = new ArrayList<>();
         expectedExcludes.add("xwiki%3AFoo.Foo_10.%25&xwiki%3AFoo.Foo_12.WebHome&xwiki%3AFoo.Foo_14.WebHome");
         // we must keep the same number of argument as for pages
+        expectedExcludes.add("");
         expectedExcludes.add("");
 
         assertEquals(expectedPages, otherFormatView.getPagesValues());

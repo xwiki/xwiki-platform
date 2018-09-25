@@ -113,7 +113,7 @@ public class ExportAction extends XWikiAction
          *
          * Warning: order of the arguments matters, it's linked with excludedPages
          */
-        private List<List<String>> includedPages;
+        private List<String> includedPages;
 
         /**
          * All patterns that have to be excluded in the request
@@ -147,8 +147,8 @@ public class ExportAction extends XWikiAction
 
             String[] excludes = request.getParameterValues("excludes");
 
-            this.includedPages = this.extractArguments(pages, context);
-            this.excludedPages = this.extractArguments(excludes, context);
+            this.includedPages = Arrays.asList(pages);
+            this.excludedPages = this.extractArguments(excludes, context, true);
 
             if (!this.excludedPages.isEmpty() && this.includedPages.size() != this.excludedPages.size()) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
@@ -156,7 +156,7 @@ public class ExportAction extends XWikiAction
             }
         }
 
-        private List<List<String>> extractArguments(String[] args, XWikiContext context) throws XWikiException
+        private List<List<String>> extractArguments(String[] args, XWikiContext context, boolean decode) throws XWikiException
         {
             List<List<String>> result = new ArrayList<>();
 
@@ -174,7 +174,10 @@ public class ExportAction extends XWikiAction
             List<String> listOfPages = new ArrayList<>();
             for (String page : parameterValue.split(PAGE_SEPARATOR)) {
                 try {
-                    listOfPages.add(URLDecoder.decode(page, context.getRequest().getCharacterEncoding()));
+                    String decoded = URLDecoder.decode(page, context.getRequest().getCharacterEncoding());
+                    if (!decoded.isEmpty()) {
+                        listOfPages.add(decoded);
+                    }
                 } catch (UnsupportedEncodingException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
                         "Failed to resolve pages to export", e);
@@ -247,66 +250,49 @@ public class ExportAction extends XWikiAction
             Map<String, Object[]> wikiQueries = new HashMap<>();
 
             for (int i = 0; i < arguments.includedPages.size(); i++) {
-                String wikiName = null;
                 StringBuffer where = null;
                 List<QueryParameter> params = null;
 
-                List<String> includedPages = arguments.includedPages.get(i);
+                String includePage = arguments.includedPages.get(i);
                 List<String> excludedPages = Collections.emptyList();
 
                 if (!arguments.excludedPages.isEmpty()) {
                     excludedPages = arguments.excludedPages.get(i);
                 }
 
-                if (includedPages.isEmpty()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                        "You cannot specify an empty pages argument. See the export  documentation.");
+                String wikiName = this.extractWikiName(includePage, context);
+
+                if (includePage.startsWith(wikiName+":")) {
+                    includePage = includePage.substring(wikiName.length() + 1);
                 }
 
-                for (int j = 0; j < includedPages.size(); j++) {
-                    String includePage = includedPages.get(j);
-
-                    String localWikiName = this.extractWikiName(includePage, context);
-                    if (j > 0 && !localWikiName.equals(wikiName)) {
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                            "You cannot use two different Wikis in the same pages argument. "
-                                + "See the export documentation.");
-                    } else {
-                        wikiName = localWikiName;
-                    }
-
-                    if (includePage.startsWith(wikiName+":")) {
-                        includePage = includePage.substring(wikiName.length() + 1);
-                    }
-
-                    boolean newWhere = false;
-                    if (!wikiQueries.containsKey(wikiName)) {
-                        Object[] query = new Object[2];
-                        query[0] = where = new StringBuffer("where ");
-                        query[1] = params = new ArrayList<>();
-                        wikiQueries.put(wikiName, query);
-                        newWhere = true;
-                    } else {
-                        Object[] query = wikiQueries.get(wikiName);
-                        where = (StringBuffer) query[0];
-                        params = (List<QueryParameter>) query[1];
-                    }
-
-                    if (j == 0 && newWhere) {
-                        where.append("( ");
-                    } else if (j == 0 && !newWhere) {
-                        where.append("or ( ");
-                    }
-                    if (j > 0) {
-                        where.append(" or ");
-                    }
-
-                    where.append("doc.fullName like ?");
-                    params.add(new DefaultQueryParameter(null).like(includePage));
+                boolean newWhere = false;
+                if (!wikiQueries.containsKey(wikiName)) {
+                    Object[] query = new Object[2];
+                    query[0] = where = new StringBuffer("where ");
+                    query[1] = params = new ArrayList<>();
+                    wikiQueries.put(wikiName, query);
+                    newWhere = true;
+                } else {
+                    Object[] query = wikiQueries.get(wikiName);
+                    where = (StringBuffer) query[0];
+                    params = (List<QueryParameter>) query[1];
                 }
+
+                if (i == 0 || newWhere) {
+                    where.append("( ");
+                }
+                if (i > 0 && !newWhere) {
+                    where.append("or ( ");
+                }
+
+                where.append("doc.fullName like ?");
+                params.add(new DefaultQueryParameter(null).like(includePage));
+
                 if (!excludedPages.isEmpty()) {
                     for (int j = 0; j < excludedPages.size(); j++) {
                         String excludePage = excludedPages.get(j);
+
 
                         // useless
                         wikiName = this.extractWikiName(excludePage, context);

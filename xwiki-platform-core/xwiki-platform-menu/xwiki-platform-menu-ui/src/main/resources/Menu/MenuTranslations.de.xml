@@ -37,38 +37,38 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-### Missing: Menu.MenuClass_content1=Menu Structure
+Menu.MenuClass_content1=Menüstruktur
 
 # Live table generic keys
-### Missing: menu.livetable.doc.title=Page title
-### Missing: menu.livetable.doc.name=Page name
-### Missing: menu.livetable.doc.location=Location
-### Missing: menu.livetable.doc.space=Space
-### Missing: menu.livetable.doc.fullname=Page full name
-### Missing: menu.livetable.doc.author=Last Author
-### Missing: menu.livetable.doc.creator=Creator
-### Missing: menu.livetable.doc.date=Update date
-### Missing: menu.livetable.doc.creationDate=Creation date
-### Missing: menu.livetable._avatar=Avatar
-### Missing: menu.livetable._images=Images
-### Missing: menu.livetable._attachments=Attachments
-### Missing: menu.livetable._actions=Actions
-### Missing: menu.livetable._actions.edit=Edit
-### Missing: menu.livetable._actions.delete=Delete
-### Missing: menu.livetable.emptyvalue=-
+menu.livetable.doc.title=Seitentitel
+menu.livetable.doc.name=Seitenname
+menu.livetable.doc.location=Speicherort
+menu.livetable.doc.space=Bereich
+menu.livetable.doc.fullname=Vollständiger Seitenname
+menu.livetable.doc.author=Letzter Autor
+menu.livetable.doc.creator=Ersteller
+menu.livetable.doc.date=Bearbeitungsdatum
+menu.livetable.doc.creationDate=Erstellungsdatum
+menu.livetable._avatar=Profilbild
+menu.livetable._images=Bilder
+menu.livetable._attachments=Anhänge
+menu.livetable._actions=Aktionen
+menu.livetable._actions.edit=Bearbeiten
+menu.livetable._actions.delete=Löschen
+menu.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: menu.livetable.content1=Menu Structure
+menu.livetable.content1=Menüstruktur
 
 # Administration keys
-### Missing: admin.menu.name=Menu
+admin.menu.name=Menü
 
 # UIX keys
-### Missing: menu.uix.extensionPoint.label=Menu Display Location
-### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
-### Missing: menu.uix.extensionPoint.value.nowhere=Nowhere
-### Missing: menu.uix.extensionPoint.value.template.header.after=After the Page Header
-### Missing: menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel
+menu.uix.extensionPoint.label=Menü Anzeigeposition
+menu.uix.extensionPoint.hint=Gibt an, wo das Menü angezeigt werden soll. Das Menü wird entweder horizontal oder vertikal angezeigt, abhängig vom gewählten Ort.
+menu.uix.extensionPoint.value.nowhere=Nirgends
+menu.uix.extensionPoint.value.template.header.after=Nach dem Seitenkopf
+menu.uix.extensionPoint.value.panels.rightPanels=Im rechten Bereich
 ### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
 ### Missing: menu.uix.content.label=UI Extension Content
 ### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.

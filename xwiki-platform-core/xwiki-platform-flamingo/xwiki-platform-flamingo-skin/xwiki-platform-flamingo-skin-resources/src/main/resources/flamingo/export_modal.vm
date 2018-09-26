@@ -59,46 +59,44 @@
       </h4>
     </div>
     <div id="exportModelOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
-      <form id="export-form" method="post">
-        <div class="panel-body">
+      <form id="export-form" method="post" class="panel-body">
+        #if ($doc.name == 'WebHome')
+          #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
+          <div class="row">
+            <div class="col-xs-6">
+              <p>$escapetool.xml($services.localization.render('core.exporter.selectPages'))</p>
+            </div>
+            <div class="col-xs-6">
+              <p class="text-right"><a href="#" class="tree_select_all">$escapetool.xml($services.localization.render('core.exporter.selectAll'))</a> / <a href="#" class="tree_select_none">$escapetool.xml($services.localization.render('core.exporter.selectNone'))</a></p>
+            </div>
+          </div>
+          <div class="exportModalTreeContainer">
+            ## We put readOnly to false to enable the contextmenu, that we will replace afterwards
+            ## we put filterHiddenDocuments to false to enable user to see all hidden documents for export,
+            ## no matter what they user preferences are.
+            #documentTree({
+              'checkboxes' : true,
+              'root': "document:$doc.documentReference",
+              'showRoot': true,
+              'showAttachments': false,
+              'showTranslations': false,
+              'readOnly': false,
+              'filterHiddenDocuments': false
+            })
+          </div>
+        #end
+        <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.html')</a>
+        #if($hasAdmin && $services.xar.isXARExportAvailable())
+          #set($exportURL = "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,'default'))")
           #if ($doc.name == 'WebHome')
-            #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
-            <div class="row">
-              <div class="col-xs-6">
-                <p>$escapetool.xml($services.localization.render('core.exporter.selectPages'))</p>
-              </div>
-              <div class="col-xs-6">
-                <p class="text-right"><a href="#" class="tree_select_all">$escapetool.xml($services.localization.render('core.exporter.selectAll'))</a> / <a href="#" class="tree_select_none">$escapetool.xml($services.localization.render('core.exporter.selectNone'))</a></p>
-              </div>
-            </div>
-            <div class="exportModalTreeContainer">
-              ## We put readOnly to false to enable the contextmenu, that we will replace afterwards
-              ## we put filterHiddenDocuments to false to enable user to see all hidden documents for export,
-              ## no matter what they user preferences are.
-              #documentTree({
-                'checkboxes' : true,
-                'root': "document:$doc.documentReference",
-                'showRoot': true,
-                'showAttachments': false,
-                'showTranslations': false,
-                'readOnly': false,
-                'filterHiddenDocuments': false
-              })
-            </div>
+            ## When nested page also export WebPreferences which contain among other things the right of this entity
+            #set($exportURL = "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,'default'))}.WebPreferences")
           #end
-          <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.html')</a>
-          #if($hasAdmin && $services.xar.isXARExportAvailable())
-            #set($exportURL = "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,'default'))")
-            #if ($doc.name == 'WebHome')
-              ## When nested page also export WebPreferences which contain among other things the right of this entity
-              #set($exportURL = "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,'default'))}.WebPreferences")
-            #end
-            <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.xar')</a>
-          #end
-          #foreach ($exportExtension in $exportExtensions)
-            $services.rendering.render($exportExtension.execute(), 'html/5.0')
-          #end
-        </div>
+          <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.xar')</a>
+        #end
+        #foreach ($exportExtension in $exportExtensions)
+          $services.rendering.render($exportExtension.execute(), 'html/5.0')
+        #end
       </form>
     </div>
   </div>

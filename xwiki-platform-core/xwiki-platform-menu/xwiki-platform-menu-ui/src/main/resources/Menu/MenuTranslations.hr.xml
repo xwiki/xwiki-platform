@@ -60,6 +60,9 @@ menu.livetable.emptyvalue=-
 # Live table specific keys
 menu.livetable.content1=Struktura izbornika
 
+# Administration keys
+### Missing: admin.menu.name=Menu
+
 # UIX keys
 menu.uix.extensionPoint.label=Lokacija prikaza izbornika
 menu.uix.extensionPoint.hint=Naznačava gdje prikazati izbornik. Izbornik se prikazuje ili horizontalno ili vertikalno, prema odabranoj lokaciji.

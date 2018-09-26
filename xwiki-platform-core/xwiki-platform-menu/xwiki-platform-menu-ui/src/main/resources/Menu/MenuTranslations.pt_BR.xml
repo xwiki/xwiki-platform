@@ -60,6 +60,9 @@ menu.livetable.doc.date=Data de atualização
 # Live table specific keys
 ### Missing: menu.livetable.content1=Menu Structure
 
+# Administration keys
+### Missing: admin.menu.name=Menu
+
 # UIX keys
 ### Missing: menu.uix.extensionPoint.label=Menu Display Location
 ### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.

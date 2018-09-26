@@ -60,6 +60,9 @@ menu.livetable.emptyvalue=-
 # Live table specific keys
 menu.livetable.content1=Structure du menu
 
+# Administration keys
+### Missing: admin.menu.name=Menu
+
 # UIX keys
 menu.uix.extensionPoint.label=Emplacement du menu
 menu.uix.extensionPoint.hint=Choix de l'emplacement du menu. Selon votre choix, il sera affiché soit horizontalement, soit verticalement.

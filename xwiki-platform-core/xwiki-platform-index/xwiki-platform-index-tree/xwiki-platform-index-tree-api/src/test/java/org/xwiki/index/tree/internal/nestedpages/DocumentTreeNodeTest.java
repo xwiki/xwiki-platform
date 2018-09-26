@@ -22,6 +22,7 @@ package org.xwiki.index.tree.internal.nestedpages;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -86,6 +88,17 @@ public class DocumentTreeNodeTest
     private ContextualAuthorizationManager authorization;
 
     @MockComponent
+    private LocalizationContext localizationContext;
+
+    @MockComponent
+    @Named("childPage/nestedPages")
+    private QueryFilter childPageFilter;
+
+    @MockComponent
+    @Named("documentReferenceResolver/nestedPages")
+    private QueryFilter documentReferenceResolverFilter;
+
+    @MockComponent
     private QueryManager queryManager;
 
     @MockComponent
@@ -111,6 +124,8 @@ public class DocumentTreeNodeTest
     private DocumentReference documentReference =
         new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
 
+    private DocumentReference terminalDocumentReference = new DocumentReference("wiki", "Some", "Page");
+
     @BeforeComponent
     public void configure(MockitoComponentManager componentManager) throws Exception
     {
@@ -124,11 +139,18 @@ public class DocumentTreeNodeTest
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
+
         when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page.WebHome", EntityType.DOCUMENT))
             .thenReturn(documentReference);
         when(this.defaultEntityReferenceSerializer.serialize(documentReference))
             .thenReturn("wiki:Path.To.Page.WebHome");
         when(this.localEntityReferenceSerializer.serialize(documentReference.getParent())).thenReturn("Path.To.Page");
+
+        when(this.currentEntityReferenceResolver.resolve("wiki:Some.Page", EntityType.DOCUMENT))
+            .thenReturn(this.terminalDocumentReference);
+        when(this.defaultEntityReferenceSerializer.serialize(this.terminalDocumentReference))
+            .thenReturn("wiki:Some.Page");
+
         when(this.queryManager.getNamedQuery("nestedPagesOrderedByName")).thenReturn(this.nestedPagesOrderedByName);
         when(this.nestedPagesOrderedByName.addFilter(any(QueryFilter.class))).thenReturn(this.nestedPagesOrderedByName);
     }
@@ -185,6 +207,46 @@ public class DocumentTreeNodeTest
     }
 
     @Test
+    public void getChildDocuments() throws Exception
+    {
+        assertEquals(Collections.emptyList(),
+            this.documentTreeNode.getChildDocuments(terminalDocumentReference, 0, 10));
+
+        this.documentTreeNode.getProperties().put("showTerminalDocuments", false);
+        Query queryNonTerminalPagesByName = mock(Query.class, "nonTerminalPagesOrderedByTitle");
+        String statement = "select reference, 0 as terminal from XWikiSpace page order by lower(name), name";
+        when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(queryNonTerminalPagesByName);
+        when(queryNonTerminalPagesByName.addFilter(this.documentReferenceResolverFilter))
+            .thenReturn(queryNonTerminalPagesByName);
+        DocumentReference childReference = new DocumentReference("wiki", Arrays.asList("Path.To.Page"), "Alice");
+        when(queryNonTerminalPagesByName.execute()).thenReturn(Collections.singletonList(childReference));
+
+        assertEquals(Collections.singletonList(childReference),
+            this.documentTreeNode.getChildDocuments(documentReference, 5, 3));
+
+        verify(queryNonTerminalPagesByName).setWiki("wiki");
+        verify(queryNonTerminalPagesByName).setOffset(5);
+        verify(queryNonTerminalPagesByName).setLimit(3);
+        verify(queryNonTerminalPagesByName).addFilter(this.childPageFilter);
+        verify(queryNonTerminalPagesByName).bindValue("parent", "Path.To.Page");
+
+        this.documentTreeNode.getProperties().put("orderBy", "title");
+        Query queryNonTerminalPagesByTitle = mock(Query.class, "nonTerminalPagesOrderedByTitle");
+        when(this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle"))
+            .thenReturn(queryNonTerminalPagesByTitle);
+        childReference = new DocumentReference("wiki", Arrays.asList("Path.To.Page"), "Bob");
+        when(queryNonTerminalPagesByTitle.addFilter(this.documentReferenceResolverFilter))
+            .thenReturn(queryNonTerminalPagesByTitle);
+        when(queryNonTerminalPagesByTitle.execute()).thenReturn(Collections.singletonList(childReference));
+        when(this.localizationContext.getCurrentLocale()).thenReturn(Locale.GERMAN);
+
+        assertEquals(Collections.singletonList(childReference),
+            this.documentTreeNode.getChildDocuments(documentReference, 0, 5));
+
+        verify(queryNonTerminalPagesByTitle).bindValue("locale", "de");
+    }
+
+    @Test
     public void getChildrenByNameWithExclusions() throws Exception
     {
         this.documentTreeNode.getProperties().put("exclusions",
@@ -213,11 +275,9 @@ public class DocumentTreeNodeTest
         assertEquals(Collections.singletonList("document:wiki:Path.To.Page.Child"),
             this.documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 0, 5));
 
-        verify(this.nestedPagesOrderedByName).setWiki("wiki");
         verify(this.nestedPagesOrderedByName).bindValue("excludedDocuments",
             Collections.singleton("Path.To.Page.Alice"));
         verify(this.nestedPagesOrderedByName).bindValue("excludedSpaces", Collections.singleton("Path.To.Page.Bob"));
-        verify(this.nestedPagesOrderedByName).bindValue("parent", "Path.To.Page");
     }
 
     @Test
@@ -258,5 +318,40 @@ public class DocumentTreeNodeTest
         verify(childTerminalPagesQuery).bindValue("space", "Path.To.Page");
         verify(childTerminalPagesQuery).bindValue("defaultDocName", "WebHome");
         verify(childTerminalPagesQuery).bindValue("excludedDocuments", Collections.singleton("Path.To.Page.Alice"));
+
+        this.documentTreeNode.getProperties().put("showTerminalDocuments", false);
+
+        assertEquals(2L, this.documentTreeNode.getChildCount("document:wiki:Path.To.Page.WebHome"));
+    }
+
+    @Test
+    public void getPseudoChildCount()
+    {
+        when(this.translationsTreeNode.getChildCount("translations:wiki:Some.Page")).thenReturn(2);
+        when(this.attachmentsTreeNode.getChildCount("attachments:wiki:Some.Page")).thenReturn(1);
+        when(this.classPropertiesTreeNode.getChildCount("classProperties:wiki:Some.Page")).thenReturn(3);
+        when(this.objectsTreeNode.getChildCount("objects:wiki:Some.Page")).thenReturn(5);
+
+        assertEquals(0L, this.documentTreeNode.getChildCount("document:wiki:Some.Page"));
+
+        this.documentTreeNode.getProperties().put("showTranslations", true);
+
+        assertEquals(1L, this.documentTreeNode.getChildCount("document:wiki:Some.Page"));
+
+        this.documentTreeNode.getProperties().put("showAttachments", true);
+
+        assertEquals(2L, this.documentTreeNode.getChildCount("document:wiki:Some.Page"));
+
+        this.documentTreeNode.getProperties().put("showClassProperties", true);
+
+        assertEquals(3L, this.documentTreeNode.getChildCount("document:wiki:Some.Page"));
+
+        this.documentTreeNode.getProperties().put("showObjects", true);
+
+        assertEquals(4L, this.documentTreeNode.getChildCount("document:wiki:Some.Page"));
+
+        when(this.attachmentsTreeNode.getChildCount("attachments:wiki:Some.Page")).thenReturn(0);
+
+        assertEquals(3L, this.documentTreeNode.getChildCount("document:wiki:Some.Page"));
     }
 }

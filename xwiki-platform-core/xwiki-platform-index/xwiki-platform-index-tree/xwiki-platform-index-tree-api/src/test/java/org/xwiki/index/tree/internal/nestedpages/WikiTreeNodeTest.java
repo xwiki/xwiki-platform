@@ -29,6 +29,7 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -36,6 +37,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -80,6 +82,22 @@ public class WikiTreeNodeTest
     private LocalizationContext localizationContext;
 
     @MockComponent
+    @Named("user")
+    private ConfigurationSource userPreferencesSource;
+
+    @MockComponent
+    @Named("topLevelPage/nestedPages")
+    private QueryFilter topLevelPageFilter;
+
+    @MockComponent
+    @Named("hiddenPage/nestedPages")
+    private QueryFilter hiddenPageFilter;
+
+    @MockComponent
+    @Named("excludedSpace/nestedPages")
+    private QueryFilter excludedSpaceFilter;
+
+    @MockComponent
     private QueryManager queryManager;
 
     @Mock
@@ -115,11 +133,15 @@ public class WikiTreeNodeTest
     @Test
     public void getChildCount() throws Exception
     {
+        // Filter hidden child nodes.
+        this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
+        when(this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class)).thenReturn(0);
+
         assertEquals(0, this.wikiTreeNode.getChildCount("something"));
         assertEquals(0, this.wikiTreeNode.getChildCount("some:thing"));
 
-        when(this.queryManager.createQuery("select count(*) from XWikiSpace where parent is null", Query.HQL))
-            .thenReturn(this.query);
+        when(this.queryManager.createQuery("select count(*) from XWikiSpace where parent is null and hidden <> true",
+            Query.HQL)).thenReturn(this.query);
         when(query.execute()).thenReturn(Collections.singletonList(2L));
 
         assertEquals(2L, this.wikiTreeNode.getChildCount("wiki:foo"));
@@ -131,8 +153,15 @@ public class WikiTreeNodeTest
     @Test
     public void getChildCountWithExclusions() throws Exception
     {
-        this.wikiTreeNode.getProperties().put("exclusions",
-            new HashSet<>(Arrays.asList("document:bar:A.WebHome", "document:foo:B.WebHome")));
+        this.wikiTreeNode.getProperties().put("exclusions", new HashSet<>(
+            Arrays.asList("document:bar:A.WebHome", "document:foo:B.WebHome", "document:foo:C.D", "space:foo:C")));
+
+        DocumentReference denis = new DocumentReference("foo", "C", "D");
+        when(this.currentEntityReferenceResolver.resolve("foo:C.D", EntityType.DOCUMENT)).thenReturn(denis);
+
+        SpaceReference carol = new SpaceReference("foo", "C");
+        when(this.currentEntityReferenceResolver.resolve("foo:C", EntityType.SPACE)).thenReturn(carol);
+        when(this.localEntityReferenceSerializer.serialize(carol)).thenReturn("C");
 
         when(this.queryManager.createQuery(
             "select count(*) from XWikiSpace where parent is null " + "and reference not in (:excludedSpaces)",
@@ -142,12 +171,37 @@ public class WikiTreeNodeTest
         assertEquals(2L, this.wikiTreeNode.getChildCount("wiki:foo"));
 
         verify(this.query).setWiki("foo");
-        verify(this.query).bindValue("excludedSpaces", Collections.singleton("B"));
+        verify(this.query).bindValue("excludedSpaces", new HashSet<String>(Arrays.asList("B", "C")));
+    }
+
+    @Test
+    public void getChildren() throws Exception
+    {
+        // Filter hidden child nodes.
+        this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
+        when(this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class)).thenReturn(0);
+
+        String statement = "select reference, 0 as terminal from XWikiSpace page order by lower(name), name";
+        when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(this.query);
+        when(query.execute()).thenReturn(Collections.singletonList(new DocumentReference("foo", "C", "WebHome")));
+
+        assertEquals(Collections.singletonList("document:foo:C.WebHome"),
+            this.wikiTreeNode.getChildren("wiki:foo", 5, 10));
+
+        verify(this.query).setWiki("foo");
+        verify(this.query).setOffset(5);
+        verify(this.query).setLimit(10);
+        verify(this.query).addFilter(this.topLevelPageFilter);
+        verify(this.query).addFilter(this.hiddenPageFilter);
     }
 
     @Test
     public void getChildrenByTitle() throws Exception
     {
+        // Don't filter hidden child nodes.
+        this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
+        when(this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class)).thenReturn(1);
+
         this.wikiTreeNode.getProperties().put("orderBy", "title");
         this.wikiTreeNode.getProperties().put("exclusions",
             new HashSet<>(Arrays.asList("document:bar:A.WebHome", "document:foo:B.WebHome")));
@@ -159,10 +213,11 @@ public class WikiTreeNodeTest
         assertEquals(Collections.singletonList("document:foo:C.WebHome"),
             this.wikiTreeNode.getChildren("wiki:foo", 5, 10));
 
-        verify(this.query).bindValue("locale", "fr");
-        verify(this.query).bindValue("excludedSpaces", Collections.singleton("B"));
         verify(this.query).setWiki("foo");
         verify(this.query).setOffset(5);
         verify(this.query).setLimit(10);
+        verify(this.query).bindValue("locale", "fr");
+        verify(this.query).bindValue("excludedSpaces", Collections.singleton("B"));
+        verify(this.query).addFilter(this.excludedSpaceFilter);
     }
 }

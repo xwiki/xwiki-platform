@@ -281,6 +281,18 @@ public class DefaultGroupManagerTest
     }
 
     @Test
+    public void getGroupsWhenCrossReference() throws GroupException
+    {
+        mockGroups("xwiki", GLOBAL_GROUP_1, Arrays.asList(GLOBAL_GROUP_2));
+        mockGroups("xwiki", GLOBAL_GROUP_2, Arrays.asList(GLOBAL_GROUP_1));
+
+        assertGetGroups(GLOBAL_GROUP_1, GLOBAL_GROUP_2, WikiTarget.ENTITY, false);
+        assertGetGroups(GLOBAL_GROUP_2, GLOBAL_GROUP_1, WikiTarget.ENTITY, false);
+        assertGetGroups(GLOBAL_GROUP_1, GLOBAL_GROUP_2, WikiTarget.ENTITY, true);
+        assertGetGroups(GLOBAL_GROUP_2, GLOBAL_GROUP_1, WikiTarget.ENTITY, true);
+    }
+
+    @Test
     public void getMembersWhenNoMembers() throws GroupException
     {
         assertGetMembersEmpty(GLOBAL_GROUP_1, false);
@@ -304,5 +316,17 @@ public class DefaultGroupManagerTest
 
         assertGetMembers(GLOBAL_GROUP_1, GLOBAL_GROUP_2, false);
         assertGetMembers(Arrays.asList(GLOBAL_GROUP_1, GLOBAL_USER_1), GLOBAL_GROUP_2, true);
+    }
+
+    @Test
+    public void getMembersWhenCrossReference() throws GroupException
+    {
+        mockMembers(GLOBAL_GROUP_1, Arrays.asList(GLOBAL_GROUP_2));
+        mockMembers(GLOBAL_GROUP_2, Arrays.asList(GLOBAL_GROUP_1));
+
+        assertGetMembers(GLOBAL_GROUP_1, GLOBAL_GROUP_2, false);
+        assertGetMembers(GLOBAL_GROUP_2, GLOBAL_GROUP_1, false);
+        assertGetMembers(GLOBAL_GROUP_1, GLOBAL_GROUP_2, true);
+        assertGetMembers(GLOBAL_GROUP_2, GLOBAL_GROUP_1, true);
     }
 }

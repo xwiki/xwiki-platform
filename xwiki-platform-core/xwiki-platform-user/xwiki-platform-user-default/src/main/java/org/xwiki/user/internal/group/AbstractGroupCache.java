@@ -37,7 +37,6 @@ import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
@@ -120,9 +119,6 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
 
     @Inject
     private CacheManager cacheManager;
-
-    @Inject
-    private EntityReferenceFactory referenceFactory;
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 

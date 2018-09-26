@@ -152,6 +152,12 @@ public class DefaultGroupManager implements GroupManager
     public Collection<DocumentReference> getGroups(DocumentReference reference, Object wikiTarget, boolean recurse)
         throws GroupException
     {
+        return getGroups(reference, wikiTarget, recurse, null);
+    }
+
+    private Collection<DocumentReference> getGroups(DocumentReference reference, Object wikiTarget, boolean recurse,
+        Set<DocumentReference> rootGroups) throws GroupException
+    {
         Collection<String> cacheWikis = getSearchWikis(reference, wikiTarget, false);
 
         // Try in the cache
@@ -159,6 +165,10 @@ public class DefaultGroupManager implements GroupManager
 
         Collection<DocumentReference> groups = get(entry, recurse);
         if (groups != null) {
+            if (rootGroups != null) {
+                rootGroups.addAll(groups);
+            }
+
             return groups;
         }
 
@@ -168,43 +178,62 @@ public class DefaultGroupManager implements GroupManager
             // Check if it was calculated by another thread in the meantime
             groups = get(entry, recurse);
             if (groups != null) {
+                if (rootGroups != null) {
+                    rootGroups.addAll(groups);
+                }
+
                 return groups;
             }
 
-            // Calculate groups
-            groups = getGroups(reference, cacheWikis);
+            // Get direct groups
+            groups = entry.getDirect();
+            if (groups == null) {
+                groups = entry.setDirect(getGroups(reference, cacheWikis));
+            }
 
+            // Get all groups
             if (recurse) {
-                // Recursively resolve sub-groups
-                Collection<DocumentReference> resolvedGroups = groups;
-                for (DocumentReference member : groups) {
-                    Collection<DocumentReference> subGroups = getGroups(member, cacheWikis, true);
+                Set<DocumentReference> resolvedGroups = new LinkedHashSet<>();
 
-                    resolvedGroups = addElements(subGroups, resolvedGroups, resolvedGroups == groups);
+                if (rootGroups == null) {
+                    rootGroups = resolvedGroups;
                 }
 
-                groups = entry.setAll(resolvedGroups);
+                // Make sure asked reference won't be resolved
+                resolvedGroups.add(reference);
+
+                // Recursively resolve sub-groups
+                for (DocumentReference group : groups) {
+                    // Protect against cross references between groups
+                    if (!rootGroups.contains(group)) {
+                        rootGroups.add(group);
+
+                        Collection<DocumentReference> subGRoups = getGroups(group, cacheWikis, true, rootGroups);
+
+                        if (subGRoups != null) {
+                            resolvedGroups.addAll(subGRoups);
+                        } else {
+                            groups = null;
+                        }
+                    } else {
+                        groups = null;
+                    }
+                }
+
+                // Remove asked reference from groups
+                resolvedGroups.remove(reference);
+
+                if (groups != null || rootGroups == resolvedGroups) {
+                    groups = entry.setAll(resolvedGroups);
+                }
             } else {
-                groups = entry.setDirect(groups);
+                if (rootGroups != null) {
+                    rootGroups.addAll(groups);
+                }
             }
 
             return groups;
         }
-    }
-
-    private Collection<DocumentReference> addElements(Collection<DocumentReference> subElements,
-        Collection<DocumentReference> elements, boolean create)
-    {
-        Collection<DocumentReference> resolvedElements = elements;
-        if (!subElements.isEmpty()) {
-            if (create) {
-                resolvedElements = new LinkedHashSet<>(elements);
-            }
-
-            resolvedElements.addAll(subElements);
-        }
-
-        return resolvedElements;
     }
 
     private XWikiGroupService getXWikiGroupService(XWikiContext xcontext) throws GroupException
@@ -263,47 +292,85 @@ public class DefaultGroupManager implements GroupManager
     @Override
     public Collection<DocumentReference> getMembers(DocumentReference reference, boolean recurse) throws GroupException
     {
-        this.membersCache.lockRead();
+        return getMembers(reference, recurse, null);
+    }
 
-        try {
-            // Try in the cache
-            GroupCacheEntry entry = this.membersCache.getCacheEntry(reference, true);
+    private Collection<DocumentReference> getMembers(DocumentReference reference, boolean recurse,
+        Set<DocumentReference> rootMembers) throws GroupException
+    {
+        // Try in the cache
+        GroupCacheEntry entry = this.membersCache.getCacheEntry(reference, true);
 
-            Collection<DocumentReference> members = get(entry, recurse);
+        Collection<DocumentReference> members = get(entry, recurse);
+        if (members != null) {
+            if (rootMembers != null) {
+                rootMembers.addAll(members);
+            }
+
+            return members;
+        }
+
+        // Not in the cache
+
+        synchronized (entry) {
+            // Check if it was calculated by another thread in the meantime
+            members = get(entry, recurse);
             if (members != null) {
+                if (rootMembers != null) {
+                    rootMembers.addAll(members);
+                }
+
                 return members;
             }
 
-            // Not in the cache
+            // Get direct members
+            members = entry.getDirect();
+            if (members == null) {
+                members = entry.setDirect(getMembers(reference));
+            }
 
-            synchronized (entry) {
-                // Check if it was calculated by another thread in the meantime
-                members = get(entry, recurse);
-                if (members != null) {
-                    return members;
+            // Get all members
+            if (recurse) {
+                Set<DocumentReference> resolvedMembers = new LinkedHashSet<>();
+
+                if (rootMembers == null) {
+                    rootMembers = resolvedMembers;
                 }
 
-                // Calculate members
-                members = getMembers(reference);
+                // Make sure asked reference won't be resolved
+                resolvedMembers.add(reference);
 
-                if (recurse) {
-                    // Recursively resolve sub-groups
-                    Collection<DocumentReference> resolvedMembers = members;
-                    for (DocumentReference member : members) {
-                        Collection<DocumentReference> subMembers = getMembers(member, true);
+                // Recursively resolve sub-groups
+                for (DocumentReference member : members) {
+                    // Protect against cross references between groups
+                    if (!rootMembers.contains(member)) {
+                        rootMembers.add(member);
 
-                        resolvedMembers = addElements(subMembers, resolvedMembers, resolvedMembers == members);
+                        Collection<DocumentReference> subMembers = getMembers(member, true, rootMembers);
+
+                        if (subMembers != null) {
+                            resolvedMembers.addAll(subMembers);
+                        } else {
+                            members = null;
+                        }
+                    } else {
+                        members = null;
                     }
-
-                    members = entry.setAll(resolvedMembers);
-                } else {
-                    members = entry.setDirect(members);
                 }
 
-                return members;
+                // Remove asked reference from members
+                resolvedMembers.remove(reference);
+
+                if (members != null || rootMembers == resolvedMembers) {
+                    members = entry.setAll(resolvedMembers);
+                }
+            } else {
+                if (rootMembers != null) {
+                    rootMembers.addAll(members);
+                }
             }
-        } finally {
-            this.membersCache.unlockRead();
+
+            return members;
         }
     }
 

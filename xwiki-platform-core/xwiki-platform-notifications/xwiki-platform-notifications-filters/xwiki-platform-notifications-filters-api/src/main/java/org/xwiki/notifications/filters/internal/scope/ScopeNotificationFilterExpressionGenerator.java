@@ -288,7 +288,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // This optimization can only works on preferences stored by the user, that's why we add a condition
         // on the provider hint.
         return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
-                && nfp.getProviderHint().equals(USER_PROFILE_PROVIDER_HINT);
+                && USER_PROFILE_PROVIDER_HINT.equals(nfp.getProviderHint());
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

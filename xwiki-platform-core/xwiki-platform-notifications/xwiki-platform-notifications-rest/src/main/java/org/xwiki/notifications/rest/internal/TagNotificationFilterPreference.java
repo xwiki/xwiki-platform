@@ -27,18 +27,27 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
+ * A notification filter preference for the Tag notification filter (for internal use).
+ *
  * @version $Id$
- * @since
+ * @since 10.9RC1
  */
 public class TagNotificationFilterPreference implements NotificationFilterPreference
 {
     private String tag;
 
+    /**
+     * Construct a TagNotificationFilterPreference for the given tag.
+     * @param tag the tag to watch
+     */
     public TagNotificationFilterPreference(String tag)
     {
         this.tag = tag;
     }
 
+    /**
+     * @return the tag to watch
+     */
     public String getTag()
     {
         return tag;

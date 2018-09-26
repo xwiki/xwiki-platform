@@ -53,7 +53,7 @@ public class TagNotificationFilter implements NotificationFilter
     /**
      * Name of the filter.
      */
-    public final static String NAME = "Tag Notification Filter";
+    public static final String NAME = "Tag Notification Filter";
 
     @Override
     public FilterPolicy filterEvent(Event event, DocumentReference user,

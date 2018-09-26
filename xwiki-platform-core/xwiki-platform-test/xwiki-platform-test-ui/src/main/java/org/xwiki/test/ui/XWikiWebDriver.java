@@ -91,6 +91,25 @@ public class XWikiWebDriver extends RemoteWebDriver
         }
     }
 
+    /**
+     * Same as {@link #findElementWithoutWaiting(By)} but don't scroll to make the element visible. Useful for example
+     * whenverifying that the page has finished loading (and thus there's no element visible and we cannot scroll to
+     * it).
+     *
+     * @since 10.8.1
+     * @since 10.9RC1
+     */
+    public WebElement findElementWithoutWaitingWithoutScrolling(By by)
+    {
+        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
+        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        try {
+            return findElementWithoutScrolling(by);
+        } finally {
+            setDriverImplicitWait();
+        }
+    }
+
     public List<WebElement> findElementsWithoutWaiting(By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
@@ -142,6 +161,24 @@ public class XWikiWebDriver extends RemoteWebDriver
     {
         try {
             findElementWithoutWaiting(by);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Same as {@link #hasElementWithoutWaiting(By)} but don't scroll to make the element visible. Useful for example
+     * whenverifying that the page has finished loading (and thus there's no element visible and we cannot scroll to
+     * it).
+     *
+     * @since 10.8.1
+     * @since 10.9RC1
+     */
+    public boolean hasElementWithoutWaitingWithoutScrolling(By by)
+    {
+        try {
+            findElementWithoutWaitingWithoutScrolling(by);
             return true;
         } catch (NoSuchElementException e) {
             return false;
@@ -908,8 +945,22 @@ public class XWikiWebDriver extends RemoteWebDriver
             @Override
             public Boolean apply(WebDriver input)
             {
-                return !hasElementWithoutWaiting(By.id("pageNotYetReloadedMarker"));
+                // Note: make sure we don't scroll since we're looking for an element that's not here anymore and
+                // thus it would produce a StaleElementException!
+                return !hasElementWithoutWaitingWithoutScrolling(By.id("pageNotYetReloadedMarker"));
             }
         });
+    }
+
+    /**
+     * Same as {@link #findElement(By)} but don't scroll to make the element visible. Useful for example when
+     * verifying that the page has finished loading (and thus there's no element visible and we cannot scroll to it).
+     *
+     * @since 10.8.1
+     * @since 10.9RC1
+     */
+    public WebElement findElementWithoutScrolling(By by)
+    {
+        return this.wrappedDriver.findElement(by);
     }
 }

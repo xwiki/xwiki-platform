@@ -123,12 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Si cette case est cochée, toutes les
 platform.wiki.currentwiki.invite.username.hint=Le nom de l'utilisateur à ajouter au wiki.
 platform.wiki.currentwiki.invite.message.hint=Message à envoyer à l'utilisateur.
 platform.wiki.currentwiki.candidates.hint=Utilisateurs qui ont demandé ou qui ont été invités à rejoindre ce wiki.
+platform.wiki.currentwiki.candidates.empty=Aucun utilisateur n'a demandé, ou n'a été invité, à rejoindre le wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Gérer les paramètres comme le nom du wiki, sa description, son propriétaire et le type de ses membres.
 admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki: ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
 admin.xwiki.usersconfiguration.title=Configuration
 admin.xwiki.members.title=Membres actuels
+admin.xwiki.users.title=Tous les utilisateurs
     
 # DRAWER ITEM
 platform.wiki.drawer.homeWiki=Accueil

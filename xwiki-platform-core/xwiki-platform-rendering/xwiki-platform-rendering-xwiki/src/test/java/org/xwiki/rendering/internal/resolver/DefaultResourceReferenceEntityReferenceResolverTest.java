@@ -405,7 +405,8 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
     }
 
     @Test
-    public void trySpaceSiblingFallback() {
+    public void trySpaceSiblingFallback()
+    {
         VoidResourceReferenceEntityReferenceResolve resolver = new VoidResourceReferenceEntityReferenceResolve();
 
         String defaultDocumentName = "Foo";

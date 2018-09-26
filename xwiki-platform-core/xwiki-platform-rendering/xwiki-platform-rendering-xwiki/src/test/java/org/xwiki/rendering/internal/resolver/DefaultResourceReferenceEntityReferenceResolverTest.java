@@ -390,8 +390,10 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
             this.mocker.getComponentUnderTest().resolve(attachmentResource(ATTACHMENT, true), null));
     }
 
-    class DumbResourceReferenceEntityReferenceResolve extends AbstractResourceReferenceEntityReferenceResolver {
-        DumbResourceReferenceEntityReferenceResolve() {
+    class VoidResourceReferenceEntityReferenceResolve extends AbstractResourceReferenceEntityReferenceResolver
+    {
+        VoidResourceReferenceEntityReferenceResolve()
+        {
             this.documentAccessBridge = DefaultResourceReferenceEntityReferenceResolverTest.this.bridge;
         }
 
@@ -404,20 +406,25 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
 
     @Test
     public void trySpaceSiblingFallback() {
-        DumbResourceReferenceEntityReferenceResolve resolver = new DumbResourceReferenceEntityReferenceResolve();
+        VoidResourceReferenceEntityReferenceResolve resolver = new VoidResourceReferenceEntityReferenceResolve();
 
         String defaultDocumentName = "Foo";
         EntityReference sourceReference = new EntityReference("Bar", EntityType.DOCUMENT);
-        DocumentReference finalReference = new DocumentReference("xwiki", "Bar", "WebHome");
+        DocumentReference finalReference = new DocumentReference("xwiki", "Bar",
+            "WebHome");
         EntityReference baseReference = sourceReference;
 
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, null, defaultDocumentName));
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName));
+        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
+            defaultDocumentName));
+        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+            defaultDocumentName));
 
         defaultDocumentName = "Bar";
-        assertTrue(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName));
+        assertTrue(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+            defaultDocumentName));
 
         this.existingDocuments.add(finalReference);
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName));
+        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+            defaultDocumentName));
     }
 }

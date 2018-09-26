@@ -73,7 +73,7 @@
 ## Menus
 platform.wiki.menu.wikiindex=Wiki Verzeichnis
 platform.wiki.menu.deletewiki=Löschen
-### Missing: platform.wiki.menu.userwikis=Wikis
+platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
 ### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
@@ -85,7 +85,7 @@ platform.wiki.menu.deletewiki=Löschen
 platform.wiki.create.title=Neues Wiki erstellen
 platform.wiki.create.members=MITGLIEDER
 ### Missing: platform.wiki.create.prettyname.empty=Pretty name must not be empty
-platform.wiki.create.error=Erstellen von Wiki "{0}" fehlgeschlagen\: {1}.
+platform.wiki.create.error=Erstellen von Wiki "{0}" fehlgeschlagen: {1}.
 ### Missing: platform.wiki.create.error.wikiname.databasealreadyexists=A database with this identifier already exists
 ### Missing: platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
 platform.wiki.create.error.wikiname.empty=Bezeichner darf nicht leer sein.
@@ -94,7 +94,7 @@ platform.wiki.create.error.wikiname.empty=Bezeichner darf nicht leer sein.
 platform.wiki.error.wikidoesnotexist=Wiki {0} gibt es nicht.
 platform.wiki.error.oneParameterNotSpecified=Der Parameter ''{0}'' fehlt.
 ### Missing: platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
-platform.wiki.error.exceptionWithMessage=Unerwarteter Fehler\: {0}
+platform.wiki.error.exceptionWithMessage=Unerwarteter Fehler: {0}
 platform.wiki.form.requiredField=erforderlich
 ### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
 

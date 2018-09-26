@@ -122,9 +122,8 @@ public class XClassMigratorListener extends AbstractEventListener
         EntityReference wikiReference = propertyReference.extractReference(EntityType.WIKI);
 
         // Get all document containing object of modified class
-        Query query =
-            this.queryManager.createQuery("from doc.object(" + this.localSerializer.serialize(classReference)
-                + ") as obj", Query.XWQL);
+        Query query = this.queryManager
+            .createQuery("from doc.object(" + this.localSerializer.serialize(classReference) + ") as obj", Query.XWQL);
         query.setWiki(wikiReference.getName());
 
         List<String> documents = query.execute();
@@ -166,31 +165,32 @@ public class XClassMigratorListener extends AbstractEventListener
         boolean modified = false;
 
         for (BaseObject xobject : document.getXObjects(classReference)) {
-            BaseProperty property = (BaseProperty) xobject.getField(propertyReference.getName());
+            if (xobject != null) {
+                BaseProperty property = (BaseProperty) xobject.getField(propertyReference.getName());
 
-            // If the existing field is of different kind than what is produced by the new class property
-            if (property != null && property.getClass() != newProperty.getClass()) {
-                BaseProperty<?> convertedProperty = this.propertyConverter.convertProperty(property, newPropertyClass);
+                // If the existing field is of different kind than what is produced by the new class property
+                if (property != null && property.getClass() != newProperty.getClass()) {
+                    BaseProperty<?> convertedProperty =
+                        this.propertyConverter.convertProperty(property, newPropertyClass);
 
-                // Set new field
-                if (convertedProperty != null) {
-                    // Mark old field for removal, only if the conversion was successful, to avoid losing data.
-                    xobject.removeField(propertyReference.getName());
+                    // Set new field
+                    if (convertedProperty != null) {
+                        // Mark old field for removal, only if the conversion was successful, to avoid losing data.
+                        xobject.removeField(propertyReference.getName());
 
-                    // Don't set the new property if it's null (it means the property is not set).
-                    xobject.safeput(propertyReference.getName(), convertedProperty);
+                        // Don't set the new property if it's null (it means the property is not set).
+                        xobject.safeput(propertyReference.getName(), convertedProperty);
 
-                    modified = true;
+                        modified = true;
+                    }
                 }
             }
         }
 
         // If anything changed save the document
         if (modified) {
-            xcontext.getWiki().saveDocument(
-                document,
-                "Migrated property [" + propertyReference.getName() + "] from class ["
-                    + this.localSerializer.serialize(classReference) + "]", xcontext);
+            xcontext.getWiki().saveDocument(document, "Migrated property [" + propertyReference.getName()
+                + "] from class [" + this.localSerializer.serialize(classReference) + "]", xcontext);
         }
     }
 }

@@ -41,13 +41,13 @@ public class DatabaseContainerExecutor
     private static final String DBPASSWORD = DBUSERNAME;
 
     /**
-     * @param database the database to build and start
+     * @param configuration the configuration to build (database, debug mode, etc)
      * @return the Docker container instance
      */
-    public JdbcDatabaseContainer execute(Database database)
+    public JdbcDatabaseContainer execute(UITest configuration)
     {
         JdbcDatabaseContainer databaseContainer;
-        switch (database) {
+        switch (configuration.database()) {
             case MYSQL:
                 // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
                 //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
@@ -83,14 +83,19 @@ public class DatabaseContainerExecutor
 
                 break;
             default:
-                throw new RuntimeException(String.format("Database [%s] is not yet supported!", database));
+                throw new RuntimeException(String.format("Database [%s] is not yet supported!",
+                    configuration.database()));
         }
 
         databaseContainer
             .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikidb")
-            .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())))
-            .start();
+            .withNetworkAliases("xwikidb");
+
+        if (configuration.debug()) {
+            databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+        }
+
+        databaseContainer.start();
 
         // Note that we don't need to stop the container as this is taken care of by TestContainers
 

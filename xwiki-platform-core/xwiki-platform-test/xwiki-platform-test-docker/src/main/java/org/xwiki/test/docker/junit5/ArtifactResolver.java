@@ -160,10 +160,12 @@ public final class ArtifactResolver
             DependencyResult result = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
             LOGGER.debug("resolve = {} ms", (System.currentTimeMillis() - t1));
+
+            //TODO: Find how to generate an error if a dep is not found! To reproduce remove the minimaldependencies
+            // war from the local FS
             if (!result.getCollectExceptions().isEmpty()) {
                 sendError(artifact, result.getCollectExceptions());
             }
-
             artifactResults = result.getArtifactResults();
             this.artifactResultCache.put(artifactAsString, artifactResults);
         }

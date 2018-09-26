@@ -86,22 +86,22 @@ platform.wiki.create.title=Neues Wiki erstellen
 platform.wiki.create.members=MITGLIEDER
 platform.wiki.create.prettyname.empty=Anzeigename darf nicht leer sein
 platform.wiki.create.error=Erstellen von Wiki "{0}" fehlgeschlagen: {1}.
-platform.wiki.create.error.wikiname.databasealreadyexists=Es ist bereits eine Datenbank mit diesem Bezeichner vorhanden
-### Missing: platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
+platform.wiki.create.error.wikiname.databasealreadyexists=Es ist bereits eine Datenbank mit dieser ID vorhanden
+platform.wiki.create.error.wikiname.wikialreadyexists=Diese ID wird bereits verwendet
 platform.wiki.create.error.wikiname.empty=Bezeichner darf nicht leer sein.
 
 ## Common errors and messages
 platform.wiki.error.wikidoesnotexist=Wiki {0} gibt es nicht.
 platform.wiki.error.oneParameterNotSpecified=Der Parameter ''{0}'' fehlt.
-### Missing: platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
+platform.wiki.error.parameterAcceptsMultipleValues=Mehrere Werte erlaubt.
 platform.wiki.error.exceptionWithMessage=Unerwarteter Fehler: {0}
 platform.wiki.form.requiredField=erforderlich
-### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
+platform.wiki.csrf.error=Ungültiges Sicherheitstoken. Bitte Aktion wiederholen.
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
+platform.wiki.users.userAlreadyMemberOfWiki=Der Benutzer {0}{1}{2} ist bereits ein Mitglied des Wikis {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=Der Benutzer {0}{1}{2} ist kein Mitglied des Wikis {3}{4}{5}.
+platform.wiki.users.logInToContinue=Um fortzufahren, müssen Sie {0} zuerst {1} anmelden.
 ### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
 ### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.

@@ -56,7 +56,8 @@ public interface NotificationsResource
             @QueryParam("displayMinorEvents") String displayMinorEvents,
             @QueryParam("displaySystemEvents") String displaySystemEvents,
             @QueryParam("displayReadEvents") String displayReadEvents,
-            @QueryParam("displayReadStatus") String displayReadStatus
+            @QueryParam("displayReadStatus") String displayReadStatus,
+            @QueryParam("tags") String tags
             ) throws Exception;
 
     /**
@@ -84,6 +85,7 @@ public interface NotificationsResource
             @QueryParam("displayMinorEvents") String displayMinorEvents,
             @QueryParam("displaySystemEvents") String displaySystemEvents,
             @QueryParam("displayReadEvents") String displayReadEvents,
-            @QueryParam("displayReadStatus") String displayReadStatus
+            @QueryParam("displayReadStatus") String displayReadStatus,
+            @QueryParam("tags") String tags
     ) throws Exception;
 }

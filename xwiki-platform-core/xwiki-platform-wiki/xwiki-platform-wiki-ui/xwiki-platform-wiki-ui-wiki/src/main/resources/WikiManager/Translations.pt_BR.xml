@@ -123,12 +123,14 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=O nome de exibição do wiki
 platform.wiki.currentwiki.invite.username.hint=Nome do usuário para adicionar à wiki.
 platform.wiki.currentwiki.invite.message.hint=Mensagem a enviar para o usuário.
 platform.wiki.currentwiki.candidates.hint=Usuários que requisitaram ou foram convidados a se juntar à wiki.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Gerenciar configurações como nome da wiki, descrição, dono e tipos de memros.
 admin.xwiki.workspaceusers.description=Gerenciar membros da wiki\: adicionar, remover, convidar, aceitar ou rejeitar membros da wiki.
 admin.xwiki.usersconfiguration.title=Configuração
 admin.xwiki.members.title=Membros atuais
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

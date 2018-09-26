@@ -123,12 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Indien geselecteerd zullen alle door 
 platform.wiki.currentwiki.invite.username.hint=De naam van de gebruiker die moet worden toegevoegd aan de wiki.
 platform.wiki.currentwiki.invite.message.hint=Het bericht dat aan de gebruiker wordt gestuurd.
 platform.wiki.currentwiki.candidates.hint=Gebruikers die hebben verzocht of zijn uitgenodigd om lid te worden van de wiki.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Beheer instellingen, zoals de naam van de wiki, omschrijving, eigenaar en het type lidmaatschap
 admin.xwiki.workspaceusers.description=Beheer wiki deelnemers\: toevoegen, verwijderen, uitnodigen, accepteren of afwijzen van wiki leden.
 admin.xwiki.usersconfiguration.title=Configuratie
 admin.xwiki.members.title=Huidige leden
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 platform.wiki.drawer.homeWiki=Home

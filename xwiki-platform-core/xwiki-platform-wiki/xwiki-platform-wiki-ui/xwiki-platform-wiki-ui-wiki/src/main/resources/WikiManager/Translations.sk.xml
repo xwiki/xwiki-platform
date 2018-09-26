@@ -123,12 +123,14 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Zobrazovaný názov Wiki.
 ### Missing: platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.
 ### Missing: platform.wiki.currentwiki.invite.message.hint=The message to send to the user.
 ### Missing: platform.wiki.currentwiki.candidates.hint=Users who have requested or been invited to join the wiki.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 ### Missing: admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
 ### Missing: admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
 admin.xwiki.usersconfiguration.title=Konfigurácia
 ### Missing: admin.xwiki.members.title=Current Members
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

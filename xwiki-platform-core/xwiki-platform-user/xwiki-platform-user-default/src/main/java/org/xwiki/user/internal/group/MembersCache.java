@@ -60,20 +60,7 @@ public class MembersCache extends AbstractGroupCache
     {
         String key = toKey(reference);
 
-        lockRead();
-
-        try {
-            GroupCacheEntry entry = this.cache.get(key);
-
-            if (entry == null && create) {
-                entry = new GroupCacheEntry(key);
-                this.cache.set(key, entry);
-            }
-
-            return entry;
-        } finally {
-            unlockRead();
-        }
+        return getCacheEntry(key, reference, create);
     }
 
 }

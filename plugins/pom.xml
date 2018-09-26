@@ -84,8 +84,8 @@
       <plugin>
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
-        <!-- We want a more recent version of Jasmine and we want to use the PhantomJS driver-->
-        <version>2.2</version>
+        <!-- We want a more recent version of Jasmine. -->
+        <version>3.0-alpha-01</version>
         <executions>
           <execution>
             <goals>
@@ -94,9 +94,6 @@
           </execution>
         </executions>
         <configuration>
-          <phantomjs>
-            <version>2.1.1</version>
-          </phantomjs>
           <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
           <jsTestSrcDir>${project.basedir}/src/test/resources</jsTestSrcDir>
           <preloadSources>

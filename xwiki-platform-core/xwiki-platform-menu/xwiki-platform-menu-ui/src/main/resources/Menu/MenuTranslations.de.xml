@@ -68,19 +68,19 @@ menu.uix.extensionPoint.label=Menü Anzeigeposition
 menu.uix.extensionPoint.hint=Gibt an, wo das Menü angezeigt werden soll. Das Menü wird entweder horizontal oder vertikal angezeigt, abhängig vom gewählten Ort.
 menu.uix.extensionPoint.value.nowhere=Nirgends
 menu.uix.extensionPoint.value.template.header.after=Nach dem Seitenkopf
-menu.uix.extensionPoint.value.panels.rightPanels=Im rechten Bereich
-### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
+menu.uix.extensionPoint.value.panels.rightPanels=In einem rechten Panel
+menu.uix.extensionPoint.value.panels.leftPanels=In einem linken Panel
 ### Missing: menu.uix.content.label=UI Extension Content
 ### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
-### Missing: menu.uix.scope.label=Menu Visibility Scope
-### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
+menu.uix.scope.label=Menü Sichtbarkeit Geltungsbereich
+menu.uix.scope.hint=Legt fest, in welchem Kontext das Menü sichtbar ist.
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=Menu
+rendering.macro.menu.name=Menü
 ### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
-### Missing: rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.name=id
 ### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
-### Missing: rendering.macro.menu.parameter.type.name=Type
+rendering.macro.menu.parameter.type.name=Typ
 ### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
 ### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
 

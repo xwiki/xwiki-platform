@@ -32,6 +32,12 @@ require.config({
 
 require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
   'use strict';
+  // prevent the user from leaving the job
+  $(window).on("beforeunload", function(e) {
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
   var updateProgress = function(jobUI, job) {
     var percent = Math.floor((job.progress.offset || 0) * 100);
     jobUI.find('.ui-progress-bar').css('width', percent + '%');
@@ -144,6 +150,9 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
   var onQuestionAnswer = function(event) {
     // Disable standard form behavior
     event.preventDefault();
+
+    // we don't ask again the user to confirm he's leaving the page
+    $(window).off("beforeunload");
 
     var button = $(this);
 

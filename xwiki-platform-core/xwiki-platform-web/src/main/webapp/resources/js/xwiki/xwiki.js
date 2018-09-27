@@ -240,7 +240,11 @@ Object.extend(XWiki, {
                       // Note: This also does stripScripts internally, but it's OK now, since we have already added the necessary external scripts to head.
                       $(extraID + "pane").update(container.innerHTML);
                     },
-                    onComplete: function(transport){
+                    onComplete: function(response){
+                      if (response.status == 401) {
+                        document.location.reload();
+                      }
+
                       $("docextrapanes").className="";
 
                       // Let other know new content has been loaded

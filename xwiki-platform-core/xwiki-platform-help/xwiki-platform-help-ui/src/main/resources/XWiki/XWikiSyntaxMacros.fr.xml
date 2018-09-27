@@ -83,5 +83,13 @@ System.out.println("Hello World!");
 
 {{info}}
 Les macros Radeox ne peuvent pas être utilisées en syntaxe XWiki 2.0. C'est la raison pour laquelle elles ont été ré-écrites comme des macros XWiki. 
-{{/info}}</content>
+{{/info}}
+
+{{info}}
+Pour accéder à la liste de toutes les macros disponibles, allez sur [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+{{/info}}
+
+==== Macros in this wiki ====
+
+{{include reference="XWiki.XWikiSyntaxMacrosList"/}}</content>
 </xwikidoc>

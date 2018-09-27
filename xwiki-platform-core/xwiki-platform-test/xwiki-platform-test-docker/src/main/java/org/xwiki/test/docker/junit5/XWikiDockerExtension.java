@@ -228,10 +228,15 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         PersistentTestContext testContext = initializePersistentTestContext(xwikiWebDriver);
         savePersistentTestContext(extensionContext, testContext);
 
+        // Set the URLs:
+        // - the one used inside the Selenium container
+        testContext.getUtil().setURLPrefix("http://xwikiweb:8080/xwiki");
+        // - the one used by RestTestUtils, i.e. outside of any container
+        testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));
+
         // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
         // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
         // Note that this requires a running XWiki instance.
-        testContext.getUtil().setURLPrefix("http://xwikiweb:8080/xwiki");
         testContext.getUtil().recacheSecretToken();
 
         return webDriverContainer;

@@ -25,7 +25,7 @@
 ##
 #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
 #set ($colprops = {
-  'doc.title'    : { 'link' : 'view', 'sortable': false },
+  'doc.title'    : { 'link' : 'view' },
   'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
   'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
   '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }
@@ -39,6 +39,7 @@
 #set ($options = { 
   'url' : "$doc.getURL('get', $urlParameters)",
   'translationPrefix' : 'platform.index.',
+  'selectedColumn' : 'doc.location',
   'outputOnlyHtml' : true
 })
 #livetable('siblingsIndex' $collist $colprops $options)

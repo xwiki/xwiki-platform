@@ -50,8 +50,8 @@ admin.panels.applications.description=Gérer quelles sont les applications à af
 
 admin.panels.navigation=Panneau de navigation
 admin.panels.navigation.description=Gérer les pages à afficher dans le panneau de navigation.
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclut les pages d’Extension de haut niveau
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Ce filtre dynamique supprime de l'arbre de navigation les pages de haut niveau qui appartiennent à une extension installéee, si elles ne sont pas destinées à être modifiées.
 PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
 PanelsCode.NavigationConfigurationClass_exclusions.hint=Liste des pages à exclure de l'arbre de navigation.
 PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
@@ -59,7 +59,7 @@ PanelsCode.NavigationConfigurationClass_inclusions.hint=Liste des pages à inclu
 platform.panels.navigation.configuration.excludedPages=Pages exclues
 platform.panels.navigation.configuration.excludedPages.hint=Utilisez le Cliquer / Glisser pour déplacer les pages dans ou hors de l'arbre de navigation.
 platform.panels.navigation.configuration.excludedPages.empty=Aucune
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+platform.panels.navigation.configuration.topLevelExtensionPages=Pages d'Extension de haut niveau
 platform.panels.navigation.configuration.otherPages=Autres pages
 platform.panels.navigation.configuration.saveComment=La configuration de l'arbre de navigation a été mise à jour depuis l'Administration
 </content>

@@ -157,14 +157,15 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the test
         // result status... See https://github.com/junit-team/junit5/issues/542
         File recordingDir = new File("./target/");
-        vnc.saveRecordingToFile(new File(recordingDir, extensionContext.getRequiredTestClass().getName() + "-"
-            + extensionContext.getRequiredTestMethod().getName() + ".flv"));
+        File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
+            extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
+        vnc.saveRecordingToFile(recordingFile);
         vnc.stop();
 
         // Note: We don't need to stop the BrowserWebDriverContainer since that's done automatically by TestContainers.
         // This allows the test to finish faster and thus provide faster results (because stopping the container takes
         // a bit of time).
-        LOGGER.info("(10) VNC recording of test has been saved");
+        LOGGER.info("(10) VNC recording of test has been saved to [{}]", recordingFile);
     }
 
     @Override
@@ -204,8 +205,11 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
             .withDesiredCapabilities(uiTestAnnotation.browser().getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
-            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
-            .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
+
+        if (uiTestAnnotation.debug()) {
+            webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+        }
 
         webDriverContainer.start();
 

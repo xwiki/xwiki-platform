@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="hr">
+<xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="de">
   <web>Menu</web>
   <name>MenuTranslations</name>
-  <language>hr</language>
+  <language>de</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <creator>xwiki:XWiki.Admin</creator>
   <parent>MenuClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -37,43 +37,43 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-Menu.MenuClass_content1=Struktura izbornika
+Menu.MenuClass_content1=Menüstruktur
 
 # Live table generic keys
-menu.livetable.doc.title=Naslov stranice
-menu.livetable.doc.name=Ime stranice
-menu.livetable.doc.location=Lokacija
-menu.livetable.doc.space=Prostor
-menu.livetable.doc.fullname=Puno ime stranice
-menu.livetable.doc.author=Posljednji autor
-menu.livetable.doc.creator=Tvorac
-menu.livetable.doc.date=Datum ažuriranja
-menu.livetable.doc.creationDate=Datum izrade
-menu.livetable._avatar=Avatar
-menu.livetable._images=Slike
-menu.livetable._attachments=Privitci
-menu.livetable._actions=Akcije
-menu.livetable._actions.edit=Uredi
-menu.livetable._actions.delete=Obriši
+menu.livetable.doc.title=Seitentitel
+menu.livetable.doc.name=Seitenname
+menu.livetable.doc.location=Speicherort
+menu.livetable.doc.space=Bereich
+menu.livetable.doc.fullname=Vollständiger Seitenname
+menu.livetable.doc.author=Letzter Autor
+menu.livetable.doc.creator=Ersteller
+menu.livetable.doc.date=Bearbeitungsdatum
+menu.livetable.doc.creationDate=Erstellungsdatum
+menu.livetable._avatar=Profilbild
+menu.livetable._images=Bilder
+menu.livetable._attachments=Anhänge
+menu.livetable._actions=Aktionen
+menu.livetable._actions.edit=Bearbeiten
+menu.livetable._actions.delete=Löschen
 menu.livetable.emptyvalue=-
 
 # Live table specific keys
-menu.livetable.content1=Struktura izbornika
+menu.livetable.content1=Menüstruktur
 
 # Administration keys
-### Missing: admin.menu.name=Menu
+admin.menu.name=Menü
 
 # UIX keys
-menu.uix.extensionPoint.label=Lokacija prikaza izbornika
-menu.uix.extensionPoint.hint=Naznačava gdje prikazati izbornik. Izbornik se prikazuje ili horizontalno ili vertikalno, prema odabranoj lokaciji.
-menu.uix.extensionPoint.value.nowhere=Nigdje
-menu.uix.extensionPoint.value.template.header.after=Nakon zaglavlja stranice
-menu.uix.extensionPoint.value.panels.rightPanels=Unutar panela s desne strane
-menu.uix.extensionPoint.value.panels.leftPanels=Unutar panela s lijeve strane
-menu.uix.content.label=Sadržaj UI ekstenzije
-menu.uix.content.hint=Ukoliko ovo vidite, to onda vjerojatno znači da vam je onemogućen Javascript. Trebali biste odabrati istu vrijednost kao za lokaciju prikaza izbornika.
-menu.uix.scope.label=Doseg vidljivosti izbornika
-menu.uix.scope.hint=Naznačava u kojem kontekstu je vidljiv izbornik.
+menu.uix.extensionPoint.label=Menü Anzeigeposition
+menu.uix.extensionPoint.hint=Gibt an, wo das Menü angezeigt werden soll. Das Menü wird entweder horizontal oder vertikal angezeigt, abhängig vom gewählten Ort.
+menu.uix.extensionPoint.value.nowhere=Nirgends
+menu.uix.extensionPoint.value.template.header.after=Nach dem Seitenkopf
+menu.uix.extensionPoint.value.panels.rightPanels=Im rechten Bereich
+### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
+### Missing: menu.uix.content.label=UI Extension Content
+### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
+### Missing: menu.uix.scope.label=Menu Visibility Scope
+### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
 
 # Menu Macro
 ### Missing: rendering.macro.menu.name=Menu
@@ -85,6 +85,5 @@ menu.uix.scope.hint=Naznačava u kojem kontekstu je vidljiv izbornik.
 ### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
-</content>
+### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
 </xwikidoc>

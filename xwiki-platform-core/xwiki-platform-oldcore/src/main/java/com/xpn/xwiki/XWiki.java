@@ -4634,7 +4634,7 @@ public class XWiki implements EventListener
         }
 
         // If main wiki check the main wiki home page configuration
-        if (xcontext.isMainWiki()) {
+        if (xcontext.isMainWiki(wikiId)) {
             String homepage = getConfiguration().getProperty("xwiki.home");
             if (StringUtils.isNotEmpty(homepage)) {
                 try {
@@ -4691,9 +4691,10 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to get main wiki descriptor", e);
         }
 
-        // If current request is a "real" one keep using the same protocol (moving from one wiki to another for exampe)
+        // If request is a "real" one keep using the same protocol (if asking for the same wiki)
         XWikiRequest request = context.getRequest();
-        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+        if (wikiDescriptor.getId().equals(context.getOriginalWikiId())
+            && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
             return HttpServletUtils.getSourceBaseURL(context.getRequest()).getProtocol();
         }
 
@@ -4720,9 +4721,10 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to get main wiki descriptor", e);
         }
 
-        // If current request is a "real" one keep using the same protocol (moving from one wiki to another for example)
+        // If request is a "real" one keep using the same port (if asking for the same wiki)
         XWikiRequest request = context.getRequest();
-        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+        if (wikiDescriptor.getId().equals(context.getOriginalWikiId())
+            && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
             return HttpServletUtils.getSourceBaseURL(context.getRequest()).getPort();
         }
 
@@ -4733,8 +4735,7 @@ public class XWiki implements EventListener
     public String getServletPath(String wikiName, XWikiContext context)
     {
         // unless we are in virtual wiki path mode we should return null
-        if (!context.isMainWiki(wikiName)
-            && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
+        if (!context.isMainWiki(wikiName) && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
             try {
                 WikiDescriptor wikiDescriptor = getWikiDescriptorManager().getById(wikiName);
                 if (wikiDescriptor != null) {

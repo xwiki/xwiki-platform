@@ -285,9 +285,9 @@ public class XWikiServletURLFactoryTest
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
             this.oldcore.getXWikiContext());
-        assertEquals("https://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor", url.toString());
+        assertEquals("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor", url.toString());
         // The URL remains absolute in this case.
-        assertEquals("https://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor",
+        assertEquals("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor",
             urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
@@ -397,7 +397,7 @@ public class XWikiServletURLFactoryTest
      * Proves that from a virtual wiki, URLs generated to point to the main wiki will use xwiki.home. see: XWIKI-5981
      */
     @Test
-    public void createURLWhenWikiDotHomeParameterFromVirtualWiki() throws MalformedURLException
+    public void createURLWhenWikiDotHomeParameterFromVirtualWiki()
     {
         this.oldcore.getXWikiContext().setWikiId("subwiki");
 

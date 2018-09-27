@@ -287,6 +287,9 @@
   <div id="${htmlLiveTableId}-inaccessible-docs" class="hidden">
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
   </div>
+  <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
+    #info("(&#8224;)&#160;$services.localization.render('platform.livetable.doc_title_computed.filter_sort_hint')")
+  </div>
   <script type="text/javascript">
   //<![CDATA[
 (function() {

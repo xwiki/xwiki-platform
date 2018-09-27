@@ -168,7 +168,7 @@ Generates:
   #set($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
 #end
 #set($colprops = {
-  'doc.title' : { 'size' : 30, 'link' : 'view', 'filterable': false, 'sortable': false },
+  'doc.title' : { 'size' : 30, 'link' : 'view' },
   'doc.location' : { 'html': true },
   'doc.fullName' : { 'size' : 30, 'link' : 'view' },
   'doc.name' : { 'size' : 30, 'link' : 'view' },
@@ -177,6 +177,7 @@ Generates:
 })
 #set($options = { 
   'translationPrefix' : 'platform.index.',
+  'selectedColumn' : 'doc.location',
   'rowCount' : $xcontext.macro.params.count,
   'description' : 'This table lists documents found on this wiki based on passed criteria. The columns can be sorted and some can be filtered.'
 })

@@ -1452,6 +1452,9 @@ $Msz MB##
   <div id="${htmlLiveTableId}-inaccessible-docs" class="hidden">
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
   </div>
+  <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
+    #info("(&#8224;)&#160;$services.localization.render('platform.livetable.doc_title_computed.filter_sort_hint')")
+  </div>
   <script type="text/javascript">
   //<![CDATA[
 (function() {
@@ -1682,6 +1685,9 @@ function (row, i, table) {
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
+  if (row['doc_title_computed']) {
+    $($jsontool.serialize("${divid}-computed-title-docs")).removeClassName('hidden');
+  }
   ## NOTE: Don't use Velocity code below this line!
   var tr = new Element('tr');
   columns.forEach(function(column) {
@@ -1766,6 +1772,9 @@ function (row, i, table) {
         var text = row[fieldName] + '';
         if (fieldName === 'doc_name' && !row['doc_viewable']) {
           text += '*';
+        }
+        if (fieldName === 'doc_title' && row['doc_title_computed']) {
+          text += '\u2009\u2020';
         }
         container.update(text.escapeHTML());
       }

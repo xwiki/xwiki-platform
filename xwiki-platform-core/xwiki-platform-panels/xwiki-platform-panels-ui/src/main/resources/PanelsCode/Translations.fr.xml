@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.panels.applications.helper=Vous pouvez définir quelles sont les applications affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toutes les nouvelles applications sont affichées dans cette barre. Si vous souhaitez en supprimer certaines, il suffit de cliquer/glisser l'icône d'un pavé à l'autre. N'oubliez pas d'enregistrer vos modifications.
+  <content>platform.panels.applications.helper=Vous pouvez définir ici les applications qui seront affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toute nouvelle application sera affichée dans cette barre. Si vous souhaitez en supprimer certaines, glissez/déposez simplement son icône d'un pavé à l'autre. Vous pouvez aussi ordonner les applications. N'oubliez pas d'enregistrer vos modifications !
 platform.panels.applications.displayedapps=Applications présentes dans la barre
 platform.panels.applications.blacklistedapps=Applications absentes de la barre
 platform.panels.applications.save=Enregistrer

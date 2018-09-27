@@ -23,13 +23,10 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
-import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -43,6 +40,7 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.internal.AbstractUIExtension;
 
 import com.xpn.xwiki.objects.BaseObjectReference;
 
@@ -52,13 +50,8 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @version $Id$
  * @since 4.3M1
  */
-public class PanelWikiUIExtension implements UIExtension, WikiComponent
+public class PanelWikiUIExtension extends AbstractUIExtension implements WikiComponent
 {
-    /**
-     * The logger to log.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(PanelWikiUIExtension.class);
-
     /**
      * Serializer used to transform the panel document reference into the panel ID, for example 'Panels.Quicklinks'.
      */
@@ -104,8 +97,6 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
 
     private final AuthorExecutor authorExecutor;
 
-    private final JobProgressManager progress;
-
     /**
      * Default constructor.
      *
@@ -119,15 +110,17 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     public PanelWikiUIExtension(BaseObjectReference panelReference, DocumentReference authorReference, XDOM xdom,
         Syntax syntax, ComponentManager componentManager) throws ComponentLookupException
     {
+        super(componentManager);
+
         this.panelReference = panelReference;
         this.authorReference = authorReference;
         this.xdom = xdom;
         this.syntax = syntax;
+
         this.macroTransformation = componentManager.getInstance(Transformation.class, "macro");
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.renderingContext = componentManager.getInstance(RenderingContext.class);
         this.authorExecutor = componentManager.getInstance(AuthorExecutor.class);
-        this.progress = componentManager.getInstance(JobProgressManager.class);
     }
 
     @Override
@@ -161,30 +154,21 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     }
 
     @Override
-    public Block execute()
+    protected Block executeInternal() throws Exception
     {
         // We need to clone the xdom to avoid transforming the original and make it useless after the first
         // transformation
         final XDOM transformedXDOM = this.xdom.clone();
 
-        this.progress.startStep(getDocumentReference(), "panel.progress.execute", "Execute panel [{}]",
-            getDocumentReference());
-
         // Perform panel transformations with the right of the panel author
-        try {
-            this.authorExecutor.call(() -> {
-                TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
-                transformationContext.setId(getRoleHint());
-                ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,
-                    transformationContext, transformedXDOM);
+        this.authorExecutor.call(() -> {
+            TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
+            transformationContext.setId(getRoleHint());
+            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, transformationContext,
+                transformedXDOM);
 
-                return null;
-            }, getAuthorReference());
-        } catch (Exception e) {
-            LOGGER.error("Error while executing transformation for panel [{}]", this.panelReference);
-        } finally {
-            this.progress.endStep(getDocumentReference());
-        }
+            return null;
+        }, getAuthorReference());
 
         return new CompositeBlock(transformedXDOM.getChildren());
     }

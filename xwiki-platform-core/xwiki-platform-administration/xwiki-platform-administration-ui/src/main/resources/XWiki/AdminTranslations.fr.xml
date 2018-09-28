@@ -48,11 +48,11 @@ administration.menu.search.hint=Rechercher...
 administration.menu.search.noResults=Aucun résultat.
 
 # Registration Section
-XWiki.XWikiPreferences_use_email_verification.hint=Si défini à "Oui", un mail sera envoyé à l'adresse renseignée dans le formulaire d'enregistrement.
-XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par mail pour se connecter.
-XWiki.XWikiPreferences_validation_email_content.hint=Modèle de mail envoyé aux utilisateurs pour validation de leur adresse email.
-XWiki.XWikiPreferences_confirmation_email_content.hint=Modèle de mail envoyé aux utilisateurs après validation de leur adresse email grâce au lien présent dans le premier mail reçu.
-XWiki.XWikiPreferences_invitation_email_content.hint=Modèle de message envoyé aux utilisateurs invités à s'inscrire.
+XWiki.XWikiPreferences_use_email_verification.hint=Si défini à "Oui", un email sera envoyé à l'adresse renseignée dans le formulaire d'enregistrement.
+XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par email pour se connecter.
+XWiki.XWikiPreferences_validation_email_content.hint=Modèle d'email qui sera envoyé aux utilisateurs pour valider leur adresse email.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Modèle d'email qui sera envoyé aux utilisateurs après validation de leur adresse email grâce au lien présent dans le premier email reçu.
+XWiki.XWikiPreferences_invitation_email_content.hint=Modèle d'email qui sera envoyé aux utilisateurs invités à s'inscrire.
 
 XWiki.Registration_heading.hint=Texte affiché en haut de page lorsque les utilisateurs souhaitent s'inscrire ou lorsqu'ils viennent de s'inscrire. Vous pouvez indiquer du code Velocity.
 XWiki.Registration_welcomeMessage.hint=Affiché uniquement lorsque les utilisateurs renseignent le formulaire. Vous pouvez utiliser du code Velocity et de la syntaxe wiki.

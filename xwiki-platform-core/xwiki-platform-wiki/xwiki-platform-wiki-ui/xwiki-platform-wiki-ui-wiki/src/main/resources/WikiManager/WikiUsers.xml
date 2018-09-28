@@ -313,32 +313,32 @@
 #set ($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
 #set ($candidateMembers = $groupDoc.getObjects($candidateClass))
 #foreach ($candidateMember in $candidateMembers)
-  #set ($userFullName = $candidateMember.userName)
+  #set ($userFullName = $candidateMember.getValue('userName'))
   #set ($userURL = $xwiki.getURL($userFullName))
-  #set ($userComment = $candidateMember.getProperty('userComment').getValue())
-  #set ($status = $candidateMember.getProperty('status').getValue())
-  #set ($type = $candidateMember.getProperty('type').getValue())
+  #set ($userComment = $candidateMember.getValue('userComment'))
+  #set ($status = $candidateMember.getValue('status'))
+  #set ($type = $candidateMember.getValue('type'))
 &lt;div class='candidate'&gt;
-  &lt;div class='candidateAvatar'&gt;&lt;a href="$userURL"&gt;#mediumUserAvatar("$!{userFullName}")&lt;/a&gt;&lt;/div&gt;
+  &lt;div class='candidateAvatar'&gt;&lt;a href="$userURL"&gt;#mediumUserAvatar($userFullName)&lt;/a&gt;&lt;/div&gt;
   &lt;div class='candidateDetails'&gt;
     &lt;form class='xformInline' method='post'&gt;
       &lt;div class='candidateNameAndComment'&gt;
-        $xwiki.getUserName($candidateMember.userName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
+        $xwiki.getUserName($userFullName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
       &lt;/div&gt;
       &lt;div class='date xHint'&gt;
-        #if ($candidateMember.getProperty('date').value)
+        #if ($candidateMember.getValue('date'))
           $candidateMember.date
         #end
       &lt;/div&gt;
       &lt;div class='candidateStatus'&gt;
-        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.status.label')&lt;/label&gt; $candidateMember.status
+        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.status.label')&lt;/label&gt; $status
       &lt;/div&gt;
       &lt;div class='candidateType'&gt;
-        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.type.label')&lt;/label&gt; $candidateMember.type
+        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.type.label')&lt;/label&gt; $type
       &lt;/div&gt;
       #if ($status != 'pending' || $type == 'invitation')
       &lt;div class='reviewer'&gt;
-        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.reviewer.label')&lt;/label&gt; $xwiki.getUserName($candidateMember.reviewer)
+        &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.reviewer.label')&lt;/label&gt; $xwiki.getUserName($candidateMember.getValue('reviewer'))
       &lt;/div&gt;
       #end
       &lt;div class='reviewerComment'&gt;
@@ -348,7 +348,7 @@
         #if($status == 'pending' &amp;&amp; $type == 'request')
           &lt;textarea name='reviewerComment'/&gt;
         #else
-          &lt;span class='reviewerCommentSpan'&gt;$!{candidateMember.getProperty('reviewerComment').getValue()}&lt;/span&gt;
+          &lt;span class='reviewerCommentSpan'&gt;$!candidateMember.getValue('reviewerComment')&lt;/span&gt;
         #end
       &lt;/div&gt;
       &lt;div class='reviewerPrivateComment'&gt;
@@ -356,11 +356,11 @@
         #if($status == 'pending' &amp;&amp; $type == 'request')
           &lt;textarea name='reviewerPrivateComment'/&gt;
         #else
-          &lt;span class='reviewerPrivateCommentSpan'&gt;$!{candidateMember.getProperty('reviewerPrivateComment').getValue()}&lt;/span&gt;
+          &lt;span class='reviewerPrivateCommentSpan'&gt;$!candidateMember.getValue('reviewerPrivateComment')&lt;/span&gt;
         #end
       &lt;/div&gt;
       &lt;div class='date xHint'&gt;
-        #if ($candidateMember.getProperty('resolutionDate').value)
+        #if ($candidateMember.getValue('resolutionDate'))
           $candidateMember.resolutionDate
         #end
       &lt;/div&gt;

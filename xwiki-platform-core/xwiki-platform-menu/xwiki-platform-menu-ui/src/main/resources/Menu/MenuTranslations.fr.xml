@@ -85,6 +85,6 @@ rendering.macro.menu.parameter.type.description=Le type de menu (optionnel) dét
 rendering.macro.menu.content.description=Définit la structure du menu en utilisant la syntaxe wiki. Chaque élément du menu devrait être un élément de liste, et devrait contenir l'étiquette du menu ou un lien. Vous pouvez utiliser des listes imbriquées pour les sous-menus.
 
 # Menu WebHome
-menu.description=Ceci est une application simple qui vous permet de créer des menus de navigation à afficher horizontalement comme une barre supérieure après l'en-tête de page ou verticalement dans un panneau latéral.
+menu.description=Ceci est une application simple qui vous permet de créer des menus de navigation à afficher soit horizontalement comme une barre supérieure après l'en-tête de page, soit verticalement dans un panneau latéral.
 </content>
 </xwikidoc>

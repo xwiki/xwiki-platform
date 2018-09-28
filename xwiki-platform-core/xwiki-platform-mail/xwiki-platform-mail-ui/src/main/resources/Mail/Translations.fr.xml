@@ -36,13 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.email=Email
-admin.email.description=Configurer l'email (général, envoi d'email) et voir  les statuts d'emails.
+  <content>admin.email=Courriel
+admin.email.description=Configurer l'envoi de courriel et voir les statuts des courriels.
 admin.emailgeneral=Général
 admin.emailgeneral.description=Configurez les paramètres avancés de messagerie comme le masquage des adresses email.
-admin.emailsend=Envoi d'emails
-admin.emailsend.description=Configurer les paramètres d'envoi d'emails.
-admin.emailstatus=Statut des emails
+admin.emailsend=Envoi de courriels
+admin.emailsend.description=Configurer les paramètres d'envoi de courriels.
+admin.emailstatus=Statut des courriels
 admin.emailstatus.description=Voir le statut des emails envoyés et ré-envoyer les emails qui sont revenus en échec.
 admin.emailstatus.hint=Si vous ne pouvez pas trouver le statut d'un email c'est probablement parce que la propriété qui a expédié cet email n'a pas spécifié que son statut devait persister.
 Mail.GeneralMailConfigClass_obfuscate=Masquer l'adresse email

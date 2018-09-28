@@ -150,7 +150,7 @@ notifications.settings.watch.title=Pages surveillées
 notifications.settings.watch.autowatchmode=Surveillance automatique de pages
 notifications.settings.watch.autowatchmode.hint=Voulez-vous surveiller les pages sur lesquelles vous avez travaillé ?
 notifications.settings.watch.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
-### Missing: notifications.settings.watch.disabled=The watched entities are disabled. Please contact your administrator.
+notifications.settings.watch.disabled=Les entités surveillées sont désactivées. Merci de contacter l'administrateur.
 notifications.events.by=Par {0}.
 notifications.events.lastChange=Dernière modification : {0}.
 notifications.events.lastComment=Dernier commentaire : {0}.
@@ -227,12 +227,12 @@ rendering.macro.notifications.parameter.displayReadStatus.description=Définit s
 rendering.macro.notifications.parameter.users.name=Utilisateurs
 rendering.macro.notifications.parameter.users.description=Liste des utilisateurs à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher uniquement les utilisateurs suivis
-### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Afficher uniquement les événements créés par une liste d'utilisateurs donnés (si vide, la liste des utilisateurs suivis par l'utilisateur actuel sera utilisée).
 rendering.macro.notifications.parameter.displayRSSLink.name=Afficher le lien RSS
 rendering.macro.notifications.parameter.displayRSSLink.description=Affiche un lien vers le flux RSS de la macro courante.
 
 ## Notifications Macro
 notifications.macro.noWatchedUsers=Vous ne suivez personne.
-### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
+notifications.macro.whenNotView=Macro de notification. Peut-être vu en mode 'view'.
 </content>
 </xwikidoc>

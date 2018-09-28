@@ -154,10 +154,11 @@ public class ExportActionTest
     public void exportXARSpaceUsingUncheckedPagesAndOtherPagesArgument() throws Exception
     {
         // Scenario:
-        // From the Space.Page1 containing 2 children pages,
-        // "other pages" is checked and
-        // Space.Page1 and Space.Page2 are unchecked
-        // only the remaining Space.Page3 should be exported
+        // We want to export all Space.% that contains 3 pages, but with exclusion of Page1 and 2
+        // to export all Foo.% and to export all Bar.Baz.% except Bar.Baz.WebHome
+        //
+        // This test will check the request is properly built and the pages are correctly resolved by checking
+        // result only on Space: we ignore the others for sake of simplicity
         ExportAction action = new ExportAction();
 
         XWikiContext context = oldcore.getXWikiContext();

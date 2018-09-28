@@ -34,8 +34,8 @@
   <properties>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Don't cloverify tests since we don't want our global TPC to include test TPC -->
+    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
   <modules>
     <module>xwiki-platform-flamingo-skin-test-tests</module>

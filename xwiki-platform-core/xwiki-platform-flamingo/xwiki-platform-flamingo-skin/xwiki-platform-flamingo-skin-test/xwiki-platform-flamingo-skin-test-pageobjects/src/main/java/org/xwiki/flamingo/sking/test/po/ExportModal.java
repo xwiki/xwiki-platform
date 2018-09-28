@@ -24,26 +24,38 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
 
 /**
- * Represents the Export modal
+ * Represents the Export modal.
  *
  * @version $Id$
- * @since 10.8
+ * @since 10.9RC1
  */
 public class ExportModal extends BaseModal
 {
+    private static final String EXPORT_MODAL_ID = "exportModal";
+
+    /**.
+     * Simple constructor.
+     */
     public ExportModal()
     {
-        super(By.id("exportModal"));
-        getDriver().waitUntilElementIsVisible(By.id("exportModal"));
+        super(By.id(EXPORT_MODAL_ID));
+        getDriver().waitUntilElementIsVisible(By.id(EXPORT_MODAL_ID));
     }
 
-    public OtherFormatView openOtherFormatView()
+    /**
+     * Opens the pane "Other Format".
+     * @return the pane for "Other Format" export.
+     */
+    public OtherFormatPane openOtherFormatPane()
     {
         getDriver().findElementByLinkText("Other Formats").click();
         getDriver().waitUntilElementIsVisible(By.id(("export-form")));
-        return new OtherFormatView();
+        return new OtherFormatPane();
     }
 
+    /**
+     * @return the container of this modal.
+     */
     public WebElement getContainer()
     {
         return container;

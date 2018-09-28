@@ -44,7 +44,7 @@ public class SheetRequestInitializer implements RequestInitializer
      * The name of the request parameter specifying the sheet to be applied to the requested document. This is also the
      * name of the execution context property specifying the same thing.
      */
-    private static final String SHEET_PROPERTY_NAME = "sheet";
+    public static final String SHEET_PROPERTY_NAME = "sheet";
 
     /**
      * Execution context handler.

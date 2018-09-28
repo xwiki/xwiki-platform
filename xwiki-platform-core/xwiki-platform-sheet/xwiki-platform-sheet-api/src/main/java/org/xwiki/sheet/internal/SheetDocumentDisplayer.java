@@ -145,10 +145,16 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
         //
         // (3) We test if the default edit mode is "edit" to ensure backward compatibility with older XWiki applications
         // that don't use the new sheet system (they most probably use "inline" as the default edit mode).
+        // But it's possible to force using the sheet system (generally using "sheet" URL parameter).
         return parameters.isContentTransformed()
-            && (parameters.isExecutionContextIsolated() || document.getDocumentReference().equals(
-                documentAccessBridge.getCurrentDocumentReference()))
-            && "edit".equals(modelBridge.getDefaultEditMode(document));
+            && (parameters.isExecutionContextIsolated()
+                || document.getDocumentReference().equals(documentAccessBridge.getCurrentDocumentReference()))
+            && isNewSheetSystem(document);
+    }
+
+    private boolean isNewSheetSystem(DocumentModelBridge document)
+    {
+        return this.sheetManager.isSheetForced() || "edit".equals(modelBridge.getDefaultEditMode(document));
     }
 
     /**

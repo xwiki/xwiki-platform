@@ -1455,7 +1455,7 @@ $Msz MB##
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
   </div>
   <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
-    #info("(&#xb9;)&#160;$services.localization.render('platform.livetable.doc_title_computed.filter_sort_hint')")
+    #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
   <script type="text/javascript">
   //<![CDATA[
@@ -1776,7 +1776,7 @@ function (row, i, table) {
           text += '*';
         }
         if (fieldName === 'doc_title' && row['doc_title_computed']) {
-          text += '\u00b9';
+          container.addClassName('docTitleComputed');
         }
         container.update(text.escapeHTML());
       }

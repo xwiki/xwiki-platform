@@ -177,7 +177,6 @@ Generates:
 })
 #set($options = { 
   'translationPrefix' : 'platform.index.',
-  'selectedColumn' : 'doc.location',
   'rowCount' : $xcontext.macro.params.count,
   'description' : 'This table lists documents found on this wiki based on passed criteria. The columns can be sorted and some can be filtered.'
 })
@@ -200,6 +199,9 @@ Generates:
     'filterable': false,
     'sortable': false
   }))
+#end
+#if ($collist.contains('doc.location'))
+  #set ($discard = $options.put('selectedColumn','doc.location'))
 #end
 #if ("$!xcontext.macro.params.id" != "")
   #set ($livetableId = $xcontext.macro.params.id)

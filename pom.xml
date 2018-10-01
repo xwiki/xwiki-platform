@@ -56,7 +56,7 @@
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.10</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>1.18</tika.version>
+    <tika.version>1.19</tika.version>
     <pdfbox.version>2.0.11</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 

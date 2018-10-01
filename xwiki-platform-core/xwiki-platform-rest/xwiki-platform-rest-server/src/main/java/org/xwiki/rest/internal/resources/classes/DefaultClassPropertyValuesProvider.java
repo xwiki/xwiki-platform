@@ -69,10 +69,10 @@ public class DefaultClassPropertyValuesProvider implements ClassPropertyValuesPr
     }
 
     @Override
-    public PropertyValues getValue(ClassPropertyReference propertyReference, Object... filterParameters)
+    public PropertyValues getValue(ClassPropertyReference propertyReference, Object rawValue)
         throws XWikiRestException
     {
-        return getDedicatedProvider(getPropertyType(propertyReference)).getValue(propertyReference, filterParameters);
+        return getDedicatedProvider(getPropertyType(propertyReference)).getValue(propertyReference, rawValue);
     }
 
     private ClassPropertyValuesProvider getDedicatedProvider(String propertyType) throws XWikiRestException

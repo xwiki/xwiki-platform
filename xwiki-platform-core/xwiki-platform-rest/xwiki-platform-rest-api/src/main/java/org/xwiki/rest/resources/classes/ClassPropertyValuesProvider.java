@@ -51,11 +51,13 @@ public interface ClassPropertyValuesProvider
      * Provides the document specified by the filter as a property value.
      *
      * @param propertyReference the property to provide the value for
-     * @param filterParameters parameters used to get the document
-     * @return the value based on the filter
+     * @param rawValue raw value used to resolve the property value
+     * @return the property value based on the raw value
      * @throws XWikiRestException if retrieving the property value fails
-     * @since 10.8
+     * @since 10.9RC1
      */
-    PropertyValues getValue(ClassPropertyReference propertyReference, Object... filterParameters)
-        throws XWikiRestException;
+    default PropertyValues getValue(ClassPropertyReference propertyReference, Object rawValue)
+        throws XWikiRestException {
+        throw new UnsupportedOperationException();
+    }
 }

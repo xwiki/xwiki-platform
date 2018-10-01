@@ -84,9 +84,14 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
         propertyLink.setHref(propertyURI.toString());
         propertyLink.setRel(Relations.PROPERTY);
 
-        PropertyValues propertyValues;
+        PropertyValues propertyValues = new PropertyValues();
         if (isExactMatch) {
-            propertyValues = this.propertyValuesProvider.getValue(classPropertyReference, filterParameters.toArray());
+            for (String filterParameter : filterParameters) {
+                PropertyValues values =  this.propertyValuesProvider.getValue(classPropertyReference, filterParameter);
+                if (values != null) {
+                    propertyValues.getPropertyValues().addAll(values.getPropertyValues());
+                }
+            }
         } else {
             propertyValues = this.propertyValuesProvider
                 .getValues(classPropertyReference, limit, filterParameters.toArray());

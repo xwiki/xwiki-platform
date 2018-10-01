@@ -35,6 +35,8 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.AbstractCacheEntryListener;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
@@ -47,7 +49,8 @@ import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
  * @version $Id$
  * @since 10.8RC1
  */
-public abstract class AbstractGroupCache extends AbstractCacheEntryListener<GroupCacheEntry> implements Initializable
+public abstract class AbstractGroupCache extends AbstractCacheEntryListener<GroupCacheEntry>
+    implements Initializable, Disposable
 {
     private static final int DEFAULT_CAPACITY = 1000;
 
@@ -318,5 +321,12 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
 
         cleanIndex(key, entry.getDirect());
         cleanIndex(key, entry.getAll());
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // Make sure nothing is left behind when the component is disposed
+        removeAll();
     }
 }

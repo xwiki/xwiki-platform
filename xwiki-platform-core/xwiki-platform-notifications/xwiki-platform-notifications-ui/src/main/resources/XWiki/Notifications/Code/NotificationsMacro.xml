@@ -297,7 +297,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       }
       var promise = $.Deferred();
       var restURL = xm.restURL.substring(0, xm.restURL.indexOf('/rest/')) + '/rest/notifications?media=json';
-      $.ajax(restURL, {cache: false, data: params}).done(function (data) {
+      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data) {
         // Display the "nothing!" message if there is no notification
         if (data.notifications.length == 0 &amp;&amp; !untilDate) {
           self.displayNoNotification();

@@ -135,6 +135,11 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging-api</artifactId>
           </exclusion>
+          <!-- The SLF4J implementation is a WAR choice -->
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
           <!-- Tika depends on junrar for handling RAR files and junrar itself depends on Commons VFS2 which depends on
                org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.4. AFAIK we shouldn't require this dependency and
                we can safely exclude it. The other reason for excluding it is that it itself depends on
@@ -148,6 +153,15 @@
           <exclusion>
             <artifactId>cxf-rt-rs-client</artifactId>
             <groupId>org.apache.cxf</groupId>
+          </exclusion>
+          <!-- Tika does not use the right artifact for JAXB implementation -->
+          <exclusion>
+            <artifactId>jaxb-core</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>jaxb-impl</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
           </exclusion>
         </exclusions>
       </dependency>

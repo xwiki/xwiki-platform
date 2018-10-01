@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.email=Courriel
+  <content>admin.email=Courriel (email)
 admin.email.description=Configurer l'envoi de courriel et voir les statuts des courriels.
 admin.emailgeneral=Général
 admin.emailgeneral.description=Configurez les paramètres avancés de messagerie comme le masquage des adresses email.

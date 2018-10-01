@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - XWiki-specific Implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>90</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>91</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>

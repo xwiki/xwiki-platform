@@ -77,7 +77,7 @@ menu.uix.scope.hint=Choix du contexte d'affichage du menu.
 
 # Menu Macro
 rendering.macro.menu.name=Menu
-rendering.macro.menu.description=Affiche un menu créé en utilisant la syntaxe wiki simple (listes imbriquées et liens).
+rendering.macro.menu.description=Affiche un menu créé en utilisant une syntaxe wiki simple (listes imbriquées et liens).
 rendering.macro.menu.parameter.id.name=Id
 rendering.macro.menu.parameter.id.description=Identifiant de menu optionnel qui sera lié à l'élément html qui englobe le menu. Vous pouvez utiliser cet identifiant dans du code JavaScript pour accéder au menu DOM, ou dans des tests fonctionnels pour vérifier les éléments du menu.
 rendering.macro.menu.parameter.type.name=Type

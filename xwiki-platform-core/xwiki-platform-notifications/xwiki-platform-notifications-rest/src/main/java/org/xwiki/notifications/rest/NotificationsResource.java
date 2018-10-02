@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.rest;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -93,6 +92,10 @@ public interface NotificationsResource
      * Get notifications matching the given parameters. The POST method is used to allow large content in the
      * parameters. For example, the parameter "blackList" could be very long, and the associated URL with the GET method
      * would be too long (generating HTTP 414 error).
+     *
+     * Note: in the interface, we do not list the parameters, because Restlet does not support @FormParam...
+     * See: https://github.com/restlet/restlet-framework-java/issues/1120
+     *
      * @return notifications
      * @throws Exception if an error occurs
      * @since 10.8RC1
@@ -100,23 +103,5 @@ public interface NotificationsResource
      * @since 9.11.8
      */
     @POST
-    default Response postNotifications(
-            @FormParam("useUserPreferences") String useUserPreferences,
-            @FormParam("userId") String userId,
-            @FormParam("untilDate") String untilDate,
-            @FormParam("blackList") String blackList,
-            @FormParam("pages") String pages,
-            @FormParam("spaces") String spaces,
-            @FormParam("wikis") String wikis,
-            @FormParam("users") String users,
-            @FormParam("count") String count,
-            @FormParam("displayOwnEvents") String displayOwnEvents,
-            @FormParam("displayMinorEvents") String displayMinorEvents,
-            @FormParam("displaySystemEvents") String displaySystemEvents,
-            @FormParam("displayReadEvents") String displayReadEvents,
-            @FormParam("displayReadStatus") String displayReadStatus
-    ) throws Exception {
-        return getNotifications(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis, users, count,
-                displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, displayReadStatus);
-    }
+    Response postNotifications() throws Exception;
 }

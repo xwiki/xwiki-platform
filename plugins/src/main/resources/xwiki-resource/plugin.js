@@ -74,7 +74,8 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
         });
         var queryString = $.param(queryStringParameters);
         if (queryString.length > 0) {
-          components[2] += '?' + queryString;
+          // The replace is a workaround for a jquery issue: https://github.com/jquery/jquery/issues/2658
+          components[2] += '?' + queryString.replace(/\+/g, '%20');
         }
       }
       var serializedParameters = CKEDITOR.plugins.xwikiMarker.serializeParameters(parameters);

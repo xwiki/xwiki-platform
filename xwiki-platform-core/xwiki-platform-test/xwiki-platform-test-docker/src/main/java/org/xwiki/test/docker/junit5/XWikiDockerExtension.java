@@ -37,6 +37,7 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.utility.TestcontainersConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.XWikiWatchdog;
 import org.xwiki.test.ui.AbstractTest;
@@ -96,6 +97,12 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
+        // Force the usage of last docker image for VNC recorder
+        // See: https://github.com/testcontainers/testcontainers-java/pull/888
+        // This line could be removed once a new release (after 1.9.1) of testcontainers is done
+        TestcontainersConfiguration.getInstance().
+            updateGlobalConfig("vncrecorder.container.image", "quay.io/testcontainers/vnc-recorder:1.1.0");
+
         // Only start DB, create WAR, start Servlet engine and provision XWiki only if XWiki is not already
         // started locally. This allows running the tests with a custom XWiki setup and also allows faster development
         // turn around time when testing.

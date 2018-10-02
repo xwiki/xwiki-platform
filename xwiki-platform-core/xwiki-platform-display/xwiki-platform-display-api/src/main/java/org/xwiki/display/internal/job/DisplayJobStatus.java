@@ -17,31 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.display.job;
+package org.xwiki.display.internal.job;
 
-import org.xwiki.display.internal.job.DisplayJob;
-import org.xwiki.job.AbstractRequest;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.job.AbstractJobStatus;
+import org.xwiki.logging.LoggerManager;
+import org.xwiki.observation.ObservationManager;
 
 /**
- * The request of the {@link DisplayJob}.
+ * The status of the {@link DisplayJob}.
  * 
  * @version $Id$
  * @since 10.9RC1
  */
-public class DisplayJobRequest extends AbstractRequest
+public class DisplayJobStatus extends AbstractJobStatus<DisplayJobRequest>
 {
-    private Object source;
+    private String targetResult;
 
-    private Syntax targetSyntax;
-
-    public Object getSource()
+    /**
+     * @param request the request provided when started the job
+     * @param observationManager the observation manager component
+     * @param loggerManager the logger manager component
+     */
+    public DisplayJobStatus(DisplayJobRequest request, ObservationManager observationManager,
+        LoggerManager loggerManager)
     {
-        return this.source;
+        super(DisplayJob.JOB_TYPE, request, null, observationManager, loggerManager);
+
+        setIsolated(false);
     }
 
-    public void setSource(Object source)
+    /**
+     * @return the result of the execution
+     */
+    public String getTargetResult()
     {
-        this.source = source;
+        return this.targetResult;
     }
 }

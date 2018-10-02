@@ -24,8 +24,6 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.display.job.DisplayJobRequest;
-import org.xwiki.display.job.DisplayJobStatus;
 import org.xwiki.job.AbstractJob;
 
 /**

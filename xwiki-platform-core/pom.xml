@@ -314,6 +314,32 @@
                     "methodName": "getNotificationsRSS",
                     "elementKind": "method",
                     "justification": "Adding a parameter to a REST API is actually not a blocker."
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "package": "org.xwiki.notifications.rest",
+                    "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
+                    "classSimpleName": "NotificationsResource",
+                    "methodName": "getNotifications",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.7",
+                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.9-SNAPSHOT",
+                    "elementKind": "method",
+                    "justification": "Adding a parameter to a REST API is actually not a blocker."
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method java.lang.String org.xwiki.notifications.rest.NotificationsResource::getNotificationsRSS(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "new": "method java.lang.String org.xwiki.notifications.rest.NotificationsResource::getNotificationsRSS(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "package": "org.xwiki.notifications.rest",
+                    "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
+                    "classSimpleName": "NotificationsResource",
+                    "methodName": "getNotificationsRSS",
+                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.7",
+                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.9-SNAPSHOT",
+                    "elementKind": "method",
+                    "justification": "Adding a parameter to a REST API is actually not a blocker."
                   }
                 ]
               }

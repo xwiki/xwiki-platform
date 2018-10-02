@@ -292,7 +292,8 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         'pages':               self.pages,
         'users':               self.users,
         'displayReadStatus':   self.displayReadStatus,
-        'tags':                self.tags
+        'tags':                self.tags,
+        'currentWiki':         xm.documentReference.extractReferenceValue(XWiki.EntityType.WIKI)
       };
       if (untilDate) {
         params.untilDate = untilDate;
@@ -795,18 +796,18 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   {{info}}
     {{translation key="notifications.macro.whenNotView" /}}
   {{/info}}
-  
+
   #set ($displayMacro = false)
-#else 
+#else
   #set ($users = $xcontext.macro.params.users)
   #if ("$!xcontext.macro.params.displayWatchedUsersOnly" == 'true')
     #set ($watchedUsers = $services.notification.watch.watchedUsers)
     #if ($watchedUsers.isEmpty())
-    
+
       {{warning}}
         {{translation key="notifications.macro.noWatchedUsers" /}}
       {{/warning}}
-      
+
       #set ($displayMacro = false)
     #else
       #set ($users = $stringtool.join($services.notification.watch.watchedUsers, ','))
@@ -818,9 +819,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
 {{html clean="false"}}
-&lt;div class="notifications-macro loading" 
+&lt;div class="notifications-macro loading"
   data-userId="$!escapetool.xml($services.model.serialize($xcontext.userReference, 'default'))"
-  data-count="$!escapetool.xml($xcontext.macro.params.count)" 
+  data-count="$!escapetool.xml($xcontext.macro.params.count)"
   data-useUserPreferences="$!escapetool.xml($xcontext.macro.params.useUserPreferences)"
   data-displayOwnEvents="$!escapetool.xml($xcontext.macro.params.displayOwnEvents)"
   data-displayMinorEvents="$!escapetool.xml($xcontext.macro.params.displayMinorEvents)"
@@ -850,6 +851,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   #set ($rssURL = "${rssURL}&amp;users=$!escapetool.url($xcontext.macro.params.users)")
   #set ($rssURL = "${rssURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
   #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($xcontext.macro.params.tags)")
+  #set ($rssURL = "${rssURL}&amp;currentWiki=$!escapetool.url($services.wiki.currentWikiId)")
   &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" target="_blank"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
 #end
 &lt;/div&gt;

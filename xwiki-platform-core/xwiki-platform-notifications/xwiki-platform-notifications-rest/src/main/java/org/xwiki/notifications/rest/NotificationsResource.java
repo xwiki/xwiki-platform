@@ -59,7 +59,8 @@ public interface NotificationsResource
             @QueryParam("displaySystemEvents") String displaySystemEvents,
             @QueryParam("displayReadEvents") String displayReadEvents,
             @QueryParam("displayReadStatus") String displayReadStatus,
-            @QueryParam("tags") String tags
+            @QueryParam("tags") String tags,
+            @QueryParam("currentWiki") String currentWiki
             ) throws Exception;
 
     /**
@@ -88,7 +89,8 @@ public interface NotificationsResource
             @QueryParam("displaySystemEvents") String displaySystemEvents,
             @QueryParam("displayReadEvents") String displayReadEvents,
             @QueryParam("displayReadStatus") String displayReadStatus,
-            @QueryParam("tags") String tags
+            @QueryParam("tags") String tags,
+            @QueryParam("currentWiki") String currentWiki
     ) throws Exception;
 
     /**

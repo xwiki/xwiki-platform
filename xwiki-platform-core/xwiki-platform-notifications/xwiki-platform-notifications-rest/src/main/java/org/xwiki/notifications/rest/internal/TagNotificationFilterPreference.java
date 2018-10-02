@@ -36,13 +36,17 @@ public class TagNotificationFilterPreference implements NotificationFilterPrefer
 {
     private String tag;
 
+    private String currentWiki;
+
     /**
      * Construct a TagNotificationFilterPreference for the given tag.
      * @param tag the tag to watch
+     * @param currentWiki the current wiki (where the tags should be loaded)
      */
-    public TagNotificationFilterPreference(String tag)
+    public TagNotificationFilterPreference(String tag, String currentWiki)
     {
         this.tag = tag;
+        this.currentWiki = currentWiki;
     }
 
     /**
@@ -51,6 +55,14 @@ public class TagNotificationFilterPreference implements NotificationFilterPrefer
     public String getTag()
     {
         return tag;
+    }
+
+    /**
+     * @return the current wiki (where the tags should be loaded)
+     */
+    public String getCurrentWiki()
+    {
+        return currentWiki;
     }
 
     @Override

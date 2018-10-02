@@ -118,14 +118,16 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             String displaySystemEvents,
             String displayReadEvents,
             String displayReadStatus,
-            String tags
+            String tags,
+            String currentWiki
     ) throws Exception
     {
         // 1. Get the events and render them as notifications.
         List<CompositeEvent> events =
                 getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
                         users, count,
-                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags);
+                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
+                        currentWiki);
 
         Notifications notifications = new Notifications(
                 notificationsRenderer.renderNotifications(events, userId, TRUE.equals(displayReadStatus)));
@@ -142,12 +144,13 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     public String getNotificationsRSS(String useUserPreferences, String userId, String untilDate,
             String blackList, String pages, String spaces, String wikis, String users, String count,
             String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
-            String displayReadStatus, String tags) throws Exception
+            String displayReadStatus, String tags, String currentWiki) throws Exception
     {
         List<CompositeEvent> events =
                 getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
                         users, count,
-                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags);
+                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
+                        currentWiki);
         SyndFeedOutput output = new SyndFeedOutput();
         return output.outputString(notificationRSSManager.renderFeed(events));
     }
@@ -155,7 +158,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private List<CompositeEvent> getCompositeEvents(String useUserPreferences, String userId,
             String untilDate, String blackList, String pages, String spaces, String wikis, String users, String count,
             String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
-            String tags)
+            String tags, String currentWiki)
             throws NotificationException, EventStreamException
     {
         NotificationParameters parameters = new NotificationParameters();
@@ -178,7 +181,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             useUserPreferences(parameters);
         } else {
             dontUseUserPreferences(pages, spaces, wikis, users, parameters, displayOwnEvents, displayMinorEvents,
-                    displaySystemEvents, displayReadEvents, tags);
+                    displaySystemEvents, displayReadEvents, tags, currentWiki);
         }
 
         return getCompositeEvents(parameters);
@@ -186,7 +189,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     private void dontUseUserPreferences(String pages, String spaces, String wikis, String users,
             NotificationParameters parameters, String displayOwnEvents, String displayMinorEvents,
-            String displaySystemEvents, String displayReadEvents, String tags)
+            String displaySystemEvents, String displayReadEvents, String tags, String currentWiki)
             throws NotificationException, EventStreamException
     {
         List<String> excludedFilters = new ArrayList<>();
@@ -213,7 +216,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         handleWikisParameter(wikis, parameters);
         usersParameterHandler.handleUsersParameter(users, parameters);
 
-        handleTagsParameter(parameters, tags);
+        handleTagsParameter(parameters, tags, currentWiki);
     }
 
     private void useUserPreferences(NotificationParameters parameters) throws NotificationException
@@ -287,12 +290,12 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         }
     }
 
-    private void handleTagsParameter(NotificationParameters parameters, String tags)
+    private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
     {
         if (StringUtils.isNotBlank(tags)) {
             String[] tagArray = tags.split(",");
             for (int i = 0; i < tagArray.length; ++i) {
-                parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i]));
+                parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
             }
         }
     }

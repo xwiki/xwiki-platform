@@ -20,14 +20,14 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,6 +38,9 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
@@ -54,6 +57,12 @@ public class TagNotificationFilter implements NotificationFilter
      * Name of the filter.
      */
     public static final String NAME = "Tag Notification Filter";
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public FilterPolicy filterEvent(Event event, DocumentReference user,
@@ -93,16 +102,33 @@ public class TagNotificationFilter implements NotificationFilter
             return null;
         }
 
-        // This subquery can work only on the current wiki... but it's already that!
-        Map<String, Object> subQueryProperties = new HashMap<>();
-        subQueryProperties.put("tagList", enabledTags);
+        try {
+            Query query = queryManager.createQuery(
+                    "SELECT DISTINCT doc.fullName FROM XWikiDocument doc, BaseObject obj, "
+                            + "DBStringListProperty tags JOIN tags.list AS item "
+                            + "WHERE obj.name = doc.fullName AND obj.className = 'XWiki.TagClass' "
+                            + "AND obj.id = tags.id.id AND tags.id.name = 'tags' AND lower(item) IN (:tagList)",
+                    Query.HQL);
+            query.bindValue("tagList", enabledTags);
+            query.setWiki(findCurrentWiki(filterPreferences));
+            List<String> pagesHoldingTags = query.execute();
+            return value(EventProperty.PAGE).inStrings(pagesHoldingTags);
+        } catch (QueryException e) {
+            logger.warn("Failed to get the list of documents holding some tags.", e);
+            return null;
+        }
+    }
 
-        return value(EventProperty.PAGE).inSubQuery(
-                "SELECT DISTINCT doc.fullName FROM XWikiDocument doc, BaseObject obj, "
-                + "DBStringListProperty tags JOIN tags.list AS item "
-                + "WHERE obj.name = doc.fullName AND obj.className = 'XWiki.TagClass' "
-                + "AND obj.id = tags.id.id AND tags.id.name = 'tags' AND lower(item) IN (:tagList)",
-                subQueryProperties);
+    private String findCurrentWiki(Collection<NotificationFilterPreference> filterPreferences)
+    {
+        for (NotificationFilterPreference nfp : filterPreferences) {
+            if (nfp.isEnabled() && nfp instanceof TagNotificationFilterPreference) {
+                TagNotificationFilterPreference pref = (TagNotificationFilterPreference) nfp;
+                return pref.getCurrentWiki();
+            }
+        }
+        // Should never happen
+        return null;
     }
 
     @Override

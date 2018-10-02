@@ -74,7 +74,7 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
         });
         var queryString = $.param(queryStringParameters);
         if (queryString.length > 0) {
-          //The replace is a workaround for a jquery issue: https://github.com/jquery/jquery/issues/2658
+          // The replace is a workaround for a jquery issue: https://github.com/jquery/jquery/issues/2658
           components[2] += '?' + queryString.replace(/\+/g, '%20');
         }
       }

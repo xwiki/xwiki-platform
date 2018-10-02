@@ -60,6 +60,7 @@ import org.xwiki.text.StringUtils;
 
 import com.google.common.collect.Sets;
 import com.rometools.rome.io.SyndFeedOutput;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -153,6 +154,33 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                         currentWiki);
         SyndFeedOutput output = new SyndFeedOutput();
         return output.outputString(notificationRSSManager.renderFeed(events));
+    }
+
+    @Override
+    public Response postNotifications() throws Exception
+    {
+        // We should seriously consider to stop using Restlet, because the @FormParam attribute does not work.
+        // See: https://github.com/restlet/restlet-framework-java/issues/1120
+        // That's why we need to use this workaround: manually getting the POST params in the request object.
+        XWikiRequest request = getXWikiContext().getRequest();
+        return getNotifications(
+                request.get("useUserPreferences"),
+                request.get("userId"),
+                request.get("untilDate"),
+                request.get("blackList"),
+                request.get("pages"),
+                request.get("spaces"),
+                request.get("wikis"),
+                request.get("users"),
+                request.get("count"),
+                request.get("displayOwnEvents"),
+                request.get("displayMinorEvents"),
+                request.get("displaySystemEvents"),
+                request.get("displayReadEvents"),
+                request.get("displayReadStatus"),
+                request.get("tags"),
+                request.get("currentWiki")
+        );
     }
 
     private List<CompositeEvent> getCompositeEvents(String useUserPreferences, String userId,

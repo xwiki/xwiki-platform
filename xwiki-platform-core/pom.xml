@@ -323,8 +323,6 @@
                     "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
                     "classSimpleName": "NotificationsResource",
                     "methodName": "getNotifications",
-                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.7",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.9-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "Adding a parameter to a REST API is actually not a blocker."
                   },
@@ -336,10 +334,18 @@
                     "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
                     "classSimpleName": "NotificationsResource",
                     "methodName": "getNotificationsRSS",
-                    "oldArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.7",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-notifications-rest:jar:10.9-SNAPSHOT",
                     "elementKind": "method",
                     "justification": "Adding a parameter to a REST API is actually not a blocker."
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::postNotifications() throws java.lang.Exception",
+                    "package": "org.xwiki.notifications.rest",
+                    "classQualifiedName": "org.xwiki.notifications.rest.NotificationsResource",
+                    "classSimpleName": "NotificationsResource",
+                    "methodName": "postNotifications",
+                    "elementKind": "method",
+                    "justification": "Adding a new REST API is actually not a blocker."
                   }
                 ]
               }

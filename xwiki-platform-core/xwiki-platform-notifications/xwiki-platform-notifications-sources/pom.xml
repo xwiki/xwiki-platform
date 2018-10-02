@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Sources</name>
   <description>Handle how notifications are retrieved</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>64</xwiki.pitest.mutationThreshold>
     <checkstyle.suppressions.location>${basedir}/src/main/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>

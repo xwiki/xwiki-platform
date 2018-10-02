@@ -93,16 +93,10 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
     }
 
     @Override
-    public PropertyValues getValue(ClassPropertyReference propertyReference, Object rawValue)
+    public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
         throws XWikiRestException
     {
-        PropertyValues propertyValues = new PropertyValues();
-        PropertyValue value = this.getValueFromQueryResult(rawValue, getPropertyDefinition(propertyReference));
-        if (value != null) {
-            propertyValues.getPropertyValues().add(value);
-        }
-
-        return propertyValues;
+        return this.getValueFromQueryResult(rawValue, getPropertyDefinition(propertyReference));
     }
 
     @SuppressWarnings("unchecked")

@@ -75,10 +75,10 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     private QueryFilter viewableFilter;
 
     @Inject
-    protected DocumentReferenceResolver<String> documentReferenceResolver;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
-    public PropertyValues getValue(ClassPropertyReference propertyReference, Object rawValue)
+    public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
         throws XWikiRestException
     {
         String reference = "";
@@ -86,20 +86,17 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
             reference = rawValue.toString();
         }
         if (StringUtils.isEmpty(reference)) {
-            return new PropertyValues();
+            return null;
         }
 
-        PropertyValues propertyValues = new PropertyValues();
         DocumentReference documentReference = documentReferenceResolver.resolve(reference, EntityType.DOCUMENT);
-        if (documentReference != null) {
-            PropertyValue value =
-                this.getValueFromQueryResult(documentReference, getPropertyDefinition(propertyReference));
-            if (value != null) {
-                value.setValue(reference);
-                propertyValues.getPropertyValues().add(value);
-            }
+        PropertyValue propertyValue =
+            this.getValueFromQueryResult(documentReference, getPropertyDefinition(propertyReference));
+        if (propertyValue != null) {
+            propertyValue.setValue(reference);
         }
-        return propertyValues;
+
+        return propertyValue;
     }
 
     /**

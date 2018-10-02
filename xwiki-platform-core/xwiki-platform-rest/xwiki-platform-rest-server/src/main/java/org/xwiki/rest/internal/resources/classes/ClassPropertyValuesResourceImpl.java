@@ -37,6 +37,7 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
@@ -87,9 +88,9 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
         PropertyValues propertyValues = new PropertyValues();
         if (isExactMatch) {
             for (String filterParameter : filterParameters) {
-                PropertyValues values =  this.propertyValuesProvider.getValue(classPropertyReference, filterParameter);
-                if (values != null) {
-                    propertyValues.getPropertyValues().addAll(values.getPropertyValues());
+                PropertyValue value =  this.propertyValuesProvider.getValue(classPropertyReference, filterParameter);
+                if (value != null) {
+                    propertyValues.getPropertyValues().add(value);
                 }
             }
         } else {

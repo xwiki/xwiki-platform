@@ -30,6 +30,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 
@@ -69,7 +70,7 @@ public class DefaultClassPropertyValuesProvider implements ClassPropertyValuesPr
     }
 
     @Override
-    public PropertyValues getValue(ClassPropertyReference propertyReference, Object rawValue)
+    public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
         throws XWikiRestException
     {
         return getDedicatedProvider(getPropertyType(propertyReference)).getValue(propertyReference, rawValue);

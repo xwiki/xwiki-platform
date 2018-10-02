@@ -131,7 +131,7 @@ public class ExportAction extends XWikiAction
 
             if (!this.excludedPages.isEmpty() && this.includedPages.size() < this.excludedPages.size()) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                    "You cannot more excludes argument than pages argument. See the export documentation.");
+                    "You cannot have more excludes argument than pages argument. See the export documentation.");
             }
         }
 
@@ -209,8 +209,6 @@ public class ExportAction extends XWikiAction
 
         return defaultPage;
     }
-
-
 
     /**
      * Create ZIP archive containing wiki pages rendered in HTML, attached files and used skins.

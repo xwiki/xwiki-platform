@@ -39,6 +39,7 @@ public class OtherFormatPane extends BaseElement
     private static final String TREE_CLASS = "xtree";
     private static final String XAR_EXPORT_LINK_TEXT = "Export as XAR";
     private static final String VALUE_ATTR = "value";
+    private static final String FORM_ID = "export-form";
 
     /**
      * @return true if the tree is displayed.
@@ -53,11 +54,11 @@ public class OtherFormatPane extends BaseElement
      */
     public TreeElement getTreeElement()
     {
+        getDriver().waitUntilElementIsVisible(By.className(TREE_CLASS));
         WebElement element = getDriver()
             .findElement(By.className(CONTAINER_TREE_CLASS))
             .findElement(By.className(TREE_CLASS));
 
-        getDriver().waitUntilElementIsVisible(By.className(TREE_CLASS));
         return new TreeElement(element);
     }
 
@@ -82,15 +83,14 @@ public class OtherFormatPane extends BaseElement
      */
     public WebElement getForm()
     {
-        return getDriver().findElement(By.id("export-form"));
+        return getDriver().findElement(By.id(FORM_ID));
     }
 
     /**
      * @return all the values of the "pages" hidden input fields aggregated in a list.
      */
     public List<String> getPagesValues() {
-        return getForm()
-            .findElements(By.xpath(".//input[@type = 'hidden' and @name = 'pages']")).stream()
+        return getForm().findElements(By.cssSelector("input[type=hidden][name=pages]")).stream()
             .map(webElement -> webElement.getAttribute(VALUE_ATTR)).collect(Collectors.toList());
     }
 
@@ -99,7 +99,7 @@ public class OtherFormatPane extends BaseElement
      */
     public List<String> getExcludesValues() {
         return getForm()
-            .findElements(By.xpath(".//input[@type = 'hidden' and @name = 'excludes']")).stream()
+            .findElements(By.cssSelector("input[type=hidden][name=excludes]")).stream()
             .map(webElement -> webElement.getAttribute(VALUE_ATTR)).collect(Collectors.toList());
     }
 }

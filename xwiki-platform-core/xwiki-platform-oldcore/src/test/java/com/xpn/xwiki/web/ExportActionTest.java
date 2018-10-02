@@ -162,7 +162,8 @@ public class ExportActionTest
         ExportAction action = new ExportAction();
 
         XWikiContext context = oldcore.getXWikiContext();
-        context.setDoc(new XWikiDocument(new DocumentReference("xwiki", "Space", "Page1")));
+        context.setDoc(new XWikiDocument(new DocumentReference("xwiki", "Space",
+            "Page1")));
 
         // Make it a XAR export
         XWikiRequest request = mock(XWikiRequest.class);
@@ -173,8 +174,10 @@ public class ExportActionTest
         when(request.get("name")).thenReturn("myexport");
         when(request.getCharacterEncoding()).thenReturn("UTF-8");
         // Export all pages in the "Space" space
-        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%25", "Foo.%25", "Bar.Baz.%25"});
-        when(request.getParameterValues("excludes")).thenReturn(new String[] { "Space.Page1&Space.Page2", "", "Bar.Baz.WebHome" });
+        when(request.getParameterValues("pages")).thenReturn(new String[] {
+            "Space.%25", "Foo.%25", "Bar.Baz.%25"});
+        when(request.getParameterValues("excludes")).thenReturn(new String[] {
+            "Space.Page1&Space.Page2", "", "Bar.Baz.WebHome" });
 
         // Make the current user have programming rights
         when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
@@ -191,7 +194,8 @@ public class ExportActionTest
         when(query.execute()).thenReturn(Arrays.asList("Space.Page3"));
 
         // Register some mock resolver to resolve passed page references
-        AuthorizationManager authorizationManager = oldcore.getMocker().registerMockComponent(AuthorizationManager.class);
+        AuthorizationManager authorizationManager = oldcore.getMocker().
+            registerMockComponent(AuthorizationManager.class);
 
         DocumentReference page1Ref = new DocumentReference("xwiki", "Space", "Page1");
         DocumentReference page2Ref = new DocumentReference("xwiki", "Space", "Page2");

@@ -235,6 +235,9 @@ rendering.macro.notifications.parameter.displayRSSLink.description=Display a lin
 rendering.macro.notifications.parameter.tags.name=Tags
 rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
 
+rendering.macro.activity.name=Activity (deprecated)
+rendering.macro.activity.description=Create a bridge between the deprecated Activity Stream to the new Notifications module.
+
 ## Notifications Macro
 notifications.macro.noWatchedUsers=You are not following anybody.
 notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.

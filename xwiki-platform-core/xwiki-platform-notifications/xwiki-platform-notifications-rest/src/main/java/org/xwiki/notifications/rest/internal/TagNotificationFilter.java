@@ -103,6 +103,7 @@ public class TagNotificationFilter implements NotificationFilter
         }
 
         try {
+            String currentWiki = findCurrentWiki(filterPreferences);
             Query query = queryManager.createQuery(
                     "SELECT DISTINCT doc.fullName FROM XWikiDocument doc, BaseObject obj, "
                             + "DBStringListProperty tags JOIN tags.list AS item "
@@ -110,9 +111,10 @@ public class TagNotificationFilter implements NotificationFilter
                             + "AND obj.id = tags.id.id AND tags.id.name = 'tags' AND lower(item) IN (:tagList)",
                     Query.HQL);
             query.bindValue("tagList", enabledTags);
-            query.setWiki(findCurrentWiki(filterPreferences));
+            query.setWiki(currentWiki);
             List<String> pagesHoldingTags = query.execute();
-            return value(EventProperty.PAGE).inStrings(pagesHoldingTags);
+            return value(EventProperty.PAGE).inStrings(pagesHoldingTags)
+                    .and(value(EventProperty.WIKI).eq(value(currentWiki)));
         } catch (QueryException e) {
             logger.warn("Failed to get the list of documents holding some tags.", e);
             return null;

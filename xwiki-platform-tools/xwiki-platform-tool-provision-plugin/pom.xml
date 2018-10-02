@@ -113,17 +113,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <!-- Needed since tests in this module use case from other modules which have been clovered -->
-    <profile>
-      <id>clover</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.openclover</groupId>
-          <artifactId>clover</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>

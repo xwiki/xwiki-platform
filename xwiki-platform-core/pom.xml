@@ -281,6 +281,15 @@
                     "methodName": "getNotifications",
                     "elementKind": "method",
                     "justification": "Not a break: the REST endpoint is the same."
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::postNotifications() throws java.lang.Exception",
+                    "package": "org.xwiki.notifications.rest",
+                    "classSimpleName": "NotificationsResource",
+                    "methodName": "postNotifications",
+                    "elementKind": "method",
+                    "justification": "Adding a REST API is actually not a breakage."
                   }
                 ]
               }

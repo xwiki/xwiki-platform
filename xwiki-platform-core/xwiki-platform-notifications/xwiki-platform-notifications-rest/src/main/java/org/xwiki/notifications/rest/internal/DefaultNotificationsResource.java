@@ -59,6 +59,7 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.text.StringUtils;
 
 import com.google.common.collect.Sets;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -116,7 +117,6 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             String displayReadStatus
     ) throws Exception
     {
-        // 1. Get the events and render them as notifications.
         NotificationParameters parameters = new NotificationParameters();
         parameters.format = NotificationFormat.ALERT;
         parameters.expectedCount = 10;
@@ -149,6 +149,31 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         cacheControl.setNoCache(true);
         response.cacheControl(cacheControl);
         return response.build();
+    }
+
+    @Override
+    public Response postNotifications() throws Exception
+    {
+        // We should seriously consider to stop using Restlet, because the @FormParam attribute does not work.
+        // See: https://github.com/restlet/restlet-framework-java/issues/1120
+        // That's why we need to use this workaround: manually getting the POST params in the request object.
+        XWikiRequest request = getXWikiContext().getRequest();
+        return getNotifications(
+                request.get("useUserPreferences"),
+                request.get("userId"),
+                request.get("untilDate"),
+                request.get("blackList"),
+                request.get("pages"),
+                request.get("spaces"),
+                request.get("wikis"),
+                request.get("users"),
+                request.get("count"),
+                request.get("displayOwnEvents"),
+                request.get("displayMinorEvents"),
+                request.get("displaySystemEvents"),
+                request.get("displayReadEvents"),
+                request.get("displayReadStatus")
+        );
     }
 
     private void dontUseUserPreferences(String pages, String spaces, String wikis, String users,

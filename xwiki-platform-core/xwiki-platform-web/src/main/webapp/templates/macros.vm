@@ -1685,7 +1685,7 @@ function (row, i, table) {
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
-  if (row['doc_title_computed']) {
+  if (row['doc_title_raw'] !== undefined) {
     $($jsontool.serialize("${divid}-computed-title-docs")).removeClassName('hidden');
   }
   ## NOTE: Don't use Velocity code below this line!
@@ -1773,7 +1773,7 @@ function (row, i, table) {
         if (fieldName === 'doc_name' && !row['doc_viewable']) {
           text += '*';
         }
-        if (fieldName === 'doc_title' && row['doc_title_computed']) {
+        if (fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
           container.addClassName('docTitleComputed');
         }
         container.update(text.escapeHTML());

@@ -21,17 +21,19 @@ package org.xwiki.store;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for FileDeleteTransactionRunnable
@@ -43,7 +45,9 @@ public class FileSaveTransactionRunnableTest
 {
     private static final String[] FILE_PATH = { "path", "to", "file" };
 
-    private File storageLocation;
+    private static final String CONTENT_VERSION1 = "Version1";
+
+    private static final String CONTENT_VERSION2 = "Version2";
 
     private File toSave;
 
@@ -57,13 +61,13 @@ public class FileSaveTransactionRunnableTest
 
     private FileSaveTransactionRunnable runnable;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        this.storageLocation = new File(tmpDir, "test-storage" + System.identityHashCode(this.getClass()));
+        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
+        File storageLocation = new File(testDirectory, "test-storage" + System.identityHashCode(this.getClass()));
 
-        this.toSave = this.storageLocation;
+        this.toSave = storageLocation;
         for (int i = 0; i < FILE_PATH.length; i++) {
             this.toSave = new File(this.toSave, FILE_PATH[i]);
         }
@@ -71,153 +75,150 @@ public class FileSaveTransactionRunnableTest
         this.backup = new File(this.toSave.getParentFile(), FILE_PATH[FILE_PATH.length - 1] + "~bak");
 
         this.toSave.getParentFile().mkdirs();
-        IOUtils.write("Version1", new FileOutputStream(this.toSave));
-        IOUtils.write("HAHA I am here to trip you up!", new FileOutputStream(this.temp));
-        IOUtils.write("I am also here to trip you up!", new FileOutputStream(this.backup));
+        FileUtils.write(this.toSave, CONTENT_VERSION1, StandardCharsets.UTF_8);
+        FileUtils.write(this.temp, "HAHA I am here to trip you up!", StandardCharsets.UTF_8);
+        FileUtils.write(this.backup, "I am also here to trip you up!", StandardCharsets.UTF_8);
 
         this.lock = new ReentrantReadWriteLock();
 
-        this.provider = new StreamProvider()
-        {
-            public InputStream getStream()
-            {
-                return new ByteArrayInputStream("Version2".getBytes());
-            }
-        };
+        this.provider = () -> new ByteArrayInputStream(CONTENT_VERSION2.getBytes());
 
-        this.runnable = new FileSaveTransactionRunnable(this.toSave,
-            this.temp,
-            this.backup,
-            this.lock,
-            this.provider);
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        recursiveDelete(this.storageLocation);
+        this.runnable = new FileSaveTransactionRunnable(this.toSave, this.temp, this.backup, this.lock, this.provider);
     }
 
     @Test
     public void simpleTest() throws Exception
     {
-        Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
 
         this.runnable.start();
 
-        Assert.assertFalse(this.backup.exists());
-        Assert.assertFalse(this.temp.exists());
-        Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version2");
+        assertFalse(this.backup.exists());
+        assertFalse(this.temp.exists());
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION2);
     }
 
     @Test
     public void rollbackAfterPreRunTest() throws Exception
     {
-        Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
 
         // After preRun(), before run.
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
-                Assert.assertFalse("Temp file was not cleared in preRun.", temp.exists());
-                Assert.assertFalse("Backup file was not cleared in preRun.", backup.exists());
+                assertFalse(temp.exists(), "Temp file was not cleared in preRun.");
+                assertFalse(backup.exists(), "Backup file was not cleared in preRun.");
+
                 throw new Exception("Simulate something going wrong.");
             }
         };
+
         final StartableTransactionRunnable str = new StartableTransactionRunnable();
         failRunnable.runIn(str);
         runnable.runIn(str);
         this.validateRollback(str);
 
-        Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
     }
 
     @Test
     public void rollbackAfterRunTest() throws Exception
     {
-        Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
 
         // After run() before onCommit()
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
-                Assert.assertTrue("Content was not saved to temp file.", temp.exists());
+                assertTrue(temp.exists(), "Content was not saved to temp file.");
+
                 throw new Exception("Simulate something going wrong.");
             }
         };
+
         final StartableTransactionRunnable str = new StartableTransactionRunnable();
         runnable.runIn(str);
         failRunnable.runIn(str);
-        this.validateRollback(str);
+        validateRollback(str);
+    }
+
+    @Test
+    public void rollbackAfterFailedCommit() throws Exception
+    {
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+
+        // Make the temp rename fail
+        this.temp = new File(this.temp.getPath())
+        {
+            @Override
+            public boolean renameTo(File dest)
+            {
+                throw new SecurityException("Simulate failing rename");
+            }
+        };
+        this.runnable = new FileSaveTransactionRunnable(this.toSave, this.temp, this.backup, this.lock, this.provider);
+
+        final StartableTransactionRunnable str = new StartableTransactionRunnable();
+        runnable.runIn(str);
+        validateRollback(str);
     }
 
     @Test
     public void saveWithNonexistantOriginalTest() throws Exception
     {
         this.toSave.delete();
-        Assert.assertFalse(this.toSave.exists());
+        assertFalse(this.toSave.exists());
 
         this.runnable.start();
 
-        Assert.assertTrue(this.toSave.exists());
-        Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version2");
+        assertTrue(this.toSave.exists());
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION2);
 
-        Assert.assertFalse(this.temp.exists());
-        Assert.assertFalse(this.backup.exists());
+        assertFalse(this.temp.exists());
+        assertFalse(this.backup.exists());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void rollbackWithNonexistantOriginalTest() throws Exception
     {
         this.toSave.delete();
-        Assert.assertFalse(this.toSave.exists());
+        assertFalse(this.toSave.exists());
 
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
-                Assert.assertFalse(backup.exists());
-                Assert.assertTrue(temp.exists());
-                Assert.assertFalse(toSave.exists());
+                assertFalse(backup.exists());
+                assertTrue(temp.exists());
+                assertFalse(toSave.exists());
                 throw new Exception("Simulate something going wrong.");
             }
         };
-        try {
-            final StartableTransactionRunnable str = new StartableTransactionRunnable();
-            runnable.runIn(str);
-            failRunnable.runIn(str);
-            str.start();
-        } catch (Exception e) {
-            Assert.assertFalse(this.toSave.exists());
-            Assert.assertFalse(this.temp.exists());
-            Assert.assertFalse(this.backup.exists());
-            throw e;
-        }
+
+        final StartableTransactionRunnable str = new StartableTransactionRunnable();
+        runnable.runIn(str);
+        failRunnable.runIn(str);
+        Exception exception = assertThrows(Exception.class, () -> str.start());
+
+        assertFalse(this.toSave.exists());
+        assertFalse(this.temp.exists());
+        assertFalse(this.backup.exists());
     }
 
     private void validateRollback(final StartableTransactionRunnable tr) throws Exception
     {
-        try {
-            tr.start();
-            Assert.fail("TransactionRunnable#start() did not throw the exception thrown by run.");
-        } catch (Exception expected) {
-        }
-        Assert.assertTrue(this.toSave.exists());
-        Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
-        Assert.assertFalse(this.temp.exists());
-        Assert.assertFalse(this.backup.exists());
-    }
+        assertThrows(Exception.class, () -> tr.start(),
+            "TransactionRunnable#start() did not throw the exception thrown by run.");
 
-    private static void recursiveDelete(final File toDelete) throws Exception
-    {
-        if (toDelete.isDirectory()) {
-            final File[] children = toDelete.listFiles();
-            for (int i = 0; i < children.length; i++) {
-                recursiveDelete(children[i]);
-            }
-        }
-        toDelete.delete();
+        assertTrue(this.toSave.exists());
+        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+        assertFalse(this.temp.exists());
+        assertFalse(this.backup.exists());
     }
 }

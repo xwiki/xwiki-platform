@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>### Macro "watchlist"
 rendering.macro.watchlist.name=Vērojumu saraksts
-rendering.macro.watchlist.description=Rādīt jūsu vērojumu saturu
+rendering.macro.watchlist.description=Rādīt jūsu vērojumu saturu.
 
 ### XWiki.WatchListClass
 XWiki.WatchListClass_interval_realtime=Reāllaikā

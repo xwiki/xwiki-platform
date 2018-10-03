@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.ActivityBridgeMacro" locale="">
-  <web>XWiki.Notifications.Code</web>
-  <name>ActivityBridgeMacro</name>
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Legacy.ActivityMacro" locale="">
+  <web>XWiki.Notifications.Code.Legacy</web>
+  <name>ActivityMacro</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -31,14 +31,14 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>ActivityBridgeMacro</title>
+  <title>ActivityMacro</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{activity /}}</content>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>831c5621-cfbe-4104-8da9-dad3ed6e9fe0</guid>
@@ -171,13 +171,13 @@
       <defaultCategory>Notifications</defaultCategory>
     </property>
     <property>
-      <description>Create a bridge between the deprecated Activity Stream to the new Notifications module.</description>
+      <description>Provide a macro implemented with the Notifications Application to keep a backward compatibility with Activity Stream.</description>
     </property>
     <property>
       <id>activity</id>
     </property>
     <property>
-      <name>Activity (deprecated)</name>
+      <name>Activity (legacy)</name>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -187,7 +187,7 @@
     </property>
   </object>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>0</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>e944a523-af56-45a9-8129-557a8ebb9e41</guid>
@@ -253,7 +253,7 @@
     </property>
   </object>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>1</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>3e8c53c3-7378-49ab-91fc-f348d959be97</guid>
@@ -319,7 +319,7 @@
     </property>
   </object>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>2</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>bb0a3d5b-5ea6-4ef4-8a14-98bf254129bb</guid>
@@ -385,7 +385,7 @@
     </property>
   </object>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>3</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>14fdf648-33b1-4143-8e07-07f3587f5fcc</guid>
@@ -451,7 +451,7 @@
     </property>
   </object>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>4</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>e259a0cd-2055-4ce1-a805-6bb0f6d6289f</guid>
@@ -517,7 +517,7 @@
     </property>
   </object>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>5</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>4dab81d0-2916-483a-abfc-a33c533f260f</guid>
@@ -583,7 +583,7 @@
     </property>
   </object>
   <object>
-    <name>XWiki.Notifications.Code.ActivityBridgeMacro</name>
+    <name>XWiki.Notifications.Code.Legacy.ActivityMacro</name>
     <number>6</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>319405a6-629e-4a32-aadc-e83b421d42db</guid>

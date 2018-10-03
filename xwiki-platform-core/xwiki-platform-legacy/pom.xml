@@ -42,6 +42,7 @@
     <module>xwiki-platform-legacy-annotation</module>
     <module>xwiki-platform-legacy-instance</module>
     <module>xwiki-platform-legacy-model</module>
+    <module>xwiki-platform-legacy-notification-activitymacro</module>
     <module>xwiki-platform-legacy-observation</module>
     <module>xwiki-platform-legacy-office-importer</module>
     <module>xwiki-platform-legacy-oldcore</module>

@@ -46,66 +46,10 @@
   $doc.use($obj)
   #set($isMyProfile = ($xcontext.user == $doc.fullName))
   #if ($isMyProfile &amp;&amp; "$!services.notification.watch" != '')
-  
+
     {{notifications displayWatchedUsersOnly="true"}}
-  
-  #elseif ($isMyProfile &amp;&amp; $hasWatch)
-    #set($followedUsers = $services.watchlist.getWatchedElements("USER"))
-    ## FIXME: This is an ugly workaround for an even uglier bug in the watchlist
-    ##        plugin: the first item in the list is an empty string
-    #if ($followedUsers.size() &gt; 0 &amp;&amp; "$!followedUsers.get(0)" == '')
-      #set ($discard = $followedUsers.remove(0))
-    #end
-    {{html clean="false" wiki="true"}}
-    #set($username = $xwiki.getUserName($doc.fullName, false))
-    $xwiki.ssx.use("XWiki.XWikiUserSheet")##
-    $xwiki.ssx.use("XWiki.XWikiUserProfileSheet")##
-    $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet")##
-    &lt;div class="half column"&gt;
-      &lt;div class="following profile-section highlighted-profile-section"&gt;
-        ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
-        #if (!$followedUsers || $followedUsers.size() == 0)
-          $services.localization.render('platform.core.profile.section.following.none')
-        #else
-          &lt;ul&gt;
-          #set ($authorsParam = $services.model.serialize($services.model.resolveDocument($xcontext.user), 'default'))
-          #foreach ($followedUser in $followedUsers)
-            #set ($userDocument = $xwiki.getDocument($followedUser))
-            ## Prepare the list of followed users as it appears in the activity macro parameter
-            ## (do it here to avoid another foreach loop later)
-            #set ($authorsParam = "$!{authorsParam},${userDocument.prefixedFullName}")
-            ## Display the user info
-            &lt;li class="vcard"&gt;
-            #set ($userID = $userDocument.name)
-            #smallUserAvatar($followedUser)
-            &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
-            &lt;span class="userstatus-follow"&gt;
-              #set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
-              &lt;a class="action unfollow" href="$userDocument.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")" title="$services.localization.render('xe.activity.messages.unfollow')"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
-            &lt;/span&gt;
-            &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-            &lt;/li&gt;
-          #end
-          &lt;/ul&gt;
-        #end
-      &lt;/div&gt;
-    &lt;/div&gt;
-    #if ($followedUsers.size() &gt; 0)
-      &lt;div class="half column"&gt;
-        &lt;div class="networkActivity profile-section"&gt;
-          &lt;h1&gt;$services.localization.render('platform.core.profile.section.networkActivity')&lt;/h1&gt;
-    {{/html}}
 
-{{activity authors="$!{authorsParam}" /}}
-
-    {{html clean="false"}}
-        &lt;/div&gt;
-      &lt;/div&gt;
-    #end## $followedUsers.size() &gt; 0
-    &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-    {{/html}}##
-  #end## isMyProfile &amp;&amp; $isMessageStreamActive &amp;&amp; $hasWatch
+  #end
 #end## User object exists
 {{/velocity}}</content>
   <object>

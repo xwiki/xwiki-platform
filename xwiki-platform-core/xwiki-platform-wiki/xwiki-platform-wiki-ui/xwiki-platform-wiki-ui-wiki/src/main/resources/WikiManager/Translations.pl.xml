@@ -130,7 +130,7 @@ admin.xwiki.manageworkspace.description=Zarządzanie ustawieniami takimi jak naz
 admin.xwiki.workspaceusers.description=Zarządzanie członkami wiki: dodawanie, usuwanie, zapraszanie, akceptowanie i odrzucanie członków wiki.
 admin.xwiki.usersconfiguration.title=Konfiguracja
 admin.xwiki.members.title=Aktualni członkowie
-### Missing: admin.xwiki.users.title=All Users
+admin.xwiki.users.title=Wszyscy uytkownicy
     
 # DRAWER ITEM
 platform.wiki.drawer.homeWiki=Główna

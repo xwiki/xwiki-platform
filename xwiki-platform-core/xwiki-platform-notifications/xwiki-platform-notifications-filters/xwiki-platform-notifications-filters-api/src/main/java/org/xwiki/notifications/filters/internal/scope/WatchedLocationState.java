@@ -26,6 +26,7 @@ import java.util.Date;
  *
  * @version $Id$
  * @since 10.9RC1
+ * @since 10.8.1
  */
 public class WatchedLocationState
 {

@@ -78,7 +78,7 @@ public class ScopeNotificationFilterLocationStateComputer
 
         if (preferences.isEmpty()) {
             // If there is no filter preference, then the location is watched (no filter = we get everything)
-            return new WatchedLocationState(false);
+            return new WatchedLocationState(true);
         }
 
         WatchedState state = handleExclusiveFilters(location, preferences);

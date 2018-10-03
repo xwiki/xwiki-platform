@@ -175,16 +175,13 @@ require([
         });
 
         /**
-         * This function is called recursively to process each parent node in order to built properly the list of list
-         * of pages to includes (i.e. pages parameter of export) and pages to excludes (i.e. excludes parameter of
-         * export).
-         * FTR the parameters are ordered as the first element of pages is linked to the first element of excludes.
+         * This function is called recursively to process each parent node in order to built properly the map of pages
+         * to include and exclude.
          *
          * @param rootNode: the parent node to process
-         * @param arrayOfPages: a list of list of pages to includes
-         * @param arrayOfExcludes: a list of list of pages to excludes relatively to their included pages
+         * @param exportPages: a map of list, keys are pages to include, values are list of pages to exclude
          */
-        var processLevel = function(rootNode, arrayOfPages, arrayOfExcludes) {
+        var processLevel = function(rootNode, exportPages) {
 
           // set default value for pagination
           var isPaginationExisting = false;
@@ -262,23 +259,20 @@ require([
           // if we don't have a pagination node, or we have one and it's checked:
           // we manage the export with exporting the space and excluding stuff that needs to be
           if (!isPaginationExisting || (isPaginationExisting && isPaginationChecked)) {
-            includedPages = [ pageJoker ];
-            arrayOfPages.push(pageJoker);
-            arrayOfExcludes.push(excludedPages);
+            exportPages[pageJoker] = excludedPages;
 
           // a pagination exists but it's not checked:
-          // we need to manage the export by specifying exactly what we includes, we don't need to specify excludes
+          // we need to manage the export by specifying exactly what we include, we don't need to specify exclude
           } else {
             includedPages.forEach(function (elem) {
-                arrayOfPages.push(elem);
-                arrayOfExcludes.push([]);
+                exportPages[elem] = [];
               }
             );
           }
 
           // we call the same function for the children
           nodeWithChildren.forEach(function (node) {
-            processLevel(node, arrayOfPages, arrayOfExcludes);
+            processLevel(node, exportPages);
           });
         };
 
@@ -290,8 +284,7 @@ require([
           event.preventDefault();
           var button = $(this);
           var url = button.data('url').clone();
-          var pages = [];
-          var excludes = [];
+          var exportPages = {};
 
           // by default the pages URL attribute is empty
           if (url.params !== undefined) {
@@ -304,8 +297,8 @@ require([
           var rootNodeId = treeReference.get_node("#").children[0];
           var rootNode = treeReference.get_node(rootNodeId);
 
-          // process starting by the rootNode and build arrays of pages and excludes
-          processLevel(rootNode, pages, excludes);
+          // process starting by the rootNode and build map of pages
+          processLevel(rootNode, exportPages);
 
           // useful to create quickly the right String given an array of page names
           var aggregatePageNames = function (arrayOfNames) {
@@ -317,21 +310,19 @@ require([
           $("input[name='excludes']").remove();
 
           // create on the fly the hidden inputs
-          pages.forEach(function (elem) {
+          for (var pages in exportPages) {
             $('<input>').attr({
               type: 'hidden',
               name: 'pages',
-              value: elem
+              value: pages
             }).appendTo(form);
-          });
 
-          excludes.forEach(function (elem) {
             $('<input>').attr({
               type: 'hidden',
               name: 'excludes',
-              value: aggregatePageNames(elem)
+              value: aggregatePageNames(exportPages[pages])
             }).appendTo(form);
-          });
+          }
 
           // put the right action for the form
           form.attr('action', url.serialize());

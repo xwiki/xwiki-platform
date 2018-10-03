@@ -32,6 +32,7 @@ import org.xwiki.test.ui.po.BaseModal;
 public class ExportModal extends BaseModal
 {
     private static final String EXPORT_MODAL_ID = "exportModal";
+    private static final String OTHER_FORMAT_PANE_LINK = "Other Formats";
 
     /**.
      * Simple constructor.
@@ -48,8 +49,8 @@ public class ExportModal extends BaseModal
      */
     public OtherFormatPane openOtherFormatPane()
     {
-        getDriver().findElementByLinkText("Other Formats").click();
-        getDriver().waitUntilElementIsVisible(By.id(("export-form")));
+        getDriver().findElementByLinkText(OTHER_FORMAT_PANE_LINK).click();
+        getDriver().waitUntilElementIsVisible(By.id((OtherFormatPane.FORM_ID)));
         return new OtherFormatPane();
     }
 

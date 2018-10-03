@@ -88,18 +88,10 @@ public class ExportAction extends XWikiAction
      */
     private class ExportArguments {
         /**
-         * All patterns that have to be included in the request
-         *
-         * Warning: order of the arguments matters, it's linked with excludedPages
+         * Represent the pages to be included and excluded:
+         * keys are pattern of pages to include, values are list of pages to exclude
          */
-        private List<String> includedPages;
-
-        /**
-         * All patterns that have to be excluded in the request
-         *
-         * Warning: order matters! They might be related to the includedPages
-         */
-        private List<List<String>> excludedPages;
+        private Map<String, List<String>> exportPages;
 
         /**
          * Name of the export
@@ -123,39 +115,23 @@ public class ExportAction extends XWikiAction
             }
 
             String[] pages = request.getParameterValues("pages");
-
             String[] excludes = request.getParameterValues("excludes");
 
-            this.includedPages = Arrays.asList(pages);
-            this.excludedPages = this.extractArguments(excludes, context);
+            this.exportPages = new HashMap<>();
 
-            if (!this.excludedPages.isEmpty() && this.includedPages.size() < this.excludedPages.size()) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
-                    "You cannot have more excludes argument than pages argument. See the export documentation.");
-            }
-        }
+            if (pages != null) {
+                for (int i = 0; i < pages.length; i++) {
+                    List<String> excludedPages;
 
-        /**
-         * Build a list of list based on the given array of arguments: each element of this array should contain
-         * a value that is URIEncoded, and should use the {@link #PAGE_SEPARATOR} to separate its element.
-         *
-         * @param args the array of argument to process.
-         * @param context the context used to know the character encoding.
-         * @return a list of list of String, built by splitting each element of the given array.
-         * See also {@link #decodePages(String, XWikiContext)}.
-         * @throws XWikiException See {@link #decodePages(String, XWikiContext)}.
-         */
-        private List<List<String>> extractArguments(String[] args, XWikiContext context) throws XWikiException
-        {
-            List<List<String>> result = new ArrayList<>();
+                    if (excludes != null && i < excludes.length) {
+                        excludedPages = this.decodePages(excludes[i], context);
+                    } else {
+                        excludedPages = Collections.emptyList();
+                    }
 
-            if (args != null) {
-                for (String arg : args) {
-                    result.add(this.decodePages(arg, context));
+                    this.exportPages.put(pages[i], excludedPages);
                 }
             }
-
-            return result;
         }
 
         /**
@@ -280,23 +256,16 @@ public class ExportAction extends XWikiAction
         List<DocumentReference> pageList = new ArrayList<>();
 
         // if there's no includedPages, the default is to return the current document
-        if (arguments.includedPages.isEmpty()) {
+        if (arguments.exportPages.isEmpty()) {
             pageList.add(context.getDoc().getDocumentReference());
 
         // else we process the list of included/excluded pages
         } else {
             Map<String, Object[]> wikiQueries = new HashMap<>();
 
-            for (int i = 0; i < arguments.includedPages.size(); i++) {
-                String includePage = arguments.includedPages.get(i);
-
-                // excludedPages are optional
-                List<String> excludedPages = Collections.emptyList();
-
-                // you might have excludedPages only for the first includes
-                if (i < arguments.excludedPages.size()) {
-                    excludedPages = arguments.excludedPages.get(i);
-                }
+            for (Map.Entry<String, List<String>> export : arguments.exportPages.entrySet()) {
+                String includePage = export.getKey();
+                List<String> excludedPages = export.getValue();
 
                 String wikiName = this.extractWikiName(includePage, context);
 
@@ -447,7 +416,7 @@ public class ExportAction extends XWikiAction
 
         ExportArguments exportArguments = new ExportArguments(context);
 
-        boolean all = exportArguments.includedPages.isEmpty();
+        boolean all = exportArguments.exportPages.isEmpty();
 
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");

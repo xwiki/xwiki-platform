@@ -24,10 +24,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +117,7 @@ public class ExportAction extends XWikiAction
             String[] pages = request.getParameterValues("pages");
             String[] excludes = request.getParameterValues("excludes");
 
-            this.exportPages = new HashMap<>();
+            this.exportPages = new LinkedHashMap<>();
 
             if (pages != null) {
                 for (int i = 0; i < pages.length; i++) {

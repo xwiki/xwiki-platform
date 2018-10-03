@@ -123,14 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Jeśli właczone, wszystkie zewnętrz
 platform.wiki.currentwiki.invite.username.hint=Nazwa użytkownika do dodania
 platform.wiki.currentwiki.invite.message.hint=Wiadomość która zostanie wysłana użytkownikowi.
 platform.wiki.currentwiki.candidates.hint=Użytkownicy którzy zapytali o zaproszenie lub zostali zaproszeni do wiki.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=Brak użytkowników, którzy poprosili o dostęp lub zostali zaproszeni do dołączenia do tej wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Zarządzanie ustawieniami takimi jak nazwa wiki, opis, właściciel, typ członkostwa
 admin.xwiki.workspaceusers.description=Zarządzanie członkami wiki: dodawanie, usuwanie, zapraszanie, akceptowanie i odrzucanie członków wiki.
 admin.xwiki.usersconfiguration.title=Konfiguracja
 admin.xwiki.members.title=Aktualni członkowie
-admin.xwiki.users.title=Wszyscy uytkownicy
+admin.xwiki.users.title=Wszyscy użytkownicy
     
 # DRAWER ITEM
 platform.wiki.drawer.homeWiki=Główna

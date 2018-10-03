@@ -1,12 +1,41 @@
 ###
 ### Rename document template
 ###
+
+## Check if renaming is forced
+#set ($session = $request.session)
+#set ($sessionAttributeName = 'force_rename_' + $doc.prefixedFullName)
+#set ($renameForced = $session.getAttribute($sessionAttributeName))
+#if (!$renameForced && "$!request.get('force')" != '')
+  #set($renameForced = true)
+  #set($void = $session.setAttribute($sessionAttributeName, $renameForced))
+#end
+
+#macro (getDocumentsWithUsedClass $spaceReference $return)
+  #set ($isDirectChild = 'doc.space = :space')
+  #set ($isIndirectChild = "doc.space like :spacePrefix escape '/'")
+  #set ($containClass = "doc.fullName = obj.className")
+  #set ($queryContent = ",BaseObject as obj where $containClass and ($isDirectChild or $isIndirectChild)")
+  #set ($query = $services.query.hql($queryContent))
+  #set ($query = $query.setWiki($spaceReference.wikiReference.name))
+  #set ($localSpaceReference = $services.model.serialize($spaceReference, 'local'))
+  #set ($query = $query.bindValue('space', $localSpaceReference))
+  #set ($spacePrefix = $localSpaceReference.replaceAll('([%_/])', '/$1'))
+  #set ($query = $query.bindValue('spacePrefix', "${spacePrefix}.%"))
+  #set ($return = $NULL)
+  #setVariable("$return" $query.execute())
+#end
+
+#set ($spaceReference = $doc.documentReference.parent)
+#getDocumentsWithUsedClass($spaceReference $docsWithUsedClass)
+
 #if (!$xwiki.checkAccess($doc.fullName, 'delete') && "$!request.renameId" == '')
   #template("accessdenied.vm")
 #elseif ($xcontext.action == 'get' && "$!request.renameId" != '')
   ## AJAX request for rename status update.
   #template("renameStatus.vm")
-#else
+## There is no class being used or renaming is forced
+#elseif ($docsWithUsedClass.isEmpty() || $renameForced)
   #template("startpage.vm")
   #if ("$!step" == '')
     #set ($step = "$!request.step")
@@ -14,6 +43,7 @@
       #set ($step = '1')
     #end
   #end
+
   <div class="main layoutsubsection">
   <div id="mainContentArea">
     #if ("$!request.renameId" != '')
@@ -82,6 +112,46 @@
     #end
     <div class="clearfloats"></div>
   </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+
+## There is class being used and renaming not forced
+#else
+  #template("startpage.vm")
+  <div class="main">
+    <div id="mainContentArea">
+    ##
+      $response.setStatus(423)
+      #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
+      + '&amp;force=1')
+      #set($forceRenameURL = $tdoc.getURL($xcontext.getAction(), ${newquerystring}))
+
+      #if ($isAdvancedUser)
+        #set($boxTitle = 'notice')
+        #set($boxContent = 'extension.xar.renamewarning')
+      #else
+        #set($boxTitle = 'error')
+        #set($boxContent = 'extension.xar.renamedeny')
+      #end
+
+      #xwikimessageboxstart($services.localization.render($boxTitle) $services.localization.render($boxContent))
+
+      #if ($isAdvancedUser)
+        <ul>
+          #foreach($docWithUsedClass in $docsWithUsedClass)
+            <li>$docWithUsedClass</li>
+          #end
+        </ul>
+      #end
+
+      #if ($isAdvancedUser)
+        <p><a href="$forceRenameURL">$services.localization.render('forcelock')</a><p>
+      #else
+        $response.setStatus(403) ## forbidden
+      #end
+      #xwikimessageboxend()
+    ##
+    </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

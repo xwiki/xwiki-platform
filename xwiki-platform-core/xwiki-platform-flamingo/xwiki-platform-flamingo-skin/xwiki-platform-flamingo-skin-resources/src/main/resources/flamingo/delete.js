@@ -12,6 +12,12 @@ require.config({
   }
 });
 require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
+  // prevent the user from leaving the delete
+  $(window).on("beforeunload", function(e) {
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
   $(document).ready(function() {
     var progressBar = $('#delete-progress-bar');
     var jobId = progressBar.data('job-id');
@@ -108,6 +114,10 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         // Called when the user click on "delete"
         $('.btConfirmDelete').click(function(event){
           event.preventDefault();
+
+          // we don't ask again the user to confirm he's leaving the page
+          $(window).off("beforeunload");
+
           /*jshint camelcase:false */
 	        // Get the selection
           var selectedNodes = $('.deleteTree').jstree().get_selected(true);
@@ -139,6 +149,9 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         // Called when the user click on "cancel"
         $('.btCancelDelete').click( function(event) {
           event.preventDefault();
+
+          // we don't ask again the user to confirm he's leaving the page
+          $(window).off("beforeunload");
           $('.btConfirmDelete').prop('disabled', 'disabled');
           var notif = new XWiki.widgets.Notification(
             "$escapetool.javascript($services.localization.render('core.delete.warningExtensions.canceling'))",

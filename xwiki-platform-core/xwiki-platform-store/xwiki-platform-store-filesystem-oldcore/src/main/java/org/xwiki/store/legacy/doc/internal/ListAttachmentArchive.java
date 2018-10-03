@@ -85,12 +85,12 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     public ListAttachmentArchive(final List<XWikiAttachment> revisions)
     {
         // Empty list:
-        if (revisions.size() == 0) {
+        if (revisions.isEmpty()) {
             return;
         }
 
         this.revisions.addAll(revisions);
-        Collections.sort(this.revisions, XWikiAttachmentVersionComparitor.INSTANCE);
+        Collections.sort(this.revisions, XWikiAttachmentVersionComparator.INSTANCE);
 
         // Sanity check, all revisions should have the same ID.
         long id = revisions.get(0).getId();
@@ -338,15 +338,14 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     /**
-     * A comparitor which compares attachments by version number.
+     * A comparator which compares attachments by version number.
      */
-    private static class XWikiAttachmentVersionComparitor implements Comparator<XWikiAttachment>
+    private static class XWikiAttachmentVersionComparator implements Comparator<XWikiAttachment>
     {
         /**
          * A single instance to use instead of constructing one each time.
          */
-        public static final XWikiAttachmentVersionComparitor INSTANCE =
-            new XWikiAttachmentVersionComparitor();
+        public static final XWikiAttachmentVersionComparator INSTANCE = new XWikiAttachmentVersionComparator();
 
         @Override
         public int compare(final XWikiAttachment a, final XWikiAttachment b)

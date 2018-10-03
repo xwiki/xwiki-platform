@@ -230,6 +230,11 @@ rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher un
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Afficher uniquement les événements créés par une liste d'utilisateurs donnés (si vide, la liste des utilisateurs suivis par l'utilisateur actuel sera utilisée).
 rendering.macro.notifications.parameter.displayRSSLink.name=Afficher le lien RSS
 rendering.macro.notifications.parameter.displayRSSLink.description=Affiche un lien vers le flux RSS de la macro courante.
+rendering.macro.notifications.parameter.tags.name=Étiquettes
+### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
+
+rendering.macro.activity.name=Activité (deprecated)
+### Missing: rendering.macro.activity.description=Create a bridge between the deprecated Activity Stream to the new Notifications module.
 
 ## Notifications Macro
 notifications.macro.noWatchedUsers=Vous ne suivez personne.

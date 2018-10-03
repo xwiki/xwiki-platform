@@ -90,8 +90,7 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
         }
 
         DocumentReference documentReference = documentReferenceResolver.resolve(reference, EntityType.DOCUMENT);
-        PropertyValue propertyValue =
-            this.getValueFromQueryResult(documentReference, getPropertyDefinition(propertyReference));
+        PropertyValue propertyValue = super.getValue(propertyReference, documentReference);
         if (propertyValue != null) {
             propertyValue.setValue(reference);
         }

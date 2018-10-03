@@ -49,7 +49,7 @@ public interface ClassPropertyValuesProvider
         throws XWikiRestException;
 
     /**
-     * Provides the document specified by the filter as a property value.
+     * Resolves the given raw value into a {@link PropertyValue} of the specified class property.
      *
      * @param propertyReference the property to provide the value for
      * @param rawValue raw value used to resolve the property value

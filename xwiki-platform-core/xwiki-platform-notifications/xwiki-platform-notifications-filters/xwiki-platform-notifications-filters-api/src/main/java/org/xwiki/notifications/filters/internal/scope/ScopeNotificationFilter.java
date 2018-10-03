@@ -76,9 +76,20 @@ public class ScopeNotificationFilter implements NotificationFilter
             return FilterPolicy.NO_EFFECT;
         }
 
-        // We dismiss the event if the location is not watched
-        return !stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format)
-                ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
+        // We dismiss the event if the location is not watched or if the starting date of the location is after
+        // the date of the event.
+        // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long and
+        // used to generate stack overflows. So we won't make it worse by adding a date condition on each different
+        // scope preference.
+        WatchedLocationState state
+                = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format);
+        if (!state.isWatched()
+                || (state.getStartingDate() != null && state.getStartingDate().after(event.getDate()))) {
+            return FilterPolicy.FILTER;
+        }
+
+        // Otherwise, we have nothing to say
+        return FilterPolicy.NO_EFFECT;
     }
 
     @Override

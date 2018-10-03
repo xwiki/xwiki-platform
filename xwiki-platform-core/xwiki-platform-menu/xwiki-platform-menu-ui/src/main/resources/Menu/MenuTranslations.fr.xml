@@ -77,14 +77,14 @@ menu.uix.scope.hint=Choix du contexte d'affichage du menu.
 
 # Menu Macro
 rendering.macro.menu.name=Menu
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+rendering.macro.menu.description=Affiche un menu créé en utilisant une syntaxe wiki simple (listes imbriquées et liens).
 rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+rendering.macro.menu.parameter.id.description=Identifiant de menu optionnel qui sera lié à l'élément html qui englobe le menu. Vous pouvez utiliser cet identifiant dans du code JavaScript pour accéder au menu DOM, ou dans des tests fonctionnels pour vérifier les éléments du menu.
 rendering.macro.menu.parameter.type.name=Type
 rendering.macro.menu.parameter.type.description=Le type de menu (optionnel) détermine l'apparence et le comportement du menu. Valeurs possibles : horizontal (valeur par défaut) et vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+rendering.macro.menu.content.description=Définit la structure du menu en utilisant la syntaxe wiki. Chaque élément du menu devrait être un élément de liste, et devrait contenir l'étiquette du menu ou un lien. Vous pouvez utiliser des listes imbriquées pour les sous-menus.
 
 # Menu WebHome
-menu.description=Ceci est une application simple qui vous permet de créer des menus de navigation à afficher horizontalement comme une barre supérieure après l'en-tête de page ou verticalement dans un panneau latéral.
+menu.description=Ceci est une application simple qui vous permet de créer des menus de navigation à afficher soit horizontalement comme une barre supérieure après l'en-tête de page, soit verticalement dans un panneau latéral.
 </content>
 </xwikidoc>

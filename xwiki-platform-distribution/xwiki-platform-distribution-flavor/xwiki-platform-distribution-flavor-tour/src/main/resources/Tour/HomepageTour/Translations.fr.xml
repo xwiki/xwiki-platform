@@ -46,7 +46,7 @@ tour.homepageTour.breadcrumbs.title=Fil d'Ariane
 tour.homepageTour.breadcrumbs.contentA=Le fil d'Ariane permet d'identifier où la page courante se situe au sein du wiki. Ce fil permet aussi de naviguer dans la hiérarchie des pages.
 tour.homepageTour.breadcrumbs.contentB=Le bouton {0} vous ramène à la page d''accueil de votre Wiki.
 tour.homepageTour.pageContent.title=Contenu de la page
-tour.homepageTour.pageContent.contentA=C'est ici que le contenu propre à la page actuelle est affiché.
+tour.homepageTour.pageContent.contentA=C'est ici que le contenu de la page actuelle est affiché.
 tour.homepageTour.pageContent.contentB=Nous vous encourageons à modifier cette page pour y ajouter des tables, des listes, ou encore des macros...\n\nStructurez cette page d'accueil selon vos souhaits, afin d'organiser votre base de connaissance.
 tour.homepageTour.pageMenu.title=Menu de la page
 tour.homepageTour.pageMenu.contentA=Ce menu contient les actions liées à la page courante. Avec les droits appropriés vous pouvez modifier, créer, administrer et supprimer les pages.
@@ -57,7 +57,7 @@ tour.homepageTour.pageTabs.contentB=Vous pouvez aussi attacher des pièces joint
 tour.homepageTour.header.title=En-tête
 tour.homepageTour.header.contentA=Ce menu vous permet de faire des recherches dans le contenu du wiki, de voir vos notifications et d'accéder à votre profil utilisateur.
 tour.homepageTour.header.contentB=Le bouton {0} ouvre un tiroir contenant des actions liées à votre Wiki, comme l''administration ou l''index des pages.
-tour.homepageTour.tourComplete.title=La visite guidée est terminé
+tour.homepageTour.tourComplete.title=La visite guidée est terminée
 tour.homepageTour.tourComplete.contentA=C'est ainsi que s'achève votre visite guidée de l'interface XWiki et de ses principales fonctionnalités.
 tour.homepageTour.tourComplete.contentB=Pour plus d''informations, nous vous invitons à consulter la {0}documentation{1} officielle.
 </content>

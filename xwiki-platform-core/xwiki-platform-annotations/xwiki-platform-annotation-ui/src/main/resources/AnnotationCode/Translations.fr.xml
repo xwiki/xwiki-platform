@@ -72,11 +72,11 @@ annotations.action.create.selection.invalid=Merci de sélectionner du texte dans
 annotations.action.create.form.loaderror=Échec :
 annotations.action.create.success=Annotation ajoutée.
 annotations.action.create.loaderror=Échec :
-annotations.action.create.error.unauthorized=Vous n'êtes pas autorisés à annoter cette page.
-annotations.action.create.error.unauthorizedguest=Vous n'êtes pas autorisés à annoter ce document. Commencez par vous identifier.
+annotations.action.create.error.unauthorized=Vous n'êtes pas autorisé à annoter cette page.
+annotations.action.create.error.unauthorizedguest=Vous n'êtes pas autorisé à annoter ce document. Commencez par vous identifier.
 annotations.action.create.helpmessage=Pour annoter un texte, sélectionnez-le puis appuyez sur {0}.
 annotations.action.create.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents rédigés en syntaxe XWiki 1.0.
-annotations.action.create.error.notarget=L'annotation n'est associée à aucun document.
+annotations.action.create.error.notarget=Pas de cible (page) spécifiée pour créer une annotation.
 
 annotations.action.view.hide.text=masquer
 annotations.action.view.form.loaderror=Échec :

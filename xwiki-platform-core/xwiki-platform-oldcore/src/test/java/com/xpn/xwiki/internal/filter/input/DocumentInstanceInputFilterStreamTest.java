@@ -21,11 +21,10 @@ package com.xpn.xwiki.internal.filter.input;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
-import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.internal.filter.output.DocumentInstanceOutputFilterStream;
 
@@ -34,7 +33,6 @@ import com.xpn.xwiki.internal.filter.output.DocumentInstanceOutputFilterStream;
  * 
  * @version $Id$
  */
-@AllComponents
 public class DocumentInstanceInputFilterStreamTest extends AbstractInstanceInputFilterStreamTest
 {
     // Tests
@@ -43,7 +41,6 @@ public class DocumentInstanceInputFilterStreamTest extends AbstractInstanceInput
     public void testImportDocumentsPreserveVersion() throws FilterException, IOException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
-        outputProperties.setVersionPreserved(true);
         outputProperties.setVerbose(false);
 
         DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();

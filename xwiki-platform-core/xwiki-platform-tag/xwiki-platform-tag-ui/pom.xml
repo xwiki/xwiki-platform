@@ -41,7 +41,7 @@
     <!-- Needed when viewing individual tags -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activitystream-ui</artifactId>
+      <artifactId>xwiki-platform-notifications-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

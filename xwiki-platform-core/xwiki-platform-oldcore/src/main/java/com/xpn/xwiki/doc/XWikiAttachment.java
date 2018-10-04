@@ -288,27 +288,6 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @return the real size of the attachment extracted from the content, or the size metadata if the content cannot be
-     *         loaded. -1 if the size is unknown.
-     * @see #getLongSize()
-     * @since 9.11.8
-     * @since 10.8.1
-     * @since 10.9RC1
-     */
-    public long getLongSize(XWikiContext xcontext)
-    {
-        // Give priority to the real attachment size if the content is loaded (bulletproofing for any mistake in the
-        // metadata)
-        try {
-            loadAttachmentContent(xcontext);
-        } catch (XWikiException e) {
-            LOGGER.error("Failed to load content of attachment [{}]", getReference(), e);
-        }
-
-        return getLongSize();
-    }
-
-    /**
      * The size is automatically calculated from the attachment content so this method is mostly internal API that
      * should not be used.
      * 
@@ -351,7 +330,7 @@ public class XWikiAttachment implements Cloneable
             loadAttachmentContent(context);
         }
 
-        return this.content.getLongSize();
+        return this.content != null ? this.content.getLongSize() : -1;
     }
 
     public String getFilename()
@@ -1252,7 +1231,7 @@ public class XWikiAttachment implements Cloneable
     public boolean equalsData(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException
     {
         try {
-            if (getLongSize(xcontext) == otherAttachment.getLongSize(xcontext)) {
+            if (getContentLongSize(xcontext) == otherAttachment.getContentLongSize(xcontext)) {
                 InputStream is = getContentInputStream(xcontext);
 
                 try {

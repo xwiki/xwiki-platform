@@ -184,7 +184,7 @@ public class XWikiAttachmentContent implements Cloneable
                 internalContent = content;
             }
 
-            this.setContent(new ByteArrayInputStream(internalContent));
+            setContent(new ByteArrayInputStream(internalContent));
         } catch (IOException e) {
             throw new RuntimeException("Failed to copy data to storage.", e);
         }
@@ -326,12 +326,12 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * @return the true size of the content of the attachment.
+     * @return the true size of the content of the attachment. -1 if the size is unknown.
      * @since 9.0RC1
      */
     public long getLongSize()
     {
-        return this.file != null ? this.file.getSize() : 0;
+        return this.file != null ? this.file.getSize() : -1;
     }
 
     /**

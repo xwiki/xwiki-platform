@@ -42,6 +42,8 @@
         org.xwiki.platform:xwiki-enterprise-ui,
         org.xwiki.platform:xwiki-enterprise-ui-all
     </xwiki.extension.features>
+    <!-- We depend on legacy artifacts on purpose -->
+    <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
   </properties>
   <dependencies>
     <dependency>

@@ -20,7 +20,9 @@
 package org.xwiki.panels.internal;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,7 +32,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.uiextension.UIExtension;
@@ -95,24 +99,35 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
 
         // Verify that there's a panel configuration property defined, and if not don't return any panel extension.
         if (!StringUtils.isEmpty(panelConfigurationString)) {
-            List<String> panelSerializedReferences = new ArrayList<String>();
+            Set<DocumentReference> panelSerializedReferences = new HashSet<>();
             for (String serializedReference : getConfiguration().split(",")) {
-                panelSerializedReferences.add(serializer.serialize(resolver.resolve(serializedReference.trim())));
+                panelSerializedReferences.add(resolver.resolve(serializedReference.trim()));
             }
 
             try {
                 List<UIExtension> allExtensions =
                     contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
-                for (String panelSerializedReference : panelSerializedReferences) {
-                    // TODO: This is not performant and will not scale well when the number of UIExtension instances
-                    // increase in the wiki
-                    for (UIExtension extension : allExtensions) {
-                        // Resolve and serialize the extension id to make it absolute before we can compare it with
-                        // the serialized panel reference.
-                        String extensionId = serializer.serialize(resolver.resolve(extension.getId()));
-                        if (extensionId.equals(panelSerializedReference)) {
-                            panels.add(extension);
-                        }
+                // TODO: This is not performant and will not scale well when the number of UIExtension instances
+                // increase in the wiki
+                for (UIExtension extension : allExtensions) {
+                    DocumentReference extensionId;
+
+                    // We differentiate UIExtension implementations:
+                    //
+                    // - PanelWikiUIExtension and WikiUIExtension (i.e. WikiComponent): They point to a wiki page and we
+                    //   can use that page's reference.
+                    //
+                    // - For other implementations, we only support instance that have their id containing a document
+                    //   reference.
+                    if (extension instanceof WikiComponent) {
+                        WikiComponent wikiComponent = (WikiComponent) extension;
+                        extensionId = wikiComponent.getDocumentReference();
+                    } else {
+                        extensionId = resolver.resolve(extension.getId());
+                    }
+
+                    if (panelSerializedReferences.contains(extensionId)) {
+                        panels.add(extension);
                     }
                 }
             } catch (ComponentLookupException e) {

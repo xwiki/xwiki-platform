@@ -249,7 +249,7 @@
       </title>
     </class>
     <property>
-      <content>{{activity/}}</content>
+      <content>{{velocity}}{{notifications useUserPreferences="false" displayOwnEvents="true" wikis="$services.wiki.currentWikiId"/}}{{/velocity}}</content>
     </property>
     <property>
       <position>2,1</position>

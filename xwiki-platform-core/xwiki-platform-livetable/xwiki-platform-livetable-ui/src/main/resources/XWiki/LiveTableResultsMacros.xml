@@ -341,7 +341,7 @@
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
     #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
     #set($rawTitle = $translatedDoc.title)
-    #if($rawTitle != $translatedDoc.plainTitle)
+    #if($rawTitle != $row['doc_title'])
 	  #set($discard = $row.put('doc_title_raw', $rawTitle))
     #end
     #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))

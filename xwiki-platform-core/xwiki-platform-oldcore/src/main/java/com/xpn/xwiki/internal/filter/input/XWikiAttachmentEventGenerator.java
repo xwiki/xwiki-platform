@@ -105,7 +105,7 @@ public class XWikiAttachmentEventGenerator
         if (properties.isWithWikiAttachmentsContent()) {
             try {
                 content = attachment.getContentInputStream(xcontext);
-                size = Long.valueOf(attachment.getLongSize());
+                size = attachment.getLongSize();
             } catch (XWikiException e) {
                 this.logger.error("Failed to get content of attachment [{}]", attachment.getReference(), e);
 
@@ -114,7 +114,7 @@ public class XWikiAttachmentEventGenerator
             }
         } else {
             content = null;
-            size = null;
+            size = attachment.getLongSize();
         }
 
         // WikiAttachment

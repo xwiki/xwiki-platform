@@ -4747,7 +4747,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (xcontext != null) {
             documentProperties.setDefaultReference(getXWikiContext().getWikiReference());
         }
-        documentProperties.setVersionPreserved(withArchive);
 
         // Input
         XARInputProperties xarProperties = new XARInputProperties();

@@ -447,6 +447,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 this.writer.writeEndElement();
 
                 this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
+            } else {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(size));
             }
 
             this.writer.writeEndElement();

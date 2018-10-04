@@ -26,5 +26,7 @@
 
 node('chrome') {
   xwikiBuild {
+    // Force the latest Java version in order to be able to run the functional tests using a recent version of XWiki.
+    javaTool = 'official'
   }
 }

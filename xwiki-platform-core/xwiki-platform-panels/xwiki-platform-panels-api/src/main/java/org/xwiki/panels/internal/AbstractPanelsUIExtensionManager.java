@@ -20,9 +20,9 @@
 package org.xwiki.panels.internal;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -99,9 +99,13 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
 
         // Verify that there's a panel configuration property defined, and if not don't return any panel extension.
         if (!StringUtils.isEmpty(panelConfigurationString)) {
-            Set<DocumentReference> panelSerializedReferences = new HashSet<>();
-            for (String serializedReference : getConfiguration().split(",")) {
-                panelSerializedReferences.add(resolver.resolve(serializedReference.trim()));
+            // we store the document reference along with their position in the list,
+            // as we want to build a list ordered the same way than in the original panelConfigurationString
+            Map<DocumentReference, Integer> panelReferenceWithPosition = new HashMap<>();
+
+            String[] panelStringReferences = getConfiguration().split(",");
+            for (int i = 0; i < panelStringReferences.length; i++) {
+                panelReferenceWithPosition.put(resolver.resolve(panelStringReferences[i].trim()), i);
             }
 
             try {
@@ -126,8 +130,12 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
                         extensionId = resolver.resolve(extension.getId());
                     }
 
-                    if (panelSerializedReferences.contains(extensionId)) {
-                        panels.add(extension);
+                    if (panelReferenceWithPosition.containsKey(extensionId)) {
+                        int position = panelReferenceWithPosition.get(extensionId);
+                        if (position > panels.size()) {
+                            position = panels.size();
+                        }
+                        panels.add(position, extension);
                     }
                 }
             } catch (ComponentLookupException e) {

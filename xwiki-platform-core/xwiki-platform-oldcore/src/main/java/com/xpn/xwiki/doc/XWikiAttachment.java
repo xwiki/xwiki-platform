@@ -275,7 +275,6 @@ public class XWikiAttachment implements Cloneable
     /**
      * @return the real size of the attachment extracted from the content, or the size metadata if the content is not
      *         loaded yet. -1 if the size is unknown.
-     * @see #getLongSize(XWikiContext)
      * @since 9.0RC1
      */
     public long getLongSize()

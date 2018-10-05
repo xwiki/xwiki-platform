@@ -36,7 +36,6 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionManager;
 
@@ -67,12 +66,6 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
     @Inject
     @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
-
-    /**
-     * Serializer allowing to serialize references into their absolute representation.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
 
     /**
      * We use the Context Component Manager to lookup UI Extensions registered as components.

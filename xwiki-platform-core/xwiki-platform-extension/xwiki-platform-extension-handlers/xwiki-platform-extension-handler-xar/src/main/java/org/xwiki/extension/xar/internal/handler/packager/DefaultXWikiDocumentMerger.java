@@ -194,6 +194,12 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
+        // Check if there is any customization
+        if (currentDocument.equalsData(previousDocument)) {
+            // Check if there is any difference between previous and new
+            return currentDocument.equalsData(nextDocument) ? currentDocument : nextDocument;
+        }
+
         // 3 ways merge
         XWikiDocument mergedDocument = currentDocument.clone();
 
@@ -213,12 +219,8 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
         documentMergeResult.getLog().log(this.logger);
 
-        if (documentMergeResult.isModified() || !documentMergeResult.getLog().getLogsFrom(LogLevel.ERROR).isEmpty()) {
-            return askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration,
-                documentMergeResult);
-        }
-
-        return null;
+        return askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration,
+            documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
@@ -328,7 +330,8 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
                 documentToSave = question.getCustomDocument() != null ? question.getCustomDocument() : mergedDocument;
                 break;
             default:
-                documentToSave = mergedDocument;
+                documentToSave =
+                    documentMergeResult == null || documentMergeResult.isModified() ? mergedDocument : currentDocument;
                 break;
         }
 

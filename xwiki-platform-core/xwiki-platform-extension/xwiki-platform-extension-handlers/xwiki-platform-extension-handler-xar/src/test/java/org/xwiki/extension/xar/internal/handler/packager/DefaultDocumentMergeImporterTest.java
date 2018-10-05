@@ -187,6 +187,18 @@ public class DefaultDocumentMergeImporterTest
         verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
     }
 
+    @Test
+    public void testMergeChangesNoCustom() throws ComponentLookupException, Exception
+    {
+        this.mergeResult.setModified(true);
+        when(this.currentDocument.equalsData(same(this.previousDocument))).thenReturn(true);
+
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        verify(this.xwiki).saveDocument(same(this.nextDocument), eq("comment"), eq(false), same(this.xcontext));
+    }
+
     // Merge interactive
 
     @Test
@@ -202,6 +214,41 @@ public class DefaultDocumentMergeImporterTest
 
         verifyZeroInteractions(this.jobStatus);
         verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
+    }
+
+    @Test
+    public void testMergeInteractiveChangesNoConflictAsk() throws ComponentLookupException, Exception
+    {
+        this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
+
+        this.mergeResult.setModified(true);
+
+        this.configuration.setConflictAction(ConflictType.MERGE_SUCCESS, GlobalAction.ASK);
+
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        verify(this.jobStatus, times(1)).ask(any());
+        verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
+    }
+
+    @Test
+    public void testMergeInteractiveChangesNoCustomNoConflictAsk() throws ComponentLookupException, Exception
+    {
+        this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
+
+        this.mergeResult.setModified(true);
+        when(this.currentDocument.equalsData(same(this.previousDocument))).thenReturn(true);
+
+        this.configuration.setConflictAction(ConflictType.MERGE_SUCCESS, GlobalAction.ASK);
+
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        verifyZeroInteractions(this.jobStatus);
+        verify(this.xwiki).saveDocument(same(this.nextDocument), eq("comment"), eq(false), same(this.xcontext));
     }
 
     private void answerGlobalAction(final GlobalAction action, final boolean always) throws InterruptedException

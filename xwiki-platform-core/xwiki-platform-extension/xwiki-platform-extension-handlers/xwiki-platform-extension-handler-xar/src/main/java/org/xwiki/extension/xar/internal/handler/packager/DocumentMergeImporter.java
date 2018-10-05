@@ -143,13 +143,17 @@ public class DocumentMergeImporter
         documentMergeResult.getLog().log(this.logger);
 
         XWikiDocument documentToSave;
-        if (documentMergeResult.isModified() || !documentMergeResult.getLog().getLogsFrom(LogLevel.ERROR).isEmpty()) {
+        // Check if there is any customization
+        if (currentDocument.equalsData(previousDocument)) {
+            // Check if there is any difference between previous and new
+            documentToSave = currentDocument.equalsData(nextDocument) ? currentDocument : nextDocument;
+        } else {
             documentToSave = askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument,
                 configuration, documentMergeResult);
+        }
 
-            if (documentToSave != currentDocument) {
-                saveDocument(documentToSave, comment, false, configuration);
-            }
+        if (documentToSave != currentDocument) {
+            saveDocument(documentToSave, comment, false, configuration);
         }
 
         return new XarEntryMergeResult(
@@ -275,7 +279,8 @@ public class DocumentMergeImporter
                 documentToSave = question.getCustomDocument() != null ? question.getCustomDocument() : mergedDocument;
                 break;
             default:
-                documentToSave = mergedDocument;
+                documentToSave =
+                    documentMergeResult == null || documentMergeResult.isModified() ? mergedDocument : currentDocument;
                 break;
         }
 

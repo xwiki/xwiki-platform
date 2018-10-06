@@ -108,11 +108,11 @@
   'examples': 'Help.Macros.Tree.WebHome',
   'thumbnail': 'Help.Macros.Tree.WebHome@tree.png'
 }, {
-  'title': 'Activity',
+  'title': 'Notifications',
   'description': 'Displays recent activities done on pages by the users.',
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Activity+Macro',
-  'examples': 'Help.Macros.Activity.WebHome',
-  'thumbnail': 'Help.Macros.Activity.WebHome@activity.png'
+  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Notifications%20Application/#HNotificationsMacro',
+  'examples': 'Help.Macros.Notifications.WebHome',
+  'thumbnail': 'Help.Macros.Notifications.WebHome@notifications.png'
 }])
 {{/velocity}}
 

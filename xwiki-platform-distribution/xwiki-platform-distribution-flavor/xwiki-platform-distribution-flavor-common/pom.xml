@@ -42,7 +42,7 @@
         org.xwiki.platform:xwiki-enterprise-ui,
         org.xwiki.platform:xwiki-enterprise-ui-all
     </xwiki.extension.features>
-    <!-- We depend on legacy artifacts on purpose -->
+    <!-- We bundle legacy modules in the Flavor distribution, thus we allow depending on legacy dependencies. -->
     <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
   </properties>
   <dependencies>
@@ -141,6 +141,8 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Backward compatibility module to allow users using the old {{activity}} macro in pages to have them continue
+         working -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-notification-activitymacro</artifactId>

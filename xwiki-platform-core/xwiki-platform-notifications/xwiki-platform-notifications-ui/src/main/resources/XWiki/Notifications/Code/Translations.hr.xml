@@ -233,9 +233,6 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclus
 ### Missing: rendering.macro.notifications.parameter.tags.name=Tags
 ### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
 
-### Missing: rendering.macro.activity.name=Activity (deprecated)
-### Missing: rendering.macro.activity.description=Create a bridge between the deprecated Activity Stream to the new Notifications module.
-
 ## Notifications Macro
 ### Missing: notifications.macro.noWatchedUsers=You are not following anybody.
 ### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.

@@ -27,7 +27,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-save', {
-    requires: 'xwiki-cache,xwiki-localization',
+    requires: 'notification,xwiki-cache,xwiki-localization',
     editors: [],
 
     beforeInit: function(editor) {
@@ -71,7 +71,15 @@
 
     onLoad: function() {
       // We need to update the form fields before the form is validated (for Preview, Save and Save & Continue).
-      $(document).on('xwiki:actions:beforePreview xwiki:actions:beforeSave', $.proxy(this.updateFormFields, this));
+      $(document).on('xwiki:actions:beforePreview xwiki:actions:beforeSave', $.proxy(function(event, data) {
+        if (!this.updateFormFields()) {
+          event.preventDefault();
+          // This is for older versions of XWiki (<10.8.1) where we had to stop the original event.
+          if (data && data.originalEvent && typeof data.originalEvent.stop === 'function') {
+            data.originalEvent.stop();
+          }
+        }
+      }, this));
 
       var submitInProgress = false;
       // Disable the leave confirmation when the form action buttons are used.
@@ -107,6 +115,7 @@
     },
 
     updateFormFields: function(fullData) {
+      var success = true;
       fullData = fullData === true;
       this.editors.forEach(function(editor) {
         var oldFullData;
@@ -114,12 +123,19 @@
           oldFullData = editor.config.fullData;
           editor.config.fullData = true;
         }
-        editor.updateElement();
+        try {
+          editor.updateElement();
+        } catch (e) {
+          success = false;
+          editor.showNotification(editor.localization.get('xwiki-save.failed'), 'warning');
+          console.log(e);
+        }
         if (fullData) {
           editor.config.fullData = oldFullData;
         }
         this.updateContentType(editor);
       }, this);
+      return success;
     },
 
     updateContentType: function(editor) {

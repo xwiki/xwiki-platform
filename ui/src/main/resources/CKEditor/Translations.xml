@@ -83,6 +83,7 @@ ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
 
 ckeditor.plugin.resource.notSpecified=The {0} is not specified.
 ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
+ckeditor.plugin.save.failed=The edited content can't be saved. Try to undo some of your recent changes.
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
 
 modal.ok=OK

@@ -2822,7 +2822,7 @@ Your account on ${wikiname} has been successfully activated. You can now login a
       <title>$tdoc.getRenderedTitle('plain/1.0') - XWiki</title>
     </property>
     <property>
-      <upload_maxsize>33554432</upload_maxsize>
+      <upload_maxsize>107374182400</upload_maxsize>
     </property>
     <property>
       <validation_email_content>#set ($wikiname = $request.serverName)

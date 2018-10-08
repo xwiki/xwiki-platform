@@ -725,7 +725,7 @@
                 <features>jdom:jdom</features>
               </extensionOverride>
               <extensionOverride>
-                <id>>com.sun.mail:javax.mail</id>
+                <id>com.sun.mail:javax.mail</id>
                 <features>javax.mail:mail</features>
               </extensionOverride>
               <extensionOverride>

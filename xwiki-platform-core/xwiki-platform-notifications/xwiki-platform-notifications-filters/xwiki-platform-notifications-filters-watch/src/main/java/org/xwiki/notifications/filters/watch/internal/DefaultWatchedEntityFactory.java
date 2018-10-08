@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
@@ -56,18 +56,18 @@ public class DefaultWatchedEntityFactory implements WatchedEntityFactory
     private EventUserFilterPreferencesGetter eventUserFilterPreferencesGetter;
 
     @Inject
-    private NotificationFilterManager notificationFilterManager;
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Override
     public WatchedLocationReference createWatchedLocationReference(EntityReference location)
     {
         return new WatchedLocationReference(location, serializer.serialize(location), resolver, stateComputer,
-                notificationFilterManager);
+                notificationFilterPreferenceManager);
     }
 
     @Override
     public WatchedUserReference createWatchedUserReference(String userId)
     {
-        return new WatchedUserReference(userId, eventUserFilterPreferencesGetter, notificationFilterManager);
+        return new WatchedUserReference(userId, eventUserFilterPreferencesGetter, notificationFilterPreferenceManager);
     }
 }

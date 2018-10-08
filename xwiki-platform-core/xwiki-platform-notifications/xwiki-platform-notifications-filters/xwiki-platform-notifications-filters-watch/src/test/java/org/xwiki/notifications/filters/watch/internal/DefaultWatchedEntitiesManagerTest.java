@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
@@ -47,12 +47,12 @@ public class DefaultWatchedEntitiesManagerTest
     public final MockitoComponentMockingRule<DefaultWatchedEntitiesManager> mocker =
             new MockitoComponentMockingRule<>(DefaultWatchedEntitiesManager.class);
 
-    private NotificationFilterManager notificationFilterManager;
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Before
     public void setUp() throws Exception
     {
-        notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
+        notificationFilterPreferenceManager = mocker.getInstance(NotificationFilterPreferenceManager.class);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class DefaultWatchedEntitiesManagerTest
         pref4.setEnabled(false);
         pref4.setId("pref4");
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2, pref3, pref4));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2, pref3, pref4));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(false, true);
 
@@ -92,7 +92,7 @@ public class DefaultWatchedEntitiesManagerTest
         // Checks
         verify(watchedEntityReference, never()).matchExactly(pref2);
         verify(watchedEntityReference, never()).matchExactly(pref3);
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref4", true);
+        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled("pref4", true);
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -111,7 +111,7 @@ public class DefaultWatchedEntitiesManagerTest
         pref1.setEnabled(true);
         pref1.setId("pref1");
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(false, true);
 
@@ -119,7 +119,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref1");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference("pref1");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -144,7 +144,7 @@ public class DefaultWatchedEntitiesManagerTest
         pref2.setEnabled(true);
         pref2.setId("pref2");
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(false, true);
 
@@ -152,7 +152,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref2");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference("pref2");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -167,7 +167,7 @@ public class DefaultWatchedEntitiesManagerTest
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(false);
 
@@ -178,7 +178,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).saveFilterPreferences(eq(Sets.newSet(createdPref)));
+        verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(Sets.newSet(createdPref)));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class DefaultWatchedEntitiesManagerTest
         pref1.setEnabled(true);
         pref1.setId("pref1");
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(true, false);
 
@@ -204,7 +204,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref1");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference("pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -223,7 +223,7 @@ public class DefaultWatchedEntitiesManagerTest
         pref1.setEnabled(false);
         pref1.setId("pref1");
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(true, false);
 
@@ -231,7 +231,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref1", true);
+        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled("pref1", true);
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -257,7 +257,7 @@ public class DefaultWatchedEntitiesManagerTest
         pref2.setEnabled(true);
         pref2.setId("pref2");
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(true, false);
 
@@ -265,7 +265,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).deleteFilterPreference("pref1");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference("pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -280,7 +280,7 @@ public class DefaultWatchedEntitiesManagerTest
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
-        when(notificationFilterManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
         when(watchedEntityReference.isWatched(user)).thenReturn(true);
 
@@ -291,7 +291,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).saveFilterPreferences(eq(Sets.newSet(createdPref)));
+        verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(Sets.newSet(createdPref)));
     }
 
 

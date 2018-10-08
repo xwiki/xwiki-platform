@@ -40,6 +40,7 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
@@ -87,6 +88,9 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     @Inject
     private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     private InternalNotificationsRenderer notificationsRenderer;
@@ -253,7 +257,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
                     parameters.format);
             parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
-            parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
+            parameters.filterPreferences = notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
         }
     }
 

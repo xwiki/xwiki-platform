@@ -32,6 +32,7 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.sources.NotificationManager;
@@ -59,6 +60,9 @@ public class DefaultNotificationManager implements NotificationManager
 
     @Inject
     private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     private ParametrizedNotificationManager parametrizedNotificationManager;
@@ -132,7 +136,7 @@ public class DefaultNotificationManager implements NotificationManager
         parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
                 parameters.format);
         parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
-        parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
+        parameters.filterPreferences = notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
         return parametrizedNotificationManager.getEvents(parameters);
     }
 

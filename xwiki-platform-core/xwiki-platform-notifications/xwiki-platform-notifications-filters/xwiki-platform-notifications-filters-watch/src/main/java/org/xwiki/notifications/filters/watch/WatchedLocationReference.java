@@ -30,8 +30,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
@@ -60,7 +60,7 @@ public class WatchedLocationReference implements WatchedEntityReference
 
     private ScopeNotificationFilterLocationStateComputer stateComputer;
 
-    private NotificationFilterManager notificationFilterManager;
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     /**
      * Construct a WatchedLocationReference.
@@ -68,25 +68,25 @@ public class WatchedLocationReference implements WatchedEntityReference
      * @param serializedReference the serialized reference of the location to watch
      * @param resolver the default entity reference resolver
      * @param stateComputer the default ScopeNotificationFilterLocationStateComputer
-     * @param notificationFilterManager the notification filter manager
-     * @since 9.9RC1
+     * @param notificationFilterPreferenceManager the notification filter preference manager
+     * @since 10.9RC1
      */
     public WatchedLocationReference(EntityReference entityReference, String serializedReference,
             EntityReferenceResolver<String> resolver,
             ScopeNotificationFilterLocationStateComputer stateComputer,
-            NotificationFilterManager notificationFilterManager)
+            NotificationFilterPreferenceManager notificationFilterPreferenceManager)
     {
         this.entityReference = entityReference;
         this.serializedReference = serializedReference;
         this.resolver = resolver;
         this.stateComputer = stateComputer;
-        this.notificationFilterManager = notificationFilterManager;
+        this.notificationFilterPreferenceManager = notificationFilterPreferenceManager;
     }
 
     @Override
     public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        return stateComputer.isLocationWatched(notificationFilterManager.getFilterPreferences(userReference),
+        return stateComputer.isLocationWatched(notificationFilterPreferenceManager.getFilterPreferences(userReference),
                 this.entityReference);
     }
 

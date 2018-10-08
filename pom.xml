@@ -711,6 +711,10 @@
                 <id>commons-beanutils:commons-beanutils</id>
                 <features>commons-beanutils:commons-beanutils-core</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.jdom:jdom</id>
+                <features>jdom:jdom</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

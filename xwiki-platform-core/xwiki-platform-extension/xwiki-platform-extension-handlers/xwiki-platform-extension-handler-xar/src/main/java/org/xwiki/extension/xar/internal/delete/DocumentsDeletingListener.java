@@ -81,6 +81,12 @@ public class DocumentsDeletingListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        CancelableEvent cancelableEvent = (CancelableEvent) event;
+        if (cancelableEvent.isCanceled()) {
+            logger.warn("Skipping " + this.getName() + " as the event is already cancelled.");
+            return;
+        }
+
         if (this.configuration.getDocumentProtection() == DocumentProtection.NONE) {
             return;
         }
@@ -103,8 +109,6 @@ public class DocumentsDeletingListener extends AbstractEventListener
 
         // Ask a confirmation to the user if some pages belong to extensions
         if (!question.getExtensions().isEmpty()) {
-            // Conservative choice: we let the user enable the pages to delete.
-            question.unselectAll();
             try {
                 // The user can modify the question so it could disable some EntitySelection.
                 // We add a timeout because when a refactoring job is running, it prevents others to run.
@@ -114,12 +118,10 @@ public class DocumentsDeletingListener extends AbstractEventListener
                     // Without any confirmation, we must cancel the operation.
                     String message = "The question has been asked, however no answer has been received.";
                     this.logger.warn(message);
-                    CancelableEvent cancelableEvent = (CancelableEvent) event;
                     cancelableEvent.cancel(message);
                 }
             } catch (InterruptedException e) {
                 this.logger.warn("Confirm question has been interrupted.");
-                CancelableEvent cancelableEvent = (CancelableEvent) event;
                 cancelableEvent.cancel("Question has been interrupted.");
             }
         }

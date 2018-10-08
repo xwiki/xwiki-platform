@@ -13,6 +13,10 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
+#template('refactoringStatus_macros.vm')
+
+#controller()
+#macro(displayContent $content)
 #template("startpage.vm")
 <div class="main">
   <div id="mainContentArea">
@@ -20,28 +24,76 @@
     #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
     <div class="xcontent">
       #template('contentheader.vm')
-      #controller()
+      $content
       <div class="clearfloats"></div>
     </div> ## xcontent
   </div>## mainContentArea
 </div>## main
 #template("endpage.vm")
+#end
 #######################################################
 ##                    CONTROLLER
 #######################################################
 #macro(controller)
   #if("$!{request.jobId}" != '')
+    #set ($deleteJobStatus = $services.job.getJobStatus($request.jobId.split('/')))
     ## A delete job is running
-    #displayProgressBar()
+    #if ($xcontext.action == 'get')
+      #outputDeleteJobStatusJSON($deleteJobStatus)
+    #else
+      #set ($content = "#displayDeleteJobStatus($deleteJobStatus)")
+      #displayContent($content)
+    #end
   #else
     #if("$!{request.id}" != '')
       ## request.id means that we are deleting a document from the recycle bin
-      #displayCompletelyDeleteConfirmMessage()
+      #set ($content = "#displayCompletelyDeleteConfirmMessage()")
+      #displayContent($content)
     #else
-      #displayConfirmationPage()
+      #set ($content = "#displayConfirmationPage()")
+      #displayContent($content)
     #end
   #end
 #end
+
+#macro (outputDeleteJobStatusJSON $deleteJobStatus)
+  #getJobStatusJSON($deleteJobStatus $json)
+  $response.setContentType('application/json')
+  $jsontool.serialize($json)
+#end
+
+#######################################################
+##            DISPLAY RUNNING JOB
+#######################################################
+#macro (displayDeleteJobStatus $deleteJobStatus)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+## TODO: allows question templates to inject the web resources they need
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/ExtensionBreakingQuestion.js", true))
+  #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/XClassBreakingQuestion.js", true))
+  #set ($deleteJobState = $deleteJobStatus.state)
+  #set ($finished = $deleteJobState == 'FINISHED')
+  #set ($deleteJobRequest = $deleteJobStatus.request)
+  #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
+    'xpage': 'delete',
+    'jobId': $request.jobId,
+    'outputSyntax': 'plain'
+  })))
+  <div class="xcontent job-status" data-url="$jobStatusURL">
+  <h2>$services.localization.render('core.delete.waitmessage')</h2>
+  #if (!$finished)
+    #displayJobProgressBar($deleteJobStatus)
+    #displayJobQuestion($deleteJobStatus)
+  #else
+    #displayJobFinishedMessage($deleteJobStatus)
+  #end
+  #if ($isAdvancedUser || $isSuperAdmin)
+    #displayJobStatusLog($deleteJobStatus true)
+  #end
+  </div>
+#end
+
 #######################################################
 ##            DISPLAY CONFIRMATION PAGE
 #######################################################
@@ -52,22 +104,6 @@
     #getChildren_legacy()
     #displayConfirmMessage()
   </form>
-#end
-#######################################################
-##              DISPLAY PROGRESS BAR
-#######################################################
-#macro(displayProgressBar)
-  #set($discard = $xwiki.jsfx.use("delete${jsExtension}", true))
-  #set($discard = $xwiki.ssfx.use('uicomponents/job/job.css', true))
-  #set($jobId = $request.jobId)
-  <div class="ui-progress" id="delete-progress-bar-container">
-    <p>$services.localization.render('core.delete.waitmessage')</p>
-    <div class="ui-progress-background">
-      <div class="ui-progress-bar green" id="delete-progress-bar" data-job-id="$!escapetool.xml($jobId)" data-progress="0" style="width: 0"></div>
-    </div>
-  </div>
-  <p class="successmessage hidden" id="successMessage">$services.localization.render('core.delete.success')</p>
-  <p class="errormessage hidden" id="errorMessage">$services.localization.render('core.delete.error')</p>
 #end
 #######################################################
 ##                  DISPLAY PANEL

@@ -208,7 +208,9 @@ public class ExtensionBreakingQuestion
     {
         for (DocumentReference document : documents) {
             EntitySelection entitySelection = concernedEntities.get(document);
-            entitySelection.setSelected(true);
+            if (entitySelection != null) {
+                entitySelection.setSelected(true);
+            }
         }
     }
 }

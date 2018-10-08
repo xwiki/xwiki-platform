@@ -165,7 +165,7 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
         try {
             this.beans.populate(question, extractParameters(request, question));
         } catch (PropertyException e) {
-            throw new ResourceReferenceHandlerException("Failed to populate question object for job with id " + jobId);
+            throw new ResourceReferenceHandlerException("Failed to populate question object for job with id " + jobId, e);
         }
 
         // Cancel if supported

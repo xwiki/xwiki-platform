@@ -41,7 +41,7 @@ import org.xwiki.uiextension.UIExtensionManager;
 
 /**
  * Abstract panels UI extension manager. Implementations must provide a list of panel IDs to be displayed, this class
- * handles the retrieval of the UI extensions corresponding to the configured list.
+ * handles the retrieval of the UI extensions corresponding to the configured panel list.
  *
  * @version $Id$
  * @since 4.3.1
@@ -86,7 +86,7 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
     @Override
     public List<UIExtension> get(String extensionPointId)
     {
-        List<UIExtension> panels = new ArrayList<UIExtension>();
+        List<UIExtension> panels = new ArrayList<>();
 
         String panelConfigurationString = getConfiguration();
 

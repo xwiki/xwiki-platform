@@ -111,6 +111,17 @@ def builds = [
       profiles: 'quality,legacy',
       xvnc: false
     )
+  },
+  'Docker' : {
+    // Run functional tests based on docker on modules having them. We select the projects to build so that we build
+    // the minimal. Note that the 'Main' job will have built all functional tests not in the -Pdocker profile.
+    build(
+      name: 'Docker',
+      node: 'docker',
+      profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
+      projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
+    )
   }
 ]
 
@@ -135,6 +146,9 @@ def buildAll(builds)
       // Note: We configure the snapshot extension repository in XWiki (-PsnapshotModules) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       builds['Main'].call()
+
+      // Build the functional tests requiring docker to be installed on the executing agent
+      builds['Docker'].call()
 
       // Note: We want the following behavior:
       // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
@@ -197,7 +211,7 @@ def buildAll(builds)
 
 def build(map)
 {
-  node {
+  node(map.node ?: '') {
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
       if (map.goals) {

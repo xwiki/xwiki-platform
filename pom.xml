@@ -716,6 +716,10 @@
                   org.bouncycastle:bcmail-jdk12
                 </features>
               </extensionOverride>
+              <extensionOverride>
+                <id>commons-beanutils:commons-beanutils</id>
+                <features>commons-beanutils:commons-beanutils-core</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

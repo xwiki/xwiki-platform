@@ -205,6 +205,16 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>com.rometools</groupId>
+        <artifactId>rome</artifactId>
+        <version>1.11.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.rometools</groupId>
+        <artifactId>rome-utils</artifactId>
+        <version>1.11.0</version>
+      </dependency>
+      <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
         <groupId>de.l3s.boilerpipe</groupId>
         <artifactId>boilerpipe</artifactId>

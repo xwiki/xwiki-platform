@@ -742,6 +742,10 @@
                 <id>>com.sun.mail:javax.mail</id>
                 <features>javax.mail:mail</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>>xml-apis:xml-apis</id>
+                <features>xerces:xmlParserAPIs/2.6.2</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

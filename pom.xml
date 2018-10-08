@@ -756,6 +756,17 @@
                 <id>xml-apis:xml-apis</id>
                 <features>xerces:xmlParserAPIs/2.6.2</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>com.google.inject:guice:no_aop</id>
+                <features>com.google.inject:guice</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>net.sf.json-lib:json-lib:jdk15</id>
+                <features>
+                  net.sf.json-lib:json-lib
+                  net.sf.json-lib:json-lib:jdk13
+                </features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

@@ -68,9 +68,11 @@ public class PdfExportImplTest
 
         PdfExportImpl pdfExport = new PdfExportImpl();
 
-        // Note that the SPAN below already has some style defined in shorthand notation( "background" is shorthand,
-        // see https://www.w3schools.com/css/css_background.asp). That's important for the test since that's what was
-        // failing in the past and why this test was written.
+        // The content below allows us to test several points:
+        // 1) The SPAN below already has some style defined in shorthand notation( "background" is shorthand,
+        //    see https://www.w3schools.com/css/css_background.asp). That's important for the test since that's what was
+        //    failing in the past and why this test was written.
+        // 2) We also test that HTML entities are correctly kept since we had issues with this at one point.
         String html = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
                 + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
@@ -87,7 +89,7 @@ public class PdfExportImplTest
             + "<div id=\"xwikimaincontainerinner\">\n"
             + "\n"
             + "<div id=\"xwikicontent\">\n"
-            + "      <p><span style=\"background: white;\">Hello</span></p>\n"
+            + "      <p><span style=\"background: white;\">Hello Cl&eacute;ment</span></p>\n"
             + "          </div>\n"
             + "</div>\n"
             + "</div>\n"
@@ -105,17 +107,15 @@ public class PdfExportImplTest
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
                 + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
-                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head style=\"display: none; \">\n"
+                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head style=\"display: none; \">"
             + "<title style=\"display: none; \">\n"
             + "  Main.ttt - ttt\n"
-            + "</title>\n"
-            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\" style=\"display: none; \"/>\n"
-            + "<meta content=\"en\" name=\"language\" style=\"display: none; \"/>\n"
-            + "\n"
+            + "</title>"
+            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\" style=\"display: none; \"/>"
+            + "<meta content=\"en\" name=\"language\" style=\"display: none; \"/>"
             + "</head><body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\" "
                 + "style=\"display: block; margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px; "
-                + "unicode-bidi: embed; \">\n"
-            + "\n"
+                + "unicode-bidi: embed; \">"
             + "<div id=\"xwikimaincontainer\" style=\"display: block; unicode-bidi: embed; \">\n"
             + "<div id=\"xwikimaincontainerinner\" style=\"display: block; unicode-bidi: embed; \">\n"
             + "\n"
@@ -124,11 +124,10 @@ public class PdfExportImplTest
                 + "<span style=\"color: #f00; background-color: #fff; background-image: none; "
                 + "background-position: 0% 0%; background-size: auto auto; background-origin: padding-box; "
                 + "background-clip: border-box; background-repeat: repeat repeat; "
-                + "background-attachment: scroll; \">Hello</span></p>\n"
+                + "background-attachment: scroll; \">Hello Clément</span></p>\n"
             + "          </div>\n"
             + "</div>\n"
-            + "</div>\n"
-            + "\n"
+            + "</div>"
             + "</body></html>";
         assertEquals(expected, pdfExport.applyCSS(html, css, xcontext));
     }

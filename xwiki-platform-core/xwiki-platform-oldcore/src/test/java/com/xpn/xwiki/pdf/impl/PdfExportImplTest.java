@@ -103,7 +103,11 @@ public class PdfExportImplTest
         when(doc.getExternalURL("view", xcontext)).thenReturn("http://localhost:8080/export");
         xcontext.setDoc(doc);
 
-        // Verify that element's style attributes are normalized and that the SPAN's color is set to red.
+        // - Verify that element's style attributes are normalized and that the SPAN's color is set to red.
+        // - Verify that the accent in the content is still there.
+        //   TODO: right now we output the DOM with DOM4J and use the default of converting entities when using the
+        //   XMLWriter. We need to decide if that's correct or if we should call XMLWriter#setResolveEntityRefs(false)
+        //   instead.
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
                 + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"

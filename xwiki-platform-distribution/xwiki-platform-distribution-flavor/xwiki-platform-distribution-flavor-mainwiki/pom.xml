@@ -71,7 +71,7 @@
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-help-center</artifactId>
-      <version>1.3-SNAPSHOT</version>
+      <version>1.3</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>

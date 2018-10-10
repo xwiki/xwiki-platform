@@ -52,7 +52,7 @@
   #end
   #set ($wikiNamesList = $wikiNamesList.replaceAll(',\s$',''))
   = #if ($wikiNames.size() == 1)$services.localization.render('platform.wiki.users.profile.activity.title', [$wikiNamesList])#{else}$services.localization.render('platform.wiki.users.profile.activity.multipletitle', [$wikiNamesList])#end =
-  {{activity wikis="$wikiNamesList"}}
+  {{notifications useUserPreferences="false" displayOwnEvents="true" displayRSSLink="false" wikis="$wikiNamesList"}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

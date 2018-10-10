@@ -20,23 +20,14 @@
 package org.xwiki.test.docker.junit5;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
@@ -59,15 +50,9 @@ public class WARBuilder
 
     private static final String JAR = "jar";
 
-    private static final String VM_EXTENSION = ".vm";
-
-    private static final String DB_USERNAME = "xwiki";
-
-    private static final String DB_PASSWORD = DB_USERNAME;
-
-    private static final String SKIN = "flamingo";
-
     private ExtensionMojoHelper extensionHelper;
+
+    private ConfigurationFilesGenerator configurationFilesGenerator = new ConfigurationFilesGenerator();
 
     /**
      * Initialize an XWiki environment (ECM, etc).
@@ -88,25 +73,25 @@ public class WARBuilder
      * Note that dependencies from the module under test are not included in this WAR since they'll be installed as
      * Extensions in {@link ExtensionInstaller} (thus proving that they can be installed as Extensions!).
      *
-     * @param database the database to generate a WAR for. Specifically this means bundling the right JDBC driver in
-     * {@code WEB-INF/lib}
+     * @param configuration the configuration to build (database, debug mode, etc). This is used for example to bundle
+     * the right JDBC driver in {@code WEB-INF/lib} for the target database
      * @param targetWARDirectory the target driedctory where the expanded WAR will be generated
      * @throws Exception in case of error
      */
-    public void build(Database database, File targetWARDirectory) throws Exception
+    public void build(UITest configuration, File targetWARDirectory) throws Exception
     {
         // Create a minimal XWiki WAR that doesn't contain any dependencies from the module under test (those
         // dependencies will be installed as extensions in ExtensionInstaller).
 
         // Step 1: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
-        LOGGER.debug("Finding version ...");
+        LOGGER.info("Finding version ...");
         ArtifactResolver artifactResolver = ArtifactResolver.getInstance();
         MavenResolver mavenResolver = MavenResolver.getInstance();
         String xwikiVersion = mavenResolver.getModelFromCurrentPOM().getVersion();
-        LOGGER.debug("  -> Version = [{}]", xwikiVersion);
+        LOGGER.info("Found version = [{}]", xwikiVersion);
 
         // Step 2: Gather all the required JARs for the minimal WAR
-        LOGGER.debug("Resolving distribution dependencies ...");
+        LOGGER.info("Resolving distribution dependencies ...");
         Collection<ArtifactResult> artifactResults = artifactResolver.getDistributionDependencies(xwikiVersion);
         List<File> warDependencies = new ArrayList<>();
         List<Artifact> jarDependencies = new ArrayList<>();
@@ -126,6 +111,7 @@ public class WARBuilder
         // Step 3: Since we want to be able to provision SNAPSHOT extensions, we need to configure the SNAPSHOT
         //         extension repository. We do that by adding a dependency which will inject it automatically in the
         //         default list of extension repositories.
+        LOGGER.info("Adding SNAPSHOT extension to provision SNAPSHOT extensions ...");
         Artifact snapshotRepositoryArtifact = new DefaultArtifact("org.xwiki.commons",
             "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
         jarDependencies.add(artifactResolver.resolveArtifact(snapshotRepositoryArtifact).getArtifact());
@@ -133,53 +119,64 @@ public class WARBuilder
         // Step 4: Copy the JARs in WEB-INF/lib
         File webInfDirectory = new File(targetWARDirectory, "WEB-INF");
         File libDirectory = new File(webInfDirectory, "lib");
-        copyJARs(jarDependencies, libDirectory);
+        copyJARs(configuration, jarDependencies, libDirectory);
 
         // Step 5: Add the webapp resources (web.xml, templates VM files, etc)
-        copyWebappResources(warDependencies, targetWARDirectory);
+        copyWebappResources(configuration, warDependencies, targetWARDirectory);
 
         // Step 6: Add XWiki configuration files (depends on the selected DB for the hibernate one)
-        LOGGER.debug("Generating configuration files for database [{}]...", database);
-        generateConfigurationFiles(webInfDirectory, xwikiVersion, database, artifactResolver);
+        LOGGER.info("Generating configuration files for database [{}]...", configuration.database());
+        this.configurationFilesGenerator.generate(configuration, webInfDirectory, xwikiVersion, artifactResolver);
 
         // Step 7: Add the JDBC driver for the selected DB
-        LOGGER.debug("Copying JDBC driver for database [{}]...", database);
-        File jdbcDriverFile = getJDBCDriver(database, artifactResolver);
-        LOGGER.debug("  ... JDBC driver file: " + jdbcDriverFile);
+        LOGGER.info("Copying JDBC driver for database [{}]...", configuration.database());
+        File jdbcDriverFile = getJDBCDriver(configuration.database(), artifactResolver);
+        if (configuration.debug()) {
+            LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
+        }
         copyFile(jdbcDriverFile, libDirectory);
 
         // Step 8: Unzip the Flamingo skin
-        unzipSkin(skinDependencies, targetWARDirectory);
+        unzipSkin(configuration, skinDependencies, targetWARDirectory);
     }
 
-    private void copyWebappResources(List<File> warDependencies, File targetWARDirectory) throws Exception
+    private void copyWebappResources(UITest configuration, List<File> warDependencies, File targetWARDirectory)
+        throws Exception
     {
-        LOGGER.debug("Expanding WAR dependencies ...");
+        LOGGER.info("Expanding WAR dependencies ...");
         for (File file : warDependencies) {
             // Unzip the WARs in the target directory
-            LOGGER.debug("  ... Unzipping WAR: " + file);
+            if (configuration.debug()) {
+                LOGGER.info("... Unzipping WAR: " + file);
+            }
             unzip(file, targetWARDirectory);
         }
     }
 
-    private void copyJARs(List<Artifact> jarDependencies, File libDirectory) throws Exception
+    private void copyJARs(UITest configuration, List<Artifact> jarDependencies, File libDirectory) throws Exception
     {
-        LOGGER.debug("Copying JAR dependencies ...");
+        LOGGER.info("Copying JAR dependencies ...");
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            LOGGER.debug("  ... Copying JAR: " + artifact.getFile());
+            if (configuration.debug()) {
+                LOGGER.info("... Copying JAR: " + artifact.getFile());
+            }
             copyFile(artifact.getFile(), libDirectory);
-            LOGGER.debug("  ... Generating XED file for: " + artifact.getFile());
+            if (configuration.debug()) {
+                LOGGER.info("... Generating XED file for: " + artifact.getFile());
+            }
             generateXED(artifact, libDirectory, MavenResolver.getInstance());
         }
     }
 
-    private void unzipSkin(List<File> skinDependencies, File targetWARDirectory) throws Exception
+    private void unzipSkin(UITest configuration, List<File> skinDependencies, File targetWARDirectory) throws Exception
     {
-        LOGGER.debug("Copying Skin resources ...");
+        LOGGER.info("Copying Skin resources ...");
         File skinsDirectory = new File(targetWARDirectory, "skins");
         for (File file : skinDependencies) {
-            LOGGER.debug("  ... Unzipping skin: " + file);
+            if (configuration.debug()) {
+                LOGGER.info("... Unzipping skin: " + file);
+            }
             unzip(file, skinsDirectory);
         }
     }
@@ -217,48 +214,6 @@ public class WARBuilder
         }
     }
 
-    private void generateConfigurationFiles(File configurationFileTargetDirectory, String version, Database database,
-        ArtifactResolver resolver) throws Exception
-    {
-        VelocityContext context = createVelocityContext(new Properties(), database);
-        Artifact artifact = new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
-            JAR, version);
-        File configurationJARFile = resolver.resolveArtifact(artifact).getArtifact().getFile();
-
-        configurationFileTargetDirectory.mkdirs();
-
-        try (JarInputStream jarInputStream = new JarInputStream(new FileInputStream(configurationJARFile))) {
-            JarEntry entry;
-            while ((entry = jarInputStream.getNextJarEntry()) != null) {
-                if (entry.getName().endsWith(VM_EXTENSION)) {
-                    String fileName = entry.getName().replace(VM_EXTENSION, "");
-                    File outputFile = new File(configurationFileTargetDirectory, fileName);
-                    LOGGER.debug("  ... Generating: " + outputFile);
-                    // Note: Init is done once even if this method is called several times...
-                    Velocity.init();
-                    try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile))) {
-                        Velocity.evaluate(context, writer, "",
-                            IOUtils.toString(jarInputStream, StandardCharsets.UTF_8));
-                    }
-                    jarInputStream.closeEntry();
-                }
-            }
-        } catch (Exception e) {
-            throw new Exception("Failed to extract configuration files", e);
-        }
-    }
-
-    private VelocityContext createVelocityContext(Properties projectProperties, Database database)
-    {
-        Properties properties = new Properties();
-        properties.putAll(getDefaultConfigurationProperties(database));
-        for (Object key : projectProperties.keySet()) {
-            properties.put(key.toString(), projectProperties.get(key).toString());
-        }
-        VelocityContext context = new VelocityContext(properties);
-        return context;
-    }
-
     private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
     {
         if (database.equals(Database.MYSQL)) {
@@ -273,77 +228,12 @@ public class WARBuilder
         }
     }
 
-    private Properties getDefaultConfigurationProperties(Database database)
-    {
-        Properties props = new Properties();
-
-        // Enable superadmin user
-        props.put("xwikiCfgSuperadminPassword", "pass");
-
-        // Default configuration data for hibernate.cfg.xml
-        if (database.equals(Database.MYSQL)) {
-            props.putAll(getDBProperties(
-                "jdbc:mysql://xwikidb:3306/xwiki?useSSL=false",
-                DB_USERNAME,
-                DB_PASSWORD,
-                "com.mysql.jdbc.Driver",
-                "org.hibernate.dialect.MySQL5InnoDBDialect"));
-        } else if (database.equals(Database.HSQLDB)) {
-            props.putAll(getDBProperties(
-                "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true",
-                "sa",
-                "",
-                "org.hsqldb.jdbcDriver",
-                "org.hibernate.dialect.HSQLDialect"));
-        } else {
-            throw new RuntimeException(
-                String.format("Failed to generate Hibernate config. Database [%s] not supported yet!", database));
-        }
-
-        props.setProperty("xwikiDbHbmXwiki", "xwiki.hbm.xml");
-        props.setProperty("xwikiDbHbmFeeds", "feeds.hbm.xml");
-
-        // Default configuration data for xwiki.cfg
-        props.setProperty("xwikiCfgPlugins",
-            "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
-                + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
-                + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
-                + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
-                + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
-        props.setProperty("xwikiCfgVirtualUsepath", "1");
-        props.setProperty("xwikiCfgEditCommentMandatory", "0");
-        props.setProperty("xwikiCfgDefaultSkin", SKIN);
-        props.setProperty("xwikiCfgDefaultBaseSkin", SKIN);
-        props.setProperty("xwikiCfgEncoding", "UTF-8");
-
-        // Configure the extension repositories to have only the local maven repository. This is to improve XWiki
-        // performances and also to control the build environment so that we don't depend on any external service.
-        // We need the local maven repo to provision the XARs from the module being tested.
-/*
-        props.setProperty("xwikiExtensionRepositories",
-            String.format("maven-local:maven:file://%s/.m2/repository", System.getProperty("user.home")));
-*/
-        return props;
-    }
-
-    private Properties getDBProperties(String xwikiDbConnectionUrl, String xwikiDbConnectionUsername,
-        String xwikiDbConnectionPassword, String xwikiDbConnectionDriverClass, String xwikiDbDialect)
-    {
-        Properties props = new Properties();
-        props.setProperty("xwikiDbConnectionUrl", xwikiDbConnectionUrl);
-        props.setProperty("xwikiDbConnectionUsername", xwikiDbConnectionUsername);
-        props.setProperty("xwikiDbConnectionPassword", xwikiDbConnectionPassword);
-        props.setProperty("xwikiDbConnectionDriverClass", xwikiDbConnectionDriverClass);
-        props.setProperty("xwikiDbDialect", xwikiDbDialect);
-        return props;
-    }
-
     private void generateXED(Artifact artifact, File directory, MavenResolver resolver) throws Exception
     {
         Artifact pomArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "pom",
             artifact.getVersion());
         Model model = resolver.getModelFromPOMArtifact(pomArtifact);
         File path = new File(directory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
-        this.extensionHelper.serializeExtension(path, model);
+        this.extensionHelper.serializeExtension(path, RepositoryUtils.toArtifact(artifact), model);
     }
 }

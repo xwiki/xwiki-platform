@@ -36,9 +36,6 @@
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
-         runtime code -->
-    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
   <modules>
     <module>xwiki-platform-repository-test-tests</module>

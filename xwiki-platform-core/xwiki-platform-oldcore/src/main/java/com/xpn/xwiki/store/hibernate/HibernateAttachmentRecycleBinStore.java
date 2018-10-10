@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.AttachmentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -71,10 +70,6 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
     /** Constant string used to refer date. */
     private static final String DATE = "date";
-
-    @Inject
-    @Named("xwikicfg")
-    private ConfigurationSource configuration;
 
     @Inject
     private StoreConfiguration storeConfiguration;

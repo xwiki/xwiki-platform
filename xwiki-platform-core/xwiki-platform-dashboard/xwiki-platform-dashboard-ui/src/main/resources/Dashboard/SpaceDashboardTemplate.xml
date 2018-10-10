@@ -270,7 +270,7 @@
   #set ($aSpace = $services.rendering.escape($doc.space, 'xwiki/2.1'))
 #end
 
-{{activity spaces="$!aSpace" /}}
+{{notifications spaces="$!aSpace" useUserPreferences="false" displayOwnEvents="true" /}}
 {{/velocity}}</content>
     </property>
     <property>

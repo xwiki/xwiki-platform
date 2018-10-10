@@ -43,8 +43,8 @@ panels.type=Typ
 panels.category=Kategorie
 panels._actions=Aktionen
 panels.emptyvalue=
-### Missing: panels.children.title=Child Pages
+panels.children.title=Unterseiten
 ### Missing: panels.siblings.title=Sibling Pages
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.documentInformation.configureSyntaxes=Weitere Syntaxen konfigurieren
 </content>
 </xwikidoc>

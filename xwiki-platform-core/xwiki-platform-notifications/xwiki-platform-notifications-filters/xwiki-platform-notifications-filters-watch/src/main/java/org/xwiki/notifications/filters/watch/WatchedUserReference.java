@@ -25,8 +25,8 @@ import org.apache.commons.compress.utils.Sets;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
@@ -45,7 +45,7 @@ public class WatchedUserReference implements WatchedEntityReference
 {
     private String userId;
 
-    private NotificationFilterManager notificationFilterManager;
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     private EventUserFilterPreferencesGetter preferencesGetter;
 
@@ -53,21 +53,22 @@ public class WatchedUserReference implements WatchedEntityReference
      * Construct a WatchedUserReference.
      * @param userId id of the user to watch.
      * @param preferencesGetter the instance of EventUserFilterPreferencesGetter
-     * @param notificationFilterManager the notification filter manager
-     * @since 9.10RC1
+     * @param notificationFilterPreferenceManager the notification filter manager
+     * @since 10.9RC1
      */
     public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter,
-            NotificationFilterManager notificationFilterManager)
+            NotificationFilterPreferenceManager notificationFilterPreferenceManager)
     {
         this.userId = userId;
         this.preferencesGetter = preferencesGetter;
-        this.notificationFilterManager = notificationFilterManager;
+        this.notificationFilterPreferenceManager = notificationFilterPreferenceManager;
     }
 
     @Override
     public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        return preferencesGetter.isUsedFollowed(userId, notificationFilterManager.getFilterPreferences(userReference),
+        return preferencesGetter.isUsedFollowed(userId,
+                notificationFilterPreferenceManager.getFilterPreferences(userReference),
                 null);
     }
 

@@ -37,6 +37,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.rendering.block.Block;
@@ -55,6 +56,9 @@ public class NotificationFiltersScriptService implements ScriptService
 {
     @Inject
     private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     @Named("cached")
@@ -100,8 +104,9 @@ public class NotificationFiltersScriptService implements ScriptService
     public Set<NotificationFilterPreference> getFilterPreferences(NotificationFilter filter)
             throws NotificationException
     {
-        return notificationFilterManager.getFilterPreferences(
-                notificationFilterManager.getFilterPreferences(documentAccessBridge.getCurrentUserReference()),
+        return notificationFilterPreferenceManager.getFilterPreferences(
+                notificationFilterPreferenceManager.getFilterPreferences(
+                        documentAccessBridge.getCurrentUserReference()),
                 filter
         ).collect(Collectors.toSet());
     }
@@ -131,8 +136,7 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
     {
-
-        notificationFilterManager.deleteFilterPreference(filterPreferenceId);
+        notificationFilterPreferenceManager.deleteFilterPreference(filterPreferenceId);
     }
 
     /**
@@ -145,7 +149,7 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException
     {
-        notificationFilterManager.setFilterPreferenceEnabled(filterPreferenceId, enabled);
+        notificationFilterPreferenceManager.setFilterPreferenceEnabled(filterPreferenceId, enabled);
     }
 
     /**
@@ -160,7 +164,9 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void setStartDate(Date startDate) throws NotificationException
     {
-        notificationFilterManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
+        notificationFilterPreferenceManager.setStartDateForUser(
+                documentAccessBridge.getCurrentUserReference(), startDate
+        );
     }
 
     /**

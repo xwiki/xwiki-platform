@@ -308,6 +308,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             } else {
                 new TransactionRunnable<XWikiHibernateTransaction>()
                 {
+                    @Override
                     protected void onRun() throws XWikiException
                     {
                         avs.saveArchive(archive, context, false);
@@ -321,6 +322,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 final XWikiDocument doc = attachment.getDoc();
                 new TransactionRunnable<XWikiHibernateTransaction>()
                 {
+                    @Override
                     protected void onRun() throws XWikiException
                     {
                         store.saveXWikiDoc(doc, context, false);
@@ -376,6 +378,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             } else {
                 new TransactionRunnable<HibernateTransaction>()
                 {
+                    @Override
                     protected void onRun() throws XWikiException
                     {
                         avs.deleteArchive(attachment, context, false);

@@ -232,6 +232,8 @@ rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display fol
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
 rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
 rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
+rendering.macro.notifications.parameter.tags.name=Tags
+rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
 
 ## Notifications Macro
 notifications.macro.noWatchedUsers=You are not following anybody.

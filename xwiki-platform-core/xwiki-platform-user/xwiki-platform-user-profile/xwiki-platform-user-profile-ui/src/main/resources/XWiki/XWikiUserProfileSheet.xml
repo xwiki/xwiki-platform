@@ -169,7 +169,7 @@
       #end
 {{/html}}
 
-{{activity authors="${doc.prefixedFullName}" /}}
+{{notifications useUserPreferences="false" displayOwnEvents="true" users="${doc.prefixedFullName}" displayRSSLink="false" /}}
 
 {{html clean='false'}}
       &lt;/div&gt;

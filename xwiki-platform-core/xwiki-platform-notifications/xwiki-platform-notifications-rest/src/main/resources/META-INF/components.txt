@@ -1,3 +1,4 @@
 org.xwiki.notifications.rest.internal.DefaultNotificationsResource
 org.xwiki.notifications.rest.internal.InternalNotificationsRenderer
+org.xwiki.notifications.rest.internal.TagNotificationFilter
 org.xwiki.notifications.rest.internal.UsersParameterHandler

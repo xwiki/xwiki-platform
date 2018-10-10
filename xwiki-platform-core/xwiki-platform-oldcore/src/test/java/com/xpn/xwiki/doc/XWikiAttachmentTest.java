@@ -20,6 +20,7 @@
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -55,7 +56,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -94,8 +94,9 @@ public class XWikiAttachmentTest
     {
         XWikiAttachment attachment = new XWikiAttachment();
         attachment.fromXML("<attachment>\n" + "<filename>XWikiLogo.png</filename>\n" + "<filesize>1390</filesize>\n"
-            + "<mimetype>image/png2</mimetype>\n" + "<author>xwiki:XWiki.Admin</author>\n" + "<date>1252454400000</date>\n"
-            + "<version>1.1</version>\n" + "<comment/>\n" + "<content>MDEyMzQ1Njc4OQ==</content>\n" + "</attachment>");
+            + "<mimetype>image/png2</mimetype>\n" + "<author>xwiki:XWiki.Admin</author>\n"
+            + "<date>1252454400000</date>\n" + "<version>1.1</version>\n" + "<comment/>\n"
+            + "<content>MDEyMzQ1Njc4OQ==</content>\n" + "</attachment>");
 
         assertEquals("XWikiLogo.png", attachment.getFilename());
         assertEquals(new Date(1252454400000L), attachment.getDate());
@@ -141,6 +142,26 @@ public class XWikiAttachmentTest
     // Tests
 
     @Test
+    public void testGetSize() throws IOException
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        assertEquals(-1, attachment.getLongSize());
+
+        attachment.setLongSize(42);
+
+        assertEquals(42, attachment.getLongSize());
+
+        attachment.setContent(new ByteArrayInputStream(new byte[] { 1, 2, 3, 4 }));
+
+        assertEquals(4, attachment.getLongSize());
+
+        attachment.setLongSize(42);
+
+        assertEquals(4, attachment.getLongSize());
+    }
+
+    @Test
     public void testGetVersionList() throws Exception
     {
         final XWikiAttachment attach = new XWikiAttachment();
@@ -166,8 +187,8 @@ public class XWikiAttachmentTest
         final InputStream ris = new RandomInputStream(attachLength, seed);
         attach.setContent(ris);
         assertEquals("Not all of the stream was read", 0, ris.available());
-        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed), attach.getAttachment_content()
-            .getContentInputStream()));
+        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
+            attach.getAttachment_content().getContentInputStream()));
     }
 
     @Test
@@ -178,8 +199,8 @@ public class XWikiAttachmentTest
         final XWikiAttachment attach = new XWikiAttachment();
         final InputStream ris = new RandomInputStream(attachLength, seed);
         attach.setContent(ris);
-        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed), attach.getAttachment_content()
-            .getContentInputStream()));
+        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
+            attach.getAttachment_content().getContentInputStream()));
         // Now write to the attachment via an OutputStream.
         final XWikiAttachmentContent xac = attach.getAttachment_content();
         xac.setContentDirty(false);
@@ -285,8 +306,8 @@ public class XWikiAttachmentTest
         DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         attachment.setAuthorReference(userReference);
         assertEquals(userReference, attachment.getAuthorReference());
-        when(compactWikiEntityReferenceSerializer.serialize(userReference, attachment.getReference())).thenReturn(
-            "stringUserReference");
+        when(compactWikiEntityReferenceSerializer.serialize(userReference, attachment.getReference()))
+            .thenReturn("stringUserReference");
         assertEquals("stringUserReference", attachment.getAuthor());
 
         // getAuthorReference() based on getAuthor()
@@ -295,18 +316,18 @@ public class XWikiAttachmentTest
         userReference = new DocumentReference("wiki", "XWiki", "author");
         EntityReference relativeUserReference = userReference.removeParent(userReference.getWikiReference());
         when(xclassEntityReferenceResolver.resolve("author", EntityType.DOCUMENT)).thenReturn(relativeUserReference);
-        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference())).thenReturn(
-            userReference);
+        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference()))
+            .thenReturn(userReference);
         assertEquals(userReference, attachment.getAuthorReference());
 
         // Guest author.
         attachment.setAuthor(XWikiRightService.GUEST_USER);
         userReference = new DocumentReference("wiki", "XWiki", XWikiRightService.GUEST_USER);
         relativeUserReference = userReference.removeParent(userReference.getWikiReference());
-        when(xclassEntityReferenceResolver.resolve(any(String.class), eq(EntityType.DOCUMENT))).thenReturn(
-            relativeUserReference);
-        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference())).thenReturn(
-            userReference);
+        when(xclassEntityReferenceResolver.resolve(any(String.class), eq(EntityType.DOCUMENT)))
+            .thenReturn(relativeUserReference);
+        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference()))
+            .thenReturn(userReference);
         assertNull(attachment.getAuthorReference());
     }
 
@@ -333,8 +354,8 @@ public class XWikiAttachmentTest
         attachment.setAuthorReference(userReference);
         assertEquals(userReference, attachment.getAuthorReference());
         when(currentAttachmentReferenceResolver.resolve(attachment.getFilename())).thenReturn(attachmentReference);
-        when(compactWikiEntityReferenceSerializer.serialize(userReference, attachmentReference)).thenReturn(
-            "stringUserReference");
+        when(compactWikiEntityReferenceSerializer.serialize(userReference, attachmentReference))
+            .thenReturn("stringUserReference");
         assertEquals("stringUserReference", attachment.getAuthor());
 
         // getAuthorReference() based on getAuthor()
@@ -343,8 +364,8 @@ public class XWikiAttachmentTest
         userReference = new DocumentReference("wiki", "XWiki", "author");
         EntityReference relativeUserReference = userReference.removeParent(userReference.getWikiReference());
         when(xclassEntityReferenceResolver.resolve("author", EntityType.DOCUMENT)).thenReturn(relativeUserReference);
-        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference())).thenReturn(
-            userReference);
+        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference()))
+            .thenReturn(userReference);
         assertEquals(userReference, attachment.getAuthorReference());
     }
 
@@ -354,9 +375,8 @@ public class XWikiAttachmentTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
 
-        when(
-            this.oldcore.getXWikiContext().getWiki()
-                .getDocument(document.getDocumentReference(), this.oldcore.getXWikiContext())).thenReturn(document);
+        when(this.oldcore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
+            this.oldcore.getXWikiContext())).thenReturn(document);
 
         XWikiAttachment attachment = new XWikiAttachment(document, "file.txt");
         when(document.getAttachment(attachment.getFilename())).thenReturn(attachment);
@@ -377,9 +397,8 @@ public class XWikiAttachmentTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
 
-        when(
-            this.oldcore.getXWikiContext().getWiki()
-                .getDocument(document.getDocumentReference(), this.oldcore.getXWikiContext())).thenReturn(document);
+        when(this.oldcore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
+            this.oldcore.getXWikiContext())).thenReturn(document);
 
         XWikiAttachment attachment = new XWikiAttachment(document, "file.txt");
         attachment.setVersion("3.5");
@@ -395,8 +414,8 @@ public class XWikiAttachmentTest
         archivedAttachment.setAttachment_content(content);
 
         XWikiAttachmentArchive archive = mock(XWikiAttachmentArchive.class);
-        when(archive.getRevision(attachment, attachment.getVersion(), this.oldcore.getXWikiContext())).thenReturn(
-            archivedAttachment);
+        when(archive.getRevision(attachment, attachment.getVersion(), this.oldcore.getXWikiContext()))
+            .thenReturn(archivedAttachment);
 
         AttachmentVersioningStore store = mock(AttachmentVersioningStore.class);
         when(this.oldcore.getXWikiContext().getWiki().getDefaultAttachmentArchiveStore()).thenReturn(store);

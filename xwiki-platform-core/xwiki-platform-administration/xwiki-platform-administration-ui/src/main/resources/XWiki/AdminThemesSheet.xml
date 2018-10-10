@@ -181,7 +181,7 @@ $xwiki.jsx.use('XWiki.AdminThemesSheet')
       var inputValue = self.input.val();
       // We consider a color theme or a skin must be written with an absolute reference, so if there is no "dot", the
       // value is wrong.
-      if (inputValue.indexOf('.') &gt; 0) {
+      if (typeof inputValue === 'string' &amp;&amp; inputValue.indexOf('.') &gt; 0) {
         // TODO: verify that the page exists (?)
         var pageReference = XWiki.Model.resolve(inputValue, XWiki.EntityType.DOCUMENT);
         var url = new XWiki.Document(pageReference).getURL(self.action);

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.rest;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -37,7 +38,7 @@ import org.xwiki.stability.Unstable;
 public interface NotificationsResource
 {
     /**
-     * Get notifications RSS for the given parameters.
+     * Get notifications for the given parameters.
      * @return notifications
      * @throws Exception if an error occurs
      */
@@ -56,7 +57,9 @@ public interface NotificationsResource
             @QueryParam("displayMinorEvents") String displayMinorEvents,
             @QueryParam("displaySystemEvents") String displaySystemEvents,
             @QueryParam("displayReadEvents") String displayReadEvents,
-            @QueryParam("displayReadStatus") String displayReadStatus
+            @QueryParam("displayReadStatus") String displayReadStatus,
+            @QueryParam("tags") String tags,
+            @QueryParam("currentWiki") String currentWiki
             ) throws Exception;
 
     /**
@@ -84,6 +87,25 @@ public interface NotificationsResource
             @QueryParam("displayMinorEvents") String displayMinorEvents,
             @QueryParam("displaySystemEvents") String displaySystemEvents,
             @QueryParam("displayReadEvents") String displayReadEvents,
-            @QueryParam("displayReadStatus") String displayReadStatus
+            @QueryParam("displayReadStatus") String displayReadStatus,
+            @QueryParam("tags") String tags,
+            @QueryParam("currentWiki") String currentWiki
     ) throws Exception;
+
+    /**
+     * Get notifications matching the given parameters. The POST method is used to allow large content in the
+     * parameters. For example, the parameter "blackList" could be very long, and the associated URL with the GET method
+     * would be too long (generating HTTP 414 error).
+     *
+     * Note: in the interface, we do not list the parameters, because Restlet does not support @FormParam...
+     * See: https://github.com/restlet/restlet-framework-java/issues/1120
+     *
+     * @return notifications
+     * @throws Exception if an error occurs
+     * @since 10.8RC1
+     * @since 10.8.1
+     * @since 9.11.8
+     */
+    @POST
+    Response postNotifications() throws Exception;
 }

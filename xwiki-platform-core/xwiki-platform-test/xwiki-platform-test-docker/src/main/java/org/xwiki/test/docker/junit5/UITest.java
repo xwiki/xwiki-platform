@@ -58,4 +58,10 @@ public @interface UITest
      * @since 10.9RC1
      */
     ServletEngine servletEngine() default ServletEngine.TOMCAT;
+
+    /**
+     * @return true if the test should be started in debug mode, false otherwise
+     * @since 10.9RC1
+     */
+    boolean debug() default false;
 }

@@ -52,7 +52,7 @@
 |Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: http://xwiki.org}}}|Ceci est un URL: http://xwiki.org
 |Lien vers un URL|{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
 |Lien vers un URL avec étiquette|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
-|Lien vers une adresse émail|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Lien vers une adresse email|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Lien image|{{{&lt;a href="$xwiki.getURL("Espace1.Page1")"&gt;{image:img.png|document=Espace2.Page2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Lien vers une pièce jointe à la page courante|(((
 {{info}}Voir [[Attacher une Macro&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/AttachMacro]] pour savoir plus.{{/info}}
@@ -95,7 +95,7 @@ La syntaxe complète d'un lien est ##(alias[|&gt;])+(link)(@interWikiAlias)+([|g
 |Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: http://xwiki.org}}}|Ceci est un URL: http://xwiki.org
 |Lien vers un URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
 |Lien vers un URL avec étiquette|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
-|Lien vers une adresse émail|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Lien vers une adresse email|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Lien image|(((
 {{{[[image:Espace2.Page2@img.png&gt;&gt;Espace1.Page1]]}}}
 {{info}}La syntaxe Wiki est supportée dans les étiquettes des liens.{{/info}}
@@ -114,7 +114,7 @@ $subHeading Spécifications des liens pour la syntaxe XWiki 2.0 $subHeading
 La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 
 * ##label##: L'étiquette du lien qui peut contenir de la syntaxe wiki 
-* ##link##: La cible du lien, c'est-à-dire, où aller après cliquer sur un lien.  La syntaxe ressemble à la syntaxe XWiki 1.0 et peut contenir 2 types de URI: ##mailto~:## et##{{{attach:}}}##pour des liens vers une adresse émail et vers une pièce jointe.
+* ##link##: La cible du lien, c'est-à-dire, où aller après cliquer sur un lien.  La syntaxe ressemble à la syntaxe XWiki 1.0 et peut contenir 2 types de URI: ##mailto~:## et##{{{attach:}}}##pour des liens vers une adresse email et vers une pièce jointe.
 * ##parameters##: Une liste optionnelle de paramètres transmis au lien.
 
 === 2.1 Links ===
@@ -128,7 +128,7 @@ La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 |Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: http://xwiki.org}}}|Ceci est un URL: http://xwiki.org
 |Lien vers un URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
 |Lien vers un URL avec étiquette|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
-|Lien vers une adresse émail|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Lien vers une adresse email|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Lien image|(((
 {{{[[image:Espace2.Page2@img.png&gt;&gt;Espace1.Page1]]}}}
 {{info}}La syntaxe Wiki est supportée dans les étiquettes des liens.{{/info}}
@@ -148,7 +148,7 @@ $subHeading Spécifications des liens pour la syntaxe XWiki 2.1 $subHeading
 La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 
 * ##label##: L'étiquette du lien qui peut contenir de la syntaxe wiki 
-* ##link##: La cible du lien, c'est-à-dire, où aller après cliquer sur un lien.  La syntaxe ressemble à la syntaxe XWiki 1.0 et peut contenir 2 types de URI: ##mailto~:## et##{{{attach:}}}##pour des liens vers une adresse émail et vers une pièce jointe.
+* ##link##: La cible du lien, c'est-à-dire, où aller après cliquer sur un lien.  La syntaxe ressemble à la syntaxe XWiki 1.0 et peut contenir 2 types de URI: ##mailto~:## et##{{{attach:}}}##pour des liens vers une adresse email et vers une pièce jointe.
 * ##parameters##: Une liste optionnelle de paramètres transmis au lien.
 ** **##queryString##**: An optional query string for specifying parameters that will be appended to the link target address and used in the rendered URL. Example: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## produces target address ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##

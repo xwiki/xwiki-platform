@@ -123,12 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Wenn aktiviert, dann fangen alle vom 
 platform.wiki.currentwiki.invite.username.hint=Benutzer, welcher zum Wiki hinzugefügt werden soll.
 platform.wiki.currentwiki.invite.message.hint=Die Mitteilung für den Benutzer
 platform.wiki.currentwiki.candidates.hint=Benutzer, welche eine Mitgleidschaft beantragt haben, oder dazu eingeladen wurden.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Ändern Sie die Einstellungen des Wikis: Name, Beschreibung, Besitzer und Art der Mitgliedschaft.
 admin.xwiki.workspaceusers.description=Benutzerverwaltung für das Wiki: Benutzer hinzufügen, löschen und einladen, sowie Anträge auf Mitgliedschaft annehmen oder ablehnen.
 admin.xwiki.usersconfiguration.title=Konfiguration
 ### Missing: admin.xwiki.members.title=Current Members
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

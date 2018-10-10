@@ -29,6 +29,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.MountableFile;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -40,16 +41,18 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class ServletContainerExecutor
 {
+    private static final String TOMCAT_WEBAPP_DIR = "/usr/local/tomcat/webapps/xwiki";
+
     /**
-     * @param engine the servlet engine to build and start
+     * @param configuration the configuration to build (servlet engine, debug mode, etc)
      * @param sourceWARDirectory the location where the built WAR is located
      * @return the Docker container instance
      * @throws Exception if an error occurred during the build or start
      */
-    public GenericContainer execute(ServletEngine engine, File sourceWARDirectory) throws Exception
+    public GenericContainer execute(UITest configuration, File sourceWARDirectory) throws Exception
     {
         GenericContainer servletContainer;
-        switch (engine) {
+        switch (configuration.servletEngine()) {
             case TOMCAT:
                 // Configure Tomcat logging for debugging
                 File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
@@ -59,19 +62,22 @@ public class ServletContainerExecutor
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
 
-                // docker run --net=xwiki-nw --name xwiki -p 8080:8080 -v /my/own/xwiki:/usr/local/xwiki
-                //     -e DB_USER=xwiki -e DB_PASSWORD=xwiki -e DB_DATABASE=xwiki -e DB_HOST=mysql-xwiki
-                //     xwiki:mysql-tomcat
-                // docker run --net=xwiki-nw --name xwiki -p 8080:8080 -v /my/own/xwiki:/usr/local/xwiki
-                //     -e DB_USER=xwiki -e DB_PASSWORD=xwiki -e DB_DATABASE=xwiki -e DB_HOST=postgres-xwiki
-                //     xwiki:postgres-tomcat
-                servletContainer = new GenericContainer<>("tomcat:latest")
-                    // Map the XWiki WAR inside Tomcat
-                    .withFileSystemBind(sourceWARDirectory.toString(), "/usr/local/tomcat/webapps/xwiki");
+                servletContainer = new GenericContainer<>("tomcat:latest");
+
+                // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
+                // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
+                String osName = System.getProperty("os.name").toLowerCase();
+                if (osName.startsWith("mac os x")) {
+                    MountableFile xwikiDirectory = MountableFile.forHostPath(sourceWARDirectory.toString());
+                    servletContainer.withCopyFileToContainer(xwikiDirectory, TOMCAT_WEBAPP_DIR);
+                } else {
+                    servletContainer.withFileSystemBind(sourceWARDirectory.toString(), TOMCAT_WEBAPP_DIR);
+                }
 
                 break;
             default:
-                throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!", engine));
+                throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
+                    configuration.servletEngine()));
         }
 
         // Note: Testcontainers will wait for up to 60 seconds for the container's first mapped network port to start
@@ -79,7 +85,6 @@ public class ServletContainerExecutor
         servletContainer
             .withNetwork(Network.SHARED)
             .withNetworkAliases("xwikiweb")
-            .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())))
             .withExposedPorts(8080)
             .withEnv("CATALINA_OPTS", "-Xmx1024m "
                 + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
@@ -87,8 +92,13 @@ public class ServletContainerExecutor
                 + "-Dsecurerandom.source=file:/dev/urandom")
             .waitingFor(
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
-                    .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)))
-            .start();
+                    .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+
+        if (configuration.debug()) {
+            servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+        }
+
+        servletContainer.start();
 
         return servletContainer;
     }

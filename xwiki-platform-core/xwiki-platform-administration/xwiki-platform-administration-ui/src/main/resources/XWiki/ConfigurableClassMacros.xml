@@ -81,36 +81,48 @@
  *                             a safety measure because macros can't return values.
  *###
 #macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
-  ## Use a parameterized sql query to prevent injection.
-  #set($params = [])
-  #if($section &amp;&amp; $section != '')
-    #set($discard = $params.add("$section"))
-    #set($sqlA = ' StringProperty as section,')
-    #set($sqlB = " and section.id=obj.id and section.name='displayInSection' and section.value=?")
+  #set ($fromClause = [
+    'BaseObject as obj',
+    'StringProperty as category',
+    'IntegerProperty as sectionOrder',
+    'IntegerProperty as global'
+  ])
+  #set ($whereClause = [
+    "obj.name = doc.fullName and obj.className = ?",
+    "category.id = obj.id and category.name = 'displayInCategory'",
+    "sectionOrder.id = obj.id and sectionOrder.name = 'sectionOrder'",
+    "global.id = obj.id and global.name = 'configureGlobally' and global.value = ?"
+  ])
+  #set ($params = [$nameOfThisDocument])
+  ## Order by category and section priority, leaving empty/null category at the end, because we want to read the
+  ## category meta data from the first (most important) section in each category.
+  #set ($orderByClause = [
+    "case when category.value is null or category.value = '' then 1 else 0 end",
+    'category.value',
+    'sectionOrder.value'
+  ])
+  #if ($globaladmin == true)
+    #set ($discard = $params.add(1))
   #else
-    ## Make sure they are "" in case they were set prior to calling the macro.
-    #set($sqlA = '')
-    #set($sqlB = '')
-  #end
-  ## Set up query based on value of $globaladmin
-  #if($globaladmin == true)
-    #set($sqlC = '1')
-  #else
-    #if($space &amp;&amp; $space != '')
-      #set($sqlC = '0 and doc.space = ?')
-      #set($discard = $params.add($space))
-    #else
-      #set($sqlC = '0')
+    #set ($discard = $params.add(0))
+    #if ("$!space" != '')
+      #set ($discard = $whereClause.add('doc.space = ?'))
+      #set ($discard = $params.add($space))
     #end
   #end
-  #set($sql = ", BaseObject as obj,$sqlA IntegerProperty as global where "
-              + "doc.fullName=obj.name and obj.className='" + $nameOfThisDocument + "'$sqlB "
-              + "and global.id=obj.id and global.name='configureGlobally' and global.value=$sqlC "
-              + "order by doc.creationDate")
-  ##
-  ## Run the search
-  #set($discard = $outputList.addAll($services.query.hql($sql).bindValues($params).addFilter('unique').execute()))
-  ##
+  #if ("$!section" != '')
+    #set ($discard = $fromClause.add('StringProperty as section'))
+    #set ($discard = $whereClause.add("section.id = obj.id and section.name = 'displayInSection' and section.value = ?"))
+    #set ($discard = $params.add($section))
+  #end
+  #set ($statement = ', ' + $stringtool.join($fromClause, ', ') +
+    ' where ' + $stringtool.join($whereClause, ' and ') +
+    ' order by ' + $stringtool.join($orderByClause, ', '))
+  ## We can't remove duplicates using the unique filter because the select clause will be extended with the information
+  ## needed by the order by clause. Thus we remove the duplicates after we get the results.
+  #set ($orderedSetOfAppNames = $collectionstool.orderedSet)
+  #set ($discard = $orderedSetOfAppNames.addAll($services.query.hql($statement).bindValues($params).execute()))
+  #set ($discard = $outputList.addAll($orderedSetOfAppNames))
 #end
 
 #*

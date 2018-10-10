@@ -245,9 +245,10 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
    * @param spaces (optional) list of spaces, comma-separated, to include in the notifications
    * @param pages (optional) list of pages, comma-separated, to include in the notifications
    * @param users (optional) list of users, comma-separated, to include in the notifications (and only them)
+   * @param tags (optional) list of tags, comma-separated, to include in the notifications (and only them)
    */
   return function(macro, userId, count, displayReadStatus, blackList, useUserPreferences,
-      displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, wikis, spaces, pages, users) {
+      displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, wikis, spaces, pages, users, tags) {
     var self = this;
     self.macro = $(macro);
     self.userId = userId ? userId : self.macro.attr('data-userId');
@@ -268,6 +269,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     self.spaces = spaces != undefined ? spaces : self.macro.attr('data-spaces');
     self.pages = pages != undefined ? pages : self.macro.attr('data-pages');
     self.users = users != undefined ? users : self.macro.attr('data-users');
+    self.tags = tags != undefined ? tags : self.macro.attr('data-tags');
 
     /**
      * Function that load notifications.
@@ -289,7 +291,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         'spaces':              self.spaces,
         'pages':               self.pages,
         'users':               self.users,
-        'displayReadStatus':   self.displayReadStatus
+        'displayReadStatus':   self.displayReadStatus,
+        'tags':                self.tags,
+        'currentWiki':         xm.documentReference.extractReferenceValue(XWiki.EntityType.WIKI)
       };
       if (untilDate) {
         params.untilDate = untilDate;
@@ -297,7 +301,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       }
       var promise = $.Deferred();
       var restURL = xm.restURL.substring(0, xm.restURL.indexOf('/rest/')) + '/rest/notifications?media=json';
-      $.ajax(restURL, {cache: false, data: params}).done(function (data) {
+      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data) {
         // Display the "nothing!" message if there is no notification
         if (data.notifications.length == 0 &amp;&amp; !untilDate) {
           self.displayNoNotification();
@@ -792,18 +796,18 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   {{info}}
     {{translation key="notifications.macro.whenNotView" /}}
   {{/info}}
-  
+
   #set ($displayMacro = false)
-#else 
+#else
   #set ($users = $xcontext.macro.params.users)
   #if ("$!xcontext.macro.params.displayWatchedUsersOnly" == 'true')
     #set ($watchedUsers = $services.notification.watch.watchedUsers)
     #if ($watchedUsers.isEmpty())
-    
+
       {{warning}}
         {{translation key="notifications.macro.noWatchedUsers" /}}
       {{/warning}}
-      
+
       #set ($displayMacro = false)
     #else
       #set ($users = $stringtool.join($services.notification.watch.watchedUsers, ','))
@@ -815,9 +819,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
 {{html clean="false"}}
-&lt;div class="notifications-macro loading" 
+&lt;div class="notifications-macro loading"
   data-userId="$!escapetool.xml($services.model.serialize($xcontext.userReference, 'default'))"
-  data-count="$!escapetool.xml($xcontext.macro.params.count)" 
+  data-count="$!escapetool.xml($xcontext.macro.params.count)"
   data-useUserPreferences="$!escapetool.xml($xcontext.macro.params.useUserPreferences)"
   data-displayOwnEvents="$!escapetool.xml($xcontext.macro.params.displayOwnEvents)"
   data-displayMinorEvents="$!escapetool.xml($xcontext.macro.params.displayMinorEvents)"
@@ -828,6 +832,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   data-pages="$!escapetool.xml($xcontext.macro.params.pages)"
   data-users="$!escapetool.xml($users)"
   data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)"
+  data-tags="$!escapetool.xml($xcontext.macro.params.tags)"
 &gt;
 #if ('true' == $xcontext.macro.params.displayRSSLink)
   ## Generate the RSS URL to display the same notifications but in the RSS format
@@ -845,6 +850,8 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   #set ($rssURL = "${rssURL}&amp;pages=$!escapetool.url($xcontext.macro.params.pages)")
   #set ($rssURL = "${rssURL}&amp;users=$!escapetool.url($xcontext.macro.params.users)")
   #set ($rssURL = "${rssURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
+  #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($xcontext.macro.params.tags)")
+  #set ($rssURL = "${rssURL}&amp;currentWiki=$!escapetool.url($services.wiki.currentWikiId)")
   &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" target="_blank"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
 #end
 &lt;/div&gt;
@@ -1733,6 +1740,72 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayRSSLink</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsMacro</name>
+    <number>14</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>35490c6d-dcb8-4cff-b36b-bf2ed6e13402</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description/>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>tags</name>
     </property>
   </object>
 </xwikidoc>

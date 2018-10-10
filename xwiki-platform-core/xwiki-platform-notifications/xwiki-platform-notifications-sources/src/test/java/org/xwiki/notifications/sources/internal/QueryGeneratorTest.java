@@ -27,7 +27,6 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
@@ -113,8 +112,6 @@ public class QueryGeneratorTest
 
         fakeFilterPreference = mock(NotificationFilterPreference.class);
         when(fakeFilterPreference.isActive()).thenReturn(true);
-        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class)))
-                .thenReturn(Sets.newSet(fakeFilterPreference));
 
         when(documentAccessBridge.getProperty(userReference,
                 new DocumentReference("xwiki", "XWiki", "XWikiUsers"),

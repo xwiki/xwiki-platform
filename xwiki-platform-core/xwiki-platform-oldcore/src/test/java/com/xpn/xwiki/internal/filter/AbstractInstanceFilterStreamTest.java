@@ -26,8 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.filterxml.input.FilterXMLInputProperties;
 import org.xwiki.filter.input.BeanInputFilterStreamFactory;
@@ -41,7 +40,9 @@ import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.test.annotation.AllComponents;
 
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
 import static org.mockito.Mockito.doReturn;
@@ -51,20 +52,21 @@ import static org.mockito.Mockito.doReturn;
  * 
  * @version $Id$
  */
+@OldcoreTest
 @AllComponents
 public class AbstractInstanceFilterStreamTest
 {
     private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.ENGLISH);
 
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    protected MockitoOldcore oldcore;
 
     protected BeanInputFilterStreamFactory<FilterXMLInputProperties> xmlInputFilterStreamFactory;
 
     protected BeanOutputFilterStreamFactory<InstanceOutputProperties> outputFilterStreamFactory;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         this.xmlInputFilterStreamFactory = this.oldcore.getMocker().getInstance(InputFilterStreamFactory.class,
             FilterStreamType.FILTER_XML.serialize());

@@ -110,7 +110,7 @@ public class XWikiAttachment implements Cloneable
 
     private XWikiDocument doc;
 
-    private long size;
+    private Long size;
 
     private String mimeType;
 
@@ -163,7 +163,6 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachment()
     {
-        this.size = 0;
         this.filename = "";
         this.comment = "";
         this.date = new Date();
@@ -274,12 +273,20 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @return the metadata holding the number of bytes in this attachment content
+     * @return the real size of the attachment extracted from the content, or the size metadata if the content is not
+     *         loaded yet. -1 if the size is unknown.
      * @since 9.0RC1
      */
     public long getLongSize()
     {
-        return this.size;
+        // Give priority to the real attachment size if the content is loaded (bulletproofing for any mistake in the
+        // metadata)
+        XWikiAttachmentContent attachmentContent = getAttachment_content();
+        if (attachmentContent != null) {
+            this.size = attachmentContent.getLongSize();
+        }
+
+        return this.size == null ? -1 : this.size;
     }
 
     /**
@@ -291,7 +298,7 @@ public class XWikiAttachment implements Cloneable
      */
     public void setLongSize(long size)
     {
-        if (size != this.size) {
+        if (this.size == null || size != this.size) {
             setMetaDataDirty(true);
         }
 
@@ -325,7 +332,7 @@ public class XWikiAttachment implements Cloneable
             loadAttachmentContent(context);
         }
 
-        return this.content.getLongSize();
+        return this.content != null ? this.content.getLongSize() : -1;
     }
 
     public String getFilename()
@@ -1006,6 +1013,7 @@ public class XWikiAttachment implements Cloneable
         }
 
         this.content.setContent(data);
+        this.size = this.content.getLongSize();
     }
 
     /**
@@ -1024,6 +1032,7 @@ public class XWikiAttachment implements Cloneable
         }
 
         this.content.setContent(is, length);
+        this.size = this.content.getLongSize();
     }
 
     /**
@@ -1040,6 +1049,7 @@ public class XWikiAttachment implements Cloneable
         }
 
         this.content.setContent(is);
+        this.size = this.content.getLongSize();
     }
 
     public void loadAttachmentContent(XWikiContext xcontext) throws XWikiException
@@ -1259,7 +1269,7 @@ public class XWikiAttachment implements Cloneable
     public boolean equalsData(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException
     {
         try {
-            if (getLongSize() == otherAttachment.getLongSize()) {
+            if (getContentLongSize(xcontext) == otherAttachment.getContentLongSize(xcontext)) {
                 InputStream is = getContentInputStream(xcontext);
 
                 try {

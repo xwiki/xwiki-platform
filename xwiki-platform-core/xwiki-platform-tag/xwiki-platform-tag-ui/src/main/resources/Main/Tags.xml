@@ -92,8 +92,7 @@ $xwiki.ssx.use('Main.Tags')##
     (((
       (% class="xapp" %)
       === $services.localization.render('xe.tag.activity', ["//${tag}//"]) ===
-
-      {{activity tags="$tag" rss='true'/}}
+      {{notifications useUserPreferences="false" displayOwnEvents="true" tags="$tag" displayRSSLink="true" /}}
     )))
   {{/container}}
 #elseif ($do == 'prepareRename')

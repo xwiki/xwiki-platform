@@ -22,15 +22,16 @@ package org.xwiki.store.legacy.store.internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Session;
@@ -151,7 +152,6 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
                 allowing(mockXWiki).getDefaultAttachmentArchiveStore();
                 will(returnValue(mockAttachVersionStore));
-                allowing(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
 
                 allowing(mockAttach).getContentInputStream(mockContext);
                 will(returnValue(HELLO_STREAM));
@@ -209,15 +209,20 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         final File storeFile =
             this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
         Assert.assertFalse(this.storeFile.exists());
-        this.attachStore.saveAttachmentContent(this.mockAttach, false, this.mockContext, false);
-        Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
 
-        final InputStream is = new FileInputStream(storeFile);
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        IOUtils.copy(is, os);
-        is.close();
-        byte[] array = os.toByteArray();
-        Assert.assertEquals("The attachment file contained the wrong content", HELLO, new String(array, "UTF-8"));
+        getMockery().checking(new Expectations()
+        {
+            {
+                // Make sure an archive is saved
+                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
+            }
+        });
+
+        this.attachStore.saveAttachmentContent(this.mockAttach, false, this.mockContext, false);
+
+        Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
+        Assert.assertEquals("The attachment file contained the wrong content", HELLO,
+            FileUtils.readFileToString(storeFile, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -226,18 +231,24 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         final File storeFile =
             this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
         Assert.assertFalse(this.storeFile.exists());
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                // Make sure an archive is saved (twice)
+                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
+                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
+            }
+        });
+
         final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>();
         attachments.add(this.mockAttach);
         attachments.add(this.mockAttach);
         this.attachStore.saveAttachmentsContent(attachments, this.doc, false, this.mockContext, false);
-        Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
 
-        final InputStream is = new FileInputStream(storeFile);
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        IOUtils.copy(is, os);
-        is.close();
-        byte[] array = os.toByteArray();
-        Assert.assertEquals("The attachment file contained the wrong content", HELLO, new String(array, "UTF-8"));
+        Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
+        Assert.assertEquals("The attachment file contained the wrong content", HELLO,
+            FileUtils.readFileToString(storeFile, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -333,6 +344,8 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         {
             {
                 oneOf(mockHibernate).saveXWikiDoc(doc, mockContext, false);
+                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
+
             }
         });
 

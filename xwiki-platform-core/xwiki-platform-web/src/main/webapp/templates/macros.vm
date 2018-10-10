@@ -1275,7 +1275,6 @@ $Msz MB##
   ## Options / defaults
   ##
   #if("$!options.translationPrefix" != '') #set($transprefix = $options.translationPrefix) #else #set($transprefix = '') #end
-  #if("$!options.selectedColumn" != '')  #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.defaultOrder" == 'desc') #set($defaultOrder = 'desc') #else #set($defaultOrder = 'asc') #end
   #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
   #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
@@ -1453,6 +1452,9 @@ $Msz MB##
   </table>
   <div id="${htmlLiveTableId}-inaccessible-docs" class="hidden">
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
+  </div>
+  <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
+    #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
   <script type="text/javascript">
   //<![CDATA[
@@ -1684,6 +1686,9 @@ function (row, i, table) {
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
+  if (row['doc_title_raw'] !== undefined) {
+    $($jsontool.serialize("${divid}-computed-title-docs")).removeClassName('hidden');
+  }
   ## NOTE: Don't use Velocity code below this line!
   var tr = new Element('tr');
   columns.forEach(function(column) {
@@ -1768,6 +1773,9 @@ function (row, i, table) {
         var text = row[fieldName] + '';
         if (fieldName === 'doc_name' && !row['doc_viewable']) {
           text += '*';
+        }
+        if (fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
+          container.addClassName('docTitleComputed');
         }
         container.update(text.escapeHTML());
       }

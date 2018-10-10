@@ -164,9 +164,6 @@
     <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
       backward compatibility breakages. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't cloverify distribution code since there should be no code and we don't want to include any test or
-         tools used to build the distributions in the global TPC we computed. We want only runtime code -->
-    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not

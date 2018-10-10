@@ -40,6 +40,7 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
@@ -60,6 +61,7 @@ import org.xwiki.text.StringUtils;
 
 import com.google.common.collect.Sets;
 import com.rometools.rome.io.SyndFeedOutput;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -86,6 +88,9 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     @Inject
     private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     private InternalNotificationsRenderer notificationsRenderer;
@@ -117,14 +122,17 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             String displayMinorEvents,
             String displaySystemEvents,
             String displayReadEvents,
-            String displayReadStatus
+            String displayReadStatus,
+            String tags,
+            String currentWiki
     ) throws Exception
     {
         // 1. Get the events and render them as notifications.
         List<CompositeEvent> events =
                 getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
                         users, count,
-                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents);
+                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
+                        currentWiki);
 
         Notifications notifications = new Notifications(
                 notificationsRenderer.renderNotifications(events, userId, TRUE.equals(displayReadStatus)));
@@ -141,19 +149,48 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     public String getNotificationsRSS(String useUserPreferences, String userId, String untilDate,
             String blackList, String pages, String spaces, String wikis, String users, String count,
             String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
-            String displayReadStatus) throws Exception
+            String displayReadStatus, String tags, String currentWiki) throws Exception
     {
         List<CompositeEvent> events =
                 getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
                         users, count,
-                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents);
+                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
+                        currentWiki);
         SyndFeedOutput output = new SyndFeedOutput();
         return output.outputString(notificationRSSManager.renderFeed(events));
     }
 
+    @Override
+    public Response postNotifications() throws Exception
+    {
+        // We should seriously consider to stop using Restlet, because the @FormParam attribute does not work.
+        // See: https://github.com/restlet/restlet-framework-java/issues/1120
+        // That's why we need to use this workaround: manually getting the POST params in the request object.
+        XWikiRequest request = getXWikiContext().getRequest();
+        return getNotifications(
+                request.get("useUserPreferences"),
+                request.get("userId"),
+                request.get("untilDate"),
+                request.get("blackList"),
+                request.get("pages"),
+                request.get("spaces"),
+                request.get("wikis"),
+                request.get("users"),
+                request.get("count"),
+                request.get("displayOwnEvents"),
+                request.get("displayMinorEvents"),
+                request.get("displaySystemEvents"),
+                request.get("displayReadEvents"),
+                request.get("displayReadStatus"),
+                request.get("tags"),
+                request.get("currentWiki")
+        );
+    }
+
     private List<CompositeEvent> getCompositeEvents(String useUserPreferences, String userId,
             String untilDate, String blackList, String pages, String spaces, String wikis, String users, String count,
-            String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents)
+            String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
+            String tags, String currentWiki)
             throws NotificationException, EventStreamException
     {
         NotificationParameters parameters = new NotificationParameters();
@@ -176,7 +213,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             useUserPreferences(parameters);
         } else {
             dontUseUserPreferences(pages, spaces, wikis, users, parameters, displayOwnEvents, displayMinorEvents,
-                    displaySystemEvents, displayReadEvents);
+                    displaySystemEvents, displayReadEvents, tags, currentWiki);
         }
 
         return getCompositeEvents(parameters);
@@ -184,7 +221,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     private void dontUseUserPreferences(String pages, String spaces, String wikis, String users,
             NotificationParameters parameters, String displayOwnEvents, String displayMinorEvents,
-            String displaySystemEvents, String displayReadEvents)
+            String displaySystemEvents, String displayReadEvents, String tags, String currentWiki)
             throws NotificationException, EventStreamException
     {
         List<String> excludedFilters = new ArrayList<>();
@@ -210,6 +247,8 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         handleSpacesParameter(spaces, parameters);
         handleWikisParameter(wikis, parameters);
         usersParameterHandler.handleUsersParameter(users, parameters);
+
+        handleTagsParameter(parameters, tags, currentWiki);
     }
 
     private void useUserPreferences(NotificationParameters parameters) throws NotificationException
@@ -218,7 +257,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
                     parameters.format);
             parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
-            parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
+            parameters.filterPreferences = notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
         }
     }
 
@@ -254,6 +293,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                 pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
                 pref.setFilterType(NotificationFilterType.INCLUSIVE);
                 pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.ALERT));
+                pref.setProviderHint("REST");
                 switch (property) {
                     case WIKI:
                         pref.setWiki(locationArray[i]);
@@ -279,6 +319,16 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         for (RecordableEventDescriptor descriptor
                 : recordableEventDescriptorManager.getRecordableEventDescriptors(true)) {
             parameters.preferences.add(new InternalNotificationPreference(descriptor));
+        }
+    }
+
+    private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
+    {
+        if (StringUtils.isNotBlank(tags)) {
+            String[] tagArray = tags.split(",");
+            for (int i = 0; i < tagArray.length; ++i) {
+                parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
+            }
         }
     }
 }

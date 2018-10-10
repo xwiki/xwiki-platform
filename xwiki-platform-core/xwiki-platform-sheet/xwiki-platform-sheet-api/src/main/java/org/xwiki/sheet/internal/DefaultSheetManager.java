@@ -104,6 +104,11 @@ public class DefaultSheetManager implements SheetManager
     @Named("class")
     private SheetBinder classSheetBinder;
 
+    private String getContextSheet()
+    {
+        return (String) execution.getContext().getProperty(SheetRequestInitializer.SHEET_PROPERTY_NAME);
+    }
+
     @Override
     public List<DocumentReference> getSheets(DocumentModelBridge document, String action)
     {
@@ -111,7 +116,7 @@ public class DefaultSheetManager implements SheetManager
 
         // (1) Check if there is a sheet specified for the current execution context. Apply it only if the given
         // document is the current document on the execution context.
-        String sheetStringRef = (String) execution.getContext().getProperty("sheet");
+        String sheetStringRef = getContextSheet();
         if (sheetStringRef != null && documentReference.equals(documentAccessBridge.getCurrentDocumentReference())) {
             DocumentReference sheetReference = documentReferenceResolver.resolve(sheetStringRef, documentReference);
             if (matchSheet(sheetReference, action)) {
@@ -194,5 +199,11 @@ public class DefaultSheetManager implements SheetManager
         // We assume all actions are matched if the expected value is not specified (is empty).
         return StringUtils.isEmpty(expectedAction) || StringUtils.isEmpty(actualAction)
             || actualAction.equals(expectedAction);
+    }
+
+    @Override
+    public boolean isSheetForced()
+    {
+        return getContextSheet() != null;
     }
 }

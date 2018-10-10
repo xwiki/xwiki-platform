@@ -22,6 +22,7 @@ package com.xpn.xwiki.doc;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -603,6 +604,12 @@ public class XWikiDocumentMockitoTest
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject.getNumber()));
         Assert.assertSame(this.baseObject2,
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject2.getNumber()));
+    }
+
+    @Test
+    public void testGetXObjectsWhenClassDoesNotExist()
+    {
+        Assert.assertEquals(Collections.emptyList(), this.document.getXObjects(new DocumentReference("not", "existing", "class")));
     }
 
     @Test

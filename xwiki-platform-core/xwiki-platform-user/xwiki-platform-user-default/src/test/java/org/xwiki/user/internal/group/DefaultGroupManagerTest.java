@@ -231,6 +231,9 @@ public class DefaultGroupManagerTest
         assertGetGroupsEmpty(GLOBAL_USER_1, "otherwiki", true);
         assertGetGroups(GLOBAL_GROUP_1, GLOBAL_USER_1, Arrays.asList("xwiki", "otherwiki"), false);
         assertGetGroups(all, GLOBAL_USER_1, Arrays.asList("xwiki", "otherwiki"), true);
+
+        assertGetGroups(GLOBAL_GROUP_2, GLOBAL_GROUP_1, WikiTarget.ENTITY, false);
+        assertGetGroups(GLOBAL_GROUP_2, GLOBAL_GROUP_1, WikiTarget.ENTITY, true);        
     }
 
     @Test
@@ -316,6 +319,9 @@ public class DefaultGroupManagerTest
 
         assertGetMembers(GLOBAL_GROUP_1, GLOBAL_GROUP_2, false);
         assertGetMembers(Arrays.asList(GLOBAL_GROUP_1, GLOBAL_USER_1), GLOBAL_GROUP_2, true);
+        
+        assertGetMembers(GLOBAL_USER_1, GLOBAL_GROUP_1, false);
+        assertGetMembers(GLOBAL_USER_1, GLOBAL_GROUP_1, true);
     }
 
     @Test

@@ -168,7 +168,7 @@ Generates:
   #set($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
 #end
 #set($colprops = {
-  'doc.title' : { 'size' : 30, 'link' : 'view', 'filterable': false, 'sortable': false },
+  'doc.title' : { 'size' : 30, 'link' : 'view' },
   'doc.location' : { 'html': true },
   'doc.fullName' : { 'size' : 30, 'link' : 'view' },
   'doc.name' : { 'size' : 30, 'link' : 'view' },
@@ -199,6 +199,9 @@ Generates:
     'filterable': false,
     'sortable': false
   }))
+#end
+#if ($collist.contains('doc.location'))
+  #set ($discard = $options.put('selectedColumn','doc.location'))
 #end
 #if ("$!xcontext.macro.params.id" != "")
   #set ($livetableId = $xcontext.macro.params.id)

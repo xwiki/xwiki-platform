@@ -105,7 +105,6 @@
   ## Options / defaults
   ##
   #if("$!options.translationPrefix" != '') #set($transprefix = $options.translationPrefix) #else #set($transprefix = '') #end
-  #if("$!options.selectedColumn" != '')  #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.defaultOrder" == 'desc') #set($defaultOrder = 'desc') #else #set($defaultOrder = 'asc') #end
   #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
   #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
@@ -286,6 +285,9 @@
   </table>
   <div id="${htmlLiveTableId}-inaccessible-docs" class="hidden">
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
+  </div>
+  <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
+    #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
   <script type="text/javascript">
   //<![CDATA[

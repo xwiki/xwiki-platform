@@ -20,15 +20,12 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
@@ -75,50 +72,6 @@ public interface NotificationFilterManager
             NotificationPreference preference);
 
     /**
-     * Get the notification filter preferences of the given user.
-     * @param user a reference of the user
-     * @return the list of the notification filter preferences of the given user.
-     * @throws NotificationException if an error occurs
-     * @since 10.4RC1
-     */
-    Collection<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
-
-    /**
-     * Get from the given filter preferences the ones that match the given filter.
-     * @param filterPreferences a list of filter preferences
-     * @param filter a notification filter
-     * @return a stream returning the filter preferences that match the given filter
-     * @since 10.4RC1
-     */
-    Stream<NotificationFilterPreference> getFilterPreferences(
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter);
-
-    /**
-     * Get from the given filter preferences the ones that match the given filter and the given filter type.
-     * @param filterPreferences a list of filter preferences
-     * @param filter a notification filter
-     * @param filterType a filter type
-     * @return a stream returning the filter preferences that match the given filter and filter type
-     * @since 10.4RC1
-     */
-    Stream<NotificationFilterPreference> getFilterPreferences(
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
-            NotificationFilterType filterType);
-
-    /**
-     * Get from the given filter preferences the ones that match the given filter, filter type and format.
-     * @param filterPreferences a list of filter preferences
-     * @param filter a notification filter
-     * @param filterType a filter type
-     * @param format a notification format
-     * @return a stream returning the filter preferences that match the given filter, filter type and format
-     * @since 10.4RC1
-     */
-    Stream<NotificationFilterPreference> getFilterPreferences(
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
-            NotificationFilterType filterType, NotificationFormat format);
-
-    /**
      * Get from the given filter the one that are toggleable.
      * @param filters a list of notification filters
      * @return a stream returning the toggeable filters that was on the given collection
@@ -151,14 +104,6 @@ public interface NotificationFilterManager
             Map<String, Boolean> filterActivation);
 
     /**
-     * Save the given set of {@link NotificationFilterPreference} against their respective
-     * {@link NotificationFilterPreferenceProvider}.
-     *
-     * @param notificationFilterPreferences a set of {@link NotificationFilterPreference} to save
-     */
-    void saveFilterPreferences(Set<NotificationFilterPreference> notificationFilterPreferences);
-
-    /**
      * Render a {@link NotificationFilter} using an associated {@link NotificationFilterPreference}.
      *
      * @param filter the filter to use
@@ -168,36 +113,4 @@ public interface NotificationFilterManager
      */
     Block displayFilter(NotificationFilter filter, NotificationFilterPreference preference)
             throws NotificationException;
-
-    /**
-     * Delete a filter preference.
-     * @param filterPreferenceId id of the filter preference
-     * @throws NotificationException if an error happens
-     *
-     * @since 9.8RC1
-     */
-    void deleteFilterPreference(String filterPreferenceId) throws NotificationException;
-
-    /**
-     * Enable or disable a filter preference.
-     * @param filterPreferenceId id of the filter preference
-     * @param enabled either or not the filter preference should be enabled
-     * @throws NotificationException if an error happens
-     *
-     * @since 9.8RC1
-     */
-    void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException;
-
-    /**
-     * Update the start date for every filter preference that the user has.
-     *
-     * @param user the user to use
-     * @param startDate the new start date
-     * @throws NotificationException if an error occurs
-     *
-     * @since 10.5RC1
-     * @since 10.4
-     * @since 9.11.5
-     */
-    void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException;
 }

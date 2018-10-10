@@ -163,14 +163,7 @@ public final class HqlQueryUtils
         try {
             // TODO: should probably use a more specific Hql parser
 
-            // FIXME: Workaround https://github.com/JSQLParser/JSqlParser/issues/163 (Support class syntax in HQL query)
-            String cleanedStatement = statementString;
-            cleanedStatement = FROM_DOC.matcher(cleanedStatement).replaceAll(FROM_REPLACEMENT);
-            cleanedStatement = FROM_OBJECT.matcher(cleanedStatement).replaceAll(FROM_REPLACEMENT);
-            cleanedStatement = FROM_RCS.matcher(cleanedStatement).replaceAll(FROM_REPLACEMENT);
-            cleanedStatement = FROM_VERSION.matcher(cleanedStatement).replaceAll(FROM_REPLACEMENT);
-
-            Statement statement = CCJSqlParserUtil.parse(cleanedStatement);
+            Statement statement = CCJSqlParserUtil.parse(statementString);
 
             if (statement instanceof Select) {
                 Select select = (Select) statement;

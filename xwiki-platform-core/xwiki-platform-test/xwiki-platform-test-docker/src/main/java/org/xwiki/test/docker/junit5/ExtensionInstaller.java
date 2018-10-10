@@ -148,7 +148,7 @@ public class ExtensionInstaller
         for (Artifact artifact : extensions) {
             org.xwiki.extension.ExtensionId extId = new org.xwiki.extension.ExtensionId(
                 String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId()), xwikiVersion);
-            LOGGER.info(String.format("Adding extension [%s] to the list of extensions to provision...", extId));
+            LOGGER.info(String.format("...Adding extension [%s] to the list of extensions to provision...", extId));
             installRequest.addExtension(extId);
         }
 

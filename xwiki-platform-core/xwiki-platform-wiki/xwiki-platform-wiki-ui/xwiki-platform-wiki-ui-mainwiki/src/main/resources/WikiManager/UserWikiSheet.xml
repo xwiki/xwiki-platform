@@ -64,6 +64,7 @@
       #if ($joinedWikis.size() == 0)
         &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
       #else
+        #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
         &lt;ul id='wikis'&gt;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
@@ -200,6 +201,10 @@ XWiki.UserWikiTab = Class.create({
 
       onSuccess : function(response) {
         $('wikiActivityColumn').innerHTML = response.responseText;
+        require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMacro) {
+          var macro = new XWikiNotificationsMacro($('#wikiActivityColumn .notifications-macro'));
+          macro.load(0);
+        });
       }.bind(this),
 
       onFailure: function(response) {

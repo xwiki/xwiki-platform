@@ -31,11 +31,6 @@
   <name>XWiki Platform - Tree - Tests - Page Objects</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Tree - Tests - Page Objects</description>
-  <properties>
-    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
-         runtime code -->
-    <xwiki.clover.skip>true</xwiki.clover.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

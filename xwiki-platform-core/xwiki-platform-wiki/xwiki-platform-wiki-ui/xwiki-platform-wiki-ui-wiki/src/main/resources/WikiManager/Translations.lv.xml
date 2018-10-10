@@ -123,12 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Ja ieslēgts visas saites, kas norād
 platform.wiki.currentwiki.invite.username.hint=Viki pievienojamā lietotāja vārds
 platform.wiki.currentwiki.invite.message.hint=Lietotājam nosūtītais ziņojums
 platform.wiki.currentwiki.candidates.hint=Lietotāji, kuri ir uzaicināti vai ir pieprasījuši pievienoties viki.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Pārvaldīt iestatījumus kā, piemēram, viki nosaukums, apraksts, īpašnieks un dalības veids.
 admin.xwiki.workspaceusers.description=Pārvaldīt viki dalībniekus: pievienot, dzēst, uzaicināt, pieņemt vai noraidīt viki dalībnieku pieprasījumus.
 admin.xwiki.usersconfiguration.title=Iestatījumi
 admin.xwiki.members.title=Tekošie dalībnieki
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 platform.wiki.drawer.homeWiki=Sākums

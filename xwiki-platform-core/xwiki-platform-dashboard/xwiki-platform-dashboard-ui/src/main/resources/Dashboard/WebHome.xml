@@ -282,7 +282,7 @@
       </title>
     </class>
     <property>
-      <content>{{activity rss="true"/}}</content>
+      <content>{{notifications useUserPreferences="false" displayOwnEvents="true" displayRSSLink="true" /}}</content>
     </property>
     <property>
       <position>2, 2</position>

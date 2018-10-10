@@ -59,7 +59,7 @@
       </h4>
     </div>
     <div id="exportModelOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
-      <div class="panel-body">
+      <form id="export-form" method="post" class="panel-body">
         #if ($doc.name == 'WebHome')
           #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
           <div class="row">
@@ -72,13 +72,16 @@
           </div>
           <div class="exportModalTreeContainer">
             ## We put readOnly to false to enable the contextmenu, that we will replace afterwards
+            ## we put filterHiddenDocuments to false to enable user to see all hidden documents for export,
+            ## no matter what they user preferences are.
             #documentTree({
               'checkboxes' : true,
               'root': "document:$doc.documentReference",
               'showRoot': true,
               'showAttachments': false,
               'showTranslations': false,
-              'readOnly': false
+              'readOnly': false,
+              'filterHiddenDocuments': false
             })
           </div>
         #end
@@ -94,7 +97,7 @@
         #foreach ($exportExtension in $exportExtensions)
           $services.rendering.render($exportExtension.execute(), 'html/5.0')
         #end
-      </div>
+      </form>
     </div>
   </div>
 #end

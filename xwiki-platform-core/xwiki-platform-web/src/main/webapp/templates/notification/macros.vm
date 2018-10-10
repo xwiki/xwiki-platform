@@ -39,6 +39,9 @@
       ##
       ## * It's consistent with the way the title is displayed in the page itself (using html, see: `titlevars.vm`).
       <a href="$!escapetool.xml($document.getURL())">$document.displayTitle</a>
+      #if ("$!request.currentWiki" != '' && $request.currentWiki != $compositeEvent.document.wikiReference.name)
+        <span class="text-muted">($services.wiki.getById($compositeEvent.document.wikiReference.name).prettyName)</span>
+      #end
     </div>
     <div class="notification-description">
       #if ($compositeEvent.users.size() == 1)

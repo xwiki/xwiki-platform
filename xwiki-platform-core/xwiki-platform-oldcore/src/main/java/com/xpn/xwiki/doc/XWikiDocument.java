@@ -2514,11 +2514,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public List<BaseObject> getXObjects(DocumentReference classReference)
     {
-        if (classReference == null) {
-            return new ArrayList<BaseObject>();
+        List<BaseObject> xobjects= null;
+
+        if (classReference != null) {
+            xobjects = getXObjects().get(classReference);
         }
 
-        return getXObjects().get(classReference);
+        return xobjects != null ? xobjects : Collections.emptyList();
     }
 
     /**
@@ -4747,7 +4749,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (xcontext != null) {
             documentProperties.setDefaultReference(getXWikiContext().getWikiReference());
         }
-        documentProperties.setVersionPreserved(withArchive);
 
         // Input
         XARInputProperties xarProperties = new XARInputProperties();

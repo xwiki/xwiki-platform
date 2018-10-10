@@ -41,6 +41,11 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
     </dependency>
+    <!-- Replace the version triggered by Tika by a more accurate one -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+    </dependency>
 
     <!-- Test Dependencies -->
     <dependency>

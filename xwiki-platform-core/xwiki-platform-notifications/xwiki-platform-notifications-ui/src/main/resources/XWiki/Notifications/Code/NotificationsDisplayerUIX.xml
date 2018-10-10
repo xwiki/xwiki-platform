@@ -193,9 +193,9 @@
   var maxCountNumber = 20;
 
   /**
-   * The current number of unread notifications
+   * The current number of unread notifications (-1 means we don't know yet how many notifications there are)
    */
-  var notificationCount = 0;
+  var notificationCount = -1;
 
   /**
    * URL to the service that return the notifications to display
@@ -316,7 +316,10 @@
      */
     var notificationsMenusHasBeenOpened = false;
     $('#tmNotifications').on('show.bs.dropdown', function () {
-      if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount &gt; 0) {
+      // Don't load the notifications if the menu has already be opened before, but also if notifications count has
+      // been loaded (!= -1, which is the initial state of the notificationCount variable) but equals to 0 (so we know
+      // there is nothing to open).
+      if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount != 0) {
         macro.load(0).done(function (notifications) {
           createCleanButton(notifications[0].date);
         });
@@ -813,7 +816,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         &lt;div class="col-xs-8 text-right"&gt;
           &lt;p&gt;
             &lt;span class="notifications-header-link"&gt;
-              &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')" class="notifications-header-link" rel="nofollow"&gt;
+              &lt;a rel="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')" class="notifications-header-link" rel="nofollow"&gt;
                 $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
               &lt;/a&gt;
             &lt;/span&gt;

@@ -44,11 +44,9 @@
   <properties>
     <!-- Don't run backward-compatibility checks in tools modules since we don't consider them public API -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
+
     <!-- Set the version of Maven used at build time for Maven plugins dependencies -->
     <maven.dependencies.version>${maven.runtime.version}</maven.dependencies.version>
-    <!-- Don't cloverify tools since we don't want our global TPC to include tools TPC. We want to include only
-         runtime code -->
-    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -58,4 +56,20 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- Exclude Tools from being Clovered since 1) we don't really care getting TPC for our tools and
+               2) it's a bit involved to configure the various Maven poms using those plugins to have the Clover JAR
+               injected in the right places. -->
+          <groupId>org.openclover</groupId>
+          <artifactId>clover-maven-plugin</artifactId>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

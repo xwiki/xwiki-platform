@@ -238,24 +238,21 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         }
 
         // 2.
-        if (!isBackupFile && isMainFile) {
+        if (!isBackupFile) {
             this.toSave.renameTo(this.tempFile);
             return;
         }
 
         // 3.
-        if (isBackupFile && !isMainFile) {
+        if (!isMainFile) {
             this.backupFile.renameTo(this.toSave);
             // TODO log a low severity warning.
             return;
         }
 
         // 4.
-        if (isBackupFile && isMainFile) {
-            this.toSave.renameTo(this.tempFile);
-            this.backupFile.renameTo(this.toSave);
-            return;
-        }
+        this.toSave.renameTo(this.tempFile);
+        this.backupFile.renameTo(this.toSave);
     }
 
     /**
@@ -283,21 +280,16 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         }
 
         // 2.
-        if (isBackupFile && !isMainFile) {
+        if (!isMainFile) {
             this.backupFile.renameTo(this.toSave);
             return;
         }
 
         // 3.
-        if (isBackupFile && isMainFile) {
-            throw new IllegalStateException("Tried to rollback the saving of file "
-                + this.toSave.getAbsolutePath() + " and encountered a "
-                + "backup, a temp file, and a main file. Since any existing "
-                + "main file is renamed to a temp location and the content is "
-                + "saved in the backup location and then renamed to the main "
-                + "location, the existance of all 3 at once should never "
-                + "happen.");
-        }
+        throw new IllegalStateException("Tried to rollback the saving of file " + this.toSave.getAbsolutePath()
+            + " and encountered a backup, a temp file, and a main file. Since any existing "
+            + "main file is renamed to a temp location and the content is saved in the backup location and then "
+            + "renamed to the main location, the existance of all 3 at once should never happen.");
     }
 
     /**

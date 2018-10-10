@@ -37,8 +37,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -143,10 +141,6 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     private static final String LANGUAGE_PROPERTY_NAME = "language";
 
     @Inject
-    @Named("xwikicfg")
-    private ConfigurationSource configuration;
-
-    @Inject
     private StoreConfiguration storeConfiguration;
 
     @Inject
@@ -202,8 +196,8 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             getXWikiRecycleBinContentStore(deletedDocument.getXmlStore());
 
         if (contentStore != null) {
-            DocumentReference reference = deletedDocument.getDocumentReference();
-            XWikiDeletedDocumentContent content = contentStore.get(reference, deletedDocument.getId(), bTransaction);
+            XWikiDeletedDocumentContent content =
+                contentStore.get(deletedDocument.getDocumentReference(), deletedDocument.getId(), bTransaction);
 
             try {
                 FieldUtils.writeDeclaredField(deletedDocument, "content", content, true);

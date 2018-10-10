@@ -29,8 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.filter.FilterException;
@@ -52,10 +51,10 @@ import org.xwiki.model.reference.EntityReferenceTreeNode;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AfterComponent;
-import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +63,6 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@AllComponents
 public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
     protected BeanOutputFilterStreamFactory<FilterXMLOutputProperties> xmlOutputFilterStreamFactory;
@@ -73,11 +71,11 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
 
     protected InstanceModel instanceModelMock;
 
-    @Before
+    @BeforeEach
     @Override
-    public void before() throws Exception
+    public void beforeEach() throws Exception
     {
-        super.before();
+        super.beforeEach();
 
         this.xmlOutputFilterStreamFactory =
             this.oldcore.getMocker().getInstance(OutputFilterStreamFactory.class,
@@ -186,7 +184,7 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
         inputFilterStream.close();
         outputFilterStream.close();
 
-        Assert.assertEquals(expected, writer.getBuffer().toString());
+        assertEquals(expected, writer.getBuffer().toString());
     }
 
     protected void assertXML(String resource, InstanceOutputProperties outputProperties,

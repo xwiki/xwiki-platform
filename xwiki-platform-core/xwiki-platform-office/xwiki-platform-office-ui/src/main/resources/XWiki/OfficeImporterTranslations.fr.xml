@@ -37,9 +37,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>office.createForm.type.name=Page provenant d'Office
-office.createForm.type.description=Importer des documents office dans des pages wiki
+office.createForm.type.description=Importer des documents Office dans des pages wiki
 office.form.error.noDocument=Vous devez utiliser l''action {0}"créer une page"{1} pour importer un document Office.
-office.form.append.hint=Ce document existe déjà \! Ajouter à la page existante
+office.form.append.hint=Ce document existe déjà ! Ajouter à la page existante
 
 office.config.serverType.hint=Type de serveur Office, cela peut-être interne (local) ou externe (distant).
 office.config.serverPort.hint=Numéro de port pour se connecter au serveur Office

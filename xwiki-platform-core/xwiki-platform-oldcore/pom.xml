@@ -399,6 +399,7 @@
       <artifactId>xwiki-platform-template-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

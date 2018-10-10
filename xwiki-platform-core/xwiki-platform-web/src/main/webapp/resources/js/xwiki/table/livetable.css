@@ -408,6 +408,8 @@ table.livetable {
 }
 /* </Compatibility> */
 
+/* <Decoration> */
+/* anything about special entries in the livetable */
 .xwiki-livetable .breadcrumb {
   margin: 0;
   background-color: transparent;
@@ -417,3 +419,8 @@ table.livetable {
 .xwiki-livetable .breadcrumb .active a{
   color: $theme.linkColor;
 }
+
+.xwiki-livetable-container .docTitleComputed:after {
+  content: '\b9';
+}
+/* </Decoration> */

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
@@ -233,6 +234,6 @@ public class WARBuilder
             artifact.getVersion());
         Model model = resolver.getModelFromPOMArtifact(pomArtifact);
         File path = new File(directory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
-        this.extensionHelper.serializeExtension(path, model);
+        this.extensionHelper.serializeExtension(path, RepositoryUtils.toArtifact(artifact), model);
     }
 }

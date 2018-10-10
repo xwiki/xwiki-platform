@@ -29,7 +29,10 @@ node('docker') {
   xwikiBuild {
     // Force the latest Java version in order to be able to run the functional tests using a recent version of XWiki.
     // We have to do this since we can depend on an old XWiki parent pom version that can be using an old java version.
-    javaTool = 'official'    
+    javaTool = 'official'        
     profiles = 'quality,legacy,integration-tests,docker'
+    // Don't use xvnc since we don't need it as we're using our Docker-based testing framework which starts a VNC server
+    // in a docker container
+    xvnc = false
   }
 }

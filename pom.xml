@@ -56,7 +56,7 @@
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.10</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>1.19</tika.version>
+    <tika.version>1.19.1</tika.version>
     <pdfbox.version>2.0.12</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
@@ -126,42 +126,10 @@
         <artifactId>tika-parsers</artifactId>
         <version>${tika.version}</version>
         <exclusions>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-          <!-- The SLF4J implementation is a WAR choice -->
-          <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-          </exclusion>
-          <!-- Tika depends on junrar for handling RAR files and junrar itself depends on Commons VFS2 which depends on
-               org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.4. AFAIK we shouldn't require this dependency and
-               we can safely exclude it. The other reason for excluding it is that it itself depends on
-               regexp:regexp:jar:1.3 and this causes some duplicate class conflicts with Xalan, and we already depend
-               on jakarta-regexp:jakarta-regexp. -->
-          <exclusion>
-            <artifactId>regexp</artifactId>
-            <groupId>regexp</groupId>
-          </exclusion>
           <!-- We don't need it the way we use Tika and it causes various conflicts -->
           <exclusion>
             <artifactId>cxf-rt-rs-client</artifactId>
             <groupId>org.apache.cxf</groupId>
-          </exclusion>
-          <!-- Tika does not use the right artifact for JAXB implementation -->
-          <exclusion>
-            <artifactId>jaxb-core</artifactId>
-            <groupId>com.sun.xml.bind</groupId>
-          </exclusion>
-          <exclusion>
-            <artifactId>jaxb-impl</artifactId>
-            <groupId>com.sun.xml.bind</groupId>
           </exclusion>
         </exclusions>
       </dependency>

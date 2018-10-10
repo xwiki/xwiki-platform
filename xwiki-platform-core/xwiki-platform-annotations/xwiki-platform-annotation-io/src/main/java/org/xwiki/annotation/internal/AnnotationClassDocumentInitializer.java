@@ -71,7 +71,7 @@ public class AnnotationClassDocumentInitializer extends AbstractMandatoryClassIn
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField(Annotation.AUTHOR_FIELD, "Author", 30);
+        xclass.addUsersField(Annotation.AUTHOR_FIELD, "Author", 30, false);
         xclass.addDateField(Annotation.DATE_FIELD, "Date");
 
         xclass.addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5, ContentType.PURE_TEXT);

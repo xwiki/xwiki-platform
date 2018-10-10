@@ -24,7 +24,12 @@
 // @Library("XWiki@<branch, tag, sha1>") _
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
-xwikiModule {
-  // Force the latest Java version in order to be able to run the functional tests using a recent version of XWiki.
-  javaTool = 'official'
+// Docker is required for the functional tests
+node('docker') {
+  xwikiBuild {
+    // Force the latest Java version in order to be able to run the functional tests using a recent version of XWiki.
+    // We have to do this since we can depend on an old XWiki parent pom version that can be using an old java version.
+    javaTool = 'official'    
+    profiles = 'quality,legacy,integration-tests,docker'
+  }
 }

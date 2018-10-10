@@ -1259,8 +1259,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             if (object.getXClassReference() != null) {
-                // Remove all existing properties
-                if (object.getFieldsToRemove().size() > 0) {
+                // Remove properties to remove
+                if (!object.getFieldsToRemove().isEmpty()) {
                     for (int i = 0; i < object.getFieldsToRemove().size(); i++) {
                         BaseProperty prop = (BaseProperty) object.getFieldsToRemove().get(i);
                         if (!handledProps.contains(prop.getName())) {

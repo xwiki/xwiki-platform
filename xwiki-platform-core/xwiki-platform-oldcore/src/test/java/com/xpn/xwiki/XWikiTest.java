@@ -179,6 +179,15 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                     return null;
                 }
             });
+        this.mockXWikiStore.stubs().method("executeRead").will(
+            new CustomStub("Implements XWikiStoreInterface.executeRead")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return Collections.emptyList();
+                }
+            });
         this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
         this.mockXWikiStore.stubs().method("exists").will(returnValue(true));
 

@@ -31,8 +31,8 @@ node('docker') {
     // We have to do this since we can depend on an old XWiki parent pom version that can be using an old java version.
     javaTool = 'official'        
     profiles = 'quality,legacy,integration-tests,docker'
-    // Don't use xvnc since we don't need it as we're using our Docker-based testing framework which starts a VNC server
-    // in a docker container
-    xvnc = false
+    // We need a display for the CKBuilder. Note that we don't need xvnc for the functional tests themselves since they
+    // execute inside Docker containers.
+    xvnc = true
   }
 }

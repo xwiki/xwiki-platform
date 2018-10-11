@@ -1,5 +1,6 @@
 package com.xpn.xwiki.internal.job;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -116,7 +117,7 @@ public class XWikiContextContextStore implements ContextStore
     private Logger logger;
 
     @Override
-    public void save(Map<String, Object> contextStore, Set<String> entries)
+    public void save(Map<String, Serializable> contextStore, Set<String> entries)
     {
         XWikiContext xcontext = this.readProvider.get();
 
@@ -132,7 +133,7 @@ public class XWikiContextContextStore implements ContextStore
         }
     }
 
-    private void save(Map<String, Object> contextStore, String key, Object value, Set<String> entries)
+    private void save(Map<String, Serializable> contextStore, String key, Serializable value, Set<String> entries)
     {
         if (entries.contains(key)) {
             contextStore.put(key, value);
@@ -148,7 +149,8 @@ public class XWikiContextContextStore implements ContextStore
         }
     }
 
-    private void save(Map<String, Object> contextStore, String prefix, XWikiDocument document, Set<String> entries)
+    private void save(Map<String, Serializable> contextStore, String prefix, XWikiDocument document,
+        Set<String> entries)
     {
         save((key, subkey) -> {
             switch (subkey) {
@@ -164,7 +166,7 @@ public class XWikiContextContextStore implements ContextStore
         }, prefix, entries);
     }
 
-    private void save(Map<String, Object> contextStore, String prefix, XWikiRequest request, Set<String> entries)
+    private void save(Map<String, Serializable> contextStore, String prefix, XWikiRequest request, Set<String> entries)
     {
         save((key, subkey) -> {
             switch (subkey) {
@@ -184,24 +186,24 @@ public class XWikiContextContextStore implements ContextStore
         }, prefix, entries);
     }
 
-    private void saveRequestURL(Map<String, Object> contextStore, String key, XWikiRequest request)
+    private void saveRequestURL(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         contextStore.put(key, HttpServletUtils.getSourceURL(request));
     }
 
-    private void saveRequestParameters(Map<String, Object> contextStore, String key, XWikiRequest request)
+    private void saveRequestParameters(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         contextStore.put(key, new LinkedHashMap<>(request.getParameterMap()));
     }
 
-    private void saveRequestAll(Map<String, Object> contextStore, String key, XWikiRequest request)
+    private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         saveRequestURL(contextStore, key, request);
         saveRequestParameters(contextStore, key, request);
     }
 
     @Override
-    public void restore(Map<String, Object> contextStore)
+    public void restore(Map<String, Serializable> contextStore)
     {
         XWikiContext xcontext = this.writeProvider.get();
 
@@ -230,7 +232,7 @@ public class XWikiContextContextStore implements ContextStore
         restoreAuthor(contextStore, xcontext);
     }
 
-    private void restoreAuthor(Map<String, Object> contextStore, XWikiContext xcontext)
+    private void restoreAuthor(Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         if (contextStore.containsKey(PROP_AUTHOR)) {
             DocumentReference authorReference = (DocumentReference) contextStore.get(PROP_AUTHOR);
@@ -256,7 +258,7 @@ public class XWikiContextContextStore implements ContextStore
         }
     }
 
-    private void restoreDocument(Map<String, Object> contextStore, XWikiContext xcontext)
+    private void restoreDocument(Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         if (contextStore.containsKey(PROP_DOCUMENT_REFERENCE)) {
             DocumentReference documentReference = (DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE);
@@ -276,7 +278,7 @@ public class XWikiContextContextStore implements ContextStore
         }
     }
 
-    private void restoreRequest(Map<String, Object> contextStore, XWikiContext xcontext)
+    private void restoreRequest(Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         URL url = (URL) contextStore.get(PROP_REQUEST_URL);
         Map<String, String[]> parameters = (Map<String, String[]>) contextStore.get(PROP_REQUEST_PARAMETERS);

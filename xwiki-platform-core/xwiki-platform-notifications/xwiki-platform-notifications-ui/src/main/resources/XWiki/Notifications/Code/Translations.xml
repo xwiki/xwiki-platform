@@ -238,6 +238,11 @@ rendering.macro.notifications.parameter.tags.description=List of tags to conside
 ## Notifications Macro
 notifications.macro.noWatchedUsers=You are not following anybody.
 notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
+
+## Toggle notification filters titles
+notifications.filters.preferences.title.page=Toggle Page notifications only
+notifications.filters.preferences.title.space=Toggle Page and children notifications
+notifications.filters.preferences.title.wiki=Toggle Wiki notifications
 </content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>

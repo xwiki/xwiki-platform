@@ -834,7 +834,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
-          &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
+          &lt;pre&gt;&lt;input type="checkbox" title="$services.localization.render('notifications.filters.preferences.title.page')" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt;&lt;input type="checkbox" title="$services.localization.render('notifications.filters.preferences.title.space')" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt;&lt;input type="checkbox" title="$services.localization.render('notifications.filters.preferences.title.wiki')" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
         &lt;/div&gt;
       #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;

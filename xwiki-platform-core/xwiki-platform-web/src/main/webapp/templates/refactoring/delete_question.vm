@@ -32,7 +32,7 @@
     <div class="box warningmessage deleteWarningExtensions">
       <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render('core.delete.warningExtensions.title'))</strong></p>
       <p>$escapetool.xml($services.localization.render('core.delete.warningExtensions.explanation'))</p>
-      #set ($url = $xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&section=XWiki.InstalledExtensions'))
+      #set ($url = $xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=XWiki.Extensions&search=&repo=installed'))
       #set ($link = '<a href="' + $url + '">')
       ## We cannot escape the following line because it contains an HTML link
       <p>$services.localization.render('core.delete.warningExtensions.help', [$link, '</a>'])</p>

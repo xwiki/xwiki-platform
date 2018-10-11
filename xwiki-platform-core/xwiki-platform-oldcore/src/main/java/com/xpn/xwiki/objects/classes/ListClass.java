@@ -421,6 +421,7 @@ public abstract class ListClass extends PropertyClass
             lprop = new StringProperty();
         }
 
+        lprop.setName(getName());
         return lprop;
     }
 

@@ -125,9 +125,12 @@ public class PasswordClass extends StringClass
     {
         BaseProperty st = (BaseProperty) this.getField(PasswordMetaClass.STORAGE_TYPE);
         if (st != null) {
-            String type = st.getValue().toString().trim();
-            if (!type.equals("")) {
-                return type;
+            Object value = st.getValue();
+            if (value != null) {
+                String type = value.toString().trim();
+                if (!type.equals("")) {
+                    return type;
+                }
             }
         }
         return DEFAULT_STORAGE;

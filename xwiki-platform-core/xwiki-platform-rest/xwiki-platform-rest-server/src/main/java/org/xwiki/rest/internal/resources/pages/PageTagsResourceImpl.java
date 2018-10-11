@@ -137,7 +137,10 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
         if (object != null) {
             BaseProperty prop = (BaseProperty) object.safeget("tags");
             if (prop != null) {
-                return (List<String>) prop.getValue();
+                List<String> tags = (List<String>) prop.getValue();
+                if (tags != null) {
+                    return tags;
+                }
             }
         }
 

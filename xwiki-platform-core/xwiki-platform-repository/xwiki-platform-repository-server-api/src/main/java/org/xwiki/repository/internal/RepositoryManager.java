@@ -1241,7 +1241,14 @@ public class RepositoryManager implements Initializable, Disposable
     {
         BaseProperty<?> property = (BaseProperty<?>) object.safeget(field);
 
-        return property != null && property.getValue() != null ? (T) property.getValue() : def;
+        if (property != null) {
+            T value = (T) property.getValue();
+            if (value != null) {
+                return value;
+            }
+        }
+
+        return def;
     }
 
     protected boolean update(BaseObject object, String fieldName, Object value)

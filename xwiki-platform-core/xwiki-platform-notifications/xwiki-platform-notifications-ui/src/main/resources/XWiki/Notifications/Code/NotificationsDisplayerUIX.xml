@@ -799,7 +799,12 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       </scope>
     </class>
     <property>
-      <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
+      <content>{{velocity}}
+#macro (generateNotificationInput $id $reference $label)
+  &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
+  &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
+#end
+{{html clean="false"}} ## we need clean="false" because we want to display the raw content
 #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
@@ -834,7 +839,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
-          &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
+          &lt;pre&gt;
+            #generateNotificationInput('notificationPageOnly' $doc.documentReference 'notifications.filters.preferences.label.page')
+            #generateNotificationInput('notificationPageAndChildren' $doc.documentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
+            #generateNotificationInput('notificationWiki' $doc.documentReference.wikiReference 'notifications.filters.preferences.label.wiki')
+          &lt;/pre&gt;
         &lt;/div&gt;
       #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;
@@ -844,7 +853,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     &lt;/div&gt;
   &lt;/li&gt;
 #end
-{{/html}}{{/velocity}}
+{{/html}}
+{{/velocity}}
 </content>
     </property>
     <property>

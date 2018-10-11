@@ -108,7 +108,8 @@
             <configuration>
               <excludes>
                 <!-- Fan-Out complexity -->
-                **/ExtensionManagerScriptService.java
+                **/ExtensionManagerScriptService.java,
+                **/ExtensionRepositoryScriptSafeProvider.java
               </excludes>
             </configuration>
           </execution>

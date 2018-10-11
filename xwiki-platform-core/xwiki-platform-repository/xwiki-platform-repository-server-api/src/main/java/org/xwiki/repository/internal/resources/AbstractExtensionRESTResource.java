@@ -837,7 +837,10 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         BaseProperty<?> property = (BaseProperty<?>) object.safeget(field);
 
         if (property instanceof NumberProperty) {
-            return ((Number) property.getValue()).intValue() == 1;
+            Number number = (Number) property.getValue();
+            if (number != null) {
+                return number.intValue() == 1;
+            }
         }
 
         return def;

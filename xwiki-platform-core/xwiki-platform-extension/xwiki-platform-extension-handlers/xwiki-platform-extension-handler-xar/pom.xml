@@ -161,8 +161,7 @@
                 **/SafeConflictQuestion.java,
                 **/DefaultXWikiDocumentMerger.java,
                 **/WikiEventListener.java,
-                **/XarExtensionPlan.java,
-                **/XarExtensionScriptService.java
+                **/XarExtensionPlan.java
               </excludes>
             </configuration>
           </execution>

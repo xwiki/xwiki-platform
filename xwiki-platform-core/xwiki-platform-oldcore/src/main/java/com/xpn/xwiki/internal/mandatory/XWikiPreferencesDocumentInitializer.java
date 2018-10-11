@@ -203,7 +203,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("ldap_photo_attribute", "Ldap photo attribute name", 60);
         xclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5, ContentType.PURE_TEXT);
         xclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
-        xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "|always|create");
+        xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "---|always|create");
         xclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
 
         xclass.addBooleanField("showannotations", "Show document annotations", "yesno");

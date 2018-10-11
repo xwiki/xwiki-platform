@@ -821,7 +821,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     {
         BaseProperty<?> property = (BaseProperty<?>) object.safeget(field);
 
-        return property != null ? (T) property.getValue() : def;
+        T value = def;
+        if (property != null) {
+            value = (T) property.getValue();
+            if (value == null) {
+                value = def;
+            }
+        }
+
+        return value;
     }
 
     protected boolean getBooleanValue(BaseObject object, String field, boolean def)

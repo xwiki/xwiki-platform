@@ -295,7 +295,7 @@ public class ExportAction extends XWikiAction
                 }
 
                 where.append("doc.fullName like ?");
-                params.add(new DefaultQueryParameter(null).like(includePage));
+                params.add(getQueryParameter(includePage));
 
                 // if they exist we process the excludedPages associated with that include
                 if (!excludedPages.isEmpty()) {
@@ -316,7 +316,7 @@ public class ExportAction extends XWikiAction
                         }
 
                         where.append(" and doc.fullName not like ?");
-                        params.add(new DefaultQueryParameter(null).like(excludePage));
+                        params.add(getQueryParameter(excludePage));
                     }
                 }
 
@@ -338,8 +338,8 @@ public class ExportAction extends XWikiAction
                     Object[] query = entry.getValue();
                     String where = query[0].toString();
                     List<Object> params = (List<Object>) query[1];
-
                     Query dbQuery = queryManager.createQuery(where, Query.HQL);
+
                     List<String> docsNames = dbQuery.setWiki(wikiName).bindValues(params).execute();
 
                     for (String docName : docsNames) {
@@ -359,6 +359,15 @@ public class ExportAction extends XWikiAction
             }
         }
         return pageList;
+    }
+
+    private QueryParameter getQueryParameter(String like)
+    {
+        // '!' is the default escape character in queries, but it's not yet systematically escaped
+        // when used in a LikePart that's why we have to do it manually here.
+        // This should be removed once https://jira.xwiki.org/browse/XWIKI-15727 is done.
+        String likeString = like.replaceAll("([!])", "!$1");
+        return new DefaultQueryParameter(null).like(likeString);
     }
 
     private String export(String format, XWikiContext context) throws XWikiException, IOException

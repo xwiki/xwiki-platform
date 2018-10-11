@@ -67,6 +67,8 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
 
                 // Stop the job if some listener has canceled the action
                 if (event.isCanceled()) {
+                    getStatus().cancel();
+
                     return;
                 }
 

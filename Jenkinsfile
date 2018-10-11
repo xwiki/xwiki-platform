@@ -226,6 +226,9 @@ def build(map)
       if (map.pom) {
         pom = map.pom
       }
+      if (map.projects) {
+        projects = map.projects
+      }
     }
   }
 }

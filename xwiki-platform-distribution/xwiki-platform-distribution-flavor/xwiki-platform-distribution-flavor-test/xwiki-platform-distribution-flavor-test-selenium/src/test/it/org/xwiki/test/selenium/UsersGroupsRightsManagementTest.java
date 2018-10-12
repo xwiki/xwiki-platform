@@ -299,7 +299,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
     private void createUser(String login, String pwd, String fname, String lname)
     {
         openUsersPage();
-        clickLinkWithText("Add user", false);
+        clickLinkWithText("Create user", false);
         waitForElement("//input[@id='register_first_name']");
         setFieldValue("register_first_name", fname);
         setFieldValue("register_last_name", lname);

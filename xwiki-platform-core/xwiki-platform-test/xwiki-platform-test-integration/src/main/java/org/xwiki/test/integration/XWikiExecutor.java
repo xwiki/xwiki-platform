@@ -255,8 +255,8 @@ public class XWikiExecutor
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
         // Send Process output and error streams to our logger.
-        PumpStreamHandler streamHandler = new PumpStreamHandler(new XWikiLogOutputStream(XWikiLogOutputStream.STDOUT),
-            new XWikiLogOutputStream(XWikiLogOutputStream.STDERR));
+        XWikiLogOutputStream outputStream = new XWikiLogOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream, outputStream);
 
         // Make sure we end the process when the JVM exits
         ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();

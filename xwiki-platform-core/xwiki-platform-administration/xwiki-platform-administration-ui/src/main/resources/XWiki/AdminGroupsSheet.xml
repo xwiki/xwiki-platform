@@ -46,9 +46,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="createGroupModal-label"&gt;
+          &lt;div class="modal-title" id="createGroupModal-label"&gt;
             $escapetool.xml($services.localization.render('rightsmanager.creategroup'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           &lt;div class="hidden"&gt;
@@ -93,9 +93,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="editGroupModal-label"&gt;
+          &lt;div class="modal-title" id="editGroupModal-label"&gt;
             $escapetool.xml($services.localization.render('xe.admin.groups.editGroup'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;&lt;/div&gt;
       &lt;/div&gt;
@@ -112,9 +112,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="deleteGroupModal-label"&gt;
+          &lt;div class="modal-title" id="deleteGroupModal-label"&gt;
             $escapetool.xml($services.localization.render('xe.admin.groups.deleteGroup'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeletegroup')))

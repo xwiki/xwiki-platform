@@ -9,7 +9,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title" id="exportModalLabel">$services.localization.render('core.menu.export')</h4>
+          <div class="modal-title" id="exportModalLabel">$services.localization.render('core.menu.export')</div>
         </div>
         <div class="modal-body">
           <div class="panel-group" id="exportModelAccordion" role="tablist" aria-multiselectable="true">

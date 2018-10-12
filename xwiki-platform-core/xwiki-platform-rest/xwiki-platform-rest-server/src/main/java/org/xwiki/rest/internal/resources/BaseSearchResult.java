@@ -250,7 +250,7 @@ public class BaseSearchResult extends XWikiResource
 
                 /* Check if the user has the right to see the found document */
                 if (xwikiApi.hasAccessLevel("view", pageId)) {
-                    Document doc = xwikiApi.getDocument(pageFullName);
+                    Document doc = xwikiApi.getDocument(pageFullName).getTranslatedDocument(language);
                     String title = doc.getDisplayTitle();
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("page");
@@ -291,14 +291,15 @@ public class BaseSearchResult extends XWikiResource
                     for (EntityReference entityReference : doc.getDocumentReference().getReversedReferenceChain()) {
                         HierarchyItem hierarchyItem = new HierarchyItem();
                         if (Arrays.asList(EntityType.SPACE, EntityType.DOCUMENT).contains(entityReference.getType())) {
-                            Document document = xwikiApi.getDocument(entityReference);
+                            Document document = xwikiApi.getDocument(entityReference).getTranslatedDocument(language);
                             hierarchyItem.setLabel(document.getPlainTitle());
+                            hierarchyItem.setUrl(xwikiApi.getURL(document.getDocumentReferenceWithLocale()));
                         } else {
                             hierarchyItem.setLabel(entityReference.getName());
+                            hierarchyItem.setUrl(xwikiApi.getURL(entityReference));
                         }
                         hierarchyItem.setName(entityReference.getName());
                         hierarchyItem.setType(entityReference.getType().getLowerCase());
-                        hierarchyItem.setUrl(xwikiApi.getURL(entityReference));
                         hierarchy.withItems(hierarchyItem);
                     }
                     searchResult.setHierarchy(hierarchy);

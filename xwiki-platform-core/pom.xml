@@ -403,13 +403,6 @@
                     "code": "java.method.numberOfParametersChanged",
                     "old": "method org.xwiki.rest.model.jaxb.PropertyValues org.xwiki.rest.resources.classes.ClassPropertyValuesResource::getClassPropertyValues(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.util.List<java.lang.String>) throws org.xwiki.rest.XWikiRestException",
                     "new": "method org.xwiki.rest.model.jaxb.PropertyValues org.xwiki.rest.resources.classes.ClassPropertyValuesResource::getClassPropertyValues(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.util.List<java.lang.String>, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
-                    "package": "org.xwiki.rest.resources.classes",
-                    "classQualifiedName": "org.xwiki.rest.resources.classes.ClassPropertyValuesResource",
-                    "classSimpleName": "ClassPropertyValuesResource",
-                    "methodName": "getClassPropertyValues",
-                    "oldArchive": "org.xwiki.platform:xwiki-platform-rest-api:jar:10.7",
-                    "newArchive": "org.xwiki.platform:xwiki-platform-rest-api:jar:10.9-SNAPSHOT",
-                    "elementKind": "method",
                     "justification": "Add an optional parameter to a REST API end point"
                   }
                 ]

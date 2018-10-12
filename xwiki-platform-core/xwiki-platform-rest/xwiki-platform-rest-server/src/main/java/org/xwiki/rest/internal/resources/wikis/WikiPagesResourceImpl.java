@@ -133,19 +133,19 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 pageSummary.setFullName(doc.getFullName());
                 pageSummary.setWiki(wikiName);
                 pageSummary.setSpace(doc.getSpace());
-                pageSummary.setName(doc.getName());
+                pageSummary.setName(doc.getDocumentReference().getName());
                 pageSummary.setTitle(doc.getTitle());
                 pageSummary.setParent(doc.getParent());
 
-                URL absoluteUrl =
-                        Utils.getXWikiContext(componentManager).getURLFactory().createExternalURL(doc.getSpace(),
-                                doc.getName(), "view", null, null, Utils.getXWikiContext(componentManager));
+                URL absoluteUrl = Utils.getXWikiContext(componentManager).getURLFactory().createExternalURL(
+                    doc.getSpace(), doc.getDocumentReference().getName(), "view", null, null,
+                    Utils.getXWikiContext(componentManager));
                 pageSummary.setXwikiAbsoluteUrl(absoluteUrl.toString());
                 pageSummary.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
-                        absoluteUrl, Utils.getXWikiContext(componentManager)));
+                    absoluteUrl, Utils.getXWikiContext(componentManager)));
 
                 String pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
+                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
                 Link pageLink = objectFactory.createLink();
                 pageLink.setHref(pageUri);
                 pageLink.setRel(Relations.PAGE);

@@ -222,7 +222,7 @@ public class ModelFactory
         }
         objectSummary.setWiki(doc.getWiki());
         objectSummary.setSpace(doc.getSpace());
-        objectSummary.setPageName(doc.getName());
+        objectSummary.setPageName(doc.getDocumentReference().getName());
         objectSummary.setClassName(xwikiObject.getClassName());
         objectSummary.setNumber(xwikiObject.getNumber());
 
@@ -248,12 +248,12 @@ public class ModelFactory
         String propertiesUri;
         if (useVersion) {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesAtPageVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(), xwikiObject.getClassName(),
-                xwikiObject.getNumber()).toString();
+                Utils.getSpacesFromSpaceId(doc.getSpace()),doc.getDocumentReference().getName(), doc.getVersion(),
+                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiObject.getClassName(),
-                xwikiObject.getNumber()).toString();
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         }
 
         Link propertyLink = objectFactory.createLink();
@@ -335,12 +335,12 @@ public class ModelFactory
 
             if (useVersion) {
                 propertyUri = Utils.createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(),
+                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
                     xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
             } else {
                 propertyUri = Utils.createURI(baseUri, ObjectPropertyResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiObject.getClassName(),
-                    xwikiObject.getNumber(), propertyClass.getName()).toString();
+                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                    xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
             }
             Link propertyLink = this.objectFactory.createLink();
             propertyLink.setHref(propertyUri);
@@ -363,12 +363,12 @@ public class ModelFactory
 
         if (useVersion) {
             objectUri = Utils.createURI(baseUri, ObjectAtPageVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(), xwikiObject.getClassName(),
-                xwikiObject.getNumber()).toString();
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
+                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
             objectUri = Utils
                 .createURI(baseUri, ObjectResource.class, doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()),
-                    doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber())
+                    doc.getDocumentReference().getName(), xwikiObject.getClassName(), xwikiObject.getNumber())
                 .toString();
         }
         Link objectLink = objectFactory.createLink();
@@ -437,7 +437,8 @@ public class ModelFactory
         space.getLinks().add(pagesLink);
 
         if (home != null) {
-            String homeUri = Utils.createURI(baseUri, PageResource.class, wikiName, spaces, home.getName()).toString();
+            String homeUri = Utils.createURI(baseUri, PageResource.class, wikiName, spaces,
+                home.getDocumentReference().getName()).toString();
             Link homeLink = this.objectFactory.createLink();
             homeLink.setHref(homeUri);
             homeLink.setRel(Relations.HOME);
@@ -469,15 +470,15 @@ public class ModelFactory
                 translation.setLanguage(doc.getDefaultLanguage());
 
                 /* Add the default page with the default translation explicitely */
-                String pageTranslationUri =
-                    Utils.createURI(baseUri, PageResource.class, doc.getWiki(), spaces, doc.getName()).toString();
+                String pageTranslationUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(), spaces,
+                    doc.getDocumentReference().getName()).toString();
                 Link pageTranslationLink = this.objectFactory.createLink();
                 pageTranslationLink.setHref(pageTranslationUri);
                 pageTranslationLink.setRel(Relations.PAGE);
                 translation.getLinks().add(pageTranslationLink);
 
-                String historyUri = Utils
-                    .createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces, doc.getName()).toString();
+                String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces,
+                    doc.getDocumentReference().getName()).toString();
                 Link historyLink = this.objectFactory.createLink();
                 historyLink.setHref(historyUri);
                 historyLink.setRel(Relations.HISTORY);
@@ -491,16 +492,15 @@ public class ModelFactory
             Translation translation = this.objectFactory.createTranslation();
             translation.setLanguage(language);
 
-            String pageTranslationUri =
-                Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(), spaces, doc.getName(), language)
-                    .toString();
+            String pageTranslationUri = Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(), spaces,
+                doc.getDocumentReference().getName(), language).toString();
             Link pageTranslationLink = this.objectFactory.createLink();
             pageTranslationLink.setHref(pageTranslationUri);
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
             String historyUri = Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(), spaces,
-                doc.getName(), language).toString();
+                doc.getDocumentReference().getName(), language).toString();
             Link historyLink = this.objectFactory.createLink();
             historyLink.setHref(historyUri);
             historyLink.setRel(Relations.HISTORY);
@@ -524,7 +524,7 @@ public class ModelFactory
         pageSummary.setFullName(doc.getFullName());
         pageSummary.setId(doc.getPrefixedFullName());
         pageSummary.setSpace(doc.getSpace());
-        pageSummary.setName(doc.getName());
+        pageSummary.setName(doc.getDocumentReference().getName());
         pageSummary.setTitle(doc.getDisplayTitle());
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
@@ -563,15 +563,15 @@ public class ModelFactory
         }
 
         String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(),
-            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
+            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
         Link historyLink = this.objectFactory.createLink();
         historyLink.setHref(historyUri);
         historyLink.setRel(Relations.HISTORY);
         pageSummary.getLinks().add(historyLink);
 
         if (!doc.getChildren().isEmpty()) {
-            String pageChildrenUri =
-                Utils.createURI(baseUri, PageChildrenResource.class, doc.getWiki(), spaces, doc.getName()).toString();
+            String pageChildrenUri = Utils.createURI(baseUri, PageChildrenResource.class, doc.getWiki(), spaces,
+                doc.getDocumentReference().getName()).toString();
             Link pageChildrenLink = this.objectFactory.createLink();
             pageChildrenLink.setHref(pageChildrenUri);
             pageChildrenLink.setRel(Relations.CHILDREN);
@@ -582,10 +582,10 @@ public class ModelFactory
             String commentsUri;
             if (useVersion) {
                 commentsUri = Utils.createURI(baseUri, CommentsVersionResource.class, doc.getWiki(), spaces,
-                    doc.getName(), doc.getVersion()).toString();
+                    doc.getDocumentReference().getName(), doc.getVersion()).toString();
             } else {
-                commentsUri =
-                    Utils.createURI(baseUri, CommentsResource.class, doc.getWiki(), spaces, doc.getName()).toString();
+                commentsUri = Utils.createURI(baseUri, CommentsResource.class, doc.getWiki(), spaces,
+                    doc.getDocumentReference().getName()).toString();
             }
 
             Link commentsLink = this.objectFactory.createLink();
@@ -598,10 +598,10 @@ public class ModelFactory
             String attachmentsUri;
             if (useVersion) {
                 attachmentsUri = Utils.createURI(baseUri, AttachmentsAtPageVersionResource.class, doc.getWiki(), spaces,
-                    doc.getName(), doc.getVersion()).toString();
+                    doc.getDocumentReference().getName(), doc.getVersion()).toString();
             } else {
-                attachmentsUri = Utils
-                    .createURI(baseUri, AttachmentsResource.class, doc.getWiki(), spaces, doc.getName()).toString();
+                attachmentsUri = Utils.createURI(baseUri, AttachmentsResource.class, doc.getWiki(), spaces,
+                    doc.getDocumentReference().getName()).toString();
             }
 
             Link attachmentsLink = this.objectFactory.createLink();
@@ -615,10 +615,10 @@ public class ModelFactory
 
             if (useVersion) {
                 objectsUri = Utils.createURI(baseUri, ObjectsAtPageVersionResource.class, doc.getWiki(), spaces,
-                    doc.getName(), doc.getVersion()).toString();
+                    doc.getDocumentReference().getName(), doc.getVersion()).toString();
             } else {
-                objectsUri =
-                    Utils.createURI(baseUri, ObjectsResource.class, doc.getWiki(), spaces, doc.getName()).toString();
+                objectsUri = Utils.createURI(baseUri, ObjectsResource.class, doc.getWiki(), spaces,
+                    doc.getDocumentReference().getName()).toString();
             }
             Link objectsLink = this.objectFactory.createLink();
             objectsLink.setHref(objectsUri);
@@ -629,8 +629,8 @@ public class ModelFactory
         com.xpn.xwiki.api.Object tagsObject = doc.getObject("XWiki.TagClass", 0);
         if (tagsObject != null) {
             if (tagsObject.getProperty("tags") != null) {
-                String tagsUri =
-                    Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), spaces, doc.getName()).toString();
+                String tagsUri = Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), spaces,
+                    doc.getDocumentReference().getName()).toString();
                 Link tagsLink = this.objectFactory.createLink();
                 tagsLink.setHref(tagsUri);
                 tagsLink.setRel(Relations.TAGS);
@@ -651,7 +651,7 @@ public class ModelFactory
         toRestPageSummary(pageSummary, baseUri, doc, false, withPrettyNames);
 
         String pageUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(),
-            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
+            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
         Link pageLink = this.objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -718,7 +718,7 @@ public class ModelFactory
 
             for (com.xpn.xwiki.api.Attachment attachment : doc.getAttachmentList()) {
                 URL url = xcontext.getURLFactory().createAttachmentURL(attachment.getFilename(), doc.getSpace(),
-                    doc.getName(), "download", null, doc.getWiki(), xcontext);
+                    doc.getDocumentReference().getName(), "download", null, doc.getWiki(), xcontext);
                 String attachmentXWikiAbsoluteUrl = url.toString();
                 String attachmentXWikiRelativeUrl = xcontext.getURLFactory().getURL(url, xcontext);
 
@@ -846,7 +846,7 @@ public class ModelFactory
         attachment.setXwikiAbsoluteUrl(xwikiAbsoluteUrl);
 
         String pageUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(),
-            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
+            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
         Link pageLink = objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -855,14 +855,12 @@ public class ModelFactory
         String attachmentUri;
         if (versionURL) {
             attachmentUri = Utils.createURI(baseUri, AttachmentVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiAttachment.getFilename(),
-                xwikiAttachment.getVersion()).toString();
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
         } else {
-            attachmentUri =
-                Utils
-                    .createURI(baseUri, AttachmentResource.class, doc.getWiki(),
-                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiAttachment.getFilename())
-                    .toString();
+            attachmentUri = Utils.createURI(baseUri, AttachmentResource.class, doc.getWiki(),
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                xwikiAttachment.getFilename()).toString();
         }
 
         Link attachmentLink = objectFactory.createLink();

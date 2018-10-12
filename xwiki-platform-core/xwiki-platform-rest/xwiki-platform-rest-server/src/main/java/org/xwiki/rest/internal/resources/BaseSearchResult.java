@@ -348,7 +348,7 @@ public class BaseSearchResult extends XWikiResource
                 if (spaceDoc != null && !spaceDoc.isNew()) {
                     Link pageLink = new Link();
                     pageLink.setHref(Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces,
-                        spaceDoc.getName()).toString());
+                        spaceDoc.getDocumentReference().getName()).toString());
                     pageLink.setRel(Relations.HOME);
                     searchResult.getLinks().add(pageLink);
                 }

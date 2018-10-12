@@ -476,7 +476,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         placement: 'bottom'
       });
       var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
-      if (xm.documentReference.getName() != 'WebHome') {
+      if (xm.documentReference.name != 'WebHome') {
         // Adapt the tooltip when the current document is terminal
         watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
       }

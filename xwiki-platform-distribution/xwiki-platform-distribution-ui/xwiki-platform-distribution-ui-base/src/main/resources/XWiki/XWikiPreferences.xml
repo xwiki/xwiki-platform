@@ -2694,7 +2694,7 @@ Subject: Your account on ${wikiname} has been activated
 
 Hello ${xwiki.getUserName("$xwikiname", false)},
 
-Your account on ${wikiname} has been successfully activated. You can now login at ${host}${xwiki.getURL('XWiki.XWikiLogin', 'login')} using your username (${xwiki.getDocument($xwikiname).getName()}).</confirmation_email_content>
+Your account on ${wikiname} has been successfully activated. You can now login at ${host}${xwiki.getURL('XWiki.XWikiLogin', 'login')} using your username (${xwiki.getDocument($xwikiname).documentReference.name}).</confirmation_email_content>
     </property>
     <property>
       <core.defaultDocumentSyntax/>

@@ -375,7 +375,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         List<String> namespaces =
             (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
         Integer namespacesEmpty =
-            (Integer) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY);
+            getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, 0);
         if (namespaces != null && (!namespaces.isEmpty() || namespacesEmpty == 1)) {
             Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
             restNamespaces.withNamespaces(namespaces);

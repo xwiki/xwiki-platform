@@ -88,13 +88,13 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
 
     private void migrateObjectsOfType(String className, BaseClass xclass) throws DataMigrationException, XWikiException
     {
-        long expectedPropertyCount = Integer.valueOf(xclass.getPropertyList().size()).longValue();
         getStore().executeWrite(getXWikiContext(), new HibernateCallback<Void>()
         {
             @Override
             public Void doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                List<BaseObject> objects = getObjectsWithMissingProperties(className, expectedPropertyCount, session);
+                List<BaseObject> objects =
+                    getObjectsWithMissingProperties(className, xclass.getPropertyList(), session);
                 for (BaseObject object : objects) {
                     addMissingProperties(object, xclass, session);
                 }
@@ -105,15 +105,17 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
     }
 
     @SuppressWarnings("unchecked")
-    private List<BaseObject> getObjectsWithMissingProperties(String className, long expectedPropertyCount,
+    private List<BaseObject> getObjectsWithMissingProperties(String className, Set<String> expectedProperties,
         Session session)
     {
         // Get all the objects that have less properties than what their class declares (the expected property count).
+        // Note that we count only the expected properties (those declared by the class).
         Query query = session.createQuery("select obj from BaseObject as obj, BaseProperty as prop "
-            + "where obj.id = prop.id.id and obj.className = :className "
-            + "group by obj having count(prop) < :expectedPropCount");
+            + "where obj.id = prop.id.id and obj.className = :className and prop.id.name in :expectedProperties "
+            + "group by obj having count(prop) < :expectedPropertyCount");
         query.setString("className", className);
-        query.setLong("expectedPropCount", expectedPropertyCount);
+        query.setParameterList("expectedProperties", expectedProperties);
+        query.setLong("expectedPropertyCount", Integer.valueOf(expectedProperties.size()).longValue());
         return query.list();
     }
 

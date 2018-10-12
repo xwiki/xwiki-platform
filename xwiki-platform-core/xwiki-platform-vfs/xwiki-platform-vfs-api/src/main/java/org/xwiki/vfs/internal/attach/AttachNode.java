@@ -123,7 +123,7 @@ public class AttachNode extends FsAbstractNode implements IoEntry<AttachNode>
         // Get the size of the attachment in bytes
         try {
             XWikiAttachment attachment = this.xwikiModelNode.getAttachment();
-            return attachment.getContentSize(this.xwikiModelNode.getXWikiContext());
+            return attachment.getContentLongSize(this.xwikiModelNode.getXWikiContext());
         } catch (Exception e) {
             return UNKNOWN;
         }

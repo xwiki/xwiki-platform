@@ -131,9 +131,10 @@ public class XClassMigratorListener extends AbstractEventListener
         EntityReference classReference = propertyReference.extractReference(EntityType.DOCUMENT);
         EntityReference wikiReference = propertyReference.extractReference(EntityType.WIKI);
 
-        // Get all document containing object of modified class
-        Query query = this.queryManager.createQuery("select distinct doc.fullName from Document doc, doc.object("
-            + this.localSerializer.serialize(classReference) + ") as obj", Query.XWQL);
+        // Get all the documents containing at least one object of the modified class
+        Query query = this.queryManager
+            .createQuery("select distinct obj.name from BaseObject as obj where obj.className = ?", Query.HQL);
+        query.bindValue(0, this.localSerializer.serialize(classReference));
         query.setWiki(wikiReference.getName());
 
         List<String> documents = query.execute();

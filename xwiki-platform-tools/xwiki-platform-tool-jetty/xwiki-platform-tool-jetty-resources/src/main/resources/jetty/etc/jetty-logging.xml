@@ -29,7 +29,7 @@
 
   <New id="ServerLog" class="java.io.PrintStream">
     <Arg>
-      <!-- Log to both a rolling file + to stdout -->
+      <!-- Split output to both the file and the old stderr -->
       <New class="org.apache.commons.io.output.TeeOutputStream">
         <Arg>
           <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
@@ -40,9 +40,7 @@
             <Get id="ServerLogName" name="datedFilename"/>
           </New>
         </Arg>
-        <!-- Since we can't send to both out and err, we choose to send to out since logs are not errors by default
-             so it seems the most logical one to use -->
-        <Arg><Get class="java.lang.System" name="out"/></Arg>
+        <Arg><Get class="java.lang.System" name="err"/></Arg>
       </New>
     </Arg>
   </New>

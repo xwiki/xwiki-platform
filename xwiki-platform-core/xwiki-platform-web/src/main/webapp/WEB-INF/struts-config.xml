@@ -86,14 +86,7 @@
                    type="com.xpn.xwiki.web.DeleteVersionsForm"/>
     </form-beans>
 
-  <global-exceptions>
-    <exception
-      key="something"
-      type="java.lang.Throwable"
-      path="/bin/error/" />
-  </global-exceptions>
-
-  <!-- ========== Global Forward Definitions ============================== -->
+    <!-- ========== Global Forward Definitions ============================== -->
     <global-forwards>
 
         <!-- Forward to view -->
@@ -105,6 +98,7 @@
         <forward name="accessdenied" path="/templates/accessdenied.vm"/>
         <forward name="userinactive" path="/templates/userinactive.vm"/>
     </global-forwards>
+
 
     <!-- ========== Action Mapping Definitions ============================== -->
     <action-mappings>
@@ -450,18 +444,12 @@
             <forward name="distribution" path="/templates/distribution.vm"/>
         </action>
 
+
         <action path="/unknown/"
                 type="com.xpn.xwiki.web.UnknownAction"
                 name="unknown"
                 unknown="true"
                 scope="request">
-        </action>
-
-        <action path="/error/"
-              type="com.xpn.xwiki.web.ErrorAction"
-              name="error"
-              scope="request">
-            <forward name="error" path="/templates/error.vm"/>
         </action>
 
     </action-mappings>

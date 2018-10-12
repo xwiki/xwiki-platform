@@ -58,6 +58,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
@@ -87,7 +88,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
 
     private void migrateObjectsOfType(String className, BaseClass xclass) throws DataMigrationException, XWikiException
     {
-        long expectedPropertyCount = new Integer(xclass.getPropertyList().size()).longValue();
+        long expectedPropertyCount = Integer.valueOf(xclass.getPropertyList().size()).longValue();
         getStore().executeWrite(getXWikiContext(), new HibernateCallback<Void>()
         {
             @Override

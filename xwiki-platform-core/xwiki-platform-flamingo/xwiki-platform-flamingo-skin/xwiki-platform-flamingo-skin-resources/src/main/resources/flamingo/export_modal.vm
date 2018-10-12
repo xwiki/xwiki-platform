@@ -26,11 +26,11 @@
 #macro (displayOfficeFormats $exportExtensions)
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="exportModalHeadingOffice">
-      <h4 class="panel-title">
+      <div class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#exportModelAccordion" href="#exportModelOfficeCollapse" aria-expanded="true" aria-controls="exportModelOfficeCollapse">
           $escapetool.xml($services.localization.render('core.exporter.headings.officeFormats'))
         </a>
-      </h4>
+      </div>
     </div>
     <div id="exportModelOfficeCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="exportModalHeadingOffice">
       <div class="panel-body">
@@ -52,11 +52,11 @@
 #macro (displayOtherFormats $exportExtensions)
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="exportModalHeadingOther">
-      <h4 class="panel-title">
+      <div class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#exportModelAccordion" href="#exportModelOtherCollapse" aria-expanded="false" aria-controls="exportModelOtherCollapse">
           $escapetool.xml($services.localization.render('core.exporter.headings.otherFormats'))
         </a>
-      </h4>
+      </div>
     </div>
     <div id="exportModelOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
       <form id="export-form" method="post" class="panel-body">

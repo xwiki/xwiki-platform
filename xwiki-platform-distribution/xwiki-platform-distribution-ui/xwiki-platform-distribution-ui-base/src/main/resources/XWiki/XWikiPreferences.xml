@@ -597,7 +597,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>|always|create</values>
+      <values>---|always|create</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </ldap_mode_group_sync>
     <ldap_photo_attachment_name>

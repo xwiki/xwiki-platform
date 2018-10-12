@@ -130,7 +130,6 @@ public class AttachNode extends FsAbstractNode implements IoEntry<AttachNode>
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public long getTime(Access type)
     {
         if (WRITE != type) {

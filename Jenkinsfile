@@ -118,7 +118,6 @@ def builds = [
     build(
       name: 'Docker',
       node: 'docker',
-      goals: 'clean install',
       profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
       projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'

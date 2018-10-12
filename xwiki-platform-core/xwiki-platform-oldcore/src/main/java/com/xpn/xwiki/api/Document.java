@@ -272,9 +272,13 @@ public class Document extends Api
     }
 
     /**
-     * return the name of a document. for example if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
-     *
-     * @return the name of the document
+     * @return the last part of the document's reference. For example if the reference of a document is
+     *         {@code MySpace.Mydoc}, the returned name is {@code MyDoc}. For a nested document, the last part of the
+     *         reference is always {@code WebHome} and thus the returned name is {@code Webhome}. It's better to use
+     *         {@link #getDocumentReference()}. This API is equivalent to {@code getDocumentReference().getName()}.
+     *         To get the space name of the nested document you can use
+     *         {@code getDocumentReference().getParent().getName()}.
+     * @see #getDocumentReference()
      */
     public String getName()
     {

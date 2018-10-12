@@ -22,6 +22,7 @@
 @import "layout";
 @import "livetable";
 @import "messages";
+@import "modals";
 @import "misc";
 @import "panels";
 @import "tables";

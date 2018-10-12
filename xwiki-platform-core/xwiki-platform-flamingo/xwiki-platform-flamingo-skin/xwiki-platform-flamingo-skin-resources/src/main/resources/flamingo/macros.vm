@@ -14,7 +14,7 @@
 #macro(xwikimessageboxstart $title $message)
     <div class="centered panel panel-default xwikimessage">
      <div class="panel-heading">
-      <h3 class="panel-title">$title</h3>
+      <div class="panel-title">$title</div>
      </div>
      <div class="panel-body">
       <p class="xwikimessage">$message</p>

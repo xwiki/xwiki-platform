@@ -175,7 +175,7 @@ public class ExportAction extends XWikiAction
                 }
 
                 where.append("doc.fullName like ?");
-                params.add(new DefaultQueryParameter(null).like(pattern));
+                params.add(getQueryParameter(pattern));
             }
 
             DocumentReferenceResolver<String> resolver =

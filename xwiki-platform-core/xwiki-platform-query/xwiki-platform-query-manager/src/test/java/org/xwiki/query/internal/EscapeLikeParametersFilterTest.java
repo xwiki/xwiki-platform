@@ -154,4 +154,23 @@ public class EscapeLikeParametersFilterTest
         assertEquals("SELECT a FROM b WHERE ref LIKE LOWER(?) ESCAPE '!'", filteredQuery.getStatement());
         assertEquals("wiki:space1.space\\.2.space!!3.WebHome", filteredQuery.getPositionalParameters().get(0));
     }
+
+    @Test
+    public void filterWhenUsingBangInLike()
+    {
+        Query query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn("select a from b where ref like :likeValue");
+
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        parameters.put("likeValue", new DefaultQueryParameter(query).like("%some!thing%"));
+        when(query.getNamedParameters()).thenReturn(parameters);
+
+        Query filteredQuery = this.filter.filterQuery(query);
+        assertEquals("SELECT a FROM b WHERE ref LIKE :likeValue ESCAPE '!'", filteredQuery.getStatement());
+        // The test is here, we verify that the bang character has been escaped from the like value since it's an
+        // escape character
+        assertEquals("%some!!thing%", filteredQuery.getNamedParameters().get("likeValue"));
+
+    }
 }

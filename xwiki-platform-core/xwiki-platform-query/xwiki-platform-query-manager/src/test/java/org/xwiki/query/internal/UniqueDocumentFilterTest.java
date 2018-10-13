@@ -19,95 +19,86 @@
  */
 package org.xwiki.query.internal;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link org.xwiki.query.internal.UniqueDocumentFilter}
  *
  * @version $Id$
  */
+@ComponentTest
 public class UniqueDocumentFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<UniqueDocumentFilter> mocker =
-        new MockitoComponentMockingRule<UniqueDocumentFilter>(UniqueDocumentFilter.class);
-
-    private QueryFilter filter;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.filter = this.mocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private UniqueDocumentFilter filter;
 
     @Test
-    public void filterSelectStatement() throws Exception
+    public void filterSelectStatement()
     {
         assertEquals("select distinct doc.fullName from XWikiDocument doc",
-            filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
+            this.filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
 
         List<String> items = Arrays.asList("doc1", "doc2");
-        assertThat((List<String>) filter.filterResults(items), is(items));
+        assertThat((List<String>) this.filter.filterResults(items), is(items));
 
         // Verify it works with keywords in uppercase
         assertEquals("select distinct doc.fullName FROM XWikiDocument doc",
-            filter.filterStatement("SELECT doc.fullName FROM XWikiDocument doc", Query.HQL));
+            this.filter.filterStatement("SELECT doc.fullName FROM XWikiDocument doc", Query.HQL));
     }
 
     @Test
-    public void filterSelectWithAsStatement() throws Exception
+    public void filterSelectWithAsStatement()
     {
         assertEquals("select distinct doc.fullName from XWikiDocument as doc",
-                filter.filterStatement("select doc.fullName from XWikiDocument as doc", Query.HQL));
+            this.filter.filterStatement("select doc.fullName from XWikiDocument as doc", Query.HQL));
     }
 
     @Test
-    public void filterSelectStatementWithMismatchingDocAlias() throws Exception
+    public void filterSelectStatementWithMismatchingDocAlias()
     {
         assertEquals("select mydoc.fullName from XWikiDocument mydoc",
-                filter.filterStatement("select mydoc.fullName from XWikiDocument mydoc", Query.HQL));
+            this.filter.filterStatement("select mydoc.fullName from XWikiDocument mydoc", Query.HQL));
     }
 
     @Test
-    public void filterStatementWhenStatementAlreadyContainsDistinct() throws Exception
+    public void filterStatementWhenStatementAlreadyContainsDistinct()
     {
         assertEquals("select distinct doc.fullName from XWikiDocument doc",
-                filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
+            this.filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test
-    public void filterStatementWhenStatementContainsAnotherOrderBy() throws Exception
+    public void filterStatementWhenStatementContainsAnotherOrderBy()
     {
         assertEquals("select distinct doc.fullName, doc.name from XWikiDocument doc order by doc.name asc",
-            filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name asc", Query.HQL));
+            this.filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name asc", Query.HQL));
 
-        List<Object[]> results = filter.filterResults(
-            Arrays.asList(new Object[] {"full1", "name1"}, new Object[] {"full2", "name2"}));
+        List<Object[]> results = this.filter.filterResults(
+            Arrays.asList(new Object[]{ "full1", "name1" }, new Object[]{ "full2", "name2" }));
         assertEquals(2, results.size());
         assertEquals("full1", results.get(0));
         assertEquals("full2", results.get(1));
     }
 
     @Test
-    public void filterStatementWhenTheFirstSelectColumnIsNotFullName() throws Exception
+    public void filterStatementWhenTheFirstSelectColumnIsNotFullName()
     {
         assertEquals("select distinct doc.fullName, doc.name from XWikiDocument doc order by doc.name asc",
-            filter.filterStatement("select doc.name, doc.fullName from XWikiDocument doc order by doc.name asc",
+            this.filter.filterStatement("select doc.name, doc.fullName from XWikiDocument doc order by doc.name asc",
                 Query.HQL));
 
-        List<Object[]> results = filter.filterResults(
-            Arrays.asList(new Object[] {"full1", "name1"}, new Object[] {"full2", "name2"}));
+        List<Object[]> results = this.filter.filterResults(
+            Arrays.asList(new Object[]{ "full1", "name1" }, new Object[]{ "full2", "name2" }));
         assertEquals(2, results.size());
         assertEquals(2, results.get(0).length);
         assertEquals("full1", results.get(0)[0]);

@@ -81,15 +81,16 @@ public class ExportAction extends XWikiAction
     private static String PAGE_SEPARATOR = "&";
 
     /**
-     * Manage the arguments of the export and provides them in an object to
-     * simplify their usage in the different methods.
+     * Manage the arguments of the export and provides them in an object to simplify their usage in the different
+     * methods.
      *
      * @since 10.9RC1
      */
-    private class ExportArguments {
+    private class ExportArguments
+    {
         /**
-         * Represent the pages to be included and excluded:
-         * keys are pattern of pages to include, values are list of pages to exclude
+         * Represent the pages to be included and excluded: keys are pattern of pages to include, values are list of
+         * pages to exclude
          */
         private Map<String, List<String>> exportPages;
 
@@ -135,8 +136,8 @@ public class ExportAction extends XWikiAction
         }
 
         /**
-         * Decode an URIEncoded String and split it based on the {@link #PAGE_SEPARATOR}.
-         * Returns a list of decoded string.
+         * Decode an URIEncoded String and split it based on the {@link #PAGE_SEPARATOR}. Returns a list of decoded
+         * string.
          *
          * @param encodedString the string to decode.
          * @param context the context used to retrieved the right character encoding.
@@ -222,8 +223,8 @@ public class ExportAction extends XWikiAction
     }
 
     /**
-     * Extract the name of the wiki from a given String representing a document.
-     * Returns the name contained in the documentName or the wiki name of the current context.
+     * Extract the name of the wiki from a given String representing a document. Returns the name contained in the
+     * documentName or the wiki name of the current context.
      *
      * @param documentName a complete name of a document, which might contain the name of the wiki.
      * @param context in case the documentName does not contain a wiki name, returns the context wiki name.
@@ -242,9 +243,9 @@ public class ExportAction extends XWikiAction
     }
 
     /**
-     * Resolve the pages in the given context and return their references.
-     * This method uses the list of includedPages and excludedPages given in the exportArguments to build a proper
-     * query and resolve the pages after checking the user rights.
+     * Resolve the pages in the given context and return their references. This method uses the list of includedPages
+     * and excludedPages given in the exportArguments to build a proper query and resolve the pages after checking the
+     * user rights.
      *
      * @param arguments the arguments of the export to know the list of included/excluded pages to resolve.
      * @param context the context to use.
@@ -259,7 +260,7 @@ public class ExportAction extends XWikiAction
         if (arguments.exportPages.isEmpty()) {
             pageList.add(context.getDoc().getDocumentReference());
 
-        // else we process the list of included/excluded pages
+            // else we process the list of included/excluded pages
         } else {
             Map<String, Object[]> wikiQueries = new HashMap<>();
 
@@ -270,7 +271,7 @@ public class ExportAction extends XWikiAction
                 String wikiName = this.extractWikiName(includePage, context);
 
                 // we only want the name of the document without its wikiName
-                if (includePage.startsWith(wikiName+":")) {
+                if (includePage.startsWith(wikiName + ":")) {
                     includePage = includePage.substring(wikiName.length() + 1);
                 }
 
@@ -285,7 +286,7 @@ public class ExportAction extends XWikiAction
                     query[1] = params = new ArrayList<>();
                     wikiQueries.put(wikiName, query);
 
-                // we get back the query we started to continue it
+                    // we get back the query we started to continue it
                 } else {
                     Object[] query = wikiQueries.get(wikiName);
                     where = (StringBuffer) query[0];
@@ -295,7 +296,7 @@ public class ExportAction extends XWikiAction
                 }
 
                 where.append("doc.fullName like ?");
-                params.add(getQueryParameter(includePage));
+                params.add(new DefaultQueryParameter(null).like(includePage));
 
                 // if they exist we process the excludedPages associated with that include
                 if (!excludedPages.isEmpty()) {
@@ -306,24 +307,24 @@ public class ExportAction extends XWikiAction
                         String localwikiName = this.extractWikiName(excludePage, context);
 
                         if (!localwikiName.equals(wikiName)) {
-                            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
+                            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                                XWikiException.ERROR_XWIKI_APP_EXPORT,
                                 String.format("The excludes argument [%s] makes reference to another wiki than its "
                                     + "attached pages argument [%s]", excludePage, includePage));
                         }
 
-                        if (excludePage.startsWith(wikiName+":")) {
+                        if (excludePage.startsWith(wikiName + ":")) {
                             excludePage = excludePage.substring(wikiName.length() + 1);
                         }
 
                         where.append(" and doc.fullName not like ?");
-                        params.add(getQueryParameter(excludePage));
+                        params.add(new DefaultQueryParameter(null).like(excludePage));
                     }
                 }
 
                 // don't forget to close the query statement
                 where.append(" ) ");
             }
-
 
             DocumentReferenceResolver<String> resolver =
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -359,15 +360,6 @@ public class ExportAction extends XWikiAction
             }
         }
         return pageList;
-    }
-
-    private QueryParameter getQueryParameter(String like)
-    {
-        // '!' is the default escape character in queries, but it's not yet systematically escaped
-        // when used in a LikePart that's why we have to do it manually here.
-        // This should be removed once https://jira.xwiki.org/browse/XWIKI-15727 is done.
-        String likeString = like.replaceAll("([!])", "!$1");
-        return new DefaultQueryParameter(null).like(likeString);
     }
 
     private String export(String format, XWikiContext context) throws XWikiException, IOException

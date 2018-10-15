@@ -81,8 +81,11 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         for (String className : classNames) {
             DocumentReference classReference = this.documentReferenceResolver.resolve(className);
             BaseClass xclass = xcontext.getWiki().getXClass(classReference, xcontext);
-            // Pass the class name so that we don't have to serialize the class reference.
-            migrateObjectsOfType(className, xclass);
+            // There's no missing object property if the class is empty.
+            if (!xclass.getPropertyList().isEmpty()) {
+                // Pass the class name so that we don't have to serialize the class reference.
+                migrateObjectsOfType(className, xclass);
+            }
         }
     }
 

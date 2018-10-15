@@ -268,7 +268,7 @@ public abstract class ListClass extends PropertyClass
      */
     public void setDefaultValue(String separator)
     {
-        setStringValue("separator", separator);
+        setStringValue("defaultValue", separator);
     }
 
     /**
@@ -794,13 +794,8 @@ public abstract class ListClass extends PropertyClass
 
         // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
-            String selectedValue = item;
-            if (StringUtils.isEmpty(selectedValue)) {
-                selectedValue = defaultValue;
-            }
-
-            if (!list.contains(selectedValue)) {
-                list.add(selectedValue);
+            if (!StringUtils.isEmpty(item) && !defaultValue.equals(item) && !list.contains(item)) {
+                list.add(item);
             }
         }
 

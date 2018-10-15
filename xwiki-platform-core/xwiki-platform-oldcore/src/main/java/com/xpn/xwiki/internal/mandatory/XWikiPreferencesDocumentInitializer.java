@@ -128,7 +128,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
         xclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
 
-        xclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
+        xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
 
         xclass.addTextField("webcopyright", "Copyright", 30);
         xclass.addTextField("title", "Title", 30);
@@ -150,12 +150,12 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10, ContentType.PURE_TEXT);
         xclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
 
-        xclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
-        xclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
-        xclass.addStaticListField("edit_anonymous", "Anonymous", "---|Image|Text");
-        xclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
-        xclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
-        xclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
+        xclass.addStaticListField("registration_anonymous", "Anonymous", "Image|Text");
+        xclass.addStaticListField("registration_registered", "Registered", "Image|Text");
+        xclass.addStaticListField("edit_anonymous", "Anonymous", "Image|Text");
+        xclass.addStaticListField("edit_registered", "Registered", "Image|Text");
+        xclass.addStaticListField("comment_anonymous", "Anonymous", "Image|Text");
+        xclass.addStaticListField("comment_registered", "Registered", "Image|Text");
 
         xclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
@@ -178,8 +178,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         xclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         xclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        xclass.addStaticListField("leftPanelsWidth", "Width of the left panel column", "---|Small|Medium|Large");
-        xclass.addStaticListField("rightPanelsWidth", "Width of the right panel column", "---|Small|Medium|Large");
+        xclass.addStaticListField("leftPanelsWidth", "Width of the left panel column", "Small|Medium|Large");
+        xclass.addStaticListField("rightPanelsWidth", "Width of the right panel column", "Small|Medium|Large");
         xclass.addTextField("languages", "Supported languages", 30);
         xclass.addPageField("documentBundles", "Internationalization Document Bundles", 60);
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
@@ -203,7 +203,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("ldap_photo_attribute", "Ldap photo attribute name", 60);
         xclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5, ContentType.PURE_TEXT);
         xclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
-        xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "---|always|create");
+        xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "always|create");
         xclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
 
         xclass.addBooleanField("showannotations", "Show document annotations", "yesno");

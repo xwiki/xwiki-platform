@@ -518,10 +518,15 @@ public abstract class ListClass extends PropertyClass
      */
     protected String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
+        return getDisplayValue(value, name, map, value, context);
+    }
+
+    private String getDisplayValue(String value, String name, Map<String, ListItem> map, String def, XWikiContext context)
+    {
         ListItem item = map.get(value);
         String displayValue;
         if (item == null) {
-            displayValue = value;
+            displayValue = def;
         } else {
             displayValue = item.getValue();
         }
@@ -771,20 +776,34 @@ public abstract class ListClass extends PropertyClass
             }
         }
 
+        // Add default if not already part of the list
+        if (!isMultiSelect() && !list.contains("")) {
+            String display = getDisplayValue("", name, map, "---", context);
+
+            select.addElement(createOption("", display, selectlist));
+        }
+
         // Add options from Set
         for (String rawvalue : list) {
             String value = getElementValue(rawvalue);
             String display = getDisplayValue(rawvalue, name, map, context);
-            option option = new option(display, value);
-            option.setAttributeFilter(new XMLAttributeValueFilter());
-            option.addElement(XMLUtils.escape(display));
-            if (selectlist.contains(value)) {
-                option.setSelected(true);
-            }
-            select.addElement(option);
+
+            select.addElement(createOption(value, display, selectlist));
         }
 
         buffer.append(select.toString());
+    }
+
+    private option createOption(String value, String display, List<String> selectlist)
+    {
+        option option = new option(display, value);
+        option.setAttributeFilter(new XMLAttributeValueFilter());
+        option.addElement(XMLUtils.escape(display));
+        if (selectlist.contains(value)) {
+            option.setSelected(true);
+        }
+
+        return option;
     }
 
     public abstract List<String> getList(XWikiContext context);

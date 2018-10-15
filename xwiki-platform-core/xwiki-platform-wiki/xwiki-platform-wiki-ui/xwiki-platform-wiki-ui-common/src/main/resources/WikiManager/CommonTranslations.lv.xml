@@ -42,7 +42,7 @@ admin.wikis.descriptor.description=Iestatīt viki aprakstu
 admin.wiki.description=Aprakstiet savu viki (skaistu nosaukumu un aprakstu) un norādiet tā īpašnieku un sākuma lapu.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Jaunais īpašnieks nepastāv vai arī ir reģistrēts citā viki.\\nVai tiešām vēlaties turpināt saglabāšanu?
 platform.wiki.admin.wiki.csrfInvalidError=Nepareizs CSRF drošības marķieris. Lūdzu atjaunojiet lapas saturu un mēģiniet vēlreiz.
-platform.wiki.admin.wiki.requiredFieldsError=Īpašnieks un mājas lapa ir obligāti lauki
+platform.wiki.admin.wiki.requiredFieldsError='Mājas lapa' ir obligāts lauks.
 platform.wiki.admin.wiki.ownerWarning=Brīdinājums: Kad jūs apstiprināsiet izmaiņas, iepriekšējais viki īpašnieks zaudēs savas tiesības. Ja tas esat jūs, pārliecinieties, ka neizslēgsit sevi no šī viki. Ja tā tomēr gadīsies, jums būs jāsazinās ar viki galveno superadministratoru, kurš pārvalda visus viki.
 
 ###############################################################################

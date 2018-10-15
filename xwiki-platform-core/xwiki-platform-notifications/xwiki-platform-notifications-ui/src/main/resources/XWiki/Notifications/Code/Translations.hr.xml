@@ -230,6 +230,8 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclus
 ### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
 ### Missing: rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
 ### Missing: rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
+### Missing: rendering.macro.notifications.parameter.tags.name=Tags
+### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
 
 ## Notifications Macro
 ### Missing: notifications.macro.noWatchedUsers=You are not following anybody.

@@ -177,7 +177,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </comment_anonymous>
     <comment_registered>
@@ -199,7 +199,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </comment_registered>
     <confirmation_email_content>
@@ -304,7 +304,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </edit_anonymous>
     <edit_registered>
@@ -326,7 +326,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </edit_registered>
     <editcomment>
@@ -376,7 +376,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Text|Wysiwyg</values>
+      <values>Text|Wysiwyg</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </editor>
     <guest_comment_requires_captcha>
@@ -597,7 +597,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|always|create</values>
+      <values>always|create</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </ldap_mode_group_sync>
     <ldap_photo_attachment_name>
@@ -748,7 +748,7 @@
       <separators>|, </separators>
       <size>1</size>
       <unmodifiable>0</unmodifiable>
-      <values>---|Small|Medium|Large</values>
+      <values>Small|Medium|Large</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </leftPanelsWidth>
     <meta>
@@ -857,7 +857,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </registration_anonymous>
     <registration_registered>
@@ -879,7 +879,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </registration_registered>
     <rightPanels>
@@ -909,7 +909,7 @@
       <separators>|, </separators>
       <size>1</size>
       <unmodifiable>0</unmodifiable>
-      <values>---|Small|Medium|Large</values>
+      <values>Small|Medium|Large</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </rightPanelsWidth>
     <showLeftPanels>
@@ -1608,7 +1608,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </comment_anonymous>
       <comment_registered>
@@ -1630,7 +1630,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </comment_registered>
       <confirmation_email_content>
@@ -1735,7 +1735,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </edit_anonymous>
       <edit_registered>
@@ -1757,7 +1757,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </edit_registered>
       <editcomment>
@@ -1807,7 +1807,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Text|Wysiwyg</values>
+        <values>Text|Wysiwyg</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </editor>
       <guest_comment_requires_captcha>
@@ -2179,7 +2179,7 @@
         <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>---|Small|Medium|Large</values>
+        <values>Small|Medium|Large</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </leftPanelsWidth>
       <meta>
@@ -2288,7 +2288,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </registration_anonymous>
       <registration_registered>
@@ -2310,7 +2310,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </registration_registered>
       <rightPanels>
@@ -2340,7 +2340,7 @@
         <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>---|Small|Medium|Large</values>
+        <values>Small|Medium|Large</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </rightPanelsWidth>
       <showLeftPanels>

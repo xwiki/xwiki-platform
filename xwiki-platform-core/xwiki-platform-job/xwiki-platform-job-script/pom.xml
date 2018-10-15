@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-job</artifactId>
-    <version>10.8.1</version>
+    <version>10.8.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-job-script</artifactId>
   <name>XWiki Platform - Job - Script</name>

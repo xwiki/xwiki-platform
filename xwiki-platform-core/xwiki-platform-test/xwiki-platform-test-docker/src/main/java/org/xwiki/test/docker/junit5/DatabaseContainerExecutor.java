@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.io.File;
+
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MySQLContainer;
@@ -40,6 +42,10 @@ public class DatabaseContainerExecutor
 
     private static final String DBPASSWORD = DBUSERNAME;
 
+    private static final String MYSQL_TARGET_DIR = "./target/mysql";
+
+    private static final String PGSQL_TARGET_DIR = "./target/postgres";
+
     /**
      * @param configuration the configuration to build (database, debug mode, etc)
      * @return the Docker container instance
@@ -49,6 +55,11 @@ public class DatabaseContainerExecutor
         JdbcDatabaseContainer databaseContainer;
         switch (configuration.database()) {
             case MYSQL:
+                // Precreate the mapped directory on the host so that it's created with the current user and not
+                // some user chosen by dockerd which can cause permission problems.
+                File targetDirectory = new File(MYSQL_TARGET_DIR);
+                targetDirectory.mkdirs();
+
                 // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
                 //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
                 //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
@@ -60,7 +71,7 @@ public class DatabaseContainerExecutor
                     .withExposedPorts(3306)
                     // This allows re-running the test with the database already provisioned without having to redo
                     // the provisioning. Running "mvn clean" will remove the database data.
-                    .withFileSystemBind("./target/mysql", "/var/lib/mysql");
+                    .withFileSystemBind(MYSQL_TARGET_DIR, "/var/lib/mysql");
 
                 databaseContainer.addParameter("character-set-server", "utf8");
                 databaseContainer.addParameter("collation-server", "utf8_bin");
@@ -68,6 +79,11 @@ public class DatabaseContainerExecutor
 
                 break;
             case POSTGRESQL:
+                // Precreate the mapped directory on the host so that it's created with the current user and not
+                // some user chosen by dockerd which can cause permission problems.
+                File targetDirectory = new File(PGSQL_TARGET_DIR);
+                targetDirectory.mkdirs();
+
                 // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
                 //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
                 //     -e POSTGRES_DB=xwiki -e POSTGRES_INITDB_ARGS="--encoding=UTF8" -d postgres:9.5
@@ -77,7 +93,7 @@ public class DatabaseContainerExecutor
                     .withPassword(DBPASSWORD)
                     // This allows re-running the test with the database already provisioned without having to redo
                     // the provisioning. Running "mvn clean" will remove the database data.
-                    .withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
+                    .withFileSystemBind(PGSQL_TARGET_DIR, "/var/lib/postgresql/data");
 
                 databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
 

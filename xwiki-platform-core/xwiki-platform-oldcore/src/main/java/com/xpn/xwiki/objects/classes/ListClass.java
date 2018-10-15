@@ -214,8 +214,8 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * @param relationalStorage if false, the list items will be concatenated into a VARCHAR column on a single row.
-     * Otherwise, items are stored in their own entries in the database. In most cases, this property should have the
-     * same value as the {@code multiSelect} property
+     *            Otherwise, items are stored in their own entries in the database. In most cases, this property should
+     *            have the same value as the {@code multiSelect} property
      */
     public void setRelationalStorage(boolean relationalStorage)
     {
@@ -247,6 +247,26 @@ public abstract class ListClass extends PropertyClass
      *            the UI in view mode.
      */
     public void setSeparator(String separator)
+    {
+        setStringValue("separator", separator);
+    }
+
+    /**
+     * @return the default value used in the select editor
+     * @since 10.9RC1
+     * @since 10.8.1
+     */
+    public String getDefaultValue()
+    {
+        return getStringValue("defaultValue");
+    }
+
+    /**
+     * @param separator the default value used in the select editor
+     * @since 10.9RC1
+     * @since 10.8.1
+     */
+    public void setDefaultValue(String separator)
     {
         setStringValue("separator", separator);
     }
@@ -521,7 +541,8 @@ public abstract class ListClass extends PropertyClass
         return getDisplayValue(value, name, map, value, context);
     }
 
-    private String getDisplayValue(String value, String name, Map<String, ListItem> map, String def, XWikiContext context)
+    private String getDisplayValue(String value, String name, Map<String, ListItem> map, String def,
+        XWikiContext context)
     {
         ListItem item = map.get(value);
         String displayValue;
@@ -686,9 +707,9 @@ public abstract class ListClass extends PropertyClass
         for (Object rawvalue : list) {
             String value = getElementValue(rawvalue);
             String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
-            input radio =
-                new input((getDisplayType().equals(DISPLAYTYPE_RADIO) && !isMultiSelect()) ? input.radio
-                    : input.checkbox, prefix + name, value);
+            input radio = new input(
+                (getDisplayType().equals(DISPLAYTYPE_RADIO) && !isMultiSelect()) ? input.radio : input.checkbox,
+                prefix + name, value);
             radio.setAttributeFilter(new XMLAttributeValueFilter());
             radio.setID("xwiki-form-" + name + "-" + object.getNumber() + "-" + count);
             radio.setDisabled(isDisabled());
@@ -769,16 +790,24 @@ public abstract class ListClass extends PropertyClass
 
         List<String> selectlist = toList((BaseProperty) object.safeget(name));
 
+        String defaultValue = getDefaultValue();
+
         // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
-            if (!list.contains(item)) {
-                list.add(item);
+            String selectedValue = item;
+            if (StringUtils.isEmpty(selectedValue)) {
+                selectedValue = defaultValue;
+            }
+
+            if (!list.contains(selectedValue)) {
+                list.add(selectedValue);
             }
         }
 
         // Add default if not already part of the list
-        if (!isMultiSelect() && !list.contains("")) {
-            String display = getDisplayValue("", name, map, "---", context);
+        if (!isMultiSelect() && !list.contains(defaultValue)) {
+            String display =
+                getDisplayValue(defaultValue, name, map, defaultValue.isEmpty() ? "---" : defaultValue, context);
 
             select.addElement(createOption("", display, selectlist));
         }

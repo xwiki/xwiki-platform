@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-eventstream</artifactId>
-    <version>10.8.1-SNAPSHOT</version>
+    <version>10.8.1</version>
   </parent>
   <artifactId>xwiki-platform-eventstream-api</artifactId>
   <name>XWiki Platform - Event Stream - API</name>

@@ -69,18 +69,28 @@
       </automaticwatch>
       <documents>
         <cache>0</cache>
+        <classname/>
+        <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <hint/>
+        <idField/>
         <multiSelect>1</multiSelect>
         <name>documents</name>
         <number>4</number>
+        <picker>1</picker>
         <prettyName>Document List</prettyName>
+        <size>80</size>
         <relationalStorage>1</relationalStorage>
         <separator> </separator>
-        <size>80</size>
+        <separators/>
+        <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </documents>
       <interval>
         <cache>0</cache>
@@ -120,13 +130,14 @@
         <multiSelect>1</multiSelect>
         <name>users</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>User List</prettyName>
         <relationalStorage>1</relationalStorage>
         <separator> </separator>
         <size>80</size>
         <sql/>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
       <wikis>
         <cache>0</cache>

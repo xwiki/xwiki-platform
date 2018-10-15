@@ -127,8 +127,8 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryClassIni
         // Watched elements properties
         addWatchedElementField(xclass, WIKIS_PROPERTY, "Wiki List");
         addWatchedElementField(xclass, SPACES_PROPERTY, "Space List");
-        addWatchedElementField(xclass, DOCUMENTS_PROPERTY, "Document List");
-        addWatchedElementField(xclass, USERS_PROPERTY, "User List");
+        xclass.addPageField(DOCUMENTS_PROPERTY, "Document List", 80, true);
+        xclass.addUsersField(USERS_PROPERTY, "User List", 80);
 
         // Automatic watching property
         String automaticWatchValues = String.format("%s%s%s", AUTOMATICWATCH_DEFAULT_VALUE, ListClass.DEFAULT_SEPARATOR,

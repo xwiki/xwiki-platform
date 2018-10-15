@@ -195,6 +195,10 @@ def buildAll(builds)
           // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
           // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
           builds['Flavor Test - Webstandards'].call()
+        },
+        'flavor-test-upgrade': {
+          // Run the Flavor Upgrade tests
+          builds['Flavor Test - Upgrade'].call()
         }
       )
     },

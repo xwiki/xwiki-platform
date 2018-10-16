@@ -49,6 +49,8 @@ import net.sf.jsqlparser.statement.select.SelectBody;
  */
 public class EscapeLikeParametersQuery extends WrappingQuery
 {
+    private static final String ESCAPED_REPLACEMENT = "!$1";
+
     private List<String> modifiedNamedParameters;
 
     private List<Integer> modifiedPositionalParameters;
@@ -94,7 +96,10 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                             // See https://jira.xwiki.org/browse/XWIKI-14217 and
                             // https://groups.google.com/d/msg/h2-database/jT0O3rNgpSw/hU_JKXRkZNoJ
                             // Thus we don't escape '[' FTM meaning that the query could fail on Sybase and SQL Server
-                            buffer.append(part.getValue().replaceAll("([%_!])", "!$1"));
+                            buffer.append(part.getValue().replaceAll("([%_!])", ESCAPED_REPLACEMENT));
+                        } else if (part instanceof LikeParameterPart) {
+                            // Escape the escape character
+                            buffer.append(part.getValue().replaceAll("([!])", ESCAPED_REPLACEMENT));
                         } else {
                             buffer.append(part.getValue());
                         }
@@ -156,8 +161,8 @@ public class EscapeLikeParametersQuery extends WrappingQuery
         {
             if (expr.getEscape() == null) {
                 expr.setEscape("!");
-                expr.accept(new XWikiLikeExpressionVisitor());
             }
+            expr.accept(new XWikiLikeExpressionVisitor());
         }
     }
 

@@ -40,6 +40,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
       <version>${project.version}</version>
+      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>

@@ -1,0 +1,73 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="fr">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.notifications.name=Notifications
+rendering.macro.notifications.description=Affiche des notifications liées à l'activité du wiki.
+rendering.macro.notifications.parameter.count.name=Nombre
+rendering.macro.notifications.parameter.count.description=Nombre maximum d'évènements à afficher par défaut
+rendering.macro.notifications.parameter.useUserPreferences.name=Utiliser les paramètres de l'utilisateur
+rendering.macro.notifications.parameter.useUserPreferences.description=Si vrai, les paramètres de notifications définis par l'utilisateur sont utilisés
+rendering.macro.notifications.parameter.displayOwnEvents.name=Afficher mes propres évènements
+rendering.macro.notifications.parameter.displayOwnEvents.description=Si vrai, les évènements de l'utilisateur connecté sont affichés parmi les autres. Sinon ils sont masqués.
+rendering.macro.notifications.parameter.displayMinorEvents.name=Afficher les évènements mineurs
+rendering.macro.notifications.parameter.displayMinorEvents.description=Si vrai, les évènements concernant les révisions mineures sont affichés parmi les autres. Sinon ils sont masqués.
+rendering.macro.notifications.parameter.displaySystemEvents.name=Afficher les évènements système
+rendering.macro.notifications.parameter.displaySystemEvents.description=Si vrai, les évènements déclenchés par le logiciel XWiki sont affichés parmi les autres. Sinon ils sont masqués.
+rendering.macro.notifications.parameter.displayReadEvents.name=Afficher les évènements lus
+rendering.macro.notifications.parameter.displayReadEvents.description=Si vrai, les évènements marqués par l'utilisateur comme lus sont affichés parmi les autres. Sinon ils sont masqués.
+rendering.macro.notifications.parameter.wikis.name=Wikis
+rendering.macro.notifications.parameter.wikis.description=Liste des wikis à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
+rendering.macro.notifications.parameter.spaces.name=Espaces
+rendering.macro.notifications.parameter.spaces.description=Liste des espaces à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
+rendering.macro.notifications.parameter.pages.name=Pages
+rendering.macro.notifications.parameter.pages.description=Liste des pages à prendre en compte (nom complets séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
+rendering.macro.notifications.parameter.displayReadStatus.name=Afficher l'état "lu"
+rendering.macro.notifications.parameter.displayReadStatus.description=Définit si l'état lu ou non lu doit être affiché pour les évènements
+rendering.macro.notifications.parameter.users.name=Utilisateurs
+rendering.macro.notifications.parameter.users.description=Liste des utilisateurs à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher uniquement les utilisateurs suivis
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Afficher uniquement les événements créés par une liste d'utilisateurs donnés (si vide, la liste des utilisateurs suivis par l'utilisateur actuel sera utilisée).
+rendering.macro.notifications.parameter.displayRSSLink.name=Afficher le lien RSS
+rendering.macro.notifications.parameter.displayRSSLink.description=Affiche un lien vers le flux RSS de la macro courante.
+rendering.macro.notifications.parameter.tags.name=Étiquettes
+notifications.macro.noWatchedUsers=Vous ne suivez personne.
+notifications.macro.whenNotView=Macro de notification. Peut-être vu en mode 'view'.
+notifications.menu.nothing=Pas de notification !
+notifications.menu.more=Charger des notifications plus anciennes
+notifications.menu.details=Détails ({0})</content>
+</xwikidoc>

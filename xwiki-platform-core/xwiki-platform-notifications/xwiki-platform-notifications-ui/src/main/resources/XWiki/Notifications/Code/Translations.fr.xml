@@ -118,9 +118,6 @@ notifications.menu.header.settings=Préférences
 notifications.menu.clear=Effacer tout
 notifications.menu.clearing=Les notifications sont en train d'être effacées
 notifications.menu.cleared=Les notifications ont été effacées
-notifications.menu.nothing=Pas de notification !
-notifications.menu.more=Charger des notifications plus anciennes
-notifications.menu.details=Détails ({0})
 notifications.settings.title=Préférences de notifications
 notifications.settings.error.notAdmin=Vous devez être administrateur pour visualiser cet élément.
 notifications.settings.menu=Menu des notifications
@@ -202,39 +199,6 @@ rendering.macro.notificationsAutoWatchPreferences.description=Affiche les préf�
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cible
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Cible de la macro ("user" pour l'utilisateur courant ou "wiki" pour le wiki courant)
 
-rendering.macro.notifications.name=Notifications
-rendering.macro.notifications.description=Affiche des notifications liées à l'activité du wiki.
-rendering.macro.notifications.parameter.count.name=Nombre
-rendering.macro.notifications.parameter.count.description=Nombre maximum d'évènements à afficher par défaut
-rendering.macro.notifications.parameter.useUserPreferences.name=Utiliser les paramètres de l'utilisateur
-rendering.macro.notifications.parameter.useUserPreferences.description=Si vrai, les paramètres de notifications définis par l'utilisateur sont utilisés
-rendering.macro.notifications.parameter.displayOwnEvents.name=Afficher mes propres évènements
-rendering.macro.notifications.parameter.displayOwnEvents.description=Si vrai, les évènements de l'utilisateur connecté sont affichés parmi les autres. Sinon ils sont masqués.
-rendering.macro.notifications.parameter.displayMinorEvents.name=Afficher les évènements mineurs
-rendering.macro.notifications.parameter.displayMinorEvents.description=Si vrai, les évènements concernant les révisions mineures sont affichés parmi les autres. Sinon ils sont masqués.
-rendering.macro.notifications.parameter.displaySystemEvents.name=Afficher les évènements système
-rendering.macro.notifications.parameter.displaySystemEvents.description=Si vrai, les évènements déclenchés par le logiciel XWiki sont affichés parmi les autres. Sinon ils sont masqués.
-rendering.macro.notifications.parameter.displayReadEvents.name=Afficher les évènements lus
-rendering.macro.notifications.parameter.displayReadEvents.description=Si vrai, les évènements marqués par l'utilisateur comme lus sont affichés parmi les autres. Sinon ils sont masqués.
-rendering.macro.notifications.parameter.wikis.name=Wikis
-rendering.macro.notifications.parameter.wikis.description=Liste des wikis à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
-rendering.macro.notifications.parameter.spaces.name=Espaces
-rendering.macro.notifications.parameter.spaces.description=Liste des espaces à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
-rendering.macro.notifications.parameter.pages.name=Pages
-rendering.macro.notifications.parameter.pages.description=Liste des pages à prendre en compte (nom complets séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
-rendering.macro.notifications.parameter.displayReadStatus.name=Afficher l'état "lu"
-rendering.macro.notifications.parameter.displayReadStatus.description=Définit si l'état lu ou non lu doit être affiché pour les évènements
-rendering.macro.notifications.parameter.users.name=Utilisateurs
-rendering.macro.notifications.parameter.users.description=Liste des utilisateurs à prendre en compte (séparés par des virgules ,). Ce paramètre est ignoré si useUserPreferences vaut "true".
-rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher uniquement les utilisateurs suivis
-rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Afficher uniquement les événements créés par une liste d'utilisateurs donnés (si vide, la liste des utilisateurs suivis par l'utilisateur actuel sera utilisée).
-rendering.macro.notifications.parameter.displayRSSLink.name=Afficher le lien RSS
-rendering.macro.notifications.parameter.displayRSSLink.description=Affiche un lien vers le flux RSS de la macro courante.
-rendering.macro.notifications.parameter.tags.name=Étiquettes
 ### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
-
-## Notifications Macro
-notifications.macro.noWatchedUsers=Vous ne suivez personne.
-notifications.macro.whenNotView=Macro de notification. Peut-être vu en mode 'view'.
 </content>
 </xwikidoc>

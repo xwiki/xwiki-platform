@@ -46,7 +46,7 @@ public class DatabaseContainerExecutor
      */
     public JdbcDatabaseContainer execute(UITest configuration)
     {
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer databaseContainer = null;
         switch (configuration.database()) {
             case MYSQL:
                 // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
@@ -82,20 +82,27 @@ public class DatabaseContainerExecutor
                 databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
 
                 break;
+            case HSQLDB:
+                // We don't need a Docker image/container since HSQLDB can work in embedded mode.
+                // It's configured automatically in the custom XWiki WAR.
+                // Thus, nothing to do here!
+                break;
             default:
                 throw new RuntimeException(String.format("Database [%s] is not yet supported!",
                     configuration.database()));
         }
 
-        databaseContainer
-            .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikidb");
+        if (databaseContainer != null) {
+            databaseContainer
+                .withNetwork(Network.SHARED)
+                .withNetworkAliases("xwikidb");
 
-        if (configuration.debug()) {
-            databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            if (configuration.debug()) {
+                databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            }
+
+            databaseContainer.start();
         }
-
-        databaseContainer.start();
 
         // Note that we don't need to stop the container as this is taken care of by TestContainers
 

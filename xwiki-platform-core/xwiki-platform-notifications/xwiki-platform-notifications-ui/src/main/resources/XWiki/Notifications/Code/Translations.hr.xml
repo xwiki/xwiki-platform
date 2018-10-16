@@ -199,41 +199,6 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclus
 ### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
 ### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
 
-### Missing: rendering.macro.notifications.name=Notifications
-### Missing: rendering.macro.notifications.description=Display notifications about events happened on the wiki.
-### Missing: rendering.macro.notifications.parameter.count.name=Count
-### Missing: rendering.macro.notifications.parameter.count.description=Maximum number of events to display by default
-### Missing: rendering.macro.notifications.parameter.useUserPreferences.name=Use the preferences of the user
-### Missing: rendering.macro.notifications.parameter.useUserPreferences.description=If true, the preferences of the user about notifications are used
-### Missing: rendering.macro.notifications.parameter.displayOwnEvents.name=Display own events
-### Missing: rendering.macro.notifications.parameter.displayOwnEvents.description=If true, the events of the current user are displayed like the others. They are hidden otherwise.
-### Missing: rendering.macro.notifications.parameter.displayMinorEvents.name=Display minor events
-### Missing: rendering.macro.notifications.parameter.displayMinorEvents.description=If true, the events concerning minor revisions of pages are displayed like the others. They are hidden otherwise.
-### Missing: rendering.macro.notifications.parameter.displaySystemEvents.name=Display system events
-### Missing: rendering.macro.notifications.parameter.displaySystemEvents.description=If true, the events triggered by the XWiki software are displayed like the others. They are hidden otherwise.
-### Missing: rendering.macro.notifications.parameter.displayReadEvents.name=Display read events
-### Missing: rendering.macro.notifications.parameter.displayReadEvents.description=If true, the events that the user have already marked as read are displayed like the others. They are hidden otherwise.
-### Missing: rendering.macro.notifications.parameter.wikis.name=Wikis
-### Missing: rendering.macro.notifications.parameter.wikis.description=List of wikis (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-### Missing: rendering.macro.notifications.parameter.spaces.name=Spaces
-### Missing: rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-### Missing: rendering.macro.notifications.parameter.pages.name=Pages
-### Missing: rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-### Missing: rendering.macro.notifications.parameter.displayReadStatus.name=Display "read" status
-### Missing: rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
-### Missing: rendering.macro.notifications.parameter.users.name=Users
-### Missing: rendering.macro.notifications.parameter.users.description=List of users to consider (comma-separated). Ignored if "useUserPreferences" is set to "true".
-### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display followed users only
-### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
-### Missing: rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
-### Missing: rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
-### Missing: rendering.macro.notifications.parameter.tags.name=Tags
-### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
-
-## Notifications Macro
-### Missing: notifications.macro.noWatchedUsers=You are not following anybody.
-### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
-
 ## Toggle notification filters labels
 ### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
 ### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications

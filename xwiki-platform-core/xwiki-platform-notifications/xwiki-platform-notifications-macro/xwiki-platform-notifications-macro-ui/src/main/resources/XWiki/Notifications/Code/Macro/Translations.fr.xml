@@ -65,6 +65,7 @@ rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Affi
 rendering.macro.notifications.parameter.displayRSSLink.name=Afficher le lien RSS
 rendering.macro.notifications.parameter.displayRSSLink.description=Affiche un lien vers le flux RSS de la macro courante.
 rendering.macro.notifications.parameter.tags.name=Étiquettes
+### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
 notifications.macro.noWatchedUsers=Vous ne suivez personne.
 notifications.macro.whenNotView=Macro de notification. Peut-être vu en mode 'view'.
 notifications.menu.nothing=Pas de notification !

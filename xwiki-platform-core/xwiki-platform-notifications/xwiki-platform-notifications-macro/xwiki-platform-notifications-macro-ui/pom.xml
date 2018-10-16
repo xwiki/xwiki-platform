@@ -24,25 +24,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-user-profile</artifactId>
+    <artifactId>xwiki-platform-notifications</artifactId>
     <version>10.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user-profile-ui</artifactId>
-  <name>XWiki Platform - User - Profile - UI</name>
+  <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
   <packaging>xar</packaging>
-  <description>Performs operations related to the User Profile (change preferences, user watchlist, follow users, etc)</description>
-  <properties>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>User Profile Application</xwiki.extension.name>
-    <xwiki.extension.features>
-      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      org.xwiki.platform:xwiki-platform-user-ui,
-
-      <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
-      org.xwiki.contrib.membership:application-membership-profile
-    </xwiki.extension.features>
-  </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-rest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
@@ -51,7 +48,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -61,49 +58,22 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed to change the user's profile avatar -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-attachment-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed for the {{error}} macro used by the ChangePassword feature -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-message</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed for the user's message stream -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-messagestream-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed for membership tab -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-script</artifactId>
+      <artifactId>xwiki-platform-date</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Add the dependency to the oldcore bridges that we need for sure -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-default</artifactId>
+      <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
-    <!-- Needed to display  the activities of the user -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
+      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

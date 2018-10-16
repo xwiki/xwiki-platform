@@ -49,6 +49,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
 ##
 ##
     #set ($formname = 'historyform')
+    $xwiki.jsfx.use('uicomponents/viewers/history.js', true)
     <form id="$formname" action="$doc.getURL('view', "viewer=changes&amp;$docvariant")" method="post">
       <div id="_history">
       ## CSRF prevention
@@ -148,19 +149,16 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #pagination ($paginationParameters)
       <div class="form-inline">
         #if ($displayCompare)
-          <input type="submit" accesskey="c" value="$services.localization.render('core.viewers.history.compare')" class="btn btn-primary"/>
+          <input type="submit" name="displayCompare" accesskey="c" value="$services.localization.render('core.viewers.history.compare')" class="btn btn-primary" />
           #if ($hasAdmin)
-            <input class="btn btn-default" type="submit" name="deleteversions" value="$services.localization.render('core.viewers.history.deleteRange')"
-              onclick="var rev1 = ''; var rev2 = ''; $$('[name=rev1], [name=rev2]').each(function(item) {if(item.getValue()) { if(item.name == 'rev1') rev1 = item.getValue(); else rev2 = item.getValue(); }}); if (!confirm('$services.localization.render('core.viewers.history.confirmDeleteRange')'.replace('__rev1__', rev1).replace('__rev2__', rev2))){ return false; } document.forms.${formname}.action='$doc.getURL('deleteversions', 'confirm=1')'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" />
+            <input class="btn btn-default" type="submit" name="deleteVersions" value="$services.localization.render('core.viewers.history.deleteRange')" />
           #end
         #end
         #if ($xwiki.hasMinorEdit())
           #if ("$!request.showminor" != 'true')
-            <input class="btn btn-default" type="submit" name="viewminorversions" value="$services.localization.render('core.viewers.history.showMinorEdits')"
-              onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;showminor=true&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" />
+            <input class="btn btn-default" type="submit" name="viewMinorVersions" value="$services.localization.render('core.viewers.history.showMinorEdits')" />
           #else
-            <input class="btn btn-default" type="submit" name="hideminorversions" value="$services.localization.render('core.viewers.history.hideMinorEdits')"
-              onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" />
+            <input class="btn btn-default" type="submit" name="hideMinorVersions" value="$services.localization.render('core.viewers.history.hideMinorEdits')" />
           #end
         #end
       </div>

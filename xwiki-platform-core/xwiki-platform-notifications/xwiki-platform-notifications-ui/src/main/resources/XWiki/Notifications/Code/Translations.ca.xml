@@ -235,5 +235,10 @@ notifications.menu.header.settings=Preferències
 ## Notifications Macro
 ### Missing: notifications.macro.noWatchedUsers=You are not following anybody.
 ### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
+
+## Toggle notification filters labels
+### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
+### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
+### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
 </content>
 </xwikidoc>

@@ -161,8 +161,8 @@ public class EscapeLikeParametersQuery extends WrappingQuery
         {
             if (expr.getEscape() == null) {
                 expr.setEscape("!");
-                expr.accept(new XWikiLikeExpressionVisitor());
             }
+            expr.accept(new XWikiLikeExpressionVisitor());
         }
     }
 

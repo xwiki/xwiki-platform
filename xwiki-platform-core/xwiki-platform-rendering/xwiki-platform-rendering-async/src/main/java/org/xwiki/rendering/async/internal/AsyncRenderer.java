@@ -45,7 +45,7 @@ public interface AsyncRenderer
     String render();
 
     /**
-     * @return get the references involved in the rendering (to that the result can be invalidated when one of those
+     * @return get the references involved in the rendering (they will be used to invalidate the cache when one of those
      *         entities is modified)
      */
     Set<EntityReference> getReferences();

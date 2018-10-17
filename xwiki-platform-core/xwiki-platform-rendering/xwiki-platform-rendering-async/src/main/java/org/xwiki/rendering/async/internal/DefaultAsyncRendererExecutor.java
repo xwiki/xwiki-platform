@@ -27,13 +27,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -46,28 +40,16 @@ import org.xwiki.job.event.status.JobStatus;
  * @version $Id$
  * @since 10.9RC1
  */
-public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor, Initializable
+public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 {
-    @Inject
-    private CacheManager cacheManager;
-
     @Inject
     private JobExecutor executor;
 
     @Inject
     private ContextStoreManager contextStore;
 
-    private Cache<AsyncRendererJobStatus> cache;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        try {
-            this.cache = this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer", 500));
-        } catch (CacheException e) {
-            throw new InitializationException("Failed to initialize cache", e);
-        }
-    }
+    @Inject
+    private AsyncRendererCache cache;
 
     @Override
     public JobStatus renderer(Set<String> contextEntries, AsyncRenderer renderer) throws JobException
@@ -126,7 +108,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor, Init
         }
 
         List<String> id = new ArrayList<>(prefix.size() + (context.size() * 2));
-        for (Map.Entry<String, Object> entry : context.entrySet()) {
+        for (Map.Entry<String, Serializable> entry : context.entrySet()) {
             id.add(entry.getKey());
             id.add(String.valueOf(entry.getValue()));
         }
@@ -148,6 +130,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor, Init
     @Override
     public void flush()
     {
-        this.cache.removeAll();
+        this.cache.flush();
     }
 }

@@ -41,26 +41,26 @@ rendering.macro.watchlist.name=Abonnements
 rendering.macro.watchlist.description=Zeigt jedem Nutzer die eigene Abonnementsliste
 
 ### XWiki.WatchListClass
-### Missing: XWiki.WatchListClass_interval_realtime=Realtime
-### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Hourly
-### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Daily
-### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly
+XWiki.WatchListClass_interval_realtime=Echtzeit
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Stündlich
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Täglich
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Wöchentlich
 
 ### Notification Icons    
-### Missing: watchlist.notifications.icons.on=ON
-### Missing: watchlist.notifications.icons.off=OFF
-### Missing: watchlist.notifications.icons.tooltip.page=Watch this page
-### Missing: watchlist.notifications.icons.tooltip.pageAndChildren=Watch this page and its children
-### Missing: watchlist.notifications.icons.tooltip.space=Watch the parent page and its children
-### Missing: watchlist.notifications.icons.tooltip.wiki=Watch this wiki
-### Missing: watchlist.notifications.changeStatusError=Failed to change the status of the WatchList.
-### Missing: watchlist.settings=Settings
+watchlist.notifications.icons.on=AN
+watchlist.notifications.icons.off=AUS
+watchlist.notifications.icons.tooltip.page=Diese Seite beobachten
+watchlist.notifications.icons.tooltip.pageAndChildren=Diese Seite und Unterseiten beobachten
+watchlist.notifications.icons.tooltip.space=Die übergeordnete Seite und deren Unterseiten beobachten
+watchlist.notifications.icons.tooltip.wiki=Dieses Wiki beobachten
+watchlist.notifications.changeStatusError=Fehler beim Ändern des Status der Beobachtungsliste.
+watchlist.settings=Einstellungen
 
 ### Watchlist livetable (in the macro)
-### Missing: watchlist.table.scope.wiki=All pages of the wiki
-### Missing: watchlist.table.scope.pageandchildren=Page + Children
-### Missing: watchlist.table.scope.pageonly=Page Only
-### Missing: watchlist.table.location=Location
-### Missing: watchlist.table.scope=Scope
+watchlist.table.scope.wiki=Alle Seiten des Wikis
+watchlist.table.scope.pageandchildren=Seite + Unterseiten
+watchlist.table.scope.pageonly=Nur Seite
+watchlist.table.location=Speicherort
+watchlist.table.scope=Geltungsbereich
 </content>
 </xwikidoc>

@@ -218,10 +218,10 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
         if (reference.getName().equals(getSymbolScheme().getCurrentReferenceKeyword(reference.getType()))) {
             if (evaluatedParent == null) {
                 // No parent, start from the default reference
-                evaluatedReference = getDefaultReference(reference.getType(), parameters);
+                evaluatedReference = resolveDefaultReference(reference.getType(), parameters);
             } else if (evaluatedParent.getType() != reference.getType()) {
                 // Parent type is different, switch parent in default reference
-                EntityReference defaultReference = getDefaultReference(reference.getType(), parameters);
+                EntityReference defaultReference = resolveDefaultReference(reference.getType(), parameters);
                 EntityReference defaultParent = defaultReference.extractReference(evaluatedParent.getType());
                 evaluatedReference = defaultReference.replaceParent(defaultParent, evaluatedParent);
             } else {
@@ -229,12 +229,19 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
                 evaluatedReference = evaluatedParent;
             }
         } else if (reference.getName().equals(getSymbolScheme().getParentReferenceKeyword(reference.getType()))) {
+            // Get default reference
             if (evaluatedParent == null) {
                 // No parent
                 evaluatedReference = null;
             } else if (evaluatedParent.getType() != reference.getType()) {
-                // Parent type is different, stay on it
-                evaluatedReference = evaluatedParent;
+                // Get current reference to know is there is several levels in it (several pages or spaces for example)
+                EntityReference defaultReference = resolveDefaultReference(reference.getType(), parameters);
+                if (defaultReference.getParent() == null) {
+                    // Parent type is different, stay on it
+                    evaluatedReference = evaluatedParent;
+                } else {
+                    evaluatedReference = defaultReference.getParent().appendParent(evaluatedParent);
+                }
             } else {
                 // Parent type is the same, use its parent
                 evaluatedReference = evaluatedParent.getParent();

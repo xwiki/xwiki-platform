@@ -37,8 +37,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Macro "watchlist"
-rendering.macro.watchlist.name=Abonnements
-rendering.macro.watchlist.description=Zeigt jedem Nutzer die eigene Abonnementsliste
+rendering.macro.watchlist.name=Beobachtungsliste
+rendering.macro.watchlist.description=Zeigt jedem Nutzer die eigene Beobachtungsliste.
 
 ### XWiki.WatchListClass
 XWiki.WatchListClass_interval_realtime=Echtzeit

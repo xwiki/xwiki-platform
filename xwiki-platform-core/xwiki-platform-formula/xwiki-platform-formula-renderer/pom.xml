@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-formula</artifactId>
-    <version>9.11.8</version>
+    <version>9.11.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-formula-renderer</artifactId>
   <name>XWiki Platform - Formula - Renderer</name>

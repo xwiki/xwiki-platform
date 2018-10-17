@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>9.11.8</version>
+    <version>9.11.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-handlers</artifactId>
   <name>XWiki Platform - Extension - Handler - Parent POM</name>

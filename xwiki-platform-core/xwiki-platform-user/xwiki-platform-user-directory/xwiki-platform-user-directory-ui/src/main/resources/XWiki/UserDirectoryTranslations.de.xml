@@ -36,12 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>userdirectory.userScopeFilter=Benutzerart\:
+  <content>userdirectory.userScopeFilter=Benutzerart:
 userdirectory.userScopeFilter.hint=Wählen Sie, welche Art von Benutzern Sie anzeigen möchten
 userdirectory.userScopeFilter.local=Lokale Benutzer
 userdirectory.userScopeFilter.global=Globale Benutzer, welche in diesem Wiki Mitglieder sind
-### Missing: platform.userdirectory.customizeNotAllowed=You are not allowed to customize this User Directory.
-### Missing: platform.userdirectory.configTitle=User Directory Configuration
+platform.userdirectory.customizeNotAllowed=Sie sind nicht berechtigt, dieses Benutzerverzeichnis anzupassen.
+platform.userdirectory.configTitle=Benutzerverzeichnis Konfiguration
 ### Missing: platform.userdirectory.configSheetTitle=User Directory Configuration Sheet
 ### Missing: platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.
 </content>

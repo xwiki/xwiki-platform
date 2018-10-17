@@ -38,10 +38,10 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro (createGroupModal)
-  &lt;form action="" class="modal xform" id="createGroupModal" tabindex="-1" role="dialog"
+  &lt;div class="modal" id="createGroupModal" tabindex="-1" role="dialog"
       aria-labelledby="createGroupModal-label" data-backdrop="static" data-keyboard="false"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
-      &lt;div class="modal-content"&gt;
+      &lt;form class="modal-content xform"&gt;
         &lt;div class="modal-header"&gt;
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
@@ -79,9 +79,9 @@
             $escapetool.xml($services.localization.render('create'))
           &lt;/button&gt;
         &lt;/div&gt;
-      &lt;/div&gt;
+      &lt;/form&gt;
     &lt;/div&gt;
-  &lt;/form&gt;
+  &lt;/div&gt;
 #end
 
 #macro (editGroupModal)
@@ -310,7 +310,7 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
   var createGroupButton = createGroupModal.find('button.btn-primary');
   createGroupModal.on('shown.bs.modal', function() {
     // Reset the form each time the modal is shown.
-    createGroupModal.trigger('reset');
+    createGroupModal.find('form').trigger('reset');
     createGroupModal.find('.form-control').each(function() {
       validation.resetValidation($(this));
     }).first().focus();
@@ -352,7 +352,7 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
 
   createGroupModal.submit(function(event) {
     event.preventDefault();
-    var data = createGroupModal.serializeArray();
+    var data = createGroupModal.find('form').serializeArray();
     data.push({name: 'ajax', value: 1});
     var groupName = groupNameInput.val();
     var createGroupURL = new XWiki.Document(groupName, 'XWiki').getURL('save');

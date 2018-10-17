@@ -417,23 +417,6 @@
                       <package>org.w3c.css.sac</package>
                     </packages>
                   </exception>
-                  <!-- Logging shouldn't be configured by libraries! In any case since we route everything through
-                       SLF4J, logging is configured by the SLF4J implementation used (e.g. Logback). -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>org.apache.axis</groupId>
-                        <artifactId>axis</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>radeox</groupId>
-                        <artifactId>radeox</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <resources>
-                      <resource>simplelog.properties</resource>
-                    </resources>
-                  </exception>
                   <!-- The files are different but removing them would mean repackaging the JARs which is PITA.
                        Since the versions are the same for bc (1.52) there's a good chance the files are compatible. -->
                   <exception>

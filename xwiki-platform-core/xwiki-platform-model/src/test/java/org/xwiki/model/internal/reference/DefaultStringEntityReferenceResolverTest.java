@@ -20,6 +20,7 @@
 package org.xwiki.model.internal.reference;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,9 +41,9 @@ import org.xwiki.model.reference.test.TestConstants;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,31 +55,33 @@ import static org.mockito.Mockito.when;
 @ComponentList({ DefaultSymbolScheme.class })
 public class DefaultStringEntityReferenceResolverTest implements TestConstants
 {
+    @MockComponent
+    private EntityReferenceProvider referenceProvider;
+
     @InjectMockComponents
     private DefaultStringEntityReferenceResolver resolver;
 
     @BeforeEach
     public void setUp() throws Exception
     {
-        EntityReferenceProvider referenceProvider = mock(EntityReferenceProvider.class);
-        ReflectionUtils.setFieldValue(this.resolver, "provider", referenceProvider);
-
-        when(referenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.OBJECT)).thenReturn(DEFAULT_OBJECT_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.OBJECT_PROPERTY))
+        when(this.referenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
+        when(this.referenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
+        when(this.referenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT_REFERENCE);
+        when(this.referenceProvider.getDefaultReference(EntityType.ATTACHMENT))
+            .thenReturn(DEFAULT_ATTACHMENT_REFERENCE);
+        when(this.referenceProvider.getDefaultReference(EntityType.OBJECT)).thenReturn(DEFAULT_OBJECT_REFERENCE);
+        when(this.referenceProvider.getDefaultReference(EntityType.OBJECT_PROPERTY))
             .thenReturn(DEFAULT_OBJECT_PROPERTY_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.CLASS_PROPERTY))
+        when(this.referenceProvider.getDefaultReference(EntityType.CLASS_PROPERTY))
             .thenReturn(DEFAULT_CLASS_PROPERTY_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.PAGE)).thenReturn(DEFAULT_PAGE_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.PAGE_ATTACHMENT))
+        when(this.referenceProvider.getDefaultReference(EntityType.PAGE)).thenReturn(DEFAULT_PAGE_REFERENCE);
+        when(this.referenceProvider.getDefaultReference(EntityType.PAGE_ATTACHMENT))
             .thenReturn(DEFAULT_PAGE_ATTACHMENT_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.PAGE_OBJECT)).thenReturn(DEFAULT_PAGE_OBJECT_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.PAGE_OBJECT_PROPERTY))
+        when(this.referenceProvider.getDefaultReference(EntityType.PAGE_OBJECT))
+            .thenReturn(DEFAULT_PAGE_OBJECT_REFERENCE);
+        when(this.referenceProvider.getDefaultReference(EntityType.PAGE_OBJECT_PROPERTY))
             .thenReturn(DEFAULT_PAGE_OBJECT_PROPERTY_REFERENCE);
-        when(referenceProvider.getDefaultReference(EntityType.PAGE_CLASS_PROPERTY))
+        when(this.referenceProvider.getDefaultReference(EntityType.PAGE_CLASS_PROPERTY))
             .thenReturn(DEFAULT_PAGE_CLASS_PROPERTY_REFERENCE);
     }
 
@@ -160,6 +162,13 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         assertEquals("page", reference.getName());
+    }
+
+    @Test
+    public void testResolveDocumentReferenceWithReferenceParameter() throws Exception
+    {
+        DocumentReference otherReference = new DocumentReference("otherwiki", "otherspace", "otherpage");
+        assertEquals(otherReference, resolver.resolve("", EntityType.DOCUMENT, otherReference));
     }
 
     @Test
@@ -553,6 +562,24 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
     }
 
     @Test
+    public void testResolvePageReferenceKeywordsWithDocumentParameter() throws Exception
+    {
+        EntityReference reference = this.resolver.resolve(".", EntityType.PAGE,
+            new DocumentReference("wiki", Arrays.asList("space1", "space2"), DEFAULT_DOCUMENT));
+        assertEquals(new PageReference("wiki", "space1", "space2"), reference);
+
+        reference = this.resolver.resolve("..", EntityType.PAGE,
+            new DocumentReference("wiki", Arrays.asList("space"), DEFAULT_DOCUMENT));
+        assertEquals(new WikiReference("wiki"), reference);
+        reference = this.resolver.resolve("..", EntityType.PAGE,
+            new DocumentReference("wiki", Arrays.asList("space1", "space2"), DEFAULT_DOCUMENT));
+        assertEquals(new PageReference("wiki", "space1"), reference);
+        reference = this.resolver.resolve("..", EntityType.PAGE,
+            new DocumentReference("wiki", Arrays.asList("space1", "space2", "space3"), DEFAULT_DOCUMENT));
+        assertEquals(new PageReference("wiki", "space1", "space2"), reference);
+    }
+
+    @Test
     public void testResolvePageReferenceParameters() throws Exception
     {
         PageReference pageReference = new PageReference("wiki", "space", "page");
@@ -575,8 +602,7 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         assertEquals(new EntityReference(pageReference, parameters), reference);
 
         reference = this.resolver.resolve("wiki:space/page;key=val=ue", EntityType.PAGE);
-        assertEquals(new EntityReference(pageReference, Collections.singletonMap("key", "val=ue")),
-            reference);
+        assertEquals(new EntityReference(pageReference, Collections.singletonMap("key", "val=ue")), reference);
 
         reference = this.resolver.resolve("wiki:space/page;key\\=novalue=nokey\\=value", EntityType.PAGE);
         assertEquals(new EntityReference(pageReference, Collections.singletonMap("key=novalue", "nokey=value")),

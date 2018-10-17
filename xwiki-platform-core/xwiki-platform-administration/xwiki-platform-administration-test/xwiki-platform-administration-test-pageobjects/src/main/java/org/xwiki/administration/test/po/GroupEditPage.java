@@ -74,7 +74,7 @@ public class GroupEditPage extends InlinePage
 
     public void filterMembers(String member)
     {
-        membersLiveTable.filterColumn("xwiki-livetable-groupusers-filter-2", member);
+        membersLiveTable.filterColumn("xwiki-livetable-groupusers-filter-1", member);
     }
 
     /**

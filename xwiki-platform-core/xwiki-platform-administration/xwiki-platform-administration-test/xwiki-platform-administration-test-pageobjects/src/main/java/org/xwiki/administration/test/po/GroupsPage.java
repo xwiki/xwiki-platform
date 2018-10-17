@@ -24,6 +24,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BasePage;
+import org.xwiki.test.ui.po.ConfirmationModal;
 import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
@@ -34,40 +35,32 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class GroupsPage extends BasePage
 {
-    LiveTableElement groupsLiveTable = new LiveTableElement("groupstable");
+    private static final String GROUP_ACTION_XPATH_FORMAT =
+        "//table[@id = 'groupstable']//td[contains(@class, 'name') and normalize-space(.) = '%s']"
+            + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
 
-    @FindBy(id = "addNewGroup")
-    private WebElement addGroupButton;
+    private LiveTableElement groupsLiveTable = new LiveTableElement("groupstable");
 
-    @FindBy(css = "#addnewgroup .button.create")
+    @FindBy(css = ".btn[data-target='#createGroupModal']")
     private WebElement createGroupButton;
-
-    public void clickAddNewGroupButton()
-    {
-        this.addGroupButton.click();
-    }
-
-    public void clickCreateGroupButton()
-    {
-        this.createGroupButton.click();
-    }
 
     /**
      * Method to create a new Group.
      */
     public GroupsPage addNewGroup(String groupName)
     {
-        clickAddNewGroupButton();
+        clickCreateGroup().createGroup(groupName);
 
-        // TODO: create PO for the popup
-        getDriver().waitUntilElementIsVisible(By.id("newgroupi"));
-        getDriver().findElementWithoutWaiting(By.id("newgroupi")).sendKeys(groupName);
-        clickCreateGroupButton();
-        getDriver().waitUntilElementDisappears(By.id("lb"));
+        // The live table is refreshed.
+        this.groupsLiveTable.waitUntilReady();
 
-        GroupsPage groupsPage = new GroupsPage();
-        groupsPage.waitUntilPageIsLoaded();
-        return groupsPage;
+        return this;
+    }
+
+    public CreateGroupModal clickCreateGroup()
+    {
+        this.createGroupButton.click();
+        return new CreateGroupModal();
     }
 
     /**
@@ -77,17 +70,16 @@ public class GroupsPage extends BasePage
     {
         AdministrationPage.gotoPage().clickSection("Users & Rights", "Groups");
         GroupsPage groupsPage = new GroupsPage();
-        groupsPage.waitUntilPageIsLoaded();
-        return groupsPage;
+        return groupsPage.waitUntilPageIsLoaded();
     }
 
     /**
-     * Method that overrides waitUntilPageIsLoaded() and waits also for the Groups livetable to load.
+     * Method that overrides waitUntilPageIsLoaded() and waits also for the groups live table to load.
      *
      * @see org.xwiki.test.ui.po.BasePage#waitUntilPageIsLoaded()
      */
     @Override
-    public BasePage waitUntilPageIsLoaded()
+    public GroupsPage waitUntilPageIsLoaded()
     {
         super.waitUntilPageIsLoaded();
 
@@ -103,6 +95,42 @@ public class GroupsPage extends BasePage
 
     public void filterGroups(String group)
     {
-        groupsLiveTable.filterColumn("name", group);
+        groupsLiveTable.filterColumn("xwiki-livetable-groupstable-filter-1", group);
+    }
+
+    public ConfirmationModal clickDeleteGroup(String groupName)
+    {
+        getDriver().findElementWithoutWaiting(By.xpath(String.format(GROUP_ACTION_XPATH_FORMAT, groupName, "delete")))
+            .click();
+        return new ConfirmationModal(By.id("deleteGroupModal"));
+    }
+
+    public GroupsPage deleteGroup(String groupName)
+    {
+        clickDeleteGroup(groupName).clickOk();
+        // The live table is refreshed.
+        this.groupsLiveTable.waitUntilReady();
+        return this;
+    }
+
+    public boolean canDeleteGroup(String groupName)
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(By.xpath(String.format(GROUP_ACTION_XPATH_FORMAT, groupName, "delete")))
+            .isEmpty();
+    }
+
+    public EditGroupModal clickEditGroup(String groupName)
+    {
+        getDriver().findElementWithoutWaiting(By.xpath(String.format(GROUP_ACTION_XPATH_FORMAT, groupName, "edit")))
+            .click();
+        return new EditGroupModal().waitUntilReady();
+    }
+
+    public String getMemberCount(String groupName)
+    {
+        String xpath = "//table[@id = 'groupstable']//td[contains(@class, 'name') and normalize-space(.) = '"
+            + groupName + "']/following-sibling::td[contains(@class, 'members')]";
+        return getDriver().findElementWithoutWaiting(By.xpath(xpath)).getText();
     }
 }

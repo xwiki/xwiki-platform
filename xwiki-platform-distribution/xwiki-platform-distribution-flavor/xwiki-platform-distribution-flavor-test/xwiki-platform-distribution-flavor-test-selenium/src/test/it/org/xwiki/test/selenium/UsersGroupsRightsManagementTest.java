@@ -23,10 +23,19 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.xwiki.administration.test.po.AdministrationMenu;
+import org.xwiki.administration.test.po.CreateGroupModal;
+import org.xwiki.administration.test.po.EditGroupModal;
+import org.xwiki.administration.test.po.GroupEditPage;
+import org.xwiki.administration.test.po.GroupsPage;
+import org.xwiki.administration.test.po.RegistrationModal;
+import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
+import org.xwiki.test.ui.po.ConfirmationModal;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verify the Users, Groups and Rights Management features of XWiki.
@@ -53,8 +62,8 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         createGroup("XWikiNewGroup");
 
         // Validate XWIKI-1903: Empty group shows 1 member.
-        assertEquals("Group XWikiNewGroup which is empty print more than 0 members", 0,
-            getGroupMembersCount("XWikiNewGroup"));
+        assertEquals("Group XWikiNewGroup which is empty print more than 0 members", "0",
+            new GroupsPage().getMemberCount("XWikiNewGroup"));
 
         // Give "view" global right to XWikiNewGroup on wiki
         openGlobalRightsPage();
@@ -85,16 +94,11 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
     {
         open("XWiki", "testCreateGroupWhenGroupAlreadyExists", "edit", "editor=wiki");
         clickEditSaveAndView();
-        openGroupsPage();
-        clickLinkWithText("Add group", false);
-        waitForLightbox("Create new group".toUpperCase());
-        setFieldValue("newgroupi", "testCreateGroupWhenGroupAlreadyExists");
-        getSelenium().click("//input[@value='Create group']");
-        // We need to wait till the alert appears since when the user clicks on the "Create Group" button there's
-        // an Ajax call made to the server.
-        waitForAlert();
-        assertEquals("testCreateGroupWhenGroupAlreadyExists cannot be used for the "
-            + "group name, as another page with this name already exists.", getSelenium().getAlert());
+        CreateGroupModal createGroupModal =
+            GroupsPage.gotoPage().clickCreateGroup().setGroupName("testCreateGroupWhenGroupAlreadyExists")
+                .waitForValidationError("testCreateGroupWhenGroupAlreadyExists cannot be used for the group name, "
+                    + "as another page with this name already exists.");
+        assertFalse(createGroupModal.getCreateGroupButton().isEnabled());
     }
 
     /**
@@ -114,7 +118,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         // Verify that new users are automatically added to the XWikiAllGroup group.
         open("XWiki", "XWikiAllGroup");
         waitForGroupUsersLiveTable();
-        assertTextPresent("XWiki.XWikiNewUser");
+        assertTextPresent("XWikiNewUser");
 
         // Delete the newly created user and see if groups are cleaned
         deleteUser("XWikiNewUser", false);
@@ -122,7 +126,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         // Verify that when a user is removed he's removed from the groups he belongs to.
         open("XWiki", "XWikiAllGroup");
         waitForGroupUsersLiveTable();
-        assertTextNotPresent("XWiki.XWikiNewUser");
+        assertTextNotPresent("XWikiNewUser");
     }
 
     /**
@@ -195,35 +199,30 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
     public void testAddGroupToGroup()
     {
         String group = "GroupWithGroup";
+        deleteGroup(group, true);
         createGroup(group);
-        openGroupsPage();
-        String xpath = "//tbody/tr[td/a='" + group + "']/td[3]/img[@title='Edit']";
-        System.out.println("XPATH: " + xpath);
-        waitForCondition("selenium.isElementPresent(\"" + xpath + "\")");
-        getSelenium().click("//tbody/tr[td/a=\"" + group + "\"]/td[3]/img[@title=\"Edit\"]");
-        waitForLightbox("SUBGROUPS TO ADD");
-        setSuggestInputValue("groupInput", "XWikiAllGroup");
-        clickLinkWithLocator("addMembers", false);
-        String xpathPrefix = "//div[@id='lb-content']/div/div/table/tbody/tr/td/table/tbody/tr";
-        String adminGroupXPath =
-            xpathPrefix + "/td[contains(@class, 'member')]/a[@href='/xwiki/bin/view/XWiki/XWikiAllGroup']";
-        // this xpath expression is fragile, but we have to start as up as the lightbox does, because
-        // the same table with same ids and classes is already displayed in the Preferences page
-        // (that is, the list of existing groups).
-        waitForCondition("selenium.isElementPresent(\"" + adminGroupXPath + "\")");
-        // Now assert that XWiki.Admin, member of XWikiAdminGroup is not added as a member of our created group
-        assertElementNotPresent(xpathPrefix + "/td[contains(@class, 'member')]/a[@href='/xwiki/bin/view/XWiki/Admin']");
-        clickLinkWithLocator("lb-close");
 
-        // Now same test, but from the group document UI in inline mode
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage.filterGroups(group);
+        assertEquals(1, groupsPage.getGroupsTable().getRowCount());
+        assertTrue(groupsPage.getGroupsTable().hasRow("Members", "0"));
+
+        EditGroupModal editGroupModal = groupsPage.clickEditGroup(group);
+        assertEquals(0, editGroupModal.getMembersTable().getRowCount());
+        editGroupModal.addMember("XWikiAllGroup", false);
+        assertEquals(1, editGroupModal.getMembersTable().getRowCount());
+        assertTrue(editGroupModal.getMembersTable().hasRow("Member", "XWikiAllGroup"));
+        editGroupModal.close();
+        groupsPage.getGroupsTable().waitUntilReady();
+
+        assertEquals(1, groupsPage.getGroupsTable().getRowCount());
+        assertTrue(groupsPage.getGroupsTable().hasRow("Members", "1"));
+
+        // Now do the same by editing the group page in Inline Form edit mode.
         clickLinkWithText(group);
         clickEditPageInlineForm();
-        setSuggestInputValue("groupInput", "XWikiAdminGroup");
-        clickLinkWithLocator("addMembers", false);
-        waitForTextContains("id=groupusers", "XWiki.XWikiAdminGroup");
-
-        // cleanup
-        deleteGroup(group, false);
+        assertTrue(new GroupEditPage().addMemberToGroup("XWikiAdminGroup", false).getMembersTable().hasRow("Member",
+            "XWikiAdminGroup"));
     }
 
     /**
@@ -247,8 +246,8 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
     @Test
     public void testFilteringOnGroupSheet()
     {
-        openGroupsPage();
-        String rowXPath = "//td[contains(@class, 'member')]/a[@href='/xwiki/bin/view/XWiki/Admin']";
+        GroupsPage.gotoPage();
+        String rowXPath = "//td[contains(@class, 'member')]//a[@href='/xwiki/bin/view/XWiki/Admin']";
         this.clickLinkWithText("XWikiAdminGroup");
         this.waitForCondition("selenium.isElementPresent(\"" + rowXPath + "\")");
 
@@ -264,30 +263,28 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
 
     // Helper methods
 
-    private void createGroup(String groupname)
+    private void createGroup(String groupName)
     {
-        openGroupsPage();
-        clickLinkWithText("Add group", false);
-        waitForLightbox("Create new group".toUpperCase());
-        setFieldValue("newgroupi", groupname);
-        clickLinkWithXPath("//input[@value='Create group']", true);
-        waitForTextContains("id=groupstable", groupname);
+        GroupsPage.gotoPage().clickCreateGroup().createGroup(groupName);
+
+        // The groups live table is refreshed.
+        waitForLiveTable("groupstable");
     }
 
     /**
      * @param deleteOnlyIfExists if true then only delete the group if it exists
      */
-    private void deleteGroup(String groupname, boolean deleteOnlyIfExists)
+    private void deleteGroup(String groupName, boolean deleteOnlyIfExists)
     {
-        if (!deleteOnlyIfExists || (deleteOnlyIfExists && isExistingPage("XWiki", groupname))) {
-            openGroupsPage();
-            getSelenium().chooseOkOnNextConfirmation();
-            clickLinkWithLocator("//tbody/tr[td/a='" + groupname + "']//img[@title='Delete']", false);
-            waitForConfirmation();
-            assertEquals("The group XWiki." + groupname + " will be deleted. Are you sure you want to proceed?",
-                getSelenium().getConfirmation());
-            // Wait till the group has been deleted.
-            waitForCondition("!selenium.isElementPresent('//tbody/tr[td/a=\"" + groupname + "\"]')");
+        if (!deleteOnlyIfExists || (deleteOnlyIfExists && isExistingPage("XWiki", groupName))) {
+            GroupsPage groupsPage = GroupsPage.gotoPage();
+            assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", groupName));
+            ConfirmationModal confirmation = groupsPage.clickDeleteGroup(groupName);
+            assertEquals("The group XWiki." + groupName + " will be deleted. Are you sure you want to proceed?",
+                confirmation.getMessage());
+            confirmation.clickOk();
+            groupsPage.getGroupsTable().waitUntilReady();
+            assertFalse(groupsPage.getGroupsTable().hasRow("Group Name", groupName));
         }
     }
 
@@ -298,53 +295,36 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
 
     private void createUser(String login, String pwd, String fname, String lname)
     {
-        openUsersPage();
-        clickLinkWithText("Create user", false);
-        waitForElement("//input[@id='register_first_name']");
-        setFieldValue("register_first_name", fname);
-        setFieldValue("register_last_name", lname);
-        setFieldValue("xwikiname", login);
-        setFieldValue("register_password", pwd);
-        setFieldValue("register2_password", pwd);
-        setFieldValue("register_email", "new.user@xwiki.org");
-        getSelenium().click("//input[@value='Save']");
-        // Wait till the user is displayed.
-        waitForTextContains("id=userstable", login);
+        UsersAdministrationSectionPage usersPage = openUsersPage();
+        RegistrationModal registrationModal = usersPage.clickAddNewUser();
+        registrationModal.fillRegisterForm(fname, lname, login, pwd, pwd, "new.user@xwiki.org");
+        registrationModal.clickRegister();
+        usersPage.waitForNotificationSuccessMessage("User created");
+        usersPage.getUsersLiveTable().waitUntilReady();
+        assertTrue(usersPage.getUsersLiveTable().hasRow("User", login));
     }
 
     private void deleteUser(String login, boolean deleteOnlyIfExists)
     {
         if (!deleteOnlyIfExists || (deleteOnlyIfExists && isExistingPage("XWiki", login))) {
-            openUsersPage();
-            clickLinkWithLocator("//tbody/tr[td/a='" + login + "']//img[@title='Delete']", false);
-            waitForConfirmation();
+            UsersAdministrationSectionPage usersPage = openUsersPage();
+            ConfirmationModal confirmation = usersPage.clickDeleteUser(login);
             assertEquals("The user XWiki." + login + " will be deleted and removed from all groups he belongs to. "
-                + "Are you sure you want to proceed?", getSelenium().getConfirmation());
-            // Wait till the user has been deleted.
-            waitForCondition("!selenium.isElementPresent('//tbody/tr[td/a=\"" + login + "\"]')");
+                + "Are you sure you want to proceed?", confirmation.getMessage());
+            confirmation.clickOk();
+            usersPage.getUsersLiveTable().waitUntilReady();
+            assertFalse(usersPage.getUsersLiveTable().hasRow("User", login));
         }
     }
 
     private void addUserToGroup(String user, String group)
     {
-        openGroupsPage();
-        String xpath = "//tbody/tr[td/a='" + group + "']/td[3]/img[@title='Edit']";
-        waitForCondition("selenium.isElementPresent(\"" + xpath + "\")");
-        getSelenium().click(xpath);
-        waitForLightbox("USERS TO ADD");
-        setSuggestInputValue("userInput", user);
-        clickLinkWithLocator("addMembers", false);
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        EditGroupModal editGroupModal = groupsPage.clickEditGroup(group);
+        editGroupModal.addMember(user, true);
+        assertTrue(editGroupModal.getMembersTable().hasRow("Member", "New User" + user));
+        editGroupModal.close();
 
-        String xpathPrefix = "//div[@id='lb-content']/div/div/table/tbody/tr/td/table/tbody/tr";
-        String newGroupMemberXPath =
-            xpathPrefix + "/td[contains(@class, 'member')]/a[@href='/xwiki/bin/view/XWiki/" + user + "']";
-        // this xpath expression is fragile, but we have to start as up as the lightbox does, because
-        // the same table with same ids and classes is already displayed in the Preferences page
-        // (that is, the list of existing groups).
-        waitForCondition("selenium.isElementPresent(\"" + newGroupMemberXPath + "\")");
-
-        // Close the group edit lightbox
-        clickLinkWithLocator("lb-close");
         open("XWiki", group);
         waitForGroupUsersLiveTable();
         assertTextPresent(user);
@@ -355,11 +335,6 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         SuggestInputElement suggester = new SuggestInputElement(getDriver().findElementWithoutWaiting(By.id(id)));
         suggester.clearSelectedSuggestions().sendKeys(value).waitForSuggestions().sendKeys(Keys.ENTER)
             .hideSuggestions();
-    }
-
-    private void waitForLightbox(String lightboxName)
-    {
-        waitForBodyContains(lightboxName);
     }
 
     private void clickGroupsRadioButton()
@@ -374,30 +349,14 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
             .click();
     }
 
-    private void openGroupsPage()
-    {
-        openAdministrationPage();
-        administrationMenu.expandCategoryWithName("Users & Rights").getSectionByName("Users & Rights", "Groups")
-            .click();
-        waitForLiveTable("groupstable");
-    }
-
-    private void openUsersPage()
+    private UsersAdministrationSectionPage openUsersPage()
     {
         // Note: We could have used the following command instead:
         // open("XWiki", "XWikiUsers", "admin", "editor=users")
         // However we haven't done it since we also want to verify that clicking on the "Users" tab works.
         openAdministrationPage();
         administrationMenu.expandCategoryWithName("Users & Rights").getSectionByName("Users & Rights", "Users").click();
-        waitForLiveTable("userstable");
-    }
-
-    /**
-     * @return the number of members in the passed group. Should only be executed when on the Global Rights page.
-     */
-    private int getGroupMembersCount(String groupname)
-    {
-        return Integer.parseInt(getSelenium().getText("//tbody/tr[td/a=\"" + groupname + "\"]/td[2]"));
+        return new UsersAdministrationSectionPage().waitUntilPageIsLoaded();
     }
 
     /**

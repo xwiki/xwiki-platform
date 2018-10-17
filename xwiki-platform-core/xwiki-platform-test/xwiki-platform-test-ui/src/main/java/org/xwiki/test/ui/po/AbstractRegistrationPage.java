@@ -28,8 +28,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Represents the actions possible for the different registration pages (standard registration page, lightbox
- * registration page).
+ * Represents the actions possible for the different registration pages (standard registration page and the registration
+ * modal).
  *
  * @version $Id$
  * @since 3.2M3

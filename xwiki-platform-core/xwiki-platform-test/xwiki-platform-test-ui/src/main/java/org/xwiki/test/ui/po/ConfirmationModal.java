@@ -34,9 +34,15 @@ public class ConfirmationModal extends BaseModal
         super(selector);
     }
 
+    public String getMessage()
+    {
+        return getDriver().findElementWithoutWaiting(this.container, By.className("modal-body")).getText();
+    }
+
     public void clickOk()
     {
-        this.container.findElement(By.xpath(".//*[@class='modal-footer']/input[1]")).click();
+        getDriver().findElementWithoutWaiting(this.container,
+            By.cssSelector(".modal-footer .btn-primary, .modal-footer .btn-danger")).click();
         this.waitForClosed();
     }
 

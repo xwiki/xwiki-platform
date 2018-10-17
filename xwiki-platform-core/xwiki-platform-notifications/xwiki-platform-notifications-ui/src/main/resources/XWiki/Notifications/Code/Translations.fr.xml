@@ -199,6 +199,9 @@ rendering.macro.notificationsAutoWatchPreferences.description=Affiche les pr√©f√
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cible
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Cible de la macro ("user" pour l'utilisateur courant ou "wiki" pour le wiki courant)
 
-### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
+## Toggle notification filters labels
+### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
+### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
+### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
 </content>
 </xwikidoc>

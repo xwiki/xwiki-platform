@@ -35,12 +35,7 @@ import org.xwiki.tree.test.po.TreeElement;
  */
 public class OtherFormatPane extends BaseElement
 {
-    /**
-     * ID of the main form used in the Other Format Pane.
-     * It can be used to detect if the pane is opened.
-     */
-    static final String FORM_ID = "export-form";
-
+    private static final String FORM_ID = "export-form";
     private static final String CONTAINER_TREE_CLASS = "exportModalTreeContainer";
     private static final String TREE_CLASS = "xtree";
     private static final String XAR_EXPORT_LINK_TEXT = "Export as XAR";

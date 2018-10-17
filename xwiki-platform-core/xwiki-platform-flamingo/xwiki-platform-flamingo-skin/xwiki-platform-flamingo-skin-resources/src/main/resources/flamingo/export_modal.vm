@@ -59,7 +59,7 @@
       </div>
     </div>
     <div id="exportModelOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
-      <form id="export-form" method="post" class="panel-body">
+      <div class="panel-body">
         #if ($doc.name == 'WebHome')
           #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
           <div class="row">
@@ -97,7 +97,7 @@
         #foreach ($exportExtension in $exportExtensions)
           $services.rendering.render($exportExtension.execute(), 'html/5.0')
         #end
-      </form>
+      </div>
     </div>
   </div>
 #end

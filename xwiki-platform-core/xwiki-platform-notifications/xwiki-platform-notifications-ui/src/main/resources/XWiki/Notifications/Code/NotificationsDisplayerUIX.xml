@@ -807,9 +807,9 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
 {{html clean="false"}} ## we need clean="false" because we want to display the raw content
 #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
-    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
+    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))

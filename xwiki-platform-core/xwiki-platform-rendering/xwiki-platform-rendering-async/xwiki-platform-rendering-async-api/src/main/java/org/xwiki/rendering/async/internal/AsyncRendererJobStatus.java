@@ -19,56 +19,31 @@
  */
 package org.xwiki.rendering.async.internal;
 
-import javax.inject.Named;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.job.AbstractJob;
-import org.xwiki.job.Request;
+import org.xwiki.job.AbstractJobStatus;
+import org.xwiki.logging.LoggerManager;
+import org.xwiki.observation.ObservationManager;
 
 /**
- * Execute an {@link AsyncRenderer}.
+ * The status of the {@link AsyncRendererJob}.
  * 
  * @version $Id$
  * @since 10.9RC1
  */
-@Component
-@Named(AsyncRendererJob.JOBTYPE)
-public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus>
+public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRequest>
 {
     /**
      * The type of the job.
      */
     public static final String JOBTYPE = "asyncrenderer";
 
-    @Override
-    protected AsyncRendererJobRequest castRequest(Request request)
+    /**
+     * @param request the request provided when started the job
+     * @param observationManager the observation manager component
+     * @param loggerManager the logger manager component
+     */
+    public AsyncRendererJobStatus(AsyncRendererJobRequest request, ObservationManager observationManager,
+        LoggerManager loggerManager)
     {
-        AsyncRendererJobRequest indexerRequest;
-        if (request instanceof AsyncRendererJobRequest) {
-            indexerRequest = (AsyncRendererJobRequest) request;
-        } else {
-            indexerRequest = new AsyncRendererJobRequest(request);
-        }
-
-        return indexerRequest;
+        super(JOBTYPE, request, null, observationManager, loggerManager);
     }
-
-    @Override
-    protected AsyncRendererJobStatus createNewStatus(AsyncRendererJobRequest request)
-    {
-        return new AsyncRendererJobStatus(request, this.observationManager, this.loggerManager);
-    }
-
-    @Override
-    public String getType()
-    {
-        return JOBTYPE;
-    }
-
-    @Override
-    protected void runInternal() throws Exception
-    {
-
-    }
-
 }

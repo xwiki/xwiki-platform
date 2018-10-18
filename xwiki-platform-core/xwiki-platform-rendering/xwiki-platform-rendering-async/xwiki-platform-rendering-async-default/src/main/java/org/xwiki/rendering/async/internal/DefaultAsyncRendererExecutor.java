@@ -32,7 +32,8 @@ import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Default implementation of {@link AsyncRendererExecutor}.
@@ -52,7 +53,14 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     private AsyncRendererCache cache;
 
     @Override
-    public JobStatus renderer(Set<String> contextEntries, AsyncRenderer renderer) throws JobException
+    public AsyncRendererJobStatus renderer(AsyncRenderer renderer, Set<String> contextEntries) throws JobException
+    {
+        return renderer(renderer, contextEntries, null, null);
+    }
+
+    @Override
+    public AsyncRendererJobStatus renderer(AsyncRenderer renderer, Set<String> contextEntries, Right right,
+        EntityReference rightEntity) throws JobException
     {
         // Get context
         Map<String, Serializable> context;
@@ -73,8 +81,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         Job job = this.executor.getJob(jobId);
 
         // Found a running job, return it
-        if (job != null) {
-            return job.getStatus();
+        if (job instanceof AsyncRendererJob) {
+            return (AsyncRendererJobStatus) job.getStatus();
         }
 
         // Generate cache key
@@ -92,13 +100,14 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         AsyncRendererJobRequest request = new AsyncRendererJobRequest();
         request.setId(jobId);
         request.setRenderer(renderer);
+        request.setRight(right, rightEntity);
         if (context != null) {
             request.setContext(context);
         }
 
-        job = this.executor.execute(AsyncRendererJob.JOBTYPE, request);
+        job = this.executor.execute(AsyncRendererJobStatus.JOBTYPE, request);
 
-        return job.getStatus();
+        return (AsyncRendererJobStatus) job.getStatus();
     }
 
     private List<String> getJobId(List<String> prefix, Map<String, Serializable> context)

@@ -1,2 +1,0 @@
-org.xwiki.rendering.internal.parser.DefaultContentParser
-org.xwiki.rendering.internal.executor.MacroContentExecutor

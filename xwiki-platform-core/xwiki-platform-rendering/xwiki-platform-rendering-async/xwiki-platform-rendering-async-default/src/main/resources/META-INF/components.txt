@@ -1,0 +1,4 @@
+org.xwiki.rendering.async.internal.AsyncRendererCache
+org.xwiki.rendering.async.internal.AsyncRendererCacheListener
+org.xwiki.rendering.async.internal.AsyncRendererJob
+org.xwiki.rendering.async.internal.DefaultAsyncRendererExecutor

@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.rendering.async.internal;
 
 import java.util.HashSet;
@@ -102,5 +121,33 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     public void cacheEntryModified(CacheEntryEvent<AsyncRendererJobStatus> event)
     {
         cacheEntryAdded(event);
+    }
+
+    /**
+     * @param reference the reference for which to clean the cache entries
+     */
+    public void cleanCache(EntityReference reference)
+    {
+        Set<String> keys = this.referenceMapping.remove(reference);
+
+        if (keys != null) {
+            for (String key : keys) {
+                this.cache.remove(key);
+            }
+        }
+    }
+
+    /**
+     * @param wiki the wiki for which to clean the cache entries
+     */
+    public void cleanCache(String wiki)
+    {
+        for (Map.Entry<EntityReference, Set<String>> entry : this.referenceMapping.entrySet()) {
+            EntityReference reference = entry.getKey();
+
+            if (reference.getRoot().getName().equals(wiki)) {
+                cleanCache(reference);
+            }
+        }
     }
 }

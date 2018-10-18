@@ -24,15 +24,26 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering</artifactId>
+    <artifactId>xwiki-platform-rendering-async</artifactId>
     <version>10.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-async</artifactId>
-  <name>XWiki Platform - Rendering - Async - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Rendering - Async - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-rendering-async-api</module>
-    <module>xwiki-platform-rendering-async-default</module>
-  </modules>
+  <artifactId>xwiki-platform-rendering-async-default</artifactId>
+  <name>XWiki Platform - Rendering - Async - Default</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Rendering - Async - Default</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-async-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

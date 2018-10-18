@@ -175,7 +175,7 @@ public class CurrentStringEntityReferenceResolverTest
         assertEquals(new PageReference(CURRENT_WIKI, "page"), reference);
 
         reference = this.resolver.resolve("..", EntityType.PAGE);
-        assertEquals(new WikiReference(CURRENT_WIKI), reference);
+        assertEquals(new PageReference(CURRENT_WIKI, CURRENT_SPACE), reference);
 
         reference = this.resolver.resolve("page/..", EntityType.PAGE);
         assertEquals(new WikiReference(CURRENT_WIKI), reference);

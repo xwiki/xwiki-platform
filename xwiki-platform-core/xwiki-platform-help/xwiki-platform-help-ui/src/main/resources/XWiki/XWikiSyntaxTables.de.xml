@@ -69,7 +69,7 @@ Wort 1 | Wort 2
   &lt;/tbody&gt;
 &lt;/table&gt;
 )))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Wort 1|Wort 2
 )))
@@ -122,11 +122,11 @@ Erlaubt es auf einfache Weise Inhalte im Tabellenformat zu erstellen. Parameter 
 |Wort 1|Wort 2
 )))
 |Parametrisierte Tabelle|((({{{
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Wort 1|Wort 2
 }}})))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Wort 1|Wort 2
 )))

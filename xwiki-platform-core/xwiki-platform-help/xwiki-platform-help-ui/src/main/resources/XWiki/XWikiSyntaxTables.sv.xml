@@ -69,7 +69,7 @@ Ord 1 | Ord 2
   &lt;/tbody&gt;
 &lt;/table&gt;
 )))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Ord 1|Ord 2
 )))
@@ -121,11 +121,11 @@ I XWiki syntax är det relativt enkelt att skapa tabeller.  Det går också att 
 |Ord 1|Ord 2
 )))
 |Parametriserad tabell|((({{{
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Ord 1|Ord 2
 }}})))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Ord 1|Ord 2
 )))

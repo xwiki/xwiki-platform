@@ -141,7 +141,7 @@ En syntaxe XWiki 2.0, il est également possible d'avoir des paramètres pour le
 |Tableau paramétré|(((
 {{{(% style="background-color:}}}
 
-red;align=center" %)
+red;align:center" %)
 ~|=Titre 1|=~(% style="background-color: yellow" %)Titre 2
 ~|Mot 1|Mot 2
 )))|(((

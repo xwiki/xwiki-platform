@@ -87,7 +87,7 @@ public class JobsResourceImpl extends XWikiJobResource implements JobsResource
             try {
                 job.join();
             } catch (InterruptedException e) {
-                throw new XWikiRestException("The job as been interrupted", e);
+                throw new XWikiRestException("The job has been interrupted", e);
             }
 
             // Fail the HTTP request if the job failed

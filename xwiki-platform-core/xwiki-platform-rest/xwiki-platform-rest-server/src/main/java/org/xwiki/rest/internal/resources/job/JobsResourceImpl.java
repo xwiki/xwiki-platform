@@ -92,9 +92,8 @@ public class JobsResourceImpl extends XWikiJobResource implements JobsResource
 
             // Fail the HTTP request if the job failed
             if (job.getStatus().getError() != null) {
-                throw new XWikiRestException(
-                    "The job failed (" + ExceptionUtils.getRootCauseMessage(job.getStatus().getError()) + ")",
-                    job.getStatus().getError());
+                throw new XWikiRestException(String.format("The job failed with error [%s]",
+                    ExceptionUtils.getRootCauseMessage(job.getStatus().getError())), job.getStatus().getError());
             }
         }
 

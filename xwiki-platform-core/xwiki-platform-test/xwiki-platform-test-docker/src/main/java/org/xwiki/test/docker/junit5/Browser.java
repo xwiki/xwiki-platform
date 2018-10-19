@@ -47,16 +47,16 @@ public enum Browser
 
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
 
-    private static final String FIREFOX_NAME = "firefox";
+    private static final String CHROME_NAME = "chrome";
 
     private DesiredCapabilities capabilities;
 
     Browser()
     {
-        if (System.getProperty(BROWSER_PROPERTY, FIREFOX_NAME).equalsIgnoreCase(FIREFOX_NAME)) {
-            this.capabilities = DesiredCapabilities.firefox();
-        } else {
+        if (System.getProperty(BROWSER_PROPERTY, CHROME_NAME).equalsIgnoreCase(CHROME_NAME)) {
             this.capabilities = DesiredCapabilities.chrome();
+        } else {
+            this.capabilities = DesiredCapabilities.firefox();
         }
     }
 

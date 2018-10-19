@@ -27,7 +27,6 @@ import javax.inject.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.icon.IconManager;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -89,7 +88,7 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
             return null;
         }
 
-        DocumentReference documentReference = documentReferenceResolver.resolve(reference, EntityType.DOCUMENT);
+        DocumentReference documentReference = this.documentReferenceResolver.resolve(reference, propertyReference);
         PropertyValue propertyValue = super.getValue(propertyReference, documentReference);
         if (propertyValue != null) {
             propertyValue.setValue(reference);

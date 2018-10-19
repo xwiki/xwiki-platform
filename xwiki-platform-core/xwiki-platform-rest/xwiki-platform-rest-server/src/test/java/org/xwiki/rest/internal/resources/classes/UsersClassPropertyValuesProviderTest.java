@@ -105,6 +105,8 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
             .thenReturn("Users.Alice");
         when(compactSerializer.serialize(bobReference, this.classReference.getWikiReference())).thenReturn("Users.Bob");
 
+        when(this.xcontext.getWiki().getPlainUserName(bobReference, this.xcontext)).thenReturn("Bob the Great");
+
         when(this.xcontext.getWiki().getURL(aliceReference, this.xcontext)).thenReturn("url/to/alice");
         when(this.xcontext.getWiki().getURL(bobReference, this.xcontext)).thenReturn("url/to/bob");
 
@@ -130,7 +132,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         assertEquals("url/to/alice", values.getPropertyValues().get(0).getMetaData().get("url"));
 
         assertEquals("Users.Bob", values.getPropertyValues().get(1).getValue());
-        assertEquals("Bob", values.getPropertyValues().get(1).getMetaData().get("label"));
+        assertEquals("Bob the Great", values.getPropertyValues().get(1).getMetaData().get("label"));
         assertEquals(17L, values.getPropertyValues().get(1).getMetaData().get("count"));
         assertTrue(values.getPropertyValues().get(1).getMetaData().get("icon") instanceof Map);
         Map icon = (Map) values.getPropertyValues().get(1).getMetaData().get("icon");
@@ -179,11 +181,14 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         when(this.allowedValuesQuery.execute()).thenReturn(Collections.singletonList(bobReference),
             Collections.singletonList(aliceReference));
 
+        when(this.xcontext.getWiki().getPlainUserName(aliceReference, this.xcontext)).thenReturn("Alice White");
+        when(this.xcontext.getWiki().getPlainUserName(bobReference, this.xcontext)).thenReturn("Bob Black");
+
         PropertyValues values = this.provider.getValues(this.propertyReference, 5, "foo");
 
         assertEquals(2, values.getPropertyValues().size());
-        assertEquals("Alice", values.getPropertyValues().get(0).getMetaData().get("label"));
-        assertEquals("Bob", values.getPropertyValues().get(1).getMetaData().get("label"));
+        assertEquals("Alice White", values.getPropertyValues().get(0).getMetaData().get("label"));
+        assertEquals("Bob Black", values.getPropertyValues().get(1).getMetaData().get("label"));
 
         verify(this.allowedValuesQuery).setWiki("chess");
         verify(this.allowedValuesQuery, times(2)).execute();

@@ -117,4 +117,18 @@ public class UsersClassPropertyValuesProvider extends AbstractUsersAndGroupsClas
 
         return icon;
     }
+
+    @Override
+    protected String getLabel(DocumentReference userReference, Object currentLabel)
+    {
+        // The current label shouldn't be empty when the property values are retrieved from the data base. It's empty
+        // when we resolve a raw property value (exact match).
+        String label = currentLabel == null ? "" : currentLabel.toString().trim();
+        if (label.isEmpty()) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            label = xcontext.getWiki().getPlainUserName(userReference, xcontext);
+        }
+
+        return label;
+    }
 }

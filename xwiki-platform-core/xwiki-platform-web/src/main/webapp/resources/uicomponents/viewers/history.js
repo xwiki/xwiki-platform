@@ -19,8 +19,8 @@
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
   var getRev = function () {
-    var rev1 = $("input[type='radio'][name='rev1'][checked='checked']").val() || '';
-    var rev2 = $("input[type='radio'][name='rev2'][checked='checked']").val() || '';
+    var rev1 = $("input[type='radio'][name='rev1']:checked").val() || '';
+    var rev2 = $("input[type='radio'][name='rev2']:checked").val() || '';
 
     return {
       'rev1': rev1,

@@ -41,6 +41,7 @@ public interface WikiSearchResource
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("orderField") @DefaultValue("") String orderField,
             @QueryParam("order") @DefaultValue("asc") String order,
-            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
+            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
+            @QueryParam("localeAware") @DefaultValue("false") Boolean isLocaleAware
     ) throws XWikiRestException;
 }

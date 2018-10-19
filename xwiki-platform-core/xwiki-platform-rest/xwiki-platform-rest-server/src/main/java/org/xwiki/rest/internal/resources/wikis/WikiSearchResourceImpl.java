@@ -36,7 +36,8 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
 {
     @Override
     public SearchResults search(String wikiName, String keywords, List<String> searchScopeStrings, Integer number,
-        Integer start, String orderField, String order, Boolean withPrettyNames) throws XWikiRestException
+        Integer start, String orderField, String order, Boolean withPrettyNames, Boolean isLocaleAware)
+            throws XWikiRestException
     {
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
@@ -53,7 +54,7 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
             searchResults.getSearchResults().addAll(
                 search(searchScopes, keywords, getXWikiContext().getWikiId(), null, Utils.getXWiki(componentManager)
                     .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start,
-                    true, orderField, order, withPrettyNames));
+                    true, orderField, order, withPrettyNames, isLocaleAware));
 
             return searchResults;
         } catch (Exception e) {

@@ -68,6 +68,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
       'q': text,
       'scope': scopes,
       'number': 10,
+      'localeAware': true,
       'media': 'json'
     }, true));
   };

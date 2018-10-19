@@ -32,6 +32,7 @@ import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.DatePicker;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
@@ -344,7 +345,9 @@ public class EditObjectsTest extends AbstractTest
 
         // Save, edit again and check the values.
         object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(className).get(0);
-        Assert.assertEquals("15", object.openDatePicker("date").getDay());
+        DatePicker datePicker = object.openDatePicker("date");
+        Assert.assertEquals("15", datePicker.getDay());
+        datePicker.close();
         SuggestionElement author = object.getSuggestInput("author").getSelectedSuggestions().get(0);
         Assert.assertEquals("Administrator", author.getLabel());
         Assert.assertEquals("XWiki.Admin", author.getValue());

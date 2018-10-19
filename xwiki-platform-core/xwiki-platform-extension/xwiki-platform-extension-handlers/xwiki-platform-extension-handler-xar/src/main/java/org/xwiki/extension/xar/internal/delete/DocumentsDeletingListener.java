@@ -83,7 +83,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
     {
         CancelableEvent cancelableEvent = (CancelableEvent) event;
         if (cancelableEvent.isCanceled()) {
-            logger.warn("Skipping " + this.getName() + " as the event is already cancelled.");
+            logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
             return;
         }
 

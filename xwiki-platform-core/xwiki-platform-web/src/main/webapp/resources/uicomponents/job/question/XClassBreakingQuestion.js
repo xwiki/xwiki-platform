@@ -94,8 +94,8 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         var answerProperties = {
             // Pages that have been manually marked by the user to be removed
             selectedDocuments: [],
-            // Either or not all pages that don't belong to any extension should be removed (even those the user haven't
-            // seen because of the pagination)
+
+          // All pages that does not contains an used XClass
             selectAllFreePages: false
         };
 

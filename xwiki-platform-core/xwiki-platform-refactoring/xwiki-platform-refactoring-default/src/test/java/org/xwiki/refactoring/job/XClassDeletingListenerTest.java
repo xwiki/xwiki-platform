@@ -29,14 +29,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.slf4j.Logger;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.job.Job;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
@@ -84,7 +82,6 @@ import static org.mockito.Mockito.when;
 public class XClassDeletingListenerTest
 {
     @MockComponent
-    @Named("current")
     private EntityReferenceResolver<String> resolver;
 
     @MockComponent
@@ -154,9 +151,9 @@ public class XClassDeletingListenerTest
         when(query4.setWiki("wiki2")).thenReturn(query4);
         when(query4.execute()).thenReturn(Arrays.asList("b.xobject3"));
 
-        when(resolver.resolve("a.xobject1", EntityType.DOCUMENT)).thenReturn(docObjReference1);
-        when(resolver.resolve("b.xobject2", EntityType.DOCUMENT)).thenReturn(docObjReference2);
-        when(resolver.resolve("b.xobject3", EntityType.DOCUMENT)).thenReturn(docObjReference3);
+        when(resolver.resolve("a.xobject1", EntityType.DOCUMENT, xclass1)).thenReturn(docObjReference1);
+        when(resolver.resolve("b.xobject2", EntityType.DOCUMENT, xclass1)).thenReturn(docObjReference2);
+        when(resolver.resolve("b.xobject3", EntityType.DOCUMENT, xclass2)).thenReturn(docObjReference3);
 
         when(documentAccessBridge.isAdvancedUser(any())).thenReturn(true);
 
@@ -174,7 +171,7 @@ public class XClassDeletingListenerTest
             expectedXPages.add(xclass1Selection);
             expectedXPages.add(xclass2Selection);
 
-            assertEquals(expectedXPages, question.getXclassPages());
+            assertEquals(expectedXPages, question.getXClassPages());
 
             Map<EntityReference, Set<EntityReference>> expectedImpactedObjects = new HashMap<>();
 
@@ -293,7 +290,7 @@ public class XClassDeletingListenerTest
             assertEquals(concernedEntities, question.getConcernedEntities());
 
             assertTrue(question.getFreePages().isEmpty());
-            assertEquals(1, question.getXclassPages().size());
+            assertEquals(1, question.getXClassPages().size());
             assertEquals(1, question.getImpactedObjects().size());
             assertTrue(question.isRefactoringForbidden());
             return null;

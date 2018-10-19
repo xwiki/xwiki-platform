@@ -19,7 +19,6 @@
  */
 package org.xwiki.refactoring.job;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -57,8 +56,6 @@ import org.xwiki.refactoring.job.question.EntitySelection;
 @Named("XClassDeletingListener")
 public class XClassDeletingListener extends AbstractEventListener
 {
-    private static final List<Event> EVENTS = Arrays.asList(new DocumentsDeletingEvent());
-
     @Inject
     private Logger logger;
 
@@ -67,21 +64,20 @@ public class XClassDeletingListener extends AbstractEventListener
 
     @Inject
     @Named("local")
-    private EntityReferenceSerializer<String> serializer;
+    private EntityReferenceSerializer<String> localSerializer;
 
     @Inject
-    @Named("current")
     private EntityReferenceResolver<String> resolver;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Construct a DocumentsDeletingListener.
+     * Construct an XClassDeletingListener.
      */
     public XClassDeletingListener()
     {
-        super("XClass Deleting Listener", EVENTS);
+        super("XClass Deleting Listener", new DocumentsDeletingEvent());
     }
 
     @Override
@@ -89,7 +85,7 @@ public class XClassDeletingListener extends AbstractEventListener
     {
         CancelableEvent cancelableEvent = (CancelableEvent) event;
         if (cancelableEvent.isCanceled()) {
-            logger.warn("Skipping " + this.getName() + " as the event is already cancelled.");
+            logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
             return;
         }
 
@@ -145,15 +141,14 @@ public class XClassDeletingListener extends AbstractEventListener
 
     private void checkIfDeleteIsAllowed(EntitySelection entitySelection, XClassBreakingQuestion question)
     {
-        DocumentReference documentReference = (DocumentReference) entitySelection.getEntityReference();
-        String query = "select distinct doc.fullName from XWikiDocument doc, BaseObject obj where "
-            + "doc.fullName=obj.name and obj.className=:className";
+        DocumentReference classReference = (DocumentReference) entitySelection.getEntityReference();
+        String query = "select distinct obj.name from BaseObject obj where obj.className=:className";
 
-        String className = serializer.serialize(documentReference);
+        String className = localSerializer.serialize(classReference);
         try {
             List<String> results = this.queryManager.createQuery(query, Query.HQL)
                 .bindValue("className", className)
-                .setWiki(documentReference.getWikiReference().getName())
+                .setWiki(classReference.getWikiReference().getName())
                 .<String>execute();
 
             if (results.isEmpty()) {
@@ -161,7 +156,7 @@ public class XClassDeletingListener extends AbstractEventListener
             } else {
                 for (String documentObjectName : results) {
                     EntityReference documentObjectReference = this.resolver.resolve(documentObjectName,
-                        EntityType.DOCUMENT);
+                        EntityType.DOCUMENT, classReference);
                     question.markImpactedObject(entitySelection, documentObjectReference);
                 }
             }

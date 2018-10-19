@@ -37,7 +37,7 @@ import org.xwiki.refactoring.job.question.EntitySelection;
 public class XClassBreakingQuestion
 {
     /**
-     * The map of entities concerned by the refactoring, where the entity reference if the key.
+     * The map of entities concerned by the refactoring, where the entity reference is the key.
      */
     private Map<EntityReference, EntitySelection> concernedEntities;
 
@@ -116,7 +116,7 @@ public class XClassBreakingQuestion
     /**
      * @return the list of entities containing used XClass.
      */
-    public Set<EntitySelection> getXclassPages()
+    public Set<EntitySelection> getXClassPages()
     {
         return xclassPages;
     }

@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>administration.title=Администрирование
-### Missing: administration.title.page=Page Administration
+administration.title.page=Управление страницей
 administration.title.wiki=Администрирование Wiki
 administration.title.global=Глобальное администрирование
 ### Missing: administration.sectionTitle=Administration: {0}

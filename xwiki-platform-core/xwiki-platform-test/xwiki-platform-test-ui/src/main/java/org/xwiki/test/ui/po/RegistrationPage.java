@@ -30,12 +30,11 @@ import org.openqa.selenium.support.FindBy;
  */
 public class RegistrationPage extends AbstractRegistrationPage
 {
-    @FindBy(xpath = "//form[@id='register']/div/span/input[@type='submit']")
+    @FindBy(css = "form#register input[type='submit']")
     private WebElement submitButton;
 
     /**
-     * To put the registration page someplace else, subclass this class and change
-     * this method.
+     * To put the registration page someplace else, subclass this class and change this method.
      */
     public static RegistrationPage gotoPage()
     {

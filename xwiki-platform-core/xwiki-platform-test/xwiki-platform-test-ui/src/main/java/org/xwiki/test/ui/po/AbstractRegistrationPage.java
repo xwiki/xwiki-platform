@@ -113,6 +113,6 @@ public abstract class AbstractRegistrationPage extends BasePage
 
     public boolean isLiveValidationEnabled()
     {
-        return !getDriver().findElementsWithoutWaiting(By.xpath("//div[@id='mainContentArea']/script")).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(this.registerFormElement, By.xpath("./script")).isEmpty();
     }
 }

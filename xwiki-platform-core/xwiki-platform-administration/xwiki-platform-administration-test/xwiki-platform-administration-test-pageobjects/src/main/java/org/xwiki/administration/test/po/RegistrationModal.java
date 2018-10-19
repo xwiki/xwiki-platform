@@ -49,13 +49,6 @@ public class RegistrationModal extends AbstractRegistrationPage
     }
 
     @Override
-    public boolean isLiveValidationEnabled()
-    {
-        // The live validation is enabled from an in-line script tag within the modal body.
-        return !getDriver().findElements(By.cssSelector("#createUserModal .modal-body script")).isEmpty();
-    }
-
-    @Override
     public RegistrationModal waitUntilPageIsLoaded()
     {
         getDriver().waitUntilElementIsVisible(By.cssSelector("#createUserModal .modal-body form#register"));

@@ -715,7 +715,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd7s4()
     {
-        assertEmpty(Type.ERROR, "rpd7s4.links",
+        assertFalse(Type.ERROR, "rpd7s4.links",
             "//a[normalize-space(.) = '']//img[not(@alt) or normalize-space(@alt) = '']");
     }
 

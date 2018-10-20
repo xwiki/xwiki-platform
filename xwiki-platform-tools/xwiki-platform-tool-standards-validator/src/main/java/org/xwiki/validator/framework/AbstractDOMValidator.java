@@ -304,6 +304,11 @@ public abstract class AbstractDOMValidator extends AbstractXMLValidator
         }
     }
 
+    protected void assertFalse(Type errorType, String message, String xpath)
+    {
+        assertFalse(errorType, message, ((Boolean) evaluate(this.document, xpath, XPathConstants.BOOLEAN)));
+    }
+
     /**
      * Asserts that a condition is true. If it isn't it puts an error message in the validation results.
      * 
@@ -317,12 +322,6 @@ public abstract class AbstractDOMValidator extends AbstractXMLValidator
             // TODO: handle line/column
             addError(errorType, -1, -1, message);
         }
-    }
-
-    protected void assertEmpty(Type errorType, String message, String xpath)
-    {
-        assertTrue(errorType, message,
-            ((NodeList) evaluate(this.document, xpath, XPathConstants.NODESET)).getLength() == 0);
     }
 
     // Dom utils

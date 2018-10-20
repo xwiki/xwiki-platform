@@ -21,11 +21,15 @@ package org.xwiki.validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.validator.ValidationError.Type;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -54,13 +58,12 @@ public class DutchWebGuidelinesValidatorTest
 
     private String getErrors(DutchWebGuidelinesValidator validator)
     {
-        StringBuilder buffer = new StringBuilder();
-
+        List<String> errors = new ArrayList<>(validator.getErrors().size());
         for (ValidationError error : validator.getErrors()) {
-            buffer.append(error + "\n");
+            errors.add(error.toString());
         }
 
-        return buffer.toString();
+        return StringUtils.join(errors, '\n');
     }
 
     private boolean isValid(DutchWebGuidelinesValidator validator)
@@ -325,7 +328,8 @@ public class DutchWebGuidelinesValidatorTest
     {
         setValidatorDocument("<body><p><sub>sub</sub></p></body>");
         this.validator.validateRpd3s9();
-        assertFalse(getErrors(this.validator), isValid(this.validator));
+        assertEquals("WARNING: The use of <sub> is not recommended.", getErrors(validator));
+        assertTrue(isValid(this.validator));
     }
 
     @Test
@@ -333,7 +337,8 @@ public class DutchWebGuidelinesValidatorTest
     {
         setValidatorDocument("<body><p><sup>sup</sup></p></body>");
         this.validator.validateRpd3s9();
-        assertFalse(getErrors(this.validator), isValid(this.validator));
+        assertEquals("WARNING: The use of <sup> is not recommended.", getErrors(validator));
+        assertTrue(isValid(this.validator));
     }
 
     // RPD 3s11

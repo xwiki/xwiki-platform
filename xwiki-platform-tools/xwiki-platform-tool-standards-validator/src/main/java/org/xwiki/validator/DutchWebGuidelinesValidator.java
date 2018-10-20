@@ -511,9 +511,9 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd3s9()
     {
-        // <sub> and <sup> are not allowed.
-        assertFalse(Type.ERROR, "rpd3s9.sub", containsElement("sub"));
-        assertFalse(Type.ERROR, "rpd3s9.sup", containsElement("sup"));
+        // <sub> and <sup> are not recommended.
+        assertFalse(Type.WARNING, "rpd3s9.sub", containsElement("sub"));
+        assertFalse(Type.WARNING, "rpd3s9.sup", containsElement("sup"));
     }
 
     /**

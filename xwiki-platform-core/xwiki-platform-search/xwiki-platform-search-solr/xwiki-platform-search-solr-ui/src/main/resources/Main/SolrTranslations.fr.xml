@@ -75,17 +75,17 @@ solr.options.highlight.title=Afficher un extrait dans chaque résultat
 solr.options.facet=Facettes
 solr.options.facet.title=Autoriser le fitrage dans les résultats
 
-solr.result.language=Langage
+solr.result.language=Langue
 solr.result.locatedIn=Situé dans
 solr.result.author=Modifié par {0} le {1}
 solr.result.mediaType=Ficher de type {0}
 solr.result.uploadedBy=Enregistré par {0} le {1} ({2})
 solr.result.highlightAll=Afficher et surligner toutes les occurrences
 
-solr.facets.title=Affinez votre recherche
-solr.facets.hint=Sélectionnez une catégorie et activez les filtres sur les résultats
+solr.facets.title=Affinez les résultats
+solr.facets.hint=Sélectionnez des éléments pour filtrer les résultats
 solr.facets.resetAll=Tout réinitialiser
-solr.facets.expandAll=Tout déplier
+solr.facets.expandAll=Tout étendre
 solr.facets.collapseAll=Tout réduire
 solr.facets.emptyValue=Valeur vide
 solr.facets.moreValues={0} restants
@@ -138,7 +138,7 @@ solr.facet.size.moreThan=Plus de {0}
 solr.facet.size.any=Toutes les tailles
 
 solr.field.type=Type de résultat
-solr.field.locale=Langage
+solr.field.locale=Langue
 solr.field.locale.emptyValue=Sans langue
 solr.field.locale.emptyValue.hint=Certains documents n'ont aucune langue définie parce qu'ils contiennent des scripts (qui ne sont pas rédigés dans une langue naturelle) ou parce qu'ils sont évalués en fonction de la langue de l'utilisateur (comme cette page).
 solr.field.wiki=Wiki

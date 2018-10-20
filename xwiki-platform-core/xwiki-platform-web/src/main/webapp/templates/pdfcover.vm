@@ -1,5 +1,6 @@
-<div style="text-align: center; width: 100%;">
-<h1>
+<div style="width: 100%;">
+<hr style="border-width: 0.25pt"/>
+<h1 style="text-align: left;">
 #set ($title = "$!pdfdoc.display('title', 'rendered', '', $pdfobj)")
 #if ($title == '')
   $escapetool.xml($!tdoc.plainTitle)
@@ -7,9 +8,12 @@
   $escapetool.xml($title)
 #end
 </h1>
+<div>
+  <p style="text-align: left;" class="author">${services.localization.render('lastmodifiedby')} $!xwiki.getUserName($tdoc.author, false)</p>
+</div>
+<div>
+  <p style="text-align: left;" class="date">${services.localization.render('lastmodifiedon')} $!xwiki.formatDate($tdoc.date)</p>
+</div>
 <br />
-<br />
-<p class="author">$!xwiki.getUserName($tdoc.author, false)</p>
-<br />
-<p class="date">$!xwiki.formatDate($tdoc.date)</p>
+<hr style="border-width: 0.25pt"/>
 </div>

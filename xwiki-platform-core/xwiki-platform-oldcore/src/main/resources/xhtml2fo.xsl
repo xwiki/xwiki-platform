@@ -76,9 +76,9 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="text-align"><xsl:value-of select="$text-align"/></xsl:attribute>
         <xsl:attribute name="font-family">
           <xsl:choose>
-            <xsl:when test="starts-with($language, 'ja')">FreeSerif, IPAMincho, AR PL UMing CN, serif</xsl:when>
-            <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeSerif, Baekmuk Gulim, AR PL UMing CN, serif</xsl:when>
-            <xsl:otherwise>FreeSerif, AR PL UMing CN, serif</xsl:otherwise>
+            <xsl:when test="starts-with($language, 'ja')">FreeSans, IPAMincho, AR PL UMing CN, sans-serif</xsl:when>
+            <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeSans, Baekmuk Gulim, AR PL UMing CN, sans-serif</xsl:when>
+            <xsl:otherwise>FreeSans, AR PL UMing CN, sans-serif</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
         <!-- specified on fo:root to change the properties' initial values -->

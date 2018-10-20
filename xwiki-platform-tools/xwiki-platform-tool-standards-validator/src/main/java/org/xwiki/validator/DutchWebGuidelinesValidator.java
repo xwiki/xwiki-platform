@@ -63,6 +63,21 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     private static final String QUERY_STRING_SEPARATOR = "?";
 
     /**
+     * The default value of the type attribute of a button element is 'submit'. See
+     * http://www.w3.org/TR/xhtml1/dtds.html#dtdentry_xhtml1-strict.dtd_button
+     */
+    private static final String BUTTON_SUBMIT = "//button[not(@type) or @type = 'submit']";
+
+    /**
+     * Look for either a submit input or an image input with the 'alt' attribute specified. See
+     * http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
+     */
+    private static final String INPUT_SUBMIT_OR_IMAGE = "//input[@type = 'submit' or (@type = 'image' and @alt != '')]";
+
+    private static final String FORM_WITHOUT_SUBMIT =
+        "//form[not(." + INPUT_SUBMIT_OR_IMAGE + ") and not(." + BUTTON_SUBMIT + ")]";
+
+    /**
      * Message resources.
      */
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
@@ -305,18 +320,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         }
 
         // Form validation
-        NodeListIterable formElements = getElements("form");
-
-        for (Node formElement : formElements) {
-            // Look for either a submit input or an image input with the 'alt' attribute specified.
-            // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
-            String inputSubmitOrImage = "//input[@type = 'submit' or (@type = 'image' and @alt != '')]";
-            // The default value of the type attribute of a button element is 'submit'.
-            // See http://www.w3.org/TR/xhtml1/dtds.html#dtdentry_xhtml1-strict.dtd_button
-            String buttonSubmit = "//button[not(@type) or @type = 'submit']";
-            assertTrue(Type.ERROR, "rpd1s3.formSubmit",
-                (Boolean) evaluate(formElement, inputSubmitOrImage + " | " + buttonSubmit, XPathConstants.BOOLEAN));
-        }
+        assertFalse(Type.ERROR, "rpd1s3.formSubmit", FORM_WITHOUT_SUBMIT);
     }
 
     /**
@@ -1219,23 +1223,9 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd13s4()
     {
-        for (Node form : getElements(ELEM_FORM)) {
-            boolean hasSubmit = false;
-            boolean hasDynamicSelect = false;
+        assertFalse(Type.ERROR, "rpd13s4.submit", FORM_WITHOUT_SUBMIT);
 
-            String exprString = "//input[@type='submit']";
-            hasSubmit = (Boolean) evaluate(form, exprString, XPathConstants.BOOLEAN);
-            exprString = "//input[@type='image']";
-            hasSubmit = hasSubmit || (Boolean) evaluate(this.document, exprString, XPathConstants.BOOLEAN);
-            assertTrue(Type.ERROR, "rpd13s4.submit", hasSubmit);
-
-            exprString = "//select[@onchange]";
-            hasDynamicSelect = (Boolean) evaluate(form, exprString, XPathConstants.BOOLEAN);
-
-            if (hasDynamicSelect) {
-                addError(Type.WARNING, -1, -1, "rpd13s4.select");
-            }
-        }
+        assertFalse(Type.WARNING, "rpd13s4.select", "//form//select[@onchange]");
     }
 
     /**

@@ -715,27 +715,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd7s4()
     {
-        for (Node link : getElements(ELEM_LINK)) {
-
-            // Look for images in the link.
-            boolean hasNonEmptyAlt = false;
-            for (Node child : getChildren(link, ELEM_IMG)) {
-                if (StringUtils.isNotEmpty(getAttributeValue(child, ATTR_ALT))) {
-                    hasNonEmptyAlt = true;
-                }
-            }
-
-            // Look for text in the link.
-            boolean hasText = false;
-            for (Node linkChild : new NodeListIterable(link.getChildNodes())) {
-                if (linkChild.getNodeType() == Node.TEXT_NODE) {
-                    hasText = true;
-                }
-            }
-
-            // Images in links must have a not empty alt attribute if there's no text in the link.
-            assertTrue(Type.ERROR, "rpd7s4.links", hasNonEmptyAlt || hasText);
-        }
+        assertEmpty(Type.ERROR, "rpd7s4.links",
+            "//a[normalize-space(.) = '']//img[not(@alt) or normalize-space(@alt) = '']");
     }
 
     /**

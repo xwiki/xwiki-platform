@@ -319,6 +319,12 @@ public abstract class AbstractDOMValidator extends AbstractXMLValidator
         }
     }
 
+    protected void assertEmpty(Type errorType, String message, String xpath)
+    {
+        assertTrue(errorType, message,
+            ((NodeList) evaluate(this.document, xpath, XPathConstants.NODESET)).getLength() == 0);
+    }
+
     // Dom utils
 
     /**
@@ -355,7 +361,7 @@ public abstract class AbstractDOMValidator extends AbstractXMLValidator
     {
         try {
             XPathExpression expr = xpath.compile(exprString);
-            return expr.evaluate(this.document, returnType);
+            return expr.evaluate(node, returnType);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }

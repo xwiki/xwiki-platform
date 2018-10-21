@@ -649,7 +649,17 @@ public class HTML5DutchWebGuidelinesValidatorTest
         this.validator.validateRpd13s4();
         assertFalse(isValid(this.validator), getErrors(this.validator));
 
-        setValidatorDocument("<body><form><fieldset><input name='test' /><input type='submit' /></fieldset></form></body>");
+        setValidatorDocument(
+            "<body><form><fieldset><input name='test' /><input type='submit' /></fieldset></form></body>");
+        this.validator.validateRpd13s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument(
+            "<body><form><fieldset><input name='test' /><button type='submit' /></fieldset></form></body>");
+        this.validator.validateRpd13s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><form><fieldset><input name='test' /><button/></fieldset></form></body>");
         this.validator.validateRpd13s4();
         assertTrue(isValid(this.validator), getErrors(this.validator));
 

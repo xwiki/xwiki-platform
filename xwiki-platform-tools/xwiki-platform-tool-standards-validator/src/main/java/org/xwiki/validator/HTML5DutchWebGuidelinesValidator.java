@@ -684,12 +684,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
         for (Element link : getElements(ELEM_LINK)) {
 
             // Look for images in the link.
-            boolean hasNonEmptyAlt = false;
-            for (Element child : getChildren(link, ELEM_IMG)) {
-                if (StringUtils.isNotEmpty(getAttributeValue(child, ATTR_ALT))) {
-                    hasNonEmptyAlt = true;
-                }
-            }
+            boolean hasImages = link.select("img").size() > 0;
+            boolean hasImagesWithoutAlt = link.select("img[alt=''], img:not([alt])").size() > 0;
 
             // Look for text in the link.
             boolean hasText = false;
@@ -700,7 +696,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
             }
 
             // Images in links must have a not empty alt attribute if there's no text in the link.
-            assertTrue(Type.ERROR, "rpd7s4.links", hasNonEmptyAlt || hasText);
+            assertTrue(Type.ERROR, "rpd7s4.links", !hasImages || !hasImagesWithoutAlt || hasText);
         }
     }
 

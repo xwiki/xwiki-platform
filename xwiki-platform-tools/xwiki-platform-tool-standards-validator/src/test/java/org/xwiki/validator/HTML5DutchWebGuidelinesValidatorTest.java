@@ -459,6 +459,18 @@ public class HTML5DutchWebGuidelinesValidatorTest
         setValidatorDocument("<body><a><img alt='text' /></a></body>");
         this.validator.validateRpd7s4();
         assertTrue(isValid(this.validator), getErrors(this.validator));
+        
+        setValidatorDocument("<body><a><span>text</span></a></body>");
+        this.validator.validateRpd7s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><a><img/><span>text</span></a></body>");
+        this.validator.validateRpd7s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><a><span/></a></body>");
+        this.validator.validateRpd7s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
     }
 
     @Test

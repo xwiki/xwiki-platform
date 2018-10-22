@@ -42,15 +42,15 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 public class ServletContainerExecutor
 {
     /**
-     * @param configuration the configuration to build (servlet engine, debug mode, etc)
+     * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
      * @param sourceWARDirectory the location where the built WAR is located
      * @return the Docker container instance
      * @throws Exception if an error occurred during the build or start
      */
-    public GenericContainer execute(UITest configuration, File sourceWARDirectory) throws Exception
+    public GenericContainer execute(TestConfiguration testConfiguration, File sourceWARDirectory) throws Exception
     {
         GenericContainer servletContainer;
-        switch (configuration.servletEngine()) {
+        switch (testConfiguration.getServletEngine()) {
             case TOMCAT:
                 // Configure Tomcat logging for debugging
                 File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
@@ -76,7 +76,7 @@ public class ServletContainerExecutor
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    configuration.servletEngine()));
+                    testConfiguration.getServletEngine()));
         }
 
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to start
@@ -89,7 +89,7 @@ public class ServletContainerExecutor
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-        if (configuration.debug()) {
+        if (testConfiguration.isDebug()) {
             servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 

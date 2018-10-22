@@ -51,13 +51,13 @@ public @interface UITest
      * @return the database to use, see {@link Database}
      * @since 10.9RC1
      */
-    Database database() default Database.MYSQL;
+    Database database() default Database.SYSTEM;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
      * @since 10.9RC1
      */
-    ServletEngine servletEngine() default ServletEngine.TOMCAT;
+    ServletEngine servletEngine() default ServletEngine.SYSTEM;
 
     /**
      * @return true if the test should be started in debug mode, false otherwise

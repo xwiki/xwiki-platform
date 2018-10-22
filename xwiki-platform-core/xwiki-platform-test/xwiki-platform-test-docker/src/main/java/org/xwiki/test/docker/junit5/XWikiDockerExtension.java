@@ -97,6 +97,9 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
+        TestConfiguration testConfiguration = new TestConfiguration(
+            extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
+
         // Force the usage of last docker image for VNC recorder
         // See: https://github.com/testcontainers/testcontainers-java/pull/888
         // This line could be removed once a new release (after 1.9.1) of testcontainers is done
@@ -112,23 +115,22 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
 
             // Build the XWiki WAR
             LOGGER.info("(1) Building custom XWiki WAR...");
-            UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
             File targetWARDirectory = new File("./target/xwiki");
             // If the directory exists, skip the rebuilding of the XWiki WAR, allowing to re-run the test faster
             if (!targetWARDirectory.exists()) {
                 LOGGER.info("XWiki WAR directory [{}] doesn't exists, rebuilding WAR!", targetWARDirectory);
-                this.builder.build(uiTestAnnotation, targetWARDirectory);
+                this.builder.build(testConfiguration, targetWARDirectory);
             } else {
                 LOGGER.info("XWiki WAR directory [{}] exists, don't rebuild WAR to save time!", targetWARDirectory);
             }
 
             // Start the Database
-            LOGGER.info("(2) Starting database [{}]...", uiTestAnnotation.database());
-            startDatabase(extensionContext);
+            LOGGER.info("(2) Starting database [{}]...", testConfiguration.getDatabase());
+            startDatabase(testConfiguration, extensionContext);
 
             // Start the Servlet Engine
-            LOGGER.info("(3) Starting Servlet container [{}]...", uiTestAnnotation.servletEngine());
-            startServletEngine(extensionContext, targetWARDirectory);
+            LOGGER.info("(3) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
+            startServletEngine(testConfiguration, extensionContext, targetWARDirectory);
 
             // Provision XWiki by installing all required extensions.
             LOGGER.info("(4) Provision XAR extensions for test...");
@@ -138,7 +140,7 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         }
 
         // Start the Browser (this creates and initializes the PersistentTestContext, XWikiWebDriver objects)
-        startBrowser(extensionContext);
+        startBrowser(testConfiguration, extensionContext);
     }
 
     @Override
@@ -202,19 +204,19 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         shutdownPersistentTestContext(testContext);
     }
 
-    private BrowserWebDriverContainer startBrowser(ExtensionContext extensionContext)
+    private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
+        ExtensionContext extensionContext)
     {
-        UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
-        LOGGER.info("(5) Starting browser [{}]...", uiTestAnnotation.browser());
+        LOGGER.info("(5) Starting browser [{}]...", testConfiguration.getBrowser());
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
-            .withDesiredCapabilities(uiTestAnnotation.browser().getCapabilities())
+            .withDesiredCapabilities(testConfiguration.getBrowser().getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
 
-        if (uiTestAnnotation.debug()) {
+        if (testConfiguration.isDebug()) {
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
@@ -249,24 +251,22 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         return webDriverContainer;
     }
 
-    private JdbcDatabaseContainer startDatabase(ExtensionContext extensionContext)
+    private JdbcDatabaseContainer startDatabase(TestConfiguration testConfiguration, ExtensionContext extensionContext)
     {
-        UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
-        return executor.execute(uiTestAnnotation);
+        return executor.execute(testConfiguration);
     }
 
-    private GenericContainer startServletEngine(ExtensionContext extensionContext, File sourceWARDirectory)
-        throws Exception
+    private GenericContainer startServletEngine(TestConfiguration testConfiguration, ExtensionContext extensionContext,
+        File sourceWARDirectory) throws Exception
     {
-        UITest uiTestAnnotation = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
         ServletContainerExecutor executor = new ServletContainerExecutor();
-        GenericContainer servletContainer = executor.execute(uiTestAnnotation, sourceWARDirectory);
+        GenericContainer servletContainer = executor.execute(testConfiguration, sourceWARDirectory);
 
         String xwikiURL = String.format("http://%s:%s/xwiki", servletContainer.getContainerIpAddress(),
             servletContainer.getMappedPort(8080));
         saveXWikiURL(extensionContext, xwikiURL);
-        if (uiTestAnnotation.debug()) {
+        if (testConfiguration.isDebug()) {
             LOGGER.info("XWiki ping URL = " + xwikiURL);
         }
 

@@ -57,17 +57,17 @@ public class ConfigurationFilesGenerator
     private static final String SKIN = "flamingo";
 
     /**
-     * @param configuration the configuration (database, debug mode, etc)
+     * @param testConfiguration the configuration (database, debug mode, etc)
      * @param configurationFileTargetDirectory the location where to generate the config files
      * @param version the XWiki version for which to generate config files (used to get the config resources for the
      *        right version)
      * @param resolver the artifact resolver to use (can contain resolved artifacts in cache)
      * @throws Exception if an error occurs during config generation
      */
-    public void generate(UITest configuration, File configurationFileTargetDirectory, String version,
+    public void generate(TestConfiguration testConfiguration, File configurationFileTargetDirectory, String version,
         ArtifactResolver resolver) throws Exception
     {
-        VelocityContext context = createVelocityContext(new Properties(), configuration.database());
+        VelocityContext context = createVelocityContext(new Properties(), testConfiguration.getDatabase());
         Artifact artifact = new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
             JAR, version);
         File configurationJARFile = resolver.resolveArtifact(artifact).getArtifact().getFile();
@@ -80,7 +80,7 @@ public class ConfigurationFilesGenerator
                 if (entry.getName().endsWith(VM_EXTENSION)) {
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
-                    if (configuration.debug()) {
+                    if (testConfiguration.isDebug()) {
                         LOGGER.info("... Generating: " + outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...

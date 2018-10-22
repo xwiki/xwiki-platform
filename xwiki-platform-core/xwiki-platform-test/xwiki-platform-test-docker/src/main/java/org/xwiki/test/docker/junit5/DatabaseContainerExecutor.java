@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 
@@ -41,13 +42,13 @@ public class DatabaseContainerExecutor
     private static final String DBPASSWORD = DBUSERNAME;
 
     /**
-     * @param configuration the configuration to build (database, debug mode, etc)
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @return the Docker container instance
      */
-    public JdbcDatabaseContainer execute(UITest configuration)
+    public JdbcDatabaseContainer execute(TestConfiguration testConfiguration)
     {
         JdbcDatabaseContainer databaseContainer = null;
-        switch (configuration.database()) {
+        switch (testConfiguration.getDatabase()) {
             case MYSQL:
                 // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
                 //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
@@ -82,6 +83,13 @@ public class DatabaseContainerExecutor
                 databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
 
                 break;
+            case ORACLE:
+                databaseContainer = new OracleContainer()
+                    .withDatabaseName(DBNAME)
+                    .withUsername(DBUSERNAME)
+                    .withPassword(DBPASSWORD);
+
+                break;
             case HSQLDB:
                 // We don't need a Docker image/container since HSQLDB can work in embedded mode.
                 // It's configured automatically in the custom XWiki WAR.
@@ -89,7 +97,7 @@ public class DatabaseContainerExecutor
                 break;
             default:
                 throw new RuntimeException(String.format("Database [%s] is not yet supported!",
-                    configuration.database()));
+                    testConfiguration.getDatabase()));
         }
 
         if (databaseContainer != null) {
@@ -97,7 +105,7 @@ public class DatabaseContainerExecutor
                 .withNetwork(Network.SHARED)
                 .withNetworkAliases("xwikidb");
 
-            if (configuration.debug()) {
+            if (testConfiguration.isDebug()) {
                 databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
             }
 

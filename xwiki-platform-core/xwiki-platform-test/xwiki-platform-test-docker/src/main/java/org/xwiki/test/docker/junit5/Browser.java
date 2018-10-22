@@ -30,8 +30,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public enum Browser
 {
     /**
-     * The browser is selected based on the value of the "xwiki.test.ui.browser" system property, which can be
-     * "chrome" or "firefox".
+     * The browser is selected based on a system property value.
+     * @see TestConfiguration
      */
     SYSTEM,
 
@@ -45,21 +45,11 @@ public enum Browser
      */
     CHROME(DesiredCapabilities.chrome());
 
-    private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
-
-    private static final String FIREFOX_NAME = "firefox";
-
-    private static final String CHROME_NAME = "chrome";
-
     private DesiredCapabilities capabilities;
 
     Browser()
     {
-        if (System.getProperty(BROWSER_PROPERTY, CHROME_NAME).equalsIgnoreCase(FIREFOX_NAME)) {
-            this.capabilities = DesiredCapabilities.firefox();
-        } else {
-            this.capabilities = DesiredCapabilities.chrome();
-        }
+        // Capability will be resolved at runtime
     }
 
     Browser(DesiredCapabilities capabilities)

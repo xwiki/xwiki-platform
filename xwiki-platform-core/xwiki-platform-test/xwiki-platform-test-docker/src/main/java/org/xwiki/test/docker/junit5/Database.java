@@ -28,6 +28,12 @@ package org.xwiki.test.docker.junit5;
 public enum Database
 {
     /**
+     * The browser is selected based on a system property value.
+     * @see TestConfiguration
+     */
+    SYSTEM,
+
+    /**
      * Represents the MySQL database.
      */
     MYSQL,

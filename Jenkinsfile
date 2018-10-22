@@ -123,14 +123,14 @@ def builds = [
       projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
     )
   },
-  'Docker - PostgreSQL/Tomcat/Firefox' : {
+  'Docker - HSQLDB/Tomcat/Firefox' : {
     // Run functional tests based on docker on modules having them. We select the projects to build so that we build
     // the minimal. Note that the 'Main' job will have built all functional tests not in the -Pdocker profile.
     build(
-      name: 'Docker - PostgreSQL/Tomcat/Firefox',
+      name: 'Docker - HSQLDB/Tomcat/Firefox',
       node: 'docker',
       profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=firefox -Dxwiki.test.ui.database=postgresql -Dxwiki.test.ui.servletEngine=tomcat',
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=firefox -Dxwiki.test.ui.database=hsqldb -Dxwiki.test.ui.servletEngine=tomcat',
       projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
     )
   }
@@ -164,7 +164,7 @@ def buildAll(builds)
           builds['Docker - MySQL/Tomcat/Chrome'].call()
         },
         'docker-postgresql-tomcat-firefox': {
-          builds['Docker - PostgreSQL/Tomcat/Firefox'].call()
+          builds['Docker - HSQLDB/Tomcat/Firefox'].call()
         }
       )
 

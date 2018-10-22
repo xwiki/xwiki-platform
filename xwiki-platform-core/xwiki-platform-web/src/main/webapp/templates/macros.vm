@@ -1417,9 +1417,9 @@ $Msz MB##
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
                 #if($isSortable)<a rel="${colname}">#end
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
+                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 $displayName
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
+                #if($isFilterable)</label>#end
                 #if($isSortable)</a>#end
                 #set($columnCount = $mathtool.add($columnCount, 1))
               </th>

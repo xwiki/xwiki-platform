@@ -195,7 +195,20 @@ public class BaseSearchResult extends XWikiResource
                         acceptedScopes++;
                         break;
                     case TITLE:
-                        f.format("upper(doc.title) like :keywords ");
+                        f.format("(upper(doc.title) like :keywords");
+                        if (isLocaleAware) {
+                            f.format(" and (");
+                            f.format("(doc.language = :locale or"
+                                    + " (doc.language = '' and doc.defaultLanguage = :locale)) ");
+                            f.format("or (doc.language = :language or"
+                                    + " (doc.language = '' and doc.defaultLanguage = :language)) ");
+                            f.format("or (doc.language = '' and not exists("
+                                    + " from XWikiDocument as doc2"
+                                    + " where doc2.fullName = doc.fullName"
+                                    + " and (doc2.language = :locale or doc2.language = :language)))"
+                                    + ")");
+                        }
+                        f.format(") ");
                         acceptedScopes++;
                         break;
                 }
@@ -253,7 +266,9 @@ public class BaseSearchResult extends XWikiResource
             Query query = this.queryManager.createQuery(queryString, Query.HQL)
                     .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                     .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start)
-                    .setLimit(number * 4); // Worst case scenario when making the locale aware query (see above)
+                    // Worst case scenario when making the locale aware query:
+                    // e.g.: Search matches a document translated in fr_CA and fr
+                    .setLimit(number * 2);
 
             if (space != null) {
                 query.bindValue("space", space);
@@ -311,7 +326,7 @@ public class BaseSearchResult extends XWikiResource
 
             /* Check if the user has the right to see the found document */
             if (xwikiApi.hasAccessLevel("view", pageId)) {
-                Document doc = xwikiApi.getDocument(pageFullName).getTranslatedDocument(language);
+                Document doc = xwikiApi.getDocument(pageFullName).getTranslatedDocument();
                 String title = doc.getDisplayTitle();
                 SearchResult searchResult = objectFactory.createSearchResult();
                 searchResult.setType("page");
@@ -350,7 +365,7 @@ public class BaseSearchResult extends XWikiResource
                 for (EntityReference entityReference : doc.getDocumentReference().getReversedReferenceChain()) {
                     HierarchyItem hierarchyItem = new HierarchyItem();
                     if (Arrays.asList(EntityType.SPACE, EntityType.DOCUMENT).contains(entityReference.getType())) {
-                        Document document = xwikiApi.getDocument(entityReference).getTranslatedDocument(language);
+                        Document document = xwikiApi.getDocument(entityReference).getTranslatedDocument();
                         hierarchyItem.setLabel(document.getPlainTitle());
                         hierarchyItem.setUrl(xwikiApi.getURL(document.getDocumentReferenceWithLocale()));
                     } else {

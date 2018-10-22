@@ -153,10 +153,8 @@ public class BaseSearchResult extends XWikiResource
 
         /* This try is just needed for executing the finally clause. */
         try {
-            List<SearchResult> result = new ArrayList<SearchResult>();
-
             if (keywords == null) {
-                return result;
+                return new ArrayList<>();
             }
 
             Formatter f = new Formatter();
@@ -173,11 +171,11 @@ public class BaseSearchResult extends XWikiResource
             }
 
             if (space != null) {
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
+                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language, doc.defaultLanguage");
                 f.format(addColumn);
                 f.format(" from XWikiDocument as doc where doc.space = :space and ( ");
             } else {
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
+                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language, doc.defaultLanguage");
                 f.format(addColumn);
                 f.format(" from XWikiDocument as doc where ( ");
             }
@@ -209,15 +207,10 @@ public class BaseSearchResult extends XWikiResource
 
             /* If we don't find any scope related to pages then return empty results */
             if (acceptedScopes == 0) {
-                return result;
+                return new ArrayList<>();
             }
 
             f.format(") ");
-
-            if (isLocaleAware) {
-                // The language of the default document is always "" and its default language is the actual language
-                f.format("and (doc.language = :language or (doc.language = '' and doc.defaultLanguage = :language)) ");
-            }
 
             /* Build the order clause. */
             String orderClause = null;
@@ -233,19 +226,34 @@ public class BaseSearchResult extends XWikiResource
             }
 
             // Add ordering
-            f.format("order by %s", orderClause);
+            if (isLocaleAware) {
+                // 1) Search pages using the user locale (e.g. fr_CA)
+                // 2) Search pages using the user language (e.g. if locale = fr_CA then language = fr)
+                // 3) Search pages using their default language
+                // 4) Search remaining pages
+                // Note: The language of the default document is always "" and its default language is the real language
+                orderClause = "case"
+                            + " when (doc.language = :locale or (doc.language = '' and doc.defaultLanguage ="
+                            + " :locale)) then '0'"
+                            + " when (doc.language = :language or (doc.language = '' and doc.defaultLanguage ="
+                            + " :language)) then '1'"
+                            + " when doc.language = '' then '2'"
+                            + " else '3'"
+                            + " end, "
+                            + orderClause;
+            }
 
+            f.format("order by %s", orderClause);
             String queryString = f.toString();
 
             Locale userLocale = contextProvider.get().getLocale();
             String locale = userLocale.toString();
             String language = userLocale.getLanguage();
-            Set<String> seenPages = new HashSet<>();
-            int limit = number;
 
-            Query query = this.queryManager.createQuery(queryString, Query.XWQL)
+            Query query = this.queryManager.createQuery(queryString, Query.HQL)
                     .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
-                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start).setLimit(number);
+                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start)
+                    .setLimit(number * 4); // Worst case scenario when making the locale aware query (see above)
 
             if (space != null) {
                 query.bindValue("space", space);
@@ -253,31 +261,11 @@ public class BaseSearchResult extends XWikiResource
 
             // Search only pages translated in the user locale (e.g. fr_CA)
             if (isLocaleAware) {
-                query.bindValue("language", locale);
-            }
-
-            result.addAll(getPagesSearchResults(query.execute(), wikiName, withPrettyNames, limit, isLocaleAware,
-                    seenPages));
-            limit = number - result.size();
-
-            // Search pages with the user language (e.g. if locale = fr_CA then language = fr)
-            if (limit > 0 && isLocaleAware && !locale.equals(language)) {
+                query.bindValue("locale", locale);
                 query.bindValue("language", language);
-                query.setLimit(limit);
-                result.addAll(getPagesSearchResults(query.execute(), wikiName, withPrettyNames, limit, isLocaleAware,
-                        seenPages));
-                limit = number - result.size();
             }
 
-            // Search pages with their default language
-            if (limit > 0 && isLocaleAware) {
-                query.bindValue("language", "");
-                query.setLimit(limit);
-                result.addAll(getPagesSearchResults(query.execute(), wikiName, withPrettyNames, limit, isLocaleAware,
-                        seenPages));
-            }
-
-            return result;
+            return getPagesSearchResults(query.execute(), wikiName, withPrettyNames, number, isLocaleAware);
         } finally {
             Utils.getXWikiContext(componentManager).setWikiId(database);
         }
@@ -290,16 +278,15 @@ public class BaseSearchResult extends XWikiResource
      * @param wikiName the wiki name
      * @param withPrettyNames render the author name
      * @param limit the maximum number of results
-     * @param withUniquePages only add none seen pages
-     * @param seenPages seen pages names
+     * @param withUniquePages add pages only once
      * @return the list of {@link SearchResult}
      * @throws XWikiException
      */
     protected List<SearchResult> getPagesSearchResults(List<Object> queryResult, String wikiName,
-            Boolean withPrettyNames, int limit, Boolean withUniquePages, Set<String> seenPages)
-            throws XWikiException
+            Boolean withPrettyNames, int limit, Boolean withUniquePages) throws XWikiException
     {
         List<SearchResult> result = new ArrayList<>();
+        Set<String> seenPages = new HashSet<>();
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 
         for (Object object : queryResult) {

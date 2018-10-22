@@ -97,13 +97,5 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed to display  the activities of the user -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 </project>

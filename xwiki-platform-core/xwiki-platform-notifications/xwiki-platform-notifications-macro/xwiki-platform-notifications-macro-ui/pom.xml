@@ -29,6 +29,11 @@
   </parent>
   <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
   <packaging>xar</packaging>
+  <description>Provide a macro to embed notifications in any page or to display a stream of events.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Notifications Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -47,6 +47,7 @@ user.profile.groups.title=My Groups
 user.profile.groups.description=Here are listed all the groups your user belongs to.
 user.profile.groups.table.group=Group
 platform.core.profile.category.groups=My Groups
+user.profile.notifications=Notifications
 user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
 user.profile.network.unfollow.question.yes=Yes, unfollow
 user.profile.network.unfollow.question.no=No, cancel

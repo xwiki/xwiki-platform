@@ -1403,16 +1403,8 @@ $Msz MB##
             #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
-                #set($isFilterable = true)
-              #else
-                #set($isFilterable = false)
-              #end
-              #if(("$!colprop.sortable" == '' || $colprop.sortable != false) && "$!colname" != '_actions')
-                #set($isSortable = true)
-              #else
-                #set($isSortable = false)
-              #end
+              #set($isFilterable = $colprop.filterable != false && "$!colname" != '_actions')
+              #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">

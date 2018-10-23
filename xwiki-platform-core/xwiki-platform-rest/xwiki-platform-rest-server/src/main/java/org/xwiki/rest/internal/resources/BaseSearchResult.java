@@ -223,10 +223,8 @@ public class BaseSearchResult extends XWikiResource
                 return new ArrayList<>();
             }
 
-            f.format(") ");
-
             /* Build the order clause. */
-            String orderClause = null;
+            String orderClause;
             if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
@@ -239,24 +237,7 @@ public class BaseSearchResult extends XWikiResource
             }
 
             // Add ordering
-            if (isLocaleAware) {
-                // 1) Search pages using the user locale (e.g. fr_CA)
-                // 2) Search pages using the user language (e.g. if locale = fr_CA then language = fr)
-                // 3) Search pages using their default language
-                // 4) Search remaining pages
-                // Note: The language of the default document is always "" and its default language is the real language
-                orderClause = "case"
-                            + " when (doc.language = :locale or (doc.language = '' and doc.defaultLanguage ="
-                            + " :locale)) then '0'"
-                            + " when (doc.language = :language or (doc.language = '' and doc.defaultLanguage ="
-                            + " :language)) then '1'"
-                            + " when doc.language = '' then '2'"
-                            + " else '3'"
-                            + " end, "
-                            + orderClause;
-            }
-
-            f.format("order by %s", orderClause);
+            f.format(") order by %s", orderClause);
             String queryString = f.toString();
 
             Locale userLocale = contextProvider.get().getLocale();

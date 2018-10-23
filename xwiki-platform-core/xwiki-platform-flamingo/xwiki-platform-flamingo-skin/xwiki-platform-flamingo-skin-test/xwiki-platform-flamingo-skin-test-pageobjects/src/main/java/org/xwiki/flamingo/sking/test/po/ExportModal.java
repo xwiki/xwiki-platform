@@ -40,7 +40,6 @@ public class ExportModal extends BaseModal
     public ExportModal()
     {
         super(By.id(EXPORT_MODAL_ID));
-        getDriver().waitUntilElementIsVisible(By.id(EXPORT_MODAL_ID));
     }
 
     /**
@@ -49,8 +48,10 @@ public class ExportModal extends BaseModal
      */
     public OtherFormatPane openOtherFormatPane()
     {
+        getDriver().waitUntilElementIsVisible(By.id(EXPORT_MODAL_ID));
         getDriver().findElementByLinkText(OTHER_FORMAT_PANE_LINK).click();
-        getDriver().waitUntilElementIsVisible(By.cssSelector("#exportModelOtherCollapse .panel-body"));
+
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#exportModelOtherCollapse.collapse.in"));
         return new OtherFormatPane();
     }
 

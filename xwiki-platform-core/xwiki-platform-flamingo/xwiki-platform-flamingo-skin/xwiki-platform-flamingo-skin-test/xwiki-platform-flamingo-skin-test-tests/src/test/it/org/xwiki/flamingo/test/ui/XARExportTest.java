@@ -89,10 +89,11 @@ public class XARExportTest extends AbstractTest
     private void exportXARAll() throws Exception
     {
         getUtil().loginAsSuperAdmin();
-        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
+        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        // modal created before the opening to avoid fade effect. (see BaseModal)
         ExportModal exportModal = new ExportModal();
+        viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
         OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
         assertTrue(otherFormatPane.isTreeAvailable());
@@ -125,10 +126,12 @@ public class XARExportTest extends AbstractTest
     public void exportXARLotOfSelectedFiles()
     {
         getUtil().loginAsSuperAdmin();
+
         ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        // modal created before the opening to avoid fade effect. (see BaseModal)
+        ExportModal exportModal = new ExportModal();
         viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
-        ExportModal exportModal = new ExportModal();
         OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
         assertTrue(otherFormatPane.isTreeAvailable());
         assertTrue(otherFormatPane.isExportAsXARButtonAvailable());
@@ -182,9 +185,10 @@ public class XARExportTest extends AbstractTest
     {
         getUtil().loginAsSuperAdmin();
         ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        // modal created before the opening to avoid fade effect. (see BaseModal)
+        ExportModal exportModal = new ExportModal();
         viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
-        ExportModal exportModal = new ExportModal();
         OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
         assertTrue(otherFormatPane.isTreeAvailable());
         assertTrue(otherFormatPane.isExportAsXARButtonAvailable());

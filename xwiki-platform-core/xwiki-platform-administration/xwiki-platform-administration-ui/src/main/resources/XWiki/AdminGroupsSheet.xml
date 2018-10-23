@@ -363,13 +363,13 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
       'inprogress'
     );
     $.post(createGroupURL, data).done(function() {
+      // Close the modal and refresh the groups live table.
+      createGroupModal.modal('hide');
+      window.livetable_groupstable.refresh();
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.create.done')),
         'done'
       ));
-      // Close the modal and refresh the groups live table.
-      createGroupModal.modal('hide');
-      window.livetable_groupstable.refresh();
     }).fail(function() {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.create.failed')),
@@ -458,12 +458,25 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
     }
     deleteGroupModal.find('.groupName').text(groupReference);
   }).find('.btn-danger').click(function() {
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('xe.admin.groups.delete.inProgress')),
+      'inprogress'
+    );
     $.post('', {
       xpage: 'deleteuorg',
       docname: deleteGroupModal.find('.groupName').text(),
       form_token: xm.form_token
     }).done(function() {
       deleteGroupModal.data('liveTable').deleteRow(deleteGroupModal.data('rowIndex'));
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.groups.delete.done')),
+        'done'
+      ));
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.groups.delete.failed')),
+        'error'
+      ));
     });
   });
 });</code>

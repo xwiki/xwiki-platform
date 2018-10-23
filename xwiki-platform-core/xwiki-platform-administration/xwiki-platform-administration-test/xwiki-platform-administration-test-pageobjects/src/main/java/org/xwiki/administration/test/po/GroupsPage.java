@@ -24,7 +24,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BasePage;
-import org.xwiki.test.ui.po.ConfirmationModal;
 import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
@@ -98,11 +97,11 @@ public class GroupsPage extends BasePage
         groupsLiveTable.filterColumn("xwiki-livetable-groupstable-filter-1", group);
     }
 
-    public ConfirmationModal clickDeleteGroup(String groupName)
+    public DeleteGroupConfirmationModal clickDeleteGroup(String groupName)
     {
         getDriver().findElementWithoutWaiting(By.xpath(String.format(GROUP_ACTION_XPATH_FORMAT, groupName, "delete")))
             .click();
-        return new ConfirmationModal(By.id("deleteGroupModal"));
+        return new DeleteGroupConfirmationModal();
     }
 
     public GroupsPage deleteGroup(String groupName)

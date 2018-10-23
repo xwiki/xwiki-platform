@@ -420,12 +420,25 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     }
     deleteUserModal.find('.userName').text(userReference);
   }).find('.btn-danger').click(function() {
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
+      'inprogress'
+    );
     $.post('', {
       xpage: 'deleteuorg',
       docname: deleteUserModal.find('.userName').text(),
       form_token: xm.form_token
     }).done(function() {
       deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),
+        'done'
+      ));
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.users.delete.failed')),
+        'error'
+      ));
     });
   });
 });</code>

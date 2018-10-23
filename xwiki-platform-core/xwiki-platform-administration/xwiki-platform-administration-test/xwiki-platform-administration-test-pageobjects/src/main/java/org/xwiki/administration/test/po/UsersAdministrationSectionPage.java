@@ -22,7 +22,6 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ConfirmationModal;
 import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
@@ -84,11 +83,11 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
         return this;
     }
 
-    public ConfirmationModal clickDeleteUser(String userName)
+    public DeleteUserConfirmationModal clickDeleteUser(String userName)
     {
         getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "delete")))
             .click();
-        return new ConfirmationModal(By.id("deleteUserModal"));
+        return new DeleteUserConfirmationModal();
     }
 
     public UsersAdministrationSectionPage deleteUser(String userName)

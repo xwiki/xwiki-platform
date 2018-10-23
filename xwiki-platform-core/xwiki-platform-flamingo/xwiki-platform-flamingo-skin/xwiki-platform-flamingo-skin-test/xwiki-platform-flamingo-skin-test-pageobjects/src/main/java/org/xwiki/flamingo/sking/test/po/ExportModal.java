@@ -23,6 +23,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
 
+import static org.xwiki.flamingo.sking.test.po.OtherFormatPane.CONTAINER_TREE_CLASS;
+
 /**
  * Represents the Export modal.
  *
@@ -49,8 +51,15 @@ public class ExportModal extends BaseModal
      */
     public OtherFormatPane openOtherFormatPane()
     {
-        getDriver().findElementByLinkText(OTHER_FORMAT_PANE_LINK).click();
-        getDriver().waitUntilElementIsVisible(By.cssSelector("#exportModelOtherCollapse .panel-body"));
+        WebElement linkPane = getDriver().findElementByLinkText(OTHER_FORMAT_PANE_LINK);
+        linkPane.click();
+
+        // sometimes it looks like the first click does not work.
+        if (linkPane.getAttribute("class").contains("collapsed")) {
+            linkPane.click();
+        }
+        By paneContent = By.className(CONTAINER_TREE_CLASS);
+        getDriver().waitUntilElementIsVisible(paneContent);
         return new OtherFormatPane();
     }
 

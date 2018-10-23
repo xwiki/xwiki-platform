@@ -78,6 +78,8 @@ public class XARExportTest extends AbstractTest
                 getUtil().rest().savePage(documentReference);
             }
         }
+        // change the timeout as it might take time to load all nodes
+        getDriver().setTimeout(20);
     }
 
     /*
@@ -139,9 +141,6 @@ public class XARExportTest extends AbstractTest
         root.open().waitForIt();
 
         assertEquals(16, root.getChildren().size());
-
-        // change the timeout as it might take time to load all nodes
-        getDriver().setTimeout(20);
 
         TreeNodeElement lastNode = null;
         int size = 0;

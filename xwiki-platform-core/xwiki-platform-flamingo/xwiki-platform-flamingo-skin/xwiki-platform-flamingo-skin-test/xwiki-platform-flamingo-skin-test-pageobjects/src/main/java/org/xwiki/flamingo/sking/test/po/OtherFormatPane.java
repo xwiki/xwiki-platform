@@ -35,8 +35,9 @@ import org.xwiki.tree.test.po.TreeElement;
  */
 public class OtherFormatPane extends BaseElement
 {
+    protected static final String CONTAINER_TREE_CLASS = "exportModalTreeContainer";
+
     private static final String FORM_ID = "export-form";
-    private static final String CONTAINER_TREE_CLASS = "exportModalTreeContainer";
     private static final String TREE_CLASS = "xtree";
     private static final String XAR_EXPORT_LINK_TEXT = "Export as XAR";
     private static final String VALUE_ATTR = "value";

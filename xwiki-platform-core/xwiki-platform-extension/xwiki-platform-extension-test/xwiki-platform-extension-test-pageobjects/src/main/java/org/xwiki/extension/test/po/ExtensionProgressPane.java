@@ -94,7 +94,11 @@ public class ExtensionProgressPane extends BaseElement
      */
     public UnusedPagesPane getUnusedPages()
     {
-        return new UnusedPagesPane(getDriver().findElementWithoutWaiting(container,
-            By.className("extension-question")));
+        if (getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(".extension-question .document-tree"))
+            .size() > 0) {
+            return new UnusedPagesPane(
+                getDriver().findElementWithoutWaiting(container, By.className("extension-question")));
+        }
+        return null;
     }
 }

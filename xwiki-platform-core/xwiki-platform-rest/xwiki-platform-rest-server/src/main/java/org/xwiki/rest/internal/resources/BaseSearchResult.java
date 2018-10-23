@@ -34,6 +34,7 @@ import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -88,7 +89,7 @@ public class BaseSearchResult extends XWikiResource
     private Provider<QueryFilter> hiddenSpaceFilterProvider;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    private LocalizationContext localizationContext;
 
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
@@ -240,7 +241,7 @@ public class BaseSearchResult extends XWikiResource
             f.format(") order by %s", orderClause);
             String queryString = f.toString();
 
-            Locale userLocale = contextProvider.get().getLocale();
+            Locale userLocale = localizationContext.getCurrentLocale();
             String locale = userLocale.toString();
             String language = userLocale.getLanguage();
 

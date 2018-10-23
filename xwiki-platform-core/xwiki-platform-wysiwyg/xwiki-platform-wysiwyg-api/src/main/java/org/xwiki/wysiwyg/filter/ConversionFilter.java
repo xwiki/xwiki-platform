@@ -89,8 +89,7 @@ public class ConversionFilter implements Filter
         // Take the list of request parameters that require HTML conversion.
         String[] parametersRequiringHTMLConversion = req.getParameterValues(REQUIRES_HTML_CONVERSION);
         if (parametersRequiringHTMLConversion != null) {
-            MutableServletRequestFactory mreqFactory =
-                Utils.getComponent((Type) MutableServletRequestFactory.class, req.getProtocol());
+            MutableServletRequestFactory mreqFactory = Utils.getComponent((Type) MutableServletRequestFactory.class);
             // Wrap the current request in order to be able to change request parameters.
             MutableServletRequest mreq = mreqFactory.newInstance(req);
             // Remove the list of request parameters that require HTML conversion to avoid recurrency.

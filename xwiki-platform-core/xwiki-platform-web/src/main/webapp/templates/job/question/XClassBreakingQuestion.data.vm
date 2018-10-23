@@ -62,11 +62,8 @@ $response.setContentType("application/json")
       #getReference($type, $element, $pageReference)
       #set ($pageDoc = $xwiki.getDocument($pageReference))
       #set ($title = $pageDoc.getPlainTitle())
-      #if ("$!title" == '')
-        #set ($title = $pageDoc.name)
-      #end
       #set ($serializedReference = $services.model.serialize($pageReference, 'local'))
-      #addData($type, $title, $serializedReference, $data)
+      #addData($type, $title, $serializedReference, $pageDoc, $data)
     #end
   #end
 #end
@@ -114,13 +111,17 @@ $response.setContentType("application/json")
  * @param $serializedReference the serialized local reference of the page
  * @param $data the array of data to fill
  *#
-#macro(addData $type $title $serializedReference $data)
+#macro(addData $type $title $serializedReference $pageDoc $data)
   #if ($type == 'xclass')
     #set ($discard = $data.add({
       'id': $serializedReference,
       'text': "$title ($serializedReference)",
       'icon': 'fa fa-file-o',
-      'children': true
+      'children': true,
+      'a_attr': {
+        'href': $pageDoc.getURL('view'),
+        'target': '_blank'
+      }
     }))
   #elseif ($type == 'freePages')
     #set ($discard = $data.add({

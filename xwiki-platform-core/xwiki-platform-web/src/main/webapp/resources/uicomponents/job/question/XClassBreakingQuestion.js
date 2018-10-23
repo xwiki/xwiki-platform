@@ -73,7 +73,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
     var uiQuestion = $(this);
 
     // we want this to be initialized only for the right question
-    if (uiQuestion.has('.deleteWarningXClass').length == 0) {
+    if (uiQuestion.hasClass('.deleteWarningXClass')) {
       return;
     }
 

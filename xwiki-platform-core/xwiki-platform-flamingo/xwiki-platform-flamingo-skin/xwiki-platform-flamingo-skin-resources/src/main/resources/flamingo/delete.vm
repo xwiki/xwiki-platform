@@ -67,9 +67,9 @@
 #######################################################
 #macro (displayDeleteJobStatus $deleteJobStatus)
   #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
-## TODO: allows question templates to inject the web resources they need
+  ## TODO: allows question templates to inject the web resources they need
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
-  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/ExtensionBreakingQuestion.js", true))
   #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/XClassBreakingQuestion.js", true))
   #set ($deleteJobState = $deleteJobStatus.state)

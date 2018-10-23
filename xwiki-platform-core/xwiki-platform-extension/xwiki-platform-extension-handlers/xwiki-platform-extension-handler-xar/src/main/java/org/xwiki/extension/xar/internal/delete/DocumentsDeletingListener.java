@@ -109,6 +109,8 @@ public class DocumentsDeletingListener extends AbstractEventListener
 
         // Ask a confirmation to the user if some pages belong to extensions
         if (!question.getExtensions().isEmpty()) {
+            // Conservative choice: we let the user enable the pages to delete.
+            question.unselectAll();
             try {
                 // The user can modify the question so it could disable some EntitySelection.
                 // We add a timeout because when a refactoring job is running, it prevents others to run.

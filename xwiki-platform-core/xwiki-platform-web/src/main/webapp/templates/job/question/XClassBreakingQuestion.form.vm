@@ -14,13 +14,10 @@
     </div>
     <div class="panel-body">
       <ul>
-        #foreach($page in $question.getXclassPages())
+        #foreach($page in $question.getXClassPages())
           #set ($pageReference = $page.entityReference)
           #set ($pageDoc = $xwiki.getDocument($pageReference))
           #set ($title = $pageDoc.getPlainTitle())
-          #if ("$!title" == '')
-            #set ($title = $pageDoc.name)
-          #end
           <li>$title ($services.model.serialize($pageReference, 'local'))</li>
         #end
       </ul>
@@ -32,6 +29,9 @@
 <div class="warningmessage deleteWarningXClass">
   <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title"))</strong></p>
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.explanation"))</p>
+  #if ($question.isObjectsPotentiallyHidden())
+  <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.objectsPotentiallyMissingWarning"))</p>
+  #end
   <p>$escapetool.xml($services.localization.render('job.question.XClassBreakingQuestion.confirm'))</p>
   <div class="panel panel-default">
     <div class="panel-heading">

@@ -57,7 +57,15 @@ public class XClassBreakingQuestion
      */
     private Set<EntitySelection> freePages;
 
+    /**
+     * If true, the refactoring is forbidden because the user is not an advanced user.
+     */
     private boolean refactoringForbidden;
+
+    /**
+     * If true, some objects might be not displayed.
+     */
+    private boolean objectsPotentiallyHidden;
 
     /**
      * @param concernedEntities the map of entities concerned by the refactoring
@@ -109,7 +117,9 @@ public class XClassBreakingQuestion
     public void unselectAll()
     {
         for (EntitySelection entitySelection : concernedEntities.values()) {
-            entitySelection.setSelected(false);
+            if (entitySelection.getState() == EntitySelection.State.UNKNOWN) {
+                entitySelection.setSelected(false);
+            }
         }
     }
 
@@ -179,6 +189,24 @@ public class XClassBreakingQuestion
     public void setRefactoringForbidden(boolean refactoringForbidden)
     {
         this.refactoringForbidden = refactoringForbidden;
+    }
+
+    /**
+     * @return true if there might have objects not retrieved because the request limit is reached.
+     */
+    public boolean isObjectsPotentiallyHidden()
+    {
+        return objectsPotentiallyHidden;
+    }
+
+    /**
+     * Specify if the request limit has been reached.
+     * @param objectsPotentiallyHidden true means that a supplementary warning will be displayed to specify that some
+     *  impacted objects may not be displayed.
+     */
+    public void setObjectsPotentiallyHidden(boolean objectsPotentiallyHidden)
+    {
+        this.objectsPotentiallyHidden = objectsPotentiallyHidden;
     }
 
     /**

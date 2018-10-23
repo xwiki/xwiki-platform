@@ -141,12 +141,15 @@ public class XClassDeletingListener extends AbstractEventListener
 
     private void checkIfDeleteIsAllowed(EntitySelection entitySelection, XClassBreakingQuestion question)
     {
+        int queryLimit = 25;
         DocumentReference classReference = (DocumentReference) entitySelection.getEntityReference();
         String query = "select distinct obj.name from BaseObject obj where obj.className=:className";
 
         String className = localSerializer.serialize(classReference);
         try {
+
             List<String> results = this.queryManager.createQuery(query, Query.HQL)
+                .setLimit(queryLimit)
                 .bindValue("className", className)
                 .setWiki(classReference.getWikiReference().getName())
                 .<String>execute();
@@ -154,6 +157,9 @@ public class XClassDeletingListener extends AbstractEventListener
             if (results.isEmpty()) {
                 question.markAsFreePage(entitySelection);
             } else {
+                if (results.size() == queryLimit) {
+                    question.setObjectsPotentiallyHidden(true);
+                }
                 for (String documentObjectName : results) {
                     EntityReference documentObjectReference = this.resolver.resolve(documentObjectName,
                         EntityType.DOCUMENT, classReference);

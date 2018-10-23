@@ -58,6 +58,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -129,6 +130,7 @@ public class XClassDeletingListenerTest
 
         Query query = mock(Query.class);
         when(queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(query.setLimit(anyInt())).thenReturn(query);
 
         Query query1 = mock(Query.class);
         when(query.bindValue("className", "a.xclass1")).thenReturn(query1);
@@ -238,6 +240,7 @@ public class XClassDeletingListenerTest
 
         Query query = mock(Query.class);
         when(queryManager.createQuery(any(),any())).thenReturn(query);
+        when(query.setLimit(anyInt())).thenReturn(query);
         when(query.bindValue(any(), any())).thenReturn(query);
         when(query.setWiki(any())).thenReturn(query);
         when(query.execute()).thenReturn(Arrays.asList("space.document"));
@@ -276,6 +279,7 @@ public class XClassDeletingListenerTest
 
         Query query = mock(Query.class);
         when(queryManager.createQuery(any(),any())).thenReturn(query);
+        when(query.setLimit(anyInt())).thenReturn(query);
         when(query.bindValue(any(), any())).thenReturn(query);
         when(query.setWiki(any())).thenReturn(query);
         when(query.execute()).thenReturn(Arrays.asList("space.document"));

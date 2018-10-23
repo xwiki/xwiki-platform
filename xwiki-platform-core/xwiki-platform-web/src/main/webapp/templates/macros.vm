@@ -2316,14 +2316,20 @@ function (row, i, table) {
 $string##
 #end
 
+#**
+ * Pulls all the JavaScript and CSS resources needed by pickers.
+ *#
+#macro (picker_import)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+#end
 
 #**
  * Pulls all the JavaScript and CSS resources needed by the user and group picker.
  *#
 #macro (userPicker_import)
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-    {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+  #picker_import
   #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js',
     {'forceSkinAction': true, 'language': $xcontext.locale}))
 #end
@@ -2348,6 +2354,24 @@ $string##
   #userPicker_input($multiSelect $parameters)
 #end
 
+
+#**
+* Pulls all the JavaScript and CSS resources needed by the page picker.
+*#
+#macro (pagePicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPages.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+#end
+
+#macro (pagePicker $parameters)
+  #pagePicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-pages"))
+  #suggestInput($parameters)
+#end
 
 #**
  * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the

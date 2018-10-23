@@ -404,6 +404,28 @@
                     "old": "method org.xwiki.rest.model.jaxb.PropertyValues org.xwiki.rest.resources.classes.ClassPropertyValuesResource::getClassPropertyValues(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.util.List<java.lang.String>) throws org.xwiki.rest.XWikiRestException",
                     "new": "method org.xwiki.rest.model.jaxb.PropertyValues org.xwiki.rest.resources.classes.ClassPropertyValuesResource::getClassPropertyValues(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.util.List<java.lang.String>, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
                     "justification": "Add an optional parameter to a REST API end point"
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.rest.model.jaxb.SearchResult",
+                    "new": "class org.xwiki.rest.model.jaxb.SearchResult",
+                    "annotationType": "javax.xml.bind.annotation.XmlType",
+                    "attribute": "propOrder",
+                    "oldValue": "{\"type\", \"id\", \"pageFullName\", \"title\", \"wiki\", \"space\", \"pageName\", \"modified\", \"author\", \"authorName\", \"version\", \"language\", \"className\", \"objectNumber\", \"filename\", \"score\", \"object\"}",
+                    "newValue": "{\"type\", \"id\", \"pageFullName\", \"title\", \"wiki\", \"space\", \"pageName\", \"modified\", \"author\", \"authorName\", \"version\", \"language\", \"className\", \"objectNumber\", \"filename\", \"score\", \"object\", \"hierarchy\"}",
+                    "justification": "Add a hierarchy property to the Search Result from the REST model"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.spaces.SpaceSearchResource::search(java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.spaces.SpaceSearchResource::search(java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
+                    "justification": "Add an optional parameter to a REST API end point"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikiSearchResource::search(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikiSearchResource::search(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
+                    "justification": "Add an optional parameter to a REST API end point"
                   }
                 ]
               }

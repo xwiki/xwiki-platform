@@ -126,6 +126,7 @@
 ##    DISPLAY SETTINGS
 #############################
 #macro(displaySettings)
+  (% id="HWikiProperties" %)
   = {{translation key="platform.wiki.sheet.title.settings"/}} =
   {{html wiki="true" clean="false"}}
   &lt;div class="xform"&gt;
@@ -164,6 +165,7 @@
 ##    DISPLAY ALIASES
 #############################
 #macro(displayAliases)
+  (% id="HWikiViewAliases" %)
   = {{translation key="platform.wiki.sheet.title.viewaliases"/}} =
   {{translation key="platform.wiki.sheet.aliases"/}}
   #if ($aliases.size() &gt; 1)
@@ -208,6 +210,7 @@
 ##   CREATE ALIAS FORM
 #############################
 #macro(createAliasForm)
+  (% id="HWikiCreateNewAlias" %)
   = {{translation key="platform.wiki.sheet.title.createnewalias"/}} =
   
   {{html}}

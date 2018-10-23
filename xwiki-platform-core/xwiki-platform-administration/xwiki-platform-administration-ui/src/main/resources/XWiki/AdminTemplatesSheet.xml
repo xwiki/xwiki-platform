@@ -39,6 +39,7 @@
   <content>{{velocity}}
 ## Create form, left column.
 (% class="col-xs-12 col-md-6" %)(((
+(% id="HAdminTemplatesCreateProvider" %)
 == {{translation key="admin.templates.createprovider"/}} ==
 
 {{html}}
@@ -106,6 +107,7 @@
     doc.fullName").execute())
 #if($availableProviders.size() &gt; 0)
   (% class="col-xs-12 col-md-6" %)(((
+  (% id="HAdminTemplatesProvidersList" %)
   == {{translation key="admin.templates.providerslist"/}} ==
 
     #foreach($providerFullname in $availableProviders)

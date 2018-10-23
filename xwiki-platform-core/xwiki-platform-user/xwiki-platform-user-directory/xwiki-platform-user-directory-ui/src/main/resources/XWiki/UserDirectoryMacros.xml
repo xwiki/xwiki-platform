@@ -224,6 +224,7 @@
     ##
     ## Customize form. Note: Using 2 forms to be able to do everything without JavaScript.
     ##
+    (% id="HUserDirectoryCustomizeColumns" %)
     == {{translation key="xe.userdirectory.customizeColumnsTitle"/}} ==
     {{html clean='false' wiki='true'}}
     &lt;form class='xform' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
@@ -280,6 +281,7 @@
     {{/html}}
     #if ($withPreview)
       ## Display the preview.
+      (% id="HUserDirectoryCustomizePreview" %)
       == {{translation key="xe.userdirectory.customizePreviewTitle"/}} ==
       #displayUserDirectory(false)
     #end

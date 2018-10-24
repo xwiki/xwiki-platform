@@ -287,7 +287,8 @@ public class BaseSearchResult extends XWikiResource
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 
         for (Object object : queryResult) {
-            if (limit <= 0) {
+            // Stop if there's a limit specified and we reach it.
+            if (limit > 0 && result.size() >= limit) {
                 break;
             }
 
@@ -361,7 +362,6 @@ public class BaseSearchResult extends XWikiResource
                 searchResult.setHierarchy(hierarchy);
 
                 result.add(searchResult);
-                limit--;
             }
         }
 

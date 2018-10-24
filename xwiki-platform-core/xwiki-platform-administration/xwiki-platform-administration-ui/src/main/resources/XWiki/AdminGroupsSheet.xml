@@ -149,6 +149,7 @@
 {{/velocity}}
 
 {{velocity}}
+{{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('XWiki.AdminGroupsSheet'))
 #set ($discard = $xwiki.jsx.use('XWiki.AdminGroupsSheet'))
 ## The following are needed when editing a group (e.g. for adding new members).
@@ -180,7 +181,6 @@
   ## afterwards.
   #set ($liveTableOptions.topFilters = "#groupScopeFilter")
 #end
-{{html clean="false"}}
 &lt;div class="medium-avatars"&gt;
   #livetable('groupstable' $columns $columnOptions $liveTableOptions)
 &lt;/div&gt;

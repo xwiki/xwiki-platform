@@ -51,7 +51,7 @@ import org.xwiki.refactoring.job.question.EntitySelection;
  * Listener that check if pages which are going to be deleted contain an XClass which is used somewhere in the wiki.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 @Component
 @Singleton

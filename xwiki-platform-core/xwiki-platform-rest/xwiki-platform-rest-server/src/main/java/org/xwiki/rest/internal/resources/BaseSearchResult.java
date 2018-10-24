@@ -172,11 +172,11 @@ public class BaseSearchResult extends XWikiResource
             }
 
             if (space != null) {
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language, doc.defaultLanguage");
+                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
                 f.format(addColumn);
                 f.format(" from XWikiDocument as doc where doc.space = :space and ( ");
             } else {
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language, doc.defaultLanguage");
+                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
                 f.format(addColumn);
                 f.format(" from XWikiDocument as doc where ( ");
             }

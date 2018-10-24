@@ -32,6 +32,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
+import org.xwiki.job.event.status.CancelableJobStatus;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -80,20 +82,19 @@ public class XClassDeletingListener extends AbstractEventListener
         super("XClass Deleting Listener", new DocumentsDeletingEvent());
     }
 
-    @Override
-    public void onEvent(Event event, Object source, Object data)
+    private XClassBreakingQuestion buildQuestion(Job job, CancelableEvent event, Object data)
     {
-        CancelableEvent cancelableEvent = (CancelableEvent) event;
-        if (cancelableEvent.isCanceled()) {
+        JobStatus jobStatus = job.getStatus();
+        if (event.isCanceled()
+            || jobStatus instanceof CancelableJobStatus && ((CancelableJobStatus) jobStatus).isCanceled()) {
             logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
-            return;
+            return null;
         }
 
-        Job job = (Job) source;
         if (!job.getRequest().isInteractive()) {
             logger
                 .warn("XClass deleting listener will not check the document in non-interactive mode.");
-            return;
+            return null;
         }
 
         // Check if some pages contain used XClass
@@ -105,6 +106,19 @@ public class XClassDeletingListener extends AbstractEventListener
             }
         }
 
+        return question;
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        Job job = (Job) source;
+        CancelableEvent cancelableEvent = (CancelableEvent) event;
+        XClassBreakingQuestion question = this.buildQuestion(job, cancelableEvent, data);
+
+        if (question == null) {
+            return;
+        }
         // Ask a confirmation to the user if some pages contain used XClass
         if (!question.getImpactedObjects().isEmpty()) {
 
@@ -143,7 +157,9 @@ public class XClassDeletingListener extends AbstractEventListener
     {
         int queryLimit = 25;
         DocumentReference classReference = (DocumentReference) entitySelection.getEntityReference();
-        String query = "select distinct obj.name from BaseObject obj where obj.className=:className";
+
+        String query = "select distinct obj.name from BaseObject obj where obj.className=:className "
+            + "order by obj.name asc";
 
         String className = localSerializer.serialize(classReference);
         try {

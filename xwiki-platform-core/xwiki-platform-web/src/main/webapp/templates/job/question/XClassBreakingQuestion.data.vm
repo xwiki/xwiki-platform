@@ -30,14 +30,14 @@ $response.setContentType("application/json")
     'icon': 'fa fa-eye',
     'children': false,
     'data': {
-    'type': 'pagination',
-    'validChildren': [],
-    'canDelete': true,
-    'offset': $newOffset
-  },
+      'type': 'pagination',
+      'validChildren': [],
+      'canDelete': true,
+      'offset': $newOffset
+    },
     'li_attr': {
-    'class': 'paginationNode'
-  }
+      'class': 'paginationNode'
+    }
   }))
 #end
 
@@ -63,7 +63,11 @@ $response.setContentType("application/json")
       #set ($pageDoc = $xwiki.getDocument($pageReference))
       #set ($title = $pageDoc.getPlainTitle())
       #set ($serializedReference = $services.model.serialize($pageReference, 'local'))
-      #addData($type, $title, $serializedReference, $pageDoc, $data)
+      #set ($selected = 'false')
+      #if ($type == 'xclass' || $type == 'freePages')
+        #set ($selected = $element.isSelected())
+      #end
+      #addData($type, $title, $serializedReference, $pageDoc, $selected, $data)
     #end
   #end
 #end
@@ -77,9 +81,9 @@ $response.setContentType("application/json")
  *#
 #macro(getCollection $type $question $collection)
   #if ($type == 'xclass')
-    #set ($collection = $question.xclassPages)
+    #set ($collection = $question.getXClassPages())
   #elseif ($type == 'freePages')
-    #set ($collection = $question.freePages)
+    #set ($collection = $question.getFreePages())
   #elseif ($type == 'objects')
     #set ($requestReference = $services.model.resolveDocument($request.id, 'current'))
     #set ($collection = $question.impactedObjects.get($requestReference))
@@ -111,16 +115,18 @@ $response.setContentType("application/json")
  * @param $serializedReference the serialized local reference of the page
  * @param $data the array of data to fill
  *#
-#macro(addData $type $title $serializedReference $pageDoc $data)
+#macro(addData $type $title $serializedReference $pageDoc $selected $data)
   #if ($type == 'xclass')
     #set ($discard = $data.add({
       'id': $serializedReference,
       'text': "$title ($serializedReference)",
       'icon': 'fa fa-file-o',
       'children': true,
-      'a_attr': {
-        'href': $pageDoc.getURL('view'),
-        'target': '_blank'
+      'state': {
+        'selected': $selected
+      },
+      'data': {
+        'link': $pageDoc.getURL('view')
       }
     }))
   #elseif ($type == 'freePages')
@@ -128,7 +134,10 @@ $response.setContentType("application/json")
       'id': $serializedReference,
       'text': "$title ($serializedReference)",
       'icon': 'fa fa-file-o',
-      'children': false
+      'children': false,
+      'state': {
+        'selected': $selected
+      }
     }))
   #elseif ($type == 'objects')
     #set ($discard = $data.add({

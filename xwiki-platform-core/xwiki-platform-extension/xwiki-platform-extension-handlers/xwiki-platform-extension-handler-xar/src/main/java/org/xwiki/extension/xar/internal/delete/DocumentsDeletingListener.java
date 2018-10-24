@@ -39,6 +39,8 @@ import org.xwiki.extension.xar.internal.delete.question.ExtensionBreakingQuestio
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.job.Job;
+import org.xwiki.job.event.status.CancelableJobStatus;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
@@ -78,23 +80,34 @@ public class DocumentsDeletingListener extends AbstractEventListener
         super("XAR Extension Documents Deleting Listener", EVENTS);
     }
 
-    @Override
-    public void onEvent(Event event, Object source, Object data)
-    {
-        CancelableEvent cancelableEvent = (CancelableEvent) event;
-        if (cancelableEvent.isCanceled()) {
+    private boolean shouldListenerBeTriggered(Job job, CancelableEvent event) {
+        JobStatus jobStatus = job.getStatus();
+        if (event.isCanceled()
+            || jobStatus instanceof CancelableJobStatus && ((CancelableJobStatus) jobStatus).isCanceled()) {
             logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
-            return;
+            return false;
         }
 
         if (this.configuration.getDocumentProtection() == DocumentProtection.NONE) {
-            return;
+            return false;
         }
 
-        Job job = (Job) source;
         if (!job.getRequest().isInteractive()) {
             logger
                 .warn("XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        Job job = (Job) source;
+        CancelableEvent cancelableEvent = (CancelableEvent) event;
+
+        if (!this.shouldListenerBeTriggered(job, cancelableEvent)) {
             return;
         }
 

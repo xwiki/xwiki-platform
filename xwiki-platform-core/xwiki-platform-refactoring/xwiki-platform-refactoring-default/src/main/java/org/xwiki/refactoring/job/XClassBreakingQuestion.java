@@ -21,6 +21,8 @@ package org.xwiki.refactoring.job;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -94,9 +96,15 @@ public class XClassBreakingQuestion
      */
     public void markImpactedObject(EntitySelection entitySelection, EntityReference documentObjectName)
     {
-        EntityReference xclassDocReference = entitySelection.getEntityReference();
+        DocumentReference xclassDocReference = (DocumentReference) entitySelection.getEntityReference();
+
+        // we don't want the locale for the XClass reference
+        if (xclassDocReference.getLocale() != null) {
+            xclassDocReference = new DocumentReference(xclassDocReference, (Locale) null);
+        }
+
         if (!this.impactedObjects.containsKey(xclassDocReference)) {
-            this.impactedObjects.put(xclassDocReference, new HashSet<>());
+            this.impactedObjects.put(xclassDocReference, new LinkedHashSet<>());
             this.xclassPages.add(entitySelection);
         }
 

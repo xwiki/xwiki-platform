@@ -241,10 +241,6 @@ public class BaseSearchResult extends XWikiResource
             f.format(") order by %s", orderClause);
             String queryString = f.toString();
 
-            Locale userLocale = localizationContext.getCurrentLocale();
-            String locale = userLocale.toString();
-            String language = userLocale.getLanguage();
-
             Query query = this.queryManager.createQuery(queryString, Query.HQL)
                     .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                     .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start)
@@ -257,9 +253,10 @@ public class BaseSearchResult extends XWikiResource
             }
 
             // Search only pages translated in the user locale (e.g. fr_CA)
-            if (isLocaleAware) {
-                query.bindValue("locale", locale);
-                query.bindValue("language", language);
+            if (isLocaleAware && searchScopes.contains(SearchScope.TITLE)) {
+                Locale userLocale = localizationContext.getCurrentLocale();
+                query.bindValue("locale", userLocale.toString());
+                query.bindValue("language", userLocale.getLanguage());
             }
 
             return getPagesSearchResults(query.execute(), wikiName, withPrettyNames, number, isLocaleAware);

@@ -48,10 +48,11 @@
 {{/html}}
 
 #else
-  #set($results = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = ?").bindValues([$email.toLowerCase()]).execute())
+  #set($query = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = ?").bindValues([$email.toLowerCase()]))
+  #set($results = $query.execute())
   ## If local user does not exist check global user
-  #if($results.size() == 0)
-    #set($results = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = ?").bindValues([$email.toLowerCase()]).setWiki('xwiki').execute())
+  #if($results.size() == 0 &amp;&amp; ${xcontext.database} != ${xcontext.mainWikiName})
+    #set($results = $query.setWiki("${xcontext.mainWikiName}").execute())
   #end
   #if($results.size() == 0)
     {{translation key="xe.admin.forgotUsername.error.noAccount"/}}

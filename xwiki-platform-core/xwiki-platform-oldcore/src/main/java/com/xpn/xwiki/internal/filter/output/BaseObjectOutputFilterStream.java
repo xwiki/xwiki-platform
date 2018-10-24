@@ -39,6 +39,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * @version $Id$
@@ -58,6 +59,8 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
     private Provider<XWikiContext> xcontextProvider;
 
     private BaseObject externalEntity;
+
+    private BaseClass currentXClass;
 
     @Override
     public void initialize() throws InitializationException
@@ -85,6 +88,7 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
 
     private void setCurrentXClass(BaseClass xclass)
     {
+        this.currentXClass = xclass;
         getBasePropertyOutputFilterStream().setCurrentXClass(xclass);
     }
 
@@ -172,6 +176,16 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
     @Override
     public void endWikiObject(String name, FilterEventParameters parameters) throws FilterException
     {
+        // Add missing properties from the class
+        if (this.entity != null && this.currentXClass != null) {
+            for (String key : this.currentXClass.getPropertyList()) {
+                if (this.entity.safeget(key) == null) {
+                    PropertyClass classProperty = (PropertyClass) this.currentXClass.getField(key);
+                    this.entity.safeput(key, classProperty.newProperty());
+                }
+            }
+        }
+
         super.endWikiObject(name, parameters);
 
         getBaseClassOutputFilterStream().disable();

@@ -31,7 +31,7 @@ import org.openqa.selenium.support.FindBy;
  * @since 7.4.1
  * @since 8.0M1
  */
-public class CopyOrRenameStatusPage extends BasePage
+public class CopyOrRenameOrDeleteStatusPage extends BasePage
 {
     @FindBy(css = ".job-status .col-lg-6:first-child .breadcrumb > li:last-child a")
     private WebElement oldPage;
@@ -47,7 +47,7 @@ public class CopyOrRenameStatusPage extends BasePage
      * 
      * @return this page
      */
-    public CopyOrRenameStatusPage waitUntilFinished()
+    public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
     {
         getDriver().waitUntilElementDisappears(By.cssSelector(".job-status .ui-progress"));
         return this;

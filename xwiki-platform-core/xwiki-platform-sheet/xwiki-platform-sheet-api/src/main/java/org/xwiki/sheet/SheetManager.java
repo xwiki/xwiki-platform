@@ -57,7 +57,7 @@ public interface SheetManager
      * controlled using the URL {@code sheet} parameter;
      * 
      * @return true if the sheet system should be used
-     * @since 10.9RC1
+     * @since 10.9
      */
     default boolean isSheetForced()
     {

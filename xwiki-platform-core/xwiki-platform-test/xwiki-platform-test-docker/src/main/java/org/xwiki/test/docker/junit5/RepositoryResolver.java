@@ -41,7 +41,7 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
  * Handle Repository-related code.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public final class RepositoryResolver
 {

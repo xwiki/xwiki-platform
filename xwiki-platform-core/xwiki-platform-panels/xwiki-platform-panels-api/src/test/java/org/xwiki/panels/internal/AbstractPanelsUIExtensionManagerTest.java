@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link AbstractPanelsUIExtensionManager}.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 @ComponentTest
 public class AbstractPanelsUIExtensionManagerTest

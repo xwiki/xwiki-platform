@@ -42,7 +42,7 @@ import org.xwiki.tool.extension.util.ExtensionMojoHelper;
  * Generates a minimal XWiki WAR that is expanded in the passed target directory.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class WARBuilder
 {

@@ -44,7 +44,7 @@ import org.xwiki.rest.model.jaxb.JobRequest;
  * them as an extension inside a running XWiki.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class ExtensionInstaller
 {

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * Debug the Maven dependency resolution nodes by printing them.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class DebuggingDependencyVisitor implements DependencyVisitor
 {

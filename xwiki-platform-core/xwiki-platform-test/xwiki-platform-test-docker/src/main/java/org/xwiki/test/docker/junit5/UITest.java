@@ -49,19 +49,19 @@ public @interface UITest
 
     /**
      * @return the database to use, see {@link Database}
-     * @since 10.9RC1
+     * @since 10.9
      */
     Database database() default Database.SYSTEM;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
-     * @since 10.9RC1
+     * @since 10.9
      */
     ServletEngine servletEngine() default ServletEngine.SYSTEM;
 
     /**
      * @return true if the test should be started in debug mode, false otherwise
-     * @since 10.9RC1
+     * @since 10.9
      */
     boolean debug() default false;
 }

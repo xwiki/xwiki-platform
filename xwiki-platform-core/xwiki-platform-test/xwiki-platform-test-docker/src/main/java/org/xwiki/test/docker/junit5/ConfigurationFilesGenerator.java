@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * Generate XWiki config files for a given database and a given version of XWiki.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class ConfigurationFilesGenerator
 {

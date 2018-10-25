@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.BaseModal;
  * Represents the Create Group modal.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class CreateGroupModal extends BaseModal
 {

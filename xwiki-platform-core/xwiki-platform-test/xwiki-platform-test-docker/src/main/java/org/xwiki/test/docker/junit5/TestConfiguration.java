@@ -23,7 +23,7 @@ package org.xwiki.test.docker.junit5;
  * Configuration options for the test.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class TestConfiguration
 {

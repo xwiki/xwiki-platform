@@ -824,7 +824,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since 10.9RC1
+     * @since 10.9
      * @since 10.8.1
      */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, String values, String defaultValue)
@@ -866,7 +866,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since 10.9RC1
+     * @since 10.9
      * @since 10.8.1
      */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,

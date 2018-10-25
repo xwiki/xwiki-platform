@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.AbstractRegistrationPage;
  * Represents a registration page in a modal.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class RegistrationModal extends AbstractRegistrationPage
 {

@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * Resolves Maven Artifacts either from a remote repository or from a local POM file.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public final class ArtifactResolver
 {

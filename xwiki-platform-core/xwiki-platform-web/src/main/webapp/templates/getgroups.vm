@@ -33,7 +33,7 @@
   #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
     #set ($wikiName = 'local')
   #end
-  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9RC1
+  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
   #set ($row = {
     'username': $group.name,
     'fullname': $group.fullName,

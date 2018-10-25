@@ -25,7 +25,7 @@ import java.util.Date;
  * The state of a location (is it watched or not) associated with a starting date if the location is watched.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  * @since 10.8.1
  */
 public class WatchedLocationState

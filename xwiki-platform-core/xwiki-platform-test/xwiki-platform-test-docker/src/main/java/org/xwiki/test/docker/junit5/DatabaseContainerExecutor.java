@@ -31,7 +31,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
  * Create and execute the Docker database container for the tests.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class DatabaseContainerExecutor
 {

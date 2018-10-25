@@ -84,7 +84,7 @@ public class ExportAction extends XWikiAction
      * Manage the arguments of the export and provides them in an object to simplify their usage in the different
      * methods.
      *
-     * @since 10.9RC1
+     * @since 10.9
      */
     private class ExportArguments
     {

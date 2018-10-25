@@ -37,7 +37,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  * Create and execute the Docker Servlet engine container for the tests.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class ServletContainerExecutor
 {

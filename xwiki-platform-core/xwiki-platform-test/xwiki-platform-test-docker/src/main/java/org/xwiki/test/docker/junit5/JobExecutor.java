@@ -39,7 +39,7 @@ import org.xwiki.rest.model.jaxb.JobStatus;
  * Execute a Job to call the XWiki REST endpoint to install extensions.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class JobExecutor
 {

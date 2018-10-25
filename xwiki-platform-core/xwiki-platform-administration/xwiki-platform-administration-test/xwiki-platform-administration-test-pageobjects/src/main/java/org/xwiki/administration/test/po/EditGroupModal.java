@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
  * Represents the edit group modal.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class EditGroupModal extends BaseModal
 {

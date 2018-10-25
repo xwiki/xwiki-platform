@@ -40,6 +40,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -112,6 +113,26 @@ public class DefaultModelBridge implements ModelBridge
     @Inject
     @Named("explicit")
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
+
+    /**
+     * Used to check the old and new parents reference.
+     */
+    @Inject
+    private DocumentReferenceResolver<EntityReference> entityReferenceDocumentReferenceResolver;
+
+    /**
+     * Used to create the minimum need parent reference.
+     */
+    @Inject
+    @Named("compact")
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
+
+    /**
+     * Use to get back a relative reference based on a compact string reference.
+     */
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
 
     @Inject
     private JobProgressManager progressManager;
@@ -361,8 +382,18 @@ public class DefaultModelBridge implements ModelBridge
             // More information: https://jira.xwiki.org/browse/XWIKI-13493
             if (!parentChildConfiguration.isParentChildMechanismEnabled()) {
                 DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
-                if (!hierarchicalParent.equals(document.getParentReference())) {
-                    document.setParentReference(hierarchicalParent.getLocalDocumentReference());
+                DocumentReference oldParent = document.getParentReference();
+
+                DocumentReference hierarchicalParentDoc = this.entityReferenceDocumentReferenceResolver
+                    .resolve(hierarchicalParent);
+                DocumentReference oldParentDoc = this.entityReferenceDocumentReferenceResolver.resolve(oldParent);
+
+                if (!hierarchicalParentDoc.equals(oldParentDoc)) {
+                    String parentSerializedReference = this.compactEntityReferenceSerializer
+                        .serialize(hierarchicalParent, documentReference);
+
+                    document.setParentReference(this.relativeStringEntityReferenceResolver
+                        .resolve(parentSerializedReference, EntityType.DOCUMENT));
                     save = true;
                 }
             }

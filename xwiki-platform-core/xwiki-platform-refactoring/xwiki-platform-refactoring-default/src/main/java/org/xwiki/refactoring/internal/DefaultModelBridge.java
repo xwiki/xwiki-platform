@@ -375,7 +375,7 @@ public class DefaultModelBridge implements ModelBridge
             if (!parentChildConfiguration.isParentChildMechanismEnabled()) {
                 DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
                 if (!hierarchicalParent.equals(document.getParentReference())) {
-                    document.setParentReference(hierarchicalParent);
+                    document.setParentReference(hierarchicalParent.getLocalDocumentReference());
                     save = true;
                 }
             }

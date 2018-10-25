@@ -47,5 +47,16 @@ user.profile.groups.title=Mes groupes
 user.profile.groups.description=Groupes auxquels votre compte appartient.
 user.profile.groups.table.group=Groupe
 platform.core.profile.category.groups=Mes groupes
+user.profile.notifications=Notifications
+user.profile.network.unfollow.question=Êtes-vous certain de ne plus vouloir suivre cet utilisateur ?
+user.profile.network.unfollow.question.yes=Oui, ne plus suivre
+user.profile.network.unfollow.question.no=Non, annuler
+user.profile.network.following=Vous suivez
+user.profile.network.notfollowing=Vous ne suivez pas
+user.profile.network.follow=Commencer à suivre
+user.profile.network.unfollow=Arrêter de suivre
+user.profile.network.done=Terminé
+user.profile.network.saving=Enregistrement…
+### Missing: user.profile.network.error=Error saving the notification setting
 </content>
 </xwikidoc>

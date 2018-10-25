@@ -81,9 +81,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
     }
 
     private boolean shouldListenerBeTriggered(Job job, CancelableEvent event) {
-        JobStatus jobStatus = job.getStatus();
-        if (event.isCanceled()
-            || jobStatus instanceof CancelableJobStatus && ((CancelableJobStatus) jobStatus).isCanceled()) {
+        if (event.isCanceled()) {
             logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
             return false;
         }
@@ -120,6 +118,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
             }
         }
 
+        JobStatus jobStatus = job.getStatus();
         // Ask a confirmation to the user if some pages belong to extensions
         if (!question.getExtensions().isEmpty()) {
             // Conservative choice: we let the user enable the pages to delete.
@@ -128,7 +127,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
                 // The user can modify the question so it could disable some EntitySelection.
                 // We add a timeout because when a refactoring job is running, it prevents others to run.
                 // 5 minutes is probably enough for the user to decide if the process should go on.
-                boolean ack = job.getStatus().ask(question, 5, TimeUnit.MINUTES);
+                boolean ack = jobStatus.ask(question, 5, TimeUnit.MINUTES);
                 if (!ack) {
                     // Without any confirmation, we must cancel the operation.
                     String message = "The question has been asked, however no answer has been received.";
@@ -138,6 +137,16 @@ public class DocumentsDeletingListener extends AbstractEventListener
             } catch (InterruptedException e) {
                 this.logger.warn("Confirm question has been interrupted.");
                 cancelableEvent.cancel("Question has been interrupted.");
+            }
+            // we always want the event and the CancelableJobStatus to be consistent
+            if (jobStatus instanceof CancelableJobStatus) {
+                CancelableJobStatus cancelableJobStatus = (CancelableJobStatus) jobStatus;
+                if (cancelableJobStatus.isCanceled()) {
+                    cancelableEvent.cancel();
+                }
+                if (cancelableEvent.isCanceled()) {
+                    cancelableJobStatus.cancel();
+                }
             }
         }
     }

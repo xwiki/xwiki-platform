@@ -84,9 +84,7 @@ public class XClassDeletingListener extends AbstractEventListener
 
     private XClassBreakingQuestion buildQuestion(Job job, CancelableEvent event, Object data)
     {
-        JobStatus jobStatus = job.getStatus();
-        if (event.isCanceled()
-            || jobStatus instanceof CancelableJobStatus && ((CancelableJobStatus) jobStatus).isCanceled()) {
+        if (event.isCanceled()) {
             logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
             return null;
         }
@@ -121,7 +119,7 @@ public class XClassDeletingListener extends AbstractEventListener
         }
         // Ask a confirmation to the user if some pages contain used XClass
         if (!question.getImpactedObjects().isEmpty()) {
-
+            JobStatus jobStatus = job.getStatus();
             try {
                 if (this.documentAccessBridge.isAdvancedUser(job.getRequest().getProperty("user.reference"))) {
                     // Conservative choice: we let the user enable the pages to delete.
@@ -140,7 +138,7 @@ public class XClassDeletingListener extends AbstractEventListener
                     question.setRefactoringForbidden(true);
                     // we don't want the user to answer the question,
                     // but we want to display that his action is forbidden.
-                    boolean ack = job.getStatus().ask(question, 1, TimeUnit.MINUTES);
+                    boolean ack = jobStatus.ask(question, 1, TimeUnit.MINUTES);
                     if (!ack) {
                         String message = "The question has been canceled because this refactoring is forbidden.";
                         cancelableEvent.cancel(message);
@@ -149,6 +147,16 @@ public class XClassDeletingListener extends AbstractEventListener
             } catch (InterruptedException e) {
                 this.logger.warn("Confirm question has been interrupted.");
                 cancelableEvent.cancel("Question has been interrupted.");
+            }
+            // we always want the event and the CancelableJobStatus to be consistent
+            if (jobStatus instanceof CancelableJobStatus) {
+                CancelableJobStatus cancelableJobStatus = (CancelableJobStatus) jobStatus;
+                if (cancelableJobStatus.isCanceled()) {
+                    cancelableEvent.cancel();
+                }
+                if (cancelableEvent.isCanceled()) {
+                    cancelableJobStatus.cancel();
+                }
             }
         }
     }

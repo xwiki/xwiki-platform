@@ -56,7 +56,7 @@ user.profile.network.notfollowing=Vous ne suivez pas
 user.profile.network.follow=Commencer à suivre
 user.profile.network.unfollow=Arrêter de suivre
 user.profile.network.done=Terminé
-user.profile.network.saving=Enregistrement…
-### Missing: user.profile.network.error=Error saving the notification setting
+user.profile.network.saving=Enregistrement en cours…
+user.profile.network.error=Erreur à l'enregistrement des paramètres de notification
 </content>
 </xwikidoc>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tree</artifactId>
   <name>XWiki Platform - Tree - Parent POM</name>

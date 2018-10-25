@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -57,8 +58,13 @@ public class DatePicker extends BaseElement
      */
     public DatePicker setYear(String year)
     {
-        Select yearSelector = new Select(container.findElement(By.className("year")));
-        yearSelector.selectByVisibleText(year);
+        WebElement yearElement = this.container.findElement(By.className("year"));
+        new Select(yearElement).selectByVisibleText(year);
+        // In some cases (like for instance when the browser window is not maximized) the select drop down is not
+        // closed after the value is selected. As a consequence the next click will just close the drop down instead of
+        // doing the expected behavior (e.g. selecting the day after selecting the year may have no effect). We should
+        // revisit this after we upgrade Selenium.
+        yearElement.sendKeys(Keys.ESCAPE);
         return this;
     }
 
@@ -79,8 +85,10 @@ public class DatePicker extends BaseElement
      */
     public DatePicker setMonth(String month)
     {
-        Select monthSelector = new Select(container.findElement(By.className("month")));
-        monthSelector.selectByVisibleText(month);
+        WebElement monthElement = this.container.findElement(By.className("month"));
+        new Select(monthElement).selectByVisibleText(month);
+        // See the comment in #setYear()
+        monthElement.sendKeys(Keys.ESCAPE);
         return this;
     }
 

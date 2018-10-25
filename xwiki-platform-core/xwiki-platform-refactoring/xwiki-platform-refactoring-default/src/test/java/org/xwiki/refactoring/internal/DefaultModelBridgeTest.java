@@ -302,7 +302,8 @@ public class DefaultModelBridgeTest
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome"));
+        verify(document).setParentReference(
+            new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome").getLocalDocumentReference());
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
@@ -317,7 +318,8 @@ public class DefaultModelBridgeTest
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(new DocumentReference("wiki", "Path", "WebHome"));
+        verify(document).setParentReference(
+            new DocumentReference("wiki", "Path", "WebHome").getLocalDocumentReference());
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
@@ -332,7 +334,8 @@ public class DefaultModelBridgeTest
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(new DocumentReference("wiki", "Main", "WebHome"));
+        verify(document).setParentReference(
+            new DocumentReference("wiki", "Main", "WebHome").getLocalDocumentReference());
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }

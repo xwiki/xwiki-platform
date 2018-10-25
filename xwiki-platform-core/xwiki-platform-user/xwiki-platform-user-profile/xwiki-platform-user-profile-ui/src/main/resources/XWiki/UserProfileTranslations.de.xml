@@ -46,5 +46,16 @@
 ### Missing: user.profile.groups.title=My Groups
 ### Missing: user.profile.groups.description=Here are listed all the groups your user belongs to.
 ### Missing: user.profile.groups.table.group=Group
-### Missing: platform.core.profile.category.groups=My Groups</content>
+### Missing: platform.core.profile.category.groups=My Groups
+### Missing: user.profile.notifications=Notifications
+### Missing: user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
+### Missing: user.profile.network.unfollow.question.yes=Yes, unfollow
+### Missing: user.profile.network.unfollow.question.no=No, cancel
+### Missing: user.profile.network.following=Following
+### Missing: user.profile.network.notfollowing=Not following
+### Missing: user.profile.network.follow=Start following
+### Missing: user.profile.network.unfollow=Stop following
+### Missing: user.profile.network.done=Done
+### Missing: user.profile.network.saving=Saving...
+### Missing: user.profile.network.error=Error saving the notification setting</content>
 </xwikidoc>

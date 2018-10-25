@@ -123,7 +123,7 @@ macroSelector.select=Sélectionner
 
 macroEditor.title=Editer Macro
 macroEditor.more=Plus
-macroEditor.changeMacro=Modifier Macro
+macroEditor.changeMacro=Changer de Macro
 macroEditor.submit=Envoyer
 macroEditor.content=Contenu
 macroEditor.noParameters=Cette macro n'a aucun paramètres.

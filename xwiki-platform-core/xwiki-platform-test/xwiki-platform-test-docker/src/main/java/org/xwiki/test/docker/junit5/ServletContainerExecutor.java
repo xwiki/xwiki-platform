@@ -52,8 +52,9 @@ public class ServletContainerExecutor
         GenericContainer servletContainer;
         switch (testConfiguration.getServletEngine()) {
             case TOMCAT:
-                // Configure Tomcat logging for debugging
+                // Configure Tomcat logging for debugging. Create a logging.properties file
                 File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
+                logFile.createNewFile();
                 try (FileWriter writer = new FileWriter(logFile)) {
                     IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
                         + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "

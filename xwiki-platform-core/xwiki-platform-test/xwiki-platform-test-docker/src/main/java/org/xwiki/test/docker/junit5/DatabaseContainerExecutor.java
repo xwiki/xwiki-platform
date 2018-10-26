@@ -58,10 +58,13 @@ public class DatabaseContainerExecutor
                     .withDatabaseName(DBNAME)
                     .withUsername(DBUSERNAME)
                     .withPassword(DBPASSWORD)
-                    .withExposedPorts(3306)
+                    .withExposedPorts(3306);
+
+                if (testConfiguration.isDatabaseDataSaved()) {
                     // This allows re-running the test with the database already provisioned without having to redo
                     // the provisioning. Running "mvn clean" will remove the database data.
-                    .withFileSystemBind("./target/mysql", "/var/lib/mysql");
+                    databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
+                }
 
                 databaseContainer.addParameter("character-set-server", "utf8");
                 databaseContainer.addParameter("collation-server", "utf8_bin");
@@ -75,10 +78,13 @@ public class DatabaseContainerExecutor
                 databaseContainer = new PostgreSQLContainer<>()
                     .withDatabaseName(DBNAME)
                     .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD)
+                    .withPassword(DBPASSWORD);
+
+                if (testConfiguration.isDatabaseDataSaved()) {
                     // This allows re-running the test with the database already provisioned without having to redo
                     // the provisioning. Running "mvn clean" will remove the database data.
-                    .withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
+                    databaseContainer.withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
+                }
 
                 databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
 

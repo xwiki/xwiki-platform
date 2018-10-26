@@ -27,6 +27,8 @@ package org.xwiki.test.docker.junit5;
  */
 public class TestConfiguration
 {
+    private static final String FALSE = "false";
+
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
 
     private static final String DATABASE_PROPERTY = "xwiki.test.ui.database";
@@ -34,6 +36,8 @@ public class TestConfiguration
     private static final String SERVLETENGINE_PROPERTY = "xwiki.test.ui.servletEngine";
 
     private static final String DEBUG_PROPERTY = "xwiki.test.ui.debug";
+
+    private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
     private UITest uiTestAnnotation;
 
@@ -45,6 +49,8 @@ public class TestConfiguration
 
     private boolean debug;
 
+    private boolean saveDatabaseData;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -55,6 +61,7 @@ public class TestConfiguration
         resolveDatabase();
         resolveServletEngine();
         resolveDebug();
+        resolveSaveDatabaseData();
     }
 
     private void resolveBrowser()
@@ -89,9 +96,18 @@ public class TestConfiguration
     {
         boolean newDebug = this.uiTestAnnotation.debug();
         if (!newDebug) {
-            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, "false"));
+            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, FALSE));
         }
         this.debug = newDebug;
+    }
+
+    private void resolveSaveDatabaseData()
+    {
+        boolean newSaveDatabaseData = this.uiTestAnnotation.saveDatabaseData();
+        if (!newSaveDatabaseData) {
+            newSaveDatabaseData = Boolean.valueOf(System.getProperty(SAVEDBDATA_PROPERTY, FALSE));
+        }
+        this.saveDatabaseData = newSaveDatabaseData;
     }
 
     /**
@@ -124,5 +140,14 @@ public class TestConfiguration
     public boolean isDebug()
     {
         return this.debug;
+    }
+
+    /**
+     * @return true true if the database data should be mapped to a local directory on the host computer so that it can
+     *         be saved and reused for another run
+     */
+    public boolean isDatabaseDataSaved()
+    {
+        return this.saveDatabaseData;
     }
 }

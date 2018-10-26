@@ -64,4 +64,11 @@ public @interface UITest
      * @since 10.9
      */
     boolean debug() default false;
+
+    /**
+     * @return true if the database data should be mapped to a local directory on the host computer so that it can
+     *         be saved and reused for another run
+     * @since 10.10RC1
+     */
+    boolean saveDatabaseData() default false;
 }

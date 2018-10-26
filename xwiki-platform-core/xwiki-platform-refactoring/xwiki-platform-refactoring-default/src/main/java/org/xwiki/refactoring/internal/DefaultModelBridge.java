@@ -114,12 +114,6 @@ public class DefaultModelBridge implements ModelBridge
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
     /**
-     * Used to check the old and new parents reference.
-     */
-    @Inject
-    private DocumentReferenceResolver<EntityReference> entityReferenceDocumentReferenceResolver;
-
-    /**
      * Used to create the minimum need parent reference.
      */
     @Inject
@@ -132,6 +126,9 @@ public class DefaultModelBridge implements ModelBridge
     @Inject
     @Named("relative")
     private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
+
+    @Inject
+    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
 
     @Inject
     private JobProgressManager progressManager;
@@ -371,7 +368,8 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void update(DocumentReference documentReference, Map<String, String> parameters)
+    public void update(DocumentReference documentReference,
+        Map<String, String> parameters)
     {
         try {
             XWikiContext context = xcontextProvider.get();
@@ -394,19 +392,30 @@ public class DefaultModelBridge implements ModelBridge
             //
             // More information: https://jira.xwiki.org/browse/XWIKI-13493
             if (!parentChildConfiguration.isParentChildMechanismEnabled()) {
+
+                // we compute the new hierarchical parent
                 DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
-                DocumentReference oldParent = document.getParentReference();
 
-                DocumentReference hierarchicalParentDoc = this.entityReferenceDocumentReferenceResolver
-                    .resolve(hierarchicalParent);
-                DocumentReference oldParentDoc = this.entityReferenceDocumentReferenceResolver.resolve(oldParent);
+                // we compute a relative reference for the hierarchical parent
+                String hierarchicalParentSerialized = this.compactEntityReferenceSerializer
+                    .serialize(hierarchicalParent, documentReference);
+                EntityReference relativeHierarchicalReference = this.relativeStringEntityReferenceResolver
+                    .resolve(hierarchicalParentSerialized, EntityType.DOCUMENT);
 
-                if (!hierarchicalParentDoc.equals(oldParentDoc)) {
-                    String parentSerializedReference = this.compactEntityReferenceSerializer
-                        .serialize(hierarchicalParent, documentReference);
+                // we can rely on the current document parent ref, as after the copy the encoded parent is not changed.
+                EntityReference newDocumentParentRef = document.getRelativeParentReference();
 
-                    document.setParentReference(this.relativeStringEntityReferenceResolver
-                        .resolve(parentSerializedReference, EntityType.DOCUMENT));
+                // all cases are supported:
+                //   1. if we move on a same wiki but on a different space: the relative ref are different, the
+                //      parent will be updated
+                //   2. if we move on a same wiki, same space: the relative ref are the same, we keep the parent
+                //   3. if we move on a different wiki, different space: we don't care about the wiki, we are in the
+                //      same case as 1
+                //   4. if we move on a different wiki, same space: actually we can keep the old parent relative
+                //      reference, as it's relative of the document reference. So the parent reference will be well
+                //      computed with the already existing relative reference.
+                if (!relativeHierarchicalReference.equals(newDocumentParentRef)) {
+                    document.setParentReference(relativeHierarchicalReference);
                     save = true;
                 }
             }

@@ -34,11 +34,18 @@ public class DeletingPage extends CopyOrRenameOrDeleteStatusPage
     @FindBy(xpath = "//div[@id = 'document-title']//a")
     private WebElement titleLink;
 
+    private static final String DELETE_SUCCESS = "Done.";
+
     public DeletePageOutcomePage getDeletePageOutcomePage()
     {
         // Click on the title to get back to the "view" mode
         titleLink.click();
         // Since the page is deleted, we should have the "delete page outcome" UI...
         return new DeletePageOutcomePage();
+    }
+
+    public boolean isSuccess()
+    {
+        return this.getInfoMessage().equals(DELETE_SUCCESS);
     }
 }

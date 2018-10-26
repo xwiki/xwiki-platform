@@ -94,9 +94,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="createUserModal-label"&gt;
+          &lt;div class="modal-title" id="createUserModal-label"&gt;
             $escapetool.xml($services.localization.render('rightsmanager.addnewuser'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;&lt;/div&gt;
         &lt;div class="modal-footer"&gt;
@@ -121,9 +121,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="editUserModal-label"&gt;
+          &lt;div class="modal-title" id="editUserModal-label"&gt;
             $escapetool.xml($services.localization.render('xe.admin.users.editUser'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;&lt;/div&gt;
         &lt;div class="modal-footer"&gt;
@@ -148,9 +148,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="deleteUserModal-label"&gt;
+          &lt;div class="modal-title" id="deleteUserModal-label"&gt;
             $escapetool.xml($services.localization.render('xe.admin.users.deleteUser'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeleteuser')))
@@ -420,12 +420,25 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     }
     deleteUserModal.find('.userName').text(userReference);
   }).find('.btn-danger').click(function() {
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
+      'inprogress'
+    );
     $.post('', {
       xpage: 'deleteuorg',
       docname: deleteUserModal.find('.userName').text(),
       form_token: xm.form_token
     }).done(function() {
       deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),
+        'done'
+      ));
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.users.delete.failed')),
+        'error'
+      ));
     });
   });
 });</code>

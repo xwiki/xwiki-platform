@@ -150,7 +150,7 @@
     #end
 
     ## Add new sections to category children map
-    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxId").value, 'maxSyntax' : $obj.getProperty("maxSyntaxId").value, 'name' : $sectionTitle})
+    #set($child = {'id' : $sectionDoc.documentReference.name.substring(11), 'minSyntax' : $obj.getProperty("minSyntaxId").value, 'maxSyntax' : $obj.getProperty("maxSyntaxId").value, 'name' : $sectionTitle})
     $catChildren.add($child)
   #end
 #end

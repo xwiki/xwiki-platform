@@ -173,6 +173,15 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
                     return null;
                 }
             });
+        mockXWikiStore.stubs().method("executeRead").will(
+            new CustomStub("Implements XWikiStoreInterface.executeRead")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return Collections.emptyList();
+                }
+            });
         mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
         mockXWikiStore.stubs().method("exists").will(returnValue(false));
 

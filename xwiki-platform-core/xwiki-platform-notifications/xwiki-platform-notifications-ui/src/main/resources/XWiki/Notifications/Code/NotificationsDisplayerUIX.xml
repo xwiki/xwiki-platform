@@ -318,7 +318,7 @@
     $('#tmNotifications').on('show.bs.dropdown', function () {
       // Don't load the notifications if the menu has already be opened before, but also if notifications count has
       // been loaded (!= -1, which is the initial state of the notificationCount variable) but equals to 0 (so we know
-      // there is nothing to open).
+      // there is nothing to load).
       if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount != 0) {
         macro.load(0).done(function (notifications) {
           createCleanButton(notifications[0].date);
@@ -476,7 +476,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         placement: 'bottom'
       });
       var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
-      if (xm.documentReference.getName() != 'WebHome') {
+      if (xm.documentReference.name != 'WebHome') {
         // Adapt the tooltip when the current document is terminal
         watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
       }
@@ -799,12 +799,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       </scope>
     </class>
     <property>
-      <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
+      <content>{{velocity}}
+#macro (generateNotificationInput $id $reference $label)
+  &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
+  &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
+#end
+{{html clean="false"}} ## we need clean="false" because we want to display the raw content
 #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
-    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
+    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -816,7 +821,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         &lt;div class="col-xs-8 text-right"&gt;
           &lt;p&gt;
             &lt;span class="notifications-header-link"&gt;
-              &lt;a rel="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')" class="notifications-header-link" rel="nofollow"&gt;
+              &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"
+                  class="notifications-header-link" rel="nofollow external"&gt;
                 $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
               &lt;/a&gt;
             &lt;/span&gt;
@@ -834,7 +840,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
-          &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
+          &lt;pre&gt;
+            #generateNotificationInput('notificationPageOnly' $doc.documentReference 'notifications.filters.preferences.label.page')
+            #generateNotificationInput('notificationPageAndChildren' $doc.documentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
+            #generateNotificationInput('notificationWiki' $doc.documentReference.wikiReference 'notifications.filters.preferences.label.wiki')
+          &lt;/pre&gt;
         &lt;/div&gt;
       #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;
@@ -844,7 +854,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     &lt;/div&gt;
   &lt;/li&gt;
 #end
-{{/html}}{{/velocity}}
+{{/html}}
+{{/velocity}}
 </content>
     </property>
     <property>

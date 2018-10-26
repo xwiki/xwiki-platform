@@ -46,7 +46,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 
 /**
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 @Component
 @Singleton

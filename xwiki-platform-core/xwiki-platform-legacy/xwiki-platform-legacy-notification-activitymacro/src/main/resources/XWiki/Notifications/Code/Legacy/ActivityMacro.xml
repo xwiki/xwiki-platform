@@ -158,7 +158,11 @@
     </class>
     <property>
       <code>{{velocity}}
-{{notifications useUserPreferences="false" displayOwnEvents="true" count="$xcontext.macro.params.entries" #if("$!xcontext.macro.params.wikis" != '')wikis="$xcontext.macro.params.wikis"#end #if("$!xcontext.macro.params.spaces" != '')spaces="$xcontext.macro.params.spaces"#end #if("$!xcontext.macro.params.authors" != '')users="$xcontext.macro.params.authors"#end #if("$!xcontext.macro.params.tags" != '')tags="$xcontext.macro.params.tags"#end #if("$!xcontext.macro.params.minor" != '')displayMinorEvents="$xcontext.macro.params.minor"#end #if("$!xcontext.macro.params.rss" != '')displayRSSLink="$xcontext.macro.params.rss"#end /}}
+#set ($wikis = '')
+#if ($services.wiki.currentWikiId != $services.wiki.mainWikiId)
+  #set ($wikis = $services.wiki.currentWikiId)
+#end
+{{notifications useUserPreferences="false" displayOwnEvents="true" count="$xcontext.macro.params.entries" #if("$!xcontext.macro.params.wikis" != '')wikis="$xcontext.macro.params.wikis"#{else}wikis="$wikis"#end #if("$!xcontext.macro.params.spaces" != '')spaces="$xcontext.macro.params.spaces"#end #if("$!xcontext.macro.params.authors" != '')users="$xcontext.macro.params.authors"#end #if("$!xcontext.macro.params.tags" != '')tags="$xcontext.macro.params.tags"#end #if("$!xcontext.macro.params.minor" != '')displayMinorEvents="$xcontext.macro.params.minor"#end #if("$!xcontext.macro.params.rss" != '')displayRSSLink="$xcontext.macro.params.rss"#end /}}
 {{/velocity}}</code>
     </property>
     <property>

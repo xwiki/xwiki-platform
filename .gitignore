@@ -32,3 +32,4 @@ nbproject
 .sonar-ide.properties
 .clover
 *~
+**/overlays/*.info

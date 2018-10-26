@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Common</name>
@@ -192,7 +192,7 @@
     <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
       <artifactId>editor-tool-highlighting-ui</artifactId>
-      <version>4.3.1</version>
+      <version>4.4</version>
       <type>xar</type>
       <optional>true</optional>
       <exclusions>

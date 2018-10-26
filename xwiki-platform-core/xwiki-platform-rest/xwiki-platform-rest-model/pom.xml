@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-model</artifactId>
   <name>XWiki Platform - REST - Model</name>
@@ -35,7 +35,7 @@
       The jacoco instruction ratio precision is higher here because the jaxb2 plugin generates classes
       that are not excluded in the analysis.
     -->
-    <xwiki.jacoco.instructionRatio>0.0292</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.0290</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>1</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>

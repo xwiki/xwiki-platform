@@ -52,7 +52,7 @@
  *
  * Macros also depend on other macros but only other macros which are contained in this script.
  *###
-#if($doc.getName() == 'InvitationMembersCommon')
+#if($doc.documentReference.name == 'InvitationMembersCommon')
   {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##

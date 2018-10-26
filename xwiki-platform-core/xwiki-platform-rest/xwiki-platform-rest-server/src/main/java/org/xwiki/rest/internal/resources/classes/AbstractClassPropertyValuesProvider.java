@@ -92,6 +92,13 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         }
     }
 
+    @Override
+    public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
+        throws XWikiRestException
+    {
+        return this.getValueFromQueryResult(rawValue, getPropertyDefinition(propertyReference));
+    }
+
     @SuppressWarnings("unchecked")
     protected T getPropertyDefinition(ClassPropertyReference propertyReference) throws XWikiRestException
     {

@@ -42,7 +42,7 @@ import org.xwiki.tool.extension.util.ExtensionMojoHelper;
  * Generates a minimal XWiki WAR that is expanded in the passed target directory.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class WARBuilder
 {
@@ -73,12 +73,12 @@ public class WARBuilder
      * Note that dependencies from the module under test are not included in this WAR since they'll be installed as
      * Extensions in {@link ExtensionInstaller} (thus proving that they can be installed as Extensions!).
      *
-     * @param configuration the configuration to build (database, debug mode, etc). This is used for example to bundle
-     * the right JDBC driver in {@code WEB-INF/lib} for the target database
+     * @param testConfiguration the configuration to build (database, debug mode, etc). This is used for example to
+     *        bundle the right JDBC driver in {@code WEB-INF/lib} for the target database
      * @param targetWARDirectory the target driedctory where the expanded WAR will be generated
      * @throws Exception in case of error
      */
-    public void build(UITest configuration, File targetWARDirectory) throws Exception
+    public void build(TestConfiguration testConfiguration, File targetWARDirectory) throws Exception
     {
         // Create a minimal XWiki WAR that doesn't contain any dependencies from the module under test (those
         // dependencies will be installed as extensions in ExtensionInstaller).
@@ -119,62 +119,64 @@ public class WARBuilder
         // Step 4: Copy the JARs in WEB-INF/lib
         File webInfDirectory = new File(targetWARDirectory, "WEB-INF");
         File libDirectory = new File(webInfDirectory, "lib");
-        copyJARs(configuration, jarDependencies, libDirectory);
+        copyJARs(testConfiguration, jarDependencies, libDirectory);
 
         // Step 5: Add the webapp resources (web.xml, templates VM files, etc)
-        copyWebappResources(configuration, warDependencies, targetWARDirectory);
+        copyWebappResources(testConfiguration, warDependencies, targetWARDirectory);
 
         // Step 6: Add XWiki configuration files (depends on the selected DB for the hibernate one)
-        LOGGER.info("Generating configuration files for database [{}]...", configuration.database());
-        this.configurationFilesGenerator.generate(configuration, webInfDirectory, xwikiVersion, artifactResolver);
+        LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
+        this.configurationFilesGenerator.generate(testConfiguration, webInfDirectory, xwikiVersion, artifactResolver);
 
         // Step 7: Add the JDBC driver for the selected DB
-        LOGGER.info("Copying JDBC driver for database [{}]...", configuration.database());
-        File jdbcDriverFile = getJDBCDriver(configuration.database(), artifactResolver);
-        if (configuration.debug()) {
+        LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());
+        File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), artifactResolver);
+        if (testConfiguration.isDebug()) {
             LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
         }
         copyFile(jdbcDriverFile, libDirectory);
 
         // Step 8: Unzip the Flamingo skin
-        unzipSkin(configuration, skinDependencies, targetWARDirectory);
+        unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
     }
 
-    private void copyWebappResources(UITest configuration, List<File> warDependencies, File targetWARDirectory)
-        throws Exception
+    private void copyWebappResources(TestConfiguration testConfiguration, List<File> warDependencies,
+        File targetWARDirectory) throws Exception
     {
         LOGGER.info("Expanding WAR dependencies ...");
         for (File file : warDependencies) {
             // Unzip the WARs in the target directory
-            if (configuration.debug()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Unzipping WAR: " + file);
             }
             unzip(file, targetWARDirectory);
         }
     }
 
-    private void copyJARs(UITest configuration, List<Artifact> jarDependencies, File libDirectory) throws Exception
+    private void copyJARs(TestConfiguration testConfiguration, List<Artifact> jarDependencies, File libDirectory)
+        throws Exception
     {
         LOGGER.info("Copying JAR dependencies ...");
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            if (configuration.debug()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Copying JAR: " + artifact.getFile());
             }
             copyFile(artifact.getFile(), libDirectory);
-            if (configuration.debug()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
             generateXED(artifact, libDirectory, MavenResolver.getInstance());
         }
     }
 
-    private void unzipSkin(UITest configuration, List<File> skinDependencies, File targetWARDirectory) throws Exception
+    private void unzipSkin(TestConfiguration testConfiguration, List<File> skinDependencies, File targetWARDirectory)
+        throws Exception
     {
         LOGGER.info("Copying Skin resources ...");
         File skinsDirectory = new File(targetWARDirectory, "skins");
         for (File file : skinDependencies) {
-            if (configuration.debug()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Unzipping skin: " + file);
             }
             unzip(file, skinsDirectory);
@@ -216,16 +218,22 @@ public class WARBuilder
 
     private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
     {
-        if (database.equals(Database.MYSQL)) {
-            Artifact artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, "5.1.24");
-            return resolver.resolveArtifact(artifact).getArtifact().getFile();
-        } else if (database.equals(Database.HSQLDB)) {
-            Artifact artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, "2.4.1");
-            return resolver.resolveArtifact(artifact).getArtifact().getFile();
-        } else {
-            throw new RuntimeException(
-                String.format("Failed to get JDBC driver. Database [%s] not supported yet!", database));
+        File driver;
+        Artifact artifact;
+        switch (database) {
+            case MYSQL:
+                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, "5.1.24");
+                driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
+                break;
+            case HSQLDB:
+                artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, "2.4.1");
+                driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
+                break;
+            default:
+                throw new RuntimeException(
+                    String.format("Failed to get JDBC driver. Database [%s] not supported yet!", database));
         }
+        return driver;
     }
 
     private void generateXED(Artifact artifact, File directory, MavenResolver resolver) throws Exception

@@ -17,37 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.validator;
+package org.xwiki.administration.test.po;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.openqa.selenium.By;
+import org.xwiki.test.ui.po.ConfirmationModal;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-public class XHTMLValidatorTest
-{   
-    private XHTMLValidator validator;
-    
-    @Before
-    public void setUp() throws Exception
+/**
+ * Represents the actions possible on the delete group confirmation modal.
+ * 
+ * @version $Id$
+ * @since 10.9
+ */
+public class DeleteGroupConfirmationModal extends ConfirmationModal
+{
+    public DeleteGroupConfirmationModal()
     {
-        validator = new XHTMLValidator();
+        super(By.id("deleteGroupModal"));
     }
 
-    @Test
-    public void testValidXHTML() throws Exception 
-    {        
-        validator.setDocument(getClass().getResourceAsStream("/xhtml-valid.html"));
-        validator.validate();
-        assertTrue(validator.getErrors().toString(), validator.getErrors().isEmpty());
-    }
-
-    @Test
-    public void testInvalidXHTML() throws Exception 
-    {        
-        validator.setDocument(getClass().getResourceAsStream("/xhtml-invalid.html"));
-        validator.validate();
-        assertFalse(validator.getErrors().toString(), validator.getErrors().isEmpty());
+    @Override
+    public void clickOk()
+    {
+        super.clickOk();
+        waitForNotificationSuccessMessage("Group deleted");
     }
 }

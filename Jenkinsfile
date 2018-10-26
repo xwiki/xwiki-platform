@@ -112,14 +112,25 @@ def builds = [
       xvnc: false
     )
   },
-  'Docker' : {
+  'Docker - MySQL/Tomcat/Chrome' : {
     // Run functional tests based on docker on modules having them. We select the projects to build so that we build
     // the minimal. Note that the 'Main' job will have built all functional tests not in the -Pdocker profile.
     build(
-      name: 'Docker',
+      name: 'Docker - MySQL/Tomcat/Chrome',
       node: 'docker',
       profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=chrome -Dxwiki.test.ui.database=mysql -Dxwiki.test.ui.servletEngine=tomcat',
+      projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
+    )
+  },
+  'Docker - HSQLDB/Tomcat/Firefox' : {
+    // Run functional tests based on docker on modules having them. We select the projects to build so that we build
+    // the minimal. Note that the 'Main' job will have built all functional tests not in the -Pdocker profile.
+    build(
+      name: 'Docker - HSQLDB/Tomcat/Firefox',
+      node: 'docker',
+      profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=firefox -Dxwiki.test.ui.database=hsqldb -Dxwiki.test.ui.servletEngine=tomcat',
       projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
     )
   }
@@ -148,7 +159,14 @@ def buildAll(builds)
       builds['Main'].call()
 
       // Build the functional tests requiring docker to be installed on the executing agent
-      builds['Docker'].call()
+      parallel(
+        'docker-mysql-tomcat-chrome': {
+          builds['Docker - MySQL/Tomcat/Chrome'].call()
+        },
+        'docker-postgresql-tomcat-firefox': {
+          builds['Docker - HSQLDB/Tomcat/Firefox'].call()
+        }
+      )
 
       // Note: We want the following behavior:
       // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
@@ -195,6 +213,10 @@ def buildAll(builds)
           // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
           // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
           builds['Flavor Test - Webstandards'].call()
+        },
+        'flavor-test-upgrade': {
+          // Run the Flavor Upgrade tests
+          builds['Flavor Test - Upgrade'].call()
         }
       )
     },
@@ -225,6 +247,9 @@ def build(map)
       }
       if (map.pom) {
         pom = map.pom
+      }
+      if (map.projects) {
+        projects = map.projects
       }
     }
   }

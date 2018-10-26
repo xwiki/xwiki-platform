@@ -56,7 +56,7 @@
 #if($request.getParameter('test') == '1')
   {{info}}testLoadInvitationConfig{{/info}}
   #testLoadInvitationConfig()
-#elseif($doc.getName() == 'InvitationCommon')
+#elseif($doc.documentReference.name == 'InvitationCommon')
   {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##

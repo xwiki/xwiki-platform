@@ -19,9 +19,10 @@
  */
 package org.xwiki.test.docker.junit5;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -43,7 +44,7 @@ import org.xwiki.rest.model.jaxb.JobRequest;
  * them as an extension inside a running XWiki.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class ExtensionInstaller
 {
@@ -97,7 +98,7 @@ public class ExtensionInstaller
     public void installExtensions(String xwikiRESTURL, UsernamePasswordCredentials credentials,
         String installUserReference, List<String> namespaces) throws Exception
     {
-        List<Artifact> extensions = new ArrayList<>();
+        Set<Artifact> extensions = new LinkedHashSet<>();
         ArtifactResolver artifactResolver = ArtifactResolver.getInstance();
         MavenResolver mavenResolver = MavenResolver.getInstance();
         String xwikiVersion = mavenResolver.getModelFromCurrentPOM().getVersion();
@@ -124,7 +125,7 @@ public class ExtensionInstaller
         installExtensions(extensions, xwikiVersion, xwikiRESTURL, credentials, installUserReference, namespaces);
     }
 
-    private void installExtensions(List<Artifact> extensions, String xwikiVersion, String xwikiRESTURL,
+    private void installExtensions(Collection<Artifact> extensions, String xwikiVersion, String xwikiRESTURL,
         UsernamePasswordCredentials credentials, String installUserReference, List<String> namespaces) throws Exception
     {
         try {
@@ -134,7 +135,7 @@ public class ExtensionInstaller
         }
     }
 
-    private void installExtensions(List<Artifact> extensions, String xwikiVersion, String xwikiRESTURL,
+    private void installExtensions(Collection<Artifact> extensions, String xwikiVersion, String xwikiRESTURL,
         String installUserReference, List<String> namespaces, UsernamePasswordCredentials credentials) throws Exception
     {
         InstallRequest installRequest = new InstallRequest();

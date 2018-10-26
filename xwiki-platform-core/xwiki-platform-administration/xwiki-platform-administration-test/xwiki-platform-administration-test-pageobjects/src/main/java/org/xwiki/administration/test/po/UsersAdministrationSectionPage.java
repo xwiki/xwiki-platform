@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -31,10 +32,14 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class UsersAdministrationSectionPage extends AdministrationSectionPage
 {
+    private static final String USER_ACTION_XPATH_FORMAT =
+        "//table[@id = 'userstable']//td[contains(@class, 'name') and normalize-space(.) = '%s']"
+            + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
+
     public static final String ADMINISTRATION_SECTION_ID = "Users";
 
-    @FindBy(id = "addNewUser")
-    private WebElement addNewUserButton;
+    @FindBy(css = ".btn[data-target='#createUserModal']")
+    private WebElement createUserButton;
 
     /**
      * The live table listing the users.
@@ -53,13 +58,13 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public UsersAdministrationSectionPage()
     {
         super(ADMINISTRATION_SECTION_ID);
-        usersLiveTable = new LiveTableElement("userstable");
+        this.usersLiveTable = new LiveTableElement("userstable");
     }
 
-    public LightBoxRegistrationPage clickAddNewUser()
+    public RegistrationModal clickAddNewUser()
     {
-        this.addNewUserButton.click();
-        return new LightBoxRegistrationPage();
+        this.createUserButton.click();
+        return new RegistrationModal().waitUntilPageIsLoaded();
     }
 
     /**
@@ -68,6 +73,42 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
      */
     public LiveTableElement getUsersLiveTable()
     {
-        return usersLiveTable;
+        return this.usersLiveTable;
+    }
+
+    @Override
+    public UsersAdministrationSectionPage waitUntilPageIsLoaded()
+    {
+        this.usersLiveTable.waitUntilReady();
+        return this;
+    }
+
+    public DeleteUserConfirmationModal clickDeleteUser(String userName)
+    {
+        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "delete")))
+            .click();
+        return new DeleteUserConfirmationModal();
+    }
+
+    public UsersAdministrationSectionPage deleteUser(String userName)
+    {
+        clickDeleteUser(userName).clickOk();
+        // The live table is refreshed.
+        this.usersLiveTable.waitUntilReady();
+        return this;
+    }
+
+    public boolean canDeleteUser(String userName)
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "delete")))
+            .isEmpty();
+    }
+
+    public RegistrationModal clickEditUser(String userName)
+    {
+        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "edit")))
+            .click();
+        return new RegistrationModal().waitUntilPageIsLoaded();
     }
 }

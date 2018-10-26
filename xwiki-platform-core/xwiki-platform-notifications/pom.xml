@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications</artifactId>
   <name>XWiki Platform - Notifications - Parent POM</name>
@@ -40,6 +40,7 @@
     <module>xwiki-platform-notifications-script</module>
     <module>xwiki-platform-notifications-sources</module>
     <module>xwiki-platform-notifications-ui</module>
+    <module>xwiki-platform-notifications-macro</module>
   </modules>
   <profiles>
     <profile>

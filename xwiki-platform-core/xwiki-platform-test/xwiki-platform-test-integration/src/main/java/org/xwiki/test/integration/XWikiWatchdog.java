@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * Watches an XWiki URL to tell if the XWiki instance is started or not.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class XWikiWatchdog
 {

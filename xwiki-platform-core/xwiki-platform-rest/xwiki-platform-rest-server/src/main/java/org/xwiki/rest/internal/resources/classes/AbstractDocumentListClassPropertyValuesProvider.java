@@ -24,14 +24,18 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.icon.IconManager;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
@@ -68,6 +72,30 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     @Inject
     @Named("viewable")
     private QueryFilter viewableFilter;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Override
+    public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
+        throws XWikiRestException
+    {
+        String reference = "";
+        if (rawValue != null) {
+            reference = rawValue.toString();
+        }
+        if (StringUtils.isEmpty(reference)) {
+            return null;
+        }
+
+        DocumentReference documentReference = this.documentReferenceResolver.resolve(reference, propertyReference);
+        PropertyValue propertyValue = super.getValue(propertyReference, documentReference);
+        if (propertyValue != null) {
+            propertyValue.setValue(reference);
+        }
+
+        return propertyValue;
+    }
 
     /**
      * A map sharing the same keys as the {@link org.xwiki.icon.IconManager#getMetaData icon metadata}.

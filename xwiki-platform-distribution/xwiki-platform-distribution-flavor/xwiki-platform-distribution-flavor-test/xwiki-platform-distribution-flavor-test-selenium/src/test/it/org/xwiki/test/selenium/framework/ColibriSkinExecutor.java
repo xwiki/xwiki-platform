@@ -80,7 +80,7 @@ public class ColibriSkinExecutor extends AlbatrossSkinExecutor
     public void loginAsAdmin()
     {
         // Open a missing page because it loads quickly and it has the login and logout links. Note that it's not enough
-        // to test if the authentication menu is present because it can be blocked by a lightbox for instance.
+        // to test if the authentication menu is present because it can be blocked by a modal for instance.
         getTest().open("Sandbox", "PageThatDoesNotExist");
 
         super.loginAsAdmin();

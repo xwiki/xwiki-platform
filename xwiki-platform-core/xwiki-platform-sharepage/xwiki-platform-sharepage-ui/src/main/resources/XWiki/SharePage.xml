@@ -137,9 +137,9 @@ require(['jquery', 'xwiki-suggestUsers'], function($) {
                 '"&gt;' +
               '&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;' +
             '&lt;/button&gt;' +
-            '&lt;h4 class="modal-title"&gt;' +
+            '&lt;div class="modal-title"&gt;' +
               $jsontool.serialize($services.localization.render('core.viewers.share.dialogTitle')) +
-            '&lt;/h4&gt;' +
+            '&lt;/div&gt;' +
           '&lt;/div&gt;' +
           '&lt;div class="modal-body"&gt;&lt;/div&gt;' +
         '&lt;/div&gt;' +
@@ -164,7 +164,9 @@ require(['jquery', 'xwiki-suggestUsers'], function($) {
     var oldItemRenderer = selectize.settings.render.item;
     selectize.settings.render.item = function(item) {
       if (item &amp;&amp; !item.icon &amp;&amp; item.value &amp;&amp; item.value.indexOf('@') &gt; 0) {
-        item.icon = $jsontool.serialize($xwiki.getSkinFile('icons/silk/email.png'));
+        item.icon = {
+          url: $jsontool.serialize($xwiki.getSkinFile('icons/silk/email.png'))
+        };
       }
       return oldItemRenderer.call(this, item);
     };

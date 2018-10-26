@@ -99,8 +99,6 @@ require([
    */
   require(['tree'], function () {
     $(document).ready(function () {
-      var form = $('#export-form');
-
       /**
        * Save the default url
        */
@@ -305,9 +303,15 @@ require([
             return arrayOfNames.map(function (name) { return encodeURIComponent(name); }).join("&");
           };
 
-          // we clean the form from old hidden pages (in case we click several times on the export button)
-          $("input[name='pages']").remove();
-          $("input[name='excludes']").remove();
+          // in case an old form was already existing
+          // we could remove it after the submit, but it's easier that way for testing
+          $('#export-form').remove();
+
+          var form = $('<form id="export-form" />').appendTo("body");
+          form.attr({
+            action: url.serialize(),
+            method: 'post'
+          });
 
           // create on the fly the hidden inputs
           for (var pages in exportPages) {
@@ -323,9 +327,6 @@ require([
               value: aggregatePageNames(exportPages[pages])
             }).appendTo(form);
           }
-
-          // put the right action for the form
-          form.attr('action', url.serialize());
           form.submit();
         });
       });

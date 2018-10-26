@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.documentTree.name=Dokumentu koks
-rendering.macro.documentTree.description=Parāda XWiki dokumentu koku
+rendering.macro.documentTree.description=Parāda XWiki dokumentu koku.
 rendering.macro.documentTree.parameter.readOnly.name=Tikai lasāms
 rendering.macro.documentTree.parameter.readOnly.description=Vai lietotājam ir iespējams mainīt koka struktūru, ja viņam ir attiecīgas pieejas tiesības?
 rendering.macro.documentTree.parameter.showWikis.name=Rādīt viki
@@ -49,15 +49,15 @@ rendering.macro.documentTree.parameter.showSpaces.description=Vai rādīt vietu 
 rendering.macro.documentTree.parameter.showDocumentTitle.name=Rādīt dokumenta virsrakstu
 rendering.macro.documentTree.parameter.showDocumentTitle.description=Vai koka mezglam dokumenta nosaukuma vietā rādīt dokumenta virsrakstu.
 rendering.macro.documentTree.parameter.showTranslations.name=Rādīt tulkojumus
-rendering.macro.documentTree.parameter.showTranslations.description=Vai rādīt dokumentu tulkojumus
+rendering.macro.documentTree.parameter.showTranslations.description=Vai rādīt dokumentu tulkojumus.
 rendering.macro.documentTree.parameter.showAttachments.name=Rādīt pielikumus
-rendering.macro.documentTree.parameter.showAttachments.description=Vai rādīt dokumentu pielikumus
+rendering.macro.documentTree.parameter.showAttachments.description=Vai rādīt dokumentu pielikumus.
 rendering.macro.documentTree.parameter.showObjects.name=Rādīt objektus
-rendering.macro.documentTree.parameter.showObjects.description=Vai rādīt doumenta objektus
+rendering.macro.documentTree.parameter.showObjects.description=Vai rādīt dokumenta objektus.
 rendering.macro.documentTree.parameter.showClassProperties.name=Rādīt klases īpašības
 rendering.macro.documentTree.parameter.showClassProperties.description=Vai rādīt klases īpašības dokumentiem, kuros ir definētas klases.
 rendering.macro.documentTree.parameter.root.name=Sakne
-rendering.macro.documentTree.parameter.root.description=Koka sākuma elementa identifikators. Tas noder, ja vēlaties apskatīt koku, tikai sākot ar norādīto elementu (kas tad kalpo kā kokam norādītā sakne). Kokā tiek parādīti elementi, sākot ar saknes bērniem, līdz ar to pats norādītais elements parādīts netiek. Elementa attēlošanas formāts ir: Veids:Norāde, kur kur vieds var būt viki, vieta vai dokuments. Piem., viki:xwiki, vieta:xwiki:Main, dokuments:xwiki:Main.WebHome.
+rendering.macro.documentTree.parameter.root.description=Koka sākuma elementa identifikators. Tas noder, ja vēlaties apskatīt koku, tikai sākot ar norādīto elementu (kas tad kalpo kā kokam norādītā sakne). Kokā tiek parādīti elementi, sākot ar saknes bērniem, līdz ar to pats norādītais elements parādīts netiek. Elementa attēlošanas formāts ir: Veids:Norāde, kur kur vieds var būt viki, vieta vai dokuments. Piem., viki:xwiki, vieta:xwiki:Main, dokuments:xwiki:Main.WebHome
 rendering.macro.documentTree.parameter.showRoot.name=Rādīt sakni
 rendering.macro.documentTree.parameter.showRoot.description=Rādīt vai slēpt saknes mezglu. Parasti saknes mezgls tiek slēpts, jo to parasti nosaka konteksts, kurā koks tiek rādīts (piem.  birka pirms koka sākuma). Tomēr var gadīties, ka jūs vēlaties rādīt saknes mezglu, piemēram, lai zem tā varētu izveidot jaunu mezglu.
 rendering.macro.documentTree.parameter.compact.name=Kompakti

@@ -46,7 +46,18 @@ userprofile.default=Default
 user.profile.groups.title=My Groups
 user.profile.groups.description=Here are listed all the groups your user belongs to.
 user.profile.groups.table.group=Group
-platform.core.profile.category.groups=My Groups</content>
+platform.core.profile.category.groups=My Groups
+user.profile.notifications=Notifications
+user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
+user.profile.network.unfollow.question.yes=Yes, unfollow
+user.profile.network.unfollow.question.no=No, cancel
+user.profile.network.following=Following
+user.profile.network.notfollowing=Not following
+user.profile.network.follow=Start following
+user.profile.network.unfollow=Stop following
+user.profile.network.done=Done
+user.profile.network.saving=Saving...
+user.profile.network.error=Error saving the notification setting</content>
   <object>
     <name>XWiki.UserProfileTranslations</name>
     <number>0</number>

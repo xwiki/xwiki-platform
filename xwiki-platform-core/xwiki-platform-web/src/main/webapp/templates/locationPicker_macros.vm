@@ -185,7 +185,7 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title">$services.localization.render('core.documentPicker.title')</h4>
+          <div class="modal-title">$services.localization.render('core.documentPicker.title')</div>
         </div>
         <div class="modal-body">
           #set ($showWikis = $options.wiki && $displayWikiFields)

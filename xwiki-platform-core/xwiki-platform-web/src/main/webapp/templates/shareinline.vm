@@ -75,8 +75,14 @@
       <label for="shareTarget">$services.localization.render('core.viewers.share.target')</label>
       <span class="xHint">$services.localization.render('core.viewers.share.target.hint')</span>
     </dt>
-    <dd><input type="text" name="target" id="shareTarget" #if (!$xcontext.isMainWiki())class="withScope"#end
-      value="$!escapetool.xml($stringtool.join($request.getParameterValues('target'), ','))"/></dd>
+    <dd>
+      #set ($userPickerParams = {
+        'id': 'shareTarget',
+        'name': 'target',
+        'value': $request.getParameterValues('target')
+      })
+      #userPicker_input(true $userPickerParams)
+    </dd>
     #set ($ownEmail = "$!{xwiki.getDocument($xcontext.user).getObject('XWiki.XWikiUsers').getProperty('email').value}")
     #if ($ownEmail != '')
       <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($xcontext.user, false)} $escapetool.xml("<${ownEmail}>")" /> $services.localization.render('core.viewers.share.target.ccMe')</label></dd>

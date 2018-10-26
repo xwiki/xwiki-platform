@@ -17,20 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.validator;
+package org.xwiki.administration.test.po;
 
-import org.xwiki.validator.framework.AbstractXMLValidator;
+import org.openqa.selenium.By;
+import org.xwiki.test.ui.po.ConfirmationModal;
 
 /**
- * Validate provided input.
+ * Represents the actions possible on the delete user confirmation modal.
  * 
  * @version $Id$
+ * @since 10.9
  */
-public class XHTMLValidator extends AbstractXMLValidator
+public class DeleteUserConfirmationModal extends ConfirmationModal
 {
-    @Override
-    public String getName()
+    public DeleteUserConfirmationModal()
     {
-        return "XHTML";
+        super(By.id("deleteUserModal"));
+    }
+
+    @Override
+    public void clickOk()
+    {
+        super.clickOk();
+        waitForNotificationSuccessMessage("User deleted");
     }
 }

@@ -25,34 +25,43 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.AbstractRegistrationPage;
 
 /**
- * Represents a registration page in a lightbox.
+ * Represents a registration page in a modal.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 10.9
  */
-public class LightBoxRegistrationPage extends AbstractRegistrationPage
+public class RegistrationModal extends AbstractRegistrationPage
 {
-    @FindBy(xpath = "//div/form[@id='register']/div/span[1]/input[@value='Save']")
-    private WebElement submitButton;
+    @FindBy(css = "#createUserModal .btn-primary")
+    private WebElement createButton;
 
-    public static LightBoxRegistrationPage gotoPage()
+    public static RegistrationModal gotoPage()
     {
         UsersAdministrationSectionPage sectionPage = UsersAdministrationSectionPage.gotoPage();
         sectionPage.getUsersLiveTable().waitUntilReady();
-        LightBoxRegistrationPage registrationPage = sectionPage.clickAddNewUser();
-        registrationPage.getDriver().waitUntilElementIsVisible(By.id("register_first_name"));
-        return registrationPage;
+        return sectionPage.clickAddNewUser();
     }
 
     @Override
     public void clickRegister()
     {
-        this.submitButton.click();
+        this.createButton.click();
     }
 
     @Override
-    public boolean isLiveValidationEnabled()
+    public RegistrationModal waitUntilPageIsLoaded()
     {
-        return !getDriver().findElements(By.xpath("//div[@id='lb']/div[@id='lb-content']/script[3]")).isEmpty();
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#createUserModal .modal-body form#register"));
+        return this;
+    }
+
+    @Override
+    public boolean validationFailureMessagesInclude(String message)
+    {
+        // Check both the live validation errors and the server side errors.
+        By serverSideErrorMessage =
+            By.xpath(String.format("//div[contains(@class,'xnotification-error') and contains(., '%s')]", message));
+        return super.validationFailureMessagesInclude(message)
+            || getDriver().findElementsWithoutWaiting(serverSideErrorMessage).size() > 0;
     }
 }

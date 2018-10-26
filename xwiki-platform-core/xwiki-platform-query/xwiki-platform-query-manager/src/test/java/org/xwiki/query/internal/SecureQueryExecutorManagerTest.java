@@ -19,23 +19,22 @@
  */
 package org.xwiki.query.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryExecutorManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertTrue;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,27 +43,20 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentTest
 public class SecureQueryExecutorManagerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryExecutorManager> mocker =
-        new MockitoComponentMockingRule<QueryExecutorManager>(SecureQueryExecutorManager.class);
+    @InjectMockComponents
+    private SecureQueryExecutorManager executor;
 
+    @MockComponent
     private ContextualAuthorizationManager authorization;
 
     private boolean hasProgrammingRight;
 
-    /**
-     * The component under test.
-     */
-    private QueryExecutorManager executor;
-
-    @Before
+    @BeforeEach
     public void before() throws Exception
     {
-        this.executor = this.mocker.getComponentUnderTest();
-        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
-
         when(this.authorization.hasAccess(Right.PROGRAM)).then(new Answer<Boolean>()
         {
             @Override
@@ -87,13 +79,10 @@ public class SecureQueryExecutorManagerTest
         // Create a Query not implementing SecureQuery
         Query query = mock(Query.class);
 
-        try {
+        Throwable exception = assertThrows(QueryException.class, () -> {
             this.executor.execute(query);
-            fail("Should have thrown an exception here");
-        } catch (QueryException expected) {
-            assertEquals("Unsecure query require programming right. Query statement = [null]",
-                expected.getMessage());
-        }
+        });
+        assertEquals("Unsecure query require programming right. Query statement = [null]", exception.getMessage());
     }
 
     @Test
@@ -112,11 +101,9 @@ public class SecureQueryExecutorManagerTest
         DefaultQuery query = new DefaultQuery("statement", "language", this.executor);
 
         assertFalse(query.isCurrentAuthorChecked());
-        ;
 
         this.executor.execute(query);
 
         assertTrue(query.isCurrentAuthorChecked());
-        ;
     }
 }

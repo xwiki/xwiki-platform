@@ -34,6 +34,8 @@ public class BaseModal extends BaseElement
 {
     protected WebElement container;
 
+    // This constructor remove the fade effect, but it only takes effect before the modal is opened
+    // so take care to create the modal before doing the action to open it.
     public BaseModal(By selector)
     {
         this.container = getDriver().findElement(selector);

@@ -47,6 +47,13 @@ public class ListMetaClass extends PropertyMetaClass
         cacheClass.setName("cache");
         cacheClass.setPrettyName("Cache");
         safeput(cacheClass.getName(), cacheClass);
+
+        StringClass defaultClass = new StringClass(this);
+        defaultClass.setName("defaultValue");
+        defaultClass.setPrettyName("Default value");
+        defaultClass.setUnmodifiable(true);
+        defaultClass.setSize(40);
+        safeput(defaultClass.getName(), defaultClass);
     }
 
     /**

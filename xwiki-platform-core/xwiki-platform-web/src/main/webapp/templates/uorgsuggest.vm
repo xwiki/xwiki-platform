@@ -59,9 +59,14 @@
       'url': $avatarURL.url
     })
   #end
-  ## Use the local reference as value if possible (see XWIKI-10046).
+  #if ($request.exactMatch == 'true' && "$!request.input" != '')
+    #set ($value = $result)
+  #else
+    ## Use the local reference as value if possible (see XWIKI-10046).
+    #set ($value = $services.model.serialize($reference, 'compactwiki'))
+  #end
   #set ($discard = $results.add({
-    'value': $services.model.serialize($reference, 'compactwiki'),
+    'value': $value,
     'label': $label,
     'icon': $icon,
     'url': $xwiki.getURL($reference)

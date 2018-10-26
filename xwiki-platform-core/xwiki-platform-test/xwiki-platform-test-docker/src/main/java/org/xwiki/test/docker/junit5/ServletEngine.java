@@ -23,10 +23,16 @@ package org.xwiki.test.docker.junit5;
  * The Servlet Engine to use for the UI tests.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public enum ServletEngine
 {
+    /**
+     * The browser is selected based on a system property value.
+     * @see TestConfiguration
+     */
+    SYSTEM,
+
     /**
      * Represents the Tomcat Servlet engine.
      */

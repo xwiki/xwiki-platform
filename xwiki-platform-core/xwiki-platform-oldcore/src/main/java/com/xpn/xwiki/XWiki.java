@@ -4652,8 +4652,23 @@ public class XWiki implements EventListener
                 if (wikiDescriptor != null) {
                     String server = wikiDescriptor.getDefaultAlias();
                     if (server != null) {
-                        String protocol = getWikiProtocol(wikiDescriptor, xcontext);
+                        String protocol = getWikiProtocol(wikiDescriptor);
                         int port = getWikiPort(wikiDescriptor, xcontext);
+
+                        if (protocol == null && port == -1) {
+                            // If request is a "real" one keep using the same protocol (if asking for the same wiki)
+                            XWikiRequest request = xcontext.getRequest();
+                            if (wikiDescriptor.getId().equals(xcontext.getOriginalWikiId())
+                                && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+                                URL sourceURL = HttpServletUtils.getSourceBaseURL(xcontext.getRequest());
+
+                                protocol = sourceURL.getProtocol();
+                                port = sourceURL.getPort();
+                            } else {
+                                // Default to HTTP
+                                protocol = "http";
+                            }
+                        }
 
                         return new URL(protocol, server, port, "");
                     }
@@ -4666,7 +4681,7 @@ public class XWiki implements EventListener
         return null;
     }
 
-    private String getWikiProtocol(WikiDescriptor wikiDescriptor, XWikiContext context)
+    private String getWikiProtocol(WikiDescriptor wikiDescriptor)
     {
         // Try wiki descriptor
         Boolean secure = wikiDescriptor.isSecure();
@@ -4691,15 +4706,7 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to get main wiki descriptor", e);
         }
 
-        // If request is a "real" one keep using the same protocol (if asking for the same wiki)
-        XWikiRequest request = context.getRequest();
-        if (wikiDescriptor.getId().equals(context.getOriginalWikiId())
-            && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
-            return HttpServletUtils.getSourceBaseURL(context.getRequest()).getProtocol();
-        }
-
-        // Default to HTTP
-        return "http";
+        return null;
     }
 
     private int getWikiPort(WikiDescriptor wikiDescriptor, XWikiContext context)
@@ -4721,14 +4728,6 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to get main wiki descriptor", e);
         }
 
-        // If request is a "real" one keep using the same port (if asking for the same wiki)
-        XWikiRequest request = context.getRequest();
-        if (wikiDescriptor.getId().equals(context.getOriginalWikiId())
-            && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
-            return HttpServletUtils.getSourceBaseURL(context.getRequest()).getPort();
-        }
-
-        // Default to no port
         return -1;
     }
 

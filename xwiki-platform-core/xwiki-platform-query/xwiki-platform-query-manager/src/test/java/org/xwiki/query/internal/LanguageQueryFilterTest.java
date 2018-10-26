@@ -22,13 +22,13 @@ package org.xwiki.query.internal;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests for {@link org.xwiki.query.internal.LanguageQueryFilter}
@@ -36,40 +36,40 @@ import static org.junit.Assert.assertSame;
  * @version $Id$
  * @since 5.1M2
  */
+@ComponentTest
 public class LanguageQueryFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<LanguageQueryFilter> mocker =
-        new MockitoComponentMockingRule<LanguageQueryFilter>(LanguageQueryFilter.class);
+    @InjectMockComponents
+    private LanguageQueryFilter filter;
 
     @Test
-    public void filterStatementWhenStatementMatches() throws Exception
+    public void filterStatementWhenStatementMatches()
     {
-        String result = this.mocker.getComponentUnderTest().filterStatement(
+        String result = this.filter.filterStatement(
             "select doc.fullName from XWikiDocument doc ...", Query.HQL);
         assertEquals("select doc.fullName, doc.language from XWikiDocument doc ...", result);
     }
 
     @Test
-    public void filterStatementWhenStatementDoesntMatches() throws Exception
+    public void filterStatementWhenStatementDoesntMatches()
     {
-        String result = this.mocker.getComponentUnderTest().filterStatement("select whatever", Query.HQL);
+        String result = this.filter.filterStatement("select whatever", Query.HQL);
         assertEquals("select whatever", result);
     }
 
     @Test
-    public void filterStatementWhenStatementIsNotHQL() throws Exception
+    public void filterStatementWhenStatementIsNotHQL()
     {
-        String result = this.mocker.getComponentUnderTest().filterStatement(
+        String result = this.filter.filterStatement(
             "select doc.fullName from XWikiDocument doc ...", Query.XWQL);
         assertEquals("select doc.fullName from XWikiDocument doc ...", result);
     }
 
     @Test
-    public void filterResults() throws Exception
+    public void filterResults()
     {
         List<String> items = Arrays.asList("one", "two");
-        List<String> result = this.mocker.getComponentUnderTest().filterResults(items);
+        List<String> result = this.filter.filterResults(items);
         assertSame(items, result);
     }
 }

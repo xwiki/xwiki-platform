@@ -144,23 +144,23 @@
           #set ($discard = $xwiki.ssx.use('XWiki.XWikiUserProfileSheet'))
           #set ($discard = $xwiki.jsx.use('XWiki.XWikiUserProfileSheet'))
           &lt;div class="notificationWatchUser"&gt;
-            &lt;p&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/p&gt;
+            &lt;p&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('user.profile.notifications'))&lt;/p&gt;
             #set ($userId = $services.model.serialize($doc.documentReference, 'default'))
             #set ($isUserWatched = $services.notification.watch.isUserWatched($userId))
             &lt;div class="notificationWatchUserFollowing #if(!$isUserWatched)hidden#end"&gt;
               &lt;button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
-                $services.icon.renderHTML('check') $escapetool.xml($services.localization.render('notifications.userprofile.following')) &lt;span class="caret"&gt;&lt;/span&gt;
+                $services.icon.renderHTML('check') $escapetool.xml($services.localization.render('user.profile.network.following')) &lt;span class="caret"&gt;&lt;/span&gt;
               &lt;/button&gt;
               &lt;ul class="dropdown-menu"&gt;
-                &lt;li&gt;&lt;a href="#" class="notificationWatchUserRemove"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('notifications.userprofile.unfollow'))&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="#" class="notificationWatchUserRemove"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('user.profile.network.unfollow'))&lt;/a&gt;&lt;/li&gt;
               &lt;/ul&gt;
             &lt;/div&gt;
             &lt;div class="notificationWatchUserNotFollowing  #if($isUserWatched)hidden#end"&gt;
               &lt;button type="button" class="btn btn-danger dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
-                $escapetool.xml($services.localization.render('notifications.userprofile.notfollowing')) &lt;span class="caret"&gt;&lt;/span&gt;
+                $escapetool.xml($services.localization.render('user.profile.network.notfollowing')) &lt;span class="caret"&gt;&lt;/span&gt;
               &lt;/button&gt;
               &lt;ul class="dropdown-menu"&gt;
-                &lt;li&gt;&lt;a href="#" class="notificationWatchUserAdd"&gt;$services.icon.renderHTML('eye') $escapetool.xml($services.localization.render('notifications.userprofile.follow'))&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="#" class="notificationWatchUserAdd"&gt;$services.icon.renderHTML('eye') $escapetool.xml($services.localization.render('user.profile.network.follow'))&lt;/a&gt;&lt;/li&gt;
               &lt;/ul&gt;
             &lt;/div&gt;
           &lt;/div&gt;
@@ -273,7 +273,7 @@
      * Save the new user status.
      */
     var changeUserStatus = function (action) {
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.userprofile.saving'))", 'inprogress');
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.saving'))", 'inprogress');
       var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
       $.post(url, {
         'action': action,
@@ -281,7 +281,7 @@
         'userId': XWiki.Model.serialize(xm.documentReference)
       }).done(function() {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.userprofile.done'))", 'done');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
         if (action == 'watchUser') {
           $('.notificationWatchUserNotFollowing').addClass('hidden');
           $('.notificationWatchUserFollowing').removeClass('hidden')
@@ -291,7 +291,7 @@
         }
       }).fail(function() {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.userprofile.error'))", 'error');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
       });
     };
 

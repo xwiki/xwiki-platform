@@ -217,7 +217,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
     private XDOM displayInIsolatedExecutionContext(DocumentModelBridge document, String nameSpace,
         DocumentDisplayerParameters parameters)
     {
-        Map<String, Object> backupObjects = new HashMap<String, Object>();
+        Map<String, Object> backupObjects = new HashMap<>();
         EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
             // The following method call also clones the execution context.

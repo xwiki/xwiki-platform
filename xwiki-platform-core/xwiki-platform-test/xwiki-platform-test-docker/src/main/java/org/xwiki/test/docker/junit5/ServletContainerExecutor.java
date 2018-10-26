@@ -37,25 +37,24 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  * Create and execute the Docker Servlet engine container for the tests.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class ServletContainerExecutor
 {
-    private static final String TOMCAT_WEBAPP_DIR = "/usr/local/tomcat/webapps/xwiki";
-
     /**
-     * @param configuration the configuration to build (servlet engine, debug mode, etc)
+     * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
      * @param sourceWARDirectory the location where the built WAR is located
      * @return the Docker container instance
      * @throws Exception if an error occurred during the build or start
      */
-    public GenericContainer execute(UITest configuration, File sourceWARDirectory) throws Exception
+    public GenericContainer execute(TestConfiguration testConfiguration, File sourceWARDirectory) throws Exception
     {
         GenericContainer servletContainer;
-        switch (configuration.servletEngine()) {
+        switch (testConfiguration.getServletEngine()) {
             case TOMCAT:
-                // Configure Tomcat logging for debugging
+                // Configure Tomcat logging for debugging. Create a logging.properties file
                 File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
+                logFile.createNewFile();
                 try (FileWriter writer = new FileWriter(logFile)) {
                     IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
                         + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
@@ -63,43 +62,53 @@ public class ServletContainerExecutor
                 }
 
                 servletContainer = new GenericContainer<>("tomcat:latest");
+                setWebappMount(servletContainer, sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
 
-                // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
-                // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
-                String osName = System.getProperty("os.name").toLowerCase();
-                if (osName.startsWith("mac os x")) {
-                    MountableFile xwikiDirectory = MountableFile.forHostPath(sourceWARDirectory.toString());
-                    servletContainer.withCopyFileToContainer(xwikiDirectory, TOMCAT_WEBAPP_DIR);
-                } else {
-                    servletContainer.withFileSystemBind(sourceWARDirectory.toString(), TOMCAT_WEBAPP_DIR);
-                }
+                servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
+                    + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
+                    + "-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true "
+                    + "-Dsecurerandom.source=file:/dev/urandom");
+
+                break;
+            case JETTY:
+                servletContainer = new GenericContainer<>("jetty:latest");
+                setWebappMount(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
 
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    configuration.servletEngine()));
+                    testConfiguration.getServletEngine()));
         }
 
-        // Note: Testcontainers will wait for up to 60 seconds for the container's first mapped network port to start
+        // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to start
         // listening.
         servletContainer
             .withNetwork(Network.SHARED)
             .withNetworkAliases("xwikiweb")
             .withExposedPorts(8080)
-            .withEnv("CATALINA_OPTS", "-Xmx1024m "
-                + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
-                + "-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true "
-                + "-Dsecurerandom.source=file:/dev/urandom")
             .waitingFor(
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-        if (configuration.debug()) {
+        if (testConfiguration.isDebug()) {
             servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
         servletContainer.start();
 
         return servletContainer;
+    }
+
+    private void setWebappMount(GenericContainer servletContainer, File sourceWARDirectory, String webappDirectory)
+    {
+        // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
+        // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
+        String osName = System.getProperty("os.name").toLowerCase();
+        if (osName.startsWith("mac os x")) {
+            MountableFile xwikiDirectory = MountableFile.forHostPath(sourceWARDirectory.toString());
+            servletContainer.withCopyFileToContainer(xwikiDirectory, webappDirectory);
+        } else {
+            servletContainer.withFileSystemBind(sourceWARDirectory.toString(), webappDirectory);
+        }
     }
 }

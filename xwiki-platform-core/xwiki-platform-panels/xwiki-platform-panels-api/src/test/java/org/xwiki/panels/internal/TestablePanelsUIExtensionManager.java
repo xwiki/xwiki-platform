@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Component;
  * Test implementation of {@link AbstractPanelsUIExtensionManager} used in {@link TestablePanelsUIExtensionManager}.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 @Component
 public class TestablePanelsUIExtensionManager extends AbstractPanelsUIExtensionManager

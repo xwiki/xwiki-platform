@@ -121,7 +121,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |Parola 1|Parola 2
 )))
 |Tabella con Parametri|((({{{
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titolo 1|=(% style="background-color:yellow" %)Titolo 2
 |Parola 1|Parola 2
 }}})))|(((

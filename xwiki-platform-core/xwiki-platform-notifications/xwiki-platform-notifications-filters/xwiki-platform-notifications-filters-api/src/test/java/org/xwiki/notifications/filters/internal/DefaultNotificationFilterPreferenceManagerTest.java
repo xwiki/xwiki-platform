@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultNotificationFilterPreferenceManager}
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class DefaultNotificationFilterPreferenceManagerTest
 {

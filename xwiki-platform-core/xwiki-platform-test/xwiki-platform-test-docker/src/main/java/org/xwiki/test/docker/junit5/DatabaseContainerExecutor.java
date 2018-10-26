@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 
@@ -30,7 +31,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
  * Create and execute the Docker database container for the tests.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class DatabaseContainerExecutor
 {
@@ -41,13 +42,13 @@ public class DatabaseContainerExecutor
     private static final String DBPASSWORD = DBUSERNAME;
 
     /**
-     * @param configuration the configuration to build (database, debug mode, etc)
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @return the Docker container instance
      */
-    public JdbcDatabaseContainer execute(UITest configuration)
+    public JdbcDatabaseContainer execute(TestConfiguration testConfiguration)
     {
-        JdbcDatabaseContainer databaseContainer;
-        switch (configuration.database()) {
+        JdbcDatabaseContainer databaseContainer = null;
+        switch (testConfiguration.getDatabase()) {
             case MYSQL:
                 // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
                 //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
@@ -57,10 +58,13 @@ public class DatabaseContainerExecutor
                     .withDatabaseName(DBNAME)
                     .withUsername(DBUSERNAME)
                     .withPassword(DBPASSWORD)
-                    .withExposedPorts(3306)
+                    .withExposedPorts(3306);
+
+                if (testConfiguration.isDatabaseDataSaved()) {
                     // This allows re-running the test with the database already provisioned without having to redo
                     // the provisioning. Running "mvn clean" will remove the database data.
-                    .withFileSystemBind("./target/mysql", "/var/lib/mysql");
+                    databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
+                }
 
                 databaseContainer.addParameter("character-set-server", "utf8");
                 databaseContainer.addParameter("collation-server", "utf8_bin");
@@ -74,28 +78,45 @@ public class DatabaseContainerExecutor
                 databaseContainer = new PostgreSQLContainer<>()
                     .withDatabaseName(DBNAME)
                     .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD)
+                    .withPassword(DBPASSWORD);
+
+                if (testConfiguration.isDatabaseDataSaved()) {
                     // This allows re-running the test with the database already provisioned without having to redo
                     // the provisioning. Running "mvn clean" will remove the database data.
-                    .withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
+                    databaseContainer.withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
+                }
 
                 databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
 
                 break;
+            case ORACLE:
+                databaseContainer = new OracleContainer()
+                    .withDatabaseName(DBNAME)
+                    .withUsername(DBUSERNAME)
+                    .withPassword(DBPASSWORD);
+
+                break;
+            case HSQLDB:
+                // We don't need a Docker image/container since HSQLDB can work in embedded mode.
+                // It's configured automatically in the custom XWiki WAR.
+                // Thus, nothing to do here!
+                break;
             default:
                 throw new RuntimeException(String.format("Database [%s] is not yet supported!",
-                    configuration.database()));
+                    testConfiguration.getDatabase()));
         }
 
-        databaseContainer
-            .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikidb");
+        if (databaseContainer != null) {
+            databaseContainer
+                .withNetwork(Network.SHARED)
+                .withNetworkAliases("xwikidb");
 
-        if (configuration.debug()) {
-            databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            if (testConfiguration.isDebug()) {
+                databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            }
+
+            databaseContainer.start();
         }
-
-        databaseContainer.start();
 
         // Note that we don't need to stop the container as this is taken care of by TestContainers
 

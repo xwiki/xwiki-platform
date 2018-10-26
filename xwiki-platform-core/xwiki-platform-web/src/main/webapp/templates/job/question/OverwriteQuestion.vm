@@ -40,11 +40,11 @@
 
 <div class="panel panel-warning overwriteQuestion xform">
   <div class="panel-heading">
-    <h3 class="panel-title">
+    <div class="panel-title">
       $services.icon.renderHTML('warning')
       $escapetool.xml($services.localization.render('job.question.OverwriteQuestion.title',
         [$destinationDocument.plainTitle]))
-    </h3>
+    </div>
   </div>
   <div class="panel-body">
     <p>

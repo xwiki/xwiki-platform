@@ -604,7 +604,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * @since 10.7RC1
      */
-    public boolean addBooleanField(String fieldName, String fieldPrettyName, String formType, String displayType, Boolean def)
+    public boolean addBooleanField(String fieldName, String fieldPrettyName, String formType, String displayType,
+        Boolean def)
     {
         if (get(fieldName) == null) {
             BooleanClass booleanClass = new BooleanClass();
@@ -822,6 +823,15 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return addStaticListField(fieldName, fieldPrettyName, 1, false, values);
     }
 
+    /**
+     * @since 10.9
+     * @since 10.8.1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, String values, String defaultValue)
+    {
+        return addStaticListField(fieldName, fieldPrettyName, 1, false, false, values, null, null, defaultValue);
+    }
+
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         String values)
     {
@@ -851,6 +861,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String values, String displayType, String separators)
     {
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, values, displayType,
+            separators, null);
+    }
+
+    /**
+     * @since 10.9
+     * @since 10.8.1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String values, String displayType, String separators, String defaultValue)
+    {
         if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
@@ -865,6 +886,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (separators != null) {
                 list_class.setSeparators(separators);
                 list_class.setSeparator(separators.substring(0, 1));
+            }
+            if (defaultValue != null) {
+                list_class.setDefaultValue(defaultValue);
             }
             list_class.setObject(this);
             put(fieldName, list_class);
@@ -1027,10 +1051,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param size size of the input
      * @param multiSelect specifies if there can be several values
      * @param relationalStorage sets the {@link PageClass} {@code relationalStorage} property metadata with the
-     * specified value. See {@link PageClass#setRelationalStorage} for more details
+     *            specified value. See {@link PageClass#setRelationalStorage} for more details
      * @param hqlQuery the optional HQL query to execute to return allowed document references. If null or empty, the
-     * {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass) implicit
-     * page query builder} is used
+     *            {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass)
+     *            implicit page query builder} is used
      * @return true if the field has been added
      * @since 10.8RC1
      */
@@ -1049,12 +1073,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param size size of the input
      * @param multiSelect specifies if there can be several values
      * @param relationalStorage sets the {@link PageClass} {@code relationalStorage} property metadata with the
-     * specified value. See {@link PageClass#setRelationalStorage} for more details
+     *            specified value. See {@link PageClass#setRelationalStorage} for more details
      * @param hqlQuery the optional HQL query to execute to return allowed document references. If null or empty, the
-     * {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass) implicit
-     * page query builder} is used
+     *            {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass)
+     *            implicit page query builder} is used
      * @param displayType either {@link ListClass#DISPLAYTYPE_CHECKBOX}, {@link ListClass#DISPLAYTYPE_INPUT},
-     * {@link ListClass#DISPLAYTYPE_RADIO} or {@link ListClass#DISPLAYTYPE_SELECT}
+     *            {@link ListClass#DISPLAYTYPE_RADIO} or {@link ListClass#DISPLAYTYPE_SELECT}
      * @param hasPicker enables auto suggestion display
      * @return true if the field has been added
      * @since 10.8RC1

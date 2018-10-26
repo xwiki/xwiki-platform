@@ -14,7 +14,7 @@
 #macro(xwikimessageboxstart $title $message)
     <div class="centered panel panel-default xwikimessage">
      <div class="panel-heading">
-      <h3 class="panel-title">$title</h3>
+      <div class="panel-title">$title</div>
      </div>
      <div class="panel-body">
       <p class="xwikimessage">$message</p>
@@ -236,24 +236,16 @@
             #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
-                #set($isFilterable = true)
-              #else
-                #set($isFilterable = false)
-              #end
-              #if(("$!colprop.sortable" == '' || $colprop.sortable != false) && "$!colname" != '_actions')
-                #set($isSortable = true)
-              #else
-                #set($isSortable = false)
-              #end
+              #set($isFilterable = $colprop.filterable != false && "$!colname" != '_actions')
+              #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
+                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 #if($isSortable)<a data-rel="${colname}">#end
                 $displayName
                 #if($isSortable)</a>#end
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
+                #if($isFilterable)</label>#end
                 #set($columnCount = $mathtool.add($columnCount, 1))
               </th>
             #end
@@ -405,12 +397,13 @@
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker',
       'css/bootstrap-daterangepicker.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
     ## Hidden input for date fields allows us to send timestamps to the server while displaying pretty dates.
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="hidden" />
+    <input name="$column" type="hidden" />
     #set ($dateFormat = $xproperty.getValue('dateFormat'))
     #if ("$!dateFormat" == '')
       #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
     #end
-    <input type="text" data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" type="text"
+      data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
       [$services.localization.render("${transprefix}$column")]))" />

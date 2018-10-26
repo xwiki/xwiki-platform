@@ -19,11 +19,11 @@
  */
 package org.xwiki.query.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link DefaultQuery}.

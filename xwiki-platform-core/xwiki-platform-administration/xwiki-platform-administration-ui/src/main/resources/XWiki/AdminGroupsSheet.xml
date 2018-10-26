@@ -38,17 +38,17 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro (createGroupModal)
-  &lt;form action="" class="modal xform" id="createGroupModal" tabindex="-1" role="dialog"
+  &lt;div class="modal" id="createGroupModal" tabindex="-1" role="dialog"
       aria-labelledby="createGroupModal-label" data-backdrop="static" data-keyboard="false"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
-      &lt;div class="modal-content"&gt;
+      &lt;form class="modal-content xform"&gt;
         &lt;div class="modal-header"&gt;
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="createGroupModal-label"&gt;
+          &lt;div class="modal-title" id="createGroupModal-label"&gt;
             $escapetool.xml($services.localization.render('rightsmanager.creategroup'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           &lt;div class="hidden"&gt;
@@ -79,9 +79,9 @@
             $escapetool.xml($services.localization.render('create'))
           &lt;/button&gt;
         &lt;/div&gt;
-      &lt;/div&gt;
+      &lt;/form&gt;
     &lt;/div&gt;
-  &lt;/form&gt;
+  &lt;/div&gt;
 #end
 
 #macro (editGroupModal)
@@ -93,9 +93,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="editGroupModal-label"&gt;
+          &lt;div class="modal-title" id="editGroupModal-label"&gt;
             $escapetool.xml($services.localization.render('xe.admin.groups.editGroup'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;&lt;/div&gt;
       &lt;/div&gt;
@@ -112,9 +112,9 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="deleteGroupModal-label"&gt;
+          &lt;div class="modal-title" id="deleteGroupModal-label"&gt;
             $escapetool.xml($services.localization.render('xe.admin.groups.deleteGroup'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeletegroup')))
@@ -149,6 +149,7 @@
 {{/velocity}}
 
 {{velocity}}
+{{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('XWiki.AdminGroupsSheet'))
 #set ($discard = $xwiki.jsx.use('XWiki.AdminGroupsSheet'))
 ## The following are needed when editing a group (e.g. for adding new members).
@@ -180,7 +181,6 @@
   ## afterwards.
   #set ($liveTableOptions.topFilters = "#groupScopeFilter")
 #end
-{{html clean="false"}}
 &lt;div class="medium-avatars"&gt;
   #livetable('groupstable' $columns $columnOptions $liveTableOptions)
 &lt;/div&gt;
@@ -310,7 +310,7 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
   var createGroupButton = createGroupModal.find('button.btn-primary');
   createGroupModal.on('shown.bs.modal', function() {
     // Reset the form each time the modal is shown.
-    createGroupModal.trigger('reset');
+    createGroupModal.find('form').trigger('reset');
     createGroupModal.find('.form-control').each(function() {
       validation.resetValidation($(this));
     }).first().focus();
@@ -352,7 +352,7 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
 
   createGroupModal.submit(function(event) {
     event.preventDefault();
-    var data = createGroupModal.serializeArray();
+    var data = createGroupModal.find('form').serializeArray();
     data.push({name: 'ajax', value: 1});
     var groupName = groupNameInput.val();
     var createGroupURL = new XWiki.Document(groupName, 'XWiki').getURL('save');
@@ -363,13 +363,13 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
       'inprogress'
     );
     $.post(createGroupURL, data).done(function() {
+      // Close the modal and refresh the groups live table.
+      createGroupModal.modal('hide');
+      window.livetable_groupstable.refresh();
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.create.done')),
         'done'
       ));
-      // Close the modal and refresh the groups live table.
-      createGroupModal.modal('hide');
-      window.livetable_groupstable.refresh();
     }).fail(function() {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.create.failed')),
@@ -458,12 +458,25 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
     }
     deleteGroupModal.find('.groupName').text(groupReference);
   }).find('.btn-danger').click(function() {
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('xe.admin.groups.delete.inProgress')),
+      'inprogress'
+    );
     $.post('', {
       xpage: 'deleteuorg',
       docname: deleteGroupModal.find('.groupName').text(),
       form_token: xm.form_token
     }).done(function() {
       deleteGroupModal.data('liveTable').deleteRow(deleteGroupModal.data('rowIndex'));
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.groups.delete.done')),
+        'done'
+      ));
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.groups.delete.failed')),
+        'error'
+      ));
     });
   });
 });</code>

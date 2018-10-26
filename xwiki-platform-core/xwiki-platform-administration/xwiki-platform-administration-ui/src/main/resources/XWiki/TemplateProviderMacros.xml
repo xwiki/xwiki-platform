@@ -95,7 +95,7 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title"&gt;$services.localization.render('core.documentPicker.title')&lt;/h4&gt;
+          &lt;div class="modal-title"&gt;$services.localization.render('core.documentPicker.title')&lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           #documentTree({

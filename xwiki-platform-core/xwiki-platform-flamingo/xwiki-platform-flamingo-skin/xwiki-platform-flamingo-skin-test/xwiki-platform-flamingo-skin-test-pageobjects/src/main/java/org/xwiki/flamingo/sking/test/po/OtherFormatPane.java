@@ -31,17 +31,12 @@ import org.xwiki.tree.test.po.TreeElement;
  * Represents the opened panel "Other Formats" in the modal export.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class OtherFormatPane extends BaseElement
 {
-    /**
-     * ID of the main form used in the Other Format Pane.
-     * It can be used to detect if the pane is opened.
-     */
-    static final String FORM_ID = "export-form";
-
     private static final String CONTAINER_TREE_CLASS = "exportModalTreeContainer";
+    private static final String FORM_ID = "export-form";
     private static final String TREE_CLASS = "xtree";
     private static final String XAR_EXPORT_LINK_TEXT = "Export as XAR";
     private static final String VALUE_ATTR = "value";

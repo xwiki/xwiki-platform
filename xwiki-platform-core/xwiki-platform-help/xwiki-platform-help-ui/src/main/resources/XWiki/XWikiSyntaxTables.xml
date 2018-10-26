@@ -149,7 +149,7 @@ Word 1 | Word 2
   &lt;/tbody&gt;
 &lt;/table&gt;
 )))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Title 1|=(% style="background-color:yellow" %)Title 2
 |Word 1|Word 2
 )))
@@ -201,11 +201,11 @@ Allows to easily create content in table format. Parameters for table, row or ce
 |Word 1|Word 2
 )))
 |Parametrized table|((({{{
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Title 1|=(% style="background-color:yellow" %)Title 2
 |Word 1|Word 2
 }}})))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Title 1|=(% style="background-color:yellow" %)Title 2
 |Word 1|Word 2
 )))

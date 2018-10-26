@@ -459,6 +459,18 @@ public class HTML5DutchWebGuidelinesValidatorTest
         setValidatorDocument("<body><a><img alt='text' /></a></body>");
         this.validator.validateRpd7s4();
         assertTrue(isValid(this.validator), getErrors(this.validator));
+        
+        setValidatorDocument("<body><a><span>text</span></a></body>");
+        this.validator.validateRpd7s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><a><img/><span>text</span></a></body>");
+        this.validator.validateRpd7s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><a><span/></a></body>");
+        this.validator.validateRpd7s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
     }
 
     @Test
@@ -637,7 +649,17 @@ public class HTML5DutchWebGuidelinesValidatorTest
         this.validator.validateRpd13s4();
         assertFalse(isValid(this.validator), getErrors(this.validator));
 
-        setValidatorDocument("<body><form><fieldset><input name='test' /><input type='submit' /></fieldset></form></body>");
+        setValidatorDocument(
+            "<body><form><fieldset><input name='test' /><input type='submit' /></fieldset></form></body>");
+        this.validator.validateRpd13s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument(
+            "<body><form><fieldset><input name='test' /><button type='submit' /></fieldset></form></body>");
+        this.validator.validateRpd13s4();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><form><fieldset><input name='test' /><button/></fieldset></form></body>");
         this.validator.validateRpd13s4();
         assertTrue(isValid(this.validator), getErrors(this.validator));
 

@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  * Verify that the XAR export features works fine.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class XARExportTest extends AbstractTest
 {
@@ -78,6 +78,8 @@ public class XARExportTest extends AbstractTest
                 getUtil().rest().savePage(documentReference);
             }
         }
+        // change the timeout as it might take time to load all nodes
+        getDriver().setTimeout(20);
     }
 
     /*
@@ -87,10 +89,11 @@ public class XARExportTest extends AbstractTest
     private void exportXARAll() throws Exception
     {
         getUtil().loginAsSuperAdmin();
-        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
+        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        // modal created before the opening to avoid fade effect. (see BaseModal)
         ExportModal exportModal = new ExportModal();
+        viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
         OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
         assertTrue(otherFormatPane.isTreeAvailable());
@@ -123,10 +126,12 @@ public class XARExportTest extends AbstractTest
     public void exportXARLotOfSelectedFiles()
     {
         getUtil().loginAsSuperAdmin();
+
         ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        // modal created before the opening to avoid fade effect. (see BaseModal)
+        ExportModal exportModal = new ExportModal();
         viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
-        ExportModal exportModal = new ExportModal();
         OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
         assertTrue(otherFormatPane.isTreeAvailable());
         assertTrue(otherFormatPane.isExportAsXARButtonAvailable());
@@ -139,9 +144,6 @@ public class XARExportTest extends AbstractTest
         root.open().waitForIt();
 
         assertEquals(16, root.getChildren().size());
-
-        // change the timeout as it might take time to load all nodes
-        getDriver().setTimeout(20);
 
         TreeNodeElement lastNode = null;
         int size = 0;
@@ -183,9 +185,10 @@ public class XARExportTest extends AbstractTest
     {
         getUtil().loginAsSuperAdmin();
         ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        // modal created before the opening to avoid fade effect. (see BaseModal)
+        ExportModal exportModal = new ExportModal();
         viewPage.clickMoreActionsSubMenuEntry("tmExport");
 
-        ExportModal exportModal = new ExportModal();
         OtherFormatPane otherFormatPane = exportModal.openOtherFormatPane();
         assertTrue(otherFormatPane.isTreeAvailable());
         assertTrue(otherFormatPane.isExportAsXARButtonAvailable());

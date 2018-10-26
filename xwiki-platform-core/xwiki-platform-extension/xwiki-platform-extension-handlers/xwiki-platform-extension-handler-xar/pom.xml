@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-handlers</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-handler-xar</artifactId>
   <name>XWiki Platform - Extension - Handler - XAR</name>
@@ -161,7 +161,8 @@
                 **/SafeConflictQuestion.java,
                 **/DefaultXWikiDocumentMerger.java,
                 **/WikiEventListener.java,
-                **/XarExtensionPlan.java
+                **/XarExtensionPlan.java,
+                **/XarExtensionScriptService.java
               </excludes>
             </configuration>
           </execution>

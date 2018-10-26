@@ -128,7 +128,7 @@ public class XarFile implements Closeable
 
     /**
      * @return the {@link XarPackage}
-     * @since 10.9RC1
+     * @since 10.9
      */
     public XarPackage getXarPackage()
     {

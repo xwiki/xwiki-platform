@@ -129,7 +129,7 @@ public class HistoryPane extends BaseElement
      */
     public HistoryPane showMinorEdits()
     {
-        getDriver().findElementWithoutWaiting(pane, By.name("viewminorversions")).click();
+        getDriver().findElementWithoutWaiting(pane, By.name("viewMinorVersions")).click();
         return new HistoryPane();
     }
 

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.stability.Unstable;
@@ -131,7 +132,13 @@ public class NotificationsTrayPage extends ViewPage
             if (!clearAllLink.isDisplayed()) {
                 throw new RuntimeException("'Clear All' link is not displayed!");
             }
-            clearAllLink.click();
+            // Calling click() doesn't have the expected result: the mouse is moved over the link (we can see that the
+            // link is hovered because it gets underlined and the link URL is displayed in the browser status bar) but
+            // the link is not clicked (the event listeners are not fired and neither the browser's default behavior,
+            // because the window location doesn't change). If we pause the test and click the link ourselves everything
+            // is fine. Moreover, if I change the link style to display:block and height:100px the click also works. So
+            // it seems this is a Selenium / WebDriver bug. The workaround is to use the Enter / Return key.
+            clearAllLink.sendKeys(Keys.RETURN);
             // Wait for the confirm box to be visible
             getDriver().waitUntilElementIsVisible(By.className("xdialog-content"));
             // Enter is like clicking on "yes"

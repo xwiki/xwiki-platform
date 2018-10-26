@@ -43,7 +43,7 @@ skin.sheet.overriddenTemplates=Pārlabotās veidnes
 skin.sheet.addTemplate=Pievienot jaunu pārrakstītu veidni
 skin.sheet.add=Pievienot
 skin.sheet.overrideTemplateWarning=Šī sadaļa ļauj jums pārrakstīt apdares veidni. Šī ir tehniski sarežģīta lieta un jums ir jāsaprot, kādas var būt izmaiņu sekas.
-skin.sheet.deprecatedPropertiesWarning=Šī sadaļa ir tikai savietojamībai ar iepriekšējām versijām. Tā vietā jums būtu jāizmanto augstāk minētais 'pārrakstīt veidni' paņēmiens
+skin.sheet.deprecatedPropertiesWarning=Šī sadaļa ir tikai savietojamībai ar iepriekšējām versijām. Tā vietā jums būtu jāizmanto augstāk minētais 'pārrakstīt veidni' paņēmiens.
 skin.sheet.nojs=Jūs nevarat izmantot šo sadaļu bez JavaScript atbalsta. Bet tā vietā jūs varat izmantot {0}Objektu redaktoru{1} un pievienot manuāli {2} objektus.
 
 skin.sheet.js.deleting=Dzēšu...

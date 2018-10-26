@@ -1981,7 +1981,7 @@ public class TestUtils
          * different from a REST URL used outside of any container and that needs to call XWiki running inside a
          * container... ;)
          *
-         * @since 10.9RC1
+         * @since 10.9
          */
         public void setURLPrefix(String newURLPrefix)
         {

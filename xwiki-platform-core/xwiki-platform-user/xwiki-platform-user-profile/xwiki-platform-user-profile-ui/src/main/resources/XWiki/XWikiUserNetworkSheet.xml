@@ -45,11 +45,94 @@
 #else
   $doc.use($obj)
   #set($isMyProfile = ($xcontext.user == $doc.fullName))
+  ## Code if the notifications app is installed (we don't depend on notifications, we only display some info if the
+  ## app is here).
+  ## TODO: also look if the "notifications" macro is installed too.
   #if ($isMyProfile &amp;&amp; "$!services.notification.watch" != '')
+    #set ($followedUsers = $services.notification.watch.watchedUsers)
+    #set ($discard = $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet"))
+    #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserNetworkSheet"))
+    {{html}}
+    &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
+    #if ($followedUsers.size() &gt; 0)
+      &lt;ul class="followed-users"&gt;
+        #foreach ($followedUser in $followedUsers)
+          #set ($userDocument = $xwiki.getDocument($followedUser))
+          &lt;li class="vcard"&gt;
+            #set ($userID = $userDocument.name)
+            #smallUserAvatar($followedUser)
+            &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
+            &lt;a class="btn btn-xs btn-danger userstatus-follow" data-userid="$escapetool.xml($followedUser)"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('xe.activity.messages.unfollow'))&lt;/a&gt;
+          &lt;/li&gt;
+        #end
+      &lt;/ul&gt;
+    #else
+      $services.localization.render('platform.core.profile.section.following.none')
+    #end
+    {{/html}}
+    #if ($followedUsers.size() &gt; 0)
+      = $services.localization.render('platform.core.profile.section.networkActivity') =
 
-    {{notifications displayWatchedUsersOnly="true"}}
+      {{notifications displayWatchedUsersOnly="true"}}
 
-  #end
+    #end
+  #elseif ($isMyProfile &amp;&amp; $hasWatch)
+    #set($followedUsers = $services.watchlist.getWatchedElements("USER"))
+    ## FIXME: This is an ugly workaround for an even uglier bug in the watchlist
+    ##        plugin: the first item in the list is an empty string
+    #if ($followedUsers.size() &gt; 0 &amp;&amp; "$!followedUsers.get(0)" == '')
+      #set ($discard = $followedUsers.remove(0))
+    #end
+    {{html clean="false" wiki="true"}}
+    #set($username = $xwiki.getUserName($doc.fullName, false))
+    $xwiki.ssx.use("XWiki.XWikiUserSheet")##
+    $xwiki.ssx.use("XWiki.XWikiUserProfileSheet")##
+    $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet")##
+    &lt;div class="half column"&gt;
+      &lt;div class="following profile-section highlighted-profile-section"&gt;
+        ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
+        #if (!$followedUsers || $followedUsers.size() == 0)
+          $services.localization.render('platform.core.profile.section.following.none')
+        #else
+          &lt;ul&gt;
+          #set ($authorsParam = $services.model.serialize($services.model.resolveDocument($xcontext.user), 'default'))
+          #foreach ($followedUser in $followedUsers)
+            #set ($userDocument = $xwiki.getDocument($followedUser))
+            ## Prepare the list of followed users as it appears in the activity macro parameter
+            ## (do it here to avoid another foreach loop later)
+            #set ($authorsParam = "$!{authorsParam},${userDocument.prefixedFullName}")
+            ## Display the user info
+            &lt;li class="vcard"&gt;
+            #set ($userID = $userDocument.name)
+            #smallUserAvatar($followedUser)
+            &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
+            &lt;span class="userstatus-follow"&gt;
+              #set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
+              &lt;a class="action unfollow" href="$userDocument.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")" title="$services.localization.render('xe.activity.messages.unfollow')"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
+            &lt;/span&gt;
+            &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+            &lt;/li&gt;
+          #end
+          &lt;/ul&gt;
+        #end
+      &lt;/div&gt;
+    &lt;/div&gt;
+    #if ($followedUsers.size() &gt; 0)
+      &lt;div class="half column"&gt;
+        &lt;div class="networkActivity profile-section"&gt;
+          &lt;h1&gt;$services.localization.render('platform.core.profile.section.networkActivity')&lt;/h1&gt;
+    {{/html}}
+
+{{activity authors="$!{authorsParam}" /}}
+
+    {{html clean="false"}}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    #end## $followedUsers.size() &gt; 0
+    &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+    {{/html}}##
+  #end## isMyProfile &amp;&amp; $isMessageStreamActive &amp;&amp; $hasWatch
 #end## User object exists
 {{/velocity}}</content>
   <object>
@@ -195,6 +278,247 @@
     </property>
     <property>
       <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiUserNetworkSheet</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>00f4f424-5c65-4002-85b0-4e6322ec6d00</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>'use strict';
+require(['jquery', 'xwiki-meta'], function ($, xm) {
+  $('ul.followed-users a.userstatus-follow').click(function(event) {
+    var button = $(this);
+    var behavior = {
+      onYes: function() {
+        var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.saving'))", 'inprogress');
+        var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+        $.post(url, {
+          'action': 'unwatchUser',
+          'csrf': xm.form_token,
+          'userId': button.attr('data-userid')
+        }).done(function() {
+          button.parent('li').remove();
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
+        }).fail(function() {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
+        });
+      }
+    };
+    var myInteractionParameters = {
+      confirmationText: "$escapetool.javascript($services.localization.render('user.profile.network.unfollow.question'))",
+      yesButtonText: "$escapetool.javascript($services.localization.render('user.profile.network.unfollow.question.yes'))",
+      noButtonText: "$escapetool.javascript($services.localization.render('user.profile.network.unfollow.question.no'))"
+    };
+    new XWiki.widgets.ConfirmationBox(behavior, myInteractionParameters);
+  });
+});</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiUserNetworkSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8203e709-2198-4413-ba27-dcd179ab0230</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>ul.followed-users {
+  list-style-type: none;
+  padding: 0;
+}</code>
+    </property>
+    <property>
+      <contentType/>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use/>
     </property>
   </object>
 </xwikidoc>

@@ -21,10 +21,10 @@ package org.xwiki.user.internal.group;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
@@ -130,9 +130,7 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
     /**
      * Keep an index of what's in the cache to clean just what's needed.
      */
-    private Map<DocumentReference, Set<String>> cacheDocumentIndex = new HashMap<>();
-
-    private Map<String, Set<DocumentReference>> cacheWikiIndex = new HashMap<>();
+    private Map<DocumentReference, Set<String>> cacheDocumentIndex = new ConcurrentHashMap<>();
 
     /**
      * @param id the id of the cache
@@ -187,8 +185,6 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
     private void addToIndex(String key, DocumentReference reference)
     {
         this.cacheDocumentIndex.computeIfAbsent(reference, k -> new HashSet<>()).add(key);
-        this.cacheWikiIndex.computeIfAbsent(reference.getWikiReference().getName(), k -> new HashSet<>())
-            .add(reference);
     }
 
     private void addToIndex(String key, Collection<DocumentReference> references)
@@ -206,6 +202,10 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
 
                 if (keys != null) {
                     keys.remove(key);
+
+                    if (keys.isEmpty()) {
+                        this.cacheDocumentIndex.remove(reference);
+                    }
                 }
             }
         }
@@ -254,11 +254,6 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
 
         try {
             cleanDocumentCache(reference);
-
-            Set<DocumentReference> references = this.cacheWikiIndex.get(reference.getWikiReference().getName());
-            if (references != null) {
-                references.remove(reference);
-            }
         } finally {
             unlockWrite();
         }
@@ -285,10 +280,9 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         lockWrite();
 
         try {
-            Set<DocumentReference> references = this.cacheWikiIndex.remove(wiki);
-
-            if (references != null) {
-                for (DocumentReference reference : references) {
+            for (Map.Entry<DocumentReference, Set<String>> entry : this.cacheDocumentIndex.entrySet()) {
+                DocumentReference reference = entry.getKey();
+                if (reference.getWikiReference().getName().equals(wiki)) {
                     cleanDocumentCache(reference);
                 }
             }
@@ -307,7 +301,6 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         try {
             this.cache.removeAll();
             this.cacheDocumentIndex.clear();
-            this.cacheWikiIndex.clear();
         } finally {
             unlockWrite();
         }

@@ -103,31 +103,36 @@
 #macro (displayUserDirectoryNoCustomization)
   #set ($columnsProperties = {})
   #foreach ($column in $columns)
-    #set ($filterable = true)
-    #set ($sortable = true)
-    #set ($type = 'text')
-    #set ($link = '')
-    #set ($html = false)
-    #set ($displayName = $xwikiUsersClass.get($column).translatedPrettyName)
+    #set ($columnProperties = {
+      'type': 'text',
+      'html': false,
+      'sortable': true,
+      'filterable': true,
+      'displayName': $xwikiUsersClass.get($column).translatedPrettyName
+    })
     #set ($classPropertyType = $xwikiUsersClass.get($column).classType)
     #if ($column == '_avatar')
-      #set ($type = 'none')
-      #set ($html = true)
-      #set ($sortable = false)
-      #set ($link = 'view')
+      #set ($discard = $columnProperties.putAll({
+        'html': true,
+        'sortable': false,
+        'filterable': false,
+        'link': 'view'
+      }))
     #elseif ($column == 'doc.name')
-      #set ($link = 'view')
+      #set ($columnProperties.link = 'view')
     #elseif ($classPropertyType.endsWith('List'))
-      #set ($type = 'list')
+      #set ($columnProperties.type = 'list')
     #elseif ($classPropertyType.endsWith('Number'))
-      #set ($type = 'number')
+      #set ($columnProperties.type = 'number')
     #elseif ($classPropertyType.endsWith('Password'))
-      #set ($sortable = false)
+      #set ($discard = $columnProperties.putAll({
+        'sortable': false,
+        'filterable': false
+      }))
     #elseif ($classPropertyType.endsWith('TextArea') || $classPropertyType.endsWith('Email') || $classPropertyType.endsWith('Groups'))
-      #set ($html = true)
+      #set ($columnProperties.html = true)
     #end
-    #set ($columnValue = { 'type' : $type, 'link' : $link, 'html' : $html, 'sortable' : $sortable, 'displayName' : $displayName })
-    #set ($discard = $columnsProperties.put($column, $columnValue))
+    #set ($discard = $columnsProperties.put($column, $columnProperties))
   #end
   ##
   ## Allow other applications to provide a different data source for the user directory livetable. For example, some application might define a different membership relation.
@@ -219,6 +224,7 @@
     ##
     ## Customize form. Note: Using 2 forms to be able to do everything without JavaScript.
     ##
+    (% id="HUserDirectoryCustomizeColumns" %)
     == {{translation key="xe.userdirectory.customizeColumnsTitle"/}} ==
     {{html clean='false' wiki='true'}}
     &lt;form class='xform' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
@@ -275,6 +281,7 @@
     {{/html}}
     #if ($withPreview)
       ## Display the preview.
+      (% id="HUserDirectoryCustomizePreview" %)
       == {{translation key="xe.userdirectory.customizePreviewTitle"/}} ==
       #displayUserDirectory(false)
     #end

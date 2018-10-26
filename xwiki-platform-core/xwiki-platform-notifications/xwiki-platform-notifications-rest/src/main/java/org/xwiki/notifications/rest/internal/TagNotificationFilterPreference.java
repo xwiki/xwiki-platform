@@ -30,7 +30,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  * A notification filter preference for the Tag notification filter (for internal use).
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class TagNotificationFilterPreference implements NotificationFilterPreference
 {

@@ -47,7 +47,7 @@ admin.emailstatus.description=Voir le statut des courriels envoyés et ré-envoy
 admin.emailstatus.hint=Si vous ne pouvez pas trouver le statut d'un courriel c'est probablement parce que la propriété qui a expédié ce courriel n'a pas spécifié que son statut devait persister.
 Mail.GeneralMailConfigClass_obfuscate=Masquer l'adresse email
 Mail.GeneralMailConfigClass_obfuscate.hint=Cela affecte seulement les adresses email enregistrées dans les propriétés de l'objet de type Email, aussi longtemps que le displayer par défaut pour le type de propriété Email n'est pas écrasé. Exemple: a...@domain.org
-Mail.SendMailConfigClass_from=Adresse email à utiliser pour l'envoi
+Mail.SendMailConfigClass_from=Adresse email de l'expéditeur
 Mail.SendMailConfigClass_from.hint=L'adresse email utilisée par défaut pour envoyer les courriels de notifications
 Mail.SendMailConfigClass_bcc=Adresses email en CCI (copie conforme invisible)
 Mail.SendMailConfigClass_bcc.hint=Une liste d'adresses email CCI (copie conforme invisible) séparée par des virgules à utiliser lors de l'envoi
@@ -61,7 +61,7 @@ Mail.SendMailConfigClass_password=Mot de passe du serveur d'email (optionnel)
 Mail.SendMailConfigClass_password.hint=Le mot de passe pour se connecter au serveur SMTP, seulement quand l'authentification est requise
 Mail.SendMailConfigClass_properties=Propriétés additionnelles
 Mail.SendMailConfigClass_properties.hint=La liste des propriétés JavaMail additionnelles à utiliser (par exemple "mail.smtp.starttls.enable=true" pour TLS)
-Mail.SendMailConfigClass_sendWaitTime=Envoyer le temps d'attente
+Mail.SendMailConfigClass_sendWaitTime=Fréquence d'envoi
 Mail.SendMailConfigClass_sendWaitTime.hint=Le délai d'attente entre chaque email envoyé, en milli-secondes (par défaut 8 secondes)
 Mail.SendMailConfigClass_discardSuccessStatuses=Effacer les statuts succès ?
 Mail.SendMailConfigClass_discardSuccessStatuses.hint=Ne pas stocker les statuts des courriels envoyés avec succès (par défaut, oui)

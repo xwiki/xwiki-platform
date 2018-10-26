@@ -161,8 +161,14 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   var loadSelectedValue = function(selectize, value) {
     var deferred = $.Deferred();
-    if (value && typeof selectize.settings.load === 'function') {
-      selectize.settings.load(value, function(options) {
+    var load;
+    if (typeof selectize.settings.loadSelected === 'function') {
+      load = selectize.settings.loadSelected;
+    } else {
+      load = selectize.settings.load;
+    }
+    if (value && typeof load === 'function') {
+      load(value, function(options) {
         $.isArray(options) && options.forEach(function(option) {
           var value = option[selectize.settings.valueField];
           if (selectize.options.hasOwnProperty(value)) {

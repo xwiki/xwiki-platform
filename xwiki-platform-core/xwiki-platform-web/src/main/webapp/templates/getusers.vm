@@ -80,7 +80,7 @@
     #set ($wikiName = 'local')
   #end
   #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
-  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9RC1
+  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
   #set ($row = {
     'username': $user.name,
     'fullname': $user.fullName,

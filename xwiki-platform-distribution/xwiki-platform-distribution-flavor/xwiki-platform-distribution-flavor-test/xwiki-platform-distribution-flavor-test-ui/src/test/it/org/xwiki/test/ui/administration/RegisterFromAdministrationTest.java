@@ -20,14 +20,15 @@
 package org.xwiki.test.ui.administration;
 
 import org.openqa.selenium.By;
-import org.xwiki.administration.test.po.LightBoxRegistrationPage;
-import org.xwiki.test.ui.po.AbstractRegistrationPage;
+import org.openqa.selenium.NoSuchElementException;
+import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.test.ui.RegisterTest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.AbstractRegistrationPage;
 
 /**
- * Test the Admin->Users->AddNewUser feature by executing the same tests as in RegisterTest but from
- * the lightbox from Admin->Users->AddNewUser.
+ * Test the Administration -> Users -> Create User feature by executing the same tests as in {@link RegisterTest} but
+ * from the create user modal.
  * 
  * @version $Id$
  * @since 2.4M2
@@ -45,24 +46,32 @@ public class RegisterFromAdministrationTest extends RegisterTest
     @Override
     protected AbstractRegistrationPage getRegistrationPage()
     {
-        return LightBoxRegistrationPage.gotoPage();
+        return RegistrationModal.gotoPage();
     }
 
     @Override
     protected boolean tryToRegister()
     {
-        registrationPage.clickRegister();
+        this.registrationPage.clickRegister();
 
-        getDriver().waitUntilElementsAreVisible(
-            new By[] {By.xpath("//td[@class='username']/a[@href='/xwiki/bin/view/XWiki/JohnSmith']"),
-                      By.xpath("//dd/span[@class='LV_validation_message LV_invalid']")
-            },
-            false
-        );
+        // Wait until one of the following happens:
+        getDriver().waitUntilElementsAreVisible(new By[] {
+            // A live validation error message appears.
+            By.cssSelector("dd > span.LV_validation_message.LV_invalid"),
+            // The operation fails on the server.
+            By.cssSelector(".xnotification-error"),
+            // The operation succeeds.
+            By.cssSelector(".xnotification-done")
+        },false);
 
-        return !getDriver()
-                .findElements(
-                  By.xpath("//td[@class='username']/a[@href='/xwiki/bin/view/XWiki/JohnSmith']"))
-                    .isEmpty();
+        try {
+            // Try to hide the success message by clicking on it.
+            getDriver().findElementWithoutWaiting(
+                By.xpath("//div[contains(@class,'xnotification-done') and contains(., 'User created')]")).click();
+            // If we get here it means the registration was successful.
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 }

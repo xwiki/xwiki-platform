@@ -19,8 +19,13 @@
  */
 package org.xwiki.test.selenium;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
 
 /**
@@ -89,27 +94,17 @@ public class DocExtraTest extends AbstractXWikiTestCase
     @Test
     public void testDocExtraLoadingFromURLAnchor()
     {
-        // We have to load a different page first since opening the same page with a new anchor doesn't call
-        // our functions (on purpose)
-        open("Main", "ThisPageDoesNotExist");
-        open("Main", "WebHome#Attachments");
-        waitForDocExtraPaneActive("attachments");
-        assertDocExtraPaneInView("attachments");
-
-        open("Main", "ThisPageDoesNotExist");
-        open("Main", "WebHome#History");
-        waitForDocExtraPaneActive("history");
-        assertDocExtraPaneInView("history");
-
-        open("Main", "ThisPageDoesNotExist");
-        open("Main", "WebHome#Information");
-        waitForDocExtraPaneActive("information");
-        assertDocExtraPaneInView("information");
-
-        open("Main", "ThisPageDoesNotExist");
-        open("Main", "WebHome#Comments");
-        waitForDocExtraPaneActive("comments");
-        assertDocExtraPaneInView("comments");
+        LocalDocumentReference homePageReference = new LocalDocumentReference("Sandbox", "WebHome");
+        LocalDocumentReference otherPageReference = new LocalDocumentReference("Main", "ThisPageDoesNotExist");
+        List<String> docExtraPanes = Arrays.asList("attachments", "history", "information", "comments");
+        for (String docExtraPane : docExtraPanes) {
+            // We have to load a different page first since opening the same page with a new anchor doesn't call
+            // our functions (on purpose).
+            getUtil().gotoPage(otherPageReference);
+            getUtil().gotoPage(homePageReference, "view", null, StringUtils.capitalize(docExtraPane));
+            waitForDocExtraPaneActive(docExtraPane);
+            assertDocExtraPaneInView(docExtraPane);
+        }
     }
 
     /**

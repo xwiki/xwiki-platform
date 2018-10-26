@@ -368,8 +368,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void update(DocumentReference documentReference,
-        Map<String, String> parameters)
+    public void update(DocumentReference documentReference, Map<String, String> parameters)
     {
         try {
             XWikiContext context = xcontextProvider.get();

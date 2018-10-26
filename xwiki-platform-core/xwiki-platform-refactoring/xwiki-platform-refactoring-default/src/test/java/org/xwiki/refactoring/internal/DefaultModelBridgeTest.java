@@ -98,7 +98,7 @@ public class DefaultModelBridgeTest
         when(xcontextProvider.get()).thenReturn(this.xcontext);
 
         this.relativeStringEntityReferenceResolver = this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "relative");
-        this.compactEntityReferenceSerializer = this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "compact");
+        this.compactEntityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
 
         EntityReferenceProvider entityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
         when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))

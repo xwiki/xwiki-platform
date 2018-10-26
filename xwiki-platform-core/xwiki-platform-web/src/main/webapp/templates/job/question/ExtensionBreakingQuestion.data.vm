@@ -73,6 +73,9 @@ $response.setContentType("application/json")
         'children': false,
         'data': {
           'type': 'page'
+        },
+        'state': {
+          'selected': $page.isSelected()
         }
       }))
     #end

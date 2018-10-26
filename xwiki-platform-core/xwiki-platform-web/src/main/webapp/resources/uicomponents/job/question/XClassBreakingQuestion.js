@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-// TODO: move all that to XAR handler module
+
 /*!
 #set ($jsExtension = '.min.js')
 #if (!$services.debug.minify)
@@ -54,19 +54,17 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
       answerProperties.selectAllFreePages = false;
       for (var i = 0; i < selectedNodes.length; ++i) {
         var node = selectedNodes[i];
-        if (node.data.type == 'extension') {
-          answerProperties.selectedExtensions.push(node.id);
-        } else if (node.data.type == 'page') {
-          answerProperties.selectedDocuments.push(node.id);
-        } else if (node.id == 'freePages') {
+        if (node.id == 'freePages') {
           // For free pages, we can rely on the state of the "freePage" node
           answerProperties.selectAllFreePages = true;
+        } else {
+          answerProperties.selectedDocuments.push(node.id);
         }
       }
 
       return answerProperties;
     }
-  }
+  };
 
   /**
    * Called when a question is being asked
@@ -75,7 +73,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
     var uiQuestion = $(this);
 
     // we want this to be initialized only for the right question
-    if (uiQuestion.hasClass('.deleteWarningExtensions')) {
+    if (uiQuestion.hasClass('.deleteWarningXClass')) {
       return;
     }
 
@@ -90,20 +88,41 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         // Register data callback
         questionForm.data('job-answer-properties-extra', getAnswerProperties);
 
+        var hideObjectsCheckbox = function () {
+          var treeReference = deleteTree.jstree();
+          var nodes = treeReference.get_json(deleteTree, {flat: true});
+
+          for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (typeof node.data != "undefined" && node.data.type == "object") {
+              var nodeDom = treeReference.get_node(node.id, true);
+              nodeDom.find('.jstree-checkbox').hide();
+              deleteTree.jstree().uncheck_node(node.id);
+            }
+          }
+        };
+
+        deleteTree.on('create_node.jstree', hideObjectsCheckbox);
+
+        var followLinks = function (e, data) {
+          var data = data.node.data;
+
+          if (data && data.link) {
+            window.open( data.link, '_blank' );
+          }
+        };
+
+        deleteTree.on('activate_node.jstree', followLinks);
+
         /**
          * Represent the selected pages & extensions the user can chose to delete
          */
         var answerProperties = {
-            // Selected extensions to be removed (all contained pages will be removed, even those the user haven't seen
-            // because of the pagination)
-            selectedExtensions: [],
             // Pages that have been manually marked by the user to be removed
             selectedDocuments: [],
-            // Either or not all pages that don't belong to any extension should be removed (even those the user haven't
-            // seen because of the pagination)
-            selectAllFreePages: false,
-            // Either or not all extensions should be removed (even those the user haven't seen because of the pagination)
-            selectAllExtensions: false
+
+          // All pages that does not contains an used XClass
+            selectAllFreePages: false
         };
 
         deleteTree.data('job-answer-properties-data', answerProperties);
@@ -111,23 +130,21 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         // Enable the tree that will display the pages to delete
         deleteTree.xtree({plugins: ['checkbox'], core: {themes: {icons: true, dots: true}}});
 
-        // Called when a node has been clicked on the tree
-        deleteTree.on('changed.jstree', function (event) {
-          // It's the only safe way to prevent unwanted deletion of extension
-          answerProperties.selectAllExtensions = false;
-        });
-
         // Called when the user click on "select all"
         questionForm.find('.btSelectAllTree').click(function(event){
           event.preventDefault();
           deleteTree.jstree().check_all();
-          answerProperties.selectAllExtensions = true;
+          hideObjectsCheckbox();
         });
+
+        // Called when a node has been opened on the tree
+        deleteTree.on('after_open.jstree', hideObjectsCheckbox);
 
         // Called when the user click on "select none"
         questionForm.find('.btUnselectAllTree').click(function(event){
           event.preventDefault();
           deleteTree.jstree().uncheck_all();
+          hideObjectsCheckbox();
         });
       }
     }

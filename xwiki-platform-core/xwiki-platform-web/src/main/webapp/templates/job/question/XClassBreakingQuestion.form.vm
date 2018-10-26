@@ -1,0 +1,49 @@
+#template('job/question/macros.vm')
+
+#set ($jobStatus = $job.status)
+#set ($question = $jobStatus.question)
+
+#questionHeader()
+#if ($question.isRefactoringForbidden())
+<div class="errormessage deleteWarningXClass">
+  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenTitle"))</strong></p>
+  <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenExplanation"))</p>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <p class="panel-title">$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.forbiddenConcernedPages"))</p>
+    </div>
+    <div class="panel-body">
+      <ul>
+        #foreach($page in $question.getXClassPages())
+          #set ($pageReference = $page.entityReference)
+          #set ($pageDoc = $xwiki.getDocument($pageReference))
+          #set ($title = $pageDoc.getPlainTitle())
+          <li>$title ($services.model.serialize($pageReference, 'local'))</li>
+        #end
+      </ul>
+    </div>
+    <button class="btn btn-default btAnswerCancel">$escapetool.xml($services.localization.render(["job.question.${status.jobType}.cancel", 'job.question.button.cancel']))</button>
+  </div>
+</div>
+#else
+<div class="warningmessage deleteWarningXClass">
+  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title"))</strong></p>
+  <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.explanation"))</p>
+  #if ($question.isObjectsPotentiallyHidden())
+  <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.objectsPotentiallyMissingWarning"))</p>
+  #end
+  <p>$escapetool.xml($services.localization.render('job.question.XClassBreakingQuestion.confirm'))</p>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <p class="panel-title">$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title"))</p>
+    </div>
+    <div class="panel-body">
+      <p><a href="#" class="btSelectAllTree">$escapetool.xml($services.localization.render('job.question.XClassBreakingQuestion.tree.selectAll'))</a> / <a href="#" class="btUnselectAllTree">$escapetool.xml($services.localization.render('job.question.XClassBreakingQuestion.tree.selectNone'))</a></p>
+      <div class="deleteTree" data-url="$escapetool.xml($xwiki.relativeRequestURL)?qaction=data" />
+    </div>
+  </div>
+  #questionButtons($jobStatus)
+</div>
+#end
+
+#questionFooter()

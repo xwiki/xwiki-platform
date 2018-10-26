@@ -39,6 +39,8 @@ import org.xwiki.extension.xar.internal.delete.question.ExtensionBreakingQuestio
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.job.Job;
+import org.xwiki.job.event.status.CancelableJobStatus;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
@@ -78,17 +80,32 @@ public class DocumentsDeletingListener extends AbstractEventListener
         super("XAR Extension Documents Deleting Listener", EVENTS);
     }
 
-    @Override
-    public void onEvent(Event event, Object source, Object data)
-    {
-        if (this.configuration.getDocumentProtection() == DocumentProtection.NONE) {
-            return;
+    private boolean shouldListenerBeTriggered(Job job, CancelableEvent event) {
+        if (event.isCanceled()) {
+            logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
+            return false;
         }
 
-        Job job = (Job) source;
+        if (this.configuration.getDocumentProtection() == DocumentProtection.NONE) {
+            return false;
+        }
+
         if (!job.getRequest().isInteractive()) {
             logger
                 .warn("XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        Job job = (Job) source;
+        CancelableEvent cancelableEvent = (CancelableEvent) event;
+
+        if (!this.shouldListenerBeTriggered(job, cancelableEvent)) {
             return;
         }
 
@@ -101,6 +118,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
             }
         }
 
+        JobStatus jobStatus = job.getStatus();
         // Ask a confirmation to the user if some pages belong to extensions
         if (!question.getExtensions().isEmpty()) {
             // Conservative choice: we let the user enable the pages to delete.
@@ -109,18 +127,26 @@ public class DocumentsDeletingListener extends AbstractEventListener
                 // The user can modify the question so it could disable some EntitySelection.
                 // We add a timeout because when a refactoring job is running, it prevents others to run.
                 // 5 minutes is probably enough for the user to decide if the process should go on.
-                boolean ack = job.getStatus().ask(question, 5, TimeUnit.MINUTES);
+                boolean ack = jobStatus.ask(question, 5, TimeUnit.MINUTES);
                 if (!ack) {
                     // Without any confirmation, we must cancel the operation.
                     String message = "The question has been asked, however no answer has been received.";
                     this.logger.warn(message);
-                    CancelableEvent cancelableEvent = (CancelableEvent) event;
                     cancelableEvent.cancel(message);
                 }
             } catch (InterruptedException e) {
                 this.logger.warn("Confirm question has been interrupted.");
-                CancelableEvent cancelableEvent = (CancelableEvent) event;
                 cancelableEvent.cancel("Question has been interrupted.");
+            }
+            // we always want the event and the CancelableJobStatus to be consistent
+            if (jobStatus instanceof CancelableJobStatus) {
+                CancelableJobStatus cancelableJobStatus = (CancelableJobStatus) jobStatus;
+                if (cancelableJobStatus.isCanceled()) {
+                    cancelableEvent.cancel();
+                }
+                if (cancelableEvent.isCanceled()) {
+                    cancelableJobStatus.cancel();
+                }
             }
         }
     }

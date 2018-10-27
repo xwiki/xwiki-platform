@@ -115,7 +115,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         // Note that we count only the expected properties (those declared by the class).
         Query query = session.createQuery("select obj from BaseObject as obj, BaseProperty as prop "
             + "where obj.id = prop.id.id and obj.className = :className and prop.id.name in :expectedProperties "
-            + "group by obj, BaseObject having count(prop) < :expectedPropertyCount");
+            + "group by obj, obj.number, obj.name, obj.className, obj.guid having count(prop) < :expectedPropertyCount");
         query.setString("className", className);
         query.setParameterList("expectedProperties", expectedProperties);
         query.setLong("expectedPropertyCount", Integer.valueOf(expectedProperties.size()).longValue());

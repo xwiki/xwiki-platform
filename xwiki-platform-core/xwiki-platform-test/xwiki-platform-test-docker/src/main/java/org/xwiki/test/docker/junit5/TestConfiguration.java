@@ -68,7 +68,7 @@ public class TestConfiguration
     {
         Browser newBrowser = this.uiTestAnnotation.browser();
         if (newBrowser == Browser.SYSTEM) {
-            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.CHROME.name()).toUpperCase());
+            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.FIREFOX.name()).toUpperCase());
         }
         this.browser = newBrowser;
     }
@@ -77,7 +77,8 @@ public class TestConfiguration
     {
         Database newDatabase = this.uiTestAnnotation.database();
         if (newDatabase == Database.SYSTEM) {
-            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY, Database.MYSQL.name()).toUpperCase());
+            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY,
+                Database.HSQLDB_EMBEDDED.name()).toUpperCase());
         }
         this.database = newDatabase;
     }
@@ -87,7 +88,7 @@ public class TestConfiguration
         ServletEngine newServletEngine = this.uiTestAnnotation.servletEngine();
         if (newServletEngine == ServletEngine.SYSTEM) {
             newServletEngine = ServletEngine.valueOf(System.getProperty(SERVLETENGINE_PROPERTY,
-                ServletEngine.TOMCAT.name()).toUpperCase());
+                ServletEngine.JETTY_STANDALONE.name()).toUpperCase());
         }
         this.servletEngine = newServletEngine;
     }

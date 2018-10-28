@@ -31,9 +31,8 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
@@ -99,6 +98,8 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
     {
         TestConfiguration testConfiguration = new TestConfiguration(
             extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
+        // Save the test configuration so that we can access it in afterAll()
+        saveTestConfiguration(extensionContext, testConfiguration);
 
         // Force the usage of last docker image for VNC recorder
         // See: https://github.com/testcontainers/testcontainers-java/pull/888
@@ -126,7 +127,7 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
 
             // Start the Database
             LOGGER.info("(2) Starting database [{}]...", testConfiguration.getDatabase());
-            startDatabase(testConfiguration, extensionContext);
+            startDatabase(testConfiguration);
 
             // Start the Servlet Engine
             LOGGER.info("(3) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
@@ -196,18 +197,33 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
     }
 
     @Override
-    public void afterAll(ExtensionContext extensionContext)
+    public void afterAll(ExtensionContext extensionContext) throws Exception
     {
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
         // Shutdown the test context
         shutdownPersistentTestContext(testContext);
+
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+
+        // Stop the DB
+        stopDatabase(testConfiguration);
+
+        // Stop the Servlet Container
+        stopServletEngine(testConfiguration);
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext)
     {
         LOGGER.info("(5) Starting browser [{}]...", testConfiguration.getBrowser());
+
+
+        // If XWiki is not running inside a Docker container, then it's not sharing a shared network and we need
+        // to expose its port so that the container running Selenium can do ssh port forwarding to the host.
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            Testcontainers.exposeHostPorts(8080);
+        }
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
@@ -237,9 +253,15 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         PersistentTestContext testContext = initializePersistentTestContext(xwikiWebDriver);
         savePersistentTestContext(extensionContext, testContext);
 
-        // Set the URLs:
+        // Set the URLs to access XWiki:
         // - the one used inside the Selenium container
-        testContext.getUtil().setURLPrefix("http://xwikiweb:8080/xwiki");
+
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            testContext.getUtil().setURLPrefix("http://host.testcontainers.internal:8080/xwiki");
+        } else {
+            testContext.getUtil().setURLPrefix("http://xwikiweb:8080/xwiki");
+        }
+
         // - the one used by RestTestUtils, i.e. outside of any container
         testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));
 
@@ -251,26 +273,34 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         return webDriverContainer;
     }
 
-    private JdbcDatabaseContainer startDatabase(TestConfiguration testConfiguration, ExtensionContext extensionContext)
+    private void startDatabase(TestConfiguration testConfiguration)
     {
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
-        return executor.execute(testConfiguration);
+        executor.start(testConfiguration);
     }
 
-    private GenericContainer startServletEngine(TestConfiguration testConfiguration, ExtensionContext extensionContext,
+    private void stopDatabase(TestConfiguration testConfiguration)
+    {
+        DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
+        executor.stop(testConfiguration);
+    }
+
+    private void startServletEngine(TestConfiguration testConfiguration, ExtensionContext extensionContext,
         File sourceWARDirectory) throws Exception
     {
         ServletContainerExecutor executor = new ServletContainerExecutor();
-        GenericContainer servletContainer = executor.execute(testConfiguration, sourceWARDirectory);
+        String xwikiURL = executor.start(testConfiguration, sourceWARDirectory);
 
-        String xwikiURL = String.format("http://%s:%s/xwiki", servletContainer.getContainerIpAddress(),
-            servletContainer.getMappedPort(8080));
         saveXWikiURL(extensionContext, xwikiURL);
         if (testConfiguration.isDebug()) {
             LOGGER.info("XWiki ping URL = " + xwikiURL);
         }
+    }
 
-        return servletContainer;
+    private void stopServletEngine(TestConfiguration testConfiguration) throws Exception
+    {
+        ServletContainerExecutor executor = new ServletContainerExecutor();
+        executor.stop(testConfiguration);
     }
 
     private void provisionExtensions(ExtensionContext context) throws Exception
@@ -338,6 +368,18 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
     {
         ExtensionContext.Store store = getStore(context);
         return store.get(PersistentTestContext.class, PersistentTestContext.class);
+    }
+
+    private void saveTestConfiguration(ExtensionContext context, TestConfiguration configuration)
+    {
+        ExtensionContext.Store store = getStore(context);
+        store.put(TestConfiguration.class, configuration);
+    }
+
+    private TestConfiguration loadTestConfiguration(ExtensionContext context)
+    {
+        ExtensionContext.Store store = getStore(context);
+        return store.get(TestConfiguration.class, TestConfiguration.class);
     }
 
     private static ExtensionContext.Store getStore(ExtensionContext context)

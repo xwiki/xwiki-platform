@@ -20,7 +20,6 @@
 package org.xwiki.test.docker.junit5;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +27,6 @@ import java.util.List;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
@@ -74,7 +70,7 @@ public class WARBuilder
      * Extensions in {@link ExtensionInstaller} (thus proving that they can be installed as Extensions!).
      *
      * @param testConfiguration the configuration to build (database, debug mode, etc). This is used for example to
-     *        bundle the right JDBC driver in {@code WEB-INF/lib} for the target database
+     * bundle the right JDBC driver in {@code WEB-INF/lib} for the target database
      * @param targetWARDirectory the target driedctory where the expanded WAR will be generated
      * @throws Exception in case of error
      */
@@ -134,7 +130,7 @@ public class WARBuilder
         if (testConfiguration.isDebug()) {
             LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
         }
-        copyFile(jdbcDriverFile, libDirectory);
+        XWikiFileUtils.copyFile(jdbcDriverFile, libDirectory);
 
         // Step 8: Unzip the Flamingo skin
         unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
@@ -149,7 +145,7 @@ public class WARBuilder
             if (testConfiguration.isDebug()) {
                 LOGGER.info("... Unzipping WAR: " + file);
             }
-            unzip(file, targetWARDirectory);
+            XWikiFileUtils.unzip(file, targetWARDirectory);
         }
     }
 
@@ -157,12 +153,12 @@ public class WARBuilder
         throws Exception
     {
         LOGGER.info("Copying JAR dependencies ...");
-        createDirectory(libDirectory);
+        XWikiFileUtils.createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
             if (testConfiguration.isDebug()) {
                 LOGGER.info("... Copying JAR: " + artifact.getFile());
             }
-            copyFile(artifact.getFile(), libDirectory);
+            XWikiFileUtils.copyFile(artifact.getFile(), libDirectory);
             if (testConfiguration.isDebug()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
@@ -179,40 +175,7 @@ public class WARBuilder
             if (testConfiguration.isDebug()) {
                 LOGGER.info("... Unzipping skin: " + file);
             }
-            unzip(file, skinsDirectory);
-        }
-    }
-
-    private void unzip(File source, File targetDirectory) throws Exception
-    {
-        createDirectory(targetDirectory);
-        try {
-            ZipUnArchiver unArchiver = new ZipUnArchiver();
-            unArchiver.enableLogging(new ConsoleLogger(org.codehaus.plexus.logging.Logger.LEVEL_ERROR, "Package"));
-            unArchiver.setSourceFile(source);
-            unArchiver.setDestDirectory(targetDirectory);
-            unArchiver.setOverwrite(true);
-            unArchiver.extract();
-        } catch (Exception e) {
-            throw new Exception(
-                String.format("Error unpacking file [%s] into [%s]", source, targetDirectory), e);
-        }
-    }
-
-    private void createDirectory(File directory)
-    {
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-    }
-
-    private void copyFile(File source, File targetDirectory) throws Exception
-    {
-        try {
-            FileUtils.copyFileToDirectoryIfModified(source, targetDirectory);
-        } catch (IOException e) {
-            throw new Exception(String.format("Failed to copy file [%] to [%]", source, targetDirectory),
-                e);
+            XWikiFileUtils.unzip(file, skinsDirectory);
         }
     }
 
@@ -225,7 +188,7 @@ public class WARBuilder
                 artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, "5.1.24");
                 driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
                 break;
-            case HSQLDB:
+            case HSQLDB_EMBEDDED:
                 artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, "2.4.1");
                 driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
                 break;

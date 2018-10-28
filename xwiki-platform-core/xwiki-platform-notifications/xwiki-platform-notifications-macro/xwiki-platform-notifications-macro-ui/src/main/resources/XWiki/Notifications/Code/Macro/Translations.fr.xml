@@ -69,6 +69,6 @@ rendering.macro.notifications.parameter.tags.description=Liste des tags à prend
 notifications.macro.noWatchedUsers=Vous ne suivez personne.
 notifications.macro.whenNotView=Macro de notification. Peut-être vu en mode 'view'.
 notifications.menu.nothing=Aucune notification !
-notifications.menu.more=Charger des notifications plus anciennes
+notifications.menu.more=Charger les notifications plus anciennes
 notifications.menu.details=Détails ({0})</content>
 </xwikidoc>

@@ -20,7 +20,6 @@
 package org.xwiki.test.docker.junit5;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -37,9 +36,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.TestcontainersConfiguration;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.XWikiWatchdog;
-import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -75,23 +72,16 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @version $Id$
  * @since 10.6RC1
  */
-public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback,
-    AfterEachCallback, ParameterResolver
+public class XWikiDockerExtension extends AbstractExtension implements BeforeAllCallback, AfterAllCallback,
+    BeforeEachCallback, AfterEachCallback, ParameterResolver
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
     private static final int TIMEOUT_SECONDS = 1;
 
-    private static final ExtensionContext.Namespace NAMESPACE =
-        ExtensionContext.Namespace.create(XWikiDockerExtension.class);
-
     private static final String SUPERADMIN = "superadmin";
 
-    private WARBuilder builder = new WARBuilder();
-
     private XWikiWatchdog watchodg = new XWikiWatchdog();
-
-    private ExtensionInstaller installer = new ExtensionInstaller();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
@@ -100,6 +90,13 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
             extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
         // Save the test configuration so that we can access it in afterAll()
         saveTestConfiguration(extensionContext, testConfiguration);
+
+        // Initialize resolvers and save them so that they can be accessed in afterAll()
+        RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration);
+        ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration, repositoryResolver);
+        saveArtifactResolver(extensionContext, artifactResolver);
+        MavenResolver mavenResolver = new MavenResolver(artifactResolver, repositoryResolver);
+        saveMavenResolver(extensionContext, mavenResolver);
 
         // Force the usage of last docker image for VNC recorder
         // See: https://github.com/testcontainers/testcontainers-java/pull/888
@@ -120,7 +117,8 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
             // If the directory exists, skip the rebuilding of the XWiki WAR, allowing to re-run the test faster
             if (!targetWARDirectory.exists()) {
                 LOGGER.info("XWiki WAR directory [{}] doesn't exists, rebuilding WAR!", targetWARDirectory);
-                this.builder.build(testConfiguration, targetWARDirectory);
+                WARBuilder builder = new WARBuilder(artifactResolver, mavenResolver, repositoryResolver);
+                builder.build(testConfiguration, targetWARDirectory);
             } else {
                 LOGGER.info("XWiki WAR directory [{}] exists, don't rebuild WAR to save time!", targetWARDirectory);
             }
@@ -131,11 +129,12 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
 
             // Start the Servlet Engine
             LOGGER.info("(3) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
-            startServletEngine(testConfiguration, extensionContext, targetWARDirectory);
+            startServletEngine(targetWARDirectory, testConfiguration, artifactResolver, mavenResolver,
+                extensionContext);
 
             // Provision XWiki by installing all required extensions.
             LOGGER.info("(4) Provision XAR extensions for test...");
-            provisionExtensions(extensionContext);
+            provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
             LOGGER.info("XWiki is already started, using running instance to execute the tests...");
         }
@@ -210,14 +209,14 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         stopDatabase(testConfiguration);
 
         // Stop the Servlet Container
-        stopServletEngine(testConfiguration);
+        stopServletEngine(testConfiguration, loadArtifactResolver(extensionContext),
+            loadMavenResolver(extensionContext));
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext)
     {
         LOGGER.info("(5) Starting browser [{}]...", testConfiguration.getBrowser());
-
 
         // If XWiki is not running inside a Docker container, then it's not sharing a shared network and we need
         // to expose its port so that the container running Selenium can do ssh port forwarding to the host.
@@ -285,10 +284,11 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         executor.stop(testConfiguration);
     }
 
-    private void startServletEngine(TestConfiguration testConfiguration, ExtensionContext extensionContext,
-        File sourceWARDirectory) throws Exception
+    private void startServletEngine(File sourceWARDirectory, TestConfiguration testConfiguration,
+        ArtifactResolver artifactResolver, MavenResolver mavenResolver, ExtensionContext extensionContext)
+        throws Exception
     {
-        ServletContainerExecutor executor = new ServletContainerExecutor();
+        ServletContainerExecutor executor = new ServletContainerExecutor(artifactResolver, mavenResolver);
         String xwikiURL = executor.start(testConfiguration, sourceWARDirectory);
 
         saveXWikiURL(extensionContext, xwikiURL);
@@ -297,120 +297,19 @@ public class XWikiDockerExtension implements BeforeAllCallback, AfterAllCallback
         }
     }
 
-    private void stopServletEngine(TestConfiguration testConfiguration) throws Exception
+    private void stopServletEngine(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        MavenResolver mavenResolver) throws Exception
     {
-        ServletContainerExecutor executor = new ServletContainerExecutor();
+        ServletContainerExecutor executor = new ServletContainerExecutor(artifactResolver, mavenResolver);
         executor.stop(testConfiguration);
     }
 
-    private void provisionExtensions(ExtensionContext context) throws Exception
+    private void provisionExtensions(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
+        ExtensionContext context) throws Exception
     {
         // Install extensions in the running XWiki
         String xwikiRESTURL = String.format("%s/rest", loadXWikiURL(context));
-        this.installer.installExtensions(xwikiRESTURL, SUPERADMIN, "pass", SUPERADMIN);
-    }
-
-    private void saveXWikiWebDriver(ExtensionContext context, XWikiWebDriver xwikiWebDriver)
-    {
-        ExtensionContext.Store store = getStore(context);
-        store.put(XWikiWebDriver.class, xwikiWebDriver);
-    }
-
-    private XWikiWebDriver loadXWikiWebDriver(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(XWikiWebDriver.class, XWikiWebDriver.class);
-    }
-
-    private void saveVNC(ExtensionContext context, VncRecordingContainer vnc)
-    {
-        ExtensionContext.Store store = getStore(context);
-        store.put(VncRecordingContainer.class, vnc);
-    }
-
-    private VncRecordingContainer loadVNC(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(VncRecordingContainer.class, VncRecordingContainer.class);
-    }
-
-    private void saveBrowserWebDriverContainer(ExtensionContext context, BrowserWebDriverContainer container)
-    {
-        ExtensionContext.Store store = getStore(context);
-        store.put(BrowserWebDriverContainer.class, container);
-    }
-
-    private void saveXWikiURL(ExtensionContext context, String xwikiURL)
-    {
-        ExtensionContext.Store store = getStore(context);
-        store.put(String.class, xwikiURL);
-    }
-
-    private BrowserWebDriverContainer loadBrowserWebDriverContainer(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(BrowserWebDriverContainer.class, BrowserWebDriverContainer.class);
-    }
-
-    private String loadXWikiURL(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(String.class, String.class);
-    }
-
-    private void savePersistentTestContext(ExtensionContext context, PersistentTestContext testContext)
-    {
-        ExtensionContext.Store store = getStore(context);
-        store.put(PersistentTestContext.class, testContext);
-    }
-
-    private PersistentTestContext loadPersistentTestContext(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(PersistentTestContext.class, PersistentTestContext.class);
-    }
-
-    private void saveTestConfiguration(ExtensionContext context, TestConfiguration configuration)
-    {
-        ExtensionContext.Store store = getStore(context);
-        store.put(TestConfiguration.class, configuration);
-    }
-
-    private TestConfiguration loadTestConfiguration(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(TestConfiguration.class, TestConfiguration.class);
-    }
-
-    private static ExtensionContext.Store getStore(ExtensionContext context)
-    {
-        return context.getRoot().getStore(NAMESPACE);
-    }
-
-    private PersistentTestContext initializePersistentTestContext(XWikiWebDriver driver)
-    {
-        PersistentTestContext testContext;
-
-        try {
-            PersistentTestContext initialTestContext =
-                new PersistentTestContext(Arrays.asList(new XWikiExecutor(0)), driver);
-            testContext = initialTestContext.getUnstoppable();
-            AbstractTest.initializeSystem(testContext);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize PersistentTestContext", e);
-        }
-
-        return testContext;
-    }
-
-    private void shutdownPersistentTestContext(PersistentTestContext testContext)
-    {
-        if (testContext != null) {
-            try {
-                testContext.shutdown();
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to shutdown PersistentTestContext", e);
-            }
-        }
+        ExtensionInstaller extensionInstaller = new ExtensionInstaller(artifactResolver, mavenResolver);
+        extensionInstaller.installExtensions(xwikiRESTURL, SUPERADMIN, "pass", SUPERADMIN);
     }
 }

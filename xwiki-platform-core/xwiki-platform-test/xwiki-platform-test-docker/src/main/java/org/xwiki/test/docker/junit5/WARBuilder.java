@@ -48,13 +48,26 @@ public class WARBuilder
 
     private ExtensionMojoHelper extensionHelper;
 
-    private ConfigurationFilesGenerator configurationFilesGenerator = new ConfigurationFilesGenerator();
+    private ConfigurationFilesGenerator configurationFilesGenerator;
+
+    private ArtifactResolver artifactResolver;
+
+    private MavenResolver mavenResolver;
 
     /**
      * Initialize an XWiki environment (ECM, etc).
+     *
+     * @param artifactResolver the resolver to resolve artifacts from Maven repositories
+     * @param mavenResolver the resolver to read Maven POMs
+     * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public WARBuilder()
+    public WARBuilder(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
+        RepositoryResolver repositoryResolver)
     {
+        this.artifactResolver = artifactResolver;
+        this.mavenResolver = mavenResolver;
+        this.configurationFilesGenerator = new ConfigurationFilesGenerator(repositoryResolver);
+
         // TODO: extract code from ExtensionMojo so that we don't have to depend on a maven plugin....
         try {
             this.extensionHelper = ExtensionMojoHelper.create(null, new File("./target/xwiki-data/"));
@@ -81,14 +94,12 @@ public class WARBuilder
 
         // Step: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
         LOGGER.info("Finding version ...");
-        ArtifactResolver artifactResolver = ArtifactResolver.getInstance();
-        MavenResolver mavenResolver = MavenResolver.getInstance();
-        String xwikiVersion = mavenResolver.getModelFromCurrentPOM().getVersion();
+        String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
         LOGGER.info("Found version = [{}]", xwikiVersion);
 
         // Step: Gather all the required JARs for the minimal WAR
         LOGGER.info("Resolving distribution dependencies ...");
-        Collection<ArtifactResult> artifactResults = artifactResolver.getDistributionDependencies(xwikiVersion);
+        Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion);
         List<File> warDependencies = new ArrayList<>();
         List<Artifact> jarDependencies = new ArrayList<>();
         List<File> skinDependencies = new ArrayList<>();
@@ -114,11 +125,12 @@ public class WARBuilder
 
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
-        this.configurationFilesGenerator.generate(testConfiguration, webInfDirectory, xwikiVersion, artifactResolver);
+        this.configurationFilesGenerator.generate(testConfiguration, webInfDirectory, xwikiVersion,
+            this.artifactResolver);
 
         // Step: Add the JDBC driver for the selected DB
         LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());
-        File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), artifactResolver);
+        File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), this.artifactResolver);
         if (testConfiguration.isDebug()) {
             LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
         }
@@ -154,7 +166,7 @@ public class WARBuilder
             if (testConfiguration.isDebug()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
-            generateXED(artifact, libDirectory, MavenResolver.getInstance());
+            generateXED(artifact, libDirectory, this.mavenResolver);
         }
     }
 

@@ -71,4 +71,11 @@ public @interface UITest
      * @since 10.10RC1
      */
     boolean saveDatabaseData() default false;
+
+    /**
+     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
+     *         your local repository). False by default to avoid developer problems but should be set to true in the
+     *         CI to improve performance of functional tests
+     */
+    boolean isOffline() default false;
 }

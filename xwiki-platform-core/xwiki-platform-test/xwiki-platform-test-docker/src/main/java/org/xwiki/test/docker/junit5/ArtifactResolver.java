@@ -51,31 +51,30 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  * @since 10.9
  */
-public final class ArtifactResolver
+public class ArtifactResolver
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactResolver.class);
+
+    private static final String COMMONS_GROUPID = "org.xwiki.commons";
 
     private static final String PLATFORM_GROUPID = "org.xwiki.platform";
 
     private static final String JAR = "jar";
 
-    private static ArtifactResolver artifactResolver = new ArtifactResolver();
+    private TestConfiguration testConfiguration;
+
+    private RepositoryResolver repositoryResolver;
 
     private Map<String, List<ArtifactResult>> artifactResultCache = new HashMap<>();
 
-    private RepositoryResolver repositoryResolver = RepositoryResolver.getInstance();
-
-    private ArtifactResolver()
-    {
-        // Empty voluntarily, private constructor to ensure singleton
-    }
-
     /**
-     * @return the singleton instance for this class
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public static ArtifactResolver getInstance()
+    public ArtifactResolver(TestConfiguration testConfiguration, RepositoryResolver repositoryResolver)
     {
-        return artifactResolver;
+        this.testConfiguration = testConfiguration;
+        this.repositoryResolver = repositoryResolver;
     }
 
     /**
@@ -197,9 +196,15 @@ public final class ArtifactResolver
         // Since we want to be able to provision SNAPSHOT extensions, we need to configure the SNAPSHOT
         // extension repository. We do that by adding a dependency which will inject it automatically in the
         // default list of extension repositories.
-        Artifact mavenHandlerArtifact = new DefaultArtifact("org.xwiki.commons",
-            "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
-        dependentArtifacts.add(mavenHandlerArtifact);
+        if (this.testConfiguration == null || !this.testConfiguration.isOffline()) {
+            Artifact artifact = new DefaultArtifact(COMMONS_GROUPID,
+                "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
+            dependentArtifacts.add(artifact);
+        } else {
+            Artifact artifact = new DefaultArtifact(COMMONS_GROUPID,
+                "xwiki-commons-extension-repository-maven", JAR, xwikiVersion);
+            dependentArtifacts.add(artifact);
+        }
 
         // It seems that Maven Resolver is not able to resolve the ZIP dependencies from
         // xwiki-platform-distribution-war-minimaldependencies for some reason, so we manually ask for resolving the

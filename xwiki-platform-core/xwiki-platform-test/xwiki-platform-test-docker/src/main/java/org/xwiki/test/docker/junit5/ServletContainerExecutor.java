@@ -41,6 +41,17 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class ServletContainerExecutor
 {
+    private JettyStandaloneExecutor jettyStandaloneExecutor;
+
+    /**
+     * @param artifactResolver the resolver to resolve artifacts from Maven repositories
+     * @param mavenResolver the resolver to read Maven POMs
+     */
+    public ServletContainerExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
+    {
+        this.jettyStandaloneExecutor = new JettyStandaloneExecutor(artifactResolver, mavenResolver);
+    }
+
     /**
      * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
      * @param sourceWARDirectory the location where the built WAR is located
@@ -85,8 +96,7 @@ public class ServletContainerExecutor
                 // http://www.eclipse.org/jetty/documentation/9.4.x/embedding-jetty.html) but we decided against that
                 // as it would mean maintaining 2 Jetty configurations (one for the Jetty standalone packaging and
                 // one for Jetty in embedded mode).
-                JettyStandaloneExecutor executor = new JettyStandaloneExecutor();
-                executor.start();
+                this.jettyStandaloneExecutor.start();
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
@@ -127,8 +137,7 @@ public class ServletContainerExecutor
     {
         switch (testConfiguration.getServletEngine()) {
             case JETTY_STANDALONE:
-                JettyStandaloneExecutor executor = new JettyStandaloneExecutor();
-                executor.stop();
+                this.jettyStandaloneExecutor.stop();
                 break;
             default:
                 // Nothing to do, stopped by TestContainers automatically

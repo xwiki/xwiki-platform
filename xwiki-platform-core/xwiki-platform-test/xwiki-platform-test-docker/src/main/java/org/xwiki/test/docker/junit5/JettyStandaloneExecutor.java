@@ -57,6 +57,20 @@ public class JettyStandaloneExecutor
 
     private static final String PARENT_DIR = "..";
 
+    private ArtifactResolver artifactResolver;
+
+    private MavenResolver mavenResolver;
+
+    /**
+     * @param artifactResolver the resolver to resolve artifacts from Maven repositories
+     * @param mavenResolver the resolver to read Maven POMs
+     */
+    public JettyStandaloneExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
+    {
+        this.artifactResolver = artifactResolver;
+        this.mavenResolver = mavenResolver;
+    }
+
     /**
      * Create a Jetty Standalone packaging on the file system and start Jetty.
      *
@@ -68,12 +82,10 @@ public class JettyStandaloneExecutor
         File jettyDirectory = new File(JETTY_DIR);
         if (!jettyDirectory.exists()) {
             // Step: Resolve the jetty resources
-            ArtifactResolver artifactResolver = ArtifactResolver.getInstance();
-            MavenResolver mavenResolver = MavenResolver.getInstance();
-            String xwikiVersion = mavenResolver.getModelFromCurrentPOM().getVersion();
+            String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
             Artifact jettyArtifact =
                 new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-jetty-resources", "zip", xwikiVersion);
-            File jettyArtifactFile = artifactResolver.resolveArtifact(jettyArtifact).getArtifact().getFile();
+            File jettyArtifactFile = this.artifactResolver.resolveArtifact(jettyArtifact).getArtifact().getFile();
 
             // Step: Unzip
             XWikiFileUtils.unzip(jettyArtifactFile, jettyDirectory);

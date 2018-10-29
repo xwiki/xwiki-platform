@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-webjars</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.9</version>
   </parent>
   <artifactId>xwiki-platform-webjars-test</artifactId>
   <name>XWiki Platform - WebJars - Tests - Parent POM</name>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tree</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.9</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-tree-webjar</artifactId>

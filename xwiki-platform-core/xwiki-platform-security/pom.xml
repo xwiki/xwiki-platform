@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.9</version>
   </parent>
   <artifactId>xwiki-platform-security</artifactId>
   <name>XWiki Platform - Security</name>

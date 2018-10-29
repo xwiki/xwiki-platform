@@ -32,6 +32,7 @@ import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.Right;
 
@@ -39,7 +40,7 @@ import org.xwiki.security.authorization.Right;
  * Default implementation of {@link AsyncRendererExecutor}.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 {
@@ -51,6 +52,36 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
     @Inject
     private AsyncRendererCache cache;
+
+    @Override
+    public AsyncRendererResult getResult(List<String> id, boolean wait) throws InterruptedException
+    {
+        ////////////////////////////////////////////// :
+        // Try running job
+
+        Job job = this.executor.getJob(id);
+
+        if (job != null) {
+            AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
+
+            if (status.getState() != State.FINISHED && wait) {
+                job.join();
+            }
+
+            return status.getResult();
+        }
+
+        ////////////////////////////////////////////// :
+        // Try cache
+
+        AsyncRendererJobStatus status = this.cache.get(id);
+
+        if (status != null) {
+            return status.getResult();
+        }
+
+        return null;
+    }
 
     @Override
     public AsyncRendererJobStatus renderer(AsyncRenderer renderer, Set<String> contextEntries) throws JobException
@@ -85,11 +116,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             return (AsyncRendererJobStatus) job.getStatus();
         }
 
-        // Generate cache key
-        String cacheKey = toCacheKey(jobId);
-
         // Try to find the job status in the cache
-        AsyncRendererJobStatus status = this.cache.get(cacheKey);
+        AsyncRendererJobStatus status = this.cache.get(jobId);
 
         // Found a cache entry, return it
         if (status != null) {
@@ -123,22 +151,5 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         }
 
         return id;
-    }
-
-    private String toCacheKey(List<String> jobId)
-    {
-        StringBuilder builder = new StringBuilder();
-
-        for (String element : jobId) {
-            builder.append(element.length()).append(':').append(element);
-        }
-
-        return builder.toString();
-    }
-
-    @Override
-    public void flush()
-    {
-        this.cache.flush();
     }
 }

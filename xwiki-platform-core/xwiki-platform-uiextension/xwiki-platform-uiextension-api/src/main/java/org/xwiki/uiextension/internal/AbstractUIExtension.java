@@ -33,7 +33,7 @@ import org.xwiki.uiextension.UIExtension;
  * Base class to automate things common to most implementations of {@link UIExtension}.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 public abstract class AbstractUIExtension implements UIExtension
 {

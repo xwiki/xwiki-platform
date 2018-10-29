@@ -18,7 +18,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.container.servlet.ServletRequest;
-import org.xwiki.context.concurrent.ContextStore;
+import org.xwiki.context.internal.AbstractContextStore;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -31,12 +31,12 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * Save and restore well known {@link XWikiContext} entries.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 @Component
 @Singleton
 @Named("XWikiContext")
-public class XWikiContextContextStore implements ContextStore
+public class XWikiContextContextStore extends AbstractContextStore
 {
     /**
      * Name of the entry containing the wiki.
@@ -130,22 +130,6 @@ public class XWikiContextContextStore implements ContextStore
             save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
 
             save(contextStore, PREFIX_PROP_REQUEST, xcontext.getRequest(), entries);
-        }
-    }
-
-    private void save(Map<String, Serializable> contextStore, String key, Serializable value, Set<String> entries)
-    {
-        if (entries.contains(key)) {
-            contextStore.put(key, value);
-        }
-    }
-
-    private void save(SubContextStore store, String prefix, Set<String> entries)
-    {
-        for (String key : entries) {
-            if (key.startsWith(prefix)) {
-                store.save(key, key.substring(prefix.length()));
-            }
         }
     }
 

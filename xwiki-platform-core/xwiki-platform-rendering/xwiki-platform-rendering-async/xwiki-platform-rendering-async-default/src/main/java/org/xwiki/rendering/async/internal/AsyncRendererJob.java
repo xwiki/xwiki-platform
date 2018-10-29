@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.async.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
@@ -26,15 +27,18 @@ import org.xwiki.job.AbstractJob;
 import org.xwiki.job.Request;
 
 /**
- * Execute an {@link AsyncRenderer}.
+ * Default implementation of {@link AsyncRendererJob}.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 @Component
 @Named(AsyncRendererJobStatus.JOBTYPE)
 public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus>
 {
+    @Inject
+    private AsyncRendererCache cache;
+
     @Override
     protected AsyncRendererJobRequest castRequest(Request request)
     {
@@ -63,7 +67,12 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
     @Override
     protected void runInternal() throws Exception
     {
+        AsyncRenderer renderer = getRequest().getRenderer();
 
+        AsyncRendererResult result = renderer.render();
+
+        getStatus().setResult(result);
+
+        this.cache.put(getStatus());
     }
-
 }

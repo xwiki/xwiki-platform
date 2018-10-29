@@ -28,7 +28,7 @@ import org.xwiki.security.authorization.Right;
  * The request of the asynchronous renderer job.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 public class AsyncRendererJobRequest extends AbstractRequest
 {
@@ -58,7 +58,7 @@ public class AsyncRendererJobRequest extends AbstractRequest
      */
     public AsyncRenderer getRenderer()
     {
-        return renderer;
+        return this.renderer;
     }
 
     /**

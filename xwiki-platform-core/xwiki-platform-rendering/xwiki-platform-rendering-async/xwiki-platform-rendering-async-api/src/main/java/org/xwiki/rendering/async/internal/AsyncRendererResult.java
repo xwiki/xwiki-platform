@@ -17,40 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.display.internal.job;
-
-import org.xwiki.job.AbstractJobStatus;
-import org.xwiki.logging.LoggerManager;
-import org.xwiki.observation.ObservationManager;
+package org.xwiki.rendering.async.internal;
 
 /**
- * The status of the {@link DisplayJob}.
+ * The result of the {@link AsyncRenderer} execution.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
-public class DisplayJobStatus extends AbstractJobStatus<DisplayJobRequest>
+public class AsyncRendererResult
 {
-    private String targetResult;
+    private String result;
 
     /**
-     * @param request the request provided when started the job
-     * @param observationManager the observation manager component
-     * @param loggerManager the logger manager component
+     * @param result the resulting {@link String} (generally html)
      */
-    public DisplayJobStatus(DisplayJobRequest request, ObservationManager observationManager,
-        LoggerManager loggerManager)
+    public AsyncRendererResult(String result)
     {
-        super(DisplayJob.JOB_TYPE, request, null, observationManager, loggerManager);
 
-        setIsolated(false);
     }
 
     /**
-     * @return the result of the execution
+     * @return the result the resulting {@link String} (generally html)
      */
-    public String getTargetResult()
+    public String getResult()
     {
-        return this.targetResult;
+        return this.result;
     }
 }

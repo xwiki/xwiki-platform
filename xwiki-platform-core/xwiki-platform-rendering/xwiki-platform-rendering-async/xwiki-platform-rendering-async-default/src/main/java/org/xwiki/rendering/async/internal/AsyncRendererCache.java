@@ -20,6 +20,7 @@
 package org.xwiki.rendering.async.internal;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +44,7 @@ import org.xwiki.model.reference.EntityReference;
  * Share cache containing the results of the {@link AsyncRenderer} executions.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 @Component(roles = AsyncRenderer.class)
 @Singleton
@@ -55,6 +56,21 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     private Cache<AsyncRendererJobStatus> cache;
 
     private Map<EntityReference, Set<String>> referenceMapping = new ConcurrentHashMap<>();
+
+    /**
+     * @param jobId the job identifier
+     * @return the cache key
+     */
+    public static String toCacheKey(List<String> jobId)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for (String element : jobId) {
+            builder.append(element.length()).append(':').append(element);
+        }
+
+        return builder.toString();
+    }
 
     @Override
     public void initialize() throws InitializationException
@@ -69,12 +85,20 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     }
 
     /**
-     * @param key the key used to access the value in the cache.
-     * @return the value associated with the provided key, or {@code null} if there is no value.
+     * @param id the if of the job.
+     * @return the status associated with the provided key, or {@code null} if there is no value.
      */
-    public AsyncRendererJobStatus get(String key)
+    public AsyncRendererJobStatus get(List<String> id)
     {
-        return this.cache.get(key);
+        return this.cache.get(toCacheKey(id));
+    }
+
+    /**
+     * @param status the job status to add to the cache
+     */
+    public void put(AsyncRendererJobStatus status)
+    {
+        this.cache.set(toCacheKey(status.getRequest().getId()), status);
     }
 
     /**
@@ -95,6 +119,9 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         for (EntityReference reference : status.getRequest().getRenderer().getReferences()) {
             this.referenceMapping.computeIfAbsent(reference, k -> new HashSet<String>()).add(key);
         }
+
+        // Avoid storing useless stuff in the RAM
+        status.dispose();
     }
 
     @Override

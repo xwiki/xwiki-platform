@@ -23,13 +23,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.RenderingException;
 import org.xwiki.stability.Unstable;
 
 /**
  * Execute a task and return a String result.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 @Unstable
 public interface AsyncRenderer
@@ -41,11 +42,12 @@ public interface AsyncRenderer
 
     /**
      * @return the resulting {@link String}
+     * @throws RenderingException when failing to execute the renderer
      */
-    String render();
+    AsyncRendererResult render() throws RenderingException;
 
     /**
-     * @return get the references involved in the rendering (they will be used to invalidate the cache when one of those
+     * @return the references involved in the rendering (they will be used to invalidate the cache when one of those
      *         entities is modified)
      */
     Set<EntityReference> getReferences();

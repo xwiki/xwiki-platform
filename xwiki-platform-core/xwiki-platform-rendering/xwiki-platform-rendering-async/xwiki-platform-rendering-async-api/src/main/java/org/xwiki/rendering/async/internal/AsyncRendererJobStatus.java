@@ -27,7 +27,7 @@ import org.xwiki.observation.ObservationManager;
  * The status of the {@link AsyncRendererJob}.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRequest>
 {
@@ -35,6 +35,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
      * The type of the job.
      */
     public static final String JOBTYPE = "asyncrenderer";
+
+    private AsyncRendererResult result;
 
     /**
      * @param request the request provided when started the job
@@ -45,5 +47,29 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         LoggerManager loggerManager)
     {
         super(JOBTYPE, request, null, observationManager, loggerManager);
+    }
+
+    /**
+     * @return the result of the execution
+     */
+    public AsyncRendererResult getResult()
+    {
+        return this.result;
+    }
+
+    /**
+     * @param result the result of the renderer execution
+     */
+    void setResult(AsyncRendererResult result)
+    {
+        this.result = result;
+    }
+
+    /**
+     * Remove stuff which are not required in the cache (to spare some memory).
+     */
+    void dispose()
+    {
+        getRequest().setRenderer(null);
     }
 }

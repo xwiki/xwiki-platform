@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Invalidate the cache when entities are modified.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 public class AsyncRendererCacheListener extends AbstractEventListener
 {

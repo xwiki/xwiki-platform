@@ -17,41 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.display.internal.job;
+package org.xwiki.rendering.async.internal.block;
 
-import javax.inject.Named;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.job.AbstractJob;
+import org.xwiki.rendering.async.internal.AsyncRendererResult;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 
 /**
- * Execute a display in a background thread.
+ * A {@link AsyncRendererResult} which also remember the {@link XDOM} which was rendered into the result {@link String}.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
-@Component
-@Named(DisplayJob.JOB_TYPE)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DisplayJob extends AbstractJob<DisplayJobRequest, DisplayJobStatus>
+public class BlockAsyncRendererResult extends AsyncRendererResult
 {
-    /**
-     * The job type.
-     */
-    public static final String JOB_TYPE = "display";
+    private Block block;
 
-    @Override
-    public String getType()
+    /**
+     * @param result the resulting {@link String} (generally html)
+     * @param block the block which was rendered into the passed {@link String}
+     */
+    public BlockAsyncRendererResult(String result, Block block)
     {
-        return JOB_TYPE;
+        super(result);
+
+        this.block = block;
     }
 
-    @Override
-    protected void runInternal() throws Exception
+    /**
+     * @return the block the block which was rendered into the passed {@link String}
+     */
+    public Block getBlock()
     {
-        // TODO Auto-generated method stub
-
+        return block;
     }
 }

@@ -17,56 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.async.internal;
+package org.xwiki.rendering.async.internal.block;
 
-import java.util.List;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
- * Start and cache asynchronous rendering.
+ * Start and cache asynchronous {@link Block} based rendering.
  * 
  * @version $Id$
  * @since 10.10RC1
  */
 @Role
 @Unstable
-public interface AsyncRendererExecutor
+public interface BlockAsyncRendererExecutor
 {
-    /**
-     * @param id the identifier of the execution
-     * @param wait true if the method should wait for the execution to be finished, otherwise return null
-     * @return the result of the {@link AsyncRenderer} execution for the passed id
-     * @throws InterruptedException when the thread is interrupted while waiting
-     */
-    AsyncRendererResult getResult(List<String> id, boolean wait) throws InterruptedException;
-
     /**
      * Start and cache or return the status of the job corresponding to the passed renderer.
      * 
-     * @param renderer the execution
+     * @param configuration the configuration of the execution
      * @param contextEntries the list of context entries to take remember for the execution
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
      */
-    AsyncRendererJobStatus renderer(AsyncRenderer renderer, Set<String> contextEntries) throws JobException;
+    Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries) throws JobException;
 
     /**
      * Start and cache or return the status of the job corresponding to the passed renderer.
      * 
-     * @param renderer the execution
+     * @param configuration the configuration of the execution
      * @param contextEntries the list of context entries to take remember for the execution
      * @param right the right required to access the result
      * @param rightEntity the reference on which the right is required to access the result
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
      */
-    AsyncRendererJobStatus renderer(AsyncRenderer renderer, Set<String> contextEntries, Right right,
+    Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries, Right right,
         EntityReference rightEntity) throws JobException;
 }

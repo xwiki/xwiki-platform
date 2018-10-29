@@ -111,7 +111,7 @@
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAdminGroup,</groups>
+      <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
       <levels>admin,edit</levels>
@@ -194,7 +194,7 @@
       <allow>0</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAllGroup,</groups>
+      <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
       <levels>view</levels>

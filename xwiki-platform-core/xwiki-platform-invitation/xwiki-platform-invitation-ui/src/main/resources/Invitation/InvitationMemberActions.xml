@@ -613,7 +613,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAllGroup,</groups>
+      <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
       <levels>view</levels>

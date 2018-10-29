@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Validate the behaviour of {@link XClassBreakingQuestion}
  *
- * @since 10.9RC1
+ * @since 10.10RC1
  * @version $Id$
  */
 public class XClassBreakingQuestionTest

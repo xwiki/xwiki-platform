@@ -123,7 +123,7 @@ public class ConfigurationFilesGenerator
                 DB_PASSWORD,
                 "com.mysql.jdbc.Driver",
                 "org.hibernate.dialect.MySQL5InnoDBDialect"));
-        } else if (database.equals(Database.HSQLDB)) {
+        } else if (database.equals(Database.HSQLDB_EMBEDDED)) {
             props.putAll(getDBProperties(
                 "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true",
                 "sa",

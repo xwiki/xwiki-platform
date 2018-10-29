@@ -34,7 +34,7 @@ import org.xwiki.refactoring.job.question.EntitySelection;
  * Represents a question asked to the user when he tries to refactor some pages containing used XClass.
  *
  * @version $Id$
- * @since 10.9
+ * @since 10.10RC1
  */
 public class XClassBreakingQuestion
 {

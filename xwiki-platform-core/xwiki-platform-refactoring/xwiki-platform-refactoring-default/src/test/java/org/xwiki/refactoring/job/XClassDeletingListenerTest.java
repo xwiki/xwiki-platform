@@ -73,7 +73,7 @@ import static org.mockito.Mockito.when;
  * Validate the behaviour of {@link XClassDeletingListener}
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.10RC1
  */
 @ComponentTest
 @ComponentList({

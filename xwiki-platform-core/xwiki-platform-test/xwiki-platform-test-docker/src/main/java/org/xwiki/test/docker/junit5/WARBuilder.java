@@ -79,14 +79,14 @@ public class WARBuilder
         // Create a minimal XWiki WAR that doesn't contain any dependencies from the module under test (those
         // dependencies will be installed as extensions in ExtensionInstaller).
 
-        // Step 1: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
+        // Step: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
         LOGGER.info("Finding version ...");
         ArtifactResolver artifactResolver = ArtifactResolver.getInstance();
         MavenResolver mavenResolver = MavenResolver.getInstance();
         String xwikiVersion = mavenResolver.getModelFromCurrentPOM().getVersion();
         LOGGER.info("Found version = [{}]", xwikiVersion);
 
-        // Step 2: Gather all the required JARs for the minimal WAR
+        // Step: Gather all the required JARs for the minimal WAR
         LOGGER.info("Resolving distribution dependencies ...");
         Collection<ArtifactResult> artifactResults = artifactResolver.getDistributionDependencies(xwikiVersion);
         List<File> warDependencies = new ArrayList<>();
@@ -104,27 +104,19 @@ public class WARBuilder
             }
         }
 
-        // Step 3: Since we want to be able to provision SNAPSHOT extensions, we need to configure the SNAPSHOT
-        //         extension repository. We do that by adding a dependency which will inject it automatically in the
-        //         default list of extension repositories.
-        LOGGER.info("Adding SNAPSHOT extension to provision SNAPSHOT extensions ...");
-        Artifact snapshotRepositoryArtifact = new DefaultArtifact("org.xwiki.commons",
-            "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
-        jarDependencies.add(artifactResolver.resolveArtifact(snapshotRepositoryArtifact).getArtifact());
-
-        // Step 4: Copy the JARs in WEB-INF/lib
+        // Step: Copy the JARs in WEB-INF/lib
         File webInfDirectory = new File(targetWARDirectory, "WEB-INF");
         File libDirectory = new File(webInfDirectory, "lib");
         copyJARs(testConfiguration, jarDependencies, libDirectory);
 
-        // Step 5: Add the webapp resources (web.xml, templates VM files, etc)
+        // Step: Add the webapp resources (web.xml, templates VM files, etc)
         copyWebappResources(testConfiguration, warDependencies, targetWARDirectory);
 
-        // Step 6: Add XWiki configuration files (depends on the selected DB for the hibernate one)
+        // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(testConfiguration, webInfDirectory, xwikiVersion, artifactResolver);
 
-        // Step 7: Add the JDBC driver for the selected DB
+        // Step: Add the JDBC driver for the selected DB
         LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());
         File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), artifactResolver);
         if (testConfiguration.isDebug()) {
@@ -132,7 +124,7 @@ public class WARBuilder
         }
         XWikiFileUtils.copyFile(jdbcDriverFile, libDirectory);
 
-        // Step 8: Unzip the Flamingo skin
+        // Step: Unzip the Flamingo skin
         unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
     }
 

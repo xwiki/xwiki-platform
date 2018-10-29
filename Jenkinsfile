@@ -130,7 +130,7 @@ def builds = [
       name: 'Docker - HSQLDB/Tomcat/Firefox',
       node: 'docker',
       profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=firefox -Dxwiki.test.ui.database=hsqldb -Dxwiki.test.ui.servletEngine=tomcat',
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=firefox -Dxwiki.test.ui.database=hsqldb_embedded -Dxwiki.test.ui.servletEngine=tomcat',
       projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
     )
   }

@@ -85,6 +85,10 @@
   clear: both;
 }
 
+.xwiki-flavor-picker-filter {
+  margin-bottom: 2px;
+}
+
 .skin-colibri .xwiki-flavor-picker-option {
   width: 47%;
 }

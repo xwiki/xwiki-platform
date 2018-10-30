@@ -128,8 +128,7 @@ public class WARBuilder
 
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
-        this.configurationFilesGenerator.generate(testConfiguration, webInfDirectory, xwikiVersion,
-            this.artifactResolver);
+        this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
 
         // Step: Add the JDBC driver for the selected DB
         LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());

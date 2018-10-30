@@ -47,6 +47,7 @@ public class DatabaseContainerExecutor
     public void start(TestConfiguration testConfiguration)
     {
         JdbcDatabaseContainer databaseContainer = null;
+        int port = -1;
         switch (testConfiguration.getDatabase()) {
             case MYSQL:
                 // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
@@ -56,8 +57,7 @@ public class DatabaseContainerExecutor
                 databaseContainer = new MySQLContainer<>()
                     .withDatabaseName(DBNAME)
                     .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD)
-                    .withExposedPorts(3306);
+                    .withPassword(DBPASSWORD);
 
                 if (testConfiguration.isDatabaseDataSaved()) {
                     // This allows re-running the test with the database already provisioned without having to redo
@@ -69,6 +69,8 @@ public class DatabaseContainerExecutor
                 databaseContainer.addParameter("collation-server", "utf8_bin");
                 databaseContainer.addParameter("explicit-defaults-for-timestamp", "1");
 
+                port = 3306;
+
                 break;
             case POSTGRESQL:
                 // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
@@ -77,8 +79,7 @@ public class DatabaseContainerExecutor
                 databaseContainer = new PostgreSQLContainer<>()
                     .withDatabaseName(DBNAME)
                     .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD)
-                    .withExposedPorts(5432);
+                    .withPassword(DBPASSWORD);
 
                 if (testConfiguration.isDatabaseDataSaved()) {
                     // This allows re-running the test with the database already provisioned without having to redo
@@ -88,6 +89,8 @@ public class DatabaseContainerExecutor
 
                 databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
                 databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
+
+                port = 5432;
 
                 break;
             case ORACLE:
@@ -109,6 +112,7 @@ public class DatabaseContainerExecutor
 
         if (databaseContainer != null) {
             databaseContainer
+                .withExposedPorts(port)
                 .withNetwork(Network.SHARED)
                 .withNetworkAliases("xwikidb");
 
@@ -117,6 +121,17 @@ public class DatabaseContainerExecutor
             }
 
             databaseContainer.start();
+
+            if (testConfiguration.getServletEngine().isOutsideDocker()) {
+                testConfiguration.getDatabase().setIpAddress(databaseContainer.getContainerIpAddress());
+                testConfiguration.getDatabase().setPort(databaseContainer.getMappedPort(port));
+            } else {
+                testConfiguration.getDatabase().setIpAddress((String) databaseContainer.getNetworkAliases().get(0));
+                testConfiguration.getDatabase().setPort(port);
+            }
+        } else {
+            testConfiguration.getDatabase().setIpAddress("localhost");
+            testConfiguration.getDatabase().setPort(port);
         }
     }
 

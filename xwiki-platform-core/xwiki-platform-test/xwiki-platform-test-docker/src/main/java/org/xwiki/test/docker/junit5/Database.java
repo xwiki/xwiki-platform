@@ -51,5 +51,29 @@ public enum Database
     /**
      * Represents the Oracle database.
      */
-    ORACLE
+    ORACLE;
+
+    private String ipAddress;
+
+    private int port;
+
+    void setIpAddress(String ipAddress)
+    {
+        this.ipAddress = ipAddress;
+    }
+
+    String getIpAddress()
+    {
+        return this.ipAddress;
+    }
+
+    void setPort(int port)
+    {
+        this.port = port;
+    }
+
+    int getPort()
+    {
+        return this.port;
+    }
 }

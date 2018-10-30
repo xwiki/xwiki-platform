@@ -73,17 +73,16 @@ public class ConfigurationFilesGenerator
     }
 
     /**
-     * @param testConfiguration the configuration (database, debug mode, etc)
      * @param configurationFileTargetDirectory the location where to generate the config files
      * @param version the XWiki version for which to generate config files (used to get the config resources for the
      *        right version)
      * @param resolver the artifact resolver to use (can contain resolved artifacts in cache)
      * @throws Exception if an error occurs during config generation
      */
-    public void generate(TestConfiguration testConfiguration, File configurationFileTargetDirectory, String version,
-        ArtifactResolver resolver) throws Exception
+    public void generate(File configurationFileTargetDirectory, String version, ArtifactResolver resolver)
+        throws Exception
     {
-        VelocityContext context = createVelocityContext(new Properties(), testConfiguration.getDatabase());
+        VelocityContext context = createVelocityContext(new Properties());
         Artifact artifact = new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
             JAR, version);
         File configurationJARFile = resolver.resolveArtifact(artifact).getArtifact().getFile();
@@ -96,7 +95,7 @@ public class ConfigurationFilesGenerator
                 if (entry.getName().endsWith(VM_EXTENSION)) {
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
-                    if (testConfiguration.isDebug()) {
+                    if (this.testConfiguration.isDebug()) {
                         LOGGER.info("... Generating: " + outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...
@@ -113,10 +112,10 @@ public class ConfigurationFilesGenerator
         }
     }
 
-    private VelocityContext createVelocityContext(Properties projectProperties, Database database)
+    private VelocityContext createVelocityContext(Properties projectProperties)
     {
         Properties properties = new Properties();
-        properties.putAll(getDefaultConfigurationProperties(database));
+        properties.putAll(getDefaultConfigurationProperties());
         for (Object key : projectProperties.keySet()) {
             properties.put(key.toString(), projectProperties.get(key).toString());
         }
@@ -124,7 +123,7 @@ public class ConfigurationFilesGenerator
         return context;
     }
 
-    private Properties getDefaultConfigurationProperties(Database database)
+    private Properties getDefaultConfigurationProperties()
     {
         Properties props = new Properties();
 
@@ -132,7 +131,7 @@ public class ConfigurationFilesGenerator
         props.put("xwikiCfgSuperadminPassword", "pass");
 
         // Default configuration data for hibernate.cfg.xml
-        props.putAll(getDatabaseConfigurationProperties(database));
+        props.putAll(getDatabaseConfigurationProperties());
 
         // Default configuration data for xwiki.cfg
         props.setProperty("xwikiCfgPlugins",
@@ -169,15 +168,17 @@ public class ConfigurationFilesGenerator
         return props;
     }
 
-    private Properties getDatabaseConfigurationProperties(Database database)
+    private Properties getDatabaseConfigurationProperties()
     {
         Properties props = new Properties();
 
         // Default configuration data for hibernate.cfg.xml
-        if (database.equals(Database.MYSQL)) {
+        String ipAddress = this.testConfiguration.getDatabase().getIpAddress();
+        int port = this.testConfiguration.getDatabase().getPort();
+        if (this.testConfiguration.getDatabase().equals(Database.MYSQL)) {
             props.putAll(getDBProperties(Arrays.asList(
                 "mysql",
-                "jdbc:mysql://xwikidb:3306/xwiki?useSSL=false",
+                String.format("jdbc:mysql://%s:%s/xwiki?useSSL=false", ipAddress, port),
                 DB_USERNAME,
                 DB_PASSWORD,
                 "com.mysql.jdbc.Driver",
@@ -185,10 +186,10 @@ public class ConfigurationFilesGenerator
                 null,
                 null,
                 null)));
-        } else if (database.equals(Database.POSTGRESQL)) {
+        } else if (this.testConfiguration.getDatabase().equals(Database.POSTGRESQL)) {
             props.putAll(getDBProperties(Arrays.asList(
                 "pgsql",
-                "jdbc:postgresql://xwikidb:5432/xwiki",
+                String.format("jdbc:postgresql://%s:%s/xwiki", ipAddress, port),
                 DB_USERNAME,
                 DB_PASSWORD,
                 "org.postgresql.Driver",
@@ -196,7 +197,7 @@ public class ConfigurationFilesGenerator
                 "schema",
                 "xwiki.postgresql.hbm.xml",
                 null)));
-        } else if (database.equals(Database.HSQLDB_EMBEDDED)) {
+        } else if (this.testConfiguration.getDatabase().equals(Database.HSQLDB_EMBEDDED)) {
             props.putAll(getDBProperties(Arrays.asList(
                 "hsqldb",
                 "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true",
@@ -209,7 +210,8 @@ public class ConfigurationFilesGenerator
                 null)));
         } else {
             throw new RuntimeException(
-                String.format("Failed to generate Hibernate config. Database [%s] not supported yet!", database));
+                String.format("Failed to generate Hibernate config. Database [%s] not supported yet!",
+                    this.testConfiguration.getDatabase()));
         }
 
         return props;

@@ -109,8 +109,15 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // XWiki is not started
             LOGGER.info("XWiki is not started, starting all...");
 
+            // Start the Database.
+            // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
+            // container for the database when configuring the JDBC URL, in the case when the servlet container is
+            // running outside of docker and thus outside of the shared docker network...
+            LOGGER.info("(1) Starting database [{}]...", testConfiguration.getDatabase());
+            startDatabase(testConfiguration);
+
             // Build the XWiki WAR
-            LOGGER.info("(1) Building custom XWiki WAR...");
+            LOGGER.info("(2) Building custom XWiki WAR...");
             File targetWARDirectory = new File("./target/xwiki");
             // If the directory exists, skip the rebuilding of the XWiki WAR, allowing to re-run the test faster
             if (!targetWARDirectory.exists()) {
@@ -121,10 +128,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             } else {
                 LOGGER.info("XWiki WAR directory [{}] exists, don't rebuild WAR to save time!", targetWARDirectory);
             }
-
-            // Start the Database
-            LOGGER.info("(2) Starting database [{}]...", testConfiguration.getDatabase());
-            startDatabase(testConfiguration);
 
             // Start the Servlet Engine
             LOGGER.info("(3) Starting Servlet container [{}]...", testConfiguration.getServletEngine());

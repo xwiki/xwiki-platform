@@ -83,6 +83,7 @@ ckeditor.plugin.macro.dedicatedInsertButtonHint=Umetni makro {0}
 
 ckeditor.plugin.resource.notSpecified={0} nije naznačeno.
 ckeditor.plugin.save.leaveConfirmationMessage=Ima nespremljenih izmjena. Želite li ih zanemariti?
+### Missing: ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
 ckeditor.plugin.source.conversionFailed=Konverzija nije uspjela.
 
 modal.ok=OK

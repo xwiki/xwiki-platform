@@ -202,6 +202,6 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=C
 ## Toggle notification filters labels
 notifications.filters.preferences.label.page=Activer/désactiver les notifications de Page uniquement
 notifications.filters.preferences.label.space=Activer/désactiver les notifications de Page et enfants
-notifications.filters.preferences.label.wiki=Activer/désactiver les notifications de Wiki
+notifications.filters.preferences.label.wiki=Activer/désactiver les notifications du Wiki
 </content>
 </xwikidoc>

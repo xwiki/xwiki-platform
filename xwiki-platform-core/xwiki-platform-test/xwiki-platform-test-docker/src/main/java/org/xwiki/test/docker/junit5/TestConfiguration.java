@@ -39,6 +39,8 @@ public class TestConfiguration
 
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
+    private static final String OFFLINE_PROPERTY = "xwiki.test.ui.offline";
+
     private UITest uiTestAnnotation;
 
     private Browser browser;
@@ -51,6 +53,8 @@ public class TestConfiguration
 
     private boolean saveDatabaseData;
 
+    private boolean isOffline;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -62,13 +66,14 @@ public class TestConfiguration
         resolveServletEngine();
         resolveDebug();
         resolveSaveDatabaseData();
+        resolveOffline();
     }
 
     private void resolveBrowser()
     {
         Browser newBrowser = this.uiTestAnnotation.browser();
         if (newBrowser == Browser.SYSTEM) {
-            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.CHROME.name()).toUpperCase());
+            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.FIREFOX.name()).toUpperCase());
         }
         this.browser = newBrowser;
     }
@@ -77,7 +82,8 @@ public class TestConfiguration
     {
         Database newDatabase = this.uiTestAnnotation.database();
         if (newDatabase == Database.SYSTEM) {
-            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY, Database.MYSQL.name()).toUpperCase());
+            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY,
+                Database.HSQLDB_EMBEDDED.name()).toUpperCase());
         }
         this.database = newDatabase;
     }
@@ -87,7 +93,7 @@ public class TestConfiguration
         ServletEngine newServletEngine = this.uiTestAnnotation.servletEngine();
         if (newServletEngine == ServletEngine.SYSTEM) {
             newServletEngine = ServletEngine.valueOf(System.getProperty(SERVLETENGINE_PROPERTY,
-                ServletEngine.TOMCAT.name()).toUpperCase());
+                ServletEngine.JETTY_STANDALONE.name()).toUpperCase());
         }
         this.servletEngine = newServletEngine;
     }
@@ -108,6 +114,15 @@ public class TestConfiguration
             newSaveDatabaseData = Boolean.valueOf(System.getProperty(SAVEDBDATA_PROPERTY, FALSE));
         }
         this.saveDatabaseData = newSaveDatabaseData;
+    }
+
+    private void resolveOffline()
+    {
+        boolean newOffline = this.uiTestAnnotation.isOffline();
+        if (!newOffline) {
+            newOffline = Boolean.valueOf(System.getProperty(OFFLINE_PROPERTY, FALSE));
+        }
+        this.isOffline = newOffline;
     }
 
     /**
@@ -149,5 +164,15 @@ public class TestConfiguration
     public boolean isDatabaseDataSaved()
     {
         return this.saveDatabaseData;
+    }
+
+    /**
+     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
+     *         your local repository). False by default to avoid developer problems but should be set to true in the
+     *         CI to improve performance of functional tests
+     */
+    public boolean isOffline()
+    {
+        return this.isOffline;
     }
 }

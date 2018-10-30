@@ -43,9 +43,8 @@ public class DatabaseContainerExecutor
 
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
-     * @return the Docker container instance
      */
-    public JdbcDatabaseContainer execute(TestConfiguration testConfiguration)
+    public void start(TestConfiguration testConfiguration)
     {
         JdbcDatabaseContainer databaseContainer = null;
         switch (testConfiguration.getDatabase()) {
@@ -96,7 +95,7 @@ public class DatabaseContainerExecutor
                     .withPassword(DBPASSWORD);
 
                 break;
-            case HSQLDB:
+            case HSQLDB_EMBEDDED:
                 // We don't need a Docker image/container since HSQLDB can work in embedded mode.
                 // It's configured automatically in the custom XWiki WAR.
                 // Thus, nothing to do here!
@@ -117,9 +116,13 @@ public class DatabaseContainerExecutor
 
             databaseContainer.start();
         }
+    }
 
+    /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     */
+    public void stop(TestConfiguration testConfiguration)
+    {
         // Note that we don't need to stop the container as this is taken care of by TestContainers
-
-        return databaseContainer;
     }
 }

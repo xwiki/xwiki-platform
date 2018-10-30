@@ -1454,7 +1454,7 @@
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAllGroup,</groups>
+      <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
       <levels>edit,comment,undelete,script</levels>
@@ -2922,7 +2922,7 @@ ${host}${xwiki.getURL('XWiki.AccountValidation', 'view', "validkey=${validkey}&a
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAdminGroup,</groups>
+      <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
       <levels>view</levels>

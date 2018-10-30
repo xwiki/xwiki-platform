@@ -51,31 +51,30 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  * @since 10.9
  */
-public final class ArtifactResolver
+public class ArtifactResolver
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactResolver.class);
+
+    private static final String COMMONS_GROUPID = "org.xwiki.commons";
 
     private static final String PLATFORM_GROUPID = "org.xwiki.platform";
 
     private static final String JAR = "jar";
 
-    private static ArtifactResolver artifactResolver = new ArtifactResolver();
+    private TestConfiguration testConfiguration;
+
+    private RepositoryResolver repositoryResolver;
 
     private Map<String, List<ArtifactResult>> artifactResultCache = new HashMap<>();
 
-    private RepositoryResolver repositoryResolver = RepositoryResolver.getInstance();
-
-    private ArtifactResolver()
-    {
-        // Empty voluntarily, private constructor to ensure singleton
-    }
-
     /**
-     * @return the singleton instance for this class
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public static ArtifactResolver getInstance()
+    public ArtifactResolver(TestConfiguration testConfiguration, RepositoryResolver repositoryResolver)
     {
-        return artifactResolver;
+        this.testConfiguration = testConfiguration;
+        this.repositoryResolver = repositoryResolver;
     }
 
     /**
@@ -107,27 +106,14 @@ public final class ArtifactResolver
     }
 
     /**
-     * @param artifact the artifact to resolve along with all its dependencies (will resolve against the remote and
-     * local repositories and ensure that files are available on the local file system for the artifact and all its
-     * dependencies)
-     * @return the collection of the artifact results for the artifact and all its dependencies
-     * @throws Exception if an error occurred during resolving
-     */
-    public Collection<ArtifactResult> getArtifactAndDependencies(Artifact artifact) throws Exception
-    {
-        List<ArtifactResult> artifactResults = new ArrayList<>();
-        artifactResults.add(resolveArtifact(artifact));
-        artifactResults.addAll(getArtifactDependencies(artifact));
-        return artifactResults;
-    }
-
-    /**
      * @param artifact the artifact for which to resolve its dependencies (will resolve against the remote and local
      * repositories and ensure that files are available on the local file system for the artifact's dependencies)
+     * @param dependentArtifacts additional dependencies for which to also find dependencies in the same request
      * @return the collection of the artifact results for the artifact's dependencies
      * @throws Exception if an error occurred during resolving
      */
-    public Collection<ArtifactResult> getArtifactDependencies(Artifact artifact) throws Exception
+    public Collection<ArtifactResult> getArtifactDependencies(Artifact artifact, List<Artifact> dependentArtifacts)
+        throws Exception
     {
         // If in cache, serve from the cache for increased performances
         String artifactAsString = String.format("%s:%s:%s:%s", artifact.getGroupId(), artifact.getArtifactId(),
@@ -135,6 +121,8 @@ public final class ArtifactResolver
         List<ArtifactResult> artifactResults = this.artifactResultCache.get(artifactAsString);
         if (artifactResults == null) {
             DependencyFilter filter = new AndDependencyFilter(Arrays.asList(
+                // Include compile and runtime scopes only (we don't want provided since it's supposed to be available
+                // in the execution's environment).
                 new ScopeDependencyFilter(
                     Arrays.asList(JavaScopes.COMPILE, JavaScopes.RUNTIME), Collections.emptyList()),
                 // - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
@@ -144,16 +132,26 @@ public final class ArtifactResolver
                 new ExclusionsDependencyFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
                     "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
 
-            CollectRequest collectRequest = new CollectRequest();
-            collectRequest.setRoot(new Dependency(artifact, null));
-            collectRequest.setRepositories(this.repositoryResolver.getRepositories());
+            CollectRequest collectRequest = new CollectRequest()
+                .setRoot(new Dependency(artifact, null))
+                .setRepositories(this.repositoryResolver.getRepositories());
+
+            if (dependentArtifacts != null && !dependentArtifacts.isEmpty()) {
+                for (Artifact dependentArtifact : dependentArtifacts) {
+                    // Note: we use a "runtime" scope so that the dependent artifact is included in the result (we
+                    // filter on scopes and keep "compile" and "runtime" artifacts).
+                    collectRequest.addDependency(new Dependency(dependentArtifact, "runtime"));
+                }
+            }
 
             long t1 = System.currentTimeMillis();
             DependencyNode node = this.repositoryResolver.getSystem().collectDependencies(
                 this.repositoryResolver.getSession(), collectRequest).getRoot();
             LOGGER.debug("collect = {} ms", (System.currentTimeMillis() - t1));
 
-            node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
+            if (LOGGER.isDebugEnabled()) {
+                node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
+            }
 
             DependencyRequest request = new DependencyRequest(node, filter);
             t1 = System.currentTimeMillis();
@@ -181,36 +179,41 @@ public final class ArtifactResolver
      */
     public Collection<ArtifactResult> getDistributionDependencies(String xwikiVersion) throws Exception
     {
-        List<ArtifactResult> artifactResults = new ArrayList<>();
-
-        // TODO: Find a way to resolve all those artifacts at once to ensure we cannot have different versions of the
-        // same jars in the returned collection, and for increased performances.
-
         Artifact rootDistributionArtifact = new DefaultArtifact(PLATFORM_GROUPID,
             "xwiki-platform-distribution-war-minimaldependencies", "pom", xwikiVersion);
-        artifactResults.addAll(getArtifactDependencies(rootDistributionArtifact));
+
+        List<Artifact> dependentArtifacts = new ArrayList<>();
 
         // We provision XAR and JAR extensions (as dependencies of XAR extensions). Thus we need the associated
         // handlers.
         Artifact xarHandlerArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-extension-handler-xar",
             JAR, xwikiVersion);
-        artifactResults.addAll(getArtifactAndDependencies(xarHandlerArtifact));
+        dependentArtifacts.add(xarHandlerArtifact);
         Artifact jarHandlerArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-extension-handler-jar",
             JAR, xwikiVersion);
-        artifactResults.addAll(getArtifactAndDependencies(jarHandlerArtifact));
+        dependentArtifacts.add(jarHandlerArtifact);
 
-        Artifact mavenHandlerArtifact = new DefaultArtifact("org.xwiki.commons",
-            "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
-        artifactResults.addAll(getArtifactAndDependencies(mavenHandlerArtifact));
+        // Since we want to be able to provision SNAPSHOT extensions, we need to configure the SNAPSHOT
+        // extension repository. We do that by adding a dependency which will inject it automatically in the
+        // default list of extension repositories.
+        if (this.testConfiguration == null || !this.testConfiguration.isOffline()) {
+            Artifact artifact = new DefaultArtifact(COMMONS_GROUPID,
+                "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
+            dependentArtifacts.add(artifact);
+        } else {
+            Artifact artifact = new DefaultArtifact(COMMONS_GROUPID,
+                "xwiki-commons-extension-repository-maven", JAR, xwikiVersion);
+            dependentArtifacts.add(artifact);
+        }
 
         // It seems that Maven Resolver is not able to resolve the ZIP dependencies from
         // xwiki-platform-distribution-war-minimaldependencies for some reason, so we manually ask for resolving the
         // skin dependency (which of ZIP type).
         Artifact skinArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-flamingo-skin-resources",
             "zip", xwikiVersion);
-        artifactResults.addAll(getArtifactAndDependencies(skinArtifact));
+        dependentArtifacts.add(skinArtifact);
 
-        return artifactResults;
+        return getArtifactDependencies(rootDistributionArtifact, dependentArtifacts);
     }
 
     private void sendError(Artifact artifact, Collection<Exception> exceptions) throws Exception

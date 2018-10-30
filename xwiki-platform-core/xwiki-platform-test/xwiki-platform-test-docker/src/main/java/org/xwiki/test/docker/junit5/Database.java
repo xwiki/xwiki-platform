@@ -39,9 +39,9 @@ public enum Database
     MYSQL,
 
     /**
-     * Represents the HyperSQL database.
+     * Represents the HyperSQL database, running outside of a Docker contaier.
      */
-    HSQLDB,
+    HSQLDB_EMBEDDED,
 
     /**
      * Represents the PostgreSQL database.

@@ -1,0 +1,184 @@
+###
+### Return the list of pages and extensions that are going to be deleted by a delete job
+###
+$response.setContentType("application/json")
+
+###
+### Globals
+###
+#set ($offset = "$!request.offset")
+#if ($offset == '')
+  #set ($offset = '0')
+#end
+#set ($offset = $numbertool.toNumber($offset))
+#set ($limit = 15)
+
+#**
+ * Display a pagination node.
+ * @param $data the collection where the node will be added
+ * @param $howMany the number of nodes that remains
+ * @param $newOffset the offset to use to display the next batch of nodes
+ *#
+#macro(paginationNode $data $howMany $newOffset)
+  #set ($id = "$!{request.id}")
+  #if ($id == '')
+    #set ($id = '#')
+  #end
+  #set ($discard = $data.add({
+    'id': "pagination:$id",
+    'text': "$escapetool.javascript($services.localization.render('job.question.XClassBreakingQuestion.tree.paginationNode', [$howMany]))",
+    'icon': 'fa fa-eye',
+    'children': false,
+    'data': {
+      'type': 'pagination',
+      'validChildren': [],
+      'canDelete': true,
+      'offset': $newOffset
+    },
+    'li_attr': {
+      'class': 'paginationNode'
+    }
+  }))
+#end
+
+
+#**
+ * Add page node in the collection.
+ * @param $question the question beeing asked
+ * @param $data the collection where the nodes will be added
+ * @param $type the type of the data to retrieve (xclass, freePages or objects)
+ *#
+#macro(displayPages $question $data $type)
+  #set ($collection = [])
+  #getCollection($type, $question, $collection)
+  #foreach($element in $collection)
+    #if ($velocityCount > $offset + $limit)
+      #set ($howMany = $collection.size() - $velocityCount + 1)
+      #paginationNode($data, $howMany, $velocityCount)
+      #break
+    #end
+    #if ($velocityCount > $offset)
+      #set ($pageReference = '')
+      #getReference($type, $element, $pageReference)
+      #set ($pageDoc = $xwiki.getDocument($pageReference))
+      #set ($title = $pageDoc.getPlainTitle())
+      #set ($serializedReference = $services.model.serialize($pageReference, 'local'))
+      #set ($selected = 'false')
+      #if ($type == 'xclass' || $type == 'freePages')
+        #set ($selected = $element.isSelected())
+      #end
+      #addData($type, $title, $serializedReference, $pageDoc, $selected, $data)
+    #end
+  #end
+#end
+
+#**
+ * Returns the collection of elements to iterate on from the question and type of data
+ *
+ * @param $type the type of data to iterate on (xclass, freePages or objects)
+ * @param $question the question containing the data
+ * @param $collection the variable to set with the retrieved collection
+ *#
+#macro(getCollection $type $question $collection)
+  #if ($type == 'xclass')
+    #set ($collection = $question.getXClassPages())
+  #elseif ($type == 'freePages')
+    #set ($collection = $question.getFreePages())
+  #elseif ($type == 'objects')
+    #set ($requestReference = $services.model.resolveDocument($request.id, 'current'))
+    #set ($collection = $question.impactedObjects.get($requestReference))
+  #end
+#end
+
+#**
+ * Retrieve the page reference depending of the type of the given element
+ *
+ * @param $type the type of the element (xclass, freePages or objects)
+ * @param $element the element to retrieve the reference from
+ * @param $pageReference the variable to set with the retrieved reference
+ *#
+#macro(getReference $type $element $pageReference)
+  #if ($type == 'xclass')
+    #set ($pageReference = $element.entityReference)
+  #elseif ($type == 'freePages')
+    #set ($pageReference = $element.entityReference)
+  #elseif ($type == 'objects')
+    #set ($pageReference = $element)
+  #end
+#end
+
+#**
+ * Build data based on the type and the given parameter and add it in data parameter
+ *
+ * @param $type the type of the data to add (xclass, freePages, or objects)
+ * @param $title the title of the node to display
+ * @param $serializedReference the serialized local reference of the page
+ * @param $data the array of data to fill
+ *#
+#macro(addData $type $title $serializedReference $pageDoc $selected $data)
+  #if ($type == 'xclass')
+    #set ($discard = $data.add({
+      'id': $serializedReference,
+      'text': "$title ($serializedReference)",
+      'icon': 'fa fa-file-o',
+      'children': true,
+      'state': {
+        'selected': $selected
+      },
+      'data': {
+        'link': $pageDoc.getURL('view')
+      }
+    }))
+  #elseif ($type == 'freePages')
+    #set ($discard = $data.add({
+      'id': $serializedReference,
+      'text': "$title ($serializedReference)",
+      'icon': 'fa fa-file-o',
+      'children': false,
+      'state': {
+        'selected': $selected
+      }
+    }))
+  #elseif ($type == 'objects')
+    #set ($discard = $data.add({
+      'id': "object-$serializedReference",
+      'text': "$title ($serializedReference)",
+      'icon': 'fa fa-cubes',
+      'children': false,
+      'state': {
+        'disabled': true
+      },
+      'data': {
+        'type': 'object'
+      }
+    }))
+  #end
+#end
+
+#**
+ * Controller
+ *#
+#set ($jobStatus = $job.status)
+#set ($question = $jobStatus.question)
+#set ($data = [])
+#if ("$!request.data" == 'children' && "$!request.id" != '#')
+  #if ("$!request.id" == 'freePages')
+    #displayPages($question, $data, 'freePages')
+  #else
+    #displayPages($question, $data, 'objects')
+  #end
+#else
+  #if ($offset == 0 && !$question.freePages.isEmpty())
+    #set ($discard = $data.add({
+      'id': 'freePages',
+      'text': "$escapetool.javascript($services.localization.render('job.question.XClassBreakingQuestion.tree.freePages'))",
+      'icon': 'fa fa-folder',
+      'children': true,
+      'data': {
+        'type': 'pages'
+      }
+    }))
+  #end
+  #displayPages($question, $data, 'xclass')
+#end
+$jsontool.serialize($data)

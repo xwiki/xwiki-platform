@@ -43,13 +43,11 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
  * @version $Id$
  * @since 10.9
  */
-public final class RepositoryResolver
+public class RepositoryResolver
 {
     private static final String DEFAULT_REPO_TYPE = "default";
 
     private static final RepositoryPolicy REPOSITORY_POLICY = new RepositoryPolicy(true, "never", "warn");
-
-    private static RepositoryResolver repositoryResolver = new RepositoryResolver();
 
     private RemoteRepositoryManager remoteRepositoryManager;
 
@@ -59,19 +57,17 @@ public final class RepositoryResolver
 
     private List<RemoteRepository> repositories;
 
-    private RepositoryResolver()
+    private TestConfiguration testConfiguration;
+
+    /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     */
+    public RepositoryResolver(TestConfiguration testConfiguration)
     {
+        this.testConfiguration = testConfiguration;
         this.system = newRepositorySystem();
         this.repositories = newRemoteRepositories();
         this.systemSession = newSession(this.system);
-    }
-
-    /**
-     * @return the singleton instance for this class
-     */
-    public static RepositoryResolver getInstance()
-    {
-        return repositoryResolver;
     }
 
     /**
@@ -124,6 +120,11 @@ public final class RepositoryResolver
         String localRepoLocation = String.format("%s/.m2/repository", System.getProperty("user.home"));
         LocalRepository localRepo = new LocalRepository(localRepoLocation);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
+
+        if (this.testConfiguration != null && this.testConfiguration.isOffline()) {
+            session.setOffline(true);
+        }
+
         return session;
     }
 

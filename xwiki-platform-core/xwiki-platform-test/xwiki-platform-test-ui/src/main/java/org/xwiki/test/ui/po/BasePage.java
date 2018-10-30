@@ -379,20 +379,6 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * @return {@code true} if the screen is extra small (as defined by Bootstrap), {@code false} otherwise
-     */
-    private boolean isExtraSmallScreen()
-    {
-        return getDriver().manage().window().getSize().getWidth() < 768;
-    }
-
-    private By getTopMenuToggleSelector(String menuId)
-    {
-        String side = isExtraSmallScreen() ? "left" : "right";
-        return By.xpath("//li[@id='" + menuId + "']//a[contains(@class, 'dropdown-split-" + side + "')]");
-    }
-
-    /**
      * @since 4.5M1
      */
     public CreatePagePage createPage()

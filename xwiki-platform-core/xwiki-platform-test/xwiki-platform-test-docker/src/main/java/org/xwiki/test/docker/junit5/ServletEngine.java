@@ -39,7 +39,32 @@ public enum ServletEngine
     TOMCAT,
 
     /**
-     * Represents the Jetty Servlet engine.
+     * Represents the Jetty Servlet engine (running inside Docker).
      */
-    JETTY
+    JETTY,
+
+    /**
+     * Represents the Jetty Servlet engine but running outside of Docker.
+     */
+    JETTY_STANDALONE(true);
+
+    private boolean isOutsideDocker;
+
+    ServletEngine()
+    {
+        // By default all servlet engines run inside docker containers.
+    }
+
+    ServletEngine(boolean isOutsideDocker)
+    {
+        this.isOutsideDocker = isOutsideDocker;
+    }
+
+    /**
+     * @return true if the Servlet engine is meant to be running on the host and not in a Docker container
+     */
+    public boolean isOutsideDocker()
+    {
+        return this.isOutsideDocker;
+    }
 }

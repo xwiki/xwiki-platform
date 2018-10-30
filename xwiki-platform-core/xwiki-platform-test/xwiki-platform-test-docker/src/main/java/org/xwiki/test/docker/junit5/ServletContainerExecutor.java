@@ -41,15 +41,29 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class ServletContainerExecutor
 {
+    private JettyStandaloneExecutor jettyStandaloneExecutor;
+
+    /**
+     * @param artifactResolver the resolver to resolve artifacts from Maven repositories
+     * @param mavenResolver the resolver to read Maven POMs
+     */
+    public ServletContainerExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
+    {
+        this.jettyStandaloneExecutor = new JettyStandaloneExecutor(artifactResolver, mavenResolver);
+    }
+
     /**
      * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
      * @param sourceWARDirectory the location where the built WAR is located
-     * @return the Docker container instance
+     * @return the URL to the xwiki webapp context
      * @throws Exception if an error occurred during the build or start
      */
-    public GenericContainer execute(TestConfiguration testConfiguration, File sourceWARDirectory) throws Exception
+    public String start(TestConfiguration testConfiguration, File sourceWARDirectory) throws Exception
     {
-        GenericContainer servletContainer;
+        GenericContainer servletContainer = null;
+        String xwikiIPAddress = "localhost";
+        int xwikiPort = 8080;
+
         switch (testConfiguration.getServletEngine()) {
             case TOMCAT:
                 // Configure Tomcat logging for debugging. Create a logging.properties file
@@ -75,28 +89,59 @@ public class ServletContainerExecutor
                 setWebappMount(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
 
                 break;
+            case JETTY_STANDALONE:
+                // Resolve and unzip the xwiki-platform-tool-jetty-resources zip artifact and configure Jetty to
+                // use the custom WAR that we generated. Then start jetty from the command line shell script.
+                // Note that we could have decided to embed Jetty (see
+                // http://www.eclipse.org/jetty/documentation/9.4.x/embedding-jetty.html) but we decided against that
+                // as it would mean maintaining 2 Jetty configurations (one for the Jetty standalone packaging and
+                // one for Jetty in embedded mode).
+                this.jettyStandaloneExecutor.start();
+                break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
                     testConfiguration.getServletEngine()));
         }
 
-        // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to start
-        // listening.
-        servletContainer
-            .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikiweb")
-            .withExposedPorts(8080)
-            .waitingFor(
-                Wait.forHttp("/xwiki/bin/get/Main/WebHome")
-                    .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+        if (servletContainer != null) {
+            // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
+            // start listening.
+            servletContainer
+                .withNetwork(Network.SHARED)
+                .withNetworkAliases("xwikiweb")
+                .withExposedPorts(8080)
+                .waitingFor(
+                    Wait.forHttp("/xwiki/bin/get/Main/WebHome")
+                        .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-        if (testConfiguration.isDebug()) {
-            servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            if (testConfiguration.isDebug()) {
+                servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            }
+
+            servletContainer.start();
+
+            xwikiIPAddress = servletContainer.getContainerIpAddress();
+            xwikiPort = servletContainer.getMappedPort(8080);
         }
 
-        servletContainer.start();
+        // URL to access XWiki from the host.
+        String xwikiURL = String.format("http://%s:%s/xwiki", xwikiIPAddress, xwikiPort);
+        return xwikiURL;
+    }
 
-        return servletContainer;
+    /**
+     * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
+     * @throws Exception if an error occurred during the stop
+     */
+    public void stop(TestConfiguration testConfiguration) throws Exception
+    {
+        switch (testConfiguration.getServletEngine()) {
+            case JETTY_STANDALONE:
+                this.jettyStandaloneExecutor.stop();
+                break;
+            default:
+                // Nothing to do, stopped by TestContainers automatically
+        }
     }
 
     private void setWebappMount(GenericContainer servletContainer, File sourceWARDirectory, String webappDirectory)

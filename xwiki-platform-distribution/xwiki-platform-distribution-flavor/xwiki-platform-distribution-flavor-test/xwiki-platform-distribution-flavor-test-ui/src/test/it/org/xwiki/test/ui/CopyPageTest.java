@@ -29,7 +29,7 @@ import org.xwiki.index.tree.test.po.DocumentPickerModal;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.AttachmentsPane;
-import org.xwiki.test.ui.po.CopyOrRenameStatusPage;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.CopyOverwritePromptPage;
 import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.ViewPage;
@@ -106,7 +106,7 @@ public class CopyPageTest extends AbstractTest
         documentPicker.waitForLocation(Arrays.asList("", targetSpaceName, targetPageName));
 
         // Click copy button
-        CopyOrRenameStatusPage copyStatusPage = copyPage.clickCopyButton().waitUntilFinished();
+        CopyOrRenameOrDeleteStatusPage copyStatusPage = copyPage.clickCopyButton().waitUntilFinished();
 
         // Check successful copy confirmation
         Assert.assertEquals(COPY_SUCCESSFUL, copyStatusPage.getInfoMessage());
@@ -204,7 +204,7 @@ public class CopyPageTest extends AbstractTest
 
         // Copy and confirm overwrite
         copyOverwritePrompt = copyPage.clickCopyButtonExpectingOverwritePrompt();
-        CopyOrRenameStatusPage copyStatusPage = copyOverwritePrompt.clickCopyButton().waitUntilFinished();
+        CopyOrRenameOrDeleteStatusPage copyStatusPage = copyOverwritePrompt.clickCopyButton().waitUntilFinished();
 
         // Check successful copy confirmation
         Assert.assertEquals(COPY_SUCCESSFUL, copyStatusPage.getInfoMessage());

@@ -56,6 +56,16 @@ public class ConfigurationFilesGenerator
 
     private static final String SKIN = "flamingo";
 
+    private RepositoryResolver repositoryResolver;
+
+    /**
+     * @param repositoryResolver the resolver to create Maven repositories and sessions
+     */
+    public ConfigurationFilesGenerator(RepositoryResolver repositoryResolver)
+    {
+        this.repositoryResolver = repositoryResolver;
+    }
+
     /**
      * @param testConfiguration the configuration (database, debug mode, etc)
      * @param configurationFileTargetDirectory the location where to generate the config files
@@ -123,7 +133,7 @@ public class ConfigurationFilesGenerator
                 DB_PASSWORD,
                 "com.mysql.jdbc.Driver",
                 "org.hibernate.dialect.MySQL5InnoDBDialect"));
-        } else if (database.equals(Database.HSQLDB)) {
+        } else if (database.equals(Database.HSQLDB_EMBEDDED)) {
             props.putAll(getDBProperties(
                 "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true",
                 "sa",
@@ -154,10 +164,14 @@ public class ConfigurationFilesGenerator
         // Configure the extension repositories to have only the local maven repository. This is to improve XWiki
         // performances and also to control the build environment so that we don't depend on any external service.
         // We need the local maven repo to provision the XARs from the module being tested.
-/*
-        props.setProperty("xwikiExtensionRepositories",
-            String.format("maven-local:maven:file://%s/.m2/repository", System.getProperty("user.home")));
-*/
+        // Do this only if we're offline, otherwise fetch from the usual repos including the remote snapshot repo in
+        // order to get the latest version.
+        if (this.repositoryResolver.getSession().isOffline()) {
+            props.setProperty("xwikiExtensionRepositories",
+                String.format("maven-local:maven:file://%s",
+                    this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString()));
+        }
+
         return props;
     }
 

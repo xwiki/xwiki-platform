@@ -46,27 +46,24 @@ import static org.apache.maven.project.ProjectBuildingRequest.RepositoryMerging.
  * @version $Id$
  * @since 10.9
  */
-public final class MavenResolver
+public class MavenResolver
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenResolver.class);
 
-    private static MavenResolver mavenResolver = new MavenResolver();
-
     private Map<String, Model> modelCache = new HashMap<>();
 
-    private RepositoryResolver repositoryResolver = RepositoryResolver.getInstance();
+    private ArtifactResolver artifactResolver;
 
-    private MavenResolver()
-    {
-        // Empty voluntarily, private constructor to ensure singleton
-    }
+    private RepositoryResolver repositoryResolver;
 
     /**
-     * @return the singleton instance for this class
+     * @param artifactResolver the resolver to resolve artifacts from Maven repositories
+     * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public static MavenResolver getInstance()
+    public MavenResolver(ArtifactResolver artifactResolver, RepositoryResolver repositoryResolver)
     {
-        return mavenResolver;
+        this.artifactResolver = artifactResolver;
+        this.repositoryResolver = repositoryResolver;
     }
 
     /**
@@ -125,7 +122,7 @@ public final class MavenResolver
      */
     public Model getModelFromPOMArtifact(Artifact artifact) throws Exception
     {
-        ArtifactResult artifactResult = ArtifactResolver.getInstance().resolveArtifact(artifact);
+        ArtifactResult artifactResult = this.artifactResolver.resolveArtifact(artifact);
         return getModelFromPOM(artifactResult.getArtifact().getFile());
     }
 

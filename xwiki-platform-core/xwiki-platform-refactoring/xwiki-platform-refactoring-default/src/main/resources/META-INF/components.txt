@@ -1,2 +1,3 @@
 org.xwiki.refactoring.internal.DefaultLinkRefactoring
 org.xwiki.refactoring.internal.DefaultModelBridge
+org.xwiki.refactoring.job.XClassDeletingListener

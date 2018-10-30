@@ -42,7 +42,7 @@
     'usersaveurl': $group.getURL('save'),
     'userinlineurl': $group.getURL('edit', 'xpage=plain'),
     'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Groups')
-  }))
+  })
   #if ($group.wiki == $xcontext.mainWikiName)
     #set ($scope = 'global')
   #else

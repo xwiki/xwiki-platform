@@ -2633,4 +2633,6 @@ Recursive title display detected!##
   #set ($discard = $response.setContentLength($json.getBytes($characterEncoding).size()))
   ## Make sure the entire content is send back to the client.
   #set ($discard = $response.flushBuffer())
+  ## Make sure XWiki doesn't write any more content to the response.
+  #set ($discard = $xcontext.setFinished(true))
 #end

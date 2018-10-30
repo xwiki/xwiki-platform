@@ -113,8 +113,7 @@ def builds = [
     )
   },
   'Docker - MySQL/Tomcat/Chrome' : {
-    // Run functional tests based on docker on modules having them. We select the projects to build so that we build
-    // the minimal. Note that the 'Main' job will have built all functional tests not in the -Pdocker profile.
+    // Smoke tests to verify XWiki works fine on this configuration, by testing on a single test.
     build(
       name: 'Docker - MySQL/Tomcat/Chrome',
       node: 'docker',
@@ -123,9 +122,18 @@ def builds = [
       projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
     )
   },
+  'Docker - PostgreSQL/Jetty/Chrome' : {
+    // Smoke tests to verify XWiki works fine on this configuration, by testing on a single test.
+    build(
+      name: 'Docker - PostgreSQL/Jetty/Chrome',
+      node: 'docker',
+      profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=chrome -Dxwiki.test.ui.database=postgresql -Dxwiki.test.ui.servletEngine=jetty_standalone',
+      projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
+    )
+  },
   'Docker - HSQLDB/Tomcat/Firefox' : {
-    // Run functional tests based on docker on modules having them. We select the projects to build so that we build
-    // the minimal. Note that the 'Main' job will have built all functional tests not in the -Pdocker profile.
+    // Smoke tests to verify XWiki works fine on this configuration, by testing on a single test.
     build(
       name: 'Docker - HSQLDB/Tomcat/Firefox',
       node: 'docker',
@@ -163,7 +171,10 @@ def buildAll(builds)
         'docker-mysql-tomcat-chrome': {
           builds['Docker - MySQL/Tomcat/Chrome'].call()
         },
-        'docker-postgresql-tomcat-firefox': {
+        'docker-postgresql-jetty-chrome': {
+          builds['Docker - PostgreSQL/Jetty/Chrome'].call()
+        },
+        'docker-hsqldb-tomcat-firefox': {
           builds['Docker - HSQLDB/Tomcat/Firefox'].call()
         }
       )

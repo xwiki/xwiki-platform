@@ -56,13 +56,17 @@ public class ConfigurationFilesGenerator
 
     private static final String SKIN = "flamingo";
 
+    private TestConfiguration testConfiguration;
+
     private RepositoryResolver repositoryResolver;
 
     /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public ConfigurationFilesGenerator(RepositoryResolver repositoryResolver)
+    public ConfigurationFilesGenerator(TestConfiguration testConfiguration, RepositoryResolver repositoryResolver)
     {
+        this.testConfiguration = testConfiguration;
         this.repositoryResolver = repositoryResolver;
     }
 
@@ -167,9 +171,15 @@ public class ConfigurationFilesGenerator
         // Do this only if we're offline, otherwise fetch from the usual repos including the remote snapshot repo in
         // order to get the latest version.
         if (this.repositoryResolver.getSession().isOffline()) {
-            props.setProperty("xwikiExtensionRepositories",
-                String.format("maven-local:maven:file://%s",
-                    this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString()));
+            // If we're inside a docker container, the local Maven repo is at /root/.m2/repository. This is
+            // configured in ServletContainerExecutor.
+            String localRepo;
+            if (this.testConfiguration.getServletEngine().isOutsideDocker()) {
+                localRepo = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
+            } else {
+                localRepo = "/root/.m2/repository";
+            }
+            props.setProperty("xwikiExtensionRepositories", String.format("maven-local:maven:file://%s", localRepo));
         }
 
         return props;

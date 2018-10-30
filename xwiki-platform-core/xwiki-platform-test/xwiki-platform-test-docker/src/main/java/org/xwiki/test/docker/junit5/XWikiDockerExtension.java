@@ -91,12 +91,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // Save the test configuration so that we can access it in afterAll()
         saveTestConfiguration(extensionContext, testConfiguration);
 
-        // Initialize resolvers and save them so that they can be accessed in afterAll()
+        // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration);
         ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration, repositoryResolver);
-        saveArtifactResolver(extensionContext, artifactResolver);
         MavenResolver mavenResolver = new MavenResolver(artifactResolver, repositoryResolver);
-        saveMavenResolver(extensionContext, mavenResolver);
 
         // Force the usage of last docker image for VNC recorder
         // See: https://github.com/testcontainers/testcontainers-java/pull/888
@@ -117,7 +115,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // If the directory exists, skip the rebuilding of the XWiki WAR, allowing to re-run the test faster
             if (!targetWARDirectory.exists()) {
                 LOGGER.info("XWiki WAR directory [{}] doesn't exists, rebuilding WAR!", targetWARDirectory);
-                WARBuilder builder = new WARBuilder(artifactResolver, mavenResolver, repositoryResolver);
+                WARBuilder builder =
+                    new WARBuilder(testConfiguration, artifactResolver, mavenResolver, repositoryResolver);
                 builder.build(testConfiguration, targetWARDirectory);
             } else {
                 LOGGER.info("XWiki WAR directory [{}] exists, don't rebuild WAR to save time!", targetWARDirectory);
@@ -130,7 +129,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // Start the Servlet Engine
             LOGGER.info("(3) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
             startServletEngine(targetWARDirectory, testConfiguration, artifactResolver, mavenResolver,
-                extensionContext);
+                repositoryResolver, extensionContext);
 
             // Provision XWiki by installing all required extensions.
             LOGGER.info("(4) Provision XAR extensions for test...");
@@ -209,8 +208,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         stopDatabase(testConfiguration);
 
         // Stop the Servlet Container
-        stopServletEngine(testConfiguration, loadArtifactResolver(extensionContext),
-            loadMavenResolver(extensionContext));
+        stopServletEngine(testConfiguration, extensionContext);
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
@@ -285,10 +283,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     private void startServletEngine(File sourceWARDirectory, TestConfiguration testConfiguration,
-        ArtifactResolver artifactResolver, MavenResolver mavenResolver, ExtensionContext extensionContext)
-        throws Exception
+        ArtifactResolver artifactResolver, MavenResolver mavenResolver, RepositoryResolver repositoryResolver,
+        ExtensionContext extensionContext) throws Exception
     {
-        ServletContainerExecutor executor = new ServletContainerExecutor(artifactResolver, mavenResolver);
+        ServletContainerExecutor executor =
+            new ServletContainerExecutor(artifactResolver, mavenResolver, repositoryResolver);
+        saveServletContainerExecutor(extensionContext, executor);
         String xwikiURL = executor.start(testConfiguration, sourceWARDirectory);
 
         saveXWikiURL(extensionContext, xwikiURL);
@@ -297,10 +297,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         }
     }
 
-    private void stopServletEngine(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
-        MavenResolver mavenResolver) throws Exception
+    private void stopServletEngine(TestConfiguration testConfiguration, ExtensionContext extensionContext)
+        throws Exception
     {
-        ServletContainerExecutor executor = new ServletContainerExecutor(artifactResolver, mavenResolver);
+        ServletContainerExecutor executor = loadServletContainerExecutor(extensionContext);
         executor.stop(testConfiguration);
     }
 

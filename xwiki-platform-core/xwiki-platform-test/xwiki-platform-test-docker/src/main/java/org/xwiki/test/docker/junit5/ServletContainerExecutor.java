@@ -43,13 +43,18 @@ public class ServletContainerExecutor
 {
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
+    private RepositoryResolver repositoryResolver;
+
     /**
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
+     * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public ServletContainerExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
+    public ServletContainerExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
+        RepositoryResolver repositoryResolver)
     {
         this.jettyStandaloneExecutor = new JettyStandaloneExecutor(artifactResolver, mavenResolver);
+        this.repositoryResolver = repositoryResolver;
     }
 
     /**
@@ -113,6 +118,11 @@ public class ServletContainerExecutor
                 .waitingFor(
                     Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                         .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+
+            if (testConfiguration.isOffline()) {
+                String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
+                servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
+            }
 
             if (testConfiguration.isDebug()) {
                 servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));

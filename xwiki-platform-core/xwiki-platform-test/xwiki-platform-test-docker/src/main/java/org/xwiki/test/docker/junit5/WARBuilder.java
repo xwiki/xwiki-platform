@@ -50,6 +50,8 @@ public class WARBuilder
 
     private ConfigurationFilesGenerator configurationFilesGenerator;
 
+    private TestConfiguration testConfiguration;
+
     private ArtifactResolver artifactResolver;
 
     private MavenResolver mavenResolver;
@@ -57,16 +59,17 @@ public class WARBuilder
     /**
      * Initialize an XWiki environment (ECM, etc).
      *
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public WARBuilder(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
-        RepositoryResolver repositoryResolver)
+    public WARBuilder(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
-        this.configurationFilesGenerator = new ConfigurationFilesGenerator(repositoryResolver);
+        this.configurationFilesGenerator = new ConfigurationFilesGenerator(testConfiguration, repositoryResolver);
 
         // TODO: extract code from ExtensionMojo so that we don't have to depend on a maven plugin....
         try {

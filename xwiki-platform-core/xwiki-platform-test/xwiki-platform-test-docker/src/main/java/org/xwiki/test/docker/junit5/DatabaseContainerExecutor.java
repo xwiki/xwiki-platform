@@ -77,7 +77,8 @@ public class DatabaseContainerExecutor
                 databaseContainer = new PostgreSQLContainer<>()
                     .withDatabaseName(DBNAME)
                     .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD);
+                    .withPassword(DBPASSWORD)
+                    .withExposedPorts(5432);
 
                 if (testConfiguration.isDatabaseDataSaved()) {
                     // This allows re-running the test with the database already provisioned without having to redo
@@ -85,6 +86,7 @@ public class DatabaseContainerExecutor
                     databaseContainer.withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
                 }
 
+                databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
                 databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
 
                 break;

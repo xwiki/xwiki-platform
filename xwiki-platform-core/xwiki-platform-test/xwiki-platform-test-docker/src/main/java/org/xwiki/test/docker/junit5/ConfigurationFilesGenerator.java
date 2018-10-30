@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -130,27 +132,7 @@ public class ConfigurationFilesGenerator
         props.put("xwikiCfgSuperadminPassword", "pass");
 
         // Default configuration data for hibernate.cfg.xml
-        if (database.equals(Database.MYSQL)) {
-            props.putAll(getDBProperties(
-                "jdbc:mysql://xwikidb:3306/xwiki?useSSL=false",
-                DB_USERNAME,
-                DB_PASSWORD,
-                "com.mysql.jdbc.Driver",
-                "org.hibernate.dialect.MySQL5InnoDBDialect"));
-        } else if (database.equals(Database.HSQLDB_EMBEDDED)) {
-            props.putAll(getDBProperties(
-                "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true",
-                "sa",
-                "",
-                "org.hsqldb.jdbcDriver",
-                "org.hibernate.dialect.HSQLDialect"));
-        } else {
-            throw new RuntimeException(
-                String.format("Failed to generate Hibernate config. Database [%s] not supported yet!", database));
-        }
-
-        props.setProperty("xwikiDbHbmXwiki", "xwiki.hbm.xml");
-        props.setProperty("xwikiDbHbmFeeds", "feeds.hbm.xml");
+        props.putAll(getDatabaseConfigurationProperties(database));
 
         // Default configuration data for xwiki.cfg
         props.setProperty("xwikiCfgPlugins",
@@ -182,18 +164,84 @@ public class ConfigurationFilesGenerator
             props.setProperty("xwikiExtensionRepositories", String.format("maven-local:maven:file://%s", localRepo));
         }
 
+        // TODO: Allow users to provide properties that will override the default here....
+
         return props;
     }
 
-    private Properties getDBProperties(String xwikiDbConnectionUrl, String xwikiDbConnectionUsername,
-        String xwikiDbConnectionPassword, String xwikiDbConnectionDriverClass, String xwikiDbDialect)
+    private Properties getDatabaseConfigurationProperties(Database database)
     {
         Properties props = new Properties();
-        props.setProperty("xwikiDbConnectionUrl", xwikiDbConnectionUrl);
-        props.setProperty("xwikiDbConnectionUsername", xwikiDbConnectionUsername);
-        props.setProperty("xwikiDbConnectionPassword", xwikiDbConnectionPassword);
-        props.setProperty("xwikiDbConnectionDriverClass", xwikiDbConnectionDriverClass);
-        props.setProperty("xwikiDbDialect", xwikiDbDialect);
+
+        // Default configuration data for hibernate.cfg.xml
+        if (database.equals(Database.MYSQL)) {
+            props.putAll(getDBProperties(Arrays.asList(
+                "mysql",
+                "jdbc:mysql://xwikidb:3306/xwiki?useSSL=false",
+                DB_USERNAME,
+                DB_PASSWORD,
+                "com.mysql.jdbc.Driver",
+                "org.hibernate.dialect.MySQL5InnoDBDialect",
+                null,
+                null,
+                null)));
+        } else if (database.equals(Database.POSTGRESQL)) {
+            props.putAll(getDBProperties(Arrays.asList(
+                "pgsql",
+                "jdbc:postgresql://xwikidb:5432/xwiki",
+                DB_USERNAME,
+                DB_PASSWORD,
+                "org.postgresql.Driver",
+                "org.hibernate.dialect.PostgreSQLDialect",
+                "schema",
+                "xwiki.postgresql.hbm.xml",
+                null)));
+        } else if (database.equals(Database.HSQLDB_EMBEDDED)) {
+            props.putAll(getDBProperties(Arrays.asList(
+                "hsqldb",
+                "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true",
+                "sa",
+                "",
+                "org.hsqldb.jdbcDriver",
+                "org.hibernate.dialect.HSQLDialect",
+                null,
+                null,
+                null)));
+        } else {
+            throw new RuntimeException(
+                String.format("Failed to generate Hibernate config. Database [%s] not supported yet!", database));
+        }
+
+        return props;
+    }
+
+    private Properties getDBProperties(List<String> dbProperties)
+    {
+        Properties props = new Properties();
+        props.setProperty("xwikiDb", dbProperties.get(0));
+        props.setProperty("xwikiDbConnectionUrl", dbProperties.get(1));
+        props.setProperty("xwikiDbConnectionUsername", dbProperties.get(2));
+        props.setProperty("xwikiDbConnectionPassword", dbProperties.get(3));
+        props.setProperty("xwikiDbConnectionDriverClass", dbProperties.get(4));
+        props.setProperty("xwikiDbDialect", dbProperties.get(5));
+        if (dbProperties.get(6) != null) {
+            props.setProperty("xwikiDbVirtualMode", dbProperties.get(6));
+        }
+        String xwikiDbHbmXwiki;
+        if (dbProperties.get(7) != null) {
+            xwikiDbHbmXwiki = dbProperties.get(7);
+        } else {
+            xwikiDbHbmXwiki = "xwiki.hbm.xml";
+        }
+        props.setProperty("xwikiDbHbmXwiki", xwikiDbHbmXwiki);
+        String xwikiDbHbmFeeds;
+        if (dbProperties.get(8) != null) {
+            xwikiDbHbmFeeds = dbProperties.get(8);
+        } else {
+            xwikiDbHbmFeeds = "feeds.hbm.xml";
+        }
+        props.setProperty("xwikiDbHbmFeeds", xwikiDbHbmFeeds);
+
         return props;
     }
 }

@@ -188,22 +188,23 @@ public class WARBuilder
 
     private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
     {
-        File driver;
         Artifact artifact;
         switch (database) {
             case MYSQL:
-                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, "5.1.24");
-                driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
+                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, "5.1.45");
+                break;
+            case POSTGRESQL:
+                artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, "42.1.4");
                 break;
             case HSQLDB_EMBEDDED:
                 artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, "2.4.1");
-                driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
                 break;
             default:
                 throw new RuntimeException(
                     String.format("Failed to get JDBC driver. Database [%s] not supported yet!", database));
         }
-        return driver;
+
+        return resolver.resolveArtifact(artifact).getArtifact().getFile();
     }
 
     private void generateXED(Artifact artifact, File directory, MavenResolver resolver) throws Exception

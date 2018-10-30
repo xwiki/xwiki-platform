@@ -83,6 +83,7 @@ ckeditor.plugin.office.importer.failedToLoadForm=Impossible d'afficher le formul
 
 ckeditor.plugin.resource.notSpecified=Le {0} n''est pas renseigné.
 ckeditor.plugin.save.leaveConfirmationMessage=Il y a des modifications non sauvegardées. Voulez-vous les abandonner ?
+ckeditor.plugin.save.failed=Impossible d’enregistrer le contenu en raison d’une erreur interne de CKEditor. Vous devriez essayer de copier vos changements importants avant de recharger l'éditeur.
 ckeditor.plugin.source.conversionFailed=La conversion a échoué.
 
 modal.ok=OK

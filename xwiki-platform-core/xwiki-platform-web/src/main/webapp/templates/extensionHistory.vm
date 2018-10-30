@@ -138,6 +138,7 @@
             <input type="hidden" name="xredirect" value="$xredirect" />
           </div>
           <input type="file" name="filepath" />
+          <input type="submit" name="submit" class="hidden" />
         </form>
       </div>
     </div>

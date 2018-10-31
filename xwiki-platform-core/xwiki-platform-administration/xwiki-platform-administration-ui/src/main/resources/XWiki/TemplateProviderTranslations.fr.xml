@@ -43,7 +43,7 @@ administration.templateProvider.icon.hint=L’icône à afficher pour le fournis
 administration.templateProvider.creationRestrictions=Restrictions de création
 administration.templateProvider.creationRestrictions.hint=La liste des emplacements (y compris leurs enfants) où ce modèle est autorisé à créer des pages
 administration.templateProvider.creationRestrictions.none=Ce modèle peut créer des pages partout
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions=Creation Restrictions as Suggestions
+administration.templateProvider.creationRestrictionsAreSuggestions=Création de Restrictions comme Suggestions
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=Autoriser l’utilisateur à sélectionner n’importe quel emplacement pour créer une page avec ce modèle, en utilisant la première restriction de création comme emplacement par défaut préremplie lorsque le modèle est sélectionné dans la liste.
 </content>
 </xwikidoc>

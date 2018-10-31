@@ -47,91 +47,25 @@ public class DatabaseContainerExecutor
     public void start(TestConfiguration testConfiguration)
     {
         JdbcDatabaseContainer databaseContainer = null;
-        int port = -1;
         switch (testConfiguration.getDatabase()) {
             case MYSQL:
-                // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
-                //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
-                //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
-                //     --explicit-defaults-for-timestamp=1
-                databaseContainer = new MySQLContainer<>()
-                    .withDatabaseName(DBNAME)
-                    .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD);
-
-                if (testConfiguration.isDatabaseDataSaved()) {
-                    // This allows re-running the test with the database already provisioned without having to redo
-                    // the provisioning. Running "mvn clean" will remove the database data.
-                    databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
-                }
-
-                databaseContainer.addParameter("character-set-server", "utf8");
-                databaseContainer.addParameter("collation-server", "utf8_bin");
-                databaseContainer.addParameter("explicit-defaults-for-timestamp", "1");
-
-                port = 3306;
-
+                startMySQLContainer(testConfiguration);
                 break;
             case POSTGRESQL:
-                // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
-                //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
-                //     -e POSTGRES_DB=xwiki -e POSTGRES_INITDB_ARGS="--encoding=UTF8" -d postgres:9.5
-                databaseContainer = new PostgreSQLContainer<>()
-                    .withDatabaseName(DBNAME)
-                    .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD);
-
-                if (testConfiguration.isDatabaseDataSaved()) {
-                    // This allows re-running the test with the database already provisioned without having to redo
-                    // the provisioning. Running "mvn clean" will remove the database data.
-                    databaseContainer.withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
-                }
-
-                databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
-                databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
-
-                port = 5432;
-
+                startPostgreSQLContainer(testConfiguration);
                 break;
             case ORACLE:
-                databaseContainer = new OracleContainer()
-                    .withDatabaseName(DBNAME)
-                    .withUsername(DBUSERNAME)
-                    .withPassword(DBPASSWORD);
-
+                startOracleContainer(testConfiguration);
                 break;
             case HSQLDB_EMBEDDED:
                 // We don't need a Docker image/container since HSQLDB can work in embedded mode.
                 // It's configured automatically in the custom XWiki WAR.
                 // Thus, nothing to do here!
+                testConfiguration.getDatabase().setIpAddress("localhost");
                 break;
             default:
                 throw new RuntimeException(String.format("Database [%s] is not yet supported!",
                     testConfiguration.getDatabase()));
-        }
-
-        if (databaseContainer != null) {
-            databaseContainer
-                .withExposedPorts(port)
-                .withNetwork(Network.SHARED)
-                .withNetworkAliases("xwikidb");
-
-            if (testConfiguration.isDebug()) {
-                databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
-            }
-
-            databaseContainer.start();
-
-            if (testConfiguration.getServletEngine().isOutsideDocker()) {
-                testConfiguration.getDatabase().setIpAddress(databaseContainer.getContainerIpAddress());
-                testConfiguration.getDatabase().setPort(databaseContainer.getMappedPort(port));
-            } else {
-                testConfiguration.getDatabase().setIpAddress((String) databaseContainer.getNetworkAliases().get(0));
-                testConfiguration.getDatabase().setPort(port);
-            }
-        } else {
-            testConfiguration.getDatabase().setIpAddress("localhost");
-            testConfiguration.getDatabase().setPort(port);
         }
     }
 
@@ -141,5 +75,87 @@ public class DatabaseContainerExecutor
     public void stop(TestConfiguration testConfiguration)
     {
         // Note that we don't need to stop the container as this is taken care of by TestContainers
+    }
+
+    private void startMySQLContainer(TestConfiguration testConfiguration)
+    {
+        // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
+        //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
+        //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
+        //     --explicit-defaults-for-timestamp=1
+        JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
+            ? new MySQLContainer<>(testConfiguration.getDatabaseTag()) : new MySQLContainer<>()
+            .withDatabaseName(DBNAME)
+            .withUsername(DBUSERNAME)
+            .withPassword(DBPASSWORD);
+
+        if (testConfiguration.isDatabaseDataSaved()) {
+            // This allows re-running the test with the database already provisioned without having to redo
+            // the provisioning. Running "mvn clean" will remove the database data.
+            databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
+        }
+
+        databaseContainer.addParameter("character-set-server", "utf8");
+        databaseContainer.addParameter("collation-server", "utf8_bin");
+        databaseContainer.addParameter("explicit-defaults-for-timestamp", "1");
+
+        startDatabaseContainer(databaseContainer, 3306, testConfiguration);
+    }
+
+    private void startPostgreSQLContainer(TestConfiguration testConfiguration)
+    {
+        // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
+        //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
+        //     -e POSTGRES_DB=xwiki -e POSTGRES_INITDB_ARGS="--encoding=UTF8" -d postgres:9.5
+        JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
+            ? new PostgreSQLContainer<>(testConfiguration.getDatabaseTag()) : new PostgreSQLContainer<>()
+            .withDatabaseName(DBNAME)
+            .withUsername(DBUSERNAME)
+            .withPassword(DBPASSWORD);
+
+        if (testConfiguration.isDatabaseDataSaved()) {
+            // This allows re-running the test with the database already provisioned without having to redo
+            // the provisioning. Running "mvn clean" will remove the database data.
+            databaseContainer.withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
+        }
+
+        databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
+        databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
+
+        startDatabaseContainer(databaseContainer, 5432, testConfiguration);
+    }
+
+    private void startOracleContainer(TestConfiguration testConfiguration)
+    {
+        JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
+            ? new OracleContainer(testConfiguration.getDatabaseTag()) : new OracleContainer()
+            .withDatabaseName(DBNAME)
+            .withUsername(DBUSERNAME)
+            .withPassword(DBPASSWORD);
+
+        startDatabaseContainer(databaseContainer, -1, testConfiguration);
+    }
+
+    private void startDatabaseContainer(JdbcDatabaseContainer databaseContainer, int port,
+        TestConfiguration testConfiguration)
+    {
+        databaseContainer
+            .withExposedPorts(port)
+            .withNetwork(Network.SHARED)
+            .withNetworkAliases("xwikidb");
+
+        if (testConfiguration.isDebug()) {
+            databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+        }
+
+        databaseContainer.start();
+
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            testConfiguration.getDatabase().setIpAddress(databaseContainer.getContainerIpAddress());
+            testConfiguration.getDatabase().setPort(databaseContainer.getMappedPort(port));
+        } else {
+            testConfiguration.getDatabase().setIpAddress((String) databaseContainer.getNetworkAliases().get(0));
+            testConfiguration.getDatabase().setPort(port);
+        }
     }
 }

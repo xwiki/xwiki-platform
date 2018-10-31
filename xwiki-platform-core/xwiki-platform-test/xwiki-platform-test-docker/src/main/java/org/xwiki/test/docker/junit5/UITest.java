@@ -78,4 +78,20 @@ public @interface UITest
      *         CI to improve performance of functional tests
      */
     boolean isOffline() default false;
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the "latest" tag)
+     */
+    String servletEngineTag() default "";
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the default from TestContainers)
+     */
+    String databaseTag() default "";
+
+    /**
+     * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
+     *         depending on the database)
+     */
+    String jdbcDriverVersion() default "";
 }

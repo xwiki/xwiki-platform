@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import org.xwiki.text.StringUtils;
+
 /**
  * Configuration options for the test.
  *
@@ -41,6 +43,12 @@ public class TestConfiguration
 
     private static final String OFFLINE_PROPERTY = "xwiki.test.ui.offline";
 
+    private static final String DATABASETAG_PROPERTY = "xwiki.test.ui.databaseTag";
+
+    private static final String SERVLETENGINETAG_PROPERTY = "xwiki.test.ui.servletEngineTag";
+
+    private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
+
     private UITest uiTestAnnotation;
 
     private Browser browser;
@@ -55,6 +63,12 @@ public class TestConfiguration
 
     private boolean isOffline;
 
+    private String servletEngineTag;
+
+    private String databaseTag;
+
+    private String jdbcDriverVersion;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -67,6 +81,9 @@ public class TestConfiguration
         resolveDebug();
         resolveSaveDatabaseData();
         resolveOffline();
+        resolveDatabaseTag();
+        resolveServletEngineTag();
+        resolveJDBCDriverVersion();
     }
 
     private void resolveBrowser()
@@ -125,6 +142,33 @@ public class TestConfiguration
         this.isOffline = newOffline;
     }
 
+    private void resolveDatabaseTag()
+    {
+        String newDatabaseTag = this.uiTestAnnotation.databaseTag();
+        if (StringUtils.isEmpty(newDatabaseTag)) {
+            newDatabaseTag = System.getProperty(DATABASETAG_PROPERTY);
+        }
+        this.databaseTag = newDatabaseTag;
+    }
+
+    private void resolveServletEngineTag()
+    {
+        String newServletEngineTag = this.uiTestAnnotation.servletEngineTag();
+        if (StringUtils.isEmpty(newServletEngineTag)) {
+            newServletEngineTag = System.getProperty(SERVLETENGINETAG_PROPERTY);
+        }
+        this.servletEngineTag = newServletEngineTag;
+    }
+
+    private void resolveJDBCDriverVersion()
+    {
+        String newJDBCDriverVersion = this.uiTestAnnotation.jdbcDriverVersion();
+        if (StringUtils.isEmpty(newJDBCDriverVersion)) {
+            newJDBCDriverVersion = System.getProperty(JDBCDRIVERVERSION_PROPERTY);
+        }
+        this.jdbcDriverVersion = newJDBCDriverVersion;
+    }
+
     /**
      * @return the browser to use
      */
@@ -174,5 +218,30 @@ public class TestConfiguration
     public boolean isOffline()
     {
         return this.isOffline;
+    }
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the default from TestContainers)
+     */
+    public String getDatabaseTag()
+    {
+        return this.databaseTag;
+    }
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the "latest" tag)
+     */
+    public String getServletEngineTag()
+    {
+        return this.servletEngineTag;
+    }
+
+    /**
+     * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
+     *         depending on the database)
+     */
+    public String getJDBCDriverVersion()
+    {
+        return this.jdbcDriverVersion;
     }
 }

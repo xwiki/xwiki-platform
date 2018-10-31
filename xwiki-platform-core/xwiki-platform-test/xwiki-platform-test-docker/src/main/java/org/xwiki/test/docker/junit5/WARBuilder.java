@@ -67,6 +67,7 @@ public class WARBuilder
     public WARBuilder(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
+        this.testConfiguration = testConfiguration;
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
         this.configurationFilesGenerator = new ConfigurationFilesGenerator(testConfiguration, repositoryResolver);
@@ -190,13 +191,19 @@ public class WARBuilder
         Artifact artifact;
         switch (database) {
             case MYSQL:
-                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, "5.1.45");
+                String mysqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "5.1.45";
+                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, mysqlDriverVersion);
                 break;
             case POSTGRESQL:
-                artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, "42.1.4");
+                String pgsqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "42.1.4";
+                artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, pgsqlDriverVersion);
                 break;
             case HSQLDB_EMBEDDED:
-                artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, "2.4.1");
+                String hsqldbDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "2.4.1";
+                artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, hsqldbDriverVersion);
                 break;
             default:
                 throw new RuntimeException(

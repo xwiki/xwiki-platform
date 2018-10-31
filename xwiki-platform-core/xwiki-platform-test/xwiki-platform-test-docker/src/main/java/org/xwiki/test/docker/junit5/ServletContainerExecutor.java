@@ -41,6 +41,8 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class ServletContainerExecutor
 {
+    private static final String LATEST = "latest";
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -80,7 +82,9 @@ public class ServletContainerExecutor
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
 
-                servletContainer = new GenericContainer<>("tomcat:latest");
+                String tomcatTag = String.format("tomcat:%s", testConfiguration.getServletEngineTag() != null
+                    ? testConfiguration.getServletEngineTag() : LATEST);
+                servletContainer = new GenericContainer<>(tomcatTag);
                 setWebappMount(servletContainer, sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
 
                 servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
@@ -90,7 +94,9 @@ public class ServletContainerExecutor
 
                 break;
             case JETTY:
-                servletContainer = new GenericContainer<>("jetty:latest");
+                String jettyTag = String.format("jetty:%s", testConfiguration.getServletEngineTag() != null
+                    ? testConfiguration.getServletEngineTag() : LATEST);
+                servletContainer = new GenericContainer<>(jettyTag);
                 setWebappMount(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
 
                 break;

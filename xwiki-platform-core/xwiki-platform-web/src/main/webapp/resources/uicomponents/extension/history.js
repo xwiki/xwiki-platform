@@ -22,6 +22,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   // Extension History Sources
   //
 
+  // Hide the submit button
+  $('.extension-history-source-upload input[type=submit]').addClass('hidden');
+
   $('.extension-history-sources-header').click(function() {
     $(this).closest('.extension-history-sources-selector').toggleClass('opened');
   });

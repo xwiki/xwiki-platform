@@ -138,7 +138,7 @@
             <input type="hidden" name="xredirect" value="$xredirect" />
           </div>
           <input type="file" name="filepath" />
-          <input type="submit" name="submit" class="hidden" />
+          <input type="submit" value="$services.localization.render('extension.history.sources.import')" class="btn btn-default" />
         </form>
       </div>
     </div>

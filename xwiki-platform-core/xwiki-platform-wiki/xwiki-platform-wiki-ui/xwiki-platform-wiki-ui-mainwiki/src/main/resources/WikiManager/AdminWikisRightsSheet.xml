@@ -39,8 +39,7 @@
   <content>{{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 {{html}}
-  &lt;form method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" class="xform"&gt;
-    &lt;input type="submit" name="submit" class="hidden" /&gt;
+  &lt;form method="post" class="xform"&gt;
     ############################################################################################
     ## RIGHTS
     ############################################################################################

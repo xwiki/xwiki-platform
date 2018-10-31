@@ -41,30 +41,6 @@ require.config({
 
 require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
   'use strict';
-  var getAnswerProperties = function() {
-    var questionForm = $(this);
-
-    var deleteTree = questionForm.find('.deleteTree');
-
-    if (deleteTree.length) {
-      var answerProperties = deleteTree.data('job-answer-properties-data');
-
-      var selectedNodes = deleteTree.jstree().get_selected(true);
-
-      answerProperties.selectAllFreePages = false;
-      for (var i = 0; i < selectedNodes.length; ++i) {
-        var node = selectedNodes[i];
-        if (node.id == 'freePages') {
-          // For free pages, we can rely on the state of the "freePage" node
-          answerProperties.selectAllFreePages = true;
-        } else {
-          answerProperties.selectedDocuments.push(node.id);
-        }
-      }
-
-      return answerProperties;
-    }
-  };
 
   /**
    * Called when a question is being asked
@@ -73,9 +49,34 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
     var uiQuestion = $(this);
 
     // we want this to be initialized only for the right question
-    if (uiQuestion.hasClass('.deleteWarningXClass')) {
+    if (uiQuestion.find('.deleteWarningXClass').length == 0) {
       return;
     }
+
+    var getAnswerProperties = function() {
+      var questionForm = $(this);
+
+      var deleteTree = questionForm.find('.deleteTree');
+
+      if (deleteTree.length) {
+        var answerProperties = deleteTree.data('job-answer-properties-data');
+
+        var selectedNodes = deleteTree.jstree().get_selected(true);
+
+        answerProperties.selectAllFreePages = false;
+        for (var i = 0; i < selectedNodes.length; ++i) {
+          var node = selectedNodes[i];
+          if (node.id == 'freePages') {
+            // For free pages, we can rely on the state of the "freePage" node
+            answerProperties.selectAllFreePages = true;
+          } else {
+            answerProperties.selectedDocuments.push(node.id);
+          }
+        }
+
+        return answerProperties;
+      }
+    };
 
     // Get the form
     var questionForm = uiQuestion.find('.form-question');

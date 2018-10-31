@@ -57,7 +57,7 @@
 {{/velocity}}
 
 {{velocity}}
-#if ("$!request.fileName" == '' &amp;&amp; "$!xcontext.getAction()" == 'get')
+#if ("$!request.fileName" == '' &amp;&amp; $xcontext.action == 'get')
   {{html clean="false"}}
   &lt;form class="xform"&gt;
     &lt;dl&gt;

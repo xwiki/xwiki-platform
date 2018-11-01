@@ -132,6 +132,7 @@ public class AnnotatableViewPage extends BaseElement
      * @param searchText the text selected by the annotation.
      * @return the annotation id
      * @since 10.6RC1
+     * @since 9.11.9
      */
     public String getAnnotationIdByText(String searchText)
     {
@@ -201,6 +202,7 @@ public class AnnotatableViewPage extends BaseElement
      * @param annotationId the annotation id.
      * @return the comment id. Used by {@link org.xwiki.test.ui.po.CommentsTab}.
      * @since 10.6RC1
+     * @since 9.11.9
      */
     public int getCommentId(String annotationId)
     {

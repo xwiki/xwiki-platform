@@ -38,9 +38,8 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set ($obj = $doc.getObject('XWiki.XWikiUsers'))
-#if (!$obj)
-{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
-#else
+## Load data only when the 'wikis' category is accessed.
+#if ($obj &amp;&amp; "$!request.category" == 'wikis')
   #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
   #set($temp = $xwiki.jsx.use('WikiManager.UserWikiSheet'))
   #set($temp = $doc.use($obj))
@@ -88,7 +87,11 @@
   &lt;/div&gt;
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   {{/html}}
-#end## User object exists
+#else
+= {{translation key="xe.admin.users.sheet"/}} =
+
+{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
+#end
 {{/velocity}}</content>
   <object>
     <name>WikiManager.UserWikiSheet</name>

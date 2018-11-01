@@ -200,8 +200,8 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cible
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Cible de la macro ("user" pour l'utilisateur courant ou "wiki" pour le wiki courant)
 
 ## Toggle notification filters labels
-### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
-### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
-### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
+notifications.filters.preferences.label.page=Activer/désactiver les notifications de Page uniquement
+notifications.filters.preferences.label.space=Activer/désactiver les notifications de Page et enfants
+notifications.filters.preferences.label.wiki=Activer/désactiver les notifications du Wiki
 </content>
 </xwikidoc>

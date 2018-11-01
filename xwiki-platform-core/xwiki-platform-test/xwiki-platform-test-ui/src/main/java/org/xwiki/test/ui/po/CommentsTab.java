@@ -203,6 +203,7 @@ public class CommentsTab extends BaseElement
      * @param id the comment id
      * @return true if the comment has the delete button
      * @since 10.6RC1
+     * @since 9.11.9
      */
     public boolean hasDeleteButtonForCommentByID(int id)
     {

@@ -1689,9 +1689,10 @@ function (row, i, table) {
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
-  #if ($collist.indexOf('doc.title') != -1 && $colprops['doc.title'])
+  #if ($collist.indexOf('doc.title') != -1)
     #set($titleOpts = $colprops['doc.title'])
-    #if (  ($titleOpts['filterable'] == $NULL || $titleOpts['filterable'] == true)
+    #if ("$!{titleOpts}" == ""
+        || ($titleOpts['filterable'] == $NULL || $titleOpts['filterable'] == true)
         || ($titleOpts['sortable'] == $NULL   || $titleOpts['sortable'] == true))
   showFilterNote = true;
   if (row['doc_title_raw'] !== undefined) {

@@ -1685,12 +1685,20 @@ function (row, i, table) {
   var columns = $jsontool.serialize($collist);
   var columnDescriptors = $jsontool.serialize($colprops);
   var className = $jsontool.serialize($classname);
+  var showFilterNote = false;
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
+  #if ($collist.indexOf('doc.title') != -1 && $colprops['doc.title'])
+    #set($titleOpts = $colprops['doc.title'])
+    #if (  ($titleOpts['filterable'] == $NULL || $titleOpts['filterable'] == true)
+        || ($titleOpts['sortable'] == $NULL   || $titleOpts['sortable'] == true))
+  showFilterNote = true;
   if (row['doc_title_raw'] !== undefined) {
     $($jsontool.serialize("${divid}-computed-title-docs")).removeClassName('hidden');
   }
+    #end
+  #end
   ## NOTE: Don't use Velocity code below this line!
   var tr = new Element('tr');
   columns.forEach(function(column) {
@@ -1776,7 +1784,7 @@ function (row, i, table) {
         if (fieldName === 'doc_name' && !row['doc_viewable']) {
           text += '*';
         }
-        if (fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
+        if (showFilterNote && fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
           container.addClassName('docTitleComputed');
         }
         container.update(text.escapeHTML());

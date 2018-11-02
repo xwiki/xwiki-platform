@@ -26,6 +26,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.Select;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents a template provider page in inline mode
@@ -63,6 +64,13 @@ public class TemplateProviderInlinePage extends InlinePage
     private LocationPicker visibilityRestrictionsPicker =
         new LocationPicker("XWiki.TemplateProviderClass_0_visibilityRestrictions");
 
+    private SuggestInputElement templateSuggestInput;
+
+    public TemplateProviderInlinePage()
+    {
+        this.templateSuggestInput = new SuggestInputElement(this.templateInput);
+    }
+
     public String getTemplateName()
     {
         return this.templateNameInput.getAttribute("value");
@@ -76,13 +84,18 @@ public class TemplateProviderInlinePage extends InlinePage
 
     public String getTemplate()
     {
-        return this.templateInput.getAttribute("value");
+        List<String> values = this.templateSuggestInput.getValues();
+        if (values.isEmpty()) {
+            return "";
+        }
+        return values.get(0);
     }
 
     public void setTemplate(String value)
     {
-        this.templateInput.clear();
-        this.templateInput.sendKeys(value);
+        this.templateSuggestInput.clearSelectedSuggestions();
+        this.templateSuggestInput.sendKeys(value);
+        this.templateSuggestInput.selectTypedText();
     }
 
     public boolean isPageTemplate()

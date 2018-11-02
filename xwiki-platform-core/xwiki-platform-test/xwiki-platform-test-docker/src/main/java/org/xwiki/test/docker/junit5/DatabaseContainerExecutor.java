@@ -84,7 +84,8 @@ public class DatabaseContainerExecutor
         //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
         //     --explicit-defaults-for-timestamp=1
         JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
-            ? new MySQLContainer<>(testConfiguration.getDatabaseTag()) : new MySQLContainer<>()
+            ? new MySQLContainer<>(String.format("mysql:%", testConfiguration.getDatabaseTag()))
+            : new MySQLContainer<>()
             .withDatabaseName(DBNAME)
             .withUsername(DBUSERNAME)
             .withPassword(DBPASSWORD);
@@ -108,7 +109,8 @@ public class DatabaseContainerExecutor
         //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
         //     -e POSTGRES_DB=xwiki -e POSTGRES_INITDB_ARGS="--encoding=UTF8" -d postgres:9.5
         JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
-            ? new PostgreSQLContainer<>(testConfiguration.getDatabaseTag()) : new PostgreSQLContainer<>()
+            ? new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()))
+            : new PostgreSQLContainer<>()
             .withDatabaseName(DBNAME)
             .withUsername(DBUSERNAME)
             .withPassword(DBPASSWORD);

@@ -417,6 +417,17 @@ public class DefaultModelBridge implements ModelBridge
         return new DocumentReference(spaceHomePage, documentReference.getLastSpaceReference());
     }
 
+    private XWikiDeletedDocument getDeletedDocument(XWikiContext context, long deletedDocumentId) throws XWikiException
+    {
+        XWiki xWiki = context.getWiki();
+        XWikiDeletedDocument deletedDocument = xWiki.getDeletedDocument(deletedDocumentId, context);
+        if (deletedDocument == null) {
+            logger.error("Deleted document with ID [{}] does not exist.", deletedDocumentId);
+            return null;
+        }
+        return deletedDocument;
+    }
+
     @Override
     public boolean restoreDeletedDocument(long deletedDocumentId, AbstractCheckRightsRequest request)
     {
@@ -426,12 +437,10 @@ public class DefaultModelBridge implements ModelBridge
         DocumentReference deletedDocumentReference = null;
         try {
             // Retrieve the deleted document by ID.
-            XWikiDeletedDocument deletedDocument = xwiki.getDeletedDocument(deletedDocumentId, context);
+            XWikiDeletedDocument deletedDocument = this.getDeletedDocument(context, deletedDocumentId);
             if (deletedDocument == null) {
-                logger.error("Deleted document with ID [{}] does not exist.", deletedDocumentId);
                 return false;
             }
-
             deletedDocumentReference = deletedDocument.getDocumentReference();
 
             // If the document (or the translation) that we want to restore does not exist, restore it.
@@ -514,5 +523,77 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return result;
+    }
+
+    @Override
+    public boolean canPermanentlyDeleteDocument(long deletedDocumentId, DocumentReference userReference)
+    {
+        boolean result = false;
+
+        XWikiContext context = this.xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        // Remember the context user.
+        DocumentReference currentUserReference = context.getUserReference();
+        try {
+            XWikiDeletedDocument deletedDocument =
+                xwiki.getRecycleBinStore().getDeletedDocument(deletedDocumentId, context, true);
+
+            // Reuse the DeletedDocument API to check rights.
+            DeletedDocument deletedDocumentApi = new DeletedDocument(deletedDocument, context);
+
+            // Note: DeletedDocument API works with the current context user.
+            context.setUserReference(userReference);
+
+            result = deletedDocumentApi.canDelete();
+        } catch (Exception e) {
+            logger.error("Failed to check delete rights on deleted document [{}] for user [{}]", deletedDocumentId,
+                userReference, e);
+        } finally {
+            // Restore the context user;
+            context.setUserReference(currentUserReference);
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean permanentlyDeleteDocument(long deletedDocumentId, boolean checkContextUser)
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        DocumentReference deletedDocumentReference = null;
+        try {
+            // Retrieve the deleted document by ID.
+            XWikiDeletedDocument deletedDocument = this.getDeletedDocument(context, deletedDocumentId);
+
+            if (deletedDocument == null) {
+                return false;
+            }
+            deletedDocumentReference = deletedDocument.getDocumentReference();
+
+            if (checkContextUser && !canPermanentlyDeleteDocument(deletedDocumentId, context.getUserReference())) {
+                logger.error("You are not allowed to permanently delete document [{}] with ID [{}]",
+                    deletedDocumentReference, deletedDocumentId);
+            } else {
+                // Restore the document.
+                xwiki.getRecycleBinStore().deleteFromRecycleBin(deletedDocumentId, context, true);
+
+                logger.info("Document [{}] has been permanently deleted.", deletedDocumentReference);
+
+                return true;
+            }
+        } catch (Exception e) {
+            // Try to log the document reference since it`s more useful than the ID.
+            if (deletedDocumentReference != null) {
+                logger.error("Failed to permanently delete document [{}] with ID [{}]", deletedDocumentReference,
+                    deletedDocumentId, e);
+            } else {
+                logger.error("Failed to permanently delete document with ID [{}]", deletedDocumentId, e);
+            }
+        }
+
+        return false;
     }
 }

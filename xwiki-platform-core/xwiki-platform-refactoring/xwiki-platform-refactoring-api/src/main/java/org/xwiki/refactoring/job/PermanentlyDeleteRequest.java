@@ -20,13 +20,13 @@
 package org.xwiki.refactoring.job;
 
 /**
- * A job request that can be used to restore a list of deleted documents and/or an entire batch of deleted documents
- * from the recycle bin.
+ * A job request that can be used to permanently delete a list of deleted documents and/or an entire batch of
+ * deleted documents from the recycle bin.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 10.10RC1
  */
-public class RestoreRequest extends AbstractDeletedDocumentsRequest
+public class PermanentlyDeleteRequest extends AbstractDeletedDocumentsRequest
 {
-    private static final long serialVersionUID = 7738465742607715013L;
+    private static final long serialVersionUID = 5272462199708765090L;
 }

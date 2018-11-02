@@ -149,4 +149,27 @@ public interface ModelBridge
      * @return list of IDs of the deleted documents that are part of the specified batch
      */
     List<Long> getDeletedDocumentIds(String batchId);
+
+    /**
+     * @param deletedDocumentId the ID of the document to check
+     * @param userReference the reference of the user to check
+     * @return {@code true} if the specified user is allowed to restore the specified deleted document, {@code false}
+     *         otherwise
+     */
+    boolean canRestoreDeletedDocument(long deletedDocumentId, DocumentReference userReference);
+
+    /**
+     * @param deletedDocumentId the ID of the document to check
+     * @param userReference the reference of the user to check
+     * @return {@code true} if the specified user is allowed to permanently delete the specified deleted document,
+     *         {@code false} otherwise
+     */
+    boolean canPermanentlyDeleteDocument(long deletedDocumentId, DocumentReference userReference);
+
+    /**
+     * @param deletedDocumentId the ID of the deleted document to permanently delete
+     * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
+     * @return {@code true} if the document was permanently deleted successfully, {@code false} if the deletion failed
+     */
+    boolean permanentlyDeleteDocument(long deletedDocumentId, boolean checkContextUser);
 }

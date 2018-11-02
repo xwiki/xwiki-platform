@@ -27,19 +27,19 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
- * A job that can restore entities.
+ * A job that can permanently delete an entity already in the recycle bin.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 10.10RC1
  */
 @Component
-@Named(RefactoringJobs.RESTORE)
-public class RestoreJob extends AbstractDeletedDocumentsJob
+@Named(RefactoringJobs.PERMANENTLY_DELETE)
+public class PermanentlyDeleteJob extends AbstractDeletedDocumentsJob
 {
     @Override
     public String getType()
     {
-        return RefactoringJobs.RESTORE;
+        return RefactoringJobs.PERMANENTLY_DELETE;
     }
 
     @Override
@@ -47,12 +47,12 @@ public class RestoreJob extends AbstractDeletedDocumentsJob
     {
         this.progressManager.pushLevelProgress(idsDeletedDocuments.size(), this);
 
-        for (Long idToRestore : idsDeletedDocuments) {
+        for (Long idToDelete : idsDeletedDocuments) {
             if (this.status.isCanceled()) {
                 break;
             } else {
                 this.progressManager.startStep(this);
-                modelBridge.restoreDeletedDocument(idToRestore, checkRightsRequest);
+                modelBridge.permanentlyDeleteDocument(idToDelete, checkRights);
                 this.progressManager.endStep(this);
             }
         }

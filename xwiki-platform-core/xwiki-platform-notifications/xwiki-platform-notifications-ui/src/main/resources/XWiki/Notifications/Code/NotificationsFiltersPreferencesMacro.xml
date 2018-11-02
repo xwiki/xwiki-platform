@@ -609,7 +609,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
   var userURL = $('.filterPreferences').attr('data-user-url');
 
   // Callback on livetable row printing
-  $(document).on('xwiki:livetable:newrow', function(event, data) {
+  $(document).on('xwiki:livetable:notificationFilterPreferencesLiveTable:newrow', function(event, data) {
     // Delete action
     $(data.row).find('a.actiondelete').click(function(event) {
       event.preventDefault();

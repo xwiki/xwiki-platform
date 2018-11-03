@@ -113,11 +113,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
             // container for the database when configuring the JDBC URL, in the case when the servlet container is
             // running outside of docker and thus outside of the shared docker network...
-            LOGGER.info("(1) Starting database [{}]...", testConfiguration.getDatabase());
+            LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
             startDatabase(testConfiguration);
 
             // Build the XWiki WAR
-            LOGGER.info("(2) Building custom XWiki WAR...");
+            LOGGER.info("(*) Building custom XWiki WAR...");
             File targetWARDirectory = new File("./target/xwiki");
             // If the directory exists, skip the rebuilding of the XWiki WAR, allowing to re-run the test faster
             if (!targetWARDirectory.exists()) {
@@ -130,12 +130,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             }
 
             // Start the Servlet Engine
-            LOGGER.info("(3) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
+            LOGGER.info("(*) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
             startServletEngine(targetWARDirectory, testConfiguration, artifactResolver, mavenResolver,
                 repositoryResolver, extensionContext);
 
             // Provision XWiki by installing all required extensions.
-            LOGGER.info("(4) Provision XAR extensions for test...");
+            LOGGER.info("(*) Provision XAR extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
             LOGGER.info("XWiki is already started, using running instance to execute the tests...");
@@ -148,35 +148,41 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception
     {
-        LOGGER.info("(7) Start VNC container...");
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        if (testConfiguration.vnc()) {
+            LOGGER.info("(*) Start VNC container...");
 
-        BrowserWebDriverContainer webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
+            BrowserWebDriverContainer webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
 
-        VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
-        saveVNC(extensionContext, vnc);
-        vnc.start();
+            VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
+            saveVNC(extensionContext, vnc);
+            vnc.start();
+        }
 
-        LOGGER.info("(8) Starting test...");
+        LOGGER.info("(*) Starting test...");
     }
 
     @Override
     public void afterEach(ExtensionContext extensionContext) throws Exception
     {
-        LOGGER.info("(9) Stopping test...");
+        LOGGER.info("(*) Stopping test...");
 
-        VncRecordingContainer vnc = loadVNC(extensionContext);
-        // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the test
-        // result status... See https://github.com/junit-team/junit5/issues/542
-        File recordingDir = new File("./target/");
-        File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
-            extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
-        vnc.saveRecordingToFile(recordingFile);
-        vnc.stop();
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        if (testConfiguration.vnc()) {
+            VncRecordingContainer vnc = loadVNC(extensionContext);
+            // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the test
+            // result status... See https://github.com/junit-team/junit5/issues/542
+            File recordingDir = new File("./target/");
+            File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
+                extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
+            vnc.saveRecordingToFile(recordingFile);
+            vnc.stop();
 
-        // Note: We don't need to stop the BrowserWebDriverContainer since that's done automatically by TestContainers.
-        // This allows the test to finish faster and thus provide faster results (because stopping the container takes
-        // a bit of time).
-        LOGGER.info("(10) VNC recording of test has been saved to [{}]", recordingFile);
+            // Note: We don't need to stop the BrowserWebDriverContainer since that's done automatically by TestContainers.
+            // This allows the test to finish faster and thus provide faster results (because stopping the container takes
+            // a bit of time).
+            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
+        }
     }
 
     @Override
@@ -217,7 +223,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext)
     {
-        LOGGER.info("(5) Starting browser [{}]...", testConfiguration.getBrowser());
+        LOGGER.info("(*) Starting browser [{}]...", testConfiguration.getBrowser());
 
         // If XWiki is not running inside a Docker container, then it's not sharing a shared network and we need
         // to expose its port so that the container running Selenium can do ssh port forwarding to the host.
@@ -238,7 +244,9 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
         webDriverContainer.start();
 
-        LOGGER.info("VNC server address = " + webDriverContainer.getVncAddress());
+        if (testConfiguration.vnc()) {
+            LOGGER.info("VNC server address = " + webDriverContainer.getVncAddress());
+        }
 
         // Store it so that we can retrieve it later on.
         // Note that we don't need to stop it as this is taken care of by TestContainers
@@ -249,7 +257,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         saveXWikiWebDriver(extensionContext, xwikiWebDriver);
 
         // Initialize the test context
-        LOGGER.info("(6) Initialize Test Context...");
+        LOGGER.info("(*) Initialize Test Context...");
         PersistentTestContext testContext = initializePersistentTestContext(xwikiWebDriver);
         savePersistentTestContext(extensionContext, testContext);
 

@@ -49,6 +49,8 @@ public class TestConfiguration
 
     private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
 
+    private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
+
     private UITest uiTestAnnotation;
 
     private Browser browser;
@@ -69,6 +71,8 @@ public class TestConfiguration
 
     private String jdbcDriverVersion;
 
+    private boolean vnc;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -84,6 +88,7 @@ public class TestConfiguration
         resolveDatabaseTag();
         resolveServletEngineTag();
         resolveJDBCDriverVersion();
+        resolveVNC();
     }
 
     private void resolveBrowser()
@@ -169,6 +174,15 @@ public class TestConfiguration
         this.jdbcDriverVersion = newJDBCDriverVersion;
     }
 
+    private void resolveVNC()
+    {
+        boolean newVNC = this.uiTestAnnotation.vnc();
+        if (!newVNC) {
+            newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, FALSE));
+        }
+        this.vnc = newVNC;
+    }
+
     /**
      * @return the browser to use
      */
@@ -204,6 +218,7 @@ public class TestConfiguration
     /**
      * @return true true if the database data should be mapped to a local directory on the host computer so that it can
      *         be saved and reused for another run
+     * @since 10.10RC1
      */
     public boolean isDatabaseDataSaved()
     {
@@ -214,6 +229,7 @@ public class TestConfiguration
      * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
      *         your local repository). False by default to avoid developer problems but should be set to true in the
      *         CI to improve performance of functional tests
+     * @since 10.10RC1
      */
     public boolean isOffline()
     {
@@ -222,6 +238,7 @@ public class TestConfiguration
 
     /**
      * @return the docker image tag to use (if not specified, uses the default from TestContainers)
+     * @since 10.10RC1
      */
     public String getDatabaseTag()
     {
@@ -230,6 +247,7 @@ public class TestConfiguration
 
     /**
      * @return the docker image tag to use (if not specified, uses the "latest" tag)
+     * @since 10.10RC1
      */
     public String getServletEngineTag()
     {
@@ -239,9 +257,19 @@ public class TestConfiguration
     /**
      * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
      *         depending on the database)
+     * @since 10.10RC1
      */
     public String getJDBCDriverVersion()
     {
         return this.jdbcDriverVersion;
+    }
+
+    /**
+     * @return true if VNC container is started and recording is done and saved on test exit
+     * @since 10.10RC1
+     */
+    public boolean vnc()
+    {
+        return this.vnc;
     }
 }

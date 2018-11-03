@@ -170,17 +170,17 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
             VncRecordingContainer vnc = loadVNC(extensionContext);
-            // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the test
-            // result status... See https://github.com/junit-team/junit5/issues/542
+            // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the
+            // test result status... See https://github.com/junit-team/junit5/issues/542
             File recordingDir = new File("./target/");
             File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
                 extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
             vnc.saveRecordingToFile(recordingFile);
             vnc.stop();
 
-            // Note: We don't need to stop the BrowserWebDriverContainer since that's done automatically by TestContainers.
-            // This allows the test to finish faster and thus provide faster results (because stopping the container takes
-            // a bit of time).
+            // Note: We don't need to stop the BrowserWebDriverContainer since that's done automatically by
+            // TestContainers. This allows the test to finish faster and thus provide faster results (because stopping
+            // the container takes a bit of time).
             LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
     }

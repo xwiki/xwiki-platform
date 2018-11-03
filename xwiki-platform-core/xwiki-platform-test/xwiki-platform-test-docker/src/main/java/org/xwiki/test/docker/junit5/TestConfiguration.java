@@ -29,6 +29,8 @@ import org.xwiki.text.StringUtils;
  */
 public class TestConfiguration
 {
+    private static final String TRUE = "true";
+
     private static final String FALSE = "false";
 
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
@@ -177,8 +179,8 @@ public class TestConfiguration
     private void resolveVNC()
     {
         boolean newVNC = this.uiTestAnnotation.vnc();
-        if (!newVNC) {
-            newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, FALSE));
+        if (newVNC) {
+            newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, TRUE));
         }
         this.vnc = newVNC;
     }

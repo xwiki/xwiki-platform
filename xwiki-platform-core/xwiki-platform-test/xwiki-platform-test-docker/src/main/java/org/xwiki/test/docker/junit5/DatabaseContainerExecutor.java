@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MySQLContainer;
@@ -35,6 +36,8 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
  */
 public class DatabaseContainerExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseContainerExecutor.class);
+
     private static final String DBNAME = "xwiki";
 
     private static final String DBUSERNAME = DBNAME;
@@ -46,7 +49,6 @@ public class DatabaseContainerExecutor
      */
     public void start(TestConfiguration testConfiguration)
     {
-        JdbcDatabaseContainer databaseContainer = null;
         switch (testConfiguration.getDatabase()) {
             case MYSQL:
                 startMySQLContainer(testConfiguration);
@@ -148,6 +150,10 @@ public class DatabaseContainerExecutor
 
         if (testConfiguration.isDebug()) {
             databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+        }
+
+        if (testConfiguration.isDebug()) {
+            LOGGER.info(String.format("Docker image used: [%s]", databaseContainer.getDockerImageName()));
         }
 
         databaseContainer.start();

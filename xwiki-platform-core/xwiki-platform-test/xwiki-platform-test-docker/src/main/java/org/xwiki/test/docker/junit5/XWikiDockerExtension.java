@@ -242,6 +242,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
+        if (testConfiguration.isDebug()) {
+            LOGGER.info(String.format("Docker image used: [%s]",
+                BrowserWebDriverContainer.getImageForCapabilities(testConfiguration.getBrowser().getCapabilities())));
+        }
+
         webDriverContainer.start();
 
         if (testConfiguration.vnc()) {

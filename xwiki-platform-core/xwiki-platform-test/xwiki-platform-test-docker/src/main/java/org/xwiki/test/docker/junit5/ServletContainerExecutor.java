@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.time.Duration;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -41,6 +42,8 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class ServletContainerExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServletContainerExecutor.class);
+
     private static final String LATEST = "latest";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
@@ -132,6 +135,10 @@ public class ServletContainerExecutor
 
             if (testConfiguration.isDebug()) {
                 servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            }
+
+            if (testConfiguration.isDebug()) {
+                LOGGER.info(String.format("Docker image used: [%s]", servletContainer.getDockerImageName()));
             }
 
             servletContainer.start();

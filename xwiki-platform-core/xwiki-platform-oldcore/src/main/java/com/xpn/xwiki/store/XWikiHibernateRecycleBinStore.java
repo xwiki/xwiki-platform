@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -348,6 +349,47 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         }
 
         return deletedDocuments;
+    }
+
+    @Override
+    public Long[] getAllDeletedDocumentsIds(XWikiContext context, int limit) throws XWikiException
+    {
+        Long[] deletedDocuments = executeRead(context, new HibernateCallback<Long[]>()
+        {
+            @Override
+            public Long[] doInHibernate(Session session)
+                throws HibernateException
+            {
+                Query query = session.createQuery("SELECT id FROM XWikiDeletedDocument ORDER BY date DESC");
+
+                if (limit > 0) {
+                    query.setMaxResults(limit);
+                }
+
+                @SuppressWarnings("unchecked")
+                List<Long> deletedDocIds = query.list();
+                Long[] result = new Long[deletedDocIds.size()];
+                return deletedDocIds.toArray(result);
+            }
+        });
+
+        return deletedDocuments;
+    }
+
+    @Override
+    public int getNumberOfDeletedDocuments(XWikiContext context) throws XWikiException
+    {
+        int countNumberOfDeletedDocuments = executeRead(context, new HibernateCallback<Integer>()
+        {
+            @Override
+            public Integer doInHibernate(Session session) throws HibernateException
+            {
+                Query query = session.createQuery("SELECT count(id) FROM XWikiDeletedDocument");
+                return (Integer) query.list().get(0);
+            }
+        });
+
+        return countNumberOfDeletedDocuments;
     }
 
     @Override

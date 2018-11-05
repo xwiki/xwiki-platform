@@ -47,6 +47,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.script.service.ScriptService;
@@ -661,5 +662,45 @@ public class RefactoringScriptService implements ScriptService
         }
 
         return result;
+    }
+
+    /**
+     * Creates a request to permanently delete a specified batch of deleted documents from the recycle bin.
+     *
+     * @param batchId the ID of the batch of deleted documents to permanently delete
+     * @return the permanently delete request
+     * @since 10.10RC1
+     */
+    public PermanentlyDeleteRequest createPermanentlyDeleteRequest(String batchId)
+    {
+        PermanentlyDeleteRequest request = initializePermanentlyDeleteRequest();
+        request.setBatchId(batchId);
+        return request;
+    }
+
+    /**
+     * Creates a request to permanently delete a specified list of deleted documents from the recycle bin.
+     *
+     * @param deletedDocumentIds the list of IDs of the deleted documents to permanently delete
+     * @return the permanently delete request
+     * @since 10.10RC1
+     */
+    public PermanentlyDeleteRequest createPermanentlyDeleteRequest(List<Long> deletedDocumentIds)
+    {
+        PermanentlyDeleteRequest request = initializePermanentlyDeleteRequest();
+        request.setDeletedDocumentIds(deletedDocumentIds);
+        return request;
+    }
+
+    private PermanentlyDeleteRequest initializePermanentlyDeleteRequest()
+    {
+        PermanentlyDeleteRequest request = new PermanentlyDeleteRequest();
+
+        request.setId(generateJobId(RefactoringJobs.PERMANENTLY_DELETE));
+        request.setCheckRights(true);
+        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+        request.setWikiReference(getCurrentWikiReference());
+
+        return request;
     }
 }

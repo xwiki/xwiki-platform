@@ -83,7 +83,8 @@ public class ExportAction extends XWikiAction
     /**
      * Define the different format supported by the export.
      */
-    private enum EXPORT_FORMAT {
+    private enum ExportFormat
+    {
         XAR,
         HTML,
         OTHER
@@ -113,7 +114,7 @@ public class ExportAction extends XWikiAction
          */
         private String description;
 
-        ExportArguments(XWikiContext context, EXPORT_FORMAT format) throws XWikiException
+        ExportArguments(XWikiContext context, ExportFormat format) throws XWikiException
         {
             XWikiRequest request = context.getRequest();
 
@@ -124,7 +125,7 @@ public class ExportAction extends XWikiAction
             String[] pages = request.getParameterValues("pages");
             String[] excludes = request.getParameterValues("excludes");
 
-            if (StringUtils.isBlank(name) && !format.equals(EXPORT_FORMAT.XAR)) {
+            if (StringUtils.isBlank(name) && !format.equals(ExportFormat.XAR)) {
                 this.name = context.getDoc().getFullName();
             }
 
@@ -208,7 +209,7 @@ public class ExportAction extends XWikiAction
      */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
-        ExportArguments exportArguments = new ExportArguments(context, EXPORT_FORMAT.HTML);
+        ExportArguments exportArguments = new ExportArguments(context, ExportFormat.HTML);
 
         Collection<DocumentReference> pageList = resolvePages(exportArguments, context);
         if (pageList.isEmpty()) {
@@ -425,7 +426,7 @@ public class ExportAction extends XWikiAction
         String licence = request.get("licence");
         String version = request.get("version");
 
-        ExportArguments exportArguments = new ExportArguments(context, EXPORT_FORMAT.XAR);
+        ExportArguments exportArguments = new ExportArguments(context, ExportFormat.XAR);
 
         boolean all = exportArguments.exportPages.isEmpty();
 

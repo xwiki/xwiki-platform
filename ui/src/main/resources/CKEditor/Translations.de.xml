@@ -39,37 +39,37 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: CKEditor.ConfigClass_removePlugins=Disabled Plugins
-### Missing: CKEditor.ConfigClass_removePlugins.hint=The list of plugins that have been disabled.
-### Missing: CKEditor.ConfigClass_removeButtons=Disabled Toolbar Features
-### Missing: CKEditor.ConfigClass_removeButtons.hint=The list of toolbar features that have been disabled.
-### Missing: CKEditor.ConfigClass_linkShowAdvancedTab=Link: Show Advanced Tab
+  <content>CKEditor.ConfigClass_removePlugins=Deaktivierte Plugins
+CKEditor.ConfigClass_removePlugins.hint=Die Liste der deaktivierten Plugins.
+CKEditor.ConfigClass_removeButtons=Deaktivierte Toolbar Funktionen
+CKEditor.ConfigClass_removeButtons.hint=Die Liste der deaktivierten Toolbar Funktionen.
+CKEditor.ConfigClass_linkShowAdvancedTab=Link: Registerkarte Erweitert anzeigen
 ### Missing: CKEditor.ConfigClass_linkShowAdvancedTab.hint=Allows you to set link attributes such as id, name, class or style.
-### Missing: CKEditor.ConfigClass_linkShowTargetTab=Link: Show Target Tab
+CKEditor.ConfigClass_linkShowTargetTab=Link: Registerkarte Ziel anzeigen
 ### Missing: CKEditor.ConfigClass_linkShowTargetTab.hint=Allows you to set the link target attribute (e.g. to open the link in a new tab).
-### Missing: CKEditor.ConfigClass_advanced=Advanced Configuration
+CKEditor.ConfigClass_advanced=Erweiterte Konfiguration
 ### Missing: CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
 
 ### Missing: ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
-### Missing: ckeditor.admin.reset=Reset
-### Missing: ckeditor.admin.reset.hint=Restore the default configuration
-### Missing: ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
+ckeditor.admin.reset=Zurücksetzen
+ckeditor.admin.reset.hint=Wiederherstellen der Standard-Konfiguration
+ckeditor.admin.reset.confirmation=Sind Sie sicher, dass Sie die Standard-Konfiguration wiederherstellen möchten? Alle Änderungen werden verloren gehen.
 
-### Missing: ckeditor.plugin.link.options=Options
-### Missing: ckeditor.plugin.link.anchor=Anchor
+ckeditor.plugin.link.options=Optionen
+ckeditor.plugin.link.anchor=Anker
 ### Missing: ckeditor.plugin.link.queryString=Query String
-### Missing: ckeditor.plugin.link.defaultLabel=type the link label
-### Missing: ckeditor.plugin.link.openInNewTab=Open Link in New Tab
+ckeditor.plugin.link.defaultLabel=Link-Text eingeben
+ckeditor.plugin.link.openInNewTab=Link in neuem Tab öffnen
 
-### Missing: ckeditor.plugin.macro.placeholder=macro:{0}
-### Missing: ckeditor.plugin.macro.buttonHint=XWiki Macro
-### Missing: ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
-### Missing: ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
+ckeditor.plugin.macro.placeholder=Makro:{0}
+ckeditor.plugin.macro.buttonHint=XWiki Makro
+ckeditor.plugin.macro.refreshFailed=Fehler beim Aktualisieren des bearbeiteten Inhalts.
+ckeditor.plugin.macro.dedicatedInsertButtonHint={0} Makro einfügen
 
-### Missing: ckeditor.plugin.office.importer.title=Import Office File
-### Missing: ckeditor.plugin.office.importer.filePath=File Path
-### Missing: ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
-### Missing: ckeditor.plugin.office.importer.filterStyles=Filter Styles
+ckeditor.plugin.office.importer.title=Office-Datei importieren
+ckeditor.plugin.office.importer.filePath=Dateipfad
+ckeditor.plugin.office.importer.filePath.hint=Wählen Sie die zu importierende Office-Datei. Die Datei wird hochgeladen und an diese Seite anhängt und ihr Inhalt wird in den Inhalt der Seite eingefügt.
+ckeditor.plugin.office.importer.filterStyles=Design filtern
 ### Missing: ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
 ### Missing: ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
 ### Missing: ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.

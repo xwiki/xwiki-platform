@@ -17,40 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.async.internal;
+package org.xwiki.rendering.async.internal.service;
 
 import java.util.List;
 
-import org.xwiki.rendering.RenderingException;
-import org.xwiki.stability.Unstable;
+import org.xwiki.resource.AbstractResourceReference;
+import org.xwiki.resource.ResourceType;
 
 /**
- * Execute a task and return a String result.
+ * The reference of an asynchronous renderer.
  * 
  * @version $Id$
  * @since 10.10RC1
  */
-@Unstable
-public interface AsyncRenderer
+public class AsyncRendererResourceReference extends AbstractResourceReference
 {
-    /**
-     * @return the id used as prefix (concatenated with contextual information) for the actual job identifier
-     */
-    List<String> getId();
+    private List<String> id;
 
     /**
-     * @return the resulting {@link String}
-     * @throws RenderingException when failing to execute the renderer
+     * Default constructor.
+     * 
+     * @param type see {@link #getType()}
+     * @param id the id of the async renderer
      */
-    AsyncRendererResult render() throws RenderingException;
+    public AsyncRendererResourceReference(ResourceType type, List<String> id)
+    {
+        setType(type);
+
+        this.id = id;
+    }
 
     /**
-     * @return true if the execution should be asynchronous
+     * @return the child path (elements after the child)
      */
-    boolean isAsync();
+    public List<String> getId()
+    {
+        return this.id;
+    }
 
-    /**
-     * @return true if the result cache be reused several times
-     */
-    boolean isCached();
+    @Override
+    public String toString()
+    {
+        return getId().toString();
+    }
 }

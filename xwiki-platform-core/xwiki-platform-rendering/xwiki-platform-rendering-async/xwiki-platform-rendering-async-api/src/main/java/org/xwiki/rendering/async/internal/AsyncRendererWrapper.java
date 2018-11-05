@@ -22,35 +22,47 @@ package org.xwiki.rendering.async.internal;
 import java.util.List;
 
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.stability.Unstable;
 
 /**
- * Execute a task and return a String result.
+ * Call another {@link AsyncRenderer}.
  * 
  * @version $Id$
  * @since 10.10RC1
  */
-@Unstable
-public interface AsyncRenderer
+public class AsyncRendererWrapper implements AsyncRenderer
 {
-    /**
-     * @return the id used as prefix (concatenated with contextual information) for the actual job identifier
-     */
-    List<String> getId();
+    protected AsyncRenderer renderer;
 
     /**
-     * @return the resulting {@link String}
-     * @throws RenderingException when failing to execute the renderer
+     * @param renderer the renderer
      */
-    AsyncRendererResult render() throws RenderingException;
+    public AsyncRendererWrapper(AsyncRenderer renderer)
+    {
+        this.renderer = renderer;
+    }
 
-    /**
-     * @return true if the execution should be asynchronous
-     */
-    boolean isAsync();
+    @Override
+    public List<String> getId()
+    {
+        return this.renderer.getId();
+    }
 
-    /**
-     * @return true if the result cache be reused several times
-     */
-    boolean isCached();
+    @Override
+    public AsyncRendererResult render() throws RenderingException
+    {
+        return this.renderer.render();
+    }
+
+    @Override
+    public boolean isAsync()
+    {
+        return this.renderer.isAsync();
+    }
+
+    @Override
+    public boolean isCached()
+    {
+        return this.renderer.isCached();
+    }
+
 }

@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.async.internal;
 
-import java.util.HashSet;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +36,8 @@ import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentRole;
+import org.xwiki.component.descriptor.DefaultComponentRole;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.EntityReference;
@@ -46,16 +48,42 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 10.10RC1
  */
-@Component(roles = AsyncRenderer.class)
+@Component(roles = AsyncRendererCache.class)
 @Singleton
-public class AsyncRendererCache implements Initializable, CacheEntryListener<AsyncRendererJobStatus>
+public class AsyncRendererCache implements Initializable, CacheEntryListener<AsyncRendererCache.AsyncRendererCacheEntry>
 {
+    class AsyncRendererCacheEntry
+    {
+        /**
+         * The status.
+         */
+        private final AsyncRendererJobStatus status;
+
+        /**
+         * Indicate if the entry should be removed the first time it's used.
+         */
+        private final boolean unique;
+
+        AsyncRendererCacheEntry(AsyncRendererJobStatus status)
+        {
+            this.status = status;
+            this.unique = !status.getRequest().getRenderer().isCached();
+
+            // Avoid storing useless stuff in the RAM
+            this.status.dispose();
+        }
+    }
+
     @Inject
     private CacheManager cacheManager;
 
-    private Cache<AsyncRendererJobStatus> cache;
+    private Cache<AsyncRendererCacheEntry> cache;
 
     private Map<EntityReference, Set<String>> referenceMapping = new ConcurrentHashMap<>();
+
+    private Map<Type, Set<String>> roleTypeMapping = new ConcurrentHashMap<>();
+
+    private Map<ComponentRole<?>, Set<String>> roleMapping = new ConcurrentHashMap<>();
 
     /**
      * @param jobId the job identifier
@@ -76,7 +104,8 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     public void initialize() throws InitializationException
     {
         try {
-            this.cache = this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer", 500));
+            this.cache =
+                this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer", 100, 86400));
         } catch (CacheException e) {
             throw new InitializationException("Failed to initialize cache", e);
         }
@@ -90,7 +119,19 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public AsyncRendererJobStatus get(List<String> id)
     {
-        return this.cache.get(toCacheKey(id));
+        String cacheKey = toCacheKey(id);
+
+        AsyncRendererCacheEntry entry = this.cache.get(cacheKey);
+
+        if (entry != null) {
+            if (entry.unique) {
+                this.cache.remove(cacheKey);
+            }
+
+            return entry.status;
+        }
+
+        return null;
     }
 
     /**
@@ -98,7 +139,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public void put(AsyncRendererJobStatus status)
     {
-        this.cache.set(toCacheKey(status.getRequest().getId()), status);
+        this.cache.set(toCacheKey(status.getRequest().getId()), new AsyncRendererCacheEntry(status));
     }
 
     /**
@@ -110,42 +151,54 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     }
 
     @Override
-    public void cacheEntryAdded(CacheEntryEvent<AsyncRendererJobStatus> event)
+    public void cacheEntryAdded(CacheEntryEvent<AsyncRendererCacheEntry> event)
     {
-        CacheEntry<AsyncRendererJobStatus> entry = event.getEntry();
-        AsyncRendererJobStatus status = entry.getValue();
+        CacheEntry<AsyncRendererCacheEntry> entry = event.getEntry();
+        AsyncRendererCacheEntry value = entry.getValue();
         String key = entry.getKey();
 
-        for (EntityReference reference : status.getRequest().getRenderer().getReferences()) {
-            this.referenceMapping.computeIfAbsent(reference, k -> new HashSet<String>()).add(key);
+        for (EntityReference reference : value.status.getReferences()) {
+            this.referenceMapping.computeIfAbsent(reference, k -> ConcurrentHashMap.newKeySet()).add(key);
         }
 
-        // Avoid storing useless stuff in the RAM
-        status.dispose();
+        for (Type role : value.status.getRoleTypes()) {
+            this.roleTypeMapping.computeIfAbsent(role, k -> ConcurrentHashMap.newKeySet()).add(key);
+        }
+
+        for (ComponentRole<?> role : value.status.getRoles()) {
+            this.roleMapping.computeIfAbsent(role, k -> ConcurrentHashMap.newKeySet()).add(key);
+        }
     }
 
     @Override
-    public void cacheEntryRemoved(CacheEntryEvent<AsyncRendererJobStatus> event)
+    public void cacheEntryRemoved(CacheEntryEvent<AsyncRendererCacheEntry> event)
     {
-        CacheEntry<AsyncRendererJobStatus> entry = event.getEntry();
-        AsyncRendererJobStatus status = entry.getValue();
+        CacheEntry<AsyncRendererCacheEntry> entry = event.getEntry();
+        AsyncRendererCacheEntry value = entry.getValue();
         String key = entry.getKey();
 
-        for (EntityReference reference : status.getRequest().getRenderer().getReferences()) {
-            Set<String> keys = this.referenceMapping.get(reference);
+        remove(key, value.status.getReferences(), this.referenceMapping);
+        remove(key, value.status.getRoleTypes(), this.roleTypeMapping);
+        remove(key, value.status.getRoles(), this.roleMapping);
+    }
+
+    private <T> void remove(String key, Set<T> values, Map<T, Set<String>> mapping)
+    {
+        for (T value : values) {
+            Set<String> keys = mapping.get(value);
 
             if (keys != null) {
                 keys.remove(key);
 
                 if (keys.isEmpty()) {
-                    this.referenceMapping.remove(reference);
+                    mapping.remove(value);
                 }
             }
         }
     }
 
     @Override
-    public void cacheEntryModified(CacheEntryEvent<AsyncRendererJobStatus> event)
+    public void cacheEntryModified(CacheEntryEvent<AsyncRendererCacheEntry> event)
     {
         cacheEntryAdded(event);
     }
@@ -155,13 +208,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public void cleanCache(EntityReference reference)
     {
-        Set<String> keys = this.referenceMapping.remove(reference);
-
-        if (keys != null) {
-            for (String key : keys) {
-                this.cache.remove(key);
-            }
-        }
+        clean(this.referenceMapping.remove(reference));
     }
 
     /**
@@ -174,6 +221,28 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
 
             if (reference.getRoot().getName().equals(wiki)) {
                 cleanCache(reference);
+            }
+        }
+    }
+
+    /**
+     * @param roleType the type of the component
+     * @param roleHint the hint of the component
+     */
+    public void cleanCache(Type roleType, String roleHint)
+    {
+        clean(this.roleTypeMapping.remove(roleType));
+        clean(this.roleMapping.remove(new DefaultComponentRole<>(roleType, roleHint)));
+    }
+
+    /**
+     * @param keys the keys of the cache entries to remove
+     */
+    private void clean(Set<String> keys)
+    {
+        if (keys != null) {
+            for (String key : keys) {
+                this.cache.remove(key);
             }
         }
     }

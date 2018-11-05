@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.RenderingException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
@@ -54,8 +55,10 @@ public interface AsyncRendererExecutor
      * @param contextEntries the list of context entries to take remember for the execution
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
+     * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
      */
-    AsyncRendererJobStatus renderer(AsyncRenderer renderer, Set<String> contextEntries) throws JobException;
+    AsyncRendererJobStatus render(AsyncRenderer renderer, Set<String> contextEntries)
+        throws JobException, RenderingException;
 
     /**
      * Start and cache or return the status of the job corresponding to the passed renderer.
@@ -66,7 +69,8 @@ public interface AsyncRendererExecutor
      * @param rightEntity the reference on which the right is required to access the result
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
+     * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
      */
-    AsyncRendererJobStatus renderer(AsyncRenderer renderer, Set<String> contextEntries, Right right,
-        EntityReference rightEntity) throws JobException;
+    AsyncRendererJobStatus render(AsyncRenderer renderer, Set<String> contextEntries, Right right,
+        EntityReference rightEntity) throws JobException, RenderingException;
 }

@@ -591,6 +591,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    /**
+     * @since 10.10RC1
+     */
+    public boolean addBooleanField(String fieldName, String fieldPrettyName)
+    {
+        return addBooleanField(fieldName, fieldPrettyName, null);
+    }
+
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
     {
         return addBooleanField(fieldName, fieldPrettyName, displayType, null);

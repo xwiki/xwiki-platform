@@ -27,8 +27,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.uiextension.internal.AbstractUIExtensionClassDocumentInitializer;
 
-import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 @Component
 @Named(PanelClassDocumentInitializer.CLASS_REFERENCE_STRING)
 @Singleton
-public class PanelClassDocumentInitializer extends AbstractMandatoryClassInitializer
+public class PanelClassDocumentInitializer extends AbstractUIExtensionClassDocumentInitializer
 {
     /**
      * The local reference of the class used to defined panels xobjects as a String.
@@ -76,11 +76,10 @@ public class PanelClassDocumentInitializer extends AbstractMandatoryClassInitial
     }
 
     @Override
-    protected void createClass(BaseClass xclass)
+    protected void createClassInternal(BaseClass xclass)
     {
         xclass.addStaticListField("category", "Category", 1, false, "Information|Navigation|Tools|Administration|Other",
             ListClass.DISPLAYTYPE_SELECT);
-        xclass.addTextAreaField("content", "Content", 120, 25, EditorType.TEXT);
         xclass.addTextAreaField("description", "Description", 40, 5, EditorType.TEXT);
         xclass.addTextField("name", "Name", 40);
         xclass.addStaticListField("type", "Panel type", 1, false, "view|edit", ListClass.DISPLAYTYPE_SELECT);

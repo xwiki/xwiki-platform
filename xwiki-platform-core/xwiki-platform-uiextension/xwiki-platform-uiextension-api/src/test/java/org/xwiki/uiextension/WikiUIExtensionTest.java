@@ -20,14 +20,36 @@
 package org.xwiki.uiextension;
 
 import org.apache.commons.collections.MapUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
+import org.xwiki.component.wiki.internal.bridge.ContentParser;
+import org.xwiki.job.JobException;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.uiextension.internal.WikiUIExtension;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WikiUIExtension}.
@@ -35,6 +57,8 @@ import org.xwiki.uiextension.internal.WikiUIExtension;
  * @version $Id$
  * @since 4.2M3
  */
+@OldcoreTest
+@ReferenceComponentList
 public class WikiUIExtensionTest
 {
     private static final DocumentReference CLASS_REF = new DocumentReference("xwiki", "XWiki", "UIExtensionClass");
@@ -43,28 +67,60 @@ public class WikiUIExtensionTest
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
-    private ObjectReference objectReference;
+    @MockComponent
+    private JobProgressManager jobProgressManager;
 
-    @Before
+    @MockComponent
+    private ErrorBlockGenerator errorBlockGenerator;
+
+    @MockComponent
+    private AsyncContext asyncContext;
+
+    @MockComponent
+    private BlockAsyncRendererExecutor blockAsyncRendererExecutor;
+
+    @MockComponent
+    private RenderingContext renderingContext;
+
+    @MockComponent
+    private ContentParser contentParser;
+
+    @InjectComponentManager
+    private ComponentManager componentManager;
+
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    private BaseObject baseObject;
+
+    @BeforeEach
     public void setUp() throws Exception
     {
-        objectReference = new ObjectReference(CLASS_REF.toString() + "[1]", DOC_REF);
+        XWikiDocument ownerDocument = new XWikiDocument(DOC_REF);
+        ownerDocument.setAuthorReference(AUTHOR_REFERENCE);
+
+        this.baseObject = new BaseObject();
+        this.baseObject.setOwnerDocument(ownerDocument);
+        this.baseObject.setXClassReference(CLASS_REF);
     }
 
     @Test
     public void createWikiUIExtension()
+        throws ComponentLookupException, WikiComponentException, JobException, RenderingException
     {
-        WikiUIExtension wikiUIX =
-            new WikiUIExtension("roleHint", "id", "epId", objectReference, AUTHOR_REFERENCE, null);
+        WikiUIExtension wikiUIX = new WikiUIExtension(this.baseObject, "roleHint", "id", "epId", this.componentManager);
         wikiUIX.setScope(WikiComponentScope.WIKI);
 
-        Assert.assertEquals("roleHint", wikiUIX.getRoleHint());
-        Assert.assertEquals("id", wikiUIX.getId());
-        Assert.assertEquals("epId", wikiUIX.getExtensionPointId());
-        Assert.assertEquals(AUTHOR_REFERENCE, wikiUIX.getAuthorReference());
-        Assert.assertEquals(UIExtension.class, wikiUIX.getRoleType());
-        Assert.assertEquals(WikiComponentScope.WIKI, wikiUIX.getScope());
-        Assert.assertEquals(new WordBlock(""), wikiUIX.execute());
-        Assert.assertEquals(MapUtils.EMPTY_MAP, wikiUIX.getParameters());
+        assertEquals("roleHint", wikiUIX.getRoleHint());
+        assertEquals("id", wikiUIX.getId());
+        assertEquals("epId", wikiUIX.getExtensionPointId());
+        assertEquals(AUTHOR_REFERENCE, wikiUIX.getAuthorReference());
+        assertEquals(UIExtension.class, wikiUIX.getRoleType());
+        assertEquals(WikiComponentScope.WIKI, wikiUIX.getScope());
+        assertEquals(MapUtils.EMPTY_MAP, wikiUIX.getParameters());
+
+        when(this.blockAsyncRendererExecutor.execute(any(), any())).thenReturn(new WordBlock(""));
+
+        assertEquals(new WordBlock(""), wikiUIX.execute());
     }
 }

@@ -43,6 +43,7 @@ public class AsyncRendererJobRequest extends AbstractRequest
      */
     public AsyncRendererJobRequest()
     {
+        setVerbose(false);
     }
 
     /**
@@ -51,6 +52,8 @@ public class AsyncRendererJobRequest extends AbstractRequest
     public AsyncRendererJobRequest(Request request)
     {
         super(request);
+
+        setVerbose(false);
     }
 
     /**

@@ -1,1 +1,3 @@
 org.xwiki.rendering.async.internal.DefaultAsyncContext
+org.xwiki.rendering.async.internal.block.BlockAsyncRenderer
+org.xwiki.rendering.async.internal.block.DefaultBlockAsyncRendererExecutor

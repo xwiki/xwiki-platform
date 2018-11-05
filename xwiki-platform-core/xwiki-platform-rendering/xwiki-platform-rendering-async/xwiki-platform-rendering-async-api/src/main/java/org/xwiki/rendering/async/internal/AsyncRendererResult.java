@@ -34,7 +34,7 @@ public class AsyncRendererResult
      */
     public AsyncRendererResult(String result)
     {
-
+        this.result = result;
     }
 
     /**

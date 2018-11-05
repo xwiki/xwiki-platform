@@ -20,16 +20,23 @@
 package org.xwiki.rendering.async.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.event.ComponentDescriptorAddedEvent;
+import org.xwiki.component.event.ComponentDescriptorEvent;
+import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.EntityEvent;
 import com.xpn.xwiki.internal.event.XClassPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XClassPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XClassPropertyUpdatedEvent;
@@ -45,6 +52,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 10.10RC1
  */
+@Component
+@Singleton
+@Named(AsyncRendererCacheListener.NAME)
 public class AsyncRendererCacheListener extends AbstractEventListener
 {
     /**
@@ -63,13 +73,16 @@ public class AsyncRendererCacheListener extends AbstractEventListener
         super(NAME, new WikiDeletedEvent(), new XClassPropertyAddedEvent(), new XClassPropertyDeletedEvent(),
             new XClassPropertyUpdatedEvent(), new XObjectAddedEvent(), new XObjectDeletedEvent(),
             new XObjectUpdatedEvent(), new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
-            new DocumentDeletedEvent());
+            new DocumentDeletedEvent(), new ComponentDescriptorAddedEvent(), new ComponentDescriptorRemovedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
+        if (event instanceof ComponentDescriptorEvent) {
+            ComponentDescriptorEvent componentEvent = ((ComponentDescriptorEvent) event);
+            this.cache.cleanCache(componentEvent.getRoleType(), componentEvent.getRoleHint());
+        } else if (event instanceof WikiDeletedEvent) {
             WikiReference wikiReference = new WikiReference(((WikiDeletedEvent) event).getWikiId());
 
             this.cache.cleanCache(wikiReference.getName());
@@ -79,14 +92,25 @@ public class AsyncRendererCacheListener extends AbstractEventListener
             // Clean entries associated to modified entity
             this.cache.cleanCache(document.getDocumentReference());
 
-            // Clean entries associated to modified object class reference
-            if (event instanceof XObjectEvent) {
-                XObjectEvent objectEvent = (XObjectEvent) event;
-
-                BaseObject obj = document.getXObject(objectEvent.getReference());
-
-                this.cache.cleanCache(obj.getXClassReference());
+            // Clean entries associated to the exact entry
+            if (event instanceof EntityEvent) {
+                onEntityEvent((EntityEvent) event, document);
             }
+        }
+    }
+
+    private void onEntityEvent(EntityEvent event, XWikiDocument document)
+    {
+        // Clean entries associated to the entity
+        this.cache.cleanCache(event.getReference());
+
+        // Clean entries associated to modified object class reference
+        if (event instanceof XObjectEvent) {
+            XObjectEvent objectEvent = (XObjectEvent) event;
+
+            BaseObject obj = document.getXObject(objectEvent.getReference());
+
+            this.cache.cleanCache(obj.getXClassReference());
         }
     }
 }

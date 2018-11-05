@@ -33,6 +33,7 @@
   <description>XWiki Platform - Rendering - Parent POM</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-rendering-async</module>
     <module>xwiki-platform-rendering-configuration</module>
     <module>xwiki-platform-rendering-macros</module>
     <module>xwiki-platform-rendering-parser</module>

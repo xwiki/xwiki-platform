@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,25 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.rendering.async.internal.block;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering</artifactId>
-    <version>10.10-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-rendering-async</artifactId>
-  <name>XWiki Platform - Rendering - Async - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Rendering - Async - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-rendering-async-api</module>
-    <module>xwiki-platform-rendering-async-default</module>
-    <module>xwiki-platform-rendering-async-script</module>
-  </modules>
-</project>
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.internal.AsyncRenderer;
+
+/**
+ * Give a chance to prepare and cleanup before and after the actual renderer execution.
+ * 
+ * @version $Id$
+ * @since 10.10RC1
+ */
+@FunctionalInterface
+public interface BlockAsyncRendererDecorator
+{
+    /**
+     * @param renderer the renderer to execute
+     * @return the result of the renderer execution
+     * @throws RenderingException when failing to execute the renderer
+     */
+    BlockAsyncRendererResult render(AsyncRenderer renderer) throws RenderingException;
+}

@@ -19,8 +19,15 @@
  */
 package org.xwiki.rendering.async.internal;
 
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Set;
+
+import org.xwiki.component.descriptor.ComponentRole;
 import org.xwiki.job.AbstractJobStatus;
+import org.xwiki.job.annotation.Serializable;
 import org.xwiki.logging.LoggerManager;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 
 /**
@@ -29,6 +36,8 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  * @since 10.10RC1
  */
+// TODO: we might want to decide to isolate asynchronous renderer log at some point
+@Serializable(false)
 public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRequest>
 {
     /**
@@ -37,6 +46,12 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     public static final String JOBTYPE = "asyncrenderer";
 
     private AsyncRendererResult result;
+
+    private Set<EntityReference> references;
+
+    private Set<Type> roleTypes;
+
+    private Set<ComponentRole<?>> roles;
 
     /**
      * @param request the request provided when started the job
@@ -47,6 +62,42 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         LoggerManager loggerManager)
     {
         super(JOBTYPE, request, null, observationManager, loggerManager);
+
+        // We are not ready to isolate asynchronous renderer, plus it's not stored right now so the log would be lost.
+        setIsolated(false);
+    }
+
+    /**
+     * @param request the request
+     * @param result the result of the renderer execution
+     */
+    AsyncRendererJobStatus(AsyncRendererJobRequest request, AsyncRendererResult result)
+    {
+        super(JOBTYPE, request, null, null, null);
+
+        this.result = result;
+
+        setState(State.FINISHED);
+    }
+
+    /**
+     * @param request the request
+     * @param result the result of the renderer execution
+     * @param references the involved references
+     * @param roleTypes the involved components types
+     * @param roles the involved components
+     */
+    AsyncRendererJobStatus(AsyncRendererJobRequest request, AsyncRendererResult result, Set<EntityReference> references,
+        Set<Type> roleTypes, Set<ComponentRole<?>> roles)
+    {
+        super(JOBTYPE, request, null, null, null);
+
+        setResult(result);
+        setReference(references);
+        setRoleTypes(roleTypes);
+        setRoles(roles);
+
+        setState(State.FINISHED);
     }
 
     /**
@@ -66,10 +117,63 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     }
 
     /**
+     * @return the references
+     */
+    public Set<EntityReference> getReferences()
+    {
+        return this.references != null ? this.references : Collections.emptySet();
+    }
+
+    /**
+     * @param references the references to invalidate the cache
+     */
+    void setReference(Set<EntityReference> references)
+    {
+        if (references != null) {
+            this.references = Collections.unmodifiableSet(references);
+        }
+    }
+
+    /**
+     * @return the types of the components to invalidate the cache
+     */
+    public Set<Type> getRoleTypes()
+    {
+        return this.roleTypes != null ? this.roleTypes : Collections.emptySet();
+    }
+
+    /**
+     * @param roleTypes the types of the components to invalidate the cache
+     */
+    public void setRoleTypes(Set<Type> roleTypes)
+    {
+        this.roleTypes = roleTypes;
+    }
+
+    /**
+     * @return the components to invalidate the cache
+     */
+    public Set<ComponentRole<?>> getRoles()
+    {
+        return this.roles != null ? this.roles : Collections.emptySet();
+    }
+
+    /**
+     * @param roles the components to invalidate the cache
+     */
+    void setRoles(Set<ComponentRole<?>> roles)
+    {
+        if (roles != null) {
+            this.roles = Collections.unmodifiableSet(roles);
+        }
+    }
+
+    /**
      * Remove stuff which are not required in the cache (to spare some memory).
      */
     void dispose()
     {
+        getRequest().setContext(null);
         getRequest().setRenderer(null);
     }
 }

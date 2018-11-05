@@ -344,11 +344,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     // On change
     $(self.switchAlert).on('switchChange.bootstrapSwitch', function(event, state) {
       self.application.updateSwitches();
-      setTimeout(function() { self.save('alert', state); }, 1);
     });
     $(self.switchEmail).on('switchChange.bootstrapSwitch', function(event, state) {
       self.application.updateSwitches();
-      setTimeout(function() { self.save('email', state); }, 1);
     });
 
     /**

@@ -37,6 +37,7 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <selenium.version>3.14.0</selenium.version>
   </properties>
   <dependencies>
     <dependency>
@@ -119,7 +120,7 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>3.12.0</version>
+      <version>${selenium.version}</version>
       <exclusions>
         <!-- XWiki uses a more recent version of bytebuddy -->
         <exclusion>
@@ -128,13 +129,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- selenium-server requires Guava 23.6-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
+    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
       details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
       here. Note that the version needs to be checked when we change the version of selenium-server -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>23.6-jre</version>
+      <version>25.0-jre</version>
       <exclusions>
         <!-- Use the version from TestContainers which is newer -->
         <exclusion>

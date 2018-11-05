@@ -313,5 +313,6 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 })();
     //]]>
     </script>
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
     <input type="submit" value="$services.localization.render('save')" class="sr-only sr-only-focusable" />
 </div> ## xwikieditcontent

@@ -81,9 +81,9 @@ public class ScopeNotificationFilterLocationStateComputer
             return new WatchedLocationState(true);
         }
 
-        WatchedState state = handleExclusiveFilters(location, preferences);
-        if (state != WatchedState.UNKNOWN) {
-            return new WatchedLocationState(state == WatchedState.WATCHED);
+        WatchedLocationState state = handleExclusiveFilters(location, preferences);
+        if (state != null) {
+            return state;
         }
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
@@ -112,11 +112,12 @@ public class ScopeNotificationFilterLocationStateComputer
         return new WatchedLocationState(match, startingDate);
     }
 
-    private WatchedState handleExclusiveFilters(EntityReference location,
+    private WatchedLocationState handleExclusiveFilters(EntityReference location,
             ScopeNotificationFilterPreferencesHierarchy preferences)
     {
         WatchedState state = WatchedState.UNKNOWN;
         int deepestLevel = 0;
+        Date startingDate = null;
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
         while (it.hasNext()) {
@@ -135,12 +136,14 @@ public class ScopeNotificationFilterLocationStateComputer
                     if (match(child, location) && childDeepLevel > deepestLevel) {
                         state = WatchedState.WATCHED;
                         deepestLevel = childDeepLevel;
+                        startingDate = child.getStartingDate();
                     }
                 }
             }
         }
 
-        return state;
+        return state == WatchedState.UNKNOWN ? null
+                : new WatchedLocationState(state == WatchedState.WATCHED, startingDate);
     }
 
     private boolean match(ScopeNotificationFilterPreference pref, EntityReference location)

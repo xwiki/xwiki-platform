@@ -117,28 +117,16 @@ public abstract class AbstractExtension
         return store.get(TestConfiguration.class, TestConfiguration.class);
     }
 
-    protected void saveArtifactResolver(ExtensionContext context, ArtifactResolver artifactResolver)
+    protected void saveServletContainerExecutor(ExtensionContext context, ServletContainerExecutor executor)
     {
         ExtensionContext.Store store = getStore(context);
-        store.put(ArtifactResolver.class, artifactResolver);
+        store.put(ServletContainerExecutor.class, executor);
     }
 
-    protected ArtifactResolver loadArtifactResolver(ExtensionContext context)
+    protected ServletContainerExecutor loadServletContainerExecutor(ExtensionContext context)
     {
         ExtensionContext.Store store = getStore(context);
-        return store.get(ArtifactResolver.class, ArtifactResolver.class);
-    }
-
-    protected void saveMavenResolver(ExtensionContext context, MavenResolver mavenResolver)
-    {
-        ExtensionContext.Store store = getStore(context);
-        store.put(MavenResolver.class, mavenResolver);
-    }
-
-    protected MavenResolver loadMavenResolver(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(MavenResolver.class, MavenResolver.class);
+        return store.get(ServletContainerExecutor.class, ServletContainerExecutor.class);
     }
 
     protected PersistentTestContext initializePersistentTestContext(XWikiWebDriver driver)

@@ -18,7 +18,7 @@
   #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/picker.js' , {'forceSkinAction': true, 'version': $environmentVersion}))
   <div class="xwiki-flavor-picker $!cssClass" data-namespace="$escapetool.xml($namespace)">
     ## Filter
-    <input type="text" id="${escapetool.xml($fieldName)}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" style="margin-bottom: 2px;"/>
+    <input type="text" id="${escapetool.xml($fieldName)}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" />
     ## Results
     <div class="ui-progress-background hidden" id="xwiki-flavor-picker-progress-background">
       <div class="ui-progress-bar green" id="xwiki-flavor-picker-progress-bar"/>

@@ -155,11 +155,6 @@
     &lt;input type='hidden' name='category' value="$!{escapetool.xml($currentCategory)}" /&gt;
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-  #if($request.get('xpage'))
-    &lt;script type="text/javascript"&gt;
-      document.fire('lightbox:userprofile:loaded');
-    &lt;/script&gt;
-  #end
 {{/html}}
 {{/velocity}}</content>
   <attachment>
@@ -255,9 +250,9 @@
 // Start XWiki augmentation.
 Object.extend(XWiki, {
   userprofile : {
-    init : function() {
+    init : function(container) {
       this.crtCategory = '';
-      this.tabsContainer = $('user-vertical-menu');
+      this.tabsContainer = (container || $('body')).down('#user-vertical-menu');
       if (!this.tabsContainer) {
         return;
       }
@@ -344,12 +339,14 @@ Object.extend(XWiki, {
   }
 });
 
-var init = function() {
-  XWiki.userprofile.init();
+var init = function(event) {
+  ((event &amp;&amp; event.memo.elements) || [$('body')]).each(function(element) {
+    XWiki.userprofile.init(element);
+  });
   return true;
 };
 (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
-document.observe('lightbox:userprofile:loaded', init);
+document.observe('xwiki:dom:updated', init);
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));</code>

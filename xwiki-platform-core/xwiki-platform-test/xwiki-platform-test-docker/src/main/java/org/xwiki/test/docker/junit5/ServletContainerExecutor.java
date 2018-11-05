@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.time.Duration;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -41,15 +42,24 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class ServletContainerExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServletContainerExecutor.class);
+
+    private static final String LATEST = "latest";
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
+
+    private RepositoryResolver repositoryResolver;
 
     /**
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
+     * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public ServletContainerExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
+    public ServletContainerExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
+        RepositoryResolver repositoryResolver)
     {
         this.jettyStandaloneExecutor = new JettyStandaloneExecutor(artifactResolver, mavenResolver);
+        this.repositoryResolver = repositoryResolver;
     }
 
     /**
@@ -75,7 +85,9 @@ public class ServletContainerExecutor
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
 
-                servletContainer = new GenericContainer<>("tomcat:latest");
+                String tomcatTag = String.format("tomcat:%s", testConfiguration.getServletEngineTag() != null
+                    ? testConfiguration.getServletEngineTag() : LATEST);
+                servletContainer = new GenericContainer<>(tomcatTag);
                 setWebappMount(servletContainer, sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
 
                 servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
@@ -85,7 +97,9 @@ public class ServletContainerExecutor
 
                 break;
             case JETTY:
-                servletContainer = new GenericContainer<>("jetty:latest");
+                String jettyTag = String.format("jetty:%s", testConfiguration.getServletEngineTag() != null
+                    ? testConfiguration.getServletEngineTag() : LATEST);
+                servletContainer = new GenericContainer<>(jettyTag);
                 setWebappMount(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
 
                 break;
@@ -114,8 +128,22 @@ public class ServletContainerExecutor
                     Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                         .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isOffline()) {
+                String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
+                servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
+            }
+
+            if (testConfiguration.isVerbose()) {
                 servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
+            }
+
+            if (testConfiguration.isVerbose()) {
+                LOGGER.info(String.format("Docker image used: [%s]", servletContainer.getDockerImageName()));
+            }
+
+            // Get the latest image in case the tag has been updated on dockerhub.
+            if (!testConfiguration.isOffline()) {
+                servletContainer.getDockerClient().pullImageCmd(servletContainer.getDockerImageName());
             }
 
             servletContainer.start();

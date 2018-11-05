@@ -60,10 +60,10 @@ public @interface UITest
     ServletEngine servletEngine() default ServletEngine.SYSTEM;
 
     /**
-     * @return true if the test should be started in debug mode, false otherwise
-     * @since 10.9
+     * @return true if the test should output verbose console logs or not
+     * @since 10.10RC1
      */
-    boolean debug() default false;
+    boolean verbose() default false;
 
     /**
      * @return true if the database data should be mapped to a local directory on the host computer so that it can
@@ -76,6 +76,32 @@ public @interface UITest
      * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
      *         your local repository). False by default to avoid developer problems but should be set to true in the
      *         CI to improve performance of functional tests
+     * @since 10.10RC1
      */
-    boolean isOffline() default false;
+    boolean offline() default false;
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the "latest" tag)
+     * @since 10.10RC1
+     */
+    String servletEngineTag() default "";
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the default from TestContainers)
+     * @since 10.10RC1
+     */
+    String databaseTag() default "";
+
+    /**
+     * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
+     *         depending on the database)
+     * @since 10.10RC1
+     */
+    String jdbcDriverVersion() default "";
+
+    /**
+     * @return true if VNC container is started and recording is done and saved on test exit
+     * @since 10.10RC1
+     */
+    boolean vnc() default true;
 }

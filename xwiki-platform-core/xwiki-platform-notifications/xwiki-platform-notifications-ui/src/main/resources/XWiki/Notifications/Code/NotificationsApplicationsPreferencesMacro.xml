@@ -344,11 +344,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     // On change
     $(self.switchAlert).on('switchChange.bootstrapSwitch', function(event, state) {
       self.application.updateSwitches();
-      setTimeout(function() { self.save('alert', state); }, 1);
     });
     $(self.switchEmail).on('switchChange.bootstrapSwitch', function(event, state) {
       self.application.updateSwitches();
-      setTimeout(function() { self.save('email', state); }, 1);
     });
 
     /**
@@ -920,7 +918,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       #end
       ## Collapse button
       &lt;td class="notificationCollapseButtonCell"&gt;
-        &lt;button class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
+        &lt;button type="button" class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
       &lt;/td&gt;
     &lt;/tr&gt;
     ##

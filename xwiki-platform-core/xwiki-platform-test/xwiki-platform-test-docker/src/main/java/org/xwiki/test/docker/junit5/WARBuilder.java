@@ -50,6 +50,8 @@ public class WARBuilder
 
     private ConfigurationFilesGenerator configurationFilesGenerator;
 
+    private TestConfiguration testConfiguration;
+
     private ArtifactResolver artifactResolver;
 
     private MavenResolver mavenResolver;
@@ -57,16 +59,18 @@ public class WARBuilder
     /**
      * Initialize an XWiki environment (ECM, etc).
      *
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public WARBuilder(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
-        RepositoryResolver repositoryResolver)
+    public WARBuilder(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
+        this.testConfiguration = testConfiguration;
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
-        this.configurationFilesGenerator = new ConfigurationFilesGenerator(repositoryResolver);
+        this.configurationFilesGenerator = new ConfigurationFilesGenerator(testConfiguration, repositoryResolver);
 
         // TODO: extract code from ExtensionMojo so that we don't have to depend on a maven plugin....
         try {
@@ -108,6 +112,12 @@ public class WARBuilder
             // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
             if (artifact.getExtension().equalsIgnoreCase("war")) {
                 warDependencies.add(artifact.getFile());
+                // Generate the XED file for the main WAR
+                if (artifact.getArtifactId().equals("xwiki-platform-web")) {
+                    File xedFile = new File(targetWARDirectory, "META-INF/extension.xed");
+                    xedFile.getParentFile().mkdirs();
+                    generateXED(artifact, xedFile, this.mavenResolver);
+                }
             } else if (artifact.getExtension().equalsIgnoreCase("zip")) {
                 skinDependencies.add(artifact.getFile());
             } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
@@ -125,13 +135,12 @@ public class WARBuilder
 
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
-        this.configurationFilesGenerator.generate(testConfiguration, webInfDirectory, xwikiVersion,
-            this.artifactResolver);
+        this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
 
         // Step: Add the JDBC driver for the selected DB
         LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());
         File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), this.artifactResolver);
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
         }
         XWikiFileUtils.copyFile(jdbcDriverFile, libDirectory);
@@ -146,7 +155,7 @@ public class WARBuilder
         LOGGER.info("Expanding WAR dependencies ...");
         for (File file : warDependencies) {
             // Unzip the WARs in the target directory
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping WAR: " + file);
             }
             XWikiFileUtils.unzip(file, targetWARDirectory);
@@ -159,14 +168,14 @@ public class WARBuilder
         LOGGER.info("Copying JAR dependencies ...");
         XWikiFileUtils.createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Copying JAR: " + artifact.getFile());
             }
             XWikiFileUtils.copyFile(artifact.getFile(), libDirectory);
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
-            generateXED(artifact, libDirectory, this.mavenResolver);
+            generateXEDForJAR(artifact, libDirectory, this.mavenResolver);
         }
     }
 
@@ -176,7 +185,7 @@ public class WARBuilder
         LOGGER.info("Copying Skin resources ...");
         File skinsDirectory = new File(targetWARDirectory, "skins");
         for (File file : skinDependencies) {
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping skin: " + file);
             }
             XWikiFileUtils.unzip(file, skinsDirectory);
@@ -185,30 +194,43 @@ public class WARBuilder
 
     private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
     {
-        File driver;
         Artifact artifact;
         switch (database) {
             case MYSQL:
-                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, "5.1.24");
-                driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
+                String mysqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "5.1.45";
+                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, mysqlDriverVersion);
+                break;
+            case POSTGRESQL:
+                String pgsqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "42.1.4";
+                artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, pgsqlDriverVersion);
                 break;
             case HSQLDB_EMBEDDED:
-                artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, "2.4.1");
-                driver = resolver.resolveArtifact(artifact).getArtifact().getFile();
+                String hsqldbDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "2.4.1";
+                artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, hsqldbDriverVersion);
                 break;
             default:
                 throw new RuntimeException(
                     String.format("Failed to get JDBC driver. Database [%s] not supported yet!", database));
         }
-        return driver;
+
+        return resolver.resolveArtifact(artifact).getArtifact().getFile();
     }
 
-    private void generateXED(Artifact artifact, File directory, MavenResolver resolver) throws Exception
+    private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception
+    {
+        File targetXEDFile =
+            new File(targetDirectory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
+        generateXED(artifact, targetXEDFile, resolver);
+    }
+
+    private void generateXED(Artifact artifact, File targetXEDFile, MavenResolver resolver) throws Exception
     {
         Artifact pomArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "pom",
             artifact.getVersion());
         Model model = resolver.getModelFromPOMArtifact(pomArtifact);
-        File path = new File(directory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
-        this.extensionHelper.serializeExtension(path, RepositoryUtils.toArtifact(artifact), model);
+        this.extensionHelper.serializeExtension(targetXEDFile, RepositoryUtils.toArtifact(artifact), model);
     }
 }

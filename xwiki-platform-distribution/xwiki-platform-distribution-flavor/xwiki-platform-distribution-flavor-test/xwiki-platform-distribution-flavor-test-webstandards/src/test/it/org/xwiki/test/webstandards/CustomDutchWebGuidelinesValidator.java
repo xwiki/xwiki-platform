@@ -128,7 +128,8 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
             && !isPage("XWiki", "XWikiSyntaxParagraphs") && !isPage("XWiki", "XWikiSyntaxMacros")
             && !isPage("XWiki", "XWikiSyntaxDefinitionLists") && !isPage("XWiki", "XWikiSyntaxHeadings")
             && !isPage("XWiki", "XWikiSyntaxLists") && !isPage("XWiki", "XWikiSyntaxParameters")
-            && !isPage("Panels", "PanelWizard") && !isPage("XWiki", "Treeview") && !isPage("Invitation", "WebHome")) {
+            && !isPage("XWiki", "XWikiSyntaxGroups") && !isPage("XWiki", "Treeview")
+            && !isPage("Panels", "PanelWizard") && !isPage("Invitation", "WebHome")) {
             // Usage of the style attribute is strictly forbidden in the other spaces.
 
             assertTrue(Type.ERROR, "rpd9s1.attr", getElement(ELEM_BODY).getElementsByAttribute(STYLE).isEmpty());

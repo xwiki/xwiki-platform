@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import org.xwiki.text.StringUtils;
+
 /**
  * Configuration options for the test.
  *
@@ -27,6 +29,8 @@ package org.xwiki.test.docker.junit5;
  */
 public class TestConfiguration
 {
+    private static final String TRUE = "true";
+
     private static final String FALSE = "false";
 
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
@@ -35,11 +39,19 @@ public class TestConfiguration
 
     private static final String SERVLETENGINE_PROPERTY = "xwiki.test.ui.servletEngine";
 
-    private static final String DEBUG_PROPERTY = "xwiki.test.ui.debug";
+    private static final String VERBOSE_PROPERTY = "xwiki.test.ui.verbose";
 
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
     private static final String OFFLINE_PROPERTY = "xwiki.test.ui.offline";
+
+    private static final String DATABASETAG_PROPERTY = "xwiki.test.ui.databaseTag";
+
+    private static final String SERVLETENGINETAG_PROPERTY = "xwiki.test.ui.servletEngineTag";
+
+    private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
+
+    private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
     private UITest uiTestAnnotation;
 
@@ -49,11 +61,19 @@ public class TestConfiguration
 
     private ServletEngine servletEngine;
 
-    private boolean debug;
+    private boolean verbose;
 
     private boolean saveDatabaseData;
 
     private boolean isOffline;
+
+    private String servletEngineTag;
+
+    private String databaseTag;
+
+    private String jdbcDriverVersion;
+
+    private boolean vnc;
 
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
@@ -64,9 +84,13 @@ public class TestConfiguration
         resolveBrowser();
         resolveDatabase();
         resolveServletEngine();
-        resolveDebug();
+        resolveVerbose();
         resolveSaveDatabaseData();
         resolveOffline();
+        resolveDatabaseTag();
+        resolveServletEngineTag();
+        resolveJDBCDriverVersion();
+        resolveVNC();
     }
 
     private void resolveBrowser()
@@ -98,13 +122,13 @@ public class TestConfiguration
         this.servletEngine = newServletEngine;
     }
 
-    private void resolveDebug()
+    private void resolveVerbose()
     {
-        boolean newDebug = this.uiTestAnnotation.debug();
-        if (!newDebug) {
-            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, FALSE));
+        boolean newVerbose = this.uiTestAnnotation.verbose();
+        if (!newVerbose) {
+            newVerbose = Boolean.valueOf(System.getProperty(VERBOSE_PROPERTY, FALSE));
         }
-        this.debug = newDebug;
+        this.verbose = newVerbose;
     }
 
     private void resolveSaveDatabaseData()
@@ -118,11 +142,47 @@ public class TestConfiguration
 
     private void resolveOffline()
     {
-        boolean newOffline = this.uiTestAnnotation.isOffline();
+        boolean newOffline = this.uiTestAnnotation.offline();
         if (!newOffline) {
             newOffline = Boolean.valueOf(System.getProperty(OFFLINE_PROPERTY, FALSE));
         }
         this.isOffline = newOffline;
+    }
+
+    private void resolveDatabaseTag()
+    {
+        String newDatabaseTag = this.uiTestAnnotation.databaseTag();
+        if (StringUtils.isEmpty(newDatabaseTag)) {
+            newDatabaseTag = System.getProperty(DATABASETAG_PROPERTY);
+        }
+        this.databaseTag = newDatabaseTag;
+    }
+
+    private void resolveServletEngineTag()
+    {
+        String newServletEngineTag = this.uiTestAnnotation.servletEngineTag();
+        if (StringUtils.isEmpty(newServletEngineTag)) {
+            newServletEngineTag = System.getProperty(SERVLETENGINETAG_PROPERTY);
+        }
+        this.servletEngineTag = newServletEngineTag;
+    }
+
+    private void resolveJDBCDriverVersion()
+    {
+        String newJDBCDriverVersion = this.uiTestAnnotation.jdbcDriverVersion();
+        if (StringUtils.isEmpty(newJDBCDriverVersion)) {
+            newJDBCDriverVersion = System.getProperty(JDBCDRIVERVERSION_PROPERTY);
+        }
+        this.jdbcDriverVersion = newJDBCDriverVersion;
+    }
+
+    private void resolveVNC()
+    {
+        boolean newVNC = this.uiTestAnnotation.vnc();
+        if (newVNC) {
+            newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, TRUE));
+        }
+        this.vnc = newVNC;
     }
 
     /**
@@ -150,16 +210,17 @@ public class TestConfiguration
     }
 
     /**
-     * @return true if we're in debug mode and should output more information to the console
+     * @return true if the test should output verbose console logs or not
      */
-    public boolean isDebug()
+    public boolean isVerbose()
     {
-        return this.debug;
+        return this.verbose;
     }
 
     /**
      * @return true true if the database data should be mapped to a local directory on the host computer so that it can
      *         be saved and reused for another run
+     * @since 10.10RC1
      */
     public boolean isDatabaseDataSaved()
     {
@@ -170,9 +231,47 @@ public class TestConfiguration
      * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
      *         your local repository). False by default to avoid developer problems but should be set to true in the
      *         CI to improve performance of functional tests
+     * @since 10.10RC1
      */
     public boolean isOffline()
     {
         return this.isOffline;
+    }
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the default from TestContainers)
+     * @since 10.10RC1
+     */
+    public String getDatabaseTag()
+    {
+        return this.databaseTag;
+    }
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the "latest" tag)
+     * @since 10.10RC1
+     */
+    public String getServletEngineTag()
+    {
+        return this.servletEngineTag;
+    }
+
+    /**
+     * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
+     *         depending on the database)
+     * @since 10.10RC1
+     */
+    public String getJDBCDriverVersion()
+    {
+        return this.jdbcDriverVersion;
+    }
+
+    /**
+     * @return true if VNC container is started and recording is done and saved on test exit
+     * @since 10.10RC1
+     */
+    public boolean vnc()
+    {
+        return this.vnc;
     }
 }

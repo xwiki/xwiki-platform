@@ -128,7 +128,7 @@ public class TestConfiguration
         if (!newVerbose) {
             newVerbose = Boolean.valueOf(System.getProperty(VERBOSE_PROPERTY, FALSE));
         }
-        this.verbose = verbose;
+        this.verbose = newVerbose;
     }
 
     private void resolveSaveDatabaseData()

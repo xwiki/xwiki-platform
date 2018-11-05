@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -37,6 +38,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.text.StringUtils;
 
 /**
  * Generate XWiki config files for a given database and a given version of XWiki.
@@ -146,22 +148,31 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiCfgDefaultBaseSkin", SKIN);
         props.setProperty("xwikiCfgEncoding", "UTF-8");
 
-        // Configure the extension repositories to have only the local maven repository. This is to improve XWiki
-        // performances and also to control the build environment so that we don't depend on any external service.
-        // We need the local maven repo to provision the XARs from the module being tested.
-        // Do this only if we're offline, otherwise fetch from the usual repos including the remote snapshot repo in
-        // order to get the latest version.
-        if (this.repositoryResolver.getSession().isOffline()) {
-            // If we're inside a docker container, the local Maven repo is at /root/.m2/repository. This is
-            // configured in ServletContainerExecutor.
-            String localRepo;
-            if (this.testConfiguration.getServletEngine().isOutsideDocker()) {
-                localRepo = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
-            } else {
-                localRepo = "/root/.m2/repository";
-            }
-            props.setProperty("xwikiExtensionRepositories", String.format("maven-local:maven:file://%s", localRepo));
+        // Configure the extension repositories.
+        // We configure the local maven repo to be the first repo in the list for performance reasons.
+        // If we're offline then only configure the local maven repo. This is to improve XWiki performances and also
+        // to control the build environment so that we don't depend on any external service.
+
+        // If we're inside a docker container, the local Maven repo is at /root/.m2/repository. This is
+        // configured in ServletContainerExecutor.
+        List<String> repositories = new ArrayList<>();
+        String localRepo;
+        if (this.testConfiguration.getServletEngine().isOutsideDocker()) {
+            localRepo = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
+        } else {
+            localRepo = "/root/.m2/repository";
         }
+        repositories.add(String.format("maven-local:maven:file://%s", localRepo));
+
+        if (!this.repositoryResolver.getSession().isOffline()) {
+            repositories.add("maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public");
+            // Allow snapshot extensions to be resolved too when not offline
+            // Note that the xwiki-commons-extension-repository-maven-snapshots artifact is added in
+            // WARBuilder when resolving distribution artifacts.
+            repositories.add("maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots");
+        }
+
+        props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));
 
         // TODO: Allow users to provide properties that will override the default here....
 

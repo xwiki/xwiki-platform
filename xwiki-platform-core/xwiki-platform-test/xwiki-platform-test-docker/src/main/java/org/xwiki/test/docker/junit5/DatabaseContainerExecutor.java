@@ -156,6 +156,11 @@ public class DatabaseContainerExecutor
             LOGGER.info(String.format("Docker image used: [%s]", databaseContainer.getDockerImageName()));
         }
 
+        // Get the latest image in case the tag has been updated on dockerhub.
+        if (!testConfiguration.isOffline()) {
+            databaseContainer.getDockerClient().pullImageCmd(databaseContainer.getDockerImageName());
+        }
+
         databaseContainer.start();
 
         if (testConfiguration.getServletEngine().isOutsideDocker()) {

@@ -141,6 +141,11 @@ public class ServletContainerExecutor
                 LOGGER.info(String.format("Docker image used: [%s]", servletContainer.getDockerImageName()));
             }
 
+            // Get the latest image in case the tag has been updated on dockerhub.
+            if (!testConfiguration.isOffline()) {
+                servletContainer.getDockerClient().pullImageCmd(servletContainer.getDockerImageName());
+            }
+
             servletContainer.start();
 
             xwikiIPAddress = servletContainer.getContainerIpAddress();

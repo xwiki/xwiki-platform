@@ -112,6 +112,12 @@ public class WARBuilder
             // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
             if (artifact.getExtension().equalsIgnoreCase("war")) {
                 warDependencies.add(artifact.getFile());
+                // Generate the XED file for the main WAR
+                if (artifact.getArtifactId().equals("xwiki-platform-web")) {
+                    File xedFile = new File(targetWARDirectory, "META-INF/extension.xed");
+                    xedFile.getParentFile().mkdirs();
+                    generateXED(artifact, xedFile, this.mavenResolver);
+                }
             } else if (artifact.getExtension().equalsIgnoreCase("zip")) {
                 skinDependencies.add(artifact.getFile());
             } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
@@ -169,7 +175,7 @@ public class WARBuilder
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
-            generateXED(artifact, libDirectory, this.mavenResolver);
+            generateXEDForJAR(artifact, libDirectory, this.mavenResolver);
         }
     }
 
@@ -213,12 +219,18 @@ public class WARBuilder
         return resolver.resolveArtifact(artifact).getArtifact().getFile();
     }
 
-    private void generateXED(Artifact artifact, File directory, MavenResolver resolver) throws Exception
+    private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception
+    {
+        File targetXEDFile =
+            new File(targetDirectory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
+        generateXED(artifact, targetXEDFile, resolver);
+    }
+
+    private void generateXED(Artifact artifact, File targetXEDFile, MavenResolver resolver) throws Exception
     {
         Artifact pomArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "pom",
             artifact.getVersion());
         Model model = resolver.getModelFromPOMArtifact(pomArtifact);
-        File path = new File(directory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
-        this.extensionHelper.serializeExtension(path, RepositoryUtils.toArtifact(artifact), model);
+        this.extensionHelper.serializeExtension(targetXEDFile, RepositoryUtils.toArtifact(artifact), model);
     }
 }

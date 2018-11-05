@@ -81,6 +81,15 @@ public class ExportAction extends XWikiAction
     private static String PAGE_SEPARATOR = "&";
 
     /**
+     * Define the different format supported by the export.
+     */
+    private enum EXPORT_FORMAT {
+        XAR,
+        HTML,
+        OTHER
+    }
+
+    /**
      * Manage the arguments of the export and provides them in an object to simplify their usage in the different
      * methods.
      *
@@ -104,7 +113,7 @@ public class ExportAction extends XWikiAction
          */
         private String description;
 
-        ExportArguments(XWikiContext context, String format) throws XWikiException
+        ExportArguments(XWikiContext context, EXPORT_FORMAT format) throws XWikiException
         {
             XWikiRequest request = context.getRequest();
 
@@ -115,10 +124,8 @@ public class ExportAction extends XWikiAction
             String[] pages = request.getParameterValues("pages");
             String[] excludes = request.getParameterValues("excludes");
 
-            if (StringUtils.isBlank(name)) {
-                if (!format.equals("xar")) {
-                    this.name = context.getDoc().getFullName();
-                }
+            if (StringUtils.isBlank(name) && !format.equals(EXPORT_FORMAT.XAR)) {
+                this.name = context.getDoc().getFullName();
             }
 
             this.exportPages = new LinkedHashMap<>();
@@ -201,7 +208,7 @@ public class ExportAction extends XWikiAction
      */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
-        ExportArguments exportArguments = new ExportArguments(context, "html");
+        ExportArguments exportArguments = new ExportArguments(context, EXPORT_FORMAT.HTML);
 
         Collection<DocumentReference> pageList = resolvePages(exportArguments, context);
         if (pageList.isEmpty()) {
@@ -418,7 +425,7 @@ public class ExportAction extends XWikiAction
         String licence = request.get("licence");
         String version = request.get("version");
 
-        ExportArguments exportArguments = new ExportArguments(context, "xar");
+        ExportArguments exportArguments = new ExportArguments(context, EXPORT_FORMAT.XAR);
 
         boolean all = exportArguments.exportPages.isEmpty();
 

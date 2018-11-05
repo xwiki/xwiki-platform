@@ -119,15 +119,16 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // Build the XWiki WAR
             LOGGER.info("(*) Building custom XWiki WAR...");
             File targetWARDirectory = new File("./target/xwiki");
-            // If the directory exists, skip the rebuilding of the XWiki WAR, allowing to re-run the test faster
+            // If the directory exists, skip the rebuilding of the full XWiki WAR, allowing to re-run the test faster
+            WARBuilder builder;
             if (!targetWARDirectory.exists()) {
                 LOGGER.info("XWiki WAR directory [{}] doesn't exists, rebuilding WAR!", targetWARDirectory);
-                WARBuilder builder =
-                    new WARBuilder(testConfiguration, artifactResolver, mavenResolver, repositoryResolver);
-                builder.build(testConfiguration, targetWARDirectory);
+                builder = new WARBuilder(testConfiguration, false, artifactResolver, mavenResolver, repositoryResolver);
             } else {
-                LOGGER.info("XWiki WAR directory [{}] exists, don't rebuild WAR to save time!", targetWARDirectory);
+                LOGGER.info("XWiki WAR directory [{}] exists, rebuilding only the minimum!", targetWARDirectory);
+                builder = new WARBuilder(testConfiguration, true, artifactResolver, mavenResolver, repositoryResolver);
             }
+            builder.build(testConfiguration, targetWARDirectory);
 
             // Start the Servlet Engine
             LOGGER.info("(*) Starting Servlet container [{}]...", testConfiguration.getServletEngine());

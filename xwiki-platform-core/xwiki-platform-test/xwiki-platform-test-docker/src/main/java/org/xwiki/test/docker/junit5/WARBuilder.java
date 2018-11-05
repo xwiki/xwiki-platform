@@ -56,27 +56,34 @@ public class WARBuilder
 
     private MavenResolver mavenResolver;
 
+    private boolean reuse;
+
     /**
      * Initialize an XWiki environment (ECM, etc).
      *
      * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param reuse if true then reuse an already generated configuration and only regenerate parts that can be
+     *        different such as the Hibernate configuration since it contains IPs
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public WARBuilder(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+    public WARBuilder(TestConfiguration testConfiguration, boolean reuse, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
         this.testConfiguration = testConfiguration;
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
         this.configurationFilesGenerator = new ConfigurationFilesGenerator(testConfiguration, repositoryResolver);
+        this.reuse = reuse;
 
         // TODO: extract code from ExtensionMojo so that we don't have to depend on a maven plugin....
-        try {
-            this.extensionHelper = ExtensionMojoHelper.create(null, new File("./target/xwiki-data/"));
-        } catch (MojoExecutionException e) {
-            throw new RuntimeException("Failed to initialize resolver", e);
+        if (!reuse) {
+            try {
+                this.extensionHelper = ExtensionMojoHelper.create(null, new File("./target/xwiki-data/"));
+            } catch (MojoExecutionException e) {
+                throw new RuntimeException("Failed to initialize resolver", e);
+            }
         }
     }
 
@@ -101,52 +108,57 @@ public class WARBuilder
         String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
         LOGGER.info("Found version = [{}]", xwikiVersion);
 
-        // Step: Gather all the required JARs for the minimal WAR
-        LOGGER.info("Resolving distribution dependencies ...");
-        Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion);
-        List<File> warDependencies = new ArrayList<>();
-        List<Artifact> jarDependencies = new ArrayList<>();
-        List<File> skinDependencies = new ArrayList<>();
-        for (ArtifactResult artifactResult : artifactResults) {
-            Artifact artifact = artifactResult.getArtifact();
-            // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
-            if (artifact.getExtension().equalsIgnoreCase("war")) {
-                warDependencies.add(artifact.getFile());
-                // Generate the XED file for the main WAR
-                if (artifact.getArtifactId().equals("xwiki-platform-web")) {
-                    File xedFile = new File(targetWARDirectory, "META-INF/extension.xed");
-                    xedFile.getParentFile().mkdirs();
-                    generateXED(artifact, xedFile, this.mavenResolver);
-                }
-            } else if (artifact.getExtension().equalsIgnoreCase("zip")) {
-                skinDependencies.add(artifact.getFile());
-            } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
-                jarDependencies.add(artifact);
-            }
-        }
-
-        // Step: Copy the JARs in WEB-INF/lib
         File webInfDirectory = new File(targetWARDirectory, "WEB-INF");
-        File libDirectory = new File(webInfDirectory, "lib");
-        copyJARs(testConfiguration, jarDependencies, libDirectory);
 
-        // Step: Add the webapp resources (web.xml, templates VM files, etc)
-        copyWebappResources(testConfiguration, warDependencies, targetWARDirectory);
+        if (!this.reuse) {
+
+            // Step: Gather all the required JARs for the minimal WAR
+            LOGGER.info("Resolving distribution dependencies ...");
+            Collection<ArtifactResult> artifactResults =
+                this.artifactResolver.getDistributionDependencies(xwikiVersion);
+            List<File> warDependencies = new ArrayList<>();
+            List<Artifact> jarDependencies = new ArrayList<>();
+            List<File> skinDependencies = new ArrayList<>();
+            for (ArtifactResult artifactResult : artifactResults) {
+                Artifact artifact = artifactResult.getArtifact();
+                // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
+                if (artifact.getExtension().equalsIgnoreCase("war")) {
+                    warDependencies.add(artifact.getFile());
+                    // Generate the XED file for the main WAR
+                    if (artifact.getArtifactId().equals("xwiki-platform-web")) {
+                        File xedFile = new File(targetWARDirectory, "META-INF/extension.xed");
+                        xedFile.getParentFile().mkdirs();
+                        generateXED(artifact, xedFile, this.mavenResolver);
+                    }
+                } else if (artifact.getExtension().equalsIgnoreCase("zip")) {
+                    skinDependencies.add(artifact.getFile());
+                } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
+                    jarDependencies.add(artifact);
+                }
+            }
+
+            // Step: Copy the JARs in WEB-INF/lib
+            File libDirectory = new File(webInfDirectory, "lib");
+            copyJARs(testConfiguration, jarDependencies, libDirectory);
+
+            // Step: Add the webapp resources (web.xml, templates VM files, etc)
+            copyWebappResources(testConfiguration, warDependencies, targetWARDirectory);
+
+            // Step: Add the JDBC driver for the selected DB
+            LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());
+            File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), this.artifactResolver);
+            if (testConfiguration.isVerbose()) {
+                LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
+            }
+            XWikiFileUtils.copyFile(jdbcDriverFile, libDirectory);
+
+            // Step: Unzip the Flamingo skin
+            unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
+        }
 
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
-
-        // Step: Add the JDBC driver for the selected DB
-        LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());
-        File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), this.artifactResolver);
-        if (testConfiguration.isVerbose()) {
-            LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
-        }
-        XWikiFileUtils.copyFile(jdbcDriverFile, libDirectory);
-
-        // Step: Unzip the Flamingo skin
-        unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
     }
 
     private void copyWebappResources(TestConfiguration testConfiguration, List<File> warDependencies,

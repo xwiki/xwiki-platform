@@ -133,11 +133,11 @@ public class ServletContainerExecutor
                 servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
             }
 
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
             }
 
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info(String.format("Docker image used: [%s]", servletContainer.getDockerImageName()));
             }
 

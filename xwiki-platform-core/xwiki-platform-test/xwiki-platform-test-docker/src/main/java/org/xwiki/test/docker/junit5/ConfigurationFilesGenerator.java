@@ -95,7 +95,7 @@ public class ConfigurationFilesGenerator
                 if (entry.getName().endsWith(VM_EXTENSION)) {
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
-                    if (this.testConfiguration.isDebug()) {
+                    if (this.testConfiguration.isVerbose()) {
                         LOGGER.info("... Generating: " + outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...

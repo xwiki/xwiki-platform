@@ -134,7 +134,7 @@ public class WARBuilder
         // Step: Add the JDBC driver for the selected DB
         LOGGER.info("Copying JDBC driver for database [{}]...", testConfiguration.getDatabase());
         File jdbcDriverFile = getJDBCDriver(testConfiguration.getDatabase(), this.artifactResolver);
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
         }
         XWikiFileUtils.copyFile(jdbcDriverFile, libDirectory);
@@ -149,7 +149,7 @@ public class WARBuilder
         LOGGER.info("Expanding WAR dependencies ...");
         for (File file : warDependencies) {
             // Unzip the WARs in the target directory
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping WAR: " + file);
             }
             XWikiFileUtils.unzip(file, targetWARDirectory);
@@ -162,11 +162,11 @@ public class WARBuilder
         LOGGER.info("Copying JAR dependencies ...");
         XWikiFileUtils.createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Copying JAR: " + artifact.getFile());
             }
             XWikiFileUtils.copyFile(artifact.getFile(), libDirectory);
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
             generateXED(artifact, libDirectory, this.mavenResolver);
@@ -179,7 +179,7 @@ public class WARBuilder
         LOGGER.info("Copying Skin resources ...");
         File skinsDirectory = new File(targetWARDirectory, "skins");
         for (File file : skinDependencies) {
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping skin: " + file);
             }
             XWikiFileUtils.unzip(file, skinsDirectory);

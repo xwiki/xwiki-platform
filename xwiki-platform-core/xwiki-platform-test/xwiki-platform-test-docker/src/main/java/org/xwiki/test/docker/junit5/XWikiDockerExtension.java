@@ -238,11 +238,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
 
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]",
                 BrowserWebDriverContainer.getImageForCapabilities(testConfiguration.getBrowser().getCapabilities())));
         }
@@ -308,7 +308,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         String xwikiURL = executor.start(testConfiguration, sourceWARDirectory);
 
         saveXWikiURL(extensionContext, xwikiURL);
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             LOGGER.info("XWiki ping URL = " + xwikiURL);
         }
     }

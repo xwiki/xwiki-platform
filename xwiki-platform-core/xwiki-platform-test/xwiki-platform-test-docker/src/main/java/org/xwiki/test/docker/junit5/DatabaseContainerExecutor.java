@@ -148,11 +148,11 @@ public class DatabaseContainerExecutor
             .withNetwork(Network.SHARED)
             .withNetworkAliases("xwikidb");
 
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]", databaseContainer.getDockerImageName()));
         }
 

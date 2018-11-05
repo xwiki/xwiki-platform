@@ -60,10 +60,10 @@ public @interface UITest
     ServletEngine servletEngine() default ServletEngine.SYSTEM;
 
     /**
-     * @return true if the test should be started in debug mode, false otherwise
-     * @since 10.9
+     * @return true if the test should output verbose console logs or not
+     * @since 10.10RC1
      */
-    boolean debug() default false;
+    boolean verbose() default false;
 
     /**
      * @return true if the database data should be mapped to a local directory on the host computer so that it can
@@ -78,7 +78,7 @@ public @interface UITest
      *         CI to improve performance of functional tests
      * @since 10.10RC1
      */
-    boolean isOffline() default false;
+    boolean offline() default false;
 
     /**
      * @return the docker image tag to use (if not specified, uses the "latest" tag)

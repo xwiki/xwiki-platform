@@ -39,7 +39,7 @@ public class TestConfiguration
 
     private static final String SERVLETENGINE_PROPERTY = "xwiki.test.ui.servletEngine";
 
-    private static final String DEBUG_PROPERTY = "xwiki.test.ui.debug";
+    private static final String VERBOSE_PROPERTY = "xwiki.test.ui.verbose";
 
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
@@ -61,7 +61,7 @@ public class TestConfiguration
 
     private ServletEngine servletEngine;
 
-    private boolean debug;
+    private boolean verbose;
 
     private boolean saveDatabaseData;
 
@@ -84,7 +84,7 @@ public class TestConfiguration
         resolveBrowser();
         resolveDatabase();
         resolveServletEngine();
-        resolveDebug();
+        resolveVerbose();
         resolveSaveDatabaseData();
         resolveOffline();
         resolveDatabaseTag();
@@ -122,13 +122,13 @@ public class TestConfiguration
         this.servletEngine = newServletEngine;
     }
 
-    private void resolveDebug()
+    private void resolveVerbose()
     {
-        boolean newDebug = this.uiTestAnnotation.debug();
-        if (!newDebug) {
-            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, FALSE));
+        boolean newVerbose = this.uiTestAnnotation.verbose();
+        if (!newVerbose) {
+            newVerbose = Boolean.valueOf(System.getProperty(VERBOSE_PROPERTY, FALSE));
         }
-        this.debug = newDebug;
+        this.verbose = verbose;
     }
 
     private void resolveSaveDatabaseData()
@@ -142,7 +142,7 @@ public class TestConfiguration
 
     private void resolveOffline()
     {
-        boolean newOffline = this.uiTestAnnotation.isOffline();
+        boolean newOffline = this.uiTestAnnotation.offline();
         if (!newOffline) {
             newOffline = Boolean.valueOf(System.getProperty(OFFLINE_PROPERTY, FALSE));
         }
@@ -210,11 +210,11 @@ public class TestConfiguration
     }
 
     /**
-     * @return true if we're in debug mode and should output more information to the console
+     * @return true if the test should output verbose console logs or not
      */
-    public boolean isDebug()
+    public boolean isVerbose()
     {
-        return this.debug;
+        return this.verbose;
     }
 
     /**

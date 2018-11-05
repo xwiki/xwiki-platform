@@ -104,19 +104,22 @@ public class ExportAction extends XWikiAction
          */
         private String description;
 
-        ExportArguments(XWikiContext context) throws XWikiException
+        ExportArguments(XWikiContext context, String format) throws XWikiException
         {
             XWikiRequest request = context.getRequest();
 
             this.description = request.get("description");
 
             this.name = request.get("name");
-            if (StringUtils.isBlank(name)) {
-                this.name = context.getDoc().getFullName();
-            }
 
             String[] pages = request.getParameterValues("pages");
             String[] excludes = request.getParameterValues("excludes");
+
+            if (StringUtils.isBlank(name)) {
+                if (!format.equals("xar")) {
+                    this.name = context.getDoc().getFullName();
+                }
+            }
 
             this.exportPages = new LinkedHashMap<>();
 
@@ -198,7 +201,7 @@ public class ExportAction extends XWikiAction
      */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
-        ExportArguments exportArguments = new ExportArguments(context);
+        ExportArguments exportArguments = new ExportArguments(context, "html");
 
         Collection<DocumentReference> pageList = resolvePages(exportArguments, context);
         if (pageList.isEmpty()) {
@@ -415,7 +418,7 @@ public class ExportAction extends XWikiAction
         String licence = request.get("licence");
         String version = request.get("version");
 
-        ExportArguments exportArguments = new ExportArguments(context);
+        ExportArguments exportArguments = new ExportArguments(context, "xar");
 
         boolean all = exportArguments.exportPages.isEmpty();
 

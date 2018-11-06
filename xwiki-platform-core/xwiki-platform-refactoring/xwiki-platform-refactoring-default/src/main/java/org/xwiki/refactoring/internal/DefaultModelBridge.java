@@ -45,6 +45,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -53,6 +54,7 @@ import com.xpn.xwiki.api.DeletedDocument;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
+import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
 /**
  * Default implementation of {@link ModelBridge} based on the old XWiki model.
@@ -592,6 +594,47 @@ public class DefaultModelBridge implements ModelBridge
             } else {
                 logger.error("Failed to permanently delete document with ID [{}]", deletedDocumentId, e);
             }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob, boolean checkContextUser)
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+        int limit = 10;
+
+        XWikiRecycleBinStoreInterface recycleBinStore = xwiki.getRecycleBinStore();
+        try {
+            long numberOfDocumentsToDelete = recycleBinStore.getNumberOfDeletedDocuments(context);
+
+            int nbDocToDelete;
+            if (numberOfDocumentsToDelete > Integer.MAX_VALUE) {
+                logger.warn("Only [{}] file can be deleted at once. Please run again the job to delete everything.",
+                    Integer.MAX_VALUE);
+                nbDocToDelete = Integer.MAX_VALUE;
+            } else {
+                nbDocToDelete = Integer.valueOf(numberOfDocumentsToDelete + "");
+            }
+            progressManager.pushLevelProgress(nbDocToDelete, deleteJob);
+
+            for (int i = 0; i < nbDocToDelete; i += limit) {
+                Long[] allDeletedDocumentsIds = recycleBinStore.getAllDeletedDocumentsIds(context, limit);
+                for (Long deletedDocumentsId : allDeletedDocumentsIds) {
+                    if (deleteJob.getStatus().isCanceled()) {
+                        return false;
+                    } else {
+                        this.progressManager.startStep(deleteJob);
+                        this.permanentlyDeleteDocument(deletedDocumentsId, checkContextUser);
+                        this.progressManager.endStep(deleteJob);
+                    }
+                }
+            }
+            return true;
+        } catch (XWikiException e) {
+            logger.error("Failed to permanently delete all documents", e);
         }
 
         return false;

@@ -357,8 +357,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         Long[] deletedDocuments = executeRead(context, new HibernateCallback<Long[]>()
         {
             @Override
-            public Long[] doInHibernate(Session session)
-                throws HibernateException
+            public Long[] doInHibernate(Session session) throws HibernateException
             {
                 Query query = session.createQuery("SELECT id FROM XWikiDeletedDocument ORDER BY date DESC");
 
@@ -377,19 +376,19 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public int getNumberOfDeletedDocuments(XWikiContext context) throws XWikiException
+    public Long getNumberOfDeletedDocuments(XWikiContext context) throws XWikiException
     {
-        int countNumberOfDeletedDocuments = executeRead(context, new HibernateCallback<Integer>()
+
+        return executeRead(context, new HibernateCallback<Long>()
         {
             @Override
-            public Integer doInHibernate(Session session) throws HibernateException
+            public Long doInHibernate(Session session) throws HibernateException
             {
                 Query query = session.createQuery("SELECT count(id) FROM XWikiDeletedDocument");
-                return (Integer) query.list().get(0);
+                Object queryResult = query.list().get(0);
+                return (Long) queryResult;
             }
         });
-
-        return countNumberOfDeletedDocuments;
     }
 
     @Override

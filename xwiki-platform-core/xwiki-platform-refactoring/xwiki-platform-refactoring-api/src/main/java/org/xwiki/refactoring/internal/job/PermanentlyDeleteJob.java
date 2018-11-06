@@ -45,6 +45,19 @@ public class PermanentlyDeleteJob extends AbstractDeletedDocumentsJob
     @Override
     protected void handleDeletedDocuments(List<Long> idsDeletedDocuments, boolean checkRights)
     {
+
+        // if the list is empty we delete all documents from the recycle bin
+        if (idsDeletedDocuments.isEmpty()) {
+            this.modelBridge.permanentlyDeleteAllDocuments(this, checkRights);
+
+        // else we delete the specified list
+        } else {
+            this.handleDeleteSomeDocumentsFromRecycleBin(idsDeletedDocuments, checkRights);
+        }
+    }
+
+    private void handleDeleteSomeDocumentsFromRecycleBin(List<Long> idsDeletedDocuments, boolean checkRights)
+    {
         this.progressManager.pushLevelProgress(idsDeletedDocuments.size(), this);
 
         for (Long idToDelete : idsDeletedDocuments) {

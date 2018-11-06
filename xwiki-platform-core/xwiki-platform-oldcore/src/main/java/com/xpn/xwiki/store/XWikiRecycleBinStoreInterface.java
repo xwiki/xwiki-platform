@@ -163,9 +163,9 @@ public interface XWikiRecycleBinStoreInterface
      * @throws XWikiException - if error in loading.
      * @since 10.10RC1
      */
-    default int getNumberOfDeletedDocuments(XWikiContext context) throws XWikiException
+    default Long getNumberOfDeletedDocuments(XWikiContext context) throws XWikiException
     {
-        return -1;
+        return -1L;
     }
 
     /**

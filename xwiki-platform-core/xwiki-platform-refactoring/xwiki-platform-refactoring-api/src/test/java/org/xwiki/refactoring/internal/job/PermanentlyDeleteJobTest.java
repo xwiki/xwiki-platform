@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +36,8 @@ import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -89,6 +92,20 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
 
         // Verify that the specified document is deleted.
         verify(this.modelBridge).permanentlyDeleteDocument(deletedDocumentId, true);
+    }
+
+    @Test
+    public void permanentlyDeleteAll() throws Throwable
+    {
+        PermanentlyDeleteRequest request = createRequest();
+        request.setDeletedDocumentIds(Collections.emptyList());
+        request.setCheckRights(true);
+        run(request);
+
+        verifyContext();
+
+        // Verify that the specified document is deleted.
+        verify(this.modelBridge).permanentlyDeleteAllDocuments(any(), eq(true));
     }
 
     @Test

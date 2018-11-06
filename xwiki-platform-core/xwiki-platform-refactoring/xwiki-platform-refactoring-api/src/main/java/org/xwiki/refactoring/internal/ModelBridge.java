@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
 
 /**
  * Interface used to access the XWiki model and to perform low level operations on it.
@@ -163,6 +164,7 @@ public interface ModelBridge
      * @param userReference the reference of the user to check
      * @return {@code true} if the specified user is allowed to permanently delete the specified deleted document,
      *         {@code false} otherwise
+     * @since 10.10RC1
      */
     boolean canPermanentlyDeleteDocument(long deletedDocumentId, DocumentReference userReference);
 
@@ -170,6 +172,16 @@ public interface ModelBridge
      * @param deletedDocumentId the ID of the deleted document to permanently delete
      * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
      * @return {@code true} if the document was permanently deleted successfully, {@code false} if the deletion failed
+     * @since 10.10RC1
      */
     boolean permanentlyDeleteDocument(long deletedDocumentId, boolean checkContextUser);
+
+    /**
+     * Helper to delete all documents permanently from the recycle bin.
+     * @param deleteJob The job that launches the action
+     * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
+     * @return {@code true} if all documents were permanently deleted successfully, {@code false} if the deletion failed
+     * @since 10.10RC1
+     */
+    boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob, boolean checkContextUser);
 }

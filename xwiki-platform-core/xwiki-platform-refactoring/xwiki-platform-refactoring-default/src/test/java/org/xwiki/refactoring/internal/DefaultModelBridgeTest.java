@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.xwiki.job.api.AbstractCheckRightsRequest;
+import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -40,9 +40,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
@@ -72,6 +74,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,6 +91,9 @@ public class DefaultModelBridgeTest
 
     @InjectMockComponents
     private DefaultModelBridge modelBridge;
+
+    @MockComponent
+    private JobProgressManager progressManager;
 
     @Mock
     private XWikiContext xcontext;
@@ -638,7 +644,6 @@ public class DefaultModelBridgeTest
 
         XWikiDeletedDocument[] deletedDocuments = {deletedDocument1, deletedDocument2};
 
-        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
         when(recycleBin.getAllDeletedDocuments(batchId, false, xcontext, true)).thenReturn(deletedDocuments);
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
@@ -662,5 +667,39 @@ public class DefaultModelBridgeTest
         when(document.getXObject(redirectClassReference)).thenReturn(mock(BaseObject.class));
 
         assertTrue(this.modelBridge.canOverwriteSilently(documentReference));
+    }
+
+    @Test
+    public void permanentlyDeleteAllDocuments() throws Exception
+    {
+        int nbDocs = 12;
+        PermanentlyDeleteJob deleteJob = mock(PermanentlyDeleteJob.class);
+        AbstractJobStatus jobStatus = mock(AbstractJobStatus.class);
+        when(jobStatus.isCanceled()).thenReturn(false);
+        when(deleteJob.getStatus()).thenReturn(jobStatus);
+
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getDocumentReference()).thenReturn(documentReference);
+        when(xwiki.getDeletedDocument(anyLong(), eq(xcontext))).thenReturn(deletedDocument);
+
+        when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
+        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+
+        when(recycleBin.getNumberOfDeletedDocuments(any())).thenReturn((long)nbDocs);
+        when(recycleBin.getAllDeletedDocumentsIds(eq(this.xcontext), anyInt())).thenReturn(new Long[]{
+            1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L
+        }).thenReturn(new Long[]{
+            11L, 12L
+        });
+
+        assertTrue(this.modelBridge.permanentlyDeleteAllDocuments(deleteJob, false));
+        verify(this.progressManager).pushLevelProgress(nbDocs, deleteJob);
+        verify(this.progressManager, times(12)).startStep(deleteJob);
+        verify(this.progressManager, times(12)).endStep(deleteJob);
+        for (int i = 1; i <= 12; i++) {
+            verify(recycleBin).deleteFromRecycleBin(i, xcontext, true);
+            assertLog(i-1, Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
+        }
     }
 }

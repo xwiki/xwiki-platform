@@ -89,8 +89,11 @@ public class AsyncRendererCacheListener extends AbstractEventListener
         } else {
             XWikiDocument document = (XWikiDocument) source;
 
-            // Clean entries associated to modified entity
+            // Clean entries associated to modified document
             this.cache.cleanCache(document.getDocumentReference());
+
+            // Clean entries associated to modified document with locale
+            this.cache.cleanCache(document.getDocumentReferenceWithLocale());
 
             // Clean entries associated to the exact entry
             if (event instanceof EntityEvent) {

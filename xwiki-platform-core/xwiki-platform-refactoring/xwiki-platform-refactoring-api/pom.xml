@@ -102,7 +102,9 @@
                 org/xwiki/refactoring/splitter/criterion/naming/HeadingNameNamingCriterion.java,
                 org/xwiki/refactoring/splitter/criterion/naming/PageIndexNamingCriterion.java,
                 org/xwiki/refactoring/splitter/criterion/SplittingCriterion.java,
-                org/xwiki/refactoring/WikiDocument.java
+                org/xwiki/refactoring/WikiDocument.java,
+                <!-- Fan-Out complexity of 21 -->
+                org/xwiki/refactoring/script/RefactoringScriptService.java
               </excludes>
             </configuration>
           </execution>

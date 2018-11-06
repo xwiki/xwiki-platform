@@ -44,12 +44,14 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.job.AbstractDeletedDocumentsRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.RestoreRequest;
+import org.xwiki.refactoring.job.UserOrientedRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -563,7 +565,7 @@ public class RefactoringScriptService implements ScriptService
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
      */
-    private Job execute(String type, EntityRequest request)
+    private Job execute(String type, UserOrientedRequest request)
     {
         setError(null);
 
@@ -580,7 +582,13 @@ public class RefactoringScriptService implements ScriptService
         }
     }
 
-    private <T extends EntityRequest> void setRightsProperties(T request)
+    private void setRightsProperties(UserOrientedRequest request)
+    {
+        request.setCheckRights(true);
+        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+    }
+
+    private void setRightsProperties(AbstractDeletedDocumentsRequest request)
     {
         request.setCheckRights(true);
         request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
@@ -665,6 +673,42 @@ public class RefactoringScriptService implements ScriptService
     }
 
     /**
+     * Schedules an asynchronous job for restoring the specified entities.
+     *
+     * @param restoreRequest the information of the restore to do
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *  {@code null} in case of failure
+     */
+    public Job restore(RestoreRequest restoreRequest)
+    {
+        return this.execute(RefactoringJobs.RESTORE, restoreRequest);
+    }
+
+    /**
+     * Schedules an asynchronous job for restoring the specified the batchId.
+     *
+     * @param batchId the batchId corresponding to the entities to restore
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *  {@code null} in case of failure
+     */
+    public Job restore(String batchId)
+    {
+        return this.restore(this.createRestoreRequest(batchId));
+    }
+
+    /**
+     * Schedules an asynchronous job for restoring the specified deleted documents.
+     *
+     * @param deletedDocumentIds the ids of the deleted documents to restore
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *  {@code null} in case of failure
+     */
+    public Job restore(List<Long> deletedDocumentIds)
+    {
+        return this.restore(this.createRestoreRequest(deletedDocumentIds));
+    }
+
+    /**
      * Creates a request to permanently delete a specified batch of deleted documents from the recycle bin.
      *
      * @param batchId the ID of the batch of deleted documents to permanently delete
@@ -702,5 +746,41 @@ public class RefactoringScriptService implements ScriptService
         request.setWikiReference(getCurrentWikiReference());
 
         return request;
+    }
+
+    /**
+     * Schedules an asynchronous job for permanently deleting entities.
+     *
+     * @param request the request to run.
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *  {@code null} in case of failure
+     */
+    public Job permanentlyDelete(PermanentlyDeleteRequest request)
+    {
+        return this.execute(RefactoringJobs.PERMANENTLY_DELETE, request);
+    }
+
+    /**
+     * Schedules an asynchronous job for permanently deleting entities.
+     *
+     * @param batchId the batchId with the entities to permanently delete
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *  {@code null} in case of failure
+     */
+    public Job permanentlyDelete(String batchId)
+    {
+        return this.permanentlyDelete(this.createPermanentlyDeleteRequest(batchId));
+    }
+
+    /**
+     * Schedules an asynchronous job for permanently deleting entities.
+     *
+     * @param deletedDocumentIds the list of document ids to delete
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *  {@code null} in case of failure
+     */
+    public Job permanentlyDelete(List<Long> deletedDocumentIds)
+    {
+        return this.permanentlyDelete(this.createPermanentlyDeleteRequest(deletedDocumentIds));
     }
 }

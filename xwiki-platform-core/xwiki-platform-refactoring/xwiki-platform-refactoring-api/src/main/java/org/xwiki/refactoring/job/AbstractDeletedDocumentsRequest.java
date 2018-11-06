@@ -31,7 +31,7 @@ import org.xwiki.model.reference.WikiReference;
  * @version $Id$
  * @since 10.10RC1
  */
-public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest
+public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest implements UserOrientedRequest
 {
     private static final String BATCH_ID = "batchId";
 
@@ -83,6 +83,7 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest
     /**
      * @return whether or not to check the rights of the user executing the operation
      */
+    @Override
     public boolean isCheckRights()
     {
         return getProperty(CHECK_RIGHTS, true);
@@ -91,6 +92,7 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest
     /**
      * @param checkRights whether or not to check the rights of the user executing the operation
      */
+    @Override
     public void setCheckRights(boolean checkRights)
     {
         setProperty(CHECK_RIGHTS, checkRights);
@@ -101,6 +103,7 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest
      * @return the user executing the handle operation. This is also the user for which any rights might be checked if
      *         {@link #setCheckRights(boolean)} is enabled
      */
+    @Override
     public DocumentReference getUserReference()
     {
         return getProperty(USER_REFERENCE);
@@ -110,6 +113,7 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest
      * @param userReference the user executing the handle operation. This is also the user for which any rights
      *            might be checked if {@link #setCheckRights(boolean)} is enabled
      */
+    @Override
     public void setUserReference(DocumentReference userReference)
     {
         setProperty(USER_REFERENCE, userReference);

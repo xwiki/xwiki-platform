@@ -27,7 +27,6 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.RegexEntityReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
@@ -41,7 +40,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 @Component
 @Named(XWikiCommentsDocumentInitializer.LOCAL_REFERENCE_STRING)
 @Singleton
-public class XWikiCommentsDocumentInitializer extends AbstractMandatoryClassInitializer
+public class XWikiCommentsDocumentInitializer extends AbstractCommentsDocumentInitializer
 {
     /**
      * The name of the initialized document.
@@ -82,10 +81,10 @@ public class XWikiCommentsDocumentInitializer extends AbstractMandatoryClassInit
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addUsersField("author", "Author", 30, false);
+        super.createClass(xclass);
+
         xclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
         xclass.addNumberField("replyto", "Reply To", 5, "integer");
-        xclass.addDateField("date", "Date");
         // Use the Text editor for backwards compatibility (e.g. the annotation module which uses the comment class
         // doesn't expect the WYSIWYG editor).
         xclass.addTextAreaField("comment", "Comment", 40, 5, EditorType.TEXT);

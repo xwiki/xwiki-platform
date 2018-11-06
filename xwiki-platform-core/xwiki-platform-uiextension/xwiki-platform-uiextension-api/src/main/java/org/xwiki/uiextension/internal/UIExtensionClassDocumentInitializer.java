@@ -24,10 +24,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
-import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
 /**
  * Update XWiki.UIExtensionClass document with all required informations.
@@ -38,7 +36,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 @Component
 @Named(WikiUIExtensionConstants.CLASS_REFERENCE_STRING)
 @Singleton
-public class UIExtensionClassDocumentInitializer extends AbstractMandatoryClassInitializer
+public class UIExtensionClassDocumentInitializer extends AbstractUIExtensionClassDocumentInitializer
     implements WikiUIExtensionConstants
 {
     /**
@@ -50,12 +48,10 @@ public class UIExtensionClassDocumentInitializer extends AbstractMandatoryClassI
     }
 
     @Override
-    protected void createClass(BaseClass xclass)
+    protected void createClassInternal(BaseClass xclass)
     {
         xclass.addTextField(EXTENSION_POINT_ID_PROPERTY, "Extension Point ID", 30);
         xclass.addTextField(ID_PROPERTY, "Extension ID", 30);
-        // The content property supports wiki syntax, but it uses script macros most of the time.
-        xclass.addTextAreaField(CONTENT_PROPERTY, "Extension Content", 40, 10, EditorType.TEXT);
         // The parameters property doesn't support wiki syntax.
         xclass.addTextAreaField(PARAMETERS_PROPERTY, "Extension Parameters", 40, 10, ContentType.PURE_TEXT);
         xclass.addStaticListField(SCOPE_PROPERTY, "Extension Scope", 1, false,

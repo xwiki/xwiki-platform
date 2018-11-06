@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
@@ -35,7 +36,6 @@ import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -72,13 +72,13 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
      */
     @Inject
     @Named("wiki")
+    private ComponentManager wikiComponentManager;
+
+    @Inject
     private ComponentManager componentManager;
 
     @Inject
     private AuthorizationManager authorization;
-
-    @Inject
-    private AuthorExecutor authorExecutor;
 
     @Override
     public EntityReference getClassReference()
@@ -132,23 +132,24 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
 
         // Extract extension definition.
         String id = baseObject.getStringValue(ID_PROPERTY);
-        String content = baseObject.getStringValue(CONTENT_PROPERTY);
-        String rawParameters = baseObject.getStringValue(PARAMETERS_PROPERTY);
 
         String roleHint = this.serializer.serialize(baseObject.getReference());
 
-        WikiUIExtension extension = new WikiUIExtension(roleHint, id, extensionPointId, baseObject.getReference(),
-            ownerDocument.getAuthorReference(), this.authorExecutor);
+        WikiUIExtension extension;
+        try {
+            extension = new WikiUIExtension(baseObject, roleHint, id, extensionPointId, this.componentManager);
+        } catch (ComponentLookupException e) {
+            throw new WikiComponentException(
+                String.format("Failed to initialize Panel UI extension [%s]", baseObject.getReference()), e);
+        }
+
+        String rawParameters = baseObject.getStringValue(PARAMETERS_PROPERTY);
 
         // It would be nice to have PER_LOOKUP components for UIX parameters but without constructor injection it's
         // safer to use a POJO and pass the Component Manager to it.
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(id, rawParameters, this.componentManager);
+        WikiUIExtensionParameters parameters =
+            new WikiUIExtensionParameters(id, rawParameters, this.wikiComponentManager);
         extension.setParameters(parameters);
-        // It would be nice to have PER_LOOKUP components for UIX renderers but without constructor injection it's
-        // safer to use a POJO and pass the Component Manager to it.
-        WikiUIExtensionRenderer renderer =
-            new WikiUIExtensionRenderer(roleHint, content, ownerDocument, this.componentManager);
-        extension.setRenderer(renderer);
         extension.setScope(scope);
 
         return Collections.singletonList(extension);

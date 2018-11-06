@@ -62,6 +62,9 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js')##
   $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)##
 #end
+#if($services.async.isEnabled())
+  $xwiki.jsfx.use("uicomponents/async/async.js", true)##
+#end
 ##
 ## Hooks for inserting JavaScript skin extensions
 ##

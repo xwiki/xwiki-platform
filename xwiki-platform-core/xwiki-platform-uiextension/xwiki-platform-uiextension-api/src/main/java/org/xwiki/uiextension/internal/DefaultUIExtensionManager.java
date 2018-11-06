@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionManager;
 
@@ -47,18 +48,20 @@ public class DefaultUIExtensionManager implements UIExtensionManager
     private Logger logger;
 
     /**
-     * We use the Context Component Manager to lookup UI Extensions registered as components.
-     * The Context Component Manager allows Extensions to be registered for a specific user, for a specific wiki or for
-     * a whole farm.
+     * We use the Context Component Manager to lookup UI Extensions registered as components. The Context Component
+     * Manager allows Extensions to be registered for a specific user, for a specific wiki or for a whole farm.
      */
     @Inject
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
 
+    @Inject
+    private AsyncContext asyncContext;
+
     @Override
     public List<UIExtension> get(String extensionPointId)
     {
-        List<UIExtension> extensions = new ArrayList<UIExtension>();
+        List<UIExtension> extensions = new ArrayList<>();
 
         try {
             List<UIExtension> allExtensions = contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
@@ -67,8 +70,12 @@ public class DefaultUIExtensionManager implements UIExtensionManager
                     extensions.add(extension);
                 }
             }
+
+            // Indicate that any currently running asynchronous execution result should be removed from the cache as
+            // soon as a UIExtension component is modified
+            this.asyncContext.useComponent(UIExtension.class);
         } catch (ComponentLookupException e) {
-            logger.error("Failed to lookup UIExtension instances, error: [{}]", e);
+            this.logger.error("Failed to lookup UIExtension instances, error: [{}]", e);
         }
 
         return extensions;

@@ -399,6 +399,11 @@
       <artifactId>xwiki-platform-template-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-async-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>

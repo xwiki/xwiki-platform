@@ -23,28 +23,28 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.inject.Provider;
+import javax.script.ScriptContext;
+
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.wiki.WikiComponent;
+import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
-import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.internal.AsyncRenderer;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.internal.AbstractWikiUIExtension;
 
-import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Provides a bridge between Panels defined in XObjects and {@link UIExtension}.
@@ -52,82 +52,33 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @version $Id$
  * @since 4.3M1
  */
-public class PanelWikiUIExtension implements UIExtension, WikiComponent
+public class PanelWikiUIExtension extends AbstractWikiUIExtension implements BlockAsyncRendererDecorator
 {
-    /**
-     * The logger to log.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(PanelWikiUIExtension.class);
+    private static final String SP_PANELDOC = "paneldoc";
 
     /**
      * Serializer used to transform the panel document reference into the panel ID, for example 'Panels.Quicklinks'.
      */
     private final EntityReferenceSerializer<String> serializer;
 
-    /**
-     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
-     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
-     *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
-     */
-    private final BaseObjectReference panelReference;
+    private final ScriptContextManager scriptContextManager;
+
+    private final Provider<XWikiContext> xcontextProvider;
 
     /**
-     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
-     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
-     *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
-     */
-    private final DocumentReference authorReference;
-
-    /**
-     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
-     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
-     *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
-     */
-    private final XDOM xdom;
-
-    /**
-     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
-     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
-     *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
-     */
-    private final Syntax syntax;
-
-    /**
-     * Used to update the rendering context.
-     */
-    private final RenderingContext renderingContext;
-
-    /**
-     * Used to transform the macros within the extension content.
-     */
-    private final Transformation macroTransformation;
-
-    private final AuthorExecutor authorExecutor;
-
-    private final JobProgressManager progress;
-
-    /**
-     * Default constructor.
-     *
-     * @param panelReference The reference of the object in which the panel is defined
-     * @param authorReference The author of the document in which the panel is defined
-     * @param xdom The content to display for this panel
-     * @param syntax The syntax in which the content is written
+     * @param baseObject the object containing panel setup
      * @param componentManager The XWiki content manager
      * @throws ComponentLookupException If module dependencies are missing
+     * @throws WikiComponentException When failing to parse content
      */
-    public PanelWikiUIExtension(BaseObjectReference panelReference, DocumentReference authorReference, XDOM xdom,
-        Syntax syntax, ComponentManager componentManager) throws ComponentLookupException
+    public PanelWikiUIExtension(BaseObject baseObject, ComponentManager componentManager)
+        throws ComponentLookupException, WikiComponentException
     {
-        this.panelReference = panelReference;
-        this.authorReference = authorReference;
-        this.xdom = xdom;
-        this.syntax = syntax;
-        this.macroTransformation = componentManager.getInstance(Transformation.class, "macro");
+        super(baseObject, componentManager);
+
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.renderingContext = componentManager.getInstance(RenderingContext.class);
-        this.authorExecutor = componentManager.getInstance(AuthorExecutor.class);
-        this.progress = componentManager.getInstance(JobProgressManager.class);
+        this.scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
+        this.xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
     }
 
     @Override
@@ -143,50 +94,56 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     }
 
     @Override
-    public DocumentReference getDocumentReference()
+    protected BlockAsyncRendererConfiguration configure()
     {
-        return this.panelReference.getDocumentReference();
+        BlockAsyncRendererConfiguration configuration = super.configure();
+
+        configuration.setDefaultSyntax(this.syntax);
+
+        return configuration;
     }
 
-    @Override
-    public EntityReference getEntityReference()
+    private Object before() throws RenderingException
     {
-        return this.panelReference;
-    }
+        ScriptContext scriptContext = this.scriptContextManager.getCurrentScriptContext();
 
-    @Override
-    public DocumentReference getAuthorReference()
-    {
-        return this.authorReference;
-    }
+        // Remember previous value of "paneldoc"
+        Document paneldoc = (Document) scriptContext.getAttribute(SP_PANELDOC, ScriptContext.ENGINE_SCOPE);
 
-    @Override
-    public Block execute()
-    {
-        // We need to clone the xdom to avoid transforming the original and make it useless after the first
-        // transformation
-        final XDOM transformedXDOM = this.xdom.clone();
-
-        this.progress.startStep(getDocumentReference(), "panel.progress.execute", "Execute panel [{}]",
-            getDocumentReference());
-
-        // Perform panel transformations with the right of the panel author
+        // Make panel document available from the panel context
         try {
-            this.authorExecutor.call(() -> {
-                TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
-                transformationContext.setId(getRoleHint());
-                ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,
-                    transformationContext, transformedXDOM);
-
-                return null;
-            }, getAuthorReference());
-        } catch (Exception e) {
-            LOGGER.error("Error while executing transformation for panel [{}]", this.panelReference);
-        } finally {
-            this.progress.endStep(getDocumentReference());
+            scriptContext.setAttribute(SP_PANELDOC, getPanelDocument(), ScriptContext.ENGINE_SCOPE);
+        } catch (XWikiException e) {
+            throw new RenderingException("Failed to get panel document", e);
         }
 
-        return new CompositeBlock(transformedXDOM.getChildren());
+        return paneldoc;
+    }
+
+    private void after(Object obj)
+    {
+        this.scriptContextManager.getCurrentScriptContext().setAttribute(SP_PANELDOC, obj, ScriptContext.ENGINE_SCOPE);
+    }
+
+    @Override
+    public BlockAsyncRendererResult render(AsyncRenderer renderer) throws RenderingException
+    {
+        Object obj = before();
+
+        try {
+            return (BlockAsyncRendererResult) renderer.render();
+        } finally {
+            after(obj);
+        }
+    }
+
+    private Document getPanelDocument() throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument document = xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
+
+        return document.newDocument(xcontext);
     }
 
     @Override

@@ -35,7 +35,7 @@ import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
 /**
- * Base class for all {@link JobResourceReferenceHandler} which are the result of a template excution.
+ * Base class for all {@link JobResourceReferenceHandler} which are the result of a template execution.
  * 
  * @version $Id$
  */

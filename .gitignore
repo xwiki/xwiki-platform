@@ -33,3 +33,4 @@ nbproject
 .clover
 *~
 **/overlays/*.info
+xwiki-platform-distribution/xwiki-platform-distribution-war/overlays/

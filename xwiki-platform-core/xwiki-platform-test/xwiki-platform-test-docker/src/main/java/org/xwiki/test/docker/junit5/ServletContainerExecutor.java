@@ -24,11 +24,8 @@ import java.io.FileWriter;
 import java.time.Duration;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
 
@@ -40,10 +37,8 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  * @version $Id$
  * @since 10.9
  */
-public class ServletContainerExecutor
+public class ServletContainerExecutor extends AbstractContainerExecutor
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServletContainerExecutor.class);
-
     private static final String LATEST = "latest";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
@@ -133,20 +128,7 @@ public class ServletContainerExecutor
                 servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
             }
 
-            if (testConfiguration.isVerbose()) {
-                servletContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
-            }
-
-            if (testConfiguration.isVerbose()) {
-                LOGGER.info(String.format("Docker image used: [%s]", servletContainer.getDockerImageName()));
-            }
-
-            // Get the latest image in case the tag has been updated on dockerhub.
-            if (!testConfiguration.isOffline()) {
-                servletContainer.getDockerClient().pullImageCmd(servletContainer.getDockerImageName());
-            }
-
-            servletContainer.start();
+            start(servletContainer, testConfiguration);
 
             xwikiIPAddress = servletContainer.getContainerIpAddress();
             xwikiPort = servletContainer.getMappedPort(8080);

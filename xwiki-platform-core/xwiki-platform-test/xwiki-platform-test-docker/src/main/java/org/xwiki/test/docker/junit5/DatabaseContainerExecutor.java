@@ -19,14 +19,11 @@
  */
 package org.xwiki.test.docker.junit5;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -34,10 +31,8 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
  * @version $Id$
  * @since 10.9
  */
-public class DatabaseContainerExecutor
+public class DatabaseContainerExecutor extends AbstractContainerExecutor
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseContainerExecutor.class);
-
     private static final String DBNAME = "xwiki";
 
     private static final String DBUSERNAME = DBNAME;
@@ -148,20 +143,7 @@ public class DatabaseContainerExecutor
             .withNetwork(Network.SHARED)
             .withNetworkAliases("xwikidb");
 
-        if (testConfiguration.isVerbose()) {
-            databaseContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
-        }
-
-        if (testConfiguration.isVerbose()) {
-            LOGGER.info(String.format("Docker image used: [%s]", databaseContainer.getDockerImageName()));
-        }
-
-        // Get the latest image in case the tag has been updated on dockerhub.
-        if (!testConfiguration.isOffline()) {
-            databaseContainer.getDockerClient().pullImageCmd(databaseContainer.getDockerImageName());
-        }
-
-        databaseContainer.start();
+        start(databaseContainer, testConfiguration);
 
         if (testConfiguration.getServletEngine().isOutsideDocker()) {
             testConfiguration.getDatabase().setIpAddress(databaseContainer.getContainerIpAddress());

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="CKEditor.Translations" locale="de">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1477319628000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1477570982000</date>
+  <contentUpdateDate>1477570979000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Deaktivierte Plugins
+CKEditor.ConfigClass_removePlugins.hint=Die Liste der deaktivierten Plugins.
+CKEditor.ConfigClass_removeButtons=Deaktivierte Toolbar Funktionen
+CKEditor.ConfigClass_removeButtons.hint=Die Liste der deaktivierten Toolbar Funktionen.
+CKEditor.ConfigClass_linkShowAdvancedTab=Link: Registerkarte Erweitert anzeigen
+### Missing: CKEditor.ConfigClass_linkShowAdvancedTab.hint=Allows you to set link attributes such as id, name, class or style.
+CKEditor.ConfigClass_linkShowTargetTab=Link: Registerkarte Ziel anzeigen
+### Missing: CKEditor.ConfigClass_linkShowTargetTab.hint=Allows you to set the link target attribute (e.g. to open the link in a new tab).
+CKEditor.ConfigClass_advanced=Erweiterte Konfiguration
+### Missing: CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
+
+### Missing: ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
+ckeditor.admin.reset=Zurücksetzen
+ckeditor.admin.reset.hint=Wiederherstellen der Standard-Konfiguration
+ckeditor.admin.reset.confirmation=Sind Sie sicher, dass Sie die Standard-Konfiguration wiederherstellen möchten? Alle Änderungen werden verloren gehen.
+
+ckeditor.plugin.link.options=Optionen
+ckeditor.plugin.link.anchor=Anker
+### Missing: ckeditor.plugin.link.queryString=Query String
+ckeditor.plugin.link.defaultLabel=Link-Text eingeben
+ckeditor.plugin.link.openInNewTab=Link in neuem Tab öffnen
+
+ckeditor.plugin.macro.placeholder=Makro:{0}
+ckeditor.plugin.macro.buttonHint=XWiki Makro
+ckeditor.plugin.macro.refreshFailed=Fehler beim Aktualisieren des bearbeiteten Inhalts.
+ckeditor.plugin.macro.dedicatedInsertButtonHint={0} Makro einfügen
+
+ckeditor.plugin.office.importer.title=Office-Datei importieren
+ckeditor.plugin.office.importer.filePath=Dateipfad
+ckeditor.plugin.office.importer.filePath.hint=Wählen Sie die zu importierende Office-Datei. Die Datei wird hochgeladen und an diese Seite anhängt und ihr Inhalt wird in den Inhalt der Seite eingefügt.
+ckeditor.plugin.office.importer.filterStyles=Stile filtern
+ckeditor.plugin.office.importer.filterStyles.hint=Filtere Textstile wie Schriftarten, Farben, Ausrichtungen, Ränder. Die Inhaltsstruktur einschließlich der Überschriftenebenen, Absätze, Listen und Tabellen bleibt erhalten.
+ckeditor.plugin.office.importer.useOfficeViewer=Verwende Office-Betrachter
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Aktivieren Sie diese Option, wenn Sie nicht vorhaben, den Inhalt der Office-Datei nach dem Import zu bearbeiten oder wenn Sie nicht möchten, dass der Inhalt der Office-Datei mit dem Inhalt vermischt wird, den Sie bereits bearbeiten.
+ckeditor.plugin.office.importer.required=Pflichtfeld
+ckeditor.plugin.office.importer.import=Importieren
+ckeditor.plugin.office.importer.inProgress=Office-Datei importieren…
+ckeditor.plugin.office.importer.done=Office-Datei wurde erfolgreich importiert.
+ckeditor.plugin.office.importer.fail=Office Import fehlgeschlagen.
+ckeditor.plugin.office.importer.noUploadURL=Datei-Upload-URL ist nicht konfiguriert.
+ckeditor.plugin.office.importer.failedToLoadForm=Fehler beim Laden des Formulars.
+
+ckeditor.plugin.resource.notSpecified={0} ist nicht angegeben.
+ckeditor.plugin.save.leaveConfirmationMessage=Es existieren ungespeicherte Änderungen. Wollen Sie diese verwerfen?
+ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund eines internen Fehlers im CKEditor. Sie sollten versuchen wichtige Änderungen zu kopieren und den Editor neu zu laden.
+ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.
+
+modal.ok=OK
+modal.cancel=Abbrechen
+modal.close=Schließen
+
+resource.attach.label=Anhang
+resource.attach.placeholder=Pfad.zur.Seite@Anhang.png
+resource.data.label=Daten-URI
+resource.doc.label=Seite
+resource.doc.placeholder=Pfad.zur.Seite
+resource.icon.label=Icon
+resource.mailto.label=E-Mail-Adresse
+resource.mailto.placeholder=benutzer@beispiel.org
+resource.path.label=Pfad
+resource.path.placeholder=/Pfad/zur/Datei
+resource.unc.label=UNC Pfad
+resource.unc.placeholder=//server/share/Pfad/zur/Datei
+resource.unknown.label=Unbekannt
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/bild.png
+resource.user.label=Benutzer
+resource.user.placeholder=Alias
+
+entityResourceSuggester.doc.placeholder=Eine Seite zu finden…
+entityResourceSuggester.attach.placeholder=Einen Anhang finden…
+
+entityResourcePicker.select=Auswählen
+entityResourcePicker.doc.title=Seite auswählen
+entityResourcePicker.attach.title=Anhang auswählen
+
+macroSelector.title=Makro auswählen
+macroSelector.filter.text.placeholder=Zum Filtern tippen
+macroSelector.filter.category.all=Alle Makros
+macroSelector.filter.category.other=Andere
+macroSelector.failedToRetrieveMacros=Fehler beim Abrufen der Liste verfügbarer Makros.
+macroSelector.select=Auswählen
+
+macroEditor.title=Makro bearbeiten
+macroEditor.more=Mehr
+macroEditor.changeMacro=Makro ändern
+macroEditor.submit=Übernehmen
+macroEditor.content=Inhalt
+macroEditor.noParameters=Dieses Makro hat keine Parameter.
+macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptors.</content>
+</xwikidoc>

@@ -335,6 +335,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       } else {
         createUserModal.modal('hide');
         window.livetable_userstable.refresh();
+        $('#userstable').trigger('xwiki:user:created');
         notification.replace(new XWiki.widgets.Notification(
           $jsontool.serialize($services.localization.render('xe.admin.users.create.done')),
           'done'
@@ -425,12 +426,14 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
       'inprogress'
     );
+    var userReference = deleteUserModal.find('.userName').text();
     $.post('', {
       xpage: 'deleteuorg',
-      docname: deleteUserModal.find('.userName').text(),
+      docname: userReference,
       form_token: xm.form_token
     }).done(function() {
       deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
+      deleteUserModal.data('liveTableElement').trigger('xwiki:user:deleted', {reference: userReference});
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),
         'done'

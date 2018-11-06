@@ -414,7 +414,8 @@ define('xwiki-livetable-modal', ['jquery', 'bootstrap'], function($) {
           $(modal).data({
             rowData: liveTable.fetchedRows[rowIndex],
             rowIndex: rowIndex,
-            liveTable: liveTable
+            liveTable: liveTable,
+            liveTableElement: liveTableElement
           }).modal('show');
         });
       });

@@ -207,13 +207,10 @@
     addMembersButton.prop('disabled', true);
     $.post(form.attr('action'), parameters).done(function() {
       // Clear the list of selected users and groups.
-      jQuery('#userInput')[0].selectize.clear(true);
-      jQuery('#groupInput')[0].selectize.clear(true);
+      $('#userInput')[0].selectize.clear(true);
+      $('#groupInput')[0].selectize.clear(true);
       // Reload the live table.
-      var end = editgrouptable.limit;
-      var start = Math.max(editgrouptable.lastOffset, 1);
-      editgrouptable.clearCache();
-      editgrouptable.getRows(start, end, start, end);
+      editgrouptable.refresh();
       // Show notification message.
       new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
     }).fail(function(response) {

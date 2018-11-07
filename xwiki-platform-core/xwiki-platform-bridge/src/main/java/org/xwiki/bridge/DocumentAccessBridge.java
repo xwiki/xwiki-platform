@@ -735,6 +735,8 @@ public interface DocumentAccessBridge
     /**
      * @return the author of the current document.
      * @since 10.10RC1
+     * @since 10.8.2
+     * @since 9.11.9
      */
     @Unstable
     default DocumentReference getCurrentAuthorReference()

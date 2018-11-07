@@ -70,7 +70,7 @@ public abstract class AbstractUIExtensionClassDocumentInitializer extends Abstra
         xclass.addTextAreaField(CONTENT_PROPERTY, "Executed Content", 120, 25, EditorType.TEXT);
 
         xclass.addBooleanField(ASYNC_ENABLED_PROPERTY, "Asynchronous rendering", null, Boolean.FALSE);
-        xclass.addBooleanField(ASYNC_CACHED_PROPERTY, "Cached");
+        xclass.addBooleanField(ASYNC_CACHED_PROPERTY, "Cached", null, Boolean.FALSE);
 
         // TODO: replace this with a custom displayer to be less static
         Collection<String> contextEntries;

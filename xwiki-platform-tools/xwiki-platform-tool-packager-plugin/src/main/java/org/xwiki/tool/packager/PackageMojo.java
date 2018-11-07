@@ -621,6 +621,8 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-uiextension-api", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-rendering-async-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-localization-script", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-localization-source-legacy", getXWikiPlatformVersion(), null, "jar"));

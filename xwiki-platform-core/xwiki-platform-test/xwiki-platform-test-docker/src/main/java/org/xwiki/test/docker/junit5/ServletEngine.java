@@ -46,7 +46,12 @@ public enum ServletEngine
     /**
      * Represents the Jetty Servlet engine but running outside of Docker.
      */
-    JETTY_STANDALONE(true);
+    JETTY_STANDALONE(true),
+
+    /**
+     * Represents an external Servlet Engine already configured and running (we won't start or stop it).
+     */
+    EXTERNAL(true);
 
     private boolean isOutsideDocker;
 

@@ -36,7 +36,6 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.TestcontainersConfiguration;
-import org.xwiki.test.integration.XWikiWatchdog;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -77,11 +76,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
-    private static final int TIMEOUT_SECONDS = 1;
-
     private static final String SUPERADMIN = "superadmin";
-
-    private XWikiWatchdog watchodg = new XWikiWatchdog();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
@@ -102,10 +97,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         TestcontainersConfiguration.getInstance().
             updateGlobalConfig("vncrecorder.container.image", "quay.io/testcontainers/vnc-recorder:1.1.0");
 
-        // Only start DB, create WAR, start Servlet engine and provision XWiki only if XWiki is not already
-        // started locally. This allows running the tests with a custom XWiki setup and also allows faster development
-        // turn around time when testing.
-        if (this.watchodg.isXWikiStarted("http://localhost:8080", TIMEOUT_SECONDS).timedOut) {
+        // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
+        if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
             // XWiki is not started
             LOGGER.info("XWiki is not started, starting all...");
 
@@ -139,7 +132,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             LOGGER.info("(*) Provision XAR extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
-            LOGGER.info("XWiki is already started, using running instance to execute the tests...");
+            LOGGER.info("XWiki is already started, using running instance at [%s] to execute the tests...",
+                loadXWikiURL(extensionContext));
+
+            // Note: Provisioning is not done in this case, you're supposed to have an XWiki instance that contains
+            // what's needed for the tests.
         }
 
         // Start the Browser (this creates and initializes the PersistentTestContext, XWikiWebDriver objects)
@@ -214,11 +211,14 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
-        // Stop the DB
-        stopDatabase(testConfiguration);
+        // Only stop DB and Servlet Engine if we have started them
+        if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+            // Stop the DB
+            stopDatabase(testConfiguration);
 
-        // Stop the Servlet Container
-        stopServletEngine(testConfiguration, extensionContext);
+            // Stop the Servlet Engine
+            stopServletEngine(testConfiguration, extensionContext);
+        }
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,

@@ -60,4 +60,18 @@ public interface UserOrientedRequest extends Request
      * @param userReference the user reference
      */
     void setUserReference(DocumentReference userReference);
+
+    /**
+     * @return the author of the script which is performing the request; this user must be authorized to perform the
+     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
+     */
+    DocumentReference getAuthorReference();
+
+    /**
+     * Sets the author of the script which is performing the request. This user must be authorized to perform the
+     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
+     *
+     * @param authorReference the author reference
+     */
+    void setAuthorReference(DocumentReference authorReference);
 }

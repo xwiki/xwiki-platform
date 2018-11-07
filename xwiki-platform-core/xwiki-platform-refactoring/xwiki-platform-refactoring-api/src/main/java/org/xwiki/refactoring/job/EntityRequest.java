@@ -136,6 +136,7 @@ public class EntityRequest extends AbstractRequest implements UserOrientedReques
      * @since 10.8.2
      * @since 9.11.9
      */
+    @Override
     public DocumentReference getAuthorReference()
     {
         return getProperty(PROPERTY_CALLER_REFERENCE);
@@ -150,6 +151,7 @@ public class EntityRequest extends AbstractRequest implements UserOrientedReques
      * @since 10.8.2
      * @since 9.11.9
      */
+    @Override
     public void setAuthorReference(DocumentReference authorReference)
     {
         setProperty(PROPERTY_CALLER_REFERENCE, authorReference);

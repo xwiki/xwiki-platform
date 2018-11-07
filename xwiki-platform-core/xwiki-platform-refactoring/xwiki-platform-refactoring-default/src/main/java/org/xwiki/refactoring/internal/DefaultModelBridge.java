@@ -578,6 +578,10 @@ public class DefaultModelBridge implements ModelBridge
             if (checkContextUser && !canPermanentlyDeleteDocument(deletedDocumentId, context.getUserReference())) {
                 logger.error("You are not allowed to permanently delete document [{}] with ID [{}]",
                     deletedDocumentReference, deletedDocumentId);
+            } else if (checkContextUser
+                && !canPermanentlyDeleteDocument(deletedDocumentId, context.getAuthorReference())) {
+                logger.error("The author [{}] of this script is not allowed to permanently deleted document [{}] with "
+                        + "id", context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
             } else {
                 // Restore the document.
                 xwiki.getRecycleBinStore().deleteFromRecycleBin(deletedDocumentId, context, true);

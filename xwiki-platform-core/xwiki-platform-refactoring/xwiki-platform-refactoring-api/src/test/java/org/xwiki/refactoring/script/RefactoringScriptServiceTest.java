@@ -98,6 +98,7 @@ public class RefactoringScriptServiceTest
 
         DocumentAccessBridge documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(this.userReference);
+        when(documentAccessBridge.getCurrentAuthorReference()).thenReturn(this.userReference);
 
         EntityReferenceProvider defaultEntityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
@@ -305,5 +306,20 @@ public class RefactoringScriptServiceTest
         assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
             .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
         assertTrue(permanentlyDeleteRequest.isCheckRights());
+    }
+
+    @Test
+    public void permanentlyDelete() throws Exception
+    {
+        List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
+        getService().permanentlyDelete(documentIds);
+
+        ArgumentCaptor<PermanentlyDeleteRequest> request = ArgumentCaptor.forClass(PermanentlyDeleteRequest.class);
+        verify(this.jobExecutor).execute(eq(RefactoringJobs.PERMANENTLY_DELETE), request.capture());
+
+        assertEquals(documentIds, request.getValue().getDeletedDocumentIds());
+        assertTrue(StringUtils.join(request.getValue().getId(), '/')
+            .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
+        assertTrue(request.getValue().isCheckRights());
     }
 }

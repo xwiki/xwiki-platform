@@ -86,6 +86,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         PermanentlyDeleteRequest request = createRequest();
         request.setDeletedDocumentIds(Arrays.asList(deletedDocumentId));
         request.setCheckRights(true);
+        assertEquals(request.getAuthorReference(), userReference);
         run(request);
 
         verifyContext();
@@ -200,6 +201,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
 
         request.setCheckRights(false);
         request.setUserReference(userReference);
+        request.setAuthorReference(userReference);
         request.setWikiReference(wikiReference);
 
         return request;

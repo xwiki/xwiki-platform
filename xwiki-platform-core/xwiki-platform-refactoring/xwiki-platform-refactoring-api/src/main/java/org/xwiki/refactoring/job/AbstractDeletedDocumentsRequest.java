@@ -40,6 +40,11 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest im
     private static final String CHECK_RIGHTS = "checkRights";
 
     private static final String USER_REFERENCE = "userReference";
+    
+    /**
+     * @see #getAuthorReference()
+     */
+    private static final String PROPERTY_CALLER_REFERENCE = "caller.reference";
 
     private static final String WIKI_REFERENCE = "wikiReference";
 
@@ -133,5 +138,29 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest im
     public void setWikiReference(WikiReference wikiReference)
     {
         setProperty(WIKI_REFERENCE, wikiReference);
+    }
+
+    /**
+     * @return the author of the script which is performing the request; this user must be authorized to perform the
+     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
+     * @since 10.10RC1
+     */
+    @Override
+    public DocumentReference getAuthorReference()
+    {
+        return getProperty(PROPERTY_CALLER_REFERENCE);
+    }
+
+    /**
+     * Sets the author of the script which is performing the request. This user must be authorized to perform the
+     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
+     *
+     * @param authorReference the author reference
+     * @since 10.10RC1
+     */
+    @Override
+    public void setAuthorReference(DocumentReference authorReference)
+    {
+        setProperty(PROPERTY_CALLER_REFERENCE, authorReference);
     }
 }

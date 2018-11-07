@@ -63,6 +63,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
         CreateRequest request = createRequest(documentReference, templateReference);
         request.setUserReference(userReference);
+        request.setAuthorReference(userReference);
         request.setCheckRights(false);
         run(request);
 
@@ -184,6 +185,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
         CreateRequest request = createRequest(documentReference, templateReference);
         request.setUserReference(userReference);
+        request.setAuthorReference(userReference);
         run(request);
 
         verifyNoCreate();

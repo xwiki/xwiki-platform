@@ -137,7 +137,7 @@ public class DeleteAction extends XWikiAction
         String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
         String emptyBin = request.getParameter(EMPTY_RECYCLE_BIN);
 
-        if ("1".equals(emptyBin)) {
+        if ("true".equals(emptyBin)) {
             return deleteAllFromRecycleBin(context);
         } else if (sindex != null && xwiki.hasRecycleBin(context)) {
             deleteFromRecycleBin(Long.parseLong(sindex), context);

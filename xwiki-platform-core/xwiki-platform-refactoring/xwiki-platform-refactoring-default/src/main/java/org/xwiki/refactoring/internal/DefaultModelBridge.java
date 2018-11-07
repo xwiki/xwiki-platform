@@ -439,6 +439,10 @@ public class DefaultModelBridge implements ModelBridge
                 // Default for now is to skip and log as error to restore over existing documents.
                 logger.error("Document [{}] with ID [{}] can not be restored. Document already exists",
                     deletedDocument.getFullName(), deletedDocumentId);
+            } else if (checkContextUser
+                && !canRestoreDeletedDocument(deletedDocumentId, context.getAuthorReference())) {
+                logger.error("The author [{}] of this script is not allowed to restore document [{}] with ID [{}]",
+                    context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
             } else if (checkContextUser && !canRestoreDeletedDocument(deletedDocumentId, context.getUserReference())) {
                 logger.error("You are not allowed to restore document [{}] with ID [{}]", deletedDocumentReference,
                     deletedDocumentId);

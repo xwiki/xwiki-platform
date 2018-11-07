@@ -52,6 +52,11 @@ public class EntityRequest extends AbstractRequest
     private static final String PROPERTY_USER_REFERENCE = "user.reference";
 
     /**
+     * @see #getAuthorReference()
+     */
+    private static final String PROPERTY_CALLER_REFERENCE = "caller.reference";
+
+    /**
      * @see #isCheckRights()
      */
     private static final String PROPERTY_CHECK_RIGHTS = "checkrights";
@@ -134,6 +139,28 @@ public class EntityRequest extends AbstractRequest
     public void setUserReference(DocumentReference userReference)
     {
         setProperty(PROPERTY_USER_REFERENCE, userReference);
+    }
+
+    /**
+     * @return the author of the script which is performing the request; this user must be authorized to perform the
+     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
+     * @since 10.10RC1
+     */
+    public DocumentReference getAuthorReference()
+    {
+        return getProperty(PROPERTY_CALLER_REFERENCE);
+    }
+
+    /**
+     * Sets the author of the script which is performing the request. This user must be authorized to perform the
+     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
+     *
+     * @param authorReference the author reference
+     * @since 10.10RC1
+     */
+    public void setAuthorReference(DocumentReference authorReference)
+    {
+        setProperty(PROPERTY_CALLER_REFERENCE, authorReference);
     }
 
     /**

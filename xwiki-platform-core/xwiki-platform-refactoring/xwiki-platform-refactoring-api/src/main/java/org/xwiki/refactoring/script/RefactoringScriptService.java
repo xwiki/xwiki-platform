@@ -678,6 +678,7 @@ public class RefactoringScriptService implements ScriptService
      * @param restoreRequest the information of the restore to do
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *  {@code null} in case of failure
+     *  @since 10.10RC1
      */
     public Job restore(RestoreRequest restoreRequest)
     {
@@ -690,6 +691,7 @@ public class RefactoringScriptService implements ScriptService
      * @param batchId the batchId corresponding to the entities to restore
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *  {@code null} in case of failure
+     *  @since 10.10RC1
      */
     public Job restore(String batchId)
     {
@@ -702,6 +704,7 @@ public class RefactoringScriptService implements ScriptService
      * @param deletedDocumentIds the ids of the deleted documents to restore
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *  {@code null} in case of failure
+     *  @since 10.10RC1
      */
     public Job restore(List<Long> deletedDocumentIds)
     {
@@ -754,6 +757,7 @@ public class RefactoringScriptService implements ScriptService
      * @param request the request to run.
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *  {@code null} in case of failure
+     *  @since 10.10RC1
      */
     public Job permanentlyDelete(PermanentlyDeleteRequest request)
     {
@@ -766,6 +770,7 @@ public class RefactoringScriptService implements ScriptService
      * @param batchId the batchId with the entities to permanently delete
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *  {@code null} in case of failure
+     *  @since 10.10RC1
      */
     public Job permanentlyDelete(String batchId)
     {
@@ -778,6 +783,8 @@ public class RefactoringScriptService implements ScriptService
      * @param deletedDocumentIds the list of document ids to delete
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *  {@code null} in case of failure
+     *
+     * @since 10.10RC1
      */
     public Job permanentlyDelete(List<Long> deletedDocumentIds)
     {

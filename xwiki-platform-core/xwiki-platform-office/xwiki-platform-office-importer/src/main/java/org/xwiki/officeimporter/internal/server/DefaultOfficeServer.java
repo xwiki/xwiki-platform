@@ -25,11 +25,11 @@ import java.io.InputStream;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.artofsolving.jodconverter.OfficeDocumentConverter;
-import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
-import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
-import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
-import org.artofsolving.jodconverter.office.OfficeManager;
+import org.jodconverter.LocalConverter;
+import org.jodconverter.document.JsonDocumentFormatRegistry;
+import org.jodconverter.office.LocalOfficeManager;
+import org.jodconverter.office.ExternalOfficeManagerBuilder;
+import org.jodconverter.office.OfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -78,9 +78,9 @@ public class DefaultOfficeServer implements OfficeServer
     private OfficeManager jodManager;
 
     /**
-     * Internal {@link OfficeDocumentConverter} used to convert office documents.
+     * Internal {@link LocalConverter} used to convert office documents.
      */
-    private OfficeDocumentConverter jodConverter;
+    private LocalConverter jodConverter;
 
     /**
      * Current office server process state.
@@ -108,24 +108,24 @@ public class DefaultOfficeServer implements OfficeServer
     public void initialize() throws OfficeServerException
     {
         if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_INTERNAL) {
-            DefaultOfficeManagerConfiguration configuration = new DefaultOfficeManagerConfiguration();
-            configuration.setPortNumber(this.config.getServerPort());
+            LocalOfficeManager.Builder configuration = LocalOfficeManager.builder();
+            configuration.portNumbers(this.config.getServerPort());
 
             String homePath = this.config.getHomePath();
             if (homePath != null) {
-                configuration.setOfficeHome(homePath);
+                configuration.officeHome(homePath);
             }
 
             String profilePath = this.config.getProfilePath();
             if (profilePath != null) {
-                configuration.setTemplateProfileDir(new File(profilePath));
+                configuration.templateProfileDir(new File(profilePath));
             }
 
-            configuration.setMaxTasksPerProcess(this.config.getMaxTasksPerProcess());
-            configuration.setTaskExecutionTimeout(this.config.getTaskExecutionTimeout());
+            configuration.maxTasksPerProcess(this.config.getMaxTasksPerProcess());
+            configuration.taskExecutionTimeout(this.config.getTaskExecutionTimeout());
 
             try {
-                this.jodManager = configuration.buildOfficeManager();
+                this.jodManager = configuration.build();
             } catch (Exception e) {
                 // Protect against exceptions raised by JodManager. For example if it cannot autodetect the office home,
                 // it'll throw an java.lang.IllegalStateException exception...
@@ -133,10 +133,10 @@ public class DefaultOfficeServer implements OfficeServer
                 throw new OfficeServerException("Failed to start Office server. Reason: " + e.getMessage(), e);
             }
         } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-            ExternalOfficeManagerConfiguration externalProcessOfficeManager = new ExternalOfficeManagerConfiguration();
+            ExternalOfficeManagerBuilder externalProcessOfficeManager = new ExternalOfficeManagerBuilder();
             externalProcessOfficeManager.setPortNumber(this.config.getServerPort());
             externalProcessOfficeManager.setConnectOnStart(true);
-            this.jodManager = externalProcessOfficeManager.buildOfficeManager();
+            this.jodManager = externalProcessOfficeManager.build();
         } else {
             setState(ServerState.CONF_ERROR);
             throw new OfficeServerException("Invalid office server configuration.");
@@ -147,7 +147,9 @@ public class DefaultOfficeServer implements OfficeServer
         InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH);
         if (input != null) {
             try {
-                this.jodConverter = new OfficeDocumentConverter(this.jodManager, new JsonDocumentFormatRegistry(input));
+                this.jodConverter = LocalConverter.builder().officeManager(this.jodManager)
+                    .formatRegistry(JsonDocumentFormatRegistry.create(input))
+                    .build();
             } catch (Exception e) {
                 this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
                     DOCUMENT_FORMATS_PATH, e);
@@ -158,7 +160,7 @@ public class DefaultOfficeServer implements OfficeServer
         }
         if (this.jodConverter == null) {
             // Use the default document format registry.
-            this.jodConverter = new OfficeDocumentConverter(this.jodManager);
+            this.jodConverter = LocalConverter.builder().officeManager(this.jodManager).build();
         }
 
         File workDir = this.environment.getTemporaryDirectory();

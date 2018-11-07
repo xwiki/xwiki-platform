@@ -24,7 +24,7 @@ import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.artofsolving.jodconverter.office.OfficeUtils;
+import org.jodconverter.office.LocalOfficeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -138,7 +138,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     @Override
     public void initialize() throws InitializationException
     {
-        File defaultHomeFolder = OfficeUtils.getDefaultOfficeHome();
+        File defaultHomeFolder = LocalOfficeUtils.getDefaultOfficeHome();
         this.defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : null;
     }
 }

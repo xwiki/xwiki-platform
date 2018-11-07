@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
+import org.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -191,7 +191,7 @@ public class DefaultOfficeResourceViewerTest
         OfficeServer officeServer = mocker.getInstance(OfficeServer.class);
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(officeServer.getConverter()).thenReturn(officeConverter);
-        when(officeConverter.getFormatRegistry()).thenReturn(new DefaultDocumentFormatRegistry());
+        when(officeConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
     }
 
     /**

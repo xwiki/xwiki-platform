@@ -581,6 +581,7 @@ public class RefactoringScriptService implements ScriptService
     {
         request.setCheckRights(true);
         request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+        request.setAuthorReference(this.documentAccessBridge.getCurrentAuthorReference());
     }
 
     /**

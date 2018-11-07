@@ -731,4 +731,14 @@ public interface DocumentAccessBridge
      */
     @Deprecated
     String getCurrentWiki();
+
+    /**
+     * @return the author of the current document.
+     * @since 10.10RC1
+     */
+    @Unstable
+    default DocumentReference getCurrentAuthorReference()
+    {
+        return null;
+    }
 }

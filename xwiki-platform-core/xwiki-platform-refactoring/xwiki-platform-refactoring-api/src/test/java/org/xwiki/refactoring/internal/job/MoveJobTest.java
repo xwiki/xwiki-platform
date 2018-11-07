@@ -155,6 +155,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(true);
         request.setUserReference(userReference);
+        request.setAuthorReference(userReference);
         run(request);
 
         verify(this.mocker.getMockedLogger()).error(

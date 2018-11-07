@@ -874,6 +874,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return xcontext.getWikiId();
     }
 
+    @Override
+    public DocumentReference getCurrentAuthorReference()
+    {
+        return getContext().getAuthorReference();
+    }
+
     /**
      * Utility method for checking access rights of the current user on a target document.
      *

@@ -500,10 +500,11 @@ public class XWikiExecutor
     {
         String startCommand = START_COMMAND;
         if (startCommand == null) {
+            String scriptNamePrefix = DEBUG ? "start_xwiki_debug" : "start_xwiki";
             if (SystemUtils.IS_OS_WINDOWS) {
-                startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
+                startCommand = String.format("cmd /c %s.bat %s %s", scriptNamePrefix, port, stopPort);
             } else {
-                startCommand = String.format("bash start_xwiki.sh -p %s -sp %s", port, stopPort);
+                startCommand = String.format("bash %s.sh -p %s -sp %s", scriptNamePrefix, port, stopPort);
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));

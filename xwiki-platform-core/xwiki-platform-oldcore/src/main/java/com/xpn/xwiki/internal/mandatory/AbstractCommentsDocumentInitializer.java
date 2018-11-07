@@ -34,6 +34,11 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 public abstract class AbstractCommentsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
+    /**
+     * See {@link AbstractMandatoryClassInitializer#AbstractMandatoryClassInitializer(EntityReference)}.
+     *
+     * @param reference the entity reference
+     */
     public AbstractCommentsDocumentInitializer(EntityReference reference)
     {
         super(reference);

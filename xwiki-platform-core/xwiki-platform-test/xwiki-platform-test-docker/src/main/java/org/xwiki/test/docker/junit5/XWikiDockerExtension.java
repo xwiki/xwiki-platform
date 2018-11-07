@@ -35,7 +35,6 @@ import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.utility.TestcontainersConfiguration;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -49,6 +48,7 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * <li>start a servlet container and deploy xwiki in it</li>
  * <li>provision XAR dependencies from the test inside the running xwiki</li>
  * <li>start a browser automatically</li>
+ * <li>start a VNC server to be able to connect to the UI and to record a video of the test execution</li>
  * </ul>
  *
  * <p>
@@ -90,12 +90,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration);
         ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration, repositoryResolver);
         MavenResolver mavenResolver = new MavenResolver(artifactResolver, repositoryResolver);
-
-        // Force the usage of last docker image for VNC recorder
-        // See: https://github.com/testcontainers/testcontainers-java/pull/888
-        // This line could be removed once a new release (after 1.9.1) of testcontainers is done
-        TestcontainersConfiguration.getInstance().
-            updateGlobalConfig("vncrecorder.container.image", "quay.io/testcontainers/vnc-recorder:1.1.0");
 
         // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {

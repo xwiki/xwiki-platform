@@ -94,7 +94,7 @@ public abstract class AbstractWikiUIExtension implements WikiComponent, UIExtens
         throws ComponentLookupException, WikiComponentException
     {
         this.async = baseObject.getIntValue(WikiUIExtensionConstants.ASYNC_ENABLED_PROPERTY, 0) == 1;
-        this.cached = baseObject.getIntValue(WikiUIExtensionConstants.ASYNC_CACHED_PROPERTY, async ? 1 : 0) == 1;
+        this.cached = baseObject.getIntValue(WikiUIExtensionConstants.ASYNC_CACHED_PROPERTY, 0) == 1;
         List<String> contextEntriesList = baseObject.getListValue(WikiUIExtensionConstants.ASYNC_CONTEXT_PROPERTY);
         this.contextEntries = contextEntriesList != null ? new HashSet<>(contextEntriesList) : null;
         this.objectReference = baseObject.getReference();

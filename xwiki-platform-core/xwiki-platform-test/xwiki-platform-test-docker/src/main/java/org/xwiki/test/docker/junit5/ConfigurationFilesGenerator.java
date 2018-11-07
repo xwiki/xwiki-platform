@@ -117,10 +117,16 @@ public class ConfigurationFilesGenerator
     private VelocityContext createVelocityContext(Properties projectProperties)
     {
         Properties properties = new Properties();
+
+        // Add default properties
         properties.putAll(getDefaultConfigurationProperties());
         for (Object key : projectProperties.keySet()) {
             properties.put(key.toString(), projectProperties.get(key).toString());
         }
+
+        // Add user-specified properties (with possible overrides for default properties)
+        properties.putAll(this.testConfiguration.getProperties());
+
         VelocityContext context = new VelocityContext(properties);
         return context;
     }
@@ -173,8 +179,6 @@ public class ConfigurationFilesGenerator
         }
 
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));
-
-        // TODO: Allow users to provide properties that will override the default here....
 
         return props;
     }

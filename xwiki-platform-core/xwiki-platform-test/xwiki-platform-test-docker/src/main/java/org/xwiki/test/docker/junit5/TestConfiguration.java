@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.util.Properties;
+
 import org.xwiki.text.StringUtils;
 
 /**
@@ -53,6 +55,8 @@ public class TestConfiguration
 
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
+    private static final String PROPERTIES_PREFIX_PROPERTY = "xwiki.test.ui.properties.";
+
     private UITest uiTestAnnotation;
 
     private Browser browser;
@@ -75,6 +79,8 @@ public class TestConfiguration
 
     private boolean vnc;
 
+    private Properties properties;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -91,6 +97,7 @@ public class TestConfiguration
         resolveServletEngineTag();
         resolveJDBCDriverVersion();
         resolveVNC();
+        resolveProperties();
     }
 
     private void resolveBrowser()
@@ -185,6 +192,25 @@ public class TestConfiguration
         this.vnc = newVNC;
     }
 
+    private void resolveProperties()
+    {
+        String[] propertiesAsArray = this.uiTestAnnotation.properties();
+        Properties newProperties = new Properties();
+        for (String propertyAsString : propertiesAsArray) {
+            int pos = propertyAsString.indexOf('=');
+            if (pos > -1) {
+                newProperties.setProperty(propertyAsString.substring(0, pos), propertyAsString.substring(pos + 1));
+            }
+        }
+        for (String key : System.getProperties().stringPropertyNames()) {
+            if (key.startsWith(PROPERTIES_PREFIX_PROPERTY)) {
+                String propertyAsString = StringUtils.substringAfter(key, PROPERTIES_PREFIX_PROPERTY);
+                newProperties.setProperty(propertyAsString, System.getProperty(key));
+            }
+        }
+        this.properties = newProperties;
+    }
+
     /**
      * @return the browser to use
      */
@@ -273,5 +299,15 @@ public class TestConfiguration
     public boolean vnc()
     {
         return this.vnc;
+    }
+
+    /**
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as
+     *         as {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @since 10.10RC1
+     */
+    public Properties getProperties()
+    {
+        return this.properties;
     }
 }

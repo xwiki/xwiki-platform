@@ -66,16 +66,16 @@ public @interface UITest
     boolean verbose() default false;
 
     /**
-     * @return true if the database data should be mapped to a local directory on the host computer so that it can
-     *         be saved and reused for another run
+     * @return true if the database data should be mapped to a local directory on the host computer so that it can be
+     * saved and reused for another run
      * @since 10.10RC1
      */
     boolean saveDatabaseData() default false;
 
     /**
-     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
-     *         your local repository). False by default to avoid developer problems but should be set to true in the
-     *         CI to improve performance of functional tests
+     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in your
+     * local repository). False by default to avoid developer problems but should be set to true in the CI to improve
+     * performance of functional tests
      * @since 10.10RC1
      */
     boolean offline() default false;
@@ -94,7 +94,7 @@ public @interface UITest
 
     /**
      * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
-     *         depending on the database)
+     * depending on the database)
      * @since 10.10RC1
      */
     String jdbcDriverVersion() default "";
@@ -104,4 +104,11 @@ public @interface UITest
      * @since 10.10RC1
      */
     boolean vnc() default true;
+
+    /**
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as as
+     * {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @since 10.10RC1
+     */
+    String[] properties() default {};
 }

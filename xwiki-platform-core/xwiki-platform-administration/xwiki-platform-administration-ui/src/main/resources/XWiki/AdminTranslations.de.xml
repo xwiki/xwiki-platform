@@ -83,8 +83,8 @@ XWiki.XWikiPreferences_title.hint=Definiere das Seitentitel-Format wie es von Br
 ### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
 
 # Editing Sections
-admin.edit=Bearbeitung
-### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
+admin.edit=Bearbeiten
+admin.edit.description=Konfiguriere den Bearbeiten-Modus, den WY
 ### Missing: admin.title=Title
 ### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
 ### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.

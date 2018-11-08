@@ -904,7 +904,6 @@ require(['jquery'], function($) {
   clear: left;
   color: $theme.textSecondaryColor;
   margin: 0 1.5em 2em 0;
-  max-width: 400px;
   overflow: hidden;
 }
 

@@ -90,7 +90,7 @@ XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Hindere Benutzer daran, Seiten
 XWiki.XWikiPreferences_editor.hint=Wähle den Editor-Typ der standardmäßig beim Bearbeiten von Seiten-Inhalt verwendet werden soll.
 XWiki.XWikiPreferences_editcomment.hint=Erlaubt das Eingeben einer Bemerkung wenn eine neue Seiten-Version erstellt wird.
 XWiki.XWikiPreferences_editcomment_mandatory.hint=Jede Änderung einer Seite wird erst gespeichert, wenn eine Zusammenfassung für die Version angegeben wurde.
-XWiki.XWikiPreferences_minoredit.hint=Erlaubt dass Seiten
+XWiki.XWikiPreferences_minoredit.hint=Erlaubt Seiten große (x.1) und kleine (1.x) Versionen zu haben. Die kleinen Versionen können mit dem "Kleine Änderungen "
 ### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
 ### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
 

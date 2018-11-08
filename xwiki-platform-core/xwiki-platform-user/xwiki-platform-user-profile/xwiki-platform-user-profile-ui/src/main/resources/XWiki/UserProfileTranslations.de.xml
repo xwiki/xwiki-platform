@@ -51,11 +51,11 @@ user.profile.notifications=Benachrichtigungen
 user.profile.network.unfollow.question=Sind Sie sicher, dass Sie diesem Benutzer nicht mehr folgen möchten?
 user.profile.network.unfollow.question.yes=Ja, nicht mehr folgen
 user.profile.network.unfollow.question.no=Nein, abbrechen
-user.profile.network.following=Folge
+user.profile.network.following=Wird verfolgt
 user.profile.network.notfollowing=Wird nicht verfolgt
-### Missing: user.profile.network.follow=Start following
-### Missing: user.profile.network.unfollow=Stop following
-### Missing: user.profile.network.done=Done
-### Missing: user.profile.network.saving=Saving...
-### Missing: user.profile.network.error=Error saving the notification setting</content>
+user.profile.network.follow=Ab sofort folgen
+user.profile.network.unfollow=Nicht mehr folgen
+user.profile.network.done=Erledigt
+user.profile.network.saving=Speichert…
+user.profile.network.error=Fehler beim Speichern der Benachrichtigungseinstellungen</content>
 </xwikidoc>

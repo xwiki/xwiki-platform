@@ -36,21 +36,21 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: administration.title=Administration
-### Missing: administration.title.page=Page Administration
-### Missing: administration.title.wiki=Wiki Administration
-### Missing: administration.title.global=Global Administration
-### Missing: administration.sectionTitle=Administration: {0}
-### Missing: administration.sectionTitle.page=Page Administration: {0}
-### Missing: administration.sectionTitle.wiki=Wiki Administration: {0}
-### Missing: administration.sectionTitle.global=Global Administration: {0}
-### Missing: administration.menu.search.hint=Search for...
-### Missing: administration.menu.search.noResults=No results.
+  <content>administration.title=Administration
+administration.title.page=Seiten-Administration
+administration.title.wiki=Wiki-Administration
+administration.title.global=Globale Administration
+administration.sectionTitle=Administration: {0}
+administration.sectionTitle.page=Seiten-Administration: {0}
+administration.sectionTitle.wiki=Wiki-Administration: {0}
+administration.sectionTitle.global=Globale Administration: {0}
+administration.menu.search.hint=Suche nach…
+administration.menu.search.noResults=Keine Ergebnisse.
 
 # Registration Section
-### Missing: XWiki.XWikiPreferences_use_email_verification.hint=If set to "Yes" then an email will be sent to the email address provided when filling the registration form.
-### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
-### Missing: XWiki.XWikiPreferences_validation_email_content.hint=The email template that will be send to users in order to validate their email address.
+XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
+XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
+XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
 ### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
 ### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
 
@@ -65,7 +65,7 @@
 ### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
 
 # Look &amp; Feel Sections
-### Missing: admin.themes=Themes
+admin.themes=Themes
 ### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
 ### Missing: admin.colorthemes.local=Local
 ### Missing: admin.colorthemes.global=Global

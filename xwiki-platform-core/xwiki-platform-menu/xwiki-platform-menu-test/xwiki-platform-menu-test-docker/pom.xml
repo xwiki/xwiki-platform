@@ -40,6 +40,9 @@
     <selenium.version>3.14.0</selenium.version>
   </properties>
   <dependencies>
+    <!-- ================================
+         Dependencies for tested features
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-menu-ui</artifactId>
@@ -60,7 +63,9 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Test dependencies -->
+    <!-- ================================
+         Test only dependencies
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>
@@ -79,6 +84,7 @@
       <version>${project.version}</version>
       <scope>test</scope>
       <exclusions>
+        <!-- Excluded since we use a more recent version in TestContainers-based tests -->
         <exclusion>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-java</artifactId>
@@ -114,9 +120,7 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!-- Required to fix conflicts resolution between XWiki & TestContainers -->
-
+    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
@@ -144,7 +148,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-
+    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

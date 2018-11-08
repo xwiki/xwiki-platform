@@ -72,7 +72,7 @@ admin.colorthemes.global=Global
 XWiki.XWikiPreferences_showannotations.hint=Zeige den Anmerkungsbereich im Seitenlayout.
 XWiki.XWikiPreferences_showcomments.hint=Zeige den Kommentarbereich im Seitenlayout.
 XWiki.XWikiPreferences_showattachments.hint=Zeige den Bereich für Anhänge im Seitenlayout.
-XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich mit dem Verlauf im Seitenlayout.
+XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich mit der Historie im Seitenlayout.
 XWiki.XWikiPreferences_showinformation.hint=Zeige den Informationsbereich im Seitenlayout.
 XWiki.XWikiPreferences_title.hint=Definiere das Seitentitel-Format wie es von Browsern angezeigt wird.
 ### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
@@ -90,7 +90,7 @@ XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Hindere Benutzer daran, Seiten
 XWiki.XWikiPreferences_editor.hint=Wähle den Editor-Typ der standardmäßig beim Bearbeiten von Seiten-Inhalt verwendet werden soll.
 XWiki.XWikiPreferences_editcomment.hint=Erlaubt das Eingeben einer Bemerkung wenn eine neue Seiten-Version erstellt wird.
 XWiki.XWikiPreferences_editcomment_mandatory.hint=Jede Änderung einer Seite wird erst gespeichert, wenn eine Zusammenfassung für die Version angegeben wurde.
-XWiki.XWikiPreferences_minoredit.hint=Erlaubt Seiten große (x.1) und kleine (1.x) Versionen zu haben. Die kleinen Versionen können mit dem "Kleine Änderungen "
+XWiki.XWikiPreferences_minoredit.hint=Erlaubt Seiten große (x.1) und kleine (1.x) Versionen zu haben. Die kleinen Versionen können mit dem "Kleine Änderungen anzeigen" Button in der Seiten Historie angezeigt werden.
 ### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
 ### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
 

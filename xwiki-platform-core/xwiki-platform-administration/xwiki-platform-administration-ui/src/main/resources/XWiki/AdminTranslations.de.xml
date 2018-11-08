@@ -84,11 +84,11 @@ XWiki.XWikiPreferences_title.hint=Definiere das Seitentitel-Format wie es von Br
 
 # Editing Sections
 admin.edit=Bearbeiten
-admin.edit.description=Konfiguriere den Bearbeiten-Modus, den WY
-### Missing: admin.title=Title
-### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
-### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
-### Missing: XWiki.XWikiPreferences_editcomment.hint=Allow entering a message when creating a new page version.
+admin.edit.description=Konfiguriere den Bearbeiten-Modus, den WYSIWYG Editor und die verfügbaren Syntaxen.
+admin.title=Titel
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Hindere Benutzer daran, Seiten mit leerem Titel zu erstellen.
+XWiki.XWikiPreferences_editor.hint=Wähle den Editor-Typ der standardmäßig beim Bearbeiten von Seiten-Inhalt verwendet werden soll.
+XWiki.XWikiPreferences_editcomment.hint=Erlaubt das Eingeben einer
 ### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
 ### Missing: XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
 ### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.

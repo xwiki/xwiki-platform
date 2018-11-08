@@ -66,12 +66,12 @@ XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an 
 
 # Look &amp; Feel Sections
 admin.themes=Themes
-admin.themes.description=Anpassen von Farb- und Icon-Themes,
-### Missing: admin.colorthemes.local=Local
-### Missing: admin.colorthemes.global=Global
-### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
-### Missing: XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
+admin.themes.description=Anpassen von Farb- und Icon-Themes, Skin und Logo.
+admin.colorthemes.local=Lokal
+admin.colorthemes.global=Global
+XWiki.XWikiPreferences_showannotations.hint=Zeige den Anmerkungsbereich im Seitenlayout.
+XWiki.XWikiPreferences_showcomments.hint=Zeige den Kommentarbereich im Seitenlayout.
+XWiki.XWikiPreferences_showattachments.hint=Zeige den
 ### Missing: XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
 ### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
 ### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.

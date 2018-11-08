@@ -119,7 +119,7 @@ def builds = [
       node: 'docker',
       profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=chrome -Dxwiki.test.ui.database=mysql -Dxwiki.test.ui.servletEngine=tomcat',
-      projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
+      projects: 'org.xwiki.platform:xwiki-platform-menu-test'
     )
   },
   'Docker - PostgreSQL/Jetty/Chrome' : {
@@ -129,7 +129,7 @@ def builds = [
       node: 'docker',
       profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=chrome -Dxwiki.test.ui.database=postgresql -Dxwiki.test.ui.servletEngine=jetty_standalone',
-      projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
+      projects: 'org.xwiki.platform:xwiki-platform-menu-test'
     )
   },
   'Docker - HSQLDB/Tomcat/Firefox' : {
@@ -139,7 +139,7 @@ def builds = [
       node: 'docker',
       profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=firefox -Dxwiki.test.ui.database=hsqldb_embedded -Dxwiki.test.ui.servletEngine=tomcat',
-      projects: 'org.xwiki.platform:xwiki-platform-menu-test-docker'
+      projects: 'org.xwiki.platform:xwiki-platform-menu-test'
     )
   }
 ]

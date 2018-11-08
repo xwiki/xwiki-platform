@@ -38,15 +38,7 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <modules>
+    <module>xwiki-platform-menu-test-docker</module>
     <module>xwiki-platform-menu-test-pageobjects</module>
-    <module>xwiki-platform-menu-test-tests</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>docker</id>
-      <modules>
-        <module>xwiki-platform-menu-test-docker</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

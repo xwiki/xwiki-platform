@@ -111,7 +111,13 @@ public class AsyncRendererCacheListener extends AbstractEventListener
         if (event instanceof XObjectEvent) {
             XObjectEvent objectEvent = (XObjectEvent) event;
 
-            BaseObject obj = document.getXObject(objectEvent.getReference());
+            BaseObject obj;
+
+            if (objectEvent instanceof XObjectDeletedEvent) {
+                obj = document.getOriginalDocument().getXObject(objectEvent.getReference());
+            } else {
+                obj = document.getXObject(objectEvent.getReference());
+            }
 
             this.cache.cleanCache(obj.getXClassReference());
         }

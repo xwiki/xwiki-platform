@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
@@ -72,7 +73,7 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @since 10.6RC1
  */
 public class XWikiDockerExtension extends AbstractExtension implements BeforeAllCallback, AfterAllCallback,
-    BeforeEachCallback, AfterEachCallback, ParameterResolver
+    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
@@ -175,6 +176,15 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // the container takes a bit of time).
             LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
+    }
+
+    @Override
+    public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
+        throws Throwable
+    {
+        DockerTestUtils.takeScreenshot(extensionContext.getTestMethod().get().getName(),
+            loadXWikiWebDriver(extensionContext));
+        throw throwable;
     }
 
     @Override

@@ -23,8 +23,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
@@ -44,6 +49,13 @@ import static org.testcontainers.containers.output.OutputFrame.OutputType.STDOUT
  */
 public final class DockerTestUtils
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DockerTestUtils.class);
+
+    /**
+     * The folder where to save the screenshot.
+     */
+    private static final String SCREENSHOT_DIR = System.getProperty("xwiki.test.ui.screenshotDirectory", "./target");
+
     private DockerTestUtils()
     {
         // Prevents instantiation.
@@ -116,5 +128,31 @@ public final class DockerTestUtils
         cmd.withStdErr(true);
 
         cmd.exec(callback);
+    }
+
+    /**
+     * Captures a screenshot of the browser window.
+     *
+     * @param testName the name of the file in which the screenshot will be taken. A ".png" suffix will be appended
+     * @param driver the Selenium Web Driver instance to use to take the screenshot
+     */
+    public static void takeScreenshot(String testName, WebDriver driver)
+    {
+        if (!(driver instanceof TakesScreenshot)) {
+            LOGGER.warn("The WebDriver that is currently used doesn't support taking screenshots.");
+            return;
+        }
+
+        try {
+            File sourceFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File screenshotFile;
+            File screenshotDir = new File(SCREENSHOT_DIR);
+            screenshotDir.mkdirs();
+            screenshotFile = new File(screenshotDir, testName + ".png");
+            FileUtils.copyFile(sourceFile, screenshotFile);
+            LOGGER.info("Screenshot for failing test [{}] saved at [{}].", testName, screenshotFile.getAbsolutePath());
+        } catch (Exception e) {
+            LOGGER.error("Failed to take screenshot for failing test [{}].", testName, e);
+        }
     }
 }

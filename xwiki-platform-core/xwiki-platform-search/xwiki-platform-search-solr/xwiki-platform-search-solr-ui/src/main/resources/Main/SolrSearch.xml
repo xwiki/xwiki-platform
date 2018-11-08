@@ -745,7 +745,6 @@ a.search-result-highlightAll:after {
   cursor: pointer;
   line-height: 1.4em;
   margin: 0 .2em;
-  text-transform: capitalize;
 }
 
 .search-facet-header:after {

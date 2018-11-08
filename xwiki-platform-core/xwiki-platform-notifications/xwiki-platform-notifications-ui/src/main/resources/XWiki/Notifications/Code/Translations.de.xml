@@ -65,30 +65,30 @@ notifications.filters.description.eventReadAlertFilter=Benachrichtigungen verber
 notifications.filters.name.eventReadEmailFilter=Filter Gelesene Benachrichtigungen (E-Mail)
 notifications.filters.description.eventReadEmailFilter=Benachrichtigungen verbergen, die als gelesen gekennzeichnet wurden
 notifications.filters.name.minorEventAlertNotificationFilter=Kleines Ereignis (Alarm)
-notifications.filters.description.minorEventAlertNotificationFilter=Verberge Benachrichtigungen bei kleinen Änderungen von Seiten
+notifications.filters.description.minorEventAlertNotificationFilter=Verberge Benachrichtigungen betreffend kleinen Änderungen von Seiten
 notifications.filters.name.minorEventEmailNotificationFilter=Kleines Ereignis (E-Mail)
-notifications.filters.description.minorEventEmailNotificationFilter=Verberge Benachrichtigungen bei kleinen Änderungen von Seiten
+notifications.filters.description.minorEventEmailNotificationFilter=Verberge Benachrichtigungen betreffend kleinen Änderungen von Seiten
 
 ## Filter Types
-### Missing: notifications.filters.type.inclusive=Inclusive
-### Missing: notifications.filters.type.exclusive=Exclusive
+notifications.filters.type.inclusive=Eingeschlossen
+notifications.filters.type.exclusive=Ausgeschlossen
 
 ## Translation keys for the scopeNotificationFilter
-### Missing: notifications.filters.preferences.scopeNotificationFilter.name=Scope Notification Filter
-### Missing: notifications.filters.preferences.scopeNotificationFilter.page=Page only
-### Missing: notifications.filters.preferences.scopeNotificationFilter.space=Page and children
-### Missing: notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.name=Benachrichtigungsfilter Geltungsbereich
+notifications.filters.preferences.scopeNotificationFilter.page=Nur Seite
+notifications.filters.preferences.scopeNotificationFilter.space=Seite und Unterseiten
+notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
 
-### Missing: notifications.filters.preferences.allEvents=-
+notifications.filters.preferences.allEvents=-
 
-### Missing: notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
-### Missing: notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
-### Missing: notifications.filters.preferences.addPreference.notificationFormat.label=Notification format
-### Missing: notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
-### Missing: notifications.filters.preferences.addPreference.eventType.label=Event Type
-### Missing: notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?
-### Missing: notifications.filters.preferences.addPreference.location.label=Filter Scope
-### Missing: notifications.filters.preferences.addPreference.location.hint=Which page should be targeted by the filter?
+notifications.filters.preferences.addPreference.filterType.inclusive=Eingeschlossen
+notifications.filters.preferences.addPreference.filterType.exclusive=Ausgeschlossen
+notifications.filters.preferences.addPreference.notificationFormat.label=Benachrichtigungsformat
+notifications.filters.preferences.addPreference.notificationFormat.hint=Auf welches Format von Benachrichtigung soll der Filter angewendet werden?
+notifications.filters.preferences.addPreference.eventType.label=Ereignis Kategorie
+notifications.filters.preferences.addPreference.eventType.hint=Welche Art von Ereignis soll der Filter als Ziel haben?
+notifications.filters.preferences.addPreference.location.label=Filter Geltungsbereich
+notifications.filters.preferences.addPreference.location.hint=Welche Seite(n) soll der Filter beachten?
 ### Missing: notifications.filters.preferences.delete.inProgress=Deleting...
 ### Missing: notifications.filters.preferences.delete.done=Filter preference deleted!
 ### Missing: notifications.filters.preferences.delete.error=Failed to delete the filter preference

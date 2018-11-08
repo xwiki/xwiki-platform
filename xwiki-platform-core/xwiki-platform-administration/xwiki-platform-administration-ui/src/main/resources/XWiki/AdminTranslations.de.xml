@@ -66,7 +66,7 @@ XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an 
 
 # Look &amp; Feel Sections
 admin.themes=Themes
-### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
+admin.themes.description=Anpassen von
 ### Missing: admin.colorthemes.local=Local
 ### Missing: admin.colorthemes.global=Global
 ### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.

@@ -39,35 +39,35 @@
   <hidden>true</hidden>
   <content>
 
-### Missing: platform.core.profile.category.notifications=Notifications
-### Missing: notifications.filters.cancel=Cancel
-### Missing: notifications.filters.submit=Save
-### Missing: notifications.filters.type.label=Filter type:
-### Missing: notifications.filters.type.hint=How the filter should act towards an event in the given location
-### Missing: notifications.filters.location.label=Filter scope:
-### Missing: notifications.filters.location.hint=What part of the wiki should be concerned by the filter?
+platform.core.profile.category.notifications=Benachrichtigungen
+notifications.filters.cancel=Abbrechen
+notifications.filters.submit=Speichern
+notifications.filters.type.label=Filterart:
+notifications.filters.type.hint=Wie soll der Filter auf ein Ereignis am angegebenen Ort reagieren
+notifications.filters.location.label=Filter Geltungsbereich:
+notifications.filters.location.hint=Welcher Teil des Wikis sollte durch den Filter betroffen sein?
 
 ## Advanced filters options
-### Missing: notifications.settings.filters.advanced=Advanced filtering options
-### Missing: notifications.filters.advanced.toggles.hint=These filters are activated by default, you can disable them by using the button next to each filter.
-### Missing: notifications.filters.advanced.toggles.table.name=Filter name
-### Missing: notifications.filters.advanced.toggles.table.description=Description
+notifications.settings.filters.advanced=Erweiterte Filteroptionen
+notifications.filters.advanced.toggles.hint=Diese Filter sind standardmäßig aktiviert. Sie können sie deaktivieren, indem Sie die Schaltfläche neben jedem Filter verwenden.
+notifications.filters.advanced.toggles.table.name=Filtername
+notifications.filters.advanced.toggles.table.description=Beschreibung
 ### Missing: notifications.filters.advanced.toggles.table.toggle=Toggle
-### Missing: notifications.filters.advanced.modal.close=Close
+notifications.filters.advanced.modal.close=Schließen
 
 ## Filters names
-### Missing: notifications.filters.name.systemUserNotificationFilter=System Filter
-### Missing: notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user
-### Missing: notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
-### Missing: notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity
-### Missing: notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
-### Missing: notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
-### Missing: notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
-### Missing: notifications.filters.description.eventReadEmailFilter=Hide notifications that you have marked as read
-### Missing: notifications.filters.name.minorEventAlertNotificationFilter=Minor Event (Alert)
-### Missing: notifications.filters.description.minorEventAlertNotificationFilter=Hide notifications concerning minor changes on pages
-### Missing: notifications.filters.name.minorEventEmailNotificationFilter=Minor Event (Email)
-### Missing: notifications.filters.description.minorEventEmailNotificationFilter=Hide notifications concerning minor changes on pages
+notifications.filters.name.systemUserNotificationFilter=Systemfilter
+notifications.filters.description.systemUserNotificationFilter=Benachrichtigungen vom System-Benutzer verbergen
+notifications.filters.name.ownEventsNotificationFilter=Eigene Ereignisfilter
+notifications.filters.description.ownEventsNotificationFilter=Verberge Benachrichtigungen über meine eigenen Aktivitäten
+notifications.filters.name.eventReadAlertFilter=Filter Gelesene Benachrichtigungen (Alarm)
+notifications.filters.description.eventReadAlertFilter=Benachrichtigungen verbergen, die als gelesen gekennzeichnet wurden
+notifications.filters.name.eventReadEmailFilter=Filter Gelesene Benachrichtigungen (E-Mail)
+notifications.filters.description.eventReadEmailFilter=Benachrichtigungen verbergen, die als gelesen gekennzeichnet wurden
+notifications.filters.name.minorEventAlertNotificationFilter=Kleines Ereignis (Alarm)
+notifications.filters.description.minorEventAlertNotificationFilter=Verberge Benachrichtigungen bei kleinen Änderungen von Seiten
+notifications.filters.name.minorEventEmailNotificationFilter=Kleines Ereignis (E-Mail)
+notifications.filters.description.minorEventEmailNotificationFilter=Verberge Benachrichtigungen bei kleinen Änderungen von Seiten
 
 ## Filter Types
 ### Missing: notifications.filters.type.inclusive=Inclusive

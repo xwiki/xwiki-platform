@@ -37,11 +37,8 @@ public abstract class AbstractContainerExecutor
     protected void start(GenericContainer container, TestConfiguration testConfiguration)
     {
         if (testConfiguration.isVerbose()) {
-            container.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
-        }
-
-        if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]", container.getDockerImageName()));
+            container.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
         // Get the latest image in case the tag has been updated on dockerhub.
@@ -50,5 +47,8 @@ public abstract class AbstractContainerExecutor
         }
 
         container.start();
+
+        // Display logs after the container has been started so that we can see problems happening in the containers
+        DockerTestUtils.followOutput(container, getClass());
     }
 }

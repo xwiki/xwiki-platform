@@ -88,7 +88,7 @@ public class JettyStandaloneExecutor
             File jettyArtifactFile = this.artifactResolver.resolveArtifact(jettyArtifact).getArtifact().getFile();
 
             // Step: Unzip
-            XWikiFileUtils.unzip(jettyArtifactFile, jettyDirectory);
+            DockerTestUtils.unzip(jettyArtifactFile, jettyDirectory);
 
             // Step: Replace properties in start shell scripts
             Collection<File> startFiles = org.apache.commons.io.FileUtils.listFiles(jettyDirectory,

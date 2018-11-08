@@ -150,7 +150,7 @@ public class WARBuilder
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
             }
-            XWikiFileUtils.copyFile(jdbcDriverFile, libDirectory);
+            DockerTestUtils.copyFile(jdbcDriverFile, libDirectory);
 
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
@@ -170,7 +170,7 @@ public class WARBuilder
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping WAR: " + file);
             }
-            XWikiFileUtils.unzip(file, targetWARDirectory);
+            DockerTestUtils.unzip(file, targetWARDirectory);
         }
     }
 
@@ -178,12 +178,12 @@ public class WARBuilder
         throws Exception
     {
         LOGGER.info("Copying JAR dependencies ...");
-        XWikiFileUtils.createDirectory(libDirectory);
+        DockerTestUtils.createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Copying JAR: " + artifact.getFile());
             }
-            XWikiFileUtils.copyFile(artifact.getFile(), libDirectory);
+            DockerTestUtils.copyFile(artifact.getFile(), libDirectory);
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
@@ -200,7 +200,7 @@ public class WARBuilder
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping skin: " + file);
             }
-            XWikiFileUtils.unzip(file, skinsDirectory);
+            DockerTestUtils.unzip(file, skinsDirectory);
         }
     }
 

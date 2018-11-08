@@ -234,12 +234,9 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
 
         if (testConfiguration.isVerbose()) {
-            webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
-        }
-
-        if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]",
                 BrowserWebDriverContainer.getImageForCapabilities(testConfiguration.getBrowser().getCapabilities())));
+            webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
         webDriverContainer.start();
@@ -272,6 +269,9 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
         // - the one used by RestTestUtils, i.e. outside of any container
         testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));
+
+        // Display logs after the container has been started so that we can see problems happening in the containers
+        DockerTestUtils.followOutput(webDriverContainer, getClass());
 
         // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
         // in TestUtils), including the login form. Whenever a new user logs in we need to recache.

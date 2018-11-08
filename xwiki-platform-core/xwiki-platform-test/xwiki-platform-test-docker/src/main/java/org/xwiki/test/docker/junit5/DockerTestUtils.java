@@ -21,19 +21,30 @@ package org.xwiki.test.docker.junit5;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.FrameConsumerResultCallback;
+import org.testcontainers.containers.output.OutputFrame;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+
+import com.github.dockerjava.api.command.LogContainerCmd;
+
+import static org.testcontainers.containers.output.OutputFrame.OutputType.STDERR;
+import static org.testcontainers.containers.output.OutputFrame.OutputType.STDOUT;
 
 /**
- * Utility methods for Files (unzip to directory, create directory, copy file, etc).
+ * Utility methods for setting up the test framework (unzip to directory, create directory, copy file, etc).
  *
  * @version $Id$
  * @since 10.10RC1
  */
-public final class XWikiFileUtils
+public final class DockerTestUtils
 {
-    private XWikiFileUtils()
+    private DockerTestUtils()
     {
         // Prevents instantiation.
     }
@@ -83,5 +94,27 @@ public final class XWikiFileUtils
             throw new Exception(String.format("Failed to copy file [%] to [%]", source, targetDirectory),
                 e);
         }
+    }
+
+    /**
+     * Start following a docker container's logs from the moment this API is called.
+     *
+     * @param container the container for which to follow the logs
+     * @param loggingClass the SLF4J logging class to use for logging
+     */
+    public static void followOutput(GenericContainer container, Class<?> loggingClass)
+    {
+        LogContainerCmd cmd = container.getDockerClient().logContainerCmd(container.getContainerId())
+            .withFollowStream(true)
+            .withTail(0);
+
+        FrameConsumerResultCallback callback = new FrameConsumerResultCallback();
+        Consumer<OutputFrame> consumer = new Slf4jLogConsumer(LoggerFactory.getLogger(loggingClass));
+        callback.addConsumer(STDOUT, consumer);
+        cmd.withStdOut(true);
+        callback.addConsumer(STDERR, consumer);
+        cmd.withStdErr(true);
+
+        cmd.exec(callback);
     }
 }

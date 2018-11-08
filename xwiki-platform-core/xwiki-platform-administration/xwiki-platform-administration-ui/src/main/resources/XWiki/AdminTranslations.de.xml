@@ -72,9 +72,9 @@ admin.colorthemes.global=Global
 XWiki.XWikiPreferences_showannotations.hint=Zeige den Anmerkungsbereich im Seitenlayout.
 XWiki.XWikiPreferences_showcomments.hint=Zeige den Kommentarbereich im Seitenlayout.
 XWiki.XWikiPreferences_showattachments.hint=Zeige den Bereich für Anhänge im Seitenlayout.
-XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich
-### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
-### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
+XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich mit dem Verlauf im Seitenlayout.
+XWiki.XWikiPreferences_showinformation.hint=Zeige den Informationsbereich im Seitenlayout.
+XWiki.XWikiPreferences_title.hint=Definiere das Seitentitel-Format wie es von Browsern angezeigt wird.
 ### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
 ### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
 ### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
@@ -83,7 +83,7 @@ XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich
 ### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
 
 # Editing Sections
-### Missing: admin.edit=Editing
+admin.edit=Bearbeitung
 ### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
 ### Missing: admin.title=Title
 ### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.

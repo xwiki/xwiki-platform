@@ -1909,8 +1909,8 @@ public class XWiki implements EventListener
                 // Indicate the the async context manipulated documents
                 getAsyncContext().useEntity(doc.getDocumentReferenceWithLocale());
             } catch (Exception e) {
-                // If there the AsyncContext component does not work then we are not in an asynchronous context anyway
-                LOGGER.debug("Failed to get the register the document in the asynchronous context", e);
+                // If the AsyncContext component does not work then we are not in an asynchronous context anyway
+                LOGGER.debug("Failed to register the document in the asynchronous context", e);
             }
 
             return getStore().loadXWikiDoc(doc, context);

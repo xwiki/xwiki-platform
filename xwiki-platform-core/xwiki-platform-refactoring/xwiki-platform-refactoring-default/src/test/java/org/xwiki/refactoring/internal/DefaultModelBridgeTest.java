@@ -488,11 +488,14 @@ public class DefaultModelBridgeTest
         XWikiRightService rightService = mock(XWikiRightService.class);
         when(xwiki.getRightService()).thenReturn(rightService);
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+        DocumentReference authorReference = new DocumentReference("wiki", "user", "Alice");
+        when(xcontext.getAuthorReference()).thenReturn(authorReference);
 
         assertFalse(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, true));
 
-        verify(mocker.getMockedLogger()).error("You are not allowed to restore document [{}] with ID [{}]",
-            documentReference, deletedDocumentId);
+        verify(mocker.getMockedLogger()).error(
+            "The author [{}] of this script is not allowed to restore document [{}] with ID [{}]",
+            authorReference, documentReference, deletedDocumentId);
 
         verify(xwiki, never()).restoreFromRecycleBin(any(), any(), any());
     }

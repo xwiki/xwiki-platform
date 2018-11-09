@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.job;
+package org.xwiki.refactoring.internal.job;
 
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;

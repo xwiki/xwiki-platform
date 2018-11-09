@@ -24,6 +24,7 @@ import java.util.List;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.internal.job.UserOrientedRequest;
 
 /**
  * A job request that can be used for handling deleted documents from the recycle bin.

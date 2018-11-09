@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.refactoring.internal.job.UserOrientedRequest;
 
 /**
  * A generic job request that targets multiple entities.

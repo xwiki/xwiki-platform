@@ -51,7 +51,7 @@ import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.RestoreRequest;
-import org.xwiki.refactoring.job.UserOrientedRequest;
+import org.xwiki.refactoring.internal.job.UserOrientedRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;

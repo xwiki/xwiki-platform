@@ -45,6 +45,9 @@
     <module>xwiki-platform-distribution-ui</module>
   </modules>
   <properties>
+    <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
+    <maven.version>3.6.0</maven.version>
+
     <!-- Flavors known to be valid with the current distribution -->
     <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
     <xwiki.extension.knownFlavors>

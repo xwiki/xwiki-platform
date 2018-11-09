@@ -44,9 +44,6 @@
   <properties>
     <!-- Don't run backward-compatibility checks in tools modules since we don't consider them public API -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-
-    <!-- Set the version of Maven used at build time for Maven plugins dependencies -->
-    <maven.dependencies.version>${maven.runtime.version}</maven.dependencies.version>
   </properties>
   <dependencies>
     <dependency>

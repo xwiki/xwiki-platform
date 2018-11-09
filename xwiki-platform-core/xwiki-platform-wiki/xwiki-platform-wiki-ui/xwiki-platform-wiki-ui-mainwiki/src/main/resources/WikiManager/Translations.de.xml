@@ -88,10 +88,10 @@ platform.wiki.create.prettyname.empty=Anzeigename darf nicht leer sein
 platform.wiki.create.error=Erstellen von Wiki "{0}" fehlgeschlagen: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Es ist bereits eine Datenbank mit dieser ID vorhanden
 platform.wiki.create.error.wikiname.wikialreadyexists=Diese ID wird bereits verwendet
-platform.wiki.create.error.wikiname.empty=Bezeichner darf nicht leer sein.
+platform.wiki.create.error.wikiname.empty=Bezeichner darf nicht leer sein
 
 ## Common errors and messages
-platform.wiki.error.wikidoesnotexist=Wiki {0} gibt es nicht.
+platform.wiki.error.wikidoesnotexist=Wiki [{0}] gibt es nicht
 platform.wiki.error.oneParameterNotSpecified=Der Parameter ''{0}'' fehlt.
 platform.wiki.error.parameterAcceptsMultipleValues=Mehrere Werte erlaubt.
 platform.wiki.error.exceptionWithMessage=Unerwarteter Fehler: {0}
@@ -142,15 +142,15 @@ platform.wiki.users.join.request.cancel.label=Zurück
 
 ## User profile
 platform.wiki.users.profile.joinedwikis.label=Wiki-Mitgliedschaft
-platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Sie sind noch keinen Wikis beigetreten
-platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Dieser Benutzer ist keinen Wikis beigetreten
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Sie sind noch keinen Wikis beigetreten.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Dieser Benutzer ist noch keinem Wiki beigetreten.
 platform.wiki.users.profile.activity.title=Aktivitäten im Wiki {0}
-platform.wiki.users.profile.activity.hint=Erzeugt eine Liste von Aktivitäten für die angegebenen Wikis
+platform.wiki.users.profile.activity.hint=Erzeugt eine Liste von Aktivitäten für die angegebenen Wikis.
 platform.wiki.users.profile.activity.multipletitle=Aktivitäten in den Wikis {0}
 platform.wiki.users.profile.activity.show=Aktivität zeigen
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=Sind Sie sicher, dass Sie das Wiki {0}{1}{2} löschen wollen?
+platform.wiki.delete.confirmation=Sind Sie sicher, dass Sie das Wiki {0}{1}{2} löschen wollen? Dies kann nicht rückgängig gemacht werden!
 ### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
 ### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
 platform.wiki.delete.success=Benutzer {0}{1}{2}  hat das Wiki ''{3}'' erfolgreich gelöscht.
@@ -193,10 +193,10 @@ platform.wiki.prop.wikiprettyname=Name
 platform.wiki.prop.description=Beschreibung
 platform.wiki.prop.owner=Besitzer
 platform.wiki.prop.membershipType.label=Art der Mitgliedschaft
-platform.wiki.prop.membershipType.hint=Auf welche Weise Benutzer dem Wiki beitreten
+platform.wiki.prop.membershipType.hint=Auf welche Weise Benutzer dem Wiki beitreten können.
 
 ## Wizard
-platform.wiki.create.wizard.desc.wikiname=Der (eindeutige) Bezeichner für das neue Wiki
+platform.wiki.create.wizard.desc.wikiname=Der (eindeutige) Bezeichner für das neue Wiki.
 platform.wiki.create.wizard.desc.wikiprettyname=Der Name, unter dem das Wiki angezeigt wird.
 platform.wiki.create.wizard.desc.wikialias=Der Name der Domain, unter der das neue Wiki erreichbar sein wird.
 platform.wiki.create.wizard.desc.newTemplateHint=Vorlage, welche für das Wiki benutzt wird. Beim Anlegen werden alle Dokumente der Vorlage in das neue Wiki kopiert.
@@ -208,7 +208,7 @@ platform.wiki.create.wizard.step.nameAndType.shortname=Name
 platform.wiki.create.wizard.step.users=Schritt 2 — Besitzer und Mitglieder
 platform.wiki.create.wizard.step.users.shortname=Benutzer
 platform.wiki.create.wizard.step.cleaningUp=Aufräumen
-platform.wiki.create.wizard.step.provisioning.cleanUp=Das Wiki löschen und entfernen.
+platform.wiki.create.wizard.step.provisioning.cleanUp=Das Wiki säubern und löschen
 platform.wiki.create.wizard.step.cleaningup.success=Das Wiki {0} wurde erfolgreich gelöscht.
 platform.wiki.create.wizard.step.cleaningup.error=Beim Versuch, das Wiki {0} zu löschen, ist ein Fehler aufgetreten.
 platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Sie sind im Begriff, das Wiki {0} zu löschen. Bitte bestätigen Sie diese Aktion.
@@ -216,7 +216,7 @@ platform.wiki.create.wizard.step.cleaningUp.confirm=Bestätigen
 platform.wiki.create.wizard.setAsTemplate.label=Dieses Wiki wird eine Vorlage
 platform.wiki.create.wizard.template.noTemplate=Keine Vorlage (Voreinstellung)
 platform.wiki.create.wizard.userScope.label=Benutzer
-platform.wiki.create.wizard.userScope.hint=Wählen Sie, welche Art von Benutzern es im Wiki geben wird.
+platform.wiki.create.wizard.userScope.hint=Wählen Sie, welche Art von Benutzern auf das Wiki zugreifen kann
 platform.wiki.create.wizard.template.label=Vorlage
 ### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
 ### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
@@ -246,9 +246,9 @@ platform.wiki.sheet.title=Information zu Wiki "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=Der Wiki Alias "{0}" existiert bereits.
 platform.wiki.sheet.erroraliasdoesnotexists=Der Wiki Alias "{0}" existiert nicht.
 platform.wiki.sheet.title.settings=Wiki Eigenschaften
-platform.wiki.sheet.title.createnewalias=Neuen Alias erstellen.
+platform.wiki.sheet.title.createnewalias=Neuen Alias erstellen
 platform.wiki.sheet.title.viewaliases=Aliasse ansehen
-platform.wiki.sheet.desc.wikiprettyname=Der angezeige Name des Wikis
+platform.wiki.sheet.desc.wikiprettyname=Der angezeigte Name des Wikis.
 platform.wiki.sheet.desc.owner=Ein globaler Benutzer, welcher alle Rechte im Wiki inne haben wird.
 platform.wiki.sheet.desc.secure=Wenn aktiviert, dann fangen alle vom Wiki generierten URLs mit //https// an.
 ### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.

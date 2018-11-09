@@ -1,0 +1,121 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.AdminTranslations" locale="de">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.title=Administration
+administration.title.page=Seiten-Administration
+administration.title.wiki=Wiki-Administration
+administration.title.global=Globale Administration
+administration.sectionTitle=Administration: {0}
+administration.sectionTitle.page=Seiten-Administration: {0}
+administration.sectionTitle.wiki=Wiki-Administration: {0}
+administration.sectionTitle.global=Globale Administration: {0}
+administration.menu.search.hint=Suche nach…
+administration.menu.search.noResults=Keine Ergebnisse.
+
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
+XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
+XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
+### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
+### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
+
+### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
+### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
+### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
+### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
+### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
+### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
+### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
+### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
+### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
+
+# Look &amp; Feel Sections
+admin.themes=Themes
+admin.themes.description=Anpassen von Farb- und Icon-Themes, Skin und Logo.
+admin.colorthemes.local=Lokal
+admin.colorthemes.global=Global
+XWiki.XWikiPreferences_showannotations.hint=Zeige den Anmerkungsbereich im Seitenlayout.
+XWiki.XWikiPreferences_showcomments.hint=Zeige den Kommentarbereich im Seitenlayout.
+XWiki.XWikiPreferences_showattachments.hint=Zeige den Bereich für Anhänge im Seitenlayout.
+XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich mit der Historie im Seitenlayout.
+XWiki.XWikiPreferences_showinformation.hint=Zeige den Informationsbereich im Seitenlayout.
+XWiki.XWikiPreferences_title.hint=Definiere das Seitentitel-Format wie es von Browsern angezeigt wird.
+### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
+### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
+### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
+### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
+### Missing: XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
+### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+
+# Editing Sections
+admin.edit=Bearbeiten
+admin.edit.description=Konfiguriere den Bearbeiten-Modus, den WYSIWYG Editor und die verfügbaren Syntaxen.
+admin.title=Titel
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Hindere Benutzer daran, Seiten mit leerem Titel zu erstellen.
+XWiki.XWikiPreferences_editor.hint=Wähle den Editor-Typ der standardmäßig beim Bearbeiten von Seiten-Inhalt verwendet werden soll.
+XWiki.XWikiPreferences_editcomment.hint=Erlaubt das Eingeben einer Bemerkung wenn eine neue Seiten-Version erstellt wird.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Jede Änderung einer Seite wird erst gespeichert, wenn eine Zusammenfassung für die Version angegeben wurde.
+XWiki.XWikiPreferences_minoredit.hint=Erlaubt Seiten große (x.1) und kleine (1.x) Versionen zu haben. Die kleinen Versionen können mit dem "Kleine Änderungen anzeigen" Button in der Seiten Historie angezeigt werden.
+### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
+### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+
+# Localization Section
+### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
+### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
+### Missing: XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
+### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
+### Missing: XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+
+# Import Section
+### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+
+# Export Section
+### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported content.
+### Missing: administration.section.export.description.hint=The package description, displayed when importing the package.
+### Missing: administration.section.export.licence.hint=The content licence. E.g.: LGPL, GPLV2, etc.
+### Missing: administration.section.export.author.hint=The package author.
+### Missing: administration.section.export.version.hint=The package version.
+### Missing: administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
+### Missing: administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.
+
+# Other Category
+### Missing: admin.other=Other
+### Missing: admin.other.description=Various configurations for extensions.
+### Missing: administration.section.analytics.status=Status
+### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
+</xwikidoc>

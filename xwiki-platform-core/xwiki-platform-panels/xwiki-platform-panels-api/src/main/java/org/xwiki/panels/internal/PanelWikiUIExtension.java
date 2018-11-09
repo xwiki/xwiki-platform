@@ -151,18 +151,6 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
     }
 
     @Override
-    public Type getRoleType()
-    {
-        return UIExtension.class;
-    }
-
-    @Override
-    public String getRoleHint()
-    {
-        return getId();
-    }
-
-    @Override
     public WikiComponentScope getScope()
     {
         // TODO: handle scope dynamically, in the meantime it's hardcoded to "global" for backward compatibility

@@ -32,9 +32,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -45,9 +42,8 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
-import org.xwiki.rendering.parser.ContentParser;
-import org.xwiki.rendering.parser.MissingParserException;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -76,17 +72,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     @Inject
     private Execution execution;
 
-    /**
-     * Used to serialize references of documents.
-     */
     @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    /**
-     * Content parser used to parse the macro content.
-     */
-    @Inject
-    private ContentParser parser;
+    private AuthorizationManager authorization;
 
     /**
      * The logger to log.
@@ -111,9 +98,10 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         try {
             doc = getContext().getWiki().getDocument(documentReference, getContext());
         } catch (XWikiException ex) {
-            throw new WikiMacroException(String.format("Could not build macro from : [%s], unable to load document",
-                documentReference), ex);
+            throw new WikiMacroException(
+                String.format("Could not build macro from : [%s], unable to load document", documentReference), ex);
         }
+
         return buildMacro(doc);
     }
 
@@ -131,72 +119,114 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         // Check whether this document contains a macro definition.
         BaseObject macroDefinition = doc.getObject(WIKI_MACRO_CLASS);
         if (null == macroDefinition) {
-            throw new WikiMacroException(String.format("No macro definition found in document : [%s]",
-                documentReference));
+            throw new WikiMacroException(
+                String.format("No macro definition found in document : [%s]", documentReference));
         }
 
         // Extract macro definition.
-        String macroId = macroDefinition.getStringValue(MACRO_ID_PROPERTY);
-        String macroName = macroDefinition.getStringValue(MACRO_NAME_PROPERTY);
+        String macroId = getMacroId(macroDefinition);
+        String macroName = getMacroName(macroDefinition, macroId);
         // The macro description as plain text
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
         String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
         WikiMacroVisibility macroVisibility =
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
-        boolean macroSupportsInlineMode = (macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) == 0) ? false : true;
-        String macroContentType = macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY);
+        boolean macroSupportsInlineMode = macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) != 0;
+        String macroContentType = StringUtils
+            .defaultIfEmpty(macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY), MACRO_CONTENT_OPTIONAL);
         // The macro content description as plain text
         String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
-        String macroCode = macroDefinition.getStringValue(MACRO_CODE_PROPERTY);
-
-        // Verify macro id.
-        if (StringUtils.isEmpty(macroId)) {
-            throw new WikiMacroException(String.format("Incomplete macro definition in [%s], macro id is empty",
-                documentReference));
-        }
-
-        // Verify macro name.
-        if (StringUtils.isEmpty(macroName)) {
-            macroName = macroId;
-            this.logger.debug(String.format("Incomplete macro definition in [%s], macro name is empty",
-                documentReference));
-        }
 
         // Verify macro description.
         if (StringUtils.isEmpty(macroDescription)) {
-            this.logger.debug(String.format("Incomplete macro definition in [%s], macro description is empty",
-                documentReference));
+            this.logger.debug("Incomplete macro definition in [{}], macro description is empty", documentReference);
         }
 
         // Verify default macro category.
         if (StringUtils.isEmpty(macroDefaultCategory)) {
             macroDefaultCategory = null;
-            this.logger.debug(String.format("Incomplete macro definition in [%s], default macro category is empty",
-                documentReference));
-        }
-
-        // Verify macro content type.
-        if (StringUtils.isEmpty(macroContentType)) {
-            macroContentType = MACRO_CONTENT_OPTIONAL;
+            this.logger.debug("Incomplete macro definition in [{}], default macro category is empty",
+                documentReference);
         }
 
         // Verify macro content description.
         if (!macroContentType.equals(MACRO_CONTENT_EMPTY) && StringUtils.isEmpty(macroContentDescription)) {
-            String errorMsg = "Incomplete macro definition in [%s], macro content description is empty";
-            this.logger.debug(String.format(errorMsg, documentReference));
+            this.logger.debug("Incomplete macro definition in [{}], macro content description is empty",
+                documentReference);
             macroContentDescription = "Macro content";
         }
 
         // Verify macro code.
-        if (StringUtils.isEmpty(macroCode)) {
-            throw new WikiMacroException(String.format("Incomplete macro definition in [%s], macro code is empty",
-                documentReference));
-        }
+        checkMacroCode(macroDefinition);
 
         // Extract macro parameters.
-        List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<WikiMacroParameterDescriptor>();
+        List<WikiMacroParameterDescriptor> parameterDescriptors = buildParameterDescriptors(doc);
+
+        // Create macro content descriptor.
+        ContentDescriptor contentDescriptor = null;
+        if (!macroContentType.equals(MACRO_CONTENT_EMPTY)) {
+            contentDescriptor =
+                new DefaultContentDescriptor(macroContentDescription, macroContentType.equals(MACRO_CONTENT_MANDATORY));
+        }
+
+        // Create macro descriptor.
+        // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
+        // macro for a given syntax only.
+        MacroId id = new MacroId(macroId);
+        MacroDescriptor macroDescriptor = new WikiMacroDescriptor(id, macroName, macroDescription, macroDefaultCategory,
+            macroVisibility, contentDescriptor, parameterDescriptors);
+
+        // Create & return the macro.
+        try {
+            return new DefaultWikiMacro(macroDefinition, macroSupportsInlineMode, macroDescriptor,
+                this.componentManager);
+        } catch (Exception e) {
+            throw new WikiMacroException("Failed to create the macro", e);
+        }
+    }
+
+    private String getMacroId(BaseObject macroDefinition) throws WikiMacroException
+    {
+        String macroId = macroDefinition.getStringValue(MACRO_ID_PROPERTY);
+
+        // Verify macro id.
+        if (StringUtils.isEmpty(macroId)) {
+            throw new WikiMacroException(String.format("Incomplete macro definition in [%s], macro id is empty",
+                macroDefinition.getReference()));
+        }
+
+        return macroId;
+    }
+
+    private String getMacroName(BaseObject macroDefinition, String macroId)
+    {
+        String macroName = macroDefinition.getStringValue(MACRO_NAME_PROPERTY);
+
+        // Verify macro name.
+        if (StringUtils.isEmpty(macroName)) {
+            macroName = macroId;
+            this.logger.debug("Incomplete macro definition in [{}], macro name is empty",
+                macroDefinition.getReference());
+        }
+
+        return macroName;
+    }
+
+    private void checkMacroCode(BaseObject macroDefinition) throws WikiMacroException
+    {
+        String macroCode = macroDefinition.getStringValue(MACRO_CODE_PROPERTY);
+
+        if (StringUtils.isEmpty(macroCode)) {
+            throw new WikiMacroException(String.format("Incomplete macro definition in [%s], macro code is empty",
+                macroDefinition.getReference()));
+        }
+    }
+
+    private List<WikiMacroParameterDescriptor> buildParameterDescriptors(XWikiDocument doc) throws WikiMacroException
+    {
+        List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
         Vector<BaseObject> macroParameters = doc.getObjects(WIKI_MACRO_PARAMETER_CLASS);
-        if (null != macroParameters) {
+        if (macroParameters != null) {
             for (BaseObject macroParameter : macroParameters) {
                 // Vectors can contain null values
                 if (null == macroParameter) {
@@ -212,14 +242,15 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
                 // Verify parameter name.
                 if (StringUtils.isEmpty(parameterName)) {
-                    throw new WikiMacroException(String.format(
-                        "Incomplete macro definition in [%s], macro parameter name is empty", documentReference));
+                    throw new WikiMacroException(
+                        String.format("Incomplete macro definition in [%s], macro parameter name is empty",
+                            doc.getDocumentReference()));
                 }
 
                 // Verify parameter description.
                 if (StringUtils.isEmpty(parameterDescription)) {
-                    String errorMessage = "Incomplete macro definition in [%s], macro parameter description is empty";
-                    this.logger.debug(String.format(errorMessage, documentReference));
+                    this.logger.debug("Incomplete macro definition in [{}], macro parameter description is empty",
+                        doc.getDocumentReference());
                 }
 
                 // If field empty, assume no default value was provided.
@@ -233,33 +264,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
             }
         }
 
-        // Create macro content descriptor.
-        ContentDescriptor contentDescriptor = null;
-        if (!macroContentType.equals(MACRO_CONTENT_EMPTY)) {
-            contentDescriptor =
-                new DefaultContentDescriptor(macroContentDescription, macroContentType.equals(MACRO_CONTENT_MANDATORY));
-        }
-
-        // Create macro descriptor.
-        // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
-        // macro for a given syntax only.
-        MacroId id = new MacroId(macroId);
-        MacroDescriptor macroDescriptor =
-            new WikiMacroDescriptor(id, macroName, macroDescription, macroDefaultCategory, macroVisibility,
-                contentDescriptor, parameterDescriptors);
-
-        XDOM xdom;
-        try {
-            xdom = parser.parse(macroCode, doc.getSyntax(), documentReference);
-        } catch (MissingParserException ex) {
-            throw new WikiMacroException("Could not find a parser for macro content", ex);
-        } catch (ParseException ex) {
-            throw new WikiMacroException("Error while parsing macro content", ex);
-        }
-
-        // Create & return the macro.
-        return new DefaultWikiMacro(documentReference, doc.getAuthorReference(), macroSupportsInlineMode,
-            macroDescriptor, xdom, doc.getSyntax(), this.componentManager);
+        return parameterDescriptors;
     }
 
     @Override
@@ -289,45 +294,25 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         try {
             doc = xcontext.getWiki().getDocument(documentReference, getContext());
             authorReference = doc.getAuthorReference();
-        } catch (XWikiException ex) {
+        } catch (XWikiException e) {
+            this.logger.error("Failed to get document", e);
+
             doc = null;
             authorReference = null;
         }
 
-        try {
-            switch (visibility) {
-                case GLOBAL:
-                    // Verify that the user has programming rights
-                    if (doc != null && authorReference != null) {
-                        isAllowed =
-                            xcontext
-                                .getWiki()
-                                .getRightService()
-                                .hasAccessLevel("programming", this.serializer.serialize(authorReference),
-                                    this.serializer.serialize(doc.getDocumentReference()), xcontext);
-                    } else {
-                        isAllowed = xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
-                    }
-                    break;
-                case WIKI:
-                    // Verify that the user has admin right on the macro wiki
-                    if (doc != null && authorReference != null) {
-                        isAllowed =
-                            xcontext
-                                .getWiki()
-                                .getRightService()
-                                .hasAccessLevel("admin", this.serializer.serialize(authorReference),
-                                    doc.getDocumentReference().getWikiReference().getName() + ":XWiki.XWikiPreferences",
-                                    xcontext);
-                    } else {
-                        isAllowed = xcontext.getWiki().getRightService().hasWikiAdminRights(xcontext);
-                    }
-                    break;
-                default:
-                    isAllowed = true;
-            }
-        } catch (XWikiException ex) {
-            isAllowed = false;
+        switch (visibility) {
+            case GLOBAL:
+                // Verify that the user has programming rights
+                isAllowed = doc != null && this.authorization.hasAccess(Right.PROGRAM, authorReference, null);
+                break;
+            case WIKI:
+                // Verify that the user has admin right on the macro wiki
+                isAllowed = doc != null && this.authorization.hasAccess(Right.ADMIN, authorReference,
+                    doc.getDocumentReference().getWikiReference());
+                break;
+            default:
+                isAllowed = true;
         }
 
         return isAllowed;

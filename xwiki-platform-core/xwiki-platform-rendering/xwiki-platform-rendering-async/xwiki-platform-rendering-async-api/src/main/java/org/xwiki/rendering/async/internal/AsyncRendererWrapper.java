@@ -48,21 +48,21 @@ public class AsyncRendererWrapper implements AsyncRenderer
     }
 
     @Override
-    public AsyncRendererResult render() throws RenderingException
+    public AsyncRendererResult render(boolean async, boolean cached) throws RenderingException
     {
-        return this.renderer.render();
+        return this.renderer.render(async, cached);
     }
 
     @Override
-    public boolean isAsync()
+    public boolean isAsyncAllowed()
     {
-        return this.renderer.isAsync();
+        return this.renderer.isAsyncAllowed();
     }
 
     @Override
-    public boolean isCached()
+    public boolean isCacheAllowed()
     {
-        return this.renderer.isCached();
+        return this.renderer.isCacheAllowed();
     }
 
 }

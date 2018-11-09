@@ -19,7 +19,6 @@
  */
 package org.xwiki.uiextension.internal;
 
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,22 +69,12 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
      */
     private final String extensionPointId;
 
-    /**
-     * @see #WikiUIExtension
-     */
-    private final String roleHint;
-
     private final Provider<XWikiContext> xcontextProvider;
 
     /**
      * Parameter manager for this extension.
      */
     private WikiUIExtensionParameters parameters;
-
-    /**
-     * @see #setScope(org.xwiki.component.wiki.WikiComponentScope)
-     */
-    private WikiComponentScope scope = WikiComponentScope.WIKI;
 
     /**
      * Default constructor.
@@ -101,9 +90,8 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
     public WikiUIExtension(BaseObject baseObject, String roleHint, String id, String extensionPointId,
         ComponentManager componentManager) throws ComponentLookupException, WikiComponentException
     {
-        super(baseObject, componentManager);
+        super(baseObject, UIExtension.class, roleHint, componentManager);
 
-        this.roleHint = roleHint;
         this.id = id;
         this.extensionPointId = extensionPointId;
 
@@ -182,32 +170,15 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
     }
 
     @Override
-    public BlockAsyncRendererResult render(AsyncRenderer renderer) throws RenderingException
+    public BlockAsyncRendererResult render(AsyncRenderer renderer, boolean async, boolean cached)
+        throws RenderingException
     {
         Object obj = before();
 
         try {
-            return (BlockAsyncRendererResult) renderer.render();
+            return (BlockAsyncRendererResult) renderer.render(async, cached);
         } finally {
             after(obj);
         }
-    }
-
-    @Override
-    public Type getRoleType()
-    {
-        return UIExtension.class;
-    }
-
-    @Override
-    public String getRoleHint()
-    {
-        return this.roleHint;
-    }
-
-    @Override
-    public WikiComponentScope getScope()
-    {
-        return this.scope;
     }
 }

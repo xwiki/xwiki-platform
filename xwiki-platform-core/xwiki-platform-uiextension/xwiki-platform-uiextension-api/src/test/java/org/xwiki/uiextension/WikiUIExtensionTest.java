@@ -32,6 +32,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -119,7 +120,8 @@ public class WikiUIExtensionTest
         assertEquals(WikiComponentScope.WIKI, wikiUIX.getScope());
         assertEquals(MapUtils.EMPTY_MAP, wikiUIX.getParameters());
 
-        when(this.blockAsyncRendererExecutor.execute(any(), any())).thenReturn(new WordBlock(""));
+        when(this.blockAsyncRendererExecutor.execute(any(BlockAsyncRendererConfiguration.class), any(), any(), any()))
+            .thenReturn(new WordBlock(""));
 
         assertEquals(new WordBlock(""), wikiUIX.execute());
     }

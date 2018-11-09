@@ -30,7 +30,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
@@ -56,27 +55,25 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
 {
     private static final String SP_PANELDOC = "paneldoc";
 
-    /**
-     * Serializer used to transform the panel document reference into the panel ID, for example 'Panels.Quicklinks'.
-     */
-    private final EntityReferenceSerializer<String> serializer;
-
     private final ScriptContextManager scriptContextManager;
 
     private final Provider<XWikiContext> xcontextProvider;
 
     /**
      * @param baseObject the object containing panel setup
+     * @param id the ID of this UI extension
      * @param componentManager The XWiki content manager
      * @throws ComponentLookupException If module dependencies are missing
      * @throws WikiComponentException When failing to parse content
      */
-    public PanelWikiUIExtension(BaseObject baseObject, ComponentManager componentManager)
+    public PanelWikiUIExtension(BaseObject baseObject, String id, ComponentManager componentManager)
         throws ComponentLookupException, WikiComponentException
     {
-        super(baseObject, componentManager);
+        super(baseObject, UIExtension.class, id, componentManager);
 
-        this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        // TODO: handle scope dynamically, in the meantime it's hardcoded to "global" for backward compatibility
+        this.scope = WikiComponentScope.GLOBAL;
+
         this.scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
         this.xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
     }
@@ -84,7 +81,7 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
     @Override
     public String getId()
     {
-        return this.serializer.serialize(getDocumentReference());
+        return getRoleHint();
     }
 
     @Override
@@ -126,12 +123,13 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
     }
 
     @Override
-    public BlockAsyncRendererResult render(AsyncRenderer renderer) throws RenderingException
+    public BlockAsyncRendererResult render(AsyncRenderer renderer, boolean async, boolean cached)
+        throws RenderingException
     {
         Object obj = before();
 
         try {
-            return (BlockAsyncRendererResult) renderer.render();
+            return (BlockAsyncRendererResult) renderer.render(async, cached);
         } finally {
             after(obj);
         }

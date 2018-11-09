@@ -50,15 +50,17 @@ public class BlockAsyncRendererConfiguration
 
     private DocumentReference authorReference;
 
-    private boolean async;
+    private boolean asyncAllowed;
 
-    private boolean cached;
+    private boolean cacheAllowed;
 
     private Syntax defaultSyntax;
 
     private String transformationId;
 
     private Syntax targetSyntax;
+
+    private boolean inline;
 
     private BlockAsyncRendererDecorator decorator;
 
@@ -77,7 +79,7 @@ public class BlockAsyncRendererConfiguration
         this.block = block;
 
         // Enabled by default
-        this.async = true;
+        this.asyncAllowed = true;
     }
 
     private void addElements(Iterable<?> elements)
@@ -141,35 +143,35 @@ public class BlockAsyncRendererConfiguration
     }
 
     /**
-     * @return true if the execution should be asynchronous
+     * @return true if the execution should be asynchronous if possible
      */
-    public boolean isAsync()
+    public boolean isAsyncAllowed()
     {
-        return this.async;
+        return this.asyncAllowed;
     }
 
     /**
-     * @param async true if the execution should be asynchronous
+     * @param asyncAllowed true if the execution should be asynchronous if possible
      */
-    public void setAsync(boolean async)
+    public void setAsyncAllowed(boolean asyncAllowed)
     {
-        this.async = async;
+        this.asyncAllowed = asyncAllowed;
     }
 
     /**
      * @return true if the result cache be reused several times
      */
-    public boolean isCached()
+    public boolean isCacheAllowed()
     {
-        return cached;
+        return cacheAllowed;
     }
 
     /**
-     * @param cached true if the result cache be reused several times
+     * @param cacheAllowed true if the result cache be reused several times
      */
-    public void setCached(boolean cached)
+    public void setCacheAllowed(boolean cacheAllowed)
     {
-        this.cached = cached;
+        this.cacheAllowed = cacheAllowed;
     }
 
     /**
@@ -218,6 +220,22 @@ public class BlockAsyncRendererConfiguration
     public void setTargetSyntax(Syntax targetSyntax)
     {
         this.targetSyntax = targetSyntax;
+    }
+
+    /**
+     * @return true if the rendering should be done in an inline context
+     */
+    public boolean isInline()
+    {
+        return this.inline;
+    }
+
+    /**
+     * @param inline true if the rendering should be done in an inline context
+     */
+    public void setInline(boolean inline)
+    {
+        this.inline = inline;
     }
 
     /**

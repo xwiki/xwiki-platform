@@ -67,7 +67,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         AsyncRendererCacheEntry(AsyncRendererJobStatus status)
         {
             this.status = status;
-            this.unique = !status.getRequest().getRenderer().isCached();
+            this.unique = !status.getRequest().getRenderer().isCacheAllowed();
 
             // Avoid storing useless stuff in the RAM
             this.status.dispose();

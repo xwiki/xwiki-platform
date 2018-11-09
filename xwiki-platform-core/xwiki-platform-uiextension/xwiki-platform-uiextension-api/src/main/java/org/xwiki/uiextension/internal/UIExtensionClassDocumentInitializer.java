@@ -48,8 +48,10 @@ public class UIExtensionClassDocumentInitializer extends AbstractUIExtensionClas
     }
 
     @Override
-    protected void createClassInternal(BaseClass xclass)
+    protected void createClass(BaseClass xclass)
     {
+        super.createClass(xclass);
+
         xclass.addTextField(EXTENSION_POINT_ID_PROPERTY, "Extension Point ID", 30);
         xclass.addTextField(ID_PROPERTY, "Extension ID", 30);
         // The parameters property doesn't support wiki syntax.

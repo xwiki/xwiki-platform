@@ -32,9 +32,11 @@ import org.xwiki.rendering.async.internal.AsyncRenderer;
 public interface BlockAsyncRendererDecorator
 {
     /**
+     * @param async true if the renderer is executed asynchronously
+     * @param cached true of the result of the renderer will be cached
      * @param renderer the renderer to execute
      * @return the result of the renderer execution
      * @throws RenderingException when failing to execute the renderer
      */
-    BlockAsyncRendererResult render(AsyncRenderer renderer) throws RenderingException;
+    BlockAsyncRendererResult render(AsyncRenderer renderer, boolean async, boolean cached) throws RenderingException;
 }

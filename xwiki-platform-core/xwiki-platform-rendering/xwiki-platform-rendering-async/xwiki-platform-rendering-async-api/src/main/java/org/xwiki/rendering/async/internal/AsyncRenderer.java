@@ -39,18 +39,20 @@ public interface AsyncRenderer
     List<String> getId();
 
     /**
+     * @param async true if the renderer is executed asynchronously
+     * @param cached true of the result of the renderer will be cached
      * @return the resulting {@link String}
      * @throws RenderingException when failing to execute the renderer
      */
-    AsyncRendererResult render() throws RenderingException;
+    AsyncRendererResult render(boolean async, boolean cached) throws RenderingException;
 
     /**
      * @return true if the execution should be asynchronous
      */
-    boolean isAsync();
+    boolean isAsyncAllowed();
 
     /**
      * @return true if the result cache be reused several times
      */
-    boolean isCached();
+    boolean isCacheAllowed();
 }

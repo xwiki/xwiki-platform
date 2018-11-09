@@ -34,6 +34,7 @@ import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -58,6 +59,9 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectCompo
     @Named("current")
     private DocumentReferenceResolver<String> currentResolver;
 
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
     public EntityReference getClassReference()
     {
@@ -68,8 +72,10 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectCompo
     public List<WikiComponent> buildComponents(BaseObject baseObject) throws WikiComponentException
     {
         try {
+            String id = this.serializer.serialize(baseObject.getDocumentReference());
+
             return Collections
-                .<WikiComponent>singletonList(new PanelWikiUIExtension(baseObject, this.componentManager));
+                .<WikiComponent>singletonList(new PanelWikiUIExtension(baseObject, id, this.componentManager));
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(
                 String.format("Failed to initialize Panel UI extension [%s]", baseObject.getReference()), e);

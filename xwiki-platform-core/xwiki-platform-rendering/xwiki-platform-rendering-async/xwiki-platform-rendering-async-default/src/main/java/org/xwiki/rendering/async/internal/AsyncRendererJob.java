@@ -78,7 +78,7 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         ((DefaultAsyncContext) this.asyncContext).pushContextUse();
 
         AsyncRenderer renderer = getRequest().getRenderer();
-        AsyncRendererResult result = renderer.render();
+        AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
         getStatus().setResult(result);
         // Get suff to invalidate the cache

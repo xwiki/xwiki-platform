@@ -115,7 +115,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     public AsyncRendererJobStatus render(AsyncRenderer renderer, Set<String> contextEntries, Right right,
         EntityReference rightEntity) throws JobException, RenderingException
     {
-        boolean async = renderer.isAsync() && this.asyncContext.isEnabled();
+        boolean async = renderer.isAsyncAllowed() && this.asyncContext.isEnabled();
 
         // Get context and job id
         Map<String, Serializable> context = getContext(renderer, async, contextEntries);
@@ -123,7 +123,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         // Generate job id
         List<String> jobId = getJobId(renderer, context);
 
-        if (renderer.isCached()) {
+        if (renderer.isCacheAllowed()) {
             AsyncRendererJobStatus status = getCurrent(jobId);
 
             if (status != null) {
@@ -145,7 +145,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             }
 
             // If cache is disabled make sure the id is unique
-            if (!renderer.isCached()) {
+            if (!renderer.isCacheAllowed()) {
                 jobId.add(String.valueOf(this.uniqueId.incrementAndGet()));
             }
 
@@ -156,15 +156,13 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
             status = (AsyncRendererJobStatus) job.getStatus();
         } else {
-            if (renderer.isCached()) {
+            // If async is disabled run the renderer in the current thread
+            if (renderer.isCacheAllowed()) {
                 // Prepare to catch stuff to invalidate the cache
                 ((DefaultAsyncContext) this.asyncContext).pushContextUse();
-            }
 
-            // If async is disabled run the renderer in the current thread
-            AsyncRendererResult result = renderer.render();
+                AsyncRendererResult result = renderer.render(false, true);
 
-            if (renderer.isCached()) {
                 // Get suff to invalidate the cache
                 ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
 
@@ -176,6 +174,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
                 this.cache.put(status);
             } else {
+                AsyncRendererResult result = renderer.render(false, false);
+
                 // Ceate a pseudo job status
                 status = new AsyncRendererJobStatus(request, result);
             }
@@ -187,7 +187,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     private Map<String, Serializable> getContext(AsyncRenderer renderer, boolean async, Set<String> contextEntries)
         throws JobException
     {
-        if ((async || renderer.isCached()) && contextEntries != null) {
+        if ((async || renderer.isCacheAllowed()) && contextEntries != null) {
             try {
                 return this.contextStore.save(contextEntries);
             } catch (ComponentLookupException e) {

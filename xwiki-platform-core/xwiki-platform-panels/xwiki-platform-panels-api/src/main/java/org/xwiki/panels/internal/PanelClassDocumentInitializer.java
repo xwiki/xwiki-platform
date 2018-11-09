@@ -76,8 +76,10 @@ public class PanelClassDocumentInitializer extends AbstractUIExtensionClassDocum
     }
 
     @Override
-    protected void createClassInternal(BaseClass xclass)
+    protected void createClass(BaseClass xclass)
     {
+        super.createClass(xclass);
+
         xclass.addStaticListField("category", "Category", 1, false, "Information|Navigation|Tools|Administration|Other",
             ListClass.DISPLAYTYPE_SELECT);
         xclass.addTextAreaField("description", "Description", 40, 5, EditorType.TEXT);

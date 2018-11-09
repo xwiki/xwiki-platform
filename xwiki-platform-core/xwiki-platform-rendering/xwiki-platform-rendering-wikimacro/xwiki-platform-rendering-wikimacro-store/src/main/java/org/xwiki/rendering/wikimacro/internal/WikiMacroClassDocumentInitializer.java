@@ -23,9 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.wiki.internal.AbstractAsyncClassDocumentInitializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -39,7 +39,8 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named(WikiMacroConstants.WIKI_MACRO_CLASS)
 @Singleton
-public class WikiMacroClassDocumentInitializer extends AbstractMandatoryClassInitializer implements WikiMacroConstants
+public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumentInitializer
+    implements WikiMacroConstants
 {
     private static final String PROPERTY_PIPE = "|";
 
@@ -54,6 +55,8 @@ public class WikiMacroClassDocumentInitializer extends AbstractMandatoryClassIni
     @Override
     protected void createClass(BaseClass xclass)
     {
+        super.createClass(xclass);
+
         xclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
         xclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
         // The Macro description is using plain text (same as for Java Macros).

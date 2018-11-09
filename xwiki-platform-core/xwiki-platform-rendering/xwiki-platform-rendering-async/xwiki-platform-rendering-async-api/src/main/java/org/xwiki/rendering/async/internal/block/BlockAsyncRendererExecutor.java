@@ -65,4 +65,18 @@ public interface BlockAsyncRendererExecutor
      */
     Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries, Right right,
         EntityReference rightEntity) throws JobException, RenderingException;
+
+    /**
+     * Start and cache or return the status of the job corresponding to the passed renderer.
+     * 
+     * @param renderer the renderer to execute
+     * @param contextEntries the list of context entries required for the execution
+     * @param right the right required to access the result
+     * @param rightEntity the reference on which the right is required to access the result
+     * @return the {@link JobStatus}
+     * @throws JobException when failing to start the job
+     * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
+     */
+    Block execute(BlockAsyncRenderer renderer, Set<String> contextEntries, Right right, EntityReference rightEntity)
+        throws JobException, RenderingException;
 }

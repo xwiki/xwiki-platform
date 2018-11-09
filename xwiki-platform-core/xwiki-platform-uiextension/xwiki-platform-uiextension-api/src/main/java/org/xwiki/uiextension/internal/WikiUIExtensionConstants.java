@@ -19,6 +19,7 @@
  */
 package org.xwiki.uiextension.internal;
 
+import org.xwiki.component.wiki.internal.AbstractBaseObjectWikiComponent;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -67,26 +68,5 @@ public interface WikiUIExtensionConstants
     /**
      * Extension scope property.
      */
-    String SCOPE_PROPERTY = "scope";
-
-    /**
-     * Indicate if the asynchronous execution is allowed for this extension.
-     * 
-     * @since 10.10RC1
-     */
-    String ASYNC_ENABLED_PROPERTY = "async_enabled";
-
-    /**
-     * Indicate if caching is allowed for this UI extension.
-     * 
-     * @since 10.10RC1
-     */
-    String ASYNC_CACHED_PROPERTY = "async_cached";
-
-    /**
-     * Indicate the list of context elements required by the UI extension execution.
-     * 
-     * @since 10.10RC1
-     */
-    String ASYNC_CONTEXT_PROPERTY = "async_context";
+    String SCOPE_PROPERTY = AbstractBaseObjectWikiComponent.XPROPERTY_SCOPE;
 }

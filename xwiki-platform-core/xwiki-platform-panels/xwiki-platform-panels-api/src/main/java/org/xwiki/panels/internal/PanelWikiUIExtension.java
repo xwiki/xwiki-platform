@@ -19,7 +19,6 @@
  */
 package org.xwiki.panels.internal;
 
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 

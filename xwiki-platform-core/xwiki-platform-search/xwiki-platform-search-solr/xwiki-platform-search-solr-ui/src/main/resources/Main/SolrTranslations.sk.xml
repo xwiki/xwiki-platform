@@ -137,7 +137,7 @@ solr.facet.size.lessThan=Menej ako {0}
 solr.facet.size.moreThan=Viac ako {0}
 solr.facet.size.any=Akákoľvek veľkosť
 
-### Missing: solr.field.type=Result type
+### Missing: solr.field.type=Result Type
 solr.field.locale=jazyk
 ### Missing: solr.field.locale.emptyValue=No Language
 ### Missing: solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).

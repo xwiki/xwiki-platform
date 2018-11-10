@@ -166,7 +166,7 @@ solr.field.comment=Kommentarer
 solr.field.objcontent=Objekt
 solr.field.mimetype=Filtyp
 solr.field.attauthor=Uppladdad av
-### Missing: solr.field.attauthor_display=Uploaded By
+### Missing: solr.field.attauthor_display=Uploaded by
 solr.field.attdate=Uppladdningsdatum
 solr.field.attsize=Filstorlek
 

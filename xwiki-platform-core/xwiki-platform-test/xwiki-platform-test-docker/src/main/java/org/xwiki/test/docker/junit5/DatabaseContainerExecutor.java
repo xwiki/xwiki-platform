@@ -81,7 +81,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
         //     --explicit-defaults-for-timestamp=1
         JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
-            ? new MySQLContainer<>(String.format("mysql:%", testConfiguration.getDatabaseTag()))
+            ? new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()))
             : new MySQLContainer<>()
             .withDatabaseName(DBNAME)
             .withUsername(DBUSERNAME)

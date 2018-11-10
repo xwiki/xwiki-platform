@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -54,7 +55,8 @@ public final class DockerTestUtils
     /**
      * The folder where to save the screenshot.
      */
-    private static final String SCREENSHOT_DIR = System.getProperty("xwiki.test.ui.screenshotDirectory", "./target");
+    private static final String SCREENSHOT_DIR =
+        System.getProperty("xwiki.test.ui.screenshotDirectory", "./target/screenshots");
 
     private DockerTestUtils()
     {
@@ -133,22 +135,25 @@ public final class DockerTestUtils
     /**
      * Captures a screenshot of the browser window.
      *
-     * @param testName the name of the file in which the screenshot will be taken. A ".png" suffix will be appended
+     * @param extensionContext the test context from which to extract the failing test name
      * @param driver the Selenium Web Driver instance to use to take the screenshot
      */
-    public static void takeScreenshot(String testName, WebDriver driver)
+    public static void takeScreenshot(ExtensionContext extensionContext, WebDriver driver)
     {
         if (!(driver instanceof TakesScreenshot)) {
             LOGGER.warn("The WebDriver that is currently used doesn't support taking screenshots.");
             return;
         }
 
+        String testSimpleClass = extensionContext.getTestClass().get().getSimpleName();
+        String testName =  extensionContext.getTestMethod().get().getName();
+
         try {
             File sourceFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File screenshotFile;
             File screenshotDir = new File(SCREENSHOT_DIR);
             screenshotDir.mkdirs();
-            screenshotFile = new File(screenshotDir, testName + ".png");
+            screenshotFile = new File(screenshotDir, String.format("%s-%s.png", testSimpleClass, testName));
             FileUtils.copyFile(sourceFile, screenshotFile);
             LOGGER.info("Screenshot for failing test [{}] saved at [{}].", testName, screenshotFile.getAbsolutePath());
         } catch (Exception e) {

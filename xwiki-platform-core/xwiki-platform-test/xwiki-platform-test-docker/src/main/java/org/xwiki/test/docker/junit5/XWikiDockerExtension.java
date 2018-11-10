@@ -182,8 +182,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        DockerTestUtils.takeScreenshot(extensionContext.getTestMethod().get().getName(),
-            loadXWikiWebDriver(extensionContext));
+        DockerTestUtils.takeScreenshot(extensionContext, loadXWikiWebDriver(extensionContext));
         throw throwable;
     }
 

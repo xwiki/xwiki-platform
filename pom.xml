@@ -644,12 +644,11 @@
               <extensionOverride>
                 <!-- Right id of the JAXB reference implementation -->
                 <id>org.glassfish.jaxb:jaxb-runtime</id>
-                <features>com.sun.xml.bind:jaxb-impl</features>
-              </extensionOverride>
-              <extensionOverride>
-                <!-- Right id of the JAXB reference implementation -->
-                <id>org.glassfish.jaxb:jaxb-core</id>
-                <features>com.sun.xml.bind:jaxb-core</features>
+                <features>
+                  com.sun.xml.bind:jaxb-impl,
+                  org.glassfish.jaxb:jaxb-core,
+                  com.sun.xml.bind:jaxb-core
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <!-- Open Java is the same as JSON-Java but with a different license -->

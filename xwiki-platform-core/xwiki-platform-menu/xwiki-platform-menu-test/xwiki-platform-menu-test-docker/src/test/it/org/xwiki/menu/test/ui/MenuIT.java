@@ -43,6 +43,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 10.6RC1
  */
+// Examples of various configurations:
+//@UITest(database = Database.MYSQL, databaseTag = "5", servletEngine = ServletEngine.TOMCAT, servletEngineTag = "8",
+//  browser = Browser.CHROME, verbose = true)
+//@UITest(database = Database.POSTGRESQL, databaseTag = "9", servletEngine = ServletEngine.JETTY,
+//  servletEngineTag = "9", browser = Browser.CHROME, verbose = true)
+//@UITest(database = Database.HSQLDB_EMBEDDED, servletEngine = ServletEngine.JETTY_STANDALONE,
+//  browser = Browser.FIREFOX, verbose = true)
 @UITest
 public class MenuIT
 {

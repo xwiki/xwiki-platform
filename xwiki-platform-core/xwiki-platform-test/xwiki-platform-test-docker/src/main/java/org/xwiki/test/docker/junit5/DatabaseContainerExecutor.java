@@ -80,9 +80,13 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
         //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
         //     --explicit-defaults-for-timestamp=1
-        JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
-            ? new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()))
-            : new MySQLContainer<>()
+        JdbcDatabaseContainer databaseContainer;
+        if (testConfiguration.getDatabaseTag() != null) {
+            databaseContainer = new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()));
+        } else {
+            databaseContainer = new MySQLContainer<>();
+        }
+        databaseContainer
             .withDatabaseName(DBNAME)
             .withUsername(DBUSERNAME)
             .withPassword(DBPASSWORD);
@@ -105,9 +109,14 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
         //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
         //     -e POSTGRES_DB=xwiki -e POSTGRES_INITDB_ARGS="--encoding=UTF8" -d postgres:9.5
-        JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
-            ? new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()))
-            : new PostgreSQLContainer<>()
+        JdbcDatabaseContainer databaseContainer;
+        if (testConfiguration.getDatabaseTag() != null) {
+            databaseContainer =
+                new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()));
+        } else {
+            databaseContainer = new PostgreSQLContainer<>();
+        }
+        databaseContainer
             .withDatabaseName(DBNAME)
             .withUsername(DBUSERNAME)
             .withPassword(DBPASSWORD);
@@ -126,8 +135,13 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private void startOracleContainer(TestConfiguration testConfiguration)
     {
-        JdbcDatabaseContainer databaseContainer = testConfiguration.getDatabaseTag() != null
-            ? new OracleContainer(testConfiguration.getDatabaseTag()) : new OracleContainer()
+        JdbcDatabaseContainer databaseContainer;
+        if (testConfiguration.getDatabaseTag() != null) {
+            databaseContainer = new OracleContainer(testConfiguration.getDatabaseTag());
+        } else {
+            databaseContainer = new OracleContainer();
+        }
+        databaseContainer
             .withDatabaseName(DBNAME)
             .withUsername(DBUSERNAME)
             .withPassword(DBPASSWORD);

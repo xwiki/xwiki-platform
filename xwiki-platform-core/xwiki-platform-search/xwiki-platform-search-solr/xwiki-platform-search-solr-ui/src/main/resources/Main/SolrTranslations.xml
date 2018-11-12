@@ -40,6 +40,7 @@
 solr.admin.submit=Apply
 solr.admin.error.notallowed=You are not allowed to perform this action.
 solr.admin.error.norights=Administration rights are required to access this section.
+solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Queue size

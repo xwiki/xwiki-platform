@@ -173,7 +173,7 @@
       {{error}}$message{{/error}}
     #end
   #elseif (!$isAjaxRequest)
-    {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully triggered.{{/success}}
+    {{success}}$services.localization.render('solr.admin.success.action', $escapetool.xml($stringtool.capitalize($request.action))){{/success}}
     ## Only administrators with programmings rights are allowed to execute a custom query.
     #if ($hasProgramming &amp;&amp; !$stringtool.isBlank($request.customQuery))
 

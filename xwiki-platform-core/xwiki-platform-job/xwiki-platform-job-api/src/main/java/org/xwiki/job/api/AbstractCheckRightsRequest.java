@@ -28,8 +28,6 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 10.10RC1
- * @since 10.8.2
- * @since 9.11.9
  */
 @Unstable
 public abstract class AbstractCheckRightsRequest extends AbstractRequest
@@ -48,32 +46,6 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
      * @see #isCheckRights()
      */
     private static final String PROPERTY_CHECK_RIGHTS = "checkrights";
-
-    /**
-     * @see #isCheckAuthorRights()
-     */
-    private static final String PROPERTY_CHECK_AUTHOR_RIGHTS = "checkAuthorRights";
-
-    /**
-     * @return {@code true} in case the job should check if the author specified by {@link #getAuthorReference()} is
-     *          authorized to perform the actions implied by this request, {@code false} otherwise
-     */
-    public boolean isCheckAuthorRights()
-    {
-        return getProperty(PROPERTY_CHECK_AUTHOR_RIGHTS, true);
-    }
-
-    /**
-     * Sets whether the job should check or not if the user specified by {@link #getAuthorReference()} is authorized to
-     * perform the actions implied by this request.
-     *
-     * @param checkAuthorRights {@code true} to check if {@link #getAuthorReference()} is authorized to perform this
-     *      request, {@code false} to perform this request without checking rights
-     */
-    public void setCheckAuthorRights(boolean checkAuthorRights)
-    {
-        setProperty(PROPERTY_CHECK_AUTHOR_RIGHTS, checkAuthorRights);
-    }
 
     /**
      * @return {@code true} in case the job should check if the user specified by {@link #getUserReference()} is
@@ -119,6 +91,9 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
     /**
      * @return the author of the script which is performing the request; this user must be authorized to perform the
      * actions implied by this request if {@link #isCheckRights()} is {@code true}.
+     * @since 10.10RC1
+     * @since 10.8.2
+     * @since 9.11.9
      */
     public DocumentReference getAuthorReference()
     {
@@ -130,6 +105,9 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
      * actions implied by this request if {@link #isCheckRights()} is {@code true}.
      *
      * @param authorReference the author reference
+     * @since 10.10RC1
+     * @since 10.8.2
+     * @since 9.11.9
      */
     public void setAuthorReference(DocumentReference authorReference)
     {

@@ -37,6 +37,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -51,7 +52,6 @@ import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.RestoreRequest;
-import org.xwiki.refactoring.internal.job.UserOrientedRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -565,7 +565,7 @@ public class RefactoringScriptService implements ScriptService
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
      */
-    private Job execute(String type, UserOrientedRequest request)
+    private Job execute(String type, AbstractCheckRightsRequest request)
     {
         setError(null);
 
@@ -582,13 +582,7 @@ public class RefactoringScriptService implements ScriptService
         }
     }
 
-    private void setRightsProperties(UserOrientedRequest request)
-    {
-        request.setCheckRights(true);
-        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
-    }
-
-    private void setRightsProperties(AbstractDeletedDocumentsRequest request)
+    private void setRightsProperties(AbstractCheckRightsRequest request)
     {
         request.setCheckRights(true);
         request.setUserReference(this.documentAccessBridge.getCurrentUserReference());

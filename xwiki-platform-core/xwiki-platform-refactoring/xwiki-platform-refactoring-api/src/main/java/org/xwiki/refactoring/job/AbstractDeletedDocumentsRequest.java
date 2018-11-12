@@ -21,10 +21,8 @@ package org.xwiki.refactoring.job;
 
 import java.util.List;
 
-import org.xwiki.job.AbstractRequest;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.refactoring.internal.job.UserOrientedRequest;
 
 /**
  * A job request that can be used for handling deleted documents from the recycle bin.
@@ -32,20 +30,11 @@ import org.xwiki.refactoring.internal.job.UserOrientedRequest;
  * @version $Id$
  * @since 10.10RC1
  */
-public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest implements UserOrientedRequest
+public abstract class AbstractDeletedDocumentsRequest extends AbstractCheckRightsRequest
 {
     private static final String BATCH_ID = "batchId";
 
     private static final String DELETED_DOCUMENT_IDS = "deletedDocumentIds";
-
-    private static final String CHECK_RIGHTS = "checkRights";
-
-    private static final String USER_REFERENCE = "userReference";
-    
-    /**
-     * @see #getAuthorReference()
-     */
-    private static final String PROPERTY_CALLER_REFERENCE = "caller.reference";
 
     private static final String WIKI_REFERENCE = "wikiReference";
 
@@ -87,45 +76,6 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest im
     }
 
     /**
-     * @return whether or not to check the rights of the user executing the operation
-     */
-    @Override
-    public boolean isCheckRights()
-    {
-        return getProperty(CHECK_RIGHTS, true);
-    }
-
-    /**
-     * @param checkRights whether or not to check the rights of the user executing the operation
-     */
-    @Override
-    public void setCheckRights(boolean checkRights)
-    {
-        setProperty(CHECK_RIGHTS, checkRights);
-
-    }
-
-    /**
-     * @return the user executing the handle operation. This is also the user for which any rights might be checked if
-     *         {@link #setCheckRights(boolean)} is enabled
-     */
-    @Override
-    public DocumentReference getUserReference()
-    {
-        return getProperty(USER_REFERENCE);
-    }
-
-    /**
-     * @param userReference the user executing the handle operation. This is also the user for which any rights
-     *            might be checked if {@link #setCheckRights(boolean)} is enabled
-     */
-    @Override
-    public void setUserReference(DocumentReference userReference)
-    {
-        setProperty(USER_REFERENCE, userReference);
-    }
-
-    /**
      * @return the wiki on which the handle operation is performed
      */
     public WikiReference getWikiReference()
@@ -139,29 +89,5 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractRequest im
     public void setWikiReference(WikiReference wikiReference)
     {
         setProperty(WIKI_REFERENCE, wikiReference);
-    }
-
-    /**
-     * @return the author of the script which is performing the request; this user must be authorized to perform the
-     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
-     * @since 10.10RC1
-     */
-    @Override
-    public DocumentReference getAuthorReference()
-    {
-        return getProperty(PROPERTY_CALLER_REFERENCE);
-    }
-
-    /**
-     * Sets the author of the script which is performing the request. This user must be authorized to perform the
-     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
-     *
-     * @param authorReference the author reference
-     * @since 10.10RC1
-     */
-    @Override
-    public void setAuthorReference(DocumentReference authorReference)
-    {
-        setProperty(PROPERTY_CALLER_REFERENCE, authorReference);
     }
 }

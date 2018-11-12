@@ -40,7 +40,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

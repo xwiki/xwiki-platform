@@ -744,6 +744,10 @@
                   net.sf.json-lib:json-lib:jdk13
                 </features>
               </extensionOverride>
+              <extensionOverride>
+                <id>javax.activation:javax.activation-api</id>
+                <features>javax.activation:activation</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

@@ -40,6 +40,7 @@
 ### Missing: solr.admin.submit=Apply
 ### Missing: solr.admin.error.notallowed=You are not allowed to perform this action.
 ### Missing: solr.admin.error.norights=Administration rights are required to access this section.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Estado
 ### Missing: solr.admin.status.queueSize.label=Queue size

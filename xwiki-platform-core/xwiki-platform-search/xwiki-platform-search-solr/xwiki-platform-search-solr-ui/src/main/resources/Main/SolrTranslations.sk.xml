@@ -40,6 +40,7 @@
 solr.admin.submit=Aplikovať
 solr.admin.error.notallowed=Nemáte oprávnenie na vykonávanie akcie.
 solr.admin.error.norights=Aby ste mohli pokračovať potrebujete administrátorské práva.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Stav
 solr.admin.status.queueSize.label=Veľkosť fronty

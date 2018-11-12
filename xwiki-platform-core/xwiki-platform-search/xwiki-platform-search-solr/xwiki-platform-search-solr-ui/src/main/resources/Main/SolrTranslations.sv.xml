@@ -40,6 +40,7 @@
 solr.admin.submit=Utför
 solr.admin.error.notallowed=Du har ej rättigheter att genomföra denna operation.
 solr.admin.error.norights=Administrationsrättigheter krävs för tillgång till denna sektion.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Köstorlek

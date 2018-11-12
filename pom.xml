@@ -675,45 +675,45 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcprov-jdk15on</id>
                 <features>
-                  bouncycastle:bcprov-jdk16
-                  bouncycastle:bcprov-jdk15
-                  bouncycastle:bcprov-jdk14
-                  bouncycastle:bcprov-jdk13
-                  bouncycastle:bcprov-jdk12
-                  org.bouncycastle:bcprov-jdk16
-                  org.bouncycastle:bcprov-jdk15
-                  org.bouncycastle:bcprov-jdk14
-                  org.bouncycastle:bcprov-jdk13
+                  bouncycastle:bcprov-jdk16,
+                  bouncycastle:bcprov-jdk15,
+                  bouncycastle:bcprov-jdk14,
+                  bouncycastle:bcprov-jdk13,
+                  bouncycastle:bcprov-jdk12,
+                  org.bouncycastle:bcprov-jdk16,
+                  org.bouncycastle:bcprov-jdk15,
+                  org.bouncycastle:bcprov-jdk14,
+                  org.bouncycastle:bcprov-jdk13,
                   org.bouncycastle:bcprov-jdk12
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>org.bouncycastle:bcpkix-jdk15on</id>
                 <features>
-                  bouncycastle:bcpkix-jdk16
-                  bouncycastle:bcpkix-jdk15
-                  bouncycastle:bcpkix-jdk14
-                  bouncycastle:bcpkix-jdk13
-                  bouncycastle:bcpkix-jdk12
-                  org.bouncycastle:bcpkix-jdk16
-                  org.bouncycastle:bcpkix-jdk15
-                  org.bouncycastle:bcpkix-jdk14
-                  org.bouncycastle:bcpkix-jdk13
+                  bouncycastle:bcpkix-jdk16,
+                  bouncycastle:bcpkix-jdk15,
+                  bouncycastle:bcpkix-jdk14,
+                  bouncycastle:bcpkix-jdk13,
+                  bouncycastle:bcpkix-jdk12,
+                  org.bouncycastle:bcpkix-jdk16,
+                  org.bouncycastle:bcpkix-jdk15,
+                  org.bouncycastle:bcpkix-jdk14,
+                  org.bouncycastle:bcpkix-jdk13,
                   org.bouncycastle:bcpkix-jdk12
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk15on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16
-                  bouncycastle:bcmail-jdk15
-                  bouncycastle:bcmail-jdk14
-                  bouncycastle:bcmail-jdk13
-                  bouncycastle:bcmail-jdk12
-                  org.bouncycastle:bcmail-jdk16
-                  org.bouncycastle:bcmail-jdk15
-                  org.bouncycastle:bcmail-jdk14
-                  org.bouncycastle:bcmail-jdk13
+                  bouncycastle:bcmail-jdk16,
+                  bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk14,
+                  bouncycastle:bcmail-jdk13,
+                  bouncycastle:bcmail-jdk12,
+                  org.bouncycastle:bcmail-jdk16,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk14,
+                  org.bouncycastle:bcmail-jdk13,
                   org.bouncycastle:bcmail-jdk12
                 </features>
               </extensionOverride>
@@ -740,7 +740,7 @@
               <extensionOverride>
                 <id>net.sf.json-lib:json-lib:jdk15</id>
                 <features>
-                  net.sf.json-lib:json-lib
+                  net.sf.json-lib:json-lib,
                   net.sf.json-lib:json-lib:jdk13
                 </features>
               </extensionOverride>

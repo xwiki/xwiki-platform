@@ -95,19 +95,26 @@ public class PageClassPropertyValuesProvider extends AbstractDocumentListClassPr
 
     private String getLabel(EntityReference entityReference)
     {
-        String label;
+        String label = null;
         try {
             XWikiContext xcontext = this.xcontextProvider.get();
-            XWikiDocument document;
-            document = xcontext.getWiki().getDocument(entityReference, xcontext).getTranslatedDocument(xcontext);
-            label = document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
+            XWikiDocument document = xcontext.getWiki().getDocument(entityReference, xcontext);
+            if (document != null) {
+                document = document.getTranslatedDocument(xcontext);
+            }
+            if (document != null) {
+                label = document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
+            }
         } catch (XWikiException e) {
             this.logger.error("Error while loading the document [{}]. Root cause is [{}]", entityReference,
                 ExceptionUtils.getRootCause(e));
-            if (entityReference instanceof DocumentReference) {
-                label = super.getLabel((DocumentReference) entityReference, "");
-            } else {
-                label = entityReference.getName();
+        } finally {
+            if (label == null) {
+                if (entityReference instanceof DocumentReference) {
+                    label = super.getLabel((DocumentReference) entityReference, "");
+                } else {
+                    label = entityReference.getName();
+                }
             }
         }
         return label;

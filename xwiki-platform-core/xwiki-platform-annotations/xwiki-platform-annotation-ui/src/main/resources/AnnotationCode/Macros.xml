@@ -253,7 +253,7 @@
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
   &lt;span class="annotationTools"&gt;
     #if($mode != 'create' &amp;&amp; $services.annotations.canEditAnnotation($ann.id, $docRef))
-      #set($isUserComment = $services.model.resolveDocument($ann.author, 'current') == $xcontext.userReference)
+      #set($isUserComment = $services.model.resolveDocument("$!ann.getValue('author')", 'user') == $xcontext.userReference)
       #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
       #if ("$!{ann.state}" == 'UPDATED')
         &lt;span class="tool accept"&gt;&lt;a class="validate" href="${editURL}" title="$services.localization.render('annotations.action.validate.tooltip')"&gt;$services.localization.render('annotations.action.validate.text')&lt;/a&gt;&lt;/span&gt;

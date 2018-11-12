@@ -33,7 +33,7 @@
   <description>Make it possible to implement a component in a wiki page, using wiki objects</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>46</xwiki.pitest.mutationThreshold>
+    <xwiki.pitest.mutationThreshold>45</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Component API</xwiki.extension.name>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->

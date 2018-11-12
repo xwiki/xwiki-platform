@@ -108,6 +108,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         // Execute the renderer
         Block result;
         try {
+            // TODO: add right checking (view on current document ?)
             result = this.executor.execute(renderer, this.contextEntries, null, null);
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to execute wiki macro", e);

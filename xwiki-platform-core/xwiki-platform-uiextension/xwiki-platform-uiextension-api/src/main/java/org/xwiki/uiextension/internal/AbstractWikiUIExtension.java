@@ -21,8 +21,6 @@ package org.xwiki.uiextension.internal;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -111,13 +109,8 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         try {
             BlockAsyncRendererConfiguration executorConfiguration = configure();
 
-            Set<String> entries = new HashSet<>();
-            if (this.contextEntries != null) {
-                entries.addAll(this.contextEntries);
-            }
-
             // TODO: add right checking (view on current document ?)
-            result = this.executor.execute(executorConfiguration, entries, null, null);
+            result = this.executor.execute(executorConfiguration, this.contextEntries, null, null);
         } catch (Exception e) {
             result = new CompositeBlock(this.errorBlockGenerator
                 .generateErrorBlocks(String.format("Failed to execute UIX with id [%s]", getId()), e, false));

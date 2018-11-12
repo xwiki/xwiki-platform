@@ -137,12 +137,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Async -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-async-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Core extension (what we absolutely require in a minimum XWiki runtime) -->

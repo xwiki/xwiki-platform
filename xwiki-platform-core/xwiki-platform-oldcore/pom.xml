@@ -275,6 +275,11 @@
       <groupId>com.sun.mail</groupId>
       <artifactId>javax.mail</artifactId>
     </dependency>
+    <!-- Replace the version triggered by javax.mail by a more accurate one -->
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>javax.activation-api</artifactId>
+    </dependency>
 
     <!-- Other XWiki modules -->
     <dependency>

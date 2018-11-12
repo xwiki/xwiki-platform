@@ -131,6 +131,16 @@
             <artifactId>cxf-rt-rs-client</artifactId>
             <groupId>org.apache.cxf</groupId>
           </exclusion>
+          <!-- Now merged with jaxb-runtime -->
+          <exclusion>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-core</artifactId>
+          </exclusion>
+          <!-- Artifact id changed -->
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->

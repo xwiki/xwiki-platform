@@ -25,7 +25,11 @@ import org.xwiki.rendering.RenderingException;
 import org.xwiki.stability.Unstable;
 
 /**
- * Execute a task and return a String result.
+ * Execute a task and return a {@link AsyncRendererResult} containing the resulting String (and possibly other more
+ * specific results by extending AsyncRendererResult).
+ * <p>
+ * It also give various information about the constraints of that task to {@link AsyncRendererExecutor} (the id prefix
+ * to use to generate the id of the execution, should the result be cached, is asynchronous execution allowed, etc.).
  * 
  * @version $Id$
  * @since 10.10RC1
@@ -52,7 +56,7 @@ public interface AsyncRenderer
     boolean isAsyncAllowed();
 
     /**
-     * @return true if the result cache be reused several times
+     * @return true if the result be reused several times
      */
     boolean isCacheAllowed();
 }

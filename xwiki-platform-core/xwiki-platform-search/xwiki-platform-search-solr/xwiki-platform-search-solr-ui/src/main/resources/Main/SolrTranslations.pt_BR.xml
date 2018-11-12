@@ -40,6 +40,7 @@
 solr.admin.submit=Aplicar
 solr.admin.error.notallowed=Não é permitido para você executar essa ação.
 solr.admin.error.norights=Privilégios de administrador sãoo necessários para acessar essa seção.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Tamanho da Fila

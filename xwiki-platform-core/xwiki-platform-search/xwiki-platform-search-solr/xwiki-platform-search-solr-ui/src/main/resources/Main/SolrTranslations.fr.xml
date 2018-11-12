@@ -40,6 +40,7 @@
 solr.admin.submit=Appliquer
 solr.admin.error.notallowed=Vous n'êtes pas autorisé(e) à effectuer cette action.
 solr.admin.error.norights=Les droits d'administration sont nécessaires pour accéder à cette section.
+solr.admin.success.action=Le traitement {0} a été déclenché.
 
 solr.admin.status.title=Statut
 solr.admin.status.queueSize.label=Taille de la file d'attente

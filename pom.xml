@@ -727,7 +727,10 @@
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.mail:javax.mail</id>
-                <features>javax.mail:mail</features>
+                <features>
+                  javax.mail:mail,
+                  javax.mail:mailapi
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>xml-apis:xml-apis</id>

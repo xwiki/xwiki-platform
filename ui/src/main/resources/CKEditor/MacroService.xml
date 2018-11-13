@@ -61,20 +61,30 @@
 ## }
 ## ================================================================
 #macro (getMacroList $syntaxId)
-  #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
   #set ($syntax = $services.rendering.resolveSyntax($syntaxId))
+  #set ($macroDescriptors = $services.rendering.getMacroDescriptors($syntax))
+  #if (!$macroDescriptors)
+    ## Before XWiki 9.7RC1 we had to use APIs that require programming rights.
+    #set ($macroDescriptors = [])
+    #try()
+      #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
+      #foreach ($macroId in $macroManager.getMacroIds($syntax))
+        #set ($macroDescriptor = $macroManager.getMacro($macroId).descriptor)
+        #set ($discard = $macroDescriptors.add($macroDescriptor))
+      #end
+    #end
+  #end
   #set ($data = {})
   #set ($allMacrosExcludedCategories = [])
   #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Internal' 'Internal')"))
   #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Deprecated' 'Deprecated')"))
   #set ($discard = $data.put('options', { 'allMacrosExcludedCategories' : $allMacrosExcludedCategories }))
   #set ($macroList = [])
-  #foreach ($macroId in $macroManager.getMacroIds($syntax))
-    #set ($macroDescriptor = $macroManager.getMacro($macroId).descriptor)
-    #set ($macroTranslationKey = "rendering.macro.$macroId")
+  #foreach ($macroDescriptor in $macroDescriptors)
+    #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
     #set ($macroCategoryTranslationKey = "rendering.macroCategory.$macroDescriptor.defaultCategory")
     #set ($discard = $macroList.add({
-      'id': $macroId,
+      'id': $macroDescriptor.id,
       'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
       'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
       'defaultCategory': "#maybeTranslate($macroCategoryTranslationKey $macroDescriptor.defaultCategory)"
@@ -85,25 +95,49 @@
 #end
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)
-  #set ($macroIdFactory = $services.component.getInstance('org.xwiki.rendering.macro.MacroIdFactory'))
-  #set ($macroId = $macroIdFactory.createMacroId($macroIdAsString))
-  #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
-  #if ($macroManager.exists($macroId))
-    #getMacroDescriptor($macroId)
-  #elseif ($macroId.syntax)
-    ## Try the macro id without the syntax.
-    #set ($macroId = $macroIdFactory.createMacroId($macroId.id))
+  #set ($macroDescriptor = $NULL)
+  #set ($macroId = $services.rendering.resolveMacroId($macroIdAsString))
+  #if ($macroId)
+    #set ($macroDescriptor = $services.rendering.getMacroDescriptor($macroId))
+    #if (!$macroDescriptor &amp;&amp; $macroId.syntax)
+      ## Try the macro id without the syntax.
+      #set ($macroId = $services.rendering.resolveMacroId($macroId.id))
+      #set ($macroDescriptor = $services.rendering.getMacroDescriptor($macroId))
+    #end
+  #else
+    ## Either the macro id could not be resolved (unlikely) or we are on an older XWiki instance (before 10.10RC1) where
+    ## we had to use APIs that require programming rights.
+    #getMacroWithPR($macroIdAsString)
+    #if ($xmacro)
+      #set ($macroDescriptor = $xmacro.descriptor)
+    #end
+  #end
+  #if ($macroDescriptor)
+    #getMacroDescriptor($macroDescriptor)
+  #end
+#end
+
+#macro (getMacroWithPR $macroIdAsString)
+  #set ($xmacro = $NULL)
+  #try()
+    #set ($macroIdFactory = $services.component.getInstance('org.xwiki.rendering.macro.MacroIdFactory'))
+    #set ($macroId = $macroIdFactory.createMacroId($macroIdAsString))
+    #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
     #if ($macroManager.exists($macroId))
-      #getMacroDescriptor($macroId)
+      #set ($xmacro = $macroManager.getMacro($macroId))
+    #elseif ($macroId.syntax)
+      ## Try the macro id without the syntax.
+      #set ($macroId = $macroIdFactory.createMacroId($macroId.id))
+      #if ($macroManager.exists($macroId))
+        #set ($xmacro = $macroManager.getMacro($macroId))
+      #end
     #end
   #end
 #end
 
-#macro (getMacroDescriptor $macroId)
-  #set ($macro = $macroManager.getMacro($macroId))
-  #set ($macroDescriptor = $macro.descriptor)
+#macro (getMacroDescriptor $macroDescriptor)
   ## Translate the macro name and description.
-  #set ($macroTranslationKey = "rendering.macro.$macroId")
+  #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
   #set ($data = {
     'id': $macroDescriptor.id,
     'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",

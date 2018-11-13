@@ -49,6 +49,10 @@
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -63,6 +67,10 @@
         <exclusion>
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -79,6 +87,10 @@
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -93,6 +105,10 @@
         <exclusion>
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -109,6 +125,10 @@
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -123,6 +143,10 @@
         <exclusion>
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -139,6 +163,10 @@
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -154,7 +182,15 @@
           <artifactId>slf4j-nop</artifactId>
           <groupId>org.slf4j</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>javax.mail</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

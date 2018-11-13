@@ -125,7 +125,7 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
     {
         // We need to clone the block to avoid transforming the original and make it useless after the first
         // transformation
-        XDOM transformedBlock = this.xdom;
+        XDOM transformedBlock = this.xdom.clone();
 
         BlockAsyncRendererConfiguration executorConfiguration =
             new BlockAsyncRendererConfiguration(Arrays.asList("uix", getId()), transformedBlock);

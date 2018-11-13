@@ -134,7 +134,8 @@
   ##
   ## Display the menu only if the content is not blank
   ##
-  #if ($stringtool.isNotBlank($menuContent.toString()))
+  #set ($cachedMenuContent = $menuContent.toString())
+  #if ($stringtool.isNotBlank($cachedMenuContent))
     &lt;li class="dropdown" id="tmNotifications"&gt;
       &lt;a class="icon-navbar dropdown-toggle" data-toggle="dropdown" role="button"
       title="$services.localization.render('watchlist.notification.tooltip')"&gt;
@@ -144,7 +145,7 @@
         $services.icon.renderHTML('bell')
       &lt;/a&gt;
       &lt;ul class="dropdown-menu"&gt;
-        $menuContent
+        $cachedMenuContent
       &lt;/ul&gt;
     &lt;/li&gt;
   #end

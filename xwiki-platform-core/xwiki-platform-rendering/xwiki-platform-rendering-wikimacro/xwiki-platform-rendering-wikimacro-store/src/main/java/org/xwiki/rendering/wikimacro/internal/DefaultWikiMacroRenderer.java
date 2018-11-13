@@ -398,7 +398,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         TransformationContext transformationContext = new TransformationContext(xdom, this.wikimacro.getSyntax());
         transformationContext.setTargetSyntax(this.targetSyntax);
-        if (async) {
+        if (!async) {
+            // In synchronized mode keep current transformation id
             transformationContext.setId(this.syncContext.getTransformationContext().getId());
         }
 

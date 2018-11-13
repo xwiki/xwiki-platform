@@ -20,7 +20,9 @@
 package org.xwiki.rendering.async.internal;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.component.descriptor.ComponentRole;
@@ -52,6 +54,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     private Set<Type> roleTypes;
 
     private Set<ComponentRole<?>> roles;
+
+    private Map<String, Collection<Object>> uses;
 
     /**
      * @param request the request provided when started the job
@@ -88,7 +92,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
      * @param roles the involved components
      */
     AsyncRendererJobStatus(AsyncRendererJobRequest request, AsyncRendererResult result, Set<EntityReference> references,
-        Set<Type> roleTypes, Set<ComponentRole<?>> roles)
+        Set<Type> roleTypes, Set<ComponentRole<?>> roles, Map<String, Collection<Object>> uses)
     {
         super(JOBTYPE, request, null, null, null);
 
@@ -96,6 +100,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         setReference(references);
         setRoleTypes(roleTypes);
         setRoles(roles);
+        setUses(uses);
 
         setState(State.FINISHED);
     }
@@ -166,6 +171,22 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         if (roles != null) {
             this.roles = Collections.unmodifiableSet(roles);
         }
+    }
+
+    /**
+     * @return the custom uses values
+     */
+    public Map<String, Collection<Object>> getUses()
+    {
+        return this.uses;
+    }
+
+    /**
+     * @param uses the custom uses values
+     */
+    public void setUses(Map<String, Collection<Object>> uses)
+    {
+        this.uses = uses;
     }
 
     /**

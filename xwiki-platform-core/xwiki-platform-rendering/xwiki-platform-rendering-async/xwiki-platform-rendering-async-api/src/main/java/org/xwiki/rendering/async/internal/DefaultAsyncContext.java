@@ -20,9 +20,13 @@
 package org.xwiki.rendering.async.internal;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -61,6 +65,8 @@ public class DefaultAsyncContext implements AsyncContext
 
         private final Set<ComponentRole<?>> roles = new HashSet<>();
 
+        private final Map<String, Collection<Object>> uses = new HashMap<>();
+
         /**
          * @return the references
          */
@@ -83,6 +89,14 @@ public class DefaultAsyncContext implements AsyncContext
         public Set<ComponentRole<?>> getRoles()
         {
             return this.roles;
+        }
+
+        /**
+         * @return the custom values associated with a cached execution result
+         */
+        public Map<String, Collection<Object>> getUses()
+        {
+            return this.uses;
         }
     }
 
@@ -197,6 +211,23 @@ public class DefaultAsyncContext implements AsyncContext
 
         if (contextUse != null) {
             contextUse.roles.add(new DefaultComponentRole<>(roleType, roleHint));
+        }
+    }
+
+    @Override
+    public void use(String type, Object value)
+    {
+        ContextUse contextUse = getContextUse();
+
+        if (contextUse != null) {
+            Collection<Object> values = contextUse.uses.get(type);
+
+            if (values == null) {
+                values = new ArrayList<>();
+                contextUse.uses.put(type, values);
+            }
+
+            values.add(value);
         }
     }
 }

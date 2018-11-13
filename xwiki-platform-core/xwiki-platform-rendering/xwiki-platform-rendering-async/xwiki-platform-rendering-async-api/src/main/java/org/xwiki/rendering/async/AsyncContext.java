@@ -67,11 +67,17 @@ public interface AsyncContext
     void useComponent(Type roleType);
 
     /**
-     * Indicate that the current execution manipulate component wit the passed type and hint and the result will need to
-     * be removed from the cache if it's registered or unregistered.
+     * Indicate that the current execution manipulate component with the passed type and hint and the result will need
+     * to be removed from the cache if it's registered or unregistered.
      * 
      * @param roleType the type of the component role
      * @param roleHint the hint of the component
      */
     void useComponent(Type roleType, String roleHint);
+
+    /**
+     * @param type the type of data to associated with the cached result
+     * @param value the value to associated with the cached result
+     */
+    void use(String type, Object value);
 }

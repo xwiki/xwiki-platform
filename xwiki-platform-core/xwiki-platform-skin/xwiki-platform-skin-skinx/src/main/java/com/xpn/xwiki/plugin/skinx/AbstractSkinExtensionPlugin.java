@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -82,6 +83,8 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * @see #getCurrentDocumentReferenceResolver()
      */
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    private SkinExtensionAsync async;
 
     /**
      * XWiki plugin constructor.
@@ -134,6 +137,12 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         return new SkinExtensionPluginApi((AbstractSkinExtensionPlugin) plugin, context);
     }
 
+    private void useResource(String resource, XWikiContext context)
+    {
+        LOGGER.debug("Using [{}] as [{}] extension", resource, this.getName());
+        getPulledResources(context).add(resource);
+    }
+
     /**
      * Mark a resource as used in the current result. A resource is registered only once per request, further calls will
      * not result in additional links, even if it is pulled with different parameters.
@@ -144,11 +153,14 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      */
     public void use(String resource, XWikiContext context)
     {
-        LOGGER.debug("Using [{}] as [{}] extension", resource, this.getName());
-        getPulledResources(context).add(resource);
+        useResource(resource, context);
+
         // In case a previous call added some parameters, remove them, since the last call for a resource always
         // discards previous ones.
         getParametersMap(context).remove(resource);
+
+        // Register the use of the resource in case the current execution is an asynchronous renderer
+        getSkinExtensionAsync().use(getName(), resource, null);
     }
 
     /**
@@ -166,8 +178,12 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      */
     public void use(String resource, Map<String, Object> parameters, XWikiContext context)
     {
-        use(resource, context);
+        useResource(resource, context);
+
+        // Associate parameters to the resource
         getParametersMap(context).put(resource, parameters);
+
+        getSkinExtensionAsync().use(getName(), resource, parameters);
     }
 
     /**
@@ -391,5 +407,15 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         }
 
         return this.currentDocumentReferenceResolver;
+    }
+
+    protected SkinExtensionAsync getSkinExtensionAsync()
+    {
+        if (this.async == null) {
+            this.async =
+                Utils.getComponent(SkinExtensionAsync.class);
+        }
+
+        return this.async;
     }
 }

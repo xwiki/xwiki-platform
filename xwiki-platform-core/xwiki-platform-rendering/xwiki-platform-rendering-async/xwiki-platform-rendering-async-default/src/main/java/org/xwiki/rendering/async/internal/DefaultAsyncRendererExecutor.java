@@ -21,6 +21,7 @@ package org.xwiki.rendering.async.internal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,8 +34,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -43,6 +46,7 @@ import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
 import org.xwiki.security.authorization.Right;
 
@@ -71,6 +75,13 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
     @Inject
     private AsyncContext asyncContext;
+
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
 
     private AtomicLong uniqueId = new AtomicLong();
 
@@ -127,6 +138,10 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             AsyncRendererJobStatus status = getCurrent(jobId);
 
             if (status != null) {
+                if (status.getResult() != null) {
+                    injectUses(status);
+                }
+
                 return status;
             }
         }
@@ -168,7 +183,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
                 // Create a pseudo job status
                 status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),
-                    contextUse.getRoleTypes(), contextUse.getRoles());
+                    contextUse.getRoleTypes(), contextUse.getRoles(), contextUse.getUses());
 
                 request.setId(jobId);
 
@@ -182,6 +197,26 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         }
 
         return status;
+    }
+
+    private void injectUses(AsyncRendererJobStatus status)
+    {
+        Map<String, Collection<Object>> uses = status.getUses();
+
+        if (uses != null) {
+            for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
+                AsyncContextHandler handler;
+                try {
+                    handler = this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Failed to get AsyncContextHandler with type [{}]", entry.getKey(), e);
+
+                    continue;
+                }
+
+                handler.use(entry.getValue());
+            }
+        }
     }
 
     private Map<String, Serializable> getContext(AsyncRenderer renderer, boolean async, Set<String> contextEntries)

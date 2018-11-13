@@ -9,3 +9,5 @@ org.xwiki.skinx.internal.SsxExportURLFactoryActionHandler
 org.xwiki.skinx.internal.JsxExportURLFactoryActionHandler
 org.xwiki.skinx.internal.JavascriptExtensionDocumentInitializer
 org.xwiki.skinx.internal.StyleSheetExtensionDocumentInitializer
+org.xwiki.skinx.internal.async.SkinExtensionAsync
+org.xwiki.skinx.internal.async.SkinExtensionAsyncContextHandler

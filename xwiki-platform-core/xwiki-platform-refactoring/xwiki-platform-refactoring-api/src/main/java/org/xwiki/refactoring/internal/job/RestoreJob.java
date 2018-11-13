@@ -24,6 +24,7 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
@@ -43,7 +44,7 @@ public class RestoreJob extends AbstractDeletedDocumentsJob
     }
 
     @Override
-    protected void handleDeletedDocuments(List<Long> idsDeletedDocuments, boolean checkRights)
+    protected void handleDeletedDocuments(List<Long> idsDeletedDocuments, AbstractCheckRightsRequest request)
     {
         this.progressManager.pushLevelProgress(idsDeletedDocuments.size(), this);
 
@@ -52,7 +53,7 @@ public class RestoreJob extends AbstractDeletedDocumentsJob
                 break;
             } else {
                 this.progressManager.startStep(this);
-                modelBridge.restoreDeletedDocument(idToRestore, checkRightsRequest);
+                modelBridge.restoreDeletedDocument(idToRestore, request);
                 this.progressManager.endStep(this);
             }
         }

@@ -24,6 +24,7 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
@@ -43,20 +44,21 @@ public class PermanentlyDeleteJob extends AbstractDeletedDocumentsJob
     }
 
     @Override
-    protected void handleDeletedDocuments(List<Long> idsDeletedDocuments, boolean checkRights)
+    protected void handleDeletedDocuments(List<Long> idsDeletedDocuments, AbstractCheckRightsRequest request)
     {
 
         // if the list is empty we delete all documents from the recycle bin
         if (idsDeletedDocuments.isEmpty()) {
-            this.modelBridge.permanentlyDeleteAllDocuments(this, checkRights);
+            this.modelBridge.permanentlyDeleteAllDocuments(this, request);
 
         // else we delete the specified list
         } else {
-            this.handleDeleteSomeDocumentsFromRecycleBin(idsDeletedDocuments, checkRights);
+            this.handleDeleteSomeDocumentsFromRecycleBin(idsDeletedDocuments, request);
         }
     }
 
-    private void handleDeleteSomeDocumentsFromRecycleBin(List<Long> idsDeletedDocuments, boolean checkRights)
+    private void handleDeleteSomeDocumentsFromRecycleBin(List<Long> idsDeletedDocuments,
+        AbstractCheckRightsRequest request)
     {
         this.progressManager.pushLevelProgress(idsDeletedDocuments.size(), this);
 
@@ -65,7 +67,7 @@ public class PermanentlyDeleteJob extends AbstractDeletedDocumentsJob
                 break;
             } else {
                 this.progressManager.startStep(this);
-                modelBridge.permanentlyDeleteDocument(idToDelete, checkRights);
+                modelBridge.permanentlyDeleteDocument(idToDelete, request);
                 this.progressManager.endStep(this);
             }
         }

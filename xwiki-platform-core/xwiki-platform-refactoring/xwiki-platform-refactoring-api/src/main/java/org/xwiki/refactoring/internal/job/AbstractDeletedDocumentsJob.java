@@ -30,6 +30,7 @@ import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.job.GroupedJob;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -75,8 +76,6 @@ public abstract class AbstractDeletedDocumentsJob extends AbstractJob<AbstractDe
 
         initializeContext(request);
 
-        boolean checkRights = request.isCheckRights();
-
         this.progressManager.pushLevelProgress(2, this);
 
         this.progressManager.startStep(this);
@@ -87,12 +86,12 @@ public abstract class AbstractDeletedDocumentsJob extends AbstractJob<AbstractDe
         this.progressManager.startStep(this);
 
         // Process each ID and try to restore it.
-        handleDeletedDocuments(idsToRestore, checkRights);
+        handleDeletedDocuments(idsToRestore, request);
 
         this.progressManager.popLevelProgress(this);
     }
 
-    protected abstract void handleDeletedDocuments(List<Long> idsDeletedDocuments, boolean checkRights);
+    protected abstract void handleDeletedDocuments(List<Long> idsDeletedDocuments, AbstractCheckRightsRequest request);
 
     private void initializeContext(AbstractDeletedDocumentsRequest request) throws IllegalArgumentException
     {

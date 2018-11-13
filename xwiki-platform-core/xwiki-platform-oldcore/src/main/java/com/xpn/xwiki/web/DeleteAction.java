@@ -158,6 +158,7 @@ public class DeleteAction extends XWikiAction
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
         PermanentlyDeleteRequest deleteRequest = refactoring.createPermanentlyDeleteRequest(Collections.emptyList());
         deleteRequest.setInteractive(isAsync(context.getRequest()));
+        deleteRequest.setCheckAuthorRights(false);
 
         try {
             JobExecutor jobExecutor = Utils.getComponent(JobExecutor.class);

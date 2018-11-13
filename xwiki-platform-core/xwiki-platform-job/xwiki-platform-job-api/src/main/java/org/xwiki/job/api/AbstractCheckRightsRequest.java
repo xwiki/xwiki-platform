@@ -48,6 +48,32 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
     private static final String PROPERTY_CHECK_RIGHTS = "checkrights";
 
     /**
+     * @see #isCheckAuthorRights()
+     */
+    private static final String PROPERTY_CHECK_AUTHOR_RIGHTS = "checkAuthorRights";
+
+    /**
+     * @return {@code true} in case the job should check if the author specified by {@link #getAuthorReference()} is
+     *          authorized to perform the actions implied by this request, {@code false} otherwise
+     */
+    public boolean isCheckAuthorRights()
+    {
+        return getProperty(PROPERTY_CHECK_AUTHOR_RIGHTS, true);
+    }
+
+    /**
+     * Sets whether the job should check or not if the user specified by {@link #getAuthorReference()} is authorized to
+     * perform the actions implied by this request.
+     *
+     * @param checkAuthorRights {@code true} to check if {@link #getAuthorReference()} is authorized to perform this
+     *      request, {@code false} to perform this request without checking rights
+     */
+    public void setCheckAuthorRights(boolean checkAuthorRights)
+    {
+        setProperty(PROPERTY_CHECK_AUTHOR_RIGHTS, checkAuthorRights);
+    }
+
+    /**
      * @return {@code true} in case the job should check if the user specified by {@link #getUserReference()} is
      *         authorized to perform the actions implied by this request, {@code false} otherwise
      */

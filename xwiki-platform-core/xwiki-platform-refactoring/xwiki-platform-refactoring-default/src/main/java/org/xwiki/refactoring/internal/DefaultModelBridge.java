@@ -455,8 +455,8 @@ public class DefaultModelBridge implements ModelBridge
                 && !canRestoreDeletedDocument(deletedDocument, context.getAuthorReference())) {
                 logger.error("The author [{}] of this script is not allowed to restore document [{}] with ID [{}]",
                     context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
-            } else if (request.isCheckRights()
-                && !canRestoreDeletedDocument(deletedDocument, context.getUserReference())) {
+            } else if (request.isCheckRights() &&
+                !canRestoreDeletedDocument(deletedDocument, context.getUserReference())) {
                 logger.error("You are not allowed to restore document [{}] with ID [{}]", deletedDocumentReference,
                     deletedDocumentId);
             } else {
@@ -527,8 +527,7 @@ public class DefaultModelBridge implements ModelBridge
         return result;
     }
 
-    @Override
-    public boolean canPermanentlyDeleteDocument(long deletedDocumentId, DocumentReference userReference)
+    protected boolean canPermanentlyDeleteDocument(XWikiDeletedDocument deletedDocument, DocumentReference userReference)
     {
         boolean result = false;
 
@@ -538,9 +537,6 @@ public class DefaultModelBridge implements ModelBridge
         // Remember the context user.
         DocumentReference currentUserReference = context.getUserReference();
         try {
-            XWikiDeletedDocument deletedDocument =
-                xwiki.getRecycleBinStore().getDeletedDocument(deletedDocumentId, context, true);
-
             // Reuse the DeletedDocument API to check rights.
             DeletedDocument deletedDocumentApi = new DeletedDocument(deletedDocument, context);
 
@@ -549,8 +545,8 @@ public class DefaultModelBridge implements ModelBridge
 
             result = deletedDocumentApi.canDelete();
         } catch (Exception e) {
-            logger.error("Failed to check delete rights on deleted document [{}] for user [{}]", deletedDocumentId,
-                userReference, e);
+            logger.error("Failed to check delete rights on deleted document [{}] for user [{}]",
+                deletedDocument.getId(), userReference, e);
         } finally {
             // Restore the context user;
             context.setUserReference(currentUserReference);
@@ -560,7 +556,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean permanentlyDeleteDocument(long deletedDocumentId, boolean checkContextUser)
+    public boolean permanentlyDeleteDocument(long deletedDocumentId, AbstractCheckRightsRequest request)
     {
         XWikiContext context = this.xcontextProvider.get();
         XWiki xwiki = context.getWiki();
@@ -575,11 +571,11 @@ public class DefaultModelBridge implements ModelBridge
             }
             deletedDocumentReference = deletedDocument.getDocumentReference();
 
-            if (checkContextUser && !canPermanentlyDeleteDocument(deletedDocumentId, context.getUserReference())) {
+            if (request.isCheckRights() && !canPermanentlyDeleteDocument(deletedDocument, context.getUserReference())) {
                 logger.error("You are not allowed to permanently delete document [{}] with ID [{}]",
                     deletedDocumentReference, deletedDocumentId);
-            } else if (checkContextUser
-                && !canPermanentlyDeleteDocument(deletedDocumentId, context.getAuthorReference())) {
+            } else if (request.isCheckAuthorRights()
+                && !canPermanentlyDeleteDocument(deletedDocument, context.getAuthorReference())) {
                 logger.error("The author [{}] of this script is not allowed to permanently deleted document [{}] with "
                         + "id", context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
             } else {
@@ -604,7 +600,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob, boolean checkContextUser)
+    public boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob, AbstractCheckRightsRequest request)
     {
         XWikiContext context = this.xcontextProvider.get();
         XWiki xwiki = context.getWiki();
@@ -631,7 +627,7 @@ public class DefaultModelBridge implements ModelBridge
                         return false;
                     } else {
                         this.progressManager.startStep(deleteJob);
-                        this.permanentlyDeleteDocument(deletedDocumentsId, checkContextUser);
+                        this.permanentlyDeleteDocument(deletedDocumentsId, request);
                         this.progressManager.endStep(deleteJob);
                     }
                 }

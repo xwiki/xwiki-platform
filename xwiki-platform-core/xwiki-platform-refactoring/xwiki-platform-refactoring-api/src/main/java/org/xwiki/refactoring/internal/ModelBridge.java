@@ -152,36 +152,20 @@ public interface ModelBridge
     List<Long> getDeletedDocumentIds(String batchId);
 
     /**
-     * @param deletedDocumentId the ID of the document to check
-     * @param userReference the reference of the user to check
-     * @return {@code true} if the specified user is allowed to restore the specified deleted document, {@code false}
-     *         otherwise
-     */
-    boolean canRestoreDeletedDocument(long deletedDocumentId, DocumentReference userReference);
-
-    /**
-     * @param deletedDocumentId the ID of the document to check
-     * @param userReference the reference of the user to check
-     * @return {@code true} if the specified user is allowed to permanently delete the specified deleted document,
-     *         {@code false} otherwise
-     * @since 10.10RC1
-     */
-    boolean canPermanentlyDeleteDocument(long deletedDocumentId, DocumentReference userReference);
-
-    /**
      * @param deletedDocumentId the ID of the deleted document to permanently delete
-     * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
+     * @param checkRightsRequest the request containing info about rights to check
      * @return {@code true} if the document was permanently deleted successfully, {@code false} if the deletion failed
      * @since 10.10RC1
      */
-    boolean permanentlyDeleteDocument(long deletedDocumentId, boolean checkContextUser);
+    boolean permanentlyDeleteDocument(long deletedDocumentId, AbstractCheckRightsRequest checkRightsRequest);
 
     /**
      * Helper to delete all documents permanently from the recycle bin.
      * @param deleteJob The job that launches the action
-     * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
+     * @param checkRightsRequest the request containing info about rights to check
      * @return {@code true} if all documents were permanently deleted successfully, {@code false} if the deletion failed
      * @since 10.10RC1
      */
-    boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob, boolean checkContextUser);
+    boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob,
+        AbstractCheckRightsRequest checkRightsRequest);
 }

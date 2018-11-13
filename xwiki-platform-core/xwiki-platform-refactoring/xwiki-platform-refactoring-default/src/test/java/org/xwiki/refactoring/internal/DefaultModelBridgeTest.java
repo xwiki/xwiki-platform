@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.job.AbstractJobStatus;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -103,6 +104,9 @@ public class DefaultModelBridgeTest
 
     @Mock
     private XWikiRecycleBinStoreInterface recycleBin;
+
+    @Mock
+    private AbstractCheckRightsRequest request;
 
     @BeforeEach
     public void configure(MockitoComponentManager mocker) throws Exception
@@ -422,8 +426,10 @@ public class DefaultModelBridgeTest
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
 
         when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
+        when(request.isCheckAuthorRights()).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(false);
 
-        assertTrue(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, false));
+        assertTrue(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
 
         verify(recycleBin).deleteFromRecycleBin(deletedDocumentId, xcontext, true);
         assertLog(Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
@@ -451,8 +457,10 @@ public class DefaultModelBridgeTest
         long deletedDocumentId = 42;
 
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(null);
+        when(request.isCheckAuthorRights()).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(false);
 
-        assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, false));
+        assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
 
         assertLog(Level.ERROR, "Deleted document with ID [{}] does not exist.", deletedDocumentId);
 
@@ -529,8 +537,10 @@ public class DefaultModelBridgeTest
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
 
         when(xwiki.exists(translationDocumentReference, xcontext)).thenReturn(false);
+        when(request.isCheckAuthorRights()).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(false);
 
-        assertTrue(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, false));
+        assertTrue(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
 
         verify(recycleBin).deleteFromRecycleBin(deletedDocumentId, xcontext, true);
         assertLog(Level.INFO, "Document [{}] has been permanently deleted.", translationDocumentReference);
@@ -550,10 +560,6 @@ public class DefaultModelBridgeTest
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
         when(deletedDocument.getFullName()).thenReturn(deletedDocumentFullName);
-
-        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
-        when(recycleBin.getDeletedDocument(deletedDocumentId, xcontext, true)).thenReturn(deletedDocument);
-        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiRightService rightService = mock(XWikiRightService.class);
         when(xwiki.getRightService()).thenReturn(rightService);
@@ -590,8 +596,8 @@ public class DefaultModelBridgeTest
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
         DocumentReference authorReference = new DocumentReference("wiki", "user", "Alice");
         when(xcontext.getAuthorReference()).thenReturn(authorReference);
-        when(request.isCheckAuthorRights()).thenReturn(true);
         when(request.isCheckRights()).thenReturn(true);
+        when(request.isCheckAuthorRights()).thenReturn(true);
 
         assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, request));
 
@@ -620,8 +626,10 @@ public class DefaultModelBridgeTest
         XWikiRightService rightService = mock(XWikiRightService.class);
         when(xwiki.getRightService()).thenReturn(rightService);
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(true);
+        when(request.isCheckAuthorRights()).thenReturn(true);
 
-        assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, true));
+        assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
 
         assertLog(0, Level.WARN, "Exception while checking if entry [{}] can be removed from the recycle bin",
             deletedDocumentId);
@@ -692,8 +700,10 @@ public class DefaultModelBridgeTest
         }).thenReturn(new Long[]{
             11L, 12L
         });
+        when(request.isCheckRights()).thenReturn(false);
+        when(request.isCheckAuthorRights()).thenReturn(false);
 
-        assertTrue(this.modelBridge.permanentlyDeleteAllDocuments(deleteJob, false));
+        assertTrue(this.modelBridge.permanentlyDeleteAllDocuments(deleteJob, request));
         verify(this.progressManager).pushLevelProgress(nbDocs, deleteJob);
         verify(this.progressManager, times(12)).startStep(deleteJob);
         verify(this.progressManager, times(12)).endStep(deleteJob);

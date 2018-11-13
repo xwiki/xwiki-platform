@@ -92,7 +92,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the specified document is deleted.
-        verify(this.modelBridge).permanentlyDeleteDocument(deletedDocumentId, true);
+        verify(this.modelBridge).permanentlyDeleteDocument(deletedDocumentId, request);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the specified document is deleted.
-        verify(this.modelBridge).permanentlyDeleteAllDocuments(any(), eq(true));
+        verify(this.modelBridge).permanentlyDeleteAllDocuments(any(), eq(request));
     }
 
     @Test
@@ -126,8 +126,8 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the individual documents from the batch are deleted.
-        verify(this.modelBridge).permanentlyDeleteDocument(deletedDocumentId1, false);
-        verify(this.modelBridge).permanentlyDeleteDocument(deletedDocumentId2, false);
+        verify(this.modelBridge).permanentlyDeleteDocument(deletedDocumentId1, request);
+        verify(this.modelBridge).permanentlyDeleteDocument(deletedDocumentId2, request);
     }
 
     @Test
@@ -155,10 +155,10 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that each document is permanently deleted exactly 1 time.
-        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentId1, false);
-        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentId2, false);
-        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentIdB, false);
-        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentIdC, false);
+        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentId1, request);
+        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentId2, request);
+        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentIdB, request);
+        verify(this.modelBridge, atMost(1)).permanentlyDeleteDocument(deletedDocumentIdC, request);
     }
 
     @Test
@@ -192,7 +192,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         }
 
         // Verify that the document is not restored.
-        verify(this.modelBridge, never()).permanentlyDeleteDocument(deletedDocumentId, false);
+        verify(this.modelBridge, never()).permanentlyDeleteDocument(deletedDocumentId, request);
     }
 
     private PermanentlyDeleteRequest createRequest()

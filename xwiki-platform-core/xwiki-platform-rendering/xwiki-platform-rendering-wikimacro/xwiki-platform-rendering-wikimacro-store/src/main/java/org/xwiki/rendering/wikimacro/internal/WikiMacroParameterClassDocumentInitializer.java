@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.util.stream.Collectors;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -27,6 +29,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+
+import static org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor.PARAMETER_TYPE_PROPERTY_VALUES;
 
 /**
  * Update XWiki.WikiMacroParameterClass document with all required informations.
@@ -55,5 +59,9 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
         xclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
         xclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
         xclass.addTextField(PARAMETER_DEFAULT_VALUE_PROPERTY, "Parameter default value", 30);
+        String typeValues = PARAMETER_TYPE_PROPERTY_VALUES.stream().map(parameterType ->
+                parameterType.getName() + "=" + parameterType.getPrettyName()).collect(Collectors.joining("|"));
+        String typeDefaultValue = PARAMETER_TYPE_PROPERTY_VALUES.get(0).getName();
+        xclass.addStaticListField(PARAMETER_TYPE_PROPERTY, "Parameter type", typeValues, typeDefaultValue);
     }
 }

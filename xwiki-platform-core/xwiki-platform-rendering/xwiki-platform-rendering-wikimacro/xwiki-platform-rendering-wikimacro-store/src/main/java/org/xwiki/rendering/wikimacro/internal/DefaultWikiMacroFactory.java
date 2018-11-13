@@ -239,6 +239,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 boolean parameterMandatory =
                     (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) == 0) ? false : true;
                 String parameterDefaultValue = macroParameter.getStringValue(PARAMETER_DEFAULT_VALUE_PROPERTY);
+                String parameterType = macroParameter.getStringValue(PARAMETER_TYPE_PROPERTY);
 
                 // Verify parameter name.
                 if (StringUtils.isEmpty(parameterName)) {
@@ -260,7 +261,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
                 // Create the parameter descriptor.
                 parameterDescriptors.add(new WikiMacroParameterDescriptor(parameterName, parameterDescription,
-                    parameterMandatory, parameterDefaultValue));
+                    parameterMandatory, parameterDefaultValue, parameterType));
             }
         }
 

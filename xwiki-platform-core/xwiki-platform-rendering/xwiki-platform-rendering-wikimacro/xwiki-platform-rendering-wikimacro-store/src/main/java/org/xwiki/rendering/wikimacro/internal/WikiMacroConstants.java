@@ -138,4 +138,11 @@ public interface WikiMacroConstants
      * @since 2.3M1
      */
     String PARAMETER_DEFAULT_VALUE_PROPERTY = "defaultValue";
+
+    /**
+     * Constant for representing parameter type property.
+     *
+     * @since 10.10RC1
+     */
+    String PARAMETER_TYPE_PROPERTY = "type";
 }

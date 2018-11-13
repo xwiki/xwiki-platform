@@ -20,7 +20,10 @@
 package org.xwiki.rendering.macro.wikibridge;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 
 /**
@@ -31,6 +34,22 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
  */
 public class WikiMacroParameterDescriptor implements ParameterDescriptor
 {
+    /**
+     * Constant for representing parameter type property values.
+     *
+     * @since 10.10RC1
+     */
+    public static final List<WikiMacroParameterType> PARAMETER_TYPE_PROPERTY_VALUES =
+            new ArrayList<WikiMacroParameterType>()
+        {
+            {
+                add(new WikiMacroParameterType("string", "String", String.class));
+                add(new WikiMacroParameterType("boolean", "Boolean", Boolean.class));
+                add(new WikiMacroParameterType("enum", "Enum", Enum.class));
+                add(new WikiMacroParameterType("document", "Document", DocumentReference.class));
+            }
+        };
+
     /**
      * Identifier of the parameter.
      * 
@@ -61,6 +80,11 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     private Object defaultValue;
 
     /**
+     * Type of the parameter.
+     */
+    private String type;
+
+    /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
      * 
      * @param id parameter identifier.
@@ -69,14 +93,12 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      */
     public WikiMacroParameterDescriptor(String id, String description, boolean mandatory)
     {
-        this.id = id;
-        this.description = description;
-        this.mandatory = mandatory;
+        this(id, description, mandatory, null);
     }
 
     /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
-     * 
+     *
      * @param id parameter identifier.
      * @param description parameter description.
      * @param mandatory if the parameter is mandatory.
@@ -85,10 +107,27 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      */
     public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue)
     {
+        this(id, description, mandatory, defaultValue, PARAMETER_TYPE_PROPERTY_VALUES.get(0).getName());
+    }
+
+    /**
+     * Creates a new {@link WikiMacroParameterDescriptor} instance.
+     *
+     * @param id parameter identifier.
+     * @param description parameter description.
+     * @param mandatory if the parameter is mandatory.
+     * @param defaultValue parameter default value.
+     * @param type parameter type.
+     * @since 10.10RC1
+     */
+    public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue,
+            String type)
+    {
         this.id = id;
         this.description = description;
         this.mandatory = mandatory;
         this.defaultValue = defaultValue;
+        this.type = type;
     }
 
     @Override
@@ -119,6 +158,12 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     @Override
     public Type getParameterType()
     {
+        for (WikiMacroParameterType parameterType : PARAMETER_TYPE_PROPERTY_VALUES) {
+            if (parameterType.getName().equals(this.type.toLowerCase())) {
+                return parameterType.getType();
+            }
+        }
+
         return getType();
     }
 

@@ -60,6 +60,8 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
 
     private BaseObject externalEntity;
 
+    private BaseClass databaseXClass;
+
     private BaseClass currentXClass;
 
     @Override
@@ -158,7 +160,8 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
             XWikiContext xcontext = this.xcontextProvider.get();
             if (xcontext != null && xcontext.getWiki() != null) {
                 try {
-                    setCurrentXClass(xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext));
+                    this.databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
+                    setCurrentXClass(this.databaseXClass);
                 } catch (XWikiException e) {
                     // TODO: log something ?
                 }
@@ -177,10 +180,10 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
     public void endWikiObject(String name, FilterEventParameters parameters) throws FilterException
     {
         // Add missing properties from the class
-        if (this.entity != null && this.currentXClass != null) {
-            for (String key : this.currentXClass.getPropertyList()) {
+        if (this.entity != null && this.databaseXClass != null) {
+            for (String key : this.databaseXClass.getPropertyList()) {
                 if (this.entity.safeget(key) == null) {
-                    PropertyClass classProperty = (PropertyClass) this.currentXClass.getField(key);
+                    PropertyClass classProperty = (PropertyClass) this.databaseXClass.getField(key);
                     this.entity.safeput(key, classProperty.newProperty());
                 }
             }

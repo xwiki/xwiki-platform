@@ -6,7 +6,8 @@
 ##
 ## JS Libraries.
 ##
-<script type="text/javascript" src="$services.webjars.url('requirejs', "require$jsExtension")"></script>
+<script type="text/javascript" src="$services.webjars.url('requirejs', "require$jsExtension")"
+  data-wysiwyg="true"></script>
 ##
 $xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
 $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
@@ -82,7 +83,7 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   ## Respond.js implements the CSS 3 media queries for IE8
   <script type="text/javascript" src="$services.webjars.url('respond', 'dest/respond.min.js')" defer="defer"></script>
 <![endif]-->
-<script type="text/javascript">
+<script type="text/javascript" data-wysiwyg="true">
 // <![CDATA[
 ## Requirejs will automatically add a ".js" suffix if the generated URL doesn't contain a "?". It happens that we
 ## don't generate a URL with "?" when we export in HTML for example. In this case we remove the ".js" suffix since
@@ -127,7 +128,7 @@ require.config({
 define('jQueryNoConflict', ['jquery'], function ($) {
     return $.noConflict();
 });
-if (Prototype.BrowserFeatures.ElementExtensions) {
+if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
   require(['jquery', 'bootstrap'], function ($) {
     // Fix incompatibilities between BootStrap and Prototype
     var disablePrototypeJS = function (method, pluginsToDisable) {
@@ -148,9 +149,10 @@ if (Prototype.BrowserFeatures.ElementExtensions) {
 }
 require(['jquery', 'drawer'], function($) {
   $(document).ready(function() {
-    $('body').drawer();
+    $('.drawer-main').closest('body').drawer();
   });
 });
+window.XWiki = window.XWiki || {};
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.contextPath = "${request.contextPath}";

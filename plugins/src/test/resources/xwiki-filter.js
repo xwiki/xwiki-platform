@@ -99,4 +99,29 @@ describe('XWiki Filter Plugin for CKEditor', function() {
       extraPlugins: 'xwiki-filter'
     });
   });
+
+  it('unprotect allowed scripts', function(done) {
+    testUtils.createEditor(function(event) {
+      testUtils.assertSnapshot(event.editor, [
+        '<script type="text/javascript" src="foo.js" data-wysiwyg="true"></script>',
+        '<script type="text/javascript" src="bar.js"></script>',
+        '<script type="text/javascript" src="bar?language=en&wysiwyg=true"></script>',
+        '<script type="text/javascript" src="foo?language=en"></script>',
+        '<script type="text/javascript" data-wysiwyg="true">var x = 13;</script>',
+        '<script type="text/javascript">var y = 27;</script>'
+      ].join(''), [
+        '<script type="text/javascript" src="foo.js" data-wysiwyg="true"></script>',
+        '<!--{cke_protected}%3Cscript%20type%3D%22text%2Fjavascript%22%20src%3D%22bar.js%22%3E%3C%2Fscript%3E-->',
+        '<script type="text/javascript" src="bar?language=en&amp;wysiwyg=true"></script>',
+        '<!--{cke_protected}%3Cscript%20type%3D%22text%2Fjavascript%22%20src%3D%22foo%3Flanguage%3Den%22%3E%3C%2F' +
+          'script%3E-->',
+        '<script type="text/javascript" data-wysiwyg="true">var x = 13;</script>',
+        '<!--{cke_protected}%3Cscript%20type%3D%22text%2Fjavascript%22%3Evar%20y%20%3D%2027%3B%3C%2Fscript%3E-->'
+      ].join('')).then(done);
+    }, {
+      // Configure the editor to load the JavaScript Skin Extensions.
+      loadJavaScriptSkinExtensions: true,
+      extraPlugins: 'xwiki-filter'
+    });
+  });
 });

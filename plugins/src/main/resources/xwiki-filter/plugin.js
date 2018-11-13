@@ -23,6 +23,9 @@
  *
  * <ul>
  *   <li>converts empty lines to empty paragraphs and back</li>
+ *   <li>submits only the significant content</li>
+ *   <li>converts the font tags into span tags</li>
+ *   <li>unprotect allowed scripts</li>
  * </ul>
  *
  * @see http://docs.cksource.com/CKEditor_3.x/Developers_Guide/Data_Processor
@@ -115,10 +118,34 @@
         }
       };
 
+      var isScriptAllowed = function(script) {
+        return script && script.name === 'script' && (
+          script.attributes['data-wysiwyg'] === 'true' ||
+          (typeof script.attributes.src === 'string' && script.attributes.src.indexOf('wysiwyg=true') > 0)
+        );
+      };
+
+      var unprotectAllowedScripts = {
+        comment: function(comment) {
+          var prefix = '{cke_protected}%3Cscript%20';
+          if (comment.substr(0, prefix.length) === prefix) {
+            var fragment = CKEDITOR.htmlParser.fragment.fromHtml('<script ' +
+              decodeURIComponent(comment.substr(prefix.length)));
+            var script = fragment.children[0];
+            if (isScriptAllowed(script)) {
+              return script;
+            }
+          }          
+        }
+      };
+
       // Filter the editor input.
       var dataFilter = editor.dataProcessor && editor.dataProcessor.dataFilter;
       if (dataFilter) {
         dataFilter.addRules(replaceEmptyLinesWithEmptyParagraphs, {priority: 5});
+        if (editor.config.loadJavaScriptSkinExtensions) {
+          dataFilter.addRules(unprotectAllowedScripts, {priority: 5});
+        }
       }
 
       // Filter the editor output.

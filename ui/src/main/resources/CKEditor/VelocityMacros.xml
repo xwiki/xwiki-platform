@@ -182,6 +182,7 @@
     #displayCKEditorConfigProperty($configDoc 'removeButtons' $action)
     #displayCKEditorConfigBooleanProperty($configDoc 'linkShowAdvancedTab' $action)
     #displayCKEditorConfigBooleanProperty($configDoc 'linkShowTargetTab' $action)
+    #displayCKEditorConfigBooleanProperty($configDoc 'loadJavaScriptSkinExtensions' $action)
     &lt;dt&gt;
       &lt;label&gt;$configDoc.displayPrettyName('advanced')&lt;/label&gt;
       &lt;span class="xHint"&gt;$services.localization.render('CKEditor.ConfigClass_advanced.hint',

@@ -49,10 +49,15 @@
   &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale"&gt;
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
+      ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
+      &lt;!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin --&gt;
+      ## Fix some issues caused by the fact that we put the content directly under the BODY element.
+      #set ($discard = $xwiki.ssx.use('CKEditor.ContentSheet'))
       ## Include the stylesheets that affect the content in view mode.
       #template("stylesheets.vm")
-      ## Fix some issues caused by the fact that we put the content directly under the BODY element.
-      &lt;link type="text/css" rel="stylesheet" href="$xwiki.getURL('CKEditor.ContentSheet', 'ssx')" /&gt;
+      #if ($xwiki.getDocument('CKEditor.Config').getValue('loadJavaScriptSkinExtensions') == 1)
+        #template("javascript.vm")
+      #end
     &lt;/head&gt;
     #if (!$source)
       #set ($source = $tdoc)

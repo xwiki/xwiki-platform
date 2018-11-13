@@ -60,7 +60,7 @@
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>advanced</name>
-        <number>5</number>
+        <number>6</number>
         <picker>0</picker>
         <prettyName>Advanced Configuration</prettyName>
         <rows>5</rows>
@@ -98,6 +98,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </linkShowTargetTab>
+      <loadJavaScriptSkinExtensions>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>loadJavaScriptSkinExtensions</name>
+        <number>5</number>
+        <prettyName>Load JavaScript Skin Extensions</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </loadJavaScriptSkinExtensions>
       <removeButtons>
         <customDisplay/>
         <disabled>0</disabled>
@@ -135,6 +149,9 @@
     </property>
     <property>
       <linkShowTargetTab>0</linkShowTargetTab>
+    </property>
+    <property>
+      <loadJavaScriptSkinExtensions>0</loadJavaScriptSkinExtensions>
     </property>
     <property>
       <removeButtons/>

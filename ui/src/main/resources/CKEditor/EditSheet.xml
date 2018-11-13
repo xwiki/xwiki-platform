@@ -252,13 +252,16 @@ define('xwiki-ckeditor', [
     });
   };
 
+  var loadJavaScriptSkinExtensions = $jsontool.serialize($xwiki.getDocument('CKEditor.Config'
+    ).getValue('loadJavaScriptSkinExtensions')) === 1;
+
   // See http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
   var allowedContentBySyntax = {
     'xwiki/2.1': {
       '$1': {
         elements: {
           // Elements required because the editor input is a full HTML page.
-          html: true, head: true, link: true, body: true,
+          html: true, head: true, link: true, script: loadJavaScriptSkinExtensions, body: true,
           // Headings
           h1: true, h2: true, h3: true, h4: true, h5: true, h6: true,
           // Lists

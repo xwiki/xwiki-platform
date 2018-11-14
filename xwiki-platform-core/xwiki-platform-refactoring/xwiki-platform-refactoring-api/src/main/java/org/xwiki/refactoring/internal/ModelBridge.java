@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -136,22 +137,16 @@ public interface ModelBridge
 
     /**
      * @param deletedDocumentId the ID of the deleted document to restore
-     * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
+     * @param checkRightsRequest the request containing info about rights to check
      * @return {@code true} if the document was restored successfully, {@code false} if the restore failed
+     *
+     * @since 10.10RC1
      */
-    boolean restoreDeletedDocument(long deletedDocumentId, boolean checkContextUser);
+    boolean restoreDeletedDocument(long deletedDocumentId, AbstractCheckRightsRequest checkRightsRequest);
 
     /**
      * @param batchId ID of the delete documents batch
      * @return list of IDs of the deleted documents that are part of the specified batch
      */
     List<Long> getDeletedDocumentIds(String batchId);
-
-    /**
-     * @param deletedDocumentId the ID of the document to check
-     * @param userReference the reference of the user to check
-     * @return {@code true} if the specified user is allowed to restore the specified deleted document, {@code false}
-     *         otherwise
-     */
-    boolean canRestoreDeletedDocument(long deletedDocumentId, DocumentReference userReference);
 }

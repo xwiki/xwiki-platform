@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -417,7 +418,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean restoreDeletedDocument(long deletedDocumentId, boolean checkContextUser)
+    public boolean restoreDeletedDocument(long deletedDocumentId, AbstractCheckRightsRequest request)
     {
         XWikiContext context = this.xcontextProvider.get();
         XWiki xwiki = context.getWiki();
@@ -439,11 +440,12 @@ public class DefaultModelBridge implements ModelBridge
                 // Default for now is to skip and log as error to restore over existing documents.
                 logger.error("Document [{}] with ID [{}] can not be restored. Document already exists",
                     deletedDocument.getFullName(), deletedDocumentId);
-            } else if (checkContextUser
-                && !canRestoreDeletedDocument(deletedDocumentId, context.getAuthorReference())) {
+            } else if (request.isCheckAuthorRights()
+                && !canRestoreDeletedDocument(deletedDocument, context.getAuthorReference())) {
                 logger.error("The author [{}] of this script is not allowed to restore document [{}] with ID [{}]",
                     context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
-            } else if (checkContextUser && !canRestoreDeletedDocument(deletedDocumentId, context.getUserReference())) {
+            } else if (request.isCheckRights()
+                && !canRestoreDeletedDocument(deletedDocument, context.getUserReference())) {
                 logger.error("You are not allowed to restore document [{}] with ID [{}]", deletedDocumentReference,
                     deletedDocumentId);
             } else {
@@ -487,20 +489,15 @@ public class DefaultModelBridge implements ModelBridge
         return result;
     }
 
-    @Override
-    public boolean canRestoreDeletedDocument(long deletedDocumentId, DocumentReference userReference)
+    protected boolean canRestoreDeletedDocument(XWikiDeletedDocument deletedDocument, DocumentReference userReference)
     {
         boolean result = false;
 
         XWikiContext context = this.xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
 
         // Remember the context user.
         DocumentReference currentUserReference = context.getUserReference();
         try {
-            XWikiDeletedDocument deletedDocument =
-                xwiki.getRecycleBinStore().getDeletedDocument(deletedDocumentId, context, true);
-
             // Reuse the DeletedDocument API to check rights.
             DeletedDocument deletedDocumentApi = new DeletedDocument(deletedDocument, context);
 
@@ -509,8 +506,8 @@ public class DefaultModelBridge implements ModelBridge
 
             result = deletedDocumentApi.canUndelete();
         } catch (Exception e) {
-            logger.error("Failed to check restore rights on deleted document [{}] for user [{}]", deletedDocumentId,
-                userReference, e);
+            logger.error("Failed to check restore rights on deleted document [{}] for user [{}]",
+                deletedDocument.getId(), userReference, e);
         } finally {
             // Restore the context user;
             context.setUserReference(currentUserReference);

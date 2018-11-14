@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.EntityRequest;
+import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
@@ -55,6 +57,8 @@ public class DeleteAction extends XWikiAction
     protected static final String ASYNC_PARAM = "async";
 
     protected static final String RECYCLED_DOCUMENT_ID_PARAM = "id";
+
+    protected static final String EMPTY_RECYCLE_BIN = "emptybin";
 
     private boolean isAsync(XWikiRequest request)
     {
@@ -131,7 +135,11 @@ public class DeleteAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
 
         String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
-        if (sindex != null && xwiki.hasRecycleBin(context)) {
+        String emptyBin = request.getParameter(EMPTY_RECYCLE_BIN);
+
+        if ("true".equals(emptyBin)) {
+            return deleteAllFromRecycleBin(context);
+        } else if (sindex != null && xwiki.hasRecycleBin(context)) {
             deleteFromRecycleBin(Long.parseLong(sindex), context);
             return true;
         } else if (doc.isNew()) {
@@ -141,6 +149,42 @@ public class DeleteAction extends XWikiAction
         } else {
             // Delete to recycle bin.
             return deleteToRecycleBin(context);
+        }
+    }
+
+    private boolean deleteAllFromRecycleBin(XWikiContext context) throws XWikiException
+    {
+        RefactoringScriptService refactoring =
+            (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
+        PermanentlyDeleteRequest deleteRequest = refactoring.createPermanentlyDeleteRequest(Collections.emptyList());
+        deleteRequest.setInteractive(isAsync(context.getRequest()));
+        deleteRequest.setCheckAuthorRights(false);
+
+        try {
+            JobExecutor jobExecutor = Utils.getComponent(JobExecutor.class);
+            Job job = jobExecutor.execute(RefactoringJobs.PERMANENTLY_DELETE, deleteRequest);
+
+            if (isAsync(context.getRequest())) {
+                List<String> jobId = job.getRequest().getId();
+                sendRedirect(context.getResponse(),
+                    Utils.getRedirect("view", "xpage=delete&jobId=" + serializeJobId(jobId), context));
+
+                // A redirect has been performed.
+                return true;
+            }
+
+            // Otherwise...
+            try {
+                job.join();
+            } catch (InterruptedException e) {
+                throw new XWikiException("Failed to delete all from the recycle bin", e);
+            }
+
+            // No redirect has been performed.
+            return false;
+
+        } catch (JobException e) {
+            throw new XWikiException("Failed to schedule the delete all from recycle bin job", e);
         }
     }
 

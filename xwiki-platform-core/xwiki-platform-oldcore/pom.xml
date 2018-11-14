@@ -848,6 +848,8 @@
                 **/store/XWikiDefaultStore.java,
                 **/store/XWikiHibernateAttachmentStore.java,
                 **/store/XWikiHibernateBaseStore.java,
+                <!-- XWikiHibernateRecycleBinStore has a Fan-Out complexity of 21 after adding Query on it -->
+                **/store/XWikiHibernateRecycleBinStore.java,
                 **/store/XWikiHibernateStore.java,
                 **/store/XWikiStoreInterface.java,
                 **/store/XWikiVersioningStoreInterface.java,

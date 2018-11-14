@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
 
 /**
  * Interface used to access the XWiki model and to perform low level operations on it.
@@ -149,4 +150,22 @@ public interface ModelBridge
      * @return list of IDs of the deleted documents that are part of the specified batch
      */
     List<Long> getDeletedDocumentIds(String batchId);
+
+    /**
+     * @param deletedDocumentId the ID of the deleted document to permanently delete
+     * @param checkRightsRequest the request containing info about rights to check
+     * @return {@code true} if the document was permanently deleted successfully, {@code false} if the deletion failed
+     * @since 10.10RC1
+     */
+    boolean permanentlyDeleteDocument(long deletedDocumentId, AbstractCheckRightsRequest checkRightsRequest);
+
+    /**
+     * Helper to delete all documents permanently from the recycle bin.
+     * @param deleteJob The job that launches the action
+     * @param checkRightsRequest the request containing info about rights to check
+     * @return {@code true} if all documents were permanently deleted successfully, {@code false} if the deletion failed
+     * @since 10.10RC1
+     */
+    boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob,
+        AbstractCheckRightsRequest checkRightsRequest);
 }

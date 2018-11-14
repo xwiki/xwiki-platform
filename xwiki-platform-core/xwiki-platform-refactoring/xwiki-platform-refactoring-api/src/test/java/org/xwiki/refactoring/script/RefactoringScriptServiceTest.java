@@ -19,8 +19,11 @@
  */
 package org.xwiki.refactoring.script;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,6 +45,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -94,6 +98,7 @@ public class RefactoringScriptServiceTest
 
         DocumentAccessBridge documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(this.userReference);
+        when(documentAccessBridge.getCurrentAuthorReference()).thenReturn(this.userReference);
 
         EntityReferenceProvider defaultEntityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
@@ -289,5 +294,32 @@ public class RefactoringScriptServiceTest
     private RefactoringScriptService getService() throws ComponentLookupException
     {
         return (RefactoringScriptService) this.mocker.getComponentUnderTest();
+    }
+
+    @Test
+    public void createPermanentlyDeleteRequest() throws Exception
+    {
+        List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
+        PermanentlyDeleteRequest permanentlyDeleteRequest =
+            this.getService().createPermanentlyDeleteRequest(documentIds);
+        assertEquals(documentIds, permanentlyDeleteRequest.getDeletedDocumentIds());
+        assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
+            .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
+        assertTrue(permanentlyDeleteRequest.isCheckRights());
+    }
+
+    @Test
+    public void permanentlyDelete() throws Exception
+    {
+        List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
+        getService().permanentlyDelete(documentIds);
+
+        ArgumentCaptor<PermanentlyDeleteRequest> request = ArgumentCaptor.forClass(PermanentlyDeleteRequest.class);
+        verify(this.jobExecutor).execute(eq(RefactoringJobs.PERMANENTLY_DELETE), request.capture());
+
+        assertEquals(documentIds, request.getValue().getDeletedDocumentIds());
+        assertTrue(StringUtils.join(request.getValue().getId(), '/')
+            .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
+        assertTrue(request.getValue().isCheckRights());
     }
 }

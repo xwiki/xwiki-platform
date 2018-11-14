@@ -37,7 +37,10 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     if (macros) {
       deferred.resolve(macros);
     } else {
-      var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', 'outputSyntax=plain');
+      var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
+        outputSyntax: 'plain',
+        language: $('html').attr('lang')
+      }));
       $.get(url, {data: 'list', syntaxId: syntaxId}).done(function(macros) {
         // Bulletproofing: check if the returned data is json since it could some HTML representing an error
         if (typeof macros === 'object' && $.isArray(macros.list)) {

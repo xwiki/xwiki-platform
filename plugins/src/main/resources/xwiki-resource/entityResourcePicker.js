@@ -155,12 +155,14 @@ define('entityResourcePicker', [
   var treeURL = {
     doc: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
       outputSyntax: 'plain',
+      language: $('html').attr('lang'),
       showAttachments: false,
       showTranslations: false,
       showWikis: true
     })),
     attach: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
       outputSyntax: 'plain',
+      language: $('html').attr('lang'),
       showTranslations: false,
       showWikis: true
     }))

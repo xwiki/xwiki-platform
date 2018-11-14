@@ -43,6 +43,7 @@ define('entityResourceDisplayer', ['jquery', 'resource'], function($, $resource)
   $resource.displayers.doc = function(resourceReference) {
     var deferred = $.Deferred();
     $.post(XWiki.currentDocument.getURL('get'), {
+      language: $('html').attr('lang'),
       xpage: 'hierarchy_reference',
       reference: resourceReference.reference,
       limit: 5
@@ -58,6 +59,7 @@ define('entityResourceDisplayer', ['jquery', 'resource'], function($, $resource)
     var deferred = $.Deferred();
     var attachmentReference = $resource.convertResourceReferenceToEntityReference(resourceReference);
     $.post(XWiki.currentDocument.getURL('get'), {
+      language: $('html').attr('lang'),
       xpage: 'hierarchy_reference',
       reference: XWiki.Model.serialize(attachmentReference.parent),
       limit: 4

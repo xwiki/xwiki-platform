@@ -30,6 +30,7 @@ define('entityResourceSuggester', [
   var search = function(query, input, deferred, entityType) {  
     $.post(new XWiki.Document('SuggestSolrService', 'XWiki').getURL('get'), {
       outputSyntax: 'plain',
+      language: $('html').attr('lang'),
       query: query.join('\n'),
       input: input,
       nb: 8

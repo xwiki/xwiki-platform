@@ -37,7 +37,10 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     if (macroDescriptor) {
       deferred.resolve(macroDescriptor);
     } else {
-      var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', 'outputSyntax=plain');
+      var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
+        outputSyntax: 'plain',
+        language: $('html').attr('lang')
+      }));
       $.get(url, {data: 'descriptor', macroId: macroId}).done(function(macroDescriptor) {
         if (typeof macroDescriptor === 'object' && macroDescriptor !== null) {
           macroDescriptors[macroId] = macroDescriptor;

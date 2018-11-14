@@ -304,6 +304,7 @@ define('xwiki-ckeditor', [
     return document.getURL('get', $.param({
       sheet: 'CKEditor.FileUploader',
       outputSyntax: 'plain',
+      language: $('html').attr('lang'),
       form_token: xwikiMeta.form_token,
       initiator: initiator
     }));
@@ -326,17 +327,35 @@ define('xwiki-ckeditor', [
       language: ($('html').attr('xml:lang') || '').toLowerCase().replace('_', '-'),
       uploadUrl: getUploadURL(sourceDocument, 'filetools'),
       'xwiki-link': {
-        labelGenerator: sourceDocument.getURL('get', 'sheet=CKEditor.LinkLabelGenerator&amp;outputSyntax=plain')
+        labelGenerator: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.LinkLabelGenerator',
+          outputSyntax: 'plain',
+          language: $('html').attr('lang')
+        }))
       },
       'xwiki-resource': {
-        dispatcher: sourceDocument.getURL('get', 'sheet=CKEditor.ResourceDispatcher&amp;outputSyntax=plain')
+        dispatcher: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.ResourceDispatcher',
+          outputSyntax: 'plain',
+          language: $('html').attr('lang')
+        }))
       },
       'xwiki-source': {
-        htmlConverter: sourceDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
+        htmlConverter: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.HTMLConverter',
+          outputSyntax: 'plain',
+          language: $('html').attr('lang')
+        }))
       },
       mentions: [
         {
-          feed: sourceDocument.getURL('get', 'sheet=CKEditor.LinkSuggestions&amp;outputSyntax=plain&amp;input={encodedQuery}'),
+          feed: sourceDocument.getURL('get', $.param({
+            sheet: 'CKEditor.LinkSuggestions',
+            outputSyntax: 'plain',
+            language: $('html').attr('lang')
+          // Prevent the curly brackets from being URL encoded because they mark a placeholder that will be replaced
+          // with the text typed by the user (and CKEditor takes care of URL encoding it).
+          }) + '&amp;input={encodedQuery}'),
           itemTemplate: [
             '&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;',
               '&lt;div&gt;',
@@ -357,7 +376,10 @@ define('xwiki-ckeditor', [
     };
     if ($(element).attr('data-officeImporterSupported') === 'true') {
       config['xwiki-office'] = {
-        importer: sourceDocument.getURL('get', 'sheet=CKEditor.OfficeImporter')
+        importer: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.OfficeImporter',
+          language: $('html').attr('lang')
+        }))
       };
     }
     return config;

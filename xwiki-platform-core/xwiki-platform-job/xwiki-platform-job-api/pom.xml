@@ -20,20 +20,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
+    <artifactId>xwiki-platform-job</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
     <version>9.11.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-job</artifactId>
-  <name>XWiki Platform - Job - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Job - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-job-script</module>
-    <module>xwiki-platform-job-webjar</module>
-    <module>xwiki-platform-job-api</module>
-  </modules>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>xwiki-platform-job-api</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

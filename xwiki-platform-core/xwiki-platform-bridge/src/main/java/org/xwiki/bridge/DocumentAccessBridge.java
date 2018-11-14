@@ -29,6 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document

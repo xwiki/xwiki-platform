@@ -87,7 +87,7 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the specified document is restored.
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId, request.isCheckRights());
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId, request);
     }
 
     @Test
@@ -107,8 +107,8 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the individual documents from the batch are restored.
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId1, request.isCheckRights());
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId2, request.isCheckRights());
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId1, request);
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId2, request);
     }
 
     @Test
@@ -136,10 +136,10 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that each document is restored exactly 1 time.
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId1, request.isCheckRights());
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId2, request.isCheckRights());
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdB, request.isCheckRights());
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdC, request.isCheckRights());
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId1, request);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId2, request);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdB, request);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdC, request);
     }
 
     @Test
@@ -164,14 +164,7 @@ public class RestoreJobTest extends AbstractJobTest
         Job job = run(request);
 
         // Verify that the document is not restored.
-        verify(this.modelBridge, never()).restoreDeletedDocument(deletedDocumentId, request.isCheckRights());
-
-        // Verify that the job threw an exception.
-        Throwable expected = new IllegalArgumentException("No wiki reference was specified in the job request");
-        Throwable actual = job.getStatus().getError();
-        assertNotNull(actual);
-        assertEquals(expected.getClass(), actual.getClass());
-        assertEquals(expected.getMessage(), actual.getMessage());
+        verify(this.modelBridge, never()).restoreDeletedDocument(deletedDocumentId, request);
     }
 
     private RestoreRequest createRequest()

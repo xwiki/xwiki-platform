@@ -290,6 +290,46 @@
                     "methodName": "postNotifications",
                     "elementKind": "method",
                     "justification": "Adding a REST API is actually not a breakage."
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.refactoring.job.CreateRequest",
+                    "new": "class org.xwiki.refactoring.job.CreateRequest",
+                    "superClass": "org.xwiki.job.api.AbstractCheckRightsRequest",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "CreateRequest",
+                    "elementKind": "class",
+                    "justification": "False positive"
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.refactoring.job.EntityRequest",
+                    "new": "class org.xwiki.refactoring.job.EntityRequest",
+                    "superClass": "org.xwiki.job.api.AbstractCheckRightsRequest",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "EntityRequest",
+                    "elementKind": "class",
+                    "justification": "False positive"
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.refactoring.job.MoveRequest",
+                    "new": "class org.xwiki.refactoring.job.MoveRequest",
+                    "superClass": "org.xwiki.job.api.AbstractCheckRightsRequest",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "MoveRequest",
+                    "elementKind": "class",
+                    "justification": "False positive"
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.refactoring.job.RestoreRequest",
+                    "new": "class org.xwiki.refactoring.job.RestoreRequest",
+                    "superClass": "org.xwiki.job.api.AbstractCheckRightsRequest",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "RestoreRequest",
+                    "elementKind": "class",
+                    "justification": "False positive"
                   }
                 ]
               }

@@ -111,36 +111,6 @@ def builds = [
       profiles: 'quality,legacy',
       xvnc: false
     )
-  },
-  'Docker - MySQL/Tomcat/Chrome' : {
-    // Smoke tests to verify XWiki works fine on this configuration, by testing on a single test.
-    build(
-      name: 'Docker - MySQL/Tomcat/Chrome',
-      node: 'docker',
-      profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=chrome -Dxwiki.test.ui.database=mysql -Dxwiki.test.ui.servletEngine=tomcat',
-      projects: 'org.xwiki.platform:xwiki-platform-menu-test,org.xwiki.platform:xwiki-platform-menu-test-pageobjects,org.xwiki.platform:xwiki-platform-menu-test-docker'
-    )
-  },
-  'Docker - PostgreSQL/Jetty/Chrome' : {
-    // Smoke tests to verify XWiki works fine on this configuration, by testing on a single test.
-    build(
-      name: 'Docker - PostgreSQL/Jetty/Chrome',
-      node: 'docker',
-      profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=chrome -Dxwiki.test.ui.database=postgresql -Dxwiki.test.ui.servletEngine=jetty_standalone',
-      projects: 'org.xwiki.platform:xwiki-platform-menu-test,org.xwiki.platform:xwiki-platform-menu-test-pageobjects,org.xwiki.platform:xwiki-platform-menu-test-docker'
-    )
-  },
-  'Docker - HSQLDB/Tomcat/Firefox' : {
-    // Smoke tests to verify XWiki works fine on this configuration, by testing on a single test.
-    build(
-      name: 'Docker - HSQLDB/Tomcat/Firefox',
-      node: 'docker',
-      profiles: 'docker,legacy,integration-tests,office-tests,snapshotModules',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -Dxwiki.test.ui.browser=firefox -Dxwiki.test.ui.database=hsqldb_embedded -Dxwiki.test.ui.servletEngine=tomcat',
-      projects: 'org.xwiki.platform:xwiki-platform-menu-test,org.xwiki.platform:xwiki-platform-menu-test-pageobjects,org.xwiki.platform:xwiki-platform-menu-test-docker'
-    )
   }
 ]
 
@@ -165,19 +135,6 @@ def buildAll(builds)
       // Note: We configure the snapshot extension repository in XWiki (-PsnapshotModules) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       builds['Main'].call()
-
-      // Build the functional tests requiring docker to be installed on the executing agent
-      parallel(
-        'docker-mysql-tomcat-chrome': {
-          builds['Docker - MySQL/Tomcat/Chrome'].call()
-        },
-        'docker-postgresql-jetty-chrome': {
-          builds['Docker - PostgreSQL/Jetty/Chrome'].call()
-        },
-        'docker-hsqldb-tomcat-firefox': {
-          builds['Docker - HSQLDB/Tomcat/Firefox'].call()
-        }
-      )
 
       // Note: We want the following behavior:
       // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
@@ -247,20 +204,20 @@ def build(map)
   node(map.node ?: '') {
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
-      if (map.goals) {
+      if (map.goals != null) {
         goals = map.goals
       }
-      if (map.profiles) {
+      if (map.profiles != null) {
         profiles = map.profiles
       }
-      if (map.properties) {
+      if (map.properties != null) {
         properties = map.properties
       }
-      if (map.pom) {
+      if (map.pom != null) {
         pom = map.pom
       }
-      if (map.projects) {
-        projects = map.projects
+      if (map.mavenFlags != null) {
+        mavenFlags = map.mavenFlags
       }
     }
   }

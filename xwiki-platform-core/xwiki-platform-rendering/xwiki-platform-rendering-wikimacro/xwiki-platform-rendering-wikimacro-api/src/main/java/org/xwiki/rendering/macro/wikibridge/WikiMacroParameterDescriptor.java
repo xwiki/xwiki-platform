@@ -132,13 +132,14 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
 
     @Override
     @Deprecated
-    public Class< ? > getType()
+    public Class<?> getType()
     {
-        if (this.parameterType == null) {
-            return String.class;
-        } else {
-            return ReflectionUtils.getTypeClass(this.parameterType);
+        Class<?> type = ReflectionUtils.getTypeClass(this.parameterType);
+        if (type == null) {
+            type = String.class;
         }
+
+        return type;
     }
 
     @Override

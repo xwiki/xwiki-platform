@@ -139,6 +139,8 @@ public interface ModelBridge
      * @param deletedDocumentId the ID of the deleted document to restore
      * @param checkRightsRequest the request containing info about rights to check
      * @return {@code true} if the document was restored successfully, {@code false} if the restore failed
+     *
+     * @since 10.10RC1
      */
     boolean restoreDeletedDocument(long deletedDocumentId, AbstractCheckRightsRequest checkRightsRequest);
 

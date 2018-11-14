@@ -19,9 +19,9 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 
 /**
@@ -134,16 +134,11 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     @Deprecated
     public Class< ? > getType()
     {
-        Class<?> clazz;
-        if (this.parameterType instanceof Class) {
-            clazz = (Class) this.parameterType;
-        } else if (this.parameterType instanceof ParameterizedType) {
-            clazz = (Class) ((ParameterizedType) this.parameterType).getRawType();
+        if (this.parameterType == null) {
+            return String.class;
         } else {
-            clazz = String.class;
+            return ReflectionUtils.getTypeClass(this.parameterType);
         }
-
-        return clazz;
     }
 
     @Override

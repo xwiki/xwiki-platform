@@ -17,15 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.junit5.servletEngine;
+
+import org.xwiki.test.docker.junit5.TestConfiguration;
 
 /**
- * The database to use for the UI tests.
+ * The Servlet Engine to use for the UI tests.
  *
  * @version $Id$
  * @since 10.9
  */
-public enum Database
+public enum ServletEngine
 {
     /**
      * The browser is selected based on a system property value.
@@ -34,46 +36,47 @@ public enum Database
     SYSTEM,
 
     /**
-     * Represents the MySQL database.
+     * Represents the Tomcat Servlet engine.
      */
-    MYSQL,
+    TOMCAT,
 
     /**
-     * Represents the HyperSQL database, running outside of a Docker contaier.
+     * Represents the Jetty Servlet engine (running inside Docker).
      */
-    HSQLDB_EMBEDDED,
+    JETTY,
 
     /**
-     * Represents the PostgreSQL database.
+     * Represents the Jetty Servlet engine but running outside of Docker.
      */
-    POSTGRESQL,
+    JETTY_STANDALONE(true),
 
     /**
-     * Represents the Oracle database.
+     * Represents the JBoss Wildfly engine.
      */
-    ORACLE;
+    WILDFLY,
 
-    private String ipAddress;
+    /**
+     * Represents an external Servlet Engine already configured and running (we won't start or stop it).
+     */
+    EXTERNAL(true);
 
-    private int port;
+    private boolean isOutsideDocker;
 
-    void setIpAddress(String ipAddress)
+    ServletEngine()
     {
-        this.ipAddress = ipAddress;
+        // By default all servlet engines run inside docker containers.
     }
 
-    String getIpAddress()
+    ServletEngine(boolean isOutsideDocker)
     {
-        return this.ipAddress;
+        this.isOutsideDocker = isOutsideDocker;
     }
 
-    void setPort(int port)
+    /**
+     * @return true if the Servlet engine is meant to be running on the host and not in a Docker container
+     */
+    public boolean isOutsideDocker()
     {
-        this.port = port;
-    }
-
-    int getPort()
-    {
-        return this.port;
+        return this.isOutsideDocker;
     }
 }

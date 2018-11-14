@@ -24,6 +24,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
+import org.xwiki.test.docker.junit5.servletEngine.ServletContainerExecutor;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;

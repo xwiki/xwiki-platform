@@ -32,6 +32,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.tool.extension.util.ExtensionMojoHelper;
 
 /**
@@ -212,6 +213,11 @@ public class WARBuilder
                 String mysqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
                     ? this.testConfiguration.getJDBCDriverVersion() : "5.1.45";
                 artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, mysqlDriverVersion);
+                break;
+            case MARIADB:
+                String mariadbDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "2.3.0";
+                artifact = new DefaultArtifact("org.mariadb.jdbc", "mariadb-java-client", JAR, mariadbDriverVersion);
                 break;
             case POSTGRESQL:
                 String pgsqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null

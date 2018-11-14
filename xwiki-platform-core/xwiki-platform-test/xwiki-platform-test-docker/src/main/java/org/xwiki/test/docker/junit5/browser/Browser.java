@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.junit5.browser;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 
 /**
  * The browser to use for the UI tests.
@@ -57,7 +58,10 @@ public enum Browser
         this.capabilities = capabilities;
     }
 
-    DesiredCapabilities getCapabilities()
+    /**
+     * @return the Selenium capability object for the selected browser.
+     */
+    public DesiredCapabilities getCapabilities()
     {
         return this.capabilities;
     }

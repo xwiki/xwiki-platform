@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.junit5.servletEngine;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +37,9 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.docker.junit5.ArtifactResolver;
+import org.xwiki.test.docker.junit5.DockerTestUtils;
+import org.xwiki.test.docker.junit5.MavenResolver;
 import org.xwiki.test.integration.XWikiExecutor;
 
 /**

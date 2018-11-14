@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.junit5.servletEngine;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,6 +28,11 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
+import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.junit5.ArtifactResolver;
+import org.xwiki.test.docker.junit5.MavenResolver;
+import org.xwiki.test.docker.junit5.RepositoryResolver;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -96,6 +101,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     ? testConfiguration.getServletEngineTag() : LATEST);
                 servletContainer = new GenericContainer<>(jettyTag);
                 setWebappMount(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
+
+                break;
+            case WILDFLY:
+                String wildflyTag = String.format("jboss/wildfly:%s", testConfiguration.getServletEngineTag() != null
+                    ? testConfiguration.getServletEngineTag() : LATEST);
+                servletContainer = new GenericContainer<>(wildflyTag);
+                setWebappMount(servletContainer, sourceWARDirectory, "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
                 break;
             case JETTY_STANDALONE:

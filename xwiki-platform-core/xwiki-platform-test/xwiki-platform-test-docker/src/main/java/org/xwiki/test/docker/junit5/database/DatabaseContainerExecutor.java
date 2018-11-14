@@ -17,13 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.junit5.database;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -47,6 +50,9 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         switch (testConfiguration.getDatabase()) {
             case MYSQL:
                 startMySQLContainer(testConfiguration);
+                break;
+            case MARIADB:
+                startMariaDBContainer(testConfiguration);
                 break;
             case POSTGRESQL:
                 startPostgreSQLContainer(testConfiguration);
@@ -86,6 +92,11 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         } else {
             databaseContainer = new MySQLContainer<>();
         }
+        startMySQLContainer(databaseContainer, testConfiguration);
+    }
+
+    private void startMySQLContainer(JdbcDatabaseContainer databaseContainer, TestConfiguration testConfiguration)
+    {
         databaseContainer
             .withDatabaseName(DBNAME)
             .withUsername(DBUSERNAME)
@@ -102,6 +113,17 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         databaseContainer.addParameter("explicit-defaults-for-timestamp", "1");
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
+    }
+
+    private void startMariaDBContainer(TestConfiguration testConfiguration)
+    {
+        JdbcDatabaseContainer databaseContainer;
+        if (testConfiguration.getDatabaseTag() != null) {
+            databaseContainer = new MariaDBContainer<>(String.format("mariadb:%s", testConfiguration.getDatabaseTag()));
+        } else {
+            databaseContainer = new MariaDBContainer<>();
+        }
+        startMySQLContainer(databaseContainer, testConfiguration);
     }
 
     private void startPostgreSQLContainer(TestConfiguration testConfiguration)

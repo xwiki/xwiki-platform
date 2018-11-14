@@ -38,6 +38,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.text.StringUtils;
 
 /**

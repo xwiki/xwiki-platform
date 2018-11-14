@@ -28,6 +28,8 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 10.10RC1
+ * @since 10.8.2
+ * @since 9.11.9
  */
 @Unstable
 public abstract class AbstractCheckRightsRequest extends AbstractRequest
@@ -117,9 +119,6 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
     /**
      * @return the author of the script which is performing the request; this user must be authorized to perform the
      * actions implied by this request if {@link #isCheckRights()} is {@code true}.
-     * @since 10.10RC1
-     * @since 10.8.2
-     * @since 9.11.9
      */
     public DocumentReference getAuthorReference()
     {
@@ -131,9 +130,6 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
      * actions implied by this request if {@link #isCheckRights()} is {@code true}.
      *
      * @param authorReference the author reference
-     * @since 10.10RC1
-     * @since 10.8.2
-     * @since 9.11.9
      */
     public void setAuthorReference(DocumentReference authorReference)
     {

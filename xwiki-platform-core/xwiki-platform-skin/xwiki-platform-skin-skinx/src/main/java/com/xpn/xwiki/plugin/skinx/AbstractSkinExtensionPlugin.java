@@ -412,8 +412,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     protected SkinExtensionAsync getSkinExtensionAsync()
     {
         if (this.async == null) {
-            this.async =
-                Utils.getComponent(SkinExtensionAsync.class);
+            this.async = Utils.getComponent(SkinExtensionAsync.class);
         }
 
         return this.async;

@@ -38,6 +38,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.RestoreRequest;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 
 /**
  * A job that can restore entities.
@@ -82,8 +83,6 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
 
         initializeContext(request);
 
-        boolean checkRights = request.isCheckRights();
-
         this.progressManager.pushLevelProgress(2, this);
 
         this.progressManager.startStep(this);
@@ -94,12 +93,12 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
         this.progressManager.startStep(this);
 
         // Process each ID and try to restore it.
-        restoreDocuments(idsToRestore, checkRights);
+        restoreDocuments(idsToRestore, request);
 
         this.progressManager.popLevelProgress(this);
     }
 
-    private void restoreDocuments(List<Long> idsToRestore, boolean checkRights)
+    private void restoreDocuments(List<Long> idsToRestore, AbstractCheckRightsRequest checkRightsRequest)
     {
         this.progressManager.pushLevelProgress(idsToRestore.size(), this);
 
@@ -108,7 +107,7 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
                 break;
             } else {
                 this.progressManager.startStep(this);
-                modelBridge.restoreDeletedDocument(idToRestore, checkRights);
+                modelBridge.restoreDeletedDocument(idToRestore, checkRightsRequest);
                 this.progressManager.endStep(this);
             }
         }

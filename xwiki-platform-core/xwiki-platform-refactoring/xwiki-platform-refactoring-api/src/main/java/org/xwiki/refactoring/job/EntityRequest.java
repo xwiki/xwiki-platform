@@ -24,8 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.job.AbstractRequest;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -34,7 +33,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 7.2M1
  */
-public class EntityRequest extends AbstractRequest
+public class EntityRequest extends AbstractCheckRightsRequest
 {
     /**
      * Serialization identifier.
@@ -45,21 +44,6 @@ public class EntityRequest extends AbstractRequest
      * @see #getJobType()
      */
     private static final String PROPERTY_JOB_TYPE = "job.type";
-
-    /**
-     * @see #getUserReference()
-     */
-    private static final String PROPERTY_USER_REFERENCE = "user.reference";
-
-    /**
-     * @see #getAuthorReference()
-     */
-    private static final String PROPERTY_CALLER_REFERENCE = "caller.reference";
-
-    /**
-     * @see #isCheckRights()
-     */
-    private static final String PROPERTY_CHECK_RIGHTS = "checkrights";
 
     /**
      * @see #getEntityReferences()
@@ -98,73 +82,6 @@ public class EntityRequest extends AbstractRequest
     public void setJobType(String jobType)
     {
         setProperty(PROPERTY_JOB_TYPE, jobType);
-    }
-
-    /**
-     * @return {@code true} in case the job should check if the user specified by {@link #getUserReference()} is
-     *         authorized to perform the actions implied by this request, {@code false} otherwise
-     */
-    public boolean isCheckRights()
-    {
-        return getProperty(PROPERTY_CHECK_RIGHTS, true);
-    }
-
-    /**
-     * Sets whether the job should check or not if the user specified by {@link #getUserReference()} is authorized to
-     * perform the actions implied by this request.
-     * 
-     * @param checkRights {@code true} to check if {@link #getUserReference()} is authorized to perform this request,
-     *            {@code false} to perform this request without checking rights
-     */
-    public void setCheckRights(boolean checkRights)
-    {
-        setProperty(PROPERTY_CHECK_RIGHTS, checkRights);
-    }
-
-    /**
-     * @return the user that should be used to perform this request; this user must be authorized to perform the actions
-     *         implied by this request if {@link #isCheckRights()} is {@code true}.
-     */
-    public DocumentReference getUserReference()
-    {
-        return getProperty(PROPERTY_USER_REFERENCE);
-    }
-
-    /**
-     * Sets the user that should be used to perform this request. This user must be authorized to perform the actions
-     * implied by this request if {@link #isCheckRights()} is {@code true}.
-     * 
-     * @param userReference the user reference
-     */
-    public void setUserReference(DocumentReference userReference)
-    {
-        setProperty(PROPERTY_USER_REFERENCE, userReference);
-    }
-
-    /**
-     * @return the author of the script which is performing the request; this user must be authorized to perform the
-     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
-     * @since 10.10RC1
-     * @since 10.8.2
-     * @since 9.11.9
-     */
-    public DocumentReference getAuthorReference()
-    {
-        return getProperty(PROPERTY_CALLER_REFERENCE);
-    }
-
-    /**
-     * Sets the author of the script which is performing the request. This user must be authorized to perform the
-     * actions implied by this request if {@link #isCheckRights()} is {@code true}.
-     *
-     * @param authorReference the author reference
-     * @since 10.10RC1
-     * @since 10.8.2
-     * @since 9.11.9
-     */
-    public void setAuthorReference(DocumentReference authorReference)
-    {
-        setProperty(PROPERTY_CALLER_REFERENCE, authorReference);
     }
 
     /**

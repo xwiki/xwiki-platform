@@ -19,11 +19,14 @@
  */
 package org.xwiki.rendering.async.script;
 
+import java.lang.reflect.Type;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.AsyncRendererCache;
 import org.xwiki.script.service.ScriptService;
@@ -67,5 +70,46 @@ public class AsyncScriptService implements ScriptService
     public void flushCache()
     {
         this.cache.flush();
+    }
+
+    /**
+     * Indicate that the current execution manipulate the passed entity and the result will need to be removed from the
+     * cache if it's modified in any way.
+     * <p>
+     * <ul>
+     * <li>If the reference is a document, any modification made to that document (including object and attachments)
+     * will be affected.</li>
+     * <li>If the reference is a document containing a class any modification of an object of that class will be
+     * affected.</li>
+     * </ul>
+     * 
+     * @param reference the reference of the entity
+     */
+    public void useEntity(EntityReference reference)
+    {
+        this.asyncContext.useEntity(reference);
+    }
+
+    /**
+     * Indicate that the current execution manipulate components of the passed type and the result will need to be
+     * removed from the cache if any is unregistered or a new one registered.
+     * 
+     * @param roleType the type of the component role
+     */
+    public void useComponent(Type roleType)
+    {
+        this.asyncContext.useComponent(roleType);
+    }
+
+    /**
+     * Indicate that the current execution manipulate component with the passed type and hint and the result will need
+     * to be removed from the cache if it's registered or unregistered.
+     * 
+     * @param roleType the type of the component role
+     * @param roleHint the hint of the component
+     */
+    public void useComponent(Type roleType, String roleHint)
+    {
+        this.asyncContext.useComponent(roleType, roleHint);
     }
 }

@@ -37,4 +37,12 @@ public interface AsyncContextHandler
      * @param values the values to restore
      */
     void use(Collection<Object> values);
+
+    /**
+     * Add to the returned HTML head tags required elements (required js/css, metadatas, etc.).
+     * 
+     * @param head the head to fill
+     * @param values the values for which to add HTML meta (if needed)
+     */
+    void addHTMLHead(StringBuilder head, Collection<Object> values);
 }

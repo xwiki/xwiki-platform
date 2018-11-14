@@ -20,9 +20,11 @@
 package org.xwiki.skinx.internal.async;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -31,6 +33,10 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.skinx.SkinExtension;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin;
 
 /**
  * {@link AsyncContextHandler} handler for skin extensions.
@@ -45,6 +51,9 @@ public class SkinExtensionAsyncContextHandler implements AsyncContextHandler
 {
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private Logger logger;
@@ -77,5 +86,36 @@ public class SkinExtensionAsyncContextHandler implements AsyncContextHandler
         } else {
             skinExtension.use(info.getResource());
         }
+    }
+
+    @Override
+    public void addHTMLHead(StringBuilder meta, Collection<Object> values)
+    {
+        // TODO: A bit hacky right now, the skinx module should be refactored to be fully based on components
+        XWikiContext xcontext = this.xcontextProvider.get();
+        List<XWikiPluginInterface> plugins = xcontext.getWiki().getPluginManager().getPlugins("endParsing");
+
+        for (Object value : values) {
+            SkinExtensionInfo info = (SkinExtensionInfo) value;
+
+            AbstractSkinExtensionPlugin skinPlugin = getPlugin(info.getType(), plugins);
+
+            if (skinPlugin != null) {
+                meta.append(skinPlugin.getLink(info.getResource(), xcontext));
+            } else {
+                this.logger.warn("Cannot find skin extension plugin for resource type [{}]", info.getType());
+            }
+        }
+    }
+
+    private AbstractSkinExtensionPlugin getPlugin(String name, List<XWikiPluginInterface> plugins)
+    {
+        for (XWikiPluginInterface plugin : plugins) {
+            if (plugin instanceof AbstractSkinExtensionPlugin && plugin.getName().equals(name)) {
+                return (AbstractSkinExtensionPlugin) plugin;
+            }
+        }
+
+        return null;
     }
 }

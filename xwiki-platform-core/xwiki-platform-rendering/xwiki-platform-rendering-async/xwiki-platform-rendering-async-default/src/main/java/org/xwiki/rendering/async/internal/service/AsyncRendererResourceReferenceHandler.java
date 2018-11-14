@@ -22,18 +22,26 @@ package org.xwiki.rendering.async.internal.service;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
+import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
-import org.xwiki.rendering.async.internal.AsyncRendererResult;
+import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
@@ -69,6 +77,12 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     @Inject
     private Container container;
 
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
+
     @Override
     public List<ResourceType> getSupportedResourceReferences()
     {
@@ -81,25 +95,47 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     {
         AsyncRendererResourceReference reference = (AsyncRendererResourceReference) resourceReference;
 
-        // Get the asynchronous renderer result
-        AsyncRendererResult result;
+        // Get the asynchronous renderer status
+        AsyncRendererJobStatus status;
         try {
-            result = this.executor.getResult(reference.getId(), true);
+            // TODO: don't wait forever and return the job progress if not finished
+            status = this.executor.getResult(reference.getId(), Long.MAX_VALUE, TimeUnit.DAYS);
         } catch (InterruptedException e) {
             throw new ResourceReferenceHandlerException("Failed to get content", e);
         }
 
         // Check of a result was actually found for this id
-        if (result == null) {
-            throw new ResourceReferenceHandlerException("Cannot find any result for id [" + reference.getId() + "]");
+        if (status == null) {
+            throw new ResourceReferenceHandlerException("Cannot find any status for id [" + reference.getId() + "]");
         }
 
         // Send the result back
         Response response = this.container.getResponse();
         response.setContentType("text/html");
 
+        // Create the asynchronous HTML meta
+        StringBuilder head = new StringBuilder();
+        Map<String, Collection<Object>> uses = status.getUses();
+        for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
+            AsyncContextHandler handler;
+            try {
+                handler = this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get AsyncContextHandler with type [{}]", entry.getKey(), e);
+
+                continue;
+            }
+
+            handler.addHTMLHead(head, entry.getValue());
+        }
+        if (head.length() > 0) {
+            if (response instanceof ServletResponse) {
+                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+            }
+        }
+
         try (OutputStream stream = response.getOutputStream()) {
-            IOUtils.write(result.getResult(), stream, StandardCharsets.UTF_8);
+            IOUtils.write(status.getResult().getResult(), stream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException("Failed to send content", e);
         }

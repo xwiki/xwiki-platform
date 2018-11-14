@@ -21,6 +21,7 @@ package org.xwiki.rendering.async.internal;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.job.JobException;
@@ -42,11 +43,18 @@ public interface AsyncRendererExecutor
 {
     /**
      * @param id the identifier of the execution
-     * @param wait true if the method should wait for the execution to be finished, otherwise return null
+     * @return the status corresponding to the passed id or null if not could be found
+     */
+    AsyncRendererJobStatus getResult(List<String> id);
+
+    /**
+     * @param id the identifier of the execution
+     * @param time the maximum time to wait
+     * @param unit the time unit of the {@code time} argument
      * @return the result of the {@link AsyncRenderer} execution for the passed id
      * @throws InterruptedException when the thread is interrupted while waiting
      */
-    AsyncRendererResult getResult(List<String> id, boolean wait) throws InterruptedException;
+    AsyncRendererJobStatus getResult(List<String> id, long time, TimeUnit unit) throws InterruptedException;
 
     /**
      * Start and cache or return the status of the job corresponding to the passed renderer.

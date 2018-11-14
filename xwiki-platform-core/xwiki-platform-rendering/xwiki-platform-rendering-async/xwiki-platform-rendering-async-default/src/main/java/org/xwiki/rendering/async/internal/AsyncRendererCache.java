@@ -50,34 +50,14 @@ import org.xwiki.model.reference.EntityReference;
  */
 @Component(roles = AsyncRendererCache.class)
 @Singleton
-public class AsyncRendererCache implements Initializable, CacheEntryListener<AsyncRendererCache.AsyncRendererCacheEntry>
+public class AsyncRendererCache implements Initializable, CacheEntryListener<AsyncRendererJobStatus>
 {
-    class AsyncRendererCacheEntry
-    {
-        /**
-         * The status.
-         */
-        private final AsyncRendererJobStatus status;
-
-        /**
-         * Indicate if the entry should be removed the first time it's used.
-         */
-        private final boolean unique;
-
-        AsyncRendererCacheEntry(AsyncRendererJobStatus status)
-        {
-            this.status = status;
-            this.unique = !status.getRequest().getRenderer().isCacheAllowed();
-
-            // Avoid storing useless stuff in the RAM
-            this.status.dispose();
-        }
-    }
-
     @Inject
     private CacheManager cacheManager;
 
-    private Cache<AsyncRendererCacheEntry> cache;
+    private Cache<AsyncRendererJobStatus> uniqueCache;
+
+    private Cache<AsyncRendererJobStatus> cache;
 
     private Map<EntityReference, Set<String>> referenceMapping = new ConcurrentHashMap<>();
 
@@ -104,8 +84,15 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     public void initialize() throws InitializationException
     {
         try {
+            // Standard cache (long lived but small by default)
             this.cache =
                 this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer", 100, 86400));
+
+            // Cache of unique result (i.e. not cached) kept only for the small period between which the job is finished
+            // but it was not asked yet by the client (short live but by size)
+            LRUCacheConfiguration configuration = new LRUCacheConfiguration("rendering.asyncrenderer.nocache");
+            configuration.getLRUEvictionConfiguration().setLifespan(600);
+            this.uniqueCache = this.cacheManager.createNewCache(configuration);
         } catch (CacheException e) {
             throw new InitializationException("Failed to initialize cache", e);
         }
@@ -121,14 +108,20 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     {
         String cacheKey = toCacheKey(id);
 
-        AsyncRendererCacheEntry entry = this.cache.get(cacheKey);
+        // Try standard cache
+        AsyncRendererJobStatus status = this.cache.get(cacheKey);
 
-        if (entry != null) {
-            if (entry.unique) {
-                this.cache.remove(cacheKey);
-            }
+        if (status != null) {
+            return status;
+        }
 
-            return entry.status;
+        // Try unique cache
+        status = this.uniqueCache.get(cacheKey);
+
+        if (status != null) {
+            this.uniqueCache.remove(cacheKey);
+
+            return status;
         }
 
         return null;
@@ -139,7 +132,18 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public void put(AsyncRendererJobStatus status)
     {
-        this.cache.set(toCacheKey(status.getRequest().getId()), new AsyncRendererCacheEntry(status));
+        boolean cacheAllowed = status.getRequest().getRenderer().isCacheAllowed();
+
+        // Avoid storing useless stuff in the RAM
+        status.dispose();
+
+        String cacheKey = toCacheKey(status.getRequest().getId());
+
+        if (cacheAllowed) {
+            this.cache.set(cacheKey, status);
+        } else {
+            this.uniqueCache.set(cacheKey, status);
+        }
     }
 
     /**
@@ -148,38 +152,39 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     public void flush()
     {
         this.cache.removeAll();
+        this.uniqueCache.removeAll();
     }
 
     @Override
-    public void cacheEntryAdded(CacheEntryEvent<AsyncRendererCacheEntry> event)
+    public void cacheEntryAdded(CacheEntryEvent<AsyncRendererJobStatus> event)
     {
-        CacheEntry<AsyncRendererCacheEntry> entry = event.getEntry();
-        AsyncRendererCacheEntry value = entry.getValue();
+        CacheEntry<AsyncRendererJobStatus> entry = event.getEntry();
+        AsyncRendererJobStatus status = entry.getValue();
         String key = entry.getKey();
 
-        for (EntityReference reference : value.status.getReferences()) {
+        for (EntityReference reference : status.getReferences()) {
             this.referenceMapping.computeIfAbsent(reference, k -> ConcurrentHashMap.newKeySet()).add(key);
         }
 
-        for (Type role : value.status.getRoleTypes()) {
+        for (Type role : status.getRoleTypes()) {
             this.roleTypeMapping.computeIfAbsent(role, k -> ConcurrentHashMap.newKeySet()).add(key);
         }
 
-        for (ComponentRole<?> role : value.status.getRoles()) {
+        for (ComponentRole<?> role : status.getRoles()) {
             this.roleMapping.computeIfAbsent(role, k -> ConcurrentHashMap.newKeySet()).add(key);
         }
     }
 
     @Override
-    public void cacheEntryRemoved(CacheEntryEvent<AsyncRendererCacheEntry> event)
+    public void cacheEntryRemoved(CacheEntryEvent<AsyncRendererJobStatus> event)
     {
-        CacheEntry<AsyncRendererCacheEntry> entry = event.getEntry();
-        AsyncRendererCacheEntry value = entry.getValue();
+        CacheEntry<AsyncRendererJobStatus> entry = event.getEntry();
+        AsyncRendererJobStatus status = entry.getValue();
         String key = entry.getKey();
 
-        remove(key, value.status.getReferences(), this.referenceMapping);
-        remove(key, value.status.getRoleTypes(), this.roleTypeMapping);
-        remove(key, value.status.getRoles(), this.roleMapping);
+        remove(key, status.getReferences(), this.referenceMapping);
+        remove(key, status.getRoleTypes(), this.roleTypeMapping);
+        remove(key, status.getRoles(), this.roleMapping);
     }
 
     private <T> void remove(String key, Set<T> values, Map<T, Set<String>> mapping)
@@ -198,7 +203,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     }
 
     @Override
-    public void cacheEntryModified(CacheEntryEvent<AsyncRendererCacheEntry> event)
+    public void cacheEntryModified(CacheEntryEvent<AsyncRendererJobStatus> event)
     {
         cacheEntryAdded(event);
     }
@@ -208,7 +213,12 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public void cleanCache(EntityReference reference)
     {
-        clean(this.referenceMapping.remove(reference));
+        if (reference != null) {
+            clean(this.referenceMapping.remove(reference));
+
+            // Also clean entries associated to one of the reference parents
+            cleanCache(reference.getParent());
+        }
     }
 
     /**
@@ -243,6 +253,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         if (keys != null) {
             for (String key : keys) {
                 this.cache.remove(key);
+                this.uniqueCache.remove(key);
             }
         }
     }

@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobException;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
@@ -85,6 +86,9 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
     @Inject
     private Provider<DefaultBlockAsyncRenderer> rendererProvider;
 
+    @Inject
+    private JobProgressManager progress;
+
     @Override
     public Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries)
         throws JobException, RenderingException
@@ -96,14 +100,30 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
     public Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries, Right right,
         EntityReference rightEntity) throws JobException, RenderingException
     {
-        // Create renderer (it might not be used but it should not be very expensive and it makes the code much simpler)
-        DefaultBlockAsyncRenderer renderer = this.rendererProvider.get();
-        renderer.initialize(configuration);
+        this.progress.pushLevelProgress(3, this);
 
-        // Start renderer execution if there is none already running/available
-        return execute(configuration.getDecorator() != null
-            ? new DecoratorWrapper(configuration.getDecorator(), renderer) : renderer, contextEntries, right,
-            rightEntity);
+        try {
+            this.progress.startStep(this, "async.block.progress.createRenderer", "Create asynchronous block renderer");
+
+            // Create renderer (it might not be used but it should not be very expensive and it makes the code much
+            // simpler)
+            DefaultBlockAsyncRenderer renderer = this.rendererProvider.get();
+
+            this.progress.startStep(this, "async.block.progress.initRenderer",
+                "Initialize asynchronous block renderer");
+
+            renderer.initialize(configuration);
+
+            this.progress.startStep(this, "async.block.progress.executeRenderer",
+                "Execute asynchronous block renderer");
+
+            // Start renderer execution if there is none already running/available
+            return execute(configuration.getDecorator() != null
+                ? new DecoratorWrapper(configuration.getDecorator(), renderer) : renderer, contextEntries, right,
+                rightEntity);
+        } finally {
+            this.progress.popLevelProgress(this);
+        }
     }
 
     @Override

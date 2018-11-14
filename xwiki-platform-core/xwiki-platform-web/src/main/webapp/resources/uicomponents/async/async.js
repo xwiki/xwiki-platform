@@ -20,12 +20,24 @@
 require(["jquery"], function($) {
   var activateAsyncPlaceHolder = function(element)
   {
-    var id = element.dataset.xwikiAsyncId;
+    var url = element.dataset.xwikiAsyncUrl;
 
-    var url = "${request.contextPath}/asyncrenderer/" + id;
+    // If the URL is not provided calculate it based on the id
+    if (!url) {
+        var id = element.dataset.xwikiAsyncId;
+
+        if (id) {
+          url = "${request.contextPath}/asyncrenderer/" + id;
+        }
+    }
+
+    // Don't do anything if we don't have enough information
+    if (!url) {
+      return ;
+    }
 
     element = $(element);
-    
+
     // Insert spinner (it will replaced by the result)
     if (element.tagName == 'div') {
       element.html('<div class="fa fa-spinner fa-spin"/>');
@@ -35,7 +47,17 @@ require(["jquery"], function($) {
 
     // TODO: don't wait forever
     // TODO: show progress
-    element.load(url);
+    // TODO: error handling
+    $.get(url).done(function(data, textStatus, xhr) {
+      // Add asynchronous meta tags
+      var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
+      if (asyncHead) {
+        $('head').append(asyncHead);
+      }
+
+      // Replace the element by the asynchronous result
+      element.replaceWith(data);
+    })
   }
 
   var onMutations = function(mutations)

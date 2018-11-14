@@ -45,6 +45,11 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
@@ -86,7 +87,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     private AtomicLong uniqueId = new AtomicLong();
 
     @Override
-    public AsyncRendererResult getResult(List<String> id, boolean wait) throws InterruptedException
+    public AsyncRendererJobStatus getResult(List<String> id)
     {
         //////////////////////////////////////////////
         // Try running job
@@ -94,13 +95,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         Job job = this.executor.getJob(id);
 
         if (job != null) {
-            AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
-
-            if (status.getState() != State.FINISHED && wait) {
-                job.join();
-            }
-
-            return status.getResult();
+            return (AsyncRendererJobStatus) job.getStatus();
         }
 
         //////////////////////////////////////////////
@@ -109,10 +104,26 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         AsyncRendererJobStatus status = this.cache.get(id);
 
         if (status != null) {
-            return status.getResult();
+            return status;
         }
 
         return null;
+    }
+
+    @Override
+    public AsyncRendererJobStatus getResult(List<String> id, long time, TimeUnit unit) throws InterruptedException
+    {
+        AsyncRendererJobStatus status = getResult(id);
+
+        if (status.getState() != State.FINISHED) {
+            Job job = this.executor.getJob(id);
+
+            if (job != null) {
+                job.join(time, unit);
+            }
+        }
+
+        return status;
     }
 
     @Override

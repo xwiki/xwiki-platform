@@ -32,7 +32,7 @@
   </parent>
   <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-ckeditor-test</artifactId>
-  <version>1.26</version>
+  <version>1.27-SNAPSHOT</version>
   <name>CKEditor Integration Test Modules</name>
   <packaging>pom</packaging>
   <description>Functional tests for the CKEditor Integration</description>
@@ -46,7 +46,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-ckeditor.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-ckeditor.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-ckeditor/tree/master</url>
-    <tag>application-ckeditor-1.26</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

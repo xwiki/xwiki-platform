@@ -87,7 +87,7 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the specified document is restored.
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId, true);
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId, request);
     }
 
     @Test
@@ -107,8 +107,8 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that the individual documents from the batch are restored.
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId1, false);
-        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId2, false);
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId1, request);
+        verify(this.modelBridge).restoreDeletedDocument(deletedDocumentId2, request);
     }
 
     @Test
@@ -136,10 +136,10 @@ public class RestoreJobTest extends AbstractJobTest
         verifyContext();
 
         // Verify that each document is restored exactly 1 time.
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId1, false);
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId2, false);
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdB, false);
-        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdC, false);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId1, request);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentId2, request);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdB, request);
+        verify(this.modelBridge, atMost(1)).restoreDeletedDocument(deletedDocumentIdC, request);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class RestoreJobTest extends AbstractJobTest
         }
 
         // Verify that the document is not restored.
-        verify(this.modelBridge, never()).restoreDeletedDocument(deletedDocumentId, false);
+        verify(this.modelBridge, never()).restoreDeletedDocument(deletedDocumentId, request);
     }
 
     private RestoreRequest createRequest()

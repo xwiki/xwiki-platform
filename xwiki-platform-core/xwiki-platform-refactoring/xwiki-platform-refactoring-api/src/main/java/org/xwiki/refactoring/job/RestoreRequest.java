@@ -21,8 +21,7 @@ package org.xwiki.refactoring.job;
 
 import java.util.List;
 
-import org.xwiki.job.AbstractRequest;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.WikiReference;
 
 /**
@@ -32,17 +31,13 @@ import org.xwiki.model.reference.WikiReference;
  * @version $Id$
  * @since 9.4RC1
  */
-public class RestoreRequest extends AbstractRequest
+public class RestoreRequest extends AbstractCheckRightsRequest
 {
     private static final long serialVersionUID = 7738465742607715013L;
 
     private static final String BATCH_ID = "batchId";
 
     private static final String DELETED_DOCUMENT_IDS = "deletedDocumentIds";
-
-    private static final String CHECK_RIGHTS = "checkRights";
-
-    private static final String USER_REFERENCE = "userReference";
 
     private static final String WIKI_REFERENCE = "wikiReference";
 
@@ -81,41 +76,6 @@ public class RestoreRequest extends AbstractRequest
     public void setDeletedDocumentIds(List<Long> deletedDocumentIds)
     {
         setProperty(DELETED_DOCUMENT_IDS, deletedDocumentIds);
-    }
-
-    /**
-     * @return whether or not to check the rights of the user executing the operation
-     */
-    public boolean isCheckRights()
-    {
-        return getProperty(CHECK_RIGHTS, true);
-    }
-
-    /**
-     * @param checkRights whether or not to check the rights of the user executing the operation
-     */
-    public void setCheckRights(boolean checkRights)
-    {
-        setProperty(CHECK_RIGHTS, checkRights);
-
-    }
-
-    /**
-     * @return the user executing the restore operation. This is also the user for which any rights might be checked if
-     *         {@link #setCheckRights(boolean)} is enabled
-     */
-    public DocumentReference getUserReference()
-    {
-        return getProperty(USER_REFERENCE);
-    }
-
-    /**
-     * @param userReference the user executing the restore operation. This is also the user for which any rights
-     *            might be checked if {@link #setCheckRights(boolean)} is enabled
-     */
-    public void setUserReference(DocumentReference userReference)
-    {
-        setProperty(USER_REFERENCE, userReference);
     }
 
     /**

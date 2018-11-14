@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -92,6 +93,9 @@ public class DefaultModelBridgeTest
 
     @Mock
     private XWiki xwiki;
+
+    @Mock
+    private AbstractCheckRightsRequest request;
 
     @BeforeEach
     public void configure(MockitoComponentManager mocker) throws Exception
@@ -381,8 +385,10 @@ public class DefaultModelBridgeTest
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
 
         when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
+        when(request.isCheckAuthorRights()).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(false);
 
-        assertTrue(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
+        assertTrue(this.modelBridge.restoreDeletedDocument(deletedDocumentId, request));
 
         verify(xwiki).restoreFromRecycleBin(deletedDocumentId, "Restored from recycle bin", xcontext);
         assertLog(Level.INFO, "Document [{}] has been restored", documentReference);
@@ -394,8 +400,10 @@ public class DefaultModelBridgeTest
         long deletedDocumentId = 42;
 
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(null);
+        when(request.isCheckAuthorRights()).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(false);
 
-        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
+        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, request));
 
         assertLog(Level.ERROR, "Deleted document with ID [{}] does not exist.", deletedDocumentId);
 
@@ -416,8 +424,10 @@ public class DefaultModelBridgeTest
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
 
         when(xwiki.exists(documentReference, xcontext)).thenReturn(true);
+        when(request.isCheckAuthorRights()).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(false);
 
-        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
+        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, request));
 
         assertLog(Level.ERROR, "Document [{}] with ID [{}] can not be restored. Document already exists", fullName,
             deletedDocumentId);
@@ -442,8 +452,10 @@ public class DefaultModelBridgeTest
         when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
 
         when(xwiki.exists(translationDocumentReference, xcontext)).thenReturn(false);
+        when(request.isCheckAuthorRights()).thenReturn(false);
+        when(request.isCheckRights()).thenReturn(false);
 
-        assertTrue(this.modelBridge.restoreDeletedDocument(deletedDocumentId, false));
+        assertTrue(this.modelBridge.restoreDeletedDocument(deletedDocumentId, request));
 
         verify(xwiki).restoreFromRecycleBin(deletedDocumentId, "Restored from recycle bin", xcontext);
         assertLog(Level.INFO, "Document [{}] has been restored", translationDocumentReference);
@@ -477,7 +489,7 @@ public class DefaultModelBridgeTest
         when(xwiki.getRightService()).thenReturn(rightService);
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        assertTrue(this.modelBridge.canRestoreDeletedDocument(deletedDocumentId, userReferenceToCheck));
+        assertTrue(this.modelBridge.canRestoreDeletedDocument(deletedDocument, userReferenceToCheck));
 
         // Verify that the rights were checked with the specified user as context user.
         verify(xcontext).setUserReference(userReferenceToCheck);
@@ -511,8 +523,10 @@ public class DefaultModelBridgeTest
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
         DocumentReference authorReference = new DocumentReference("wiki", "user", "Alice");
         when(xcontext.getAuthorReference()).thenReturn(authorReference);
+        when(request.isCheckAuthorRights()).thenReturn(true);
+        when(request.isCheckRights()).thenReturn(true);
 
-        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, true));
+        assertFalse(this.modelBridge.restoreDeletedDocument(deletedDocumentId, request));
 
         assertLog(Level.ERROR, "The author [{}] of this script is not allowed to restore document [{}] with ID [{}]",
             authorReference, documentReference, deletedDocumentId);

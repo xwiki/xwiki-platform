@@ -815,11 +815,17 @@ require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge', 'autosave'], functio
   ckeditorPromise.done(function(ckeditor) {
     var createEditors = function(container) {
       container.find('.ckeditor-textarea').each(function() {
-        ckeditor.replace(this);
+        // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
+        try {
+          ckeditor.replace(this);
+        } catch(e) {
+          console.log(e);
+        }
       });
     };
     createEditors($(body));
-    $(document).on('xwiki:dom:updated', function(event, data) {
+    // Make sure we don't register the event listener multiple times (in case this code is loaded multiple times).
+    $(document).off('xwiki:dom:updated.ckeditor').on('xwiki:dom:updated.ckeditor', function(event, data) {
       createEditors($(data.elements));
     });
   });

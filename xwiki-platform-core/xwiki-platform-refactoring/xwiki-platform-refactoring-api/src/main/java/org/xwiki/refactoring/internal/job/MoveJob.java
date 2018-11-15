@@ -170,7 +170,7 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
             this.logger.error("You don't have sufficient permissions over the source document [{}].",
                 oldReference);
             return false;
-        } else if (!hasAccess(Right.VIEW, newReference) || !hasAccess(Right.EDIT, newReference)
+        } else if (!hasAccess(Right.EDIT, newReference)
             || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference)))
         {
             this.logger.error("You don't have sufficient permissions over the destination document [{}].",

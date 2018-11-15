@@ -51,6 +51,44 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>2</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>3</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>author|doc.reference|wiki|request.parameters|request.url|locale|user</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>1</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <category>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -72,7 +110,7 @@
         <editor>Text</editor>
         <name>content</name>
         <number>4</number>
-        <prettyName>Content</prettyName>
+        <prettyName>Executed Content</prettyName>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -82,7 +120,7 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>description</name>
-        <number>3</number>
+        <number>6</number>
         <prettyName>Description</prettyName>
         <rows>5</rows>
         <size>40</size>
@@ -92,7 +130,7 @@
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>7</number>
         <prettyName>Name</prettyName>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -154,11 +192,12 @@ $xwiki.ssx.use('Help.SupportPanel.WebHome')
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>

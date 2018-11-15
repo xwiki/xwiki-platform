@@ -142,11 +142,11 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>type</name>
-        <number>2</number>
+        <number>8</number>
         <prettyName>Panel type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>view|edit</values>

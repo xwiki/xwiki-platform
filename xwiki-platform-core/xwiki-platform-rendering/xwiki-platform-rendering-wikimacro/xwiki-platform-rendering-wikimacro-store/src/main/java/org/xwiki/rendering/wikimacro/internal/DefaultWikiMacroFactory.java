@@ -19,9 +19,10 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.MacroId;
@@ -225,7 +227,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     private List<WikiMacroParameterDescriptor> buildParameterDescriptors(XWikiDocument doc) throws WikiMacroException
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
-        Vector<BaseObject> macroParameters = doc.getObjects(WIKI_MACRO_PARAMETER_CLASS);
+        Collection<BaseObject> macroParameters = doc.getObjects(WIKI_MACRO_PARAMETER_CLASS);
         if (macroParameters != null) {
             for (BaseObject macroParameter : macroParameters) {
                 // Vectors can contain null values
@@ -239,6 +241,16 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 boolean parameterMandatory =
                     (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) == 0) ? false : true;
                 String parameterDefaultValue = macroParameter.getStringValue(PARAMETER_DEFAULT_VALUE_PROPERTY);
+                String type = macroParameter.getStringValue(PARAMETER_TYPE_PROPERTY);
+                Type parameterType = null;
+                if (!StringUtils.isEmpty(type)) {
+                    try {
+                        parameterType =
+                                ReflectionUtils.unserializeType(type, Thread.currentThread().getContextClassLoader());
+                    } catch (ClassNotFoundException e) {
+                        throw new WikiMacroException("Couldn't unserialize the given type.", e);
+                    }
+                }
 
                 // Verify parameter name.
                 if (StringUtils.isEmpty(parameterName)) {
@@ -260,7 +272,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
                 // Create the parameter descriptor.
                 parameterDescriptors.add(new WikiMacroParameterDescriptor(parameterName, parameterDescription,
-                    parameterMandatory, parameterDefaultValue));
+                    parameterMandatory, parameterDefaultValue, parameterType));
             }
         }
 

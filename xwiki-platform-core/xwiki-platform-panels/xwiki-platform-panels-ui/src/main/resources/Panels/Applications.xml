@@ -51,13 +51,51 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>2</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>3</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>author|doc.reference|wiki|request.parameters|request.url|locale|user</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>1</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <category>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>category</name>
-        <number>1</number>
+        <number>5</number>
         <prettyName>Category</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -71,8 +109,8 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
-        <number>2</number>
-        <prettyName>Content</prettyName>
+        <number>4</number>
+        <prettyName>Executed Content</prettyName>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -82,7 +120,7 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>description</name>
-        <number>3</number>
+        <number>6</number>
         <prettyName>Description</prettyName>
         <rows>5</rows>
         <size>40</size>
@@ -92,7 +130,7 @@
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>4</number>
+        <number>7</number>
         <prettyName>Name</prettyName>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -104,7 +142,7 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>type</name>
-        <number>5</number>
+        <number>8</number>
         <prettyName>Panel type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -224,6 +262,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -376,6 +415,7 @@ document.observe('xwiki:dom:loaded', function(e) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -648,6 +688,9 @@ document.observe('xwiki:dom:loaded', function(e) {
   color: $theme.textPrimaryColor; 
 }
 </code>
+    </property>
+    <property>
+      <contentType/>
     </property>
     <property>
       <name>Applications Panel</name>

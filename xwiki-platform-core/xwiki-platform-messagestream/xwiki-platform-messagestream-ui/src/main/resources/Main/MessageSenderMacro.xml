@@ -486,8 +486,6 @@ return XWiki;
 #set ($configClass = $xwiki.getDocument($config).getxWikiClass())
 #set ($isMessageStreamActive = $services.messageStream.isActive())
 
-#set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
-
 #set ($activityActionsMap = {
   'publicMessage':    'icons/silk/user_comment.png',
   'personalMessage':  'icons/silk/user_comment.png',
@@ -618,13 +616,13 @@ return XWiki;
           #if (!$defaultTarget)
             #if ($doc.getObject('XWiki.XWikiGroups'))
               #set ($defaultTarget = 'group')
-              #set ($targetName = $doc.prefixedFullName)
+              #set ($targetName = $doc.fullName)
             #elseif ($doc.getObject('XWiki.XWikiUsers'))
-              #if ($doc.prefixedFullName == $currentUser)
+              #if ($doc.documentReference == $xcontext.userReference)
                 #set ($defaultTarget = 'followers')
               #else
                 #set ($defaultTarget = 'user')
-                #set ($targetName = $doc.prefixedFullName)
+                #set ($targetName = $doc.fullName)
               #end
             #else
               #set ($defaultTarget = 'everyone')
@@ -637,24 +635,27 @@ return XWiki;
             #end
             &lt;/select&gt;
           &lt;/label&gt;
-          #set ($userPickerParams = {
+          #set ($suggestPickerParams = {
             'name': 'targetName',
-            'value': $targetName,
             'title': $services.localization.render('xe.activity.messages.visibility.targetName.tip')
           })
-          #if ($possibleTargets.contains('user'))
-            &lt;div class="message-target message-target-user#if ($defaultTarget != 'user') hidden#end"&gt;
-              #set ($discard = $userPickerParams.put('class', 'targetName'))
-              #set ($userPickerParams.disabled = $inEditMode || $defaultTarget != 'user')
-              #userPicker(false, $userPickerParams)
-            &lt;/div&gt;
-          #end
-          #if ($possibleTargets.contains('group'))
-            &lt;div class="message-target message-target-group#if ($defaultTarget != 'group') hidden#end"&gt;
-              #set ($discard = $userPickerParams.put('class', 'targetName'))
-              #set ($userPickerParams.disabled = $inEditMode || $defaultTarget != 'group')
-              #groupPicker(false, $userPickerParams)
-            &lt;/div&gt;
+          #foreach ($target in ['user', 'group'])
+            #if ($possibleTargets.contains($target))
+              #set ($notDefaultTarget = $target != $defaultTarget)
+              &lt;div class="message-target message-target-$target#if ($notDefaultTarget) hidden#end"&gt;
+                #set ($discard = $suggestPickerParams.put('class', 'targetName'))
+                #set ($suggestPickerParams.disabled = $inEditMode || $notDefaultTarget)
+                #set ($suggestPickerParams.value = $targetName)
+                #if ($notDefaultTarget)
+                  #set ($suggestPickerParams.value = '')
+                #end
+                #if ($target == 'user')
+                  #userPicker(false, $suggestPickerParams)
+                #else
+                  #groupPicker(false, $suggestPickerParams)
+                #end
+              &lt;/div&gt;
+            #end
           #end
           &lt;div class="message-target message-target-default"&gt;
             &lt;input type="hidden" name="targetName" value="$!escapetool.xml($targetName)" class="targetName" /&gt;

@@ -36,15 +36,26 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.XWikiUsers_displayHiddenDocuments.hint=The wiki contains documents that are not displayed by default. These hidden documents represent technical content, like application classes, configuration pages, macros, styles, scripts, etc.
-### Missing: XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
-### Missing: XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
-### Missing: XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Das Wiki enthält Dokumente, die standardmäßig nicht angezeigt werden. Diese verborgenen Dokumente repräsentieren technische Inhalte wie Anwendungsklassen, Konfigurationsseiten, Makros, Stile, Skripts usw.
+XWiki.XWikiUsers_accessibility.hint=Zusätzliche Barrierefreiheit aktiviert diverse visuelle Verbesserungen wie: Größere Schriften, unterstrichene Links, etc.
+XWiki.XWikiUsers_timezone.hint=Verwenden Sie eine bestimmte Zeitzone, damit die Daten Ihrem aktuellen Standort entsprechen.
+XWiki.XWikiUsers_editor.hint=Wählen Sie einen Standard-Editor, der den global definierten Standard-Editor überschreibt. Wenn nicht definiert, wird entsprechend dem Inhalt ein Editor gewählt.
 ### Missing: XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
 ### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=Indicate if you want Extension Manager to ask you to confirm conflict resolution default rules (for example tell Extension Manager to ask you what to do if the document to upgrade has been removed from the wiki).
-### Missing: userprofile.default=Default
-### Missing: user.profile.groups.title=My Groups
-### Missing: user.profile.groups.description=Here are listed all the groups your user belongs to.
-### Missing: user.profile.groups.table.group=Group
-### Missing: platform.core.profile.category.groups=My Groups</content>
+userprofile.default=Standard
+user.profile.groups.title=Meine Gruppen
+user.profile.groups.description=Hier sind alle Gruppen aufgelistet, denen Ihr Benutzer angehört.
+user.profile.groups.table.group=Gruppe
+platform.core.profile.category.groups=Meine Gruppen
+user.profile.notifications=Benachrichtigungen
+user.profile.network.unfollow.question=Sind Sie sicher, dass Sie diesem Benutzer nicht mehr folgen möchten?
+user.profile.network.unfollow.question.yes=Ja, nicht mehr folgen
+user.profile.network.unfollow.question.no=Nein, abbrechen
+user.profile.network.following=Wird verfolgt
+user.profile.network.notfollowing=Wird nicht verfolgt
+user.profile.network.follow=Ab sofort folgen
+user.profile.network.unfollow=Nicht mehr folgen
+user.profile.network.done=Erledigt
+user.profile.network.saving=Speichert…
+user.profile.network.error=Fehler beim Speichern der Benachrichtigungseinstellungen</content>
 </xwikidoc>

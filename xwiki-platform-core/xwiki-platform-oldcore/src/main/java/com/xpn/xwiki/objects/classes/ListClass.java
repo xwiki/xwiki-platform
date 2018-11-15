@@ -253,7 +253,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * @return the default value used in the select editor
-     * @since 10.9RC1
+     * @since 10.9
      * @since 10.8.1
      */
     public String getDefaultValue()
@@ -263,7 +263,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * @param separator the default value used in the select editor
-     * @since 10.9RC1
+     * @since 10.9
      * @since 10.8.1
      */
     public void setDefaultValue(String separator)

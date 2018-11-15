@@ -28,8 +28,8 @@ import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 
-import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.AbstractCommentsDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
@@ -44,7 +44,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 // The role hint is not a document name since it can change based the configuration
 @Named(AnnotationClassDocumentInitializer.HINT)
 @Singleton
-public class AnnotationClassDocumentInitializer extends AbstractMandatoryClassInitializer
+public class AnnotationClassDocumentInitializer extends AbstractCommentsDocumentInitializer
 {
     static final String HINT = "annotationclass";
 
@@ -71,8 +71,7 @@ public class AnnotationClassDocumentInitializer extends AbstractMandatoryClassIn
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addUsersField(Annotation.AUTHOR_FIELD, "Author", 30, false);
-        xclass.addDateField(Annotation.DATE_FIELD, "Date");
+        super.createClass(xclass);
 
         xclass.addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5, ContentType.PURE_TEXT);
         xclass.addTextAreaField(Annotation.SELECTION_LEFT_CONTEXT_FIELD, "Selection Left Context", 40, 5,

@@ -33,7 +33,7 @@
   #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
     #set ($wikiName = 'local')
   #end
-  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9RC1
+  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
   #set ($row = {
     'username': $group.name,
     'fullname': $group.fullName,
@@ -42,7 +42,7 @@
     'usersaveurl': $group.getURL('save'),
     'userinlineurl': $group.getURL('edit', 'xpage=plain'),
     'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Groups')
-  }))
+  })
   #if ($group.wiki == $xcontext.mainWikiName)
     #set ($scope = 'global')
   #else

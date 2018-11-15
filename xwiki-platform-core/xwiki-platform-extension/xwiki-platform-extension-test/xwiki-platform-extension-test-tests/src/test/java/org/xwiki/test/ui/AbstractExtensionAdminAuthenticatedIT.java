@@ -48,6 +48,8 @@ public class AbstractExtensionAdminAuthenticatedIT extends AbstractTest
     @BeforeClass
     public static void init() throws Exception
     {
+        AbstractTest.init();
+
         // Make sure repository and extension utils are initialized and set.
         RepositoryTestUtils repositoryTestUtils = getRepositoryTestUtils();
         ExtensionTestUtils extensionTestUtils = getExtensionTestUtils();

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.xwiki.container.servlet.HttpServletUtils;
+import org.xwiki.context.concurrent.ContextStore;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,7 +40,9 @@ import com.xpn.xwiki.web.XWikiRequest;
  * 
  * @version $Id$
  * @since 8.3RC1
+ * @deprecated since 10.9RC1, use {@link ContextStore} instead
  */
+@Deprecated
 public class JobRequestContext implements Serializable
 {
     /**

@@ -61,7 +61,7 @@ public class RestoreDeletedPageTest extends AbstractTest
         // Delete the page.
         page.delete().clickYes();
         DeletingPage deletingPage = new DeletingPage();
-        deletingPage.waitUntilIsTerminated();
+        deletingPage.waitUntilFinished();
 
         // Restore the page.
         page = deletingPage.getDeletePageOutcomePage().clickRestore();

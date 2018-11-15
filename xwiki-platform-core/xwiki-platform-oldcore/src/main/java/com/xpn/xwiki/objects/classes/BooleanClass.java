@@ -45,7 +45,7 @@ public class BooleanClass extends PropertyClass
 
     /** Other string values that might be used to represent "false" values. */
     private static final Pattern FALSE_PATTERN = Pattern.compile("no|false", Pattern.CASE_INSENSITIVE);
-
+    
     public BooleanClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Boolean", wclass);

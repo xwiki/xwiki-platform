@@ -591,6 +591,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    /**
+     * @since 10.10RC1
+     */
+    public boolean addBooleanField(String fieldName, String fieldPrettyName)
+    {
+        return addBooleanField(fieldName, fieldPrettyName, null);
+    }
+
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
     {
         return addBooleanField(fieldName, fieldPrettyName, displayType, null);
@@ -824,7 +832,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since 10.9RC1
+     * @since 10.9
      * @since 10.8.1
      */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, String values, String defaultValue)
@@ -866,7 +874,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since 10.9RC1
+     * @since 10.9
      * @since 10.8.1
      */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,

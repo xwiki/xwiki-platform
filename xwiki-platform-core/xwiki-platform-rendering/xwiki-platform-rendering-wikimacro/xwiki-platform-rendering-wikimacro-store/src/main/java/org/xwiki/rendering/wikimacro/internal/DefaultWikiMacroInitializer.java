@@ -49,7 +49,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * A {@link DefaultWikiMacroInitializer} providing wiki macros.
+ * A {@link WikiMacroInitializer} providing wiki macros.
  * 
  * @version $Id$
  * @since 2.0M2

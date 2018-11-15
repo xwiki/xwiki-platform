@@ -40,8 +40,8 @@ public class ExtensionPage extends ViewPage
      */
     public boolean isValidExtension()
     {
-        List<WebElement> elements = getDriver().findElementsWithoutWaiting(
-            By.xpath("//div[@class='box successmessage']/*[text() = 'Installable with the Extension Manager']"));
+        List<WebElement> elements = getDriver().findElements(
+            By.xpath("//div[@class = 'box successmessage' and . = 'Installable with the Extension Manager']"));
         return !elements.isEmpty();
     }
 

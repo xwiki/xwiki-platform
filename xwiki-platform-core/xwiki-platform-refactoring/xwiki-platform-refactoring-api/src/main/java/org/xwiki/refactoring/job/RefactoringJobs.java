@@ -73,4 +73,11 @@ public interface RefactoringJobs
      * @since 7.4M2
      */
     String CREATE = GROUP_PREFIX + "create";
+
+    /**
+     * The role hint of the job that permanently deletes entities.
+     *
+     * @since 10.10RC1
+     */
+    String PERMANENTLY_DELETE = GROUP_PREFIX + "permanentlyDelete";
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-remote</artifactId>
   <name>XWiki Platform - Observation - Remote</name>
@@ -33,7 +33,7 @@
   <description>XWiki Platform - Observation - Remote</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>88</xwiki.pitest.mutationThreshold>
+    <xwiki.pitest.mutationThreshold>80</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

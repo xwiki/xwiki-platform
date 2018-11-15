@@ -185,7 +185,6 @@
   ## Inject needed JS and CSS files
   ##
   #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
-  #set ($discard = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
   #set ($discard = $xwiki.ssx.use("XWiki.AdminUsersSheet"))
   #set ($discard = $xwiki.jsx.use("XWiki.AdminUsersSheet"))
 
@@ -336,6 +335,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       } else {
         createUserModal.modal('hide');
         window.livetable_userstable.refresh();
+        $('#userstable').trigger('xwiki:user:created');
         notification.replace(new XWiki.widgets.Notification(
           $jsontool.serialize($services.localization.render('xe.admin.users.create.done')),
           'done'
@@ -365,8 +365,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     if (forceLock === true) {
       parameters.force = 1;
     }
-    editUserModal.find('.modal-body').empty().addClass('loading').load(editUserURL, parameters, function() {
+    editUserModal.find('.modal-body').first().empty().addClass('loading').load(editUserURL, parameters, function() {
       this.removeClass('loading');
+      this.find('.column.half').removeClass('half').addClass('full');
       $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
       var editUserForm = editUserModal.find('form#edituser');
       editUserForm.find(':input').filter(':visible').first().focus();
@@ -374,9 +375,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     });
   };
 
-  editUserModal.on(
-    'show.bs.modal', loadEditForm
-  ).on('click', 'a.forceLock', function(event) {
+  editUserModal.on('show.bs.modal', function(event) {
+    // The modal body may contain nested modals..
+    event.target === this &amp;&amp; loadEditForm();
+  }).on('click', 'a.forceLock', function(event) {
     event.preventDefault();
     loadEditForm(true);
   }).on('click', '.btn-primary', function(event) {
@@ -424,12 +426,14 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
       'inprogress'
     );
+    var userReference = deleteUserModal.find('.userName').text();
     $.post('', {
       xpage: 'deleteuorg',
-      docname: deleteUserModal.find('.userName').text(),
+      docname: userReference,
       form_token: xm.form_token
     }).done(function() {
       deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
+      deleteUserModal.data('liveTableElement').trigger('xwiki:user:deleted', {reference: userReference});
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),
         'done'

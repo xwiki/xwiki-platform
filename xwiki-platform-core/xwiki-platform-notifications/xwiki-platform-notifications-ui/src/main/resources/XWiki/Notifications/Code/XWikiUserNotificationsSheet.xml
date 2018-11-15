@@ -81,12 +81,18 @@
 ######################################################
 ### FILTERS
 ######################################################
+## The filters preferences section uses a modal to add a new filter and confirmation boxes (modals) to delete the
+## filters. As a consequence it doen't work out of the box when displayed inside another modal. Extra development work
+## is required to make the "nested" modals work and I'm not sure it's worth the effort. Let's hide this section for now
+## when inside the Edit User modal.
+#if ($request.xpage != 'edituser')
 (% class="profile-section highlighted-profile-section column full" %)
 (((
   (% id="Hnotifications.settings.filters.preferences.title" %)
   = {{translation key="notifications.settings.filters.preferences.title" /}} =
   {{notificationsFiltersPreferences /}}
 )))
+#end
 {{/velocity}}
 </content>
   <object>

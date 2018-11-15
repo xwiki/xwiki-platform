@@ -49,7 +49,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  * Default implementation of {@link NotificationFilterPreferenceManager}.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 @Component
 @Singleton

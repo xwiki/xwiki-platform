@@ -555,6 +555,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     paramMap["parameters"] = {};
     paramMap["parameters"][config + "_" + objNum + "_" + self.id] = setValue;
     paramMap["parameters"]["ajax"] = "1";
+    paramMap["parameters"]["comment"] = "$services.localization.render('authenticate_viewedit_savecomment')";
     paramMap["onSuccess"] = function() {
       pivot.alt = newAlt;
       pivot.src = newSrc;

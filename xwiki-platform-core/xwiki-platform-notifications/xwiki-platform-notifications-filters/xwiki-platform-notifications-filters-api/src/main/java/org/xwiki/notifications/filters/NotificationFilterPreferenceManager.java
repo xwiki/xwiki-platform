@@ -34,7 +34,7 @@ import org.xwiki.stability.Unstable;
  * Provide an interface for interacting with user notification filters preferences.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 @Role
 @Unstable

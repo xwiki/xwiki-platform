@@ -29,6 +29,7 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ConfirmationPage;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -64,6 +65,8 @@ public class DeletePageTest extends AbstractTest
 
     private static final String PAGE_TITLE = "Page title that will be deleted";
 
+    private static final String DELETE_SUCCESSFUL = "Done.";
+
     @Before
     public void setUp() throws Exception
     {
@@ -80,11 +83,10 @@ public class DeletePageTest extends AbstractTest
             confirmationPage.getCurrentUser());
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
-        deletingPage.waitUntilIsTerminated();
+        deletingPage.waitUntilFinished();
         // Note: it's better to wait instead of using isSuccess() since there could be some timeframe between
         // the hiding of the progress UI and the display of the success message.
-        deletingPage.waitUntilSuccessMessage();
-        assertEquals(CONFIRMATION, deletingPage.getSuccessMessage());
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
@@ -169,7 +171,7 @@ public class DeletePageTest extends AbstractTest
         // Delete it
         nonTerminalPage.delete().clickYes();
         DeletingPage deletingPage = new DeletingPage();
-        deletingPage.waitUntilIsTerminated();
+        deletingPage.waitUntilFinished();
         
         // Look at the recycle bin
         DeletePageOutcomePage deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
@@ -179,7 +181,7 @@ public class DeletePageTest extends AbstractTest
         ViewPage terminalPage = getUtil().createPage(terminalPageRef, "Content", "Title");
         // Delete it
         terminalPage.delete().clickYes();
-        deletingPage.waitUntilIsTerminated();
+        deletingPage.waitUntilFinished();
         
         // Look at the recycle bin
         deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
@@ -225,9 +227,8 @@ public class DeletePageTest extends AbstractTest
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
-        deletingPage.waitUntilIsTerminated();
-        deletingPage.waitUntilSuccessMessage();
-        assertEquals("The page has been deleted.", deletingPage.getSuccessMessage());
+        deletingPage.waitUntilFinished();
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
         // Check the page have been effectively removed
         ViewPage page = getUtil().gotoPage(parentReference);
         assertFalse(page.exists());
@@ -243,8 +244,7 @@ public class DeletePageTest extends AbstractTest
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(true);
         deletingPage = confirmationPage.confirmDeletePage();
-        deletingPage.waitUntilIsTerminated();
-        deletingPage.waitUntilSuccessMessage();
+        deletingPage.waitUntilFinished();
         // Check the page have been effectively removed
         page = getUtil().gotoPage(parentReference);
         assertFalse(page.exists());

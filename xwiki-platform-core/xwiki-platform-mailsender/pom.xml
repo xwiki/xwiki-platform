@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mailsender</artifactId>
   <name>XWiki Platform - Mail Sender</name>
   <description>XWiki Platform - Mail Sender</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>41</xwiki.pitest.mutationThreshold>
+    <xwiki.pitest.mutationThreshold>36</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>
@@ -48,8 +48,14 @@
     <dependency>
       <groupId>org.jvnet.mock-javamail</groupId>
       <artifactId>mock-javamail</artifactId>
-      <version>1.7</version>
+      <version>1.9</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

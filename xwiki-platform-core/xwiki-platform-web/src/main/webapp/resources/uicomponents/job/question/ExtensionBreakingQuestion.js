@@ -41,38 +41,44 @@ require.config({
 
 require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
   'use strict';
-  var getAnswerProperties = function() {
-    var questionForm = $(this);
-
-    var deleteTree = questionForm.find('.deleteTree');
-
-    if (deleteTree.length) {
-      var answerProperties = deleteTree.data('job-answer-properties-data');
-
-      var selectedNodes = deleteTree.jstree().get_selected(true);
-
-      answerProperties.allFreePages = false;
-      for (var i = 0; i < selectedNodes.length; ++i) {
-        var node = selectedNodes[i];
-        if (node.data.type == 'extension') {
-          answerProperties.selectedExtensions.push(node.id);
-        } else if (node.data.type == 'page') {
-          answerProperties.selectedDocuments.push(node.id);
-        } else if (node.id == 'freePages') {
-          // For free pages, we can rely on the state of the "freePage" node
-          answerProperties.allFreePages = true;
-        }
-      }
-
-      return answerProperties;
-    }
-  }
-
   /**
    * Called when a question is being asked
    */
   var initQuestion = function(event) {
     var uiQuestion = $(this);
+
+    // we want this to be initialized only for the right question
+    if (uiQuestion.find('.deleteWarningExtensions').length == 0) {
+      return;
+    }
+
+    var getAnswerProperties = function() {
+      var questionForm = $(this);
+
+      var deleteTree = questionForm.find('.deleteTree');
+
+      if (deleteTree.length) {
+        var answerProperties = deleteTree.data('job-answer-properties-data');
+
+        var selectedNodes = deleteTree.jstree().get_selected(true);
+
+        answerProperties.selectAllFreePages = false;
+        for (var i = 0; i < selectedNodes.length; ++i) {
+          var node = selectedNodes[i];
+          if (node.data.type == 'extension') {
+            answerProperties.selectedExtensions.push(node.id);
+          } else if (node.data.type == 'page') {
+            answerProperties.selectedDocuments.push(node.id);
+          } else if (node.id == 'freePages') {
+            // For free pages, we can rely on the state of the "freePage" node
+            answerProperties.selectAllFreePages = true;
+          }
+        }
+
+        return answerProperties;
+      }
+    };
+
 
     // Get the form
     var questionForm = uiQuestion.find('.form-question');
@@ -96,9 +102,9 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
             selectedDocuments: [],
             // Either or not all pages that don't belong to any extension should be removed (even those the user haven't
             // seen because of the pagination)
-            allFreePages: false,
+            selectAllFreePages: false,
             // Either or not all extensions should be removed (even those the user haven't seen because of the pagination)
-            allExtensions: false
+            selectAllExtensions: false
         };
 
         deleteTree.data('job-answer-properties-data', answerProperties);
@@ -109,14 +115,14 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         // Called when a node has been clicked on the tree
         deleteTree.on('changed.jstree', function (event) {
           // It's the only safe way to prevent unwanted deletion of extension
-          answerProperties.allExtensions = false;
+          answerProperties.selectAllExtensions = false;
         });
 
         // Called when the user click on "select all"
         questionForm.find('.btSelectAllTree').click(function(event){
           event.preventDefault();
           deleteTree.jstree().check_all();
-          answerProperties.allExtensions = true;
+          answerProperties.selectAllExtensions = true;
         });
 
         // Called when the user click on "select none"

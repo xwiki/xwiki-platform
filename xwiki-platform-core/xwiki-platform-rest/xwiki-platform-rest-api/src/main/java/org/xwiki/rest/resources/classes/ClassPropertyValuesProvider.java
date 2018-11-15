@@ -55,7 +55,7 @@ public interface ClassPropertyValuesProvider
      * @param rawValue raw value used to resolve the property value
      * @return the property value based on the raw value or null if the raw value is empty
      * @throws XWikiRestException if retrieving the property value fails
-     * @since 10.9RC1
+     * @since 10.9
      */
     default PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
         throws XWikiRestException {

@@ -40,6 +40,7 @@
 solr.admin.submit=Utför
 solr.admin.error.notallowed=Du har ej rättigheter att genomföra denna operation.
 solr.admin.error.norights=Administrationsrättigheter krävs för tillgång till denna sektion.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Köstorlek
@@ -166,7 +167,7 @@ solr.field.comment=Kommentarer
 solr.field.objcontent=Objekt
 solr.field.mimetype=Filtyp
 solr.field.attauthor=Uppladdad av
-### Missing: solr.field.attauthor_display=Uploaded By
+### Missing: solr.field.attauthor_display=Uploaded by
 solr.field.attdate=Uppladdningsdatum
 solr.field.attsize=Filstorlek
 

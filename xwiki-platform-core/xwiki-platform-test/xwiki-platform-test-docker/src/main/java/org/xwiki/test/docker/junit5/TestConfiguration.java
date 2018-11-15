@@ -19,21 +19,46 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.util.Properties;
+
+import org.xwiki.test.docker.junit5.browser.Browser;
+import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.text.StringUtils;
+
 /**
  * Configuration options for the test.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class TestConfiguration
 {
+    private static final String TRUE = "true";
+
+    private static final String FALSE = "false";
+
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
 
     private static final String DATABASE_PROPERTY = "xwiki.test.ui.database";
 
     private static final String SERVLETENGINE_PROPERTY = "xwiki.test.ui.servletEngine";
 
-    private static final String DEBUG_PROPERTY = "xwiki.test.ui.debug";
+    private static final String VERBOSE_PROPERTY = "xwiki.test.ui.verbose";
+
+    private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
+
+    private static final String OFFLINE_PROPERTY = "xwiki.test.ui.offline";
+
+    private static final String DATABASETAG_PROPERTY = "xwiki.test.ui.databaseTag";
+
+    private static final String SERVLETENGINETAG_PROPERTY = "xwiki.test.ui.servletEngineTag";
+
+    private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
+
+    private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
+
+    private static final String PROPERTIES_PREFIX_PROPERTY = "xwiki.test.ui.properties.";
 
     private UITest uiTestAnnotation;
 
@@ -43,7 +68,21 @@ public class TestConfiguration
 
     private ServletEngine servletEngine;
 
-    private boolean debug;
+    private boolean verbose;
+
+    private boolean saveDatabaseData;
+
+    private boolean isOffline;
+
+    private String servletEngineTag;
+
+    private String databaseTag;
+
+    private String jdbcDriverVersion;
+
+    private boolean vnc;
+
+    private Properties properties;
 
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
@@ -54,14 +93,21 @@ public class TestConfiguration
         resolveBrowser();
         resolveDatabase();
         resolveServletEngine();
-        resolveDebug();
+        resolveVerbose();
+        resolveSaveDatabaseData();
+        resolveOffline();
+        resolveDatabaseTag();
+        resolveServletEngineTag();
+        resolveJDBCDriverVersion();
+        resolveVNC();
+        resolveProperties();
     }
 
     private void resolveBrowser()
     {
         Browser newBrowser = this.uiTestAnnotation.browser();
         if (newBrowser == Browser.SYSTEM) {
-            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.CHROME.name()).toUpperCase());
+            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.FIREFOX.name()).toUpperCase());
         }
         this.browser = newBrowser;
     }
@@ -70,7 +116,8 @@ public class TestConfiguration
     {
         Database newDatabase = this.uiTestAnnotation.database();
         if (newDatabase == Database.SYSTEM) {
-            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY, Database.MYSQL.name()).toUpperCase());
+            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY,
+                Database.HSQLDB_EMBEDDED.name()).toUpperCase());
         }
         this.database = newDatabase;
     }
@@ -80,18 +127,91 @@ public class TestConfiguration
         ServletEngine newServletEngine = this.uiTestAnnotation.servletEngine();
         if (newServletEngine == ServletEngine.SYSTEM) {
             newServletEngine = ServletEngine.valueOf(System.getProperty(SERVLETENGINE_PROPERTY,
-                ServletEngine.TOMCAT.name()).toUpperCase());
+                ServletEngine.JETTY_STANDALONE.name()).toUpperCase());
         }
         this.servletEngine = newServletEngine;
     }
 
-    private void resolveDebug()
+    private void resolveVerbose()
     {
-        boolean newDebug = this.uiTestAnnotation.debug();
-        if (!newDebug) {
-            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, "false"));
+        boolean newVerbose = this.uiTestAnnotation.verbose();
+        if (!newVerbose) {
+            newVerbose = Boolean.valueOf(System.getProperty(VERBOSE_PROPERTY, FALSE));
         }
-        this.debug = newDebug;
+        this.verbose = newVerbose;
+    }
+
+    private void resolveSaveDatabaseData()
+    {
+        boolean newSaveDatabaseData = this.uiTestAnnotation.saveDatabaseData();
+        if (!newSaveDatabaseData) {
+            newSaveDatabaseData = Boolean.valueOf(System.getProperty(SAVEDBDATA_PROPERTY, FALSE));
+        }
+        this.saveDatabaseData = newSaveDatabaseData;
+    }
+
+    private void resolveOffline()
+    {
+        boolean newOffline = this.uiTestAnnotation.offline();
+        if (!newOffline) {
+            newOffline = Boolean.valueOf(System.getProperty(OFFLINE_PROPERTY, FALSE));
+        }
+        this.isOffline = newOffline;
+    }
+
+    private void resolveDatabaseTag()
+    {
+        String newDatabaseTag = this.uiTestAnnotation.databaseTag();
+        if (StringUtils.isEmpty(newDatabaseTag)) {
+            newDatabaseTag = System.getProperty(DATABASETAG_PROPERTY);
+        }
+        this.databaseTag = newDatabaseTag;
+    }
+
+    private void resolveServletEngineTag()
+    {
+        String newServletEngineTag = this.uiTestAnnotation.servletEngineTag();
+        if (StringUtils.isEmpty(newServletEngineTag)) {
+            newServletEngineTag = System.getProperty(SERVLETENGINETAG_PROPERTY);
+        }
+        this.servletEngineTag = newServletEngineTag;
+    }
+
+    private void resolveJDBCDriverVersion()
+    {
+        String newJDBCDriverVersion = this.uiTestAnnotation.jdbcDriverVersion();
+        if (StringUtils.isEmpty(newJDBCDriverVersion)) {
+            newJDBCDriverVersion = System.getProperty(JDBCDRIVERVERSION_PROPERTY);
+        }
+        this.jdbcDriverVersion = newJDBCDriverVersion;
+    }
+
+    private void resolveVNC()
+    {
+        boolean newVNC = this.uiTestAnnotation.vnc();
+        if (newVNC) {
+            newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, TRUE));
+        }
+        this.vnc = newVNC;
+    }
+
+    private void resolveProperties()
+    {
+        String[] propertiesAsArray = this.uiTestAnnotation.properties();
+        Properties newProperties = new Properties();
+        for (String propertyAsString : propertiesAsArray) {
+            int pos = propertyAsString.indexOf('=');
+            if (pos > -1) {
+                newProperties.setProperty(propertyAsString.substring(0, pos), propertyAsString.substring(pos + 1));
+            }
+        }
+        for (String key : System.getProperties().stringPropertyNames()) {
+            if (key.startsWith(PROPERTIES_PREFIX_PROPERTY)) {
+                String propertyAsString = StringUtils.substringAfter(key, PROPERTIES_PREFIX_PROPERTY);
+                newProperties.setProperty(propertyAsString, System.getProperty(key));
+            }
+        }
+        this.properties = newProperties;
     }
 
     /**
@@ -119,10 +239,78 @@ public class TestConfiguration
     }
 
     /**
-     * @return true if we're in debug mode and should output more information to the console
+     * @return true if the test should output verbose console logs or not
      */
-    public boolean isDebug()
+    public boolean isVerbose()
     {
-        return this.debug;
+        return this.verbose;
+    }
+
+    /**
+     * @return true true if the database data should be mapped to a local directory on the host computer so that it can
+     *         be saved and reused for another run
+     * @since 10.10RC1
+     */
+    public boolean isDatabaseDataSaved()
+    {
+        return this.saveDatabaseData;
+    }
+
+    /**
+     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
+     *         your local repository). False by default to avoid developer problems but should be set to true in the
+     *         CI to improve performance of functional tests
+     * @since 10.10RC1
+     */
+    public boolean isOffline()
+    {
+        return this.isOffline;
+    }
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the default from TestContainers)
+     * @since 10.10RC1
+     */
+    public String getDatabaseTag()
+    {
+        return this.databaseTag;
+    }
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the "latest" tag)
+     * @since 10.10RC1
+     */
+    public String getServletEngineTag()
+    {
+        return this.servletEngineTag;
+    }
+
+    /**
+     * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
+     *         depending on the database)
+     * @since 10.10RC1
+     */
+    public String getJDBCDriverVersion()
+    {
+        return this.jdbcDriverVersion;
+    }
+
+    /**
+     * @return true if VNC container is started and recording is done and saved on test exit
+     * @since 10.10RC1
+     */
+    public boolean vnc()
+    {
+        return this.vnc;
+    }
+
+    /**
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as
+     *         as {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @since 10.10RC1
+     */
+    public Properties getProperties()
+    {
+        return this.properties;
     }
 }

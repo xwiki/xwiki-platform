@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
 
 /**
  * Interface used to access the XWiki model and to perform low level operations on it.
@@ -136,10 +138,12 @@ public interface ModelBridge
 
     /**
      * @param deletedDocumentId the ID of the deleted document to restore
-     * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
+     * @param checkRightsRequest the request containing info about rights to check
      * @return {@code true} if the document was restored successfully, {@code false} if the restore failed
+     *
+     * @since 10.10RC1
      */
-    boolean restoreDeletedDocument(long deletedDocumentId, boolean checkContextUser);
+    boolean restoreDeletedDocument(long deletedDocumentId, AbstractCheckRightsRequest checkRightsRequest);
 
     /**
      * @param batchId ID of the delete documents batch
@@ -148,10 +152,20 @@ public interface ModelBridge
     List<Long> getDeletedDocumentIds(String batchId);
 
     /**
-     * @param deletedDocumentId the ID of the document to check
-     * @param userReference the reference of the user to check
-     * @return {@code true} if the specified user is allowed to restore the specified deleted document, {@code false}
-     *         otherwise
+     * @param deletedDocumentId the ID of the deleted document to permanently delete
+     * @param checkRightsRequest the request containing info about rights to check
+     * @return {@code true} if the document was permanently deleted successfully, {@code false} if the deletion failed
+     * @since 10.10RC1
      */
-    boolean canRestoreDeletedDocument(long deletedDocumentId, DocumentReference userReference);
+    boolean permanentlyDeleteDocument(long deletedDocumentId, AbstractCheckRightsRequest checkRightsRequest);
+
+    /**
+     * Helper to delete all documents permanently from the recycle bin.
+     * @param deleteJob The job that launches the action
+     * @param checkRightsRequest the request containing info about rights to check
+     * @return {@code true} if all documents were permanently deleted successfully, {@code false} if the deletion failed
+     * @since 10.10RC1
+     */
+    boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob,
+        AbstractCheckRightsRequest checkRightsRequest);
 }

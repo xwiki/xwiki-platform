@@ -573,7 +573,15 @@ public class TestUtils
      */
     public void gotoPage(EntityReference reference, String action, String queryString)
     {
-        gotoPage(getURL(reference, action, queryString));
+        gotoPage(reference, action, queryString, null);
+    }
+
+    /**
+     * @since 10.9
+     */
+    public void gotoPage(EntityReference reference, String action, String queryString, String fragment)
+    {
+        gotoPage(getURL(reference, action, queryString, fragment));
 
         // Update current wiki
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
@@ -880,7 +888,15 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString)
     {
-        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString);
+        return getURL(reference, action, queryString, null);
+    }
+
+    /**
+     * @since 10.9
+     */
+    public String getURL(EntityReference reference, String action, String queryString, String fragment)
+    {
+        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
     }
 
     /**
@@ -975,6 +991,14 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString)
     {
+        return getURL(action, path, queryString, null);
+    }
+
+    /**
+     * @since 10.9
+     */
+    public String getURL(String action, String[] path, String queryString, String fragment)
+    {
         StringBuilder builder = new StringBuilder(getBaseBinURL());
 
         if (!StringUtils.isEmpty(action)) {
@@ -996,6 +1020,10 @@ public class TestUtils
         }
         if (!StringUtils.isEmpty(queryString)) {
             builder.append(queryString);
+        }
+
+        if (!StringUtils.isEmpty(fragment)) {
+            builder.append('#').append(fragment);
         }
 
         return builder.toString();
@@ -1981,7 +2009,7 @@ public class TestUtils
          * different from a REST URL used outside of any container and that needs to call XWiki running inside a
          * container... ;)
          *
-         * @since 10.9RC1
+         * @since 10.9
          */
         public void setURLPrefix(String newURLPrefix)
         {

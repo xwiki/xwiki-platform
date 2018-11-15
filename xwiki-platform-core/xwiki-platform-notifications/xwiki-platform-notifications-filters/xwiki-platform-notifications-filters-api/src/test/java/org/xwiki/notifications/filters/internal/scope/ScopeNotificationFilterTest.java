@@ -322,8 +322,8 @@ public class ScopeNotificationFilterTest
 
         // Test 1
         assertEquals(
-                "(((TYPE = \"type1\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
-                        "OR (TYPE = \"type2\" AND DATE >= \"Thu Jan 01 01:01:40 CET 1970\")) " +
+                "(((TYPE = \"type1\" AND DATE >= \"" + new Date(0).toString() + "\") " +
+                        "OR (TYPE = \"type2\" AND DATE >= \"" + new Date(100000L).toString() + "\")) " +
                         "AND CONCAT(CONCAT(WIKI, \":\"), PAGE) IN " +
                         "(SELECT nfp.pageOnly FROM DefaultNotificationFilterPreference nfp WHERE nfp.owner = :owner " +
                         "AND nfp.filterType = 0 AND nfp.filterName = 'scopeNotificationFilter' " +

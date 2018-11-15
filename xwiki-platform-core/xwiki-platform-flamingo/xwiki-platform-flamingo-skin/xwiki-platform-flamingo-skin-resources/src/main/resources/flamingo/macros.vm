@@ -284,10 +284,14 @@
   <script type="text/javascript">
   //<![CDATA[
 (function() {
-  function startup() {
-    // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
-    if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
-      #set ($jsLiveTableId = $escapetool.javascript($divid))
+  var startup = function(container) {
+    // Make sure the LiveTable code is loaded (the WYSIWYG editor doesn't load the JavaScript code for instance).
+    var liveTableCodeLoaded = XWiki && XWiki.widgets && XWiki.widgets.LiveTable;
+    // Also make sure the live table is not already initialized.
+    #set ($jsLiveTableId = $escapetool.javascript($divid))
+    var liveTableElement = $('$jsLiveTableId');
+    if (liveTableCodeLoaded && liveTableElement && !liveTableElement.__liveTable &&
+        (liveTableElement == container || liveTableElement.descendantOf(container))) {
       #set ($liveTableParams = {
         'maxPages': $maxPages,
         'limit': $count,
@@ -307,8 +311,8 @@
       #if ($!callback != '')
         #set ($callbackParam = "$callback, ")
       #end
-      window[$jsontool.serialize($jsName)] = new XWiki.widgets.LiveTable("$dataurl", "$jsLiveTableId",
-        $callbackParam$jsontool.serialize($liveTableParams));
+      window[$jsontool.serialize($jsName)] = liveTableElement.__liveTable = new XWiki.widgets.LiveTable("$dataurl",
+        "$jsLiveTableId", $callbackParam$jsontool.serialize($liveTableParams));
       #if ($hasPageSize)
         document.observe("xwiki:livetable:${jsLiveTableId}:loadingEntries", function() {
           $('${jsLiveTableId}-pagesize').addClassName("hidden");
@@ -320,9 +324,15 @@
       return true;
     }
     return false;
-  }
-  // Initialize liveTable
-  (XWiki && XWiki.isInitialized && startup()) || document.observe('xwiki:livetable:loading', startup);
+  };
+  var init = function(event) {
+    var elements = (event && event.memo.elements) || [$('body')];
+    return elements.length > 0 && elements.some(startup);
+  };
+  // Initialize the live table on page load or after the live table code has been loaded.
+  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:livetable:loading', init);
+  // Initialize the live table when it is added after the page is loaded.
+  document.observe('xwiki:dom:updated', init);
 })();
    //]]>
   </script>

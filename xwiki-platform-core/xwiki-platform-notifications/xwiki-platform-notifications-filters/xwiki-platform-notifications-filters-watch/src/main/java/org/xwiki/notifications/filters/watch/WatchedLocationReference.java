@@ -69,7 +69,7 @@ public class WatchedLocationReference implements WatchedEntityReference
      * @param resolver the default entity reference resolver
      * @param stateComputer the default ScopeNotificationFilterLocationStateComputer
      * @param notificationFilterPreferenceManager the notification filter preference manager
-     * @since 10.9RC1
+     * @since 10.9
      */
     public WatchedLocationReference(EntityReference entityReference, String serializedReference,
             EntityReferenceResolver<String> resolver,

@@ -1,0 +1,1514 @@
+.runTransformations
+.configuration|rendering.macro.code.pygments.style=colorful
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Make sure vim language keep working (used to cause method too long issue when compiled to bytecode)
+.#-----------------------------------------------------
+{{code language="vim"}}
+import org.python.util.PythonInterpreter;
+
+class PygmentsVim {
+
+public static void main(String [] args) {
+
+PythonInterpreter interpreter = new PythonInterpreter();
+
+// Set a variable with the content you want to work with
+interpreter.set("code",
+"\" Vim syntax file\n" +
+"\" Language:   Log4J log files\n" +
+"\n" +
+"\" set case on\n" +
+"syn case match\n" +
+"\n" +
+"\" This creates a keyword ERROR and puts it in the highlight group called logError\n" +
+"syn keyword logError FATAL ERROR WARN\n" +
+"syn keyword logInfo INFO DEBUG TRACE\n" +
+"syn keyword mdc thread msisdn\n" +
+"\" This creates a match on the date and puts in the highlight group called logDate.  The\n" +
+"\" nextgroup and skipwhite makes vim look for logTime after the match\n" +
+"syn match logDate /\\s\\@<=\\d\\{4}-\\d\\{2}-\\d\\{2}/ nextgroup=logTime skipwhite\n" +
+"\n" +
+"\" This creates a match on the time (but only if it follows the date)\n" +
+"syn match logTime /\\d\\{2}:\\d\\{2}:\\d\\{2},\\d\\{3}/\n" +
+"\n" +
+"\" match MDC\n" +
+"syn match msisdn /\\(\\cmsisdn\\C\\s*=\\s*\\)\\@<=\\d*/\n" +
+"\n" +
+"\" match Class.method\n" +
+"syn match classMethod /\\(\\]\\s*\\)\\@<=\\w*\\.\\w*\\( -\\)\\@=/\n" +
+"\n" +
+"\" match Exception\n" +
+"syn match excepLine /^\\(Caused by: \\)\\?\\(\\w*\\.\\)*\\w*Exception:.*$/ contains=excepQName\n" +
+"syn match excepQName /\\(\\w*\\.\\)*\\w*Exception/ contained nextgroup=excepMsg\n" +
+"syn match excepMsg /:.*$/ contained nextgroup=callStack skipnl\n" +
+"syn match callStack /^\\s*\\(at \\(\\(\\w\\|\\$\\)*\\.\\)*\\w*(\\w\\+.java:\\d\\+)\\|\\.\\.\\. \\d\\+ more\\)$/ nextgroup=callStack skipnl\n" +
+"\n" +
+"\" Now make them appear:\n" +
+"\" Link just links logError to the colouring for error\n" +
+"hi link logError Error\n" +
+"hi link loginfo Comment\n" +
+"hi link excepMsg Comment\n" +
+"\" Def means default colour - colourschemes can override\n" +
+"hi def logDate guibg=yellow guifg=blue\n" +
+"hi def logTime guibg=green guifg=white\n" +
+"hi def msisdn guifg=green\n" +
+"hi def excepQName guifg=red\n" +
+"hi def callStack guifg=orange\n" +
+"hi def classMethod gui=bold\n" +
+"\n" +
+"let b:current_syntax = \"log4jlog\"\n" +
+"\n" +
+"\" vim: ts=8 sw=\n" +
+        "");
+
+// Simple use Pygments as you would in Python
+interpreter.exec("from pygments import highlight\n"
+    + "from pygments.lexers import get_lexer_by_name\n"
+    + "from pygments.formatters import HtmlFormatter\n"
+    + "lexer = get_lexer_by_name(\"vim\", stripall=True)\n"
+    + "\nresult = highlight(code, lexer, HtmlFormatter())");
+
+// Get the result that has been set in a variable
+System.out.println(interpreter.get("result", String.class));
+
+}
+
+}
+{{/code}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [language=vim] [import org.python.util.PythonInterpreter;
+
+class PygmentsVim {
+
+public static void main(String [] args) {
+
+PythonInterpreter interpreter = new PythonInterpreter();
+
+// Set a variable with the content you want to work with
+interpreter.set("code",
+"\" Vim syntax file\n" +
+"\" Language:   Log4J log files\n" +
+"\n" +
+"\" set case on\n" +
+"syn case match\n" +
+"\n" +
+"\" This creates a keyword ERROR and puts it in the highlight group called logError\n" +
+"syn keyword logError FATAL ERROR WARN\n" +
+"syn keyword logInfo INFO DEBUG TRACE\n" +
+"syn keyword mdc thread msisdn\n" +
+"\" This creates a match on the date and puts in the highlight group called logDate.  The\n" +
+"\" nextgroup and skipwhite makes vim look for logTime after the match\n" +
+"syn match logDate /\\s\\@<=\\d\\{4}-\\d\\{2}-\\d\\{2}/ nextgroup=logTime skipwhite\n" +
+"\n" +
+"\" This creates a match on the time (but only if it follows the date)\n" +
+"syn match logTime /\\d\\{2}:\\d\\{2}:\\d\\{2},\\d\\{3}/\n" +
+"\n" +
+"\" match MDC\n" +
+"syn match msisdn /\\(\\cmsisdn\\C\\s*=\\s*\\)\\@<=\\d*/\n" +
+"\n" +
+"\" match Class.method\n" +
+"syn match classMethod /\\(\\]\\s*\\)\\@<=\\w*\\.\\w*\\( -\\)\\@=/\n" +
+"\n" +
+"\" match Exception\n" +
+"syn match excepLine /^\\(Caused by: \\)\\?\\(\\w*\\.\\)*\\w*Exception:.*$/ contains=excepQName\n" +
+"syn match excepQName /\\(\\w*\\.\\)*\\w*Exception/ contained nextgroup=excepMsg\n" +
+"syn match excepMsg /:.*$/ contained nextgroup=callStack skipnl\n" +
+"syn match callStack /^\\s*\\(at \\(\\(\\w\\|\\$\\)*\\.\\)*\\w*(\\w\\+.java:\\d\\+)\\|\\.\\.\\. \\d\\+ more\\)$/ nextgroup=callStack skipnl\n" +
+"\n" +
+"\" Now make them appear:\n" +
+"\" Link just links logError to the colouring for error\n" +
+"hi link logError Error\n" +
+"hi link loginfo Comment\n" +
+"hi link excepMsg Comment\n" +
+"\" Def means default colour - colourschemes can override\n" +
+"hi def logDate guibg=yellow guifg=blue\n" +
+"hi def logTime guibg=green guifg=white\n" +
+"hi def msisdn guifg=green\n" +
+"hi def excepQName guifg=red\n" +
+"hi def callStack guifg=orange\n" +
+"hi def classMethod gui=bold\n" +
+"\n" +
+"let b:current_syntax = \"log4jlog\"\n" +
+"\n" +
+"\" vim: ts=8 sw=\n" +
+        "");
+
+// Simple use Pygments as you would in Python
+interpreter.exec("from pygments import highlight\n"
+    + "from pygments.lexers import get_lexer_by_name\n"
+    + "from pygments.formatters import HtmlFormatter\n"
+    + "lexer = get_lexer_by_name(\"vim\", stripall=True)\n"
+    + "\nresult = highlight(code, lexer, HtmlFormatter())");
+
+// Get the result that has been set in a variable
+System.out.println(interpreter.get("result", String.class));
+
+}
+
+}]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+onWord [import]
+onSpace
+onWord [org]
+onSpecialSymbol [.]
+onWord [python]
+onSpecialSymbol [.]
+onWord [util]
+onSpecialSymbol [.]
+onWord [PythonInterpreter]
+onSpecialSymbol [;]
+onNewLine
+onNewLine
+onWord [class]
+onSpace
+onWord [PygmentsVim]
+onSpace
+onSpecialSymbol [{]
+onNewLine
+onNewLine
+onWord [public]
+onSpace
+onWord [static]
+onSpace
+onWord [void]
+onSpace
+onWord [main]
+onSpecialSymbol [(]
+onWord [String]
+onSpace
+onSpecialSymbol [[]
+onSpecialSymbol []]
+onSpace
+onWord [args]
+onSpecialSymbol [)]
+onSpace
+onSpecialSymbol [{]
+onNewLine
+onNewLine
+onWord [PythonInterpreter]
+onSpace
+onWord [interpreter]
+onSpace
+onSpecialSymbol [=]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [new]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+onWord [PythonInterpreter]
+onSpecialSymbol [(]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
+onNewLine
+onNewLine
+beginFormat [NONE] [[style]=[color: #000000; background-color: #fff0ff; ]]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
+endFormat [NONE] [[style]=[color: #000000; background-color: #fff0ff; ]]
+onSpace
+onWord [Set]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [a]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+onWord [variable]
+onSpace
+onWord [with]
+onSpace
+onWord [the]
+onSpace
+onWord [content]
+onSpace
+onWord [you]
+onSpace
+onWord [want]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [to]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+onWord [work]
+onSpace
+onWord [with]
+onNewLine
+onWord [interpreter]
+onSpecialSymbol [.]
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [set]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpecialSymbol [(]
+beginFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol ["]
+onWord [code]
+onSpecialSymbol ["]
+endFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol [,]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [Vim]
+onSpace
+onWord [syntax]
+onSpace
+onWord [file\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [Language]
+onSpecialSymbol [:]
+onSpace
+onSpace
+onSpace
+onWord [Log4J]
+onSpace
+onWord [log]
+onSpace
+onWord [files\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [set]
+onSpace
+onWord [case]
+onSpace
+onWord [on\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [case]
+onSpace
+onWord [match\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [This]
+onSpace
+onWord [creates]
+onSpace
+onWord [a]
+onSpace
+onWord [keyword]
+onSpace
+onWord [ERROR]
+onSpace
+onWord [and]
+onSpace
+onWord [puts]
+onSpace
+onWord [it]
+onSpace
+onWord [in]
+onSpace
+onWord [the]
+onSpace
+onWord [highlight]
+onSpace
+onWord [group]
+onSpace
+onWord [called]
+onSpace
+onWord [logError\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [keyword]
+onSpace
+onWord [logError]
+onSpace
+onWord [FATAL]
+onSpace
+onWord [ERROR]
+onSpace
+onWord [WARN\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [keyword]
+onSpace
+onWord [logInfo]
+onSpace
+onWord [INFO]
+onSpace
+onWord [DEBUG]
+onSpace
+onWord [TRACE\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [keyword]
+onSpace
+onWord [mdc]
+onSpace
+onWord [thread]
+onSpace
+onWord [msisdn\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [This]
+onSpace
+onWord [creates]
+onSpace
+onWord [a]
+onSpace
+onWord [match]
+onSpace
+onWord [on]
+onSpace
+onWord [the]
+onSpace
+onWord [date]
+onSpace
+onWord [and]
+onSpace
+onWord [puts]
+onSpace
+onWord [in]
+onSpace
+onWord [the]
+onSpace
+onWord [highlight]
+onSpace
+onWord [group]
+onSpace
+onWord [called]
+onSpace
+onWord [logDate]
+onSpecialSymbol [.]
+onSpace
+onSpace
+onWord [The\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [nextgroup]
+onSpace
+onWord [and]
+onSpace
+onWord [skipwhite]
+onSpace
+onWord [makes]
+onSpace
+onWord [vim]
+onSpace
+onWord [look]
+onSpace
+onWord [for]
+onSpace
+onWord [logTime]
+onSpace
+onWord [after]
+onSpace
+onWord [the]
+onSpace
+onWord [match\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [logDate]
+onSpace
+onSpecialSymbol [/]
+onWord [\\s\\]
+onSpecialSymbol [@]
+onSpecialSymbol [<]
+onSpecialSymbol [=]
+onWord [\\d\\]
+onSpecialSymbol [{]
+onWord [4]
+onSpecialSymbol [}]
+onSpecialSymbol [-]
+onWord [\\d\\]
+onSpecialSymbol [{]
+onWord [2]
+onSpecialSymbol [}]
+onSpecialSymbol [-]
+onWord [\\d\\]
+onSpecialSymbol [{]
+onWord [2]
+onSpecialSymbol [}]
+onSpecialSymbol [/]
+onSpace
+onWord [nextgroup]
+onSpecialSymbol [=]
+onWord [logTime]
+onSpace
+onWord [skipwhite\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [This]
+onSpace
+onWord [creates]
+onSpace
+onWord [a]
+onSpace
+onWord [match]
+onSpace
+onWord [on]
+onSpace
+onWord [the]
+onSpace
+onWord [time]
+onSpace
+onSpecialSymbol [(]
+onWord [but]
+onSpace
+onWord [only]
+onSpace
+onWord [if]
+onSpace
+onWord [it]
+onSpace
+onWord [follows]
+onSpace
+onWord [the]
+onSpace
+onWord [date]
+onSpecialSymbol [)]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [logTime]
+onSpace
+onSpecialSymbol [/]
+onWord [\\d\\]
+onSpecialSymbol [{]
+onWord [2]
+onSpecialSymbol [}]
+onSpecialSymbol [:]
+onWord [\\d\\]
+onSpecialSymbol [{]
+onWord [2]
+onSpecialSymbol [}]
+onSpecialSymbol [:]
+onWord [\\d\\]
+onSpecialSymbol [{]
+onWord [2]
+onSpecialSymbol [}]
+onSpecialSymbol [,]
+onWord [\\d\\]
+onSpecialSymbol [{]
+onWord [3]
+onSpecialSymbol [}]
+onSpecialSymbol [/]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [match]
+onSpace
+onWord [MDC\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [msisdn]
+onSpace
+onSpecialSymbol [/]
+onWord [\\]
+onSpecialSymbol [(]
+onWord [\\cmsisdn\\C\\s]
+onSpecialSymbol [*]
+onSpecialSymbol [=]
+onWord [\\s]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [)]
+onWord [\\]
+onSpecialSymbol [@]
+onSpecialSymbol [<]
+onSpecialSymbol [=]
+onWord [\\d]
+onSpecialSymbol [*]
+onSpecialSymbol [/]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [match]
+onSpace
+onWord [Class]
+onSpecialSymbol [.]
+onWord [method\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [classMethod]
+onSpace
+onSpecialSymbol [/]
+onWord [\\]
+onSpecialSymbol [(]
+onWord [\\]
+onSpecialSymbol []]
+onWord [\\s]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [)]
+onWord [\\]
+onSpecialSymbol [@]
+onSpecialSymbol [<]
+onSpecialSymbol [=]
+onWord [\\w]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [.]
+onWord [\\w]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [(]
+onSpace
+onSpecialSymbol [-]
+onWord [\\]
+onSpecialSymbol [)]
+onWord [\\]
+onSpecialSymbol [@]
+onSpecialSymbol [=]
+onSpecialSymbol [/]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [match]
+onSpace
+onWord [Exception\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [excepLine]
+onSpace
+onSpecialSymbol [/]
+onSpecialSymbol [^]
+onWord [\\]
+onSpecialSymbol [(]
+onWord [Caused]
+onSpace
+onWord [by]
+onSpecialSymbol [:]
+onSpace
+onWord [\\]
+onSpecialSymbol [)]
+onWord [\\]
+onSpecialSymbol [?]
+onWord [\\]
+onSpecialSymbol [(]
+onWord [\\w]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [.]
+onWord [\\]
+onSpecialSymbol [)]
+onSpecialSymbol [*]
+onWord [\\w]
+onSpecialSymbol [*]
+onWord [Exception]
+onSpecialSymbol [:]
+onSpecialSymbol [.]
+onSpecialSymbol [*]
+onSpecialSymbol [$]
+onSpecialSymbol [/]
+onSpace
+onWord [contains]
+onSpecialSymbol [=]
+onWord [excepQName\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [excepQName]
+onSpace
+onSpecialSymbol [/]
+onWord [\\]
+onSpecialSymbol [(]
+onWord [\\w]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [.]
+onWord [\\]
+onSpecialSymbol [)]
+onSpecialSymbol [*]
+onWord [\\w]
+onSpecialSymbol [*]
+onWord [Exception]
+onSpecialSymbol [/]
+onSpace
+onWord [contained]
+onSpace
+onWord [nextgroup]
+onSpecialSymbol [=]
+onWord [excepMsg\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [excepMsg]
+onSpace
+onSpecialSymbol [/]
+onSpecialSymbol [:]
+onSpecialSymbol [.]
+onSpecialSymbol [*]
+onSpecialSymbol [$]
+onSpecialSymbol [/]
+onSpace
+onWord [contained]
+onSpace
+onWord [nextgroup]
+onSpecialSymbol [=]
+onWord [callStack]
+onSpace
+onWord [skipnl\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [syn]
+onSpace
+onWord [match]
+onSpace
+onWord [callStack]
+onSpace
+onSpecialSymbol [/]
+onSpecialSymbol [^]
+onWord [\\s]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [(]
+onWord [at]
+onSpace
+onWord [\\]
+onSpecialSymbol [(]
+onWord [\\]
+onSpecialSymbol [(]
+onWord [\\w\\]
+onSpecialSymbol [|]
+onWord [\\]
+onSpecialSymbol [$]
+onWord [\\]
+onSpecialSymbol [)]
+onSpecialSymbol [*]
+onWord [\\]
+onSpecialSymbol [.]
+onWord [\\]
+onSpecialSymbol [)]
+onSpecialSymbol [*]
+onWord [\\w]
+onSpecialSymbol [*]
+onSpecialSymbol [(]
+onWord [\\w\\]
+onSpecialSymbol [+]
+onSpecialSymbol [.]
+onWord [java]
+onSpecialSymbol [:]
+onWord [\\d\\]
+onSpecialSymbol [+]
+onSpecialSymbol [)]
+onWord [\\]
+onSpecialSymbol [|]
+onWord [\\]
+onSpecialSymbol [.]
+onWord [\\]
+onSpecialSymbol [.]
+onWord [\\]
+onSpecialSymbol [.]
+onSpace
+onWord [\\d\\]
+onSpecialSymbol [+]
+onSpace
+onWord [more\\]
+onSpecialSymbol [)]
+onSpecialSymbol [$]
+onSpecialSymbol [/]
+onSpace
+onWord [nextgroup]
+onSpecialSymbol [=]
+onWord [callStack]
+onSpace
+onWord [skipnl\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [Now]
+onSpace
+onWord [make]
+onSpace
+onWord [them]
+onSpace
+onWord [appear]
+onSpecialSymbol [:]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [Link]
+onSpace
+onWord [just]
+onSpace
+onWord [links]
+onSpace
+onWord [logError]
+onSpace
+onWord [to]
+onSpace
+onWord [the]
+onSpace
+onWord [colouring]
+onSpace
+onWord [for]
+onSpace
+onWord [error\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [link]
+onSpace
+onWord [logError]
+onSpace
+onWord [Error\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [link]
+onSpace
+onWord [loginfo]
+onSpace
+onWord [Comment\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [link]
+onSpace
+onWord [excepMsg]
+onSpace
+onWord [Comment\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [Def]
+onSpace
+onWord [means]
+onSpace
+onWord [default]
+onSpace
+onWord [colour]
+onSpace
+onSpecialSymbol [-]
+onSpace
+onWord [colourschemes]
+onSpace
+onWord [can]
+onSpace
+onWord [override\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [def]
+onSpace
+onWord [logDate]
+onSpace
+onWord [guibg]
+onSpecialSymbol [=]
+onWord [yellow]
+onSpace
+onWord [guifg]
+onSpecialSymbol [=]
+onWord [blue\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [def]
+onSpace
+onWord [logTime]
+onSpace
+onWord [guibg]
+onSpecialSymbol [=]
+onWord [green]
+onSpace
+onWord [guifg]
+onSpecialSymbol [=]
+onWord [white\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [def]
+onSpace
+onWord [msisdn]
+onSpace
+onWord [guifg]
+onSpecialSymbol [=]
+onWord [green\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [def]
+onSpace
+onWord [excepQName]
+onSpace
+onWord [guifg]
+onSpecialSymbol [=]
+onWord [red\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [def]
+onSpace
+onWord [callStack]
+onSpace
+onWord [guifg]
+onSpecialSymbol [=]
+onWord [orange\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [hi]
+onSpace
+onWord [def]
+onSpace
+onWord [classMethod]
+onSpace
+onWord [gui]
+onSpecialSymbol [=]
+onWord [bold\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [let]
+onSpace
+onWord [b]
+onSpecialSymbol [:]
+onWord [current]
+onSpecialSymbol [_]
+onWord [syntax]
+onSpace
+onSpecialSymbol [=]
+onSpace
+onWord [\]
+onSpecialSymbol ["]
+onWord [log4jlog\]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpecialSymbol ["]
+onWord [\]
+onSpecialSymbol ["]
+onSpace
+onWord [vim]
+onSpecialSymbol [:]
+onSpace
+onWord [ts]
+onSpecialSymbol [=]
+onWord [8]
+onSpace
+onWord [sw]
+onSpecialSymbol [=]
+onWord [\n]
+onSpecialSymbol ["]
+onSpace
+onSpecialSymbol [+]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+beginFormat [NONE] [[style]=[color: #888888; ]]
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onSpace
+onSpecialSymbol ["]
+onSpecialSymbol ["]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
+endFormat [NONE] [[style]=[color: #888888; ]]
+onNewLine
+onNewLine
+beginFormat [NONE] [[style]=[color: #000000; background-color: #fff0ff; ]]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
+endFormat [NONE] [[style]=[color: #000000; background-color: #fff0ff; ]]
+onSpace
+onWord [Simple]
+onSpace
+onWord [use]
+onSpace
+onWord [Pygments]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [as]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+onWord [you]
+onSpace
+onWord [would]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [in]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+onWord [Python]
+onNewLine
+onWord [interpreter]
+onSpecialSymbol [.]
+onWord [exec]
+onSpecialSymbol [(]
+beginFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol ["]
+onWord [from]
+onSpace
+onWord [pygments]
+onSpace
+onWord [import]
+onSpace
+onWord [highlight\n]
+onSpecialSymbol ["]
+endFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onNewLine
+onSpace
+onSpace
+onSpace
+onSpace
+onSpecialSymbol [+]
+onSpace
+beginFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol ["]
+onWord [from]
+onSpace
+onWord [pygments]
+onSpecialSymbol [.]
+onWord [lexers]
+onSpace
+onWord [import]
+onSpace
+onWord [get]
+onSpecialSymbol [_]
+onWord [lexer]
+onSpecialSymbol [_]
+onWord [by]
+onSpecialSymbol [_]
+onWord [name\n]
+onSpecialSymbol ["]
+endFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onNewLine
+onSpace
+onSpace
+onSpace
+onSpace
+onSpecialSymbol [+]
+onSpace
+beginFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol ["]
+onWord [from]
+onSpace
+onWord [pygments]
+onSpecialSymbol [.]
+onWord [formatters]
+onSpace
+onWord [import]
+onSpace
+onWord [HtmlFormatter\n]
+onSpecialSymbol ["]
+endFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onNewLine
+onSpace
+onSpace
+onSpace
+onSpace
+onSpecialSymbol [+]
+onSpace
+beginFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol ["]
+onWord [lexer]
+onSpace
+onSpecialSymbol [=]
+onSpace
+onWord [get]
+onSpecialSymbol [_]
+onWord [lexer]
+onSpecialSymbol [_]
+onWord [by]
+onSpecialSymbol [_]
+onWord [name]
+onSpecialSymbol [(]
+onWord [\]
+onSpecialSymbol ["]
+onWord [vim\]
+onSpecialSymbol ["]
+onSpecialSymbol [,]
+onSpace
+onWord [stripall]
+onSpecialSymbol [=]
+onWord [True]
+onSpecialSymbol [)]
+onWord [\n]
+onSpecialSymbol ["]
+endFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onNewLine
+onSpace
+onSpace
+onSpace
+onSpace
+onSpecialSymbol [+]
+onSpace
+beginFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol ["]
+onWord [\nresult]
+onSpace
+onSpecialSymbol [=]
+onSpace
+onWord [highlight]
+onSpecialSymbol [(]
+onWord [code]
+onSpecialSymbol [,]
+onSpace
+onWord [lexer]
+onSpecialSymbol [,]
+onSpace
+onWord [HtmlFormatter]
+onSpecialSymbol [(]
+onSpecialSymbol [)]
+onSpecialSymbol [)]
+onSpecialSymbol ["]
+endFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
+onNewLine
+onNewLine
+beginFormat [NONE] [[style]=[color: #000000; background-color: #fff0ff; ]]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
+endFormat [NONE] [[style]=[color: #000000; background-color: #fff0ff; ]]
+onSpace
+onWord [Get]
+onSpace
+onWord [the]
+onSpace
+onWord [result]
+onSpace
+onWord [that]
+onSpace
+onWord [has]
+onSpace
+onWord [been]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [set]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [in]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onWord [a]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008800; ]]
+onSpace
+onWord [variable]
+onNewLine
+onWord [System]
+onSpecialSymbol [.]
+onWord [out]
+onSpecialSymbol [.]
+onWord [println]
+onSpecialSymbol [(]
+onWord [interpreter]
+onSpecialSymbol [.]
+onWord [get]
+onSpecialSymbol [(]
+beginFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol ["]
+onWord [result]
+onSpecialSymbol ["]
+endFormat [NONE] [[style]=[background-color: #fff0f0; ]]
+onSpecialSymbol [,]
+onSpace
+onWord [String]
+onSpecialSymbol [.]
+onWord [class]
+onSpecialSymbol [)]
+onSpecialSymbol [)]
+onSpecialSymbol [;]
+onNewLine
+onNewLine
+onSpecialSymbol [}]
+onNewLine
+onNewLine
+onSpecialSymbol [}]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
+endMacroMarkerStandalone [code] [language=vim] [import org.python.util.PythonInterpreter;
+
+class PygmentsVim {
+
+public static void main(String [] args) {
+
+PythonInterpreter interpreter = new PythonInterpreter();
+
+// Set a variable with the content you want to work with
+interpreter.set("code",
+"\" Vim syntax file\n" +
+"\" Language:   Log4J log files\n" +
+"\n" +
+"\" set case on\n" +
+"syn case match\n" +
+"\n" +
+"\" This creates a keyword ERROR and puts it in the highlight group called logError\n" +
+"syn keyword logError FATAL ERROR WARN\n" +
+"syn keyword logInfo INFO DEBUG TRACE\n" +
+"syn keyword mdc thread msisdn\n" +
+"\" This creates a match on the date and puts in the highlight group called logDate.  The\n" +
+"\" nextgroup and skipwhite makes vim look for logTime after the match\n" +
+"syn match logDate /\\s\\@<=\\d\\{4}-\\d\\{2}-\\d\\{2}/ nextgroup=logTime skipwhite\n" +
+"\n" +
+"\" This creates a match on the time (but only if it follows the date)\n" +
+"syn match logTime /\\d\\{2}:\\d\\{2}:\\d\\{2},\\d\\{3}/\n" +
+"\n" +
+"\" match MDC\n" +
+"syn match msisdn /\\(\\cmsisdn\\C\\s*=\\s*\\)\\@<=\\d*/\n" +
+"\n" +
+"\" match Class.method\n" +
+"syn match classMethod /\\(\\]\\s*\\)\\@<=\\w*\\.\\w*\\( -\\)\\@=/\n" +
+"\n" +
+"\" match Exception\n" +
+"syn match excepLine /^\\(Caused by: \\)\\?\\(\\w*\\.\\)*\\w*Exception:.*$/ contains=excepQName\n" +
+"syn match excepQName /\\(\\w*\\.\\)*\\w*Exception/ contained nextgroup=excepMsg\n" +
+"syn match excepMsg /:.*$/ contained nextgroup=callStack skipnl\n" +
+"syn match callStack /^\\s*\\(at \\(\\(\\w\\|\\$\\)*\\.\\)*\\w*(\\w\\+.java:\\d\\+)\\|\\.\\.\\. \\d\\+ more\\)$/ nextgroup=callStack skipnl\n" +
+"\n" +
+"\" Now make them appear:\n" +
+"\" Link just links logError to the colouring for error\n" +
+"hi link logError Error\n" +
+"hi link loginfo Comment\n" +
+"hi link excepMsg Comment\n" +
+"\" Def means default colour - colourschemes can override\n" +
+"hi def logDate guibg=yellow guifg=blue\n" +
+"hi def logTime guibg=green guifg=white\n" +
+"hi def msisdn guifg=green\n" +
+"hi def excepQName guifg=red\n" +
+"hi def callStack guifg=orange\n" +
+"hi def classMethod gui=bold\n" +
+"\n" +
+"let b:current_syntax = \"log4jlog\"\n" +
+"\n" +
+"\" vim: ts=8 sw=\n" +
+        "");
+
+// Simple use Pygments as you would in Python
+interpreter.exec("from pygments import highlight\n"
+    + "from pygments.lexers import get_lexer_by_name\n"
+    + "from pygments.formatters import HtmlFormatter\n"
+    + "lexer = get_lexer_by_name(\"vim\", stripall=True)\n"
+    + "\nresult = highlight(code, lexer, HtmlFormatter())");
+
+// Get the result that has been set in a variable
+System.out.println(interpreter.get("result", String.class));
+
+}
+
+}]
+endDocument

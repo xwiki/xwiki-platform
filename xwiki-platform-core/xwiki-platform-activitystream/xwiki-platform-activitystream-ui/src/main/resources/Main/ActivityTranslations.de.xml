@@ -36,12 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: activity.page.link.title=Located in {0}
+  <content>activity.page.link.title=Liegt in {0}
 activity.rss.pages.modified=Geänderte Seiten RSS-Feed
 activity.rss.feed.description=RSS-Feed für Dokumentenänderungen
-activity.rss.feed.tags.description=RSS Feed der Dokumente, die getaggt sind mit\: "{0}"
+activity.rss.feed.tags.description=RSS Feed der Dokumente, die getaggt sind mit: "{0}"
 activity.rss.feed.spaces.description=RSS Feed der Dokumente in Bereich(en) "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS Feed der Dokumente in Bereich(en) "{1}", welche getaggt sind mit\: "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS Feed der Dokumente in Bereich(en) "{1}", welche getaggt sind mit: "{0}"
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

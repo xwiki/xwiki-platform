@@ -191,6 +191,7 @@ public class UndeleteAction extends XWikiAction
             restoreRequest = refactoring.createRestoreRequest(Arrays.asList(deletedDocument.getId()));
         }
         restoreRequest.setInteractive(isAsync(request));
+        restoreRequest.setCheckAuthorRights(false);
 
         try {
             JobExecutor jobExecutor = Utils.getComponent(JobExecutor.class);

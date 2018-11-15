@@ -24,6 +24,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.test.docker.junit5.browser.Browser;
+import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -49,19 +52,66 @@ public @interface UITest
 
     /**
      * @return the database to use, see {@link Database}
-     * @since 10.9RC1
+     * @since 10.9
      */
     Database database() default Database.SYSTEM;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
-     * @since 10.9RC1
+     * @since 10.9
      */
     ServletEngine servletEngine() default ServletEngine.SYSTEM;
 
     /**
-     * @return true if the test should be started in debug mode, false otherwise
-     * @since 10.9RC1
+     * @return true if the test should output verbose console logs or not
+     * @since 10.10RC1
      */
-    boolean debug() default false;
+    boolean verbose() default false;
+
+    /**
+     * @return true if the database data should be mapped to a local directory on the host computer so that it can be
+     * saved and reused for another run
+     * @since 10.10RC1
+     */
+    boolean saveDatabaseData() default false;
+
+    /**
+     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in your
+     * local repository). False by default to avoid developer problems but should be set to true in the CI to improve
+     * performance of functional tests
+     * @since 10.10RC1
+     */
+    boolean offline() default false;
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the "latest" tag)
+     * @since 10.10RC1
+     */
+    String servletEngineTag() default "";
+
+    /**
+     * @return the docker image tag to use (if not specified, uses the default from TestContainers)
+     * @since 10.10RC1
+     */
+    String databaseTag() default "";
+
+    /**
+     * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
+     * depending on the database)
+     * @since 10.10RC1
+     */
+    String jdbcDriverVersion() default "";
+
+    /**
+     * @return true if VNC container is started and recording is done and saved on test exit
+     * @since 10.10RC1
+     */
+    boolean vnc() default true;
+
+    /**
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as as
+     * {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @since 10.10RC1
+     */
+    String[] properties() default {};
 }

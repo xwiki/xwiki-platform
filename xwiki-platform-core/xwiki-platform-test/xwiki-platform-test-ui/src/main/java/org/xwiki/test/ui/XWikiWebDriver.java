@@ -97,7 +97,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      * it).
      *
      * @since 10.8.1
-     * @since 10.9RC1
+     * @since 10.9
      */
     public WebElement findElementWithoutWaitingWithoutScrolling(By by)
     {
@@ -173,7 +173,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      * it).
      *
      * @since 10.8.1
-     * @since 10.9RC1
+     * @since 10.9
      */
     public boolean hasElementWithoutWaitingWithoutScrolling(By by)
     {
@@ -957,7 +957,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      * verifying that the page has finished loading (and thus there's no element visible and we cannot scroll to it).
      *
      * @since 10.8.1
-     * @since 10.9RC1
+     * @since 10.9
      */
     public WebElement findElementWithoutScrolling(By by)
     {

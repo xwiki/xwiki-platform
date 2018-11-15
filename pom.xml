@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>10.9-SNAPSHOT</version>
+  <version>10.10-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -130,6 +130,16 @@
           <exclusion>
             <artifactId>cxf-rt-rs-client</artifactId>
             <groupId>org.apache.cxf</groupId>
+          </exclusion>
+          <!-- Now merged with jaxb-runtime -->
+          <exclusion>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-core</artifactId>
+          </exclusion>
+          <!-- Artifact id changed -->
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -234,7 +244,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10</version>
+        <version>2.10.1</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -406,7 +416,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.2.17</version>
+        <version>1.2.18</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -644,12 +654,11 @@
               <extensionOverride>
                 <!-- Right id of the JAXB reference implementation -->
                 <id>org.glassfish.jaxb:jaxb-runtime</id>
-                <features>com.sun.xml.bind:jaxb-impl</features>
-              </extensionOverride>
-              <extensionOverride>
-                <!-- Right id of the JAXB reference implementation -->
-                <id>org.glassfish.jaxb:jaxb-core</id>
-                <features>com.sun.xml.bind:jaxb-core</features>
+                <features>
+                  com.sun.xml.bind:jaxb-impl,
+                  org.glassfish.jaxb:jaxb-core,
+                  com.sun.xml.bind:jaxb-core
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <!-- Open Java is the same as JSON-Java but with a different license -->
@@ -666,45 +675,45 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcprov-jdk15on</id>
                 <features>
-                  bouncycastle:bcprov-jdk16
-                  bouncycastle:bcprov-jdk15
-                  bouncycastle:bcprov-jdk14
-                  bouncycastle:bcprov-jdk13
-                  bouncycastle:bcprov-jdk12
-                  org.bouncycastle:bcprov-jdk16
-                  org.bouncycastle:bcprov-jdk15
-                  org.bouncycastle:bcprov-jdk14
-                  org.bouncycastle:bcprov-jdk13
+                  bouncycastle:bcprov-jdk16,
+                  bouncycastle:bcprov-jdk15,
+                  bouncycastle:bcprov-jdk14,
+                  bouncycastle:bcprov-jdk13,
+                  bouncycastle:bcprov-jdk12,
+                  org.bouncycastle:bcprov-jdk16,
+                  org.bouncycastle:bcprov-jdk15,
+                  org.bouncycastle:bcprov-jdk14,
+                  org.bouncycastle:bcprov-jdk13,
                   org.bouncycastle:bcprov-jdk12
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>org.bouncycastle:bcpkix-jdk15on</id>
                 <features>
-                  bouncycastle:bcpkix-jdk16
-                  bouncycastle:bcpkix-jdk15
-                  bouncycastle:bcpkix-jdk14
-                  bouncycastle:bcpkix-jdk13
-                  bouncycastle:bcpkix-jdk12
-                  org.bouncycastle:bcpkix-jdk16
-                  org.bouncycastle:bcpkix-jdk15
-                  org.bouncycastle:bcpkix-jdk14
-                  org.bouncycastle:bcpkix-jdk13
+                  bouncycastle:bcpkix-jdk16,
+                  bouncycastle:bcpkix-jdk15,
+                  bouncycastle:bcpkix-jdk14,
+                  bouncycastle:bcpkix-jdk13,
+                  bouncycastle:bcpkix-jdk12,
+                  org.bouncycastle:bcpkix-jdk16,
+                  org.bouncycastle:bcpkix-jdk15,
+                  org.bouncycastle:bcpkix-jdk14,
+                  org.bouncycastle:bcpkix-jdk13,
                   org.bouncycastle:bcpkix-jdk12
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk15on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16
-                  bouncycastle:bcmail-jdk15
-                  bouncycastle:bcmail-jdk14
-                  bouncycastle:bcmail-jdk13
-                  bouncycastle:bcmail-jdk12
-                  org.bouncycastle:bcmail-jdk16
-                  org.bouncycastle:bcmail-jdk15
-                  org.bouncycastle:bcmail-jdk14
-                  org.bouncycastle:bcmail-jdk13
+                  bouncycastle:bcmail-jdk16,
+                  bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk14,
+                  bouncycastle:bcmail-jdk13,
+                  bouncycastle:bcmail-jdk12,
+                  org.bouncycastle:bcmail-jdk16,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk14,
+                  org.bouncycastle:bcmail-jdk13,
                   org.bouncycastle:bcmail-jdk12
                 </features>
               </extensionOverride>
@@ -718,7 +727,10 @@
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.mail:javax.mail</id>
-                <features>javax.mail:mail</features>
+                <features>
+                  javax.mail:mail,
+                  javax.mail:mailapi
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>xml-apis:xml-apis</id>
@@ -731,9 +743,13 @@
               <extensionOverride>
                 <id>net.sf.json-lib:json-lib:jdk15</id>
                 <features>
-                  net.sf.json-lib:json-lib
+                  net.sf.json-lib:json-lib,
                   net.sf.json-lib:json-lib:jdk13
                 </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>javax.activation:javax.activation-api</id>
+                <features>javax.activation:activation</features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

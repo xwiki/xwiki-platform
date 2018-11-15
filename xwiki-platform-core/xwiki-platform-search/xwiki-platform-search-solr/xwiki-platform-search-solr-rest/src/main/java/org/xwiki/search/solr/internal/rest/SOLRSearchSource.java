@@ -127,6 +127,8 @@ public class SOLRSearchSource extends AbstractSearchSource
                 }
                 fq.add("{!tag=wiki}wiki:(" + builder + ")");
             }
+        } else {
+            query.setWiki(defaultWikiName);
         }
 
         // TODO: current locale filtering ?

@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ConfirmationModal;
  * Represents the actions possible on the delete group confirmation modal.
  * 
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class DeleteGroupConfirmationModal extends ConfirmationModal
 {

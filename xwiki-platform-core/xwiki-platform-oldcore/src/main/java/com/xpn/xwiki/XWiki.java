@@ -139,6 +139,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
+import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -439,6 +440,8 @@ public class XWiki implements EventListener
 
     private WikiDescriptorManager wikiDescriptorManager;
 
+    private AsyncContext asyncContext;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -733,6 +736,15 @@ public class XWiki implements EventListener
         }
 
         return this.wikiDescriptorManager;
+    }
+
+    private AsyncContext getAsyncContext()
+    {
+        if (this.asyncContext == null) {
+            this.asyncContext = Utils.getComponent(AsyncContext.class);
+        }
+
+        return this.asyncContext;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1892,6 +1904,14 @@ public class XWiki implements EventListener
         String currentWiki = context.getWikiId();
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
+
+            try {
+                // Indicate the the async context manipulated documents
+                getAsyncContext().useEntity(doc.getDocumentReferenceWithLocale());
+            } catch (Exception e) {
+                // If the AsyncContext component does not work then we are not in an asynchronous context anyway
+                LOGGER.debug("Failed to register the document in the asynchronous context", e);
+            }
 
             return getStore().loadXWikiDoc(doc, context);
         } finally {

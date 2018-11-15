@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian</artifactId>
   <name>XWiki Platform - Distribution - Debian</name>
@@ -38,7 +38,7 @@
     <module>xwiki-platform-distribution-debian-tomcat</module>
   </modules>
   <properties>
-    <jdeb.version>1.6</jdeb.version>
+    <jdeb.version>1.7</jdeb.version>
     <debian.maintainer>XWiki Team (devs@xwiki.org)</debian.maintainer>
     <debian.license>LGPL 2.1</debian.license>
     <debian.licenseFilename>LGPL-2.1</debian.licenseFilename>

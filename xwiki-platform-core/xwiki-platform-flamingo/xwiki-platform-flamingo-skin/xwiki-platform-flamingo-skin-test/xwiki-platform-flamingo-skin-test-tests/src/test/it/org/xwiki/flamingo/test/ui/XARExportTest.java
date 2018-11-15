@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  * Verify that the XAR export features works fine.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class XARExportTest extends AbstractTest
 {

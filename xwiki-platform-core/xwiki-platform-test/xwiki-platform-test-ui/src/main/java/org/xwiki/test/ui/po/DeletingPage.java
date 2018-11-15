@@ -29,66 +29,23 @@ import org.openqa.selenium.support.FindBy;
  * @version $Id$
  * @since 7.2M3 
  */
-public class DeletingPage extends ViewPage
+public class DeletingPage extends CopyOrRenameOrDeleteStatusPage
 {
-    private static final String SUCCESS_MESSAGE_ID = "successMessage";
-    
-    private static final String ERROR_MESSAGE_ID = "errorMessage";
-    
-    private static final String PROGRESS_BAR_CONTAINER_ID = "delete-progress-bar-container";
-    
-    @FindBy(id = SUCCESS_MESSAGE_ID)
-    private WebElement successMessage;
-
-    @FindBy(id = ERROR_MESSAGE_ID)
-    private WebElement errorMessage;
-
-    @FindBy(id = PROGRESS_BAR_CONTAINER_ID)
-    private WebElement progressBarContainer;
-    
     @FindBy(xpath = "//div[@id = 'document-title']//a")
     private WebElement titleLink;
-    
-    /** 
-     * @return true if the deletion process is terminated
-     */
-    public boolean isTerminated()
-    {
-        return !progressBarContainer.isDisplayed();
-    }
 
-    /**
-     * Wait until the delete process is terminated 
-     */
-    public void waitUntilIsTerminated()
-    {
-        getDriver().waitUntilElementDisappears(By.id(PROGRESS_BAR_CONTAINER_ID));
-    }
-    
-    public boolean isSuccess()
-    {
-        return successMessage.isDisplayed();
-    }
+    private static final String DELETE_SUCCESS = "Done.";
 
-    /**
-     * Wait until the delete process is terminated
-     * @since 8.1M1
-     */
-    public void waitUntilSuccessMessage()
-    {
-        getDriver().waitUntilElementIsVisible(By.id(SUCCESS_MESSAGE_ID));
-    }
-
-    public String getSuccessMessage()
-    {
-        return successMessage.getText();
-    }
-    
     public DeletePageOutcomePage getDeletePageOutcomePage()
     {
         // Click on the title to get back to the "view" mode
         titleLink.click();
         // Since the page is deleted, we should have the "delete page outcome" UI...
         return new DeletePageOutcomePage();
+    }
+
+    public boolean isSuccess()
+    {
+        return this.getInfoMessage().equals(DELETE_SUCCESS);
     }
 }

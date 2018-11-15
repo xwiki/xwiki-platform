@@ -49,7 +49,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * Migration for XWIKI-10092. An object can be stored in the database without some of its properties.
  * 
  * @since 10.8.1
- * @since 10.9RC1
+ * @since 10.9
  * @version $Id$
  */
 @Component

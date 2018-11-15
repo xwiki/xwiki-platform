@@ -19,25 +19,13 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.job.AbstractJob;
-import org.xwiki.job.AbstractJobStatus;
-import org.xwiki.job.GroupedJob;
-import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.Request;
-import org.xwiki.model.ModelContext;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
-import org.xwiki.refactoring.job.RestoreRequest;
 
 /**
  * A job that can restore entities.
@@ -47,18 +35,8 @@ import org.xwiki.refactoring.job.RestoreRequest;
  */
 @Component
 @Named(RefactoringJobs.RESTORE)
-public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<RestoreRequest>> implements GroupedJob
+public class RestoreJob extends AbstractDeletedDocumentsJob
 {
-    static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
-
-    @Inject
-    protected ModelBridge modelBridge;
-
-    @Inject
-    protected ModelContext modelContext;
-
-    private JobGroupPath groupPath;
-
     @Override
     public String getType()
     {
@@ -66,116 +44,20 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
     }
 
     @Override
-    protected AbstractJobStatus<RestoreRequest> createNewStatus(RestoreRequest request)
+    protected void handleDeletedDocuments(List<Long> idsDeletedDocuments, AbstractCheckRightsRequest request)
     {
-        AbstractJobStatus<RestoreRequest> status = super.createNewStatus(request);
+        this.progressManager.pushLevelProgress(idsDeletedDocuments.size(), this);
 
-        status.setCancelable(true);
-
-        return status;
-    }
-
-    @Override
-    protected void runInternal() throws Exception
-    {
-        RestoreRequest request = getRequest();
-
-        initializeContext(request);
-
-        boolean checkRights = request.isCheckRights();
-
-        this.progressManager.pushLevelProgress(2, this);
-
-        this.progressManager.startStep(this);
-
-        // Read the request and build the final list of IDs to restore.
-        List<Long> idsToRestore = getIdsToRestore(request);
-
-        this.progressManager.startStep(this);
-
-        // Process each ID and try to restore it.
-        restoreDocuments(idsToRestore, checkRights);
-
-        this.progressManager.popLevelProgress(this);
-    }
-
-    private void restoreDocuments(List<Long> idsToRestore, boolean checkRights)
-    {
-        this.progressManager.pushLevelProgress(idsToRestore.size(), this);
-
-        for (Long idToRestore : idsToRestore) {
+        for (Long idToRestore : idsDeletedDocuments) {
             if (this.status.isCanceled()) {
                 break;
             } else {
                 this.progressManager.startStep(this);
-                modelBridge.restoreDeletedDocument(idToRestore, checkRights);
+                modelBridge.restoreDeletedDocument(idToRestore, request);
                 this.progressManager.endStep(this);
             }
         }
 
         this.progressManager.popLevelProgress(this);
-    }
-
-    private void initializeContext(RestoreRequest request) throws IllegalArgumentException
-    {
-        // Set the context user to the one that made the request.
-        DocumentReference userReference = request.getUserReference();
-        modelBridge.setContextUserReference(userReference);
-
-        // Set the context wiki to the one specified in the request.
-        // All DeletedDocuments APIs, specifically the IDs (single document or batch), are local to the current wiki.
-        WikiReference wikiReference = request.getWikiReference();
-        // If the wiki is not specified, then we can not continue.
-        if (wikiReference == null) {
-            throw new IllegalArgumentException("No wiki reference was specified in the job request");
-        }
-        modelContext.setCurrentEntityReference(wikiReference);
-    }
-
-    private List<Long> getIdsToRestore(RestoreRequest request)
-    {
-        List<Long> result = new ArrayList<>();
-
-        // Expand the batch in individual deleted document IDs.
-        String batchId = request.getBatchId();
-        if (StringUtils.isNotBlank(batchId)) {
-            List<Long> batchDeletedDocumentIds = modelBridge.getDeletedDocumentIds(batchId);
-            result.addAll(batchDeletedDocumentIds);
-        }
-
-        // Merge any individually specified IDs, if they are not already in the batch.
-        List<Long> deletedDocumentIds = request.getDeletedDocumentIds();
-        if (deletedDocumentIds != null) {
-            for (long deletedDocumentId : deletedDocumentIds) {
-                if (!result.contains(deletedDocumentId)) {
-                    result.add(deletedDocumentId);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public JobGroupPath getGroupPath()
-    {
-        return groupPath;
-    }
-
-    @Override
-    public void initialize(Request request)
-    {
-        super.initialize(request);
-
-        // Build the job group path.
-        // Note: Because of the nature of the RestoreJob that works with with DeletedDocument IDs and BatchIDs (and not
-        // with EntityReferences), the only way we can try to avoid executing operation at the same time on the same
-        // reference is to use a group path at the wiki level, hoping most restore operations are fast and do not block
-        // for long.
-        WikiReference wikiReference = ((RestoreRequest) request).getWikiReference();
-        if (wikiReference != null) {
-            // Note:
-            this.groupPath = new JobGroupPath(wikiReference.getName(), ROOT_GROUP);
-        }
     }
 }

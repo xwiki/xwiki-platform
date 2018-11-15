@@ -31,15 +31,20 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
@@ -63,6 +68,24 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 {
+    @MockComponent
+    private JobProgressManager jobProgressManager;
+
+    @MockComponent
+    private ErrorBlockGenerator errorBlockGenerator;
+
+    @MockComponent
+    private AsyncContext asyncContext;
+
+    @MockComponent
+    private BlockAsyncRendererExecutor blockAsyncRendererExecutor;
+
+    @MockComponent
+    private RenderingContext renderingContext;
+
+    @MockComponent
+    private ContentParser contentParser;
+
     @InjectMockComponents
     private WikiUIExtensionComponentBuilder builder;
 

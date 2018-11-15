@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -275,6 +275,11 @@
       <groupId>com.sun.mail</groupId>
       <artifactId>javax.mail</artifactId>
     </dependency>
+    <!-- Replace the version triggered by javax.mail by a more accurate one -->
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>javax.activation-api</artifactId>
+    </dependency>
 
     <!-- Other XWiki modules -->
     <dependency>
@@ -397,6 +402,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-template-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-async-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -838,6 +848,8 @@
                 **/store/XWikiDefaultStore.java,
                 **/store/XWikiHibernateAttachmentStore.java,
                 **/store/XWikiHibernateBaseStore.java,
+                <!-- XWikiHibernateRecycleBinStore has a Fan-Out complexity of 21 after adding Query on it -->
+                **/store/XWikiHibernateRecycleBinStore.java,
                 **/store/XWikiHibernateStore.java,
                 **/store/XWikiStoreInterface.java,
                 **/store/XWikiVersioningStoreInterface.java,

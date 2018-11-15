@@ -19,12 +19,6 @@
  */
 package org.xwiki.refactoring.job;
 
-import java.util.List;
-
-import org.xwiki.job.AbstractRequest;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-
 /**
  * A job request that can be used to restore a list of deleted documents and/or an entire batch of deleted documents
  * from the recycle bin.
@@ -32,105 +26,7 @@ import org.xwiki.model.reference.WikiReference;
  * @version $Id$
  * @since 9.4RC1
  */
-public class RestoreRequest extends AbstractRequest
+public class RestoreRequest extends AbstractDeletedDocumentsRequest
 {
     private static final long serialVersionUID = 7738465742607715013L;
-
-    private static final String BATCH_ID = "batchId";
-
-    private static final String DELETED_DOCUMENT_IDS = "deletedDocumentIds";
-
-    private static final String CHECK_RIGHTS = "checkRights";
-
-    private static final String USER_REFERENCE = "userReference";
-
-    private static final String WIKI_REFERENCE = "wikiReference";
-
-    /**
-     * @return the ID of the batch of deleted documents to restore. If {@link #setDeletedDocumentIds(List)} is also
-     *         specified, the two will be merged when the operation is executed
-     */
-    public String getBatchId()
-    {
-        return getProperty(BATCH_ID);
-    }
-
-    /**
-     * @param batchId the ID of the batch of deleted documents to restore. If {@link #setDeletedDocumentIds(List)} is
-     *            also specified, the two will be merged when the operation is executed
-     */
-    public void setBatchId(String batchId)
-    {
-
-        setProperty(BATCH_ID, batchId);
-    }
-
-    /**
-     * @return the list of IDs of the deleted documents to restore. If {@link #setBatchId(String)} is also specified,
-     *         the two will be merged when the operation is executed
-     */
-    public List<Long> getDeletedDocumentIds()
-    {
-        return getProperty(DELETED_DOCUMENT_IDS);
-    }
-
-    /**
-     * @param deletedDocumentIds the list of IDs of the deleted documents to restore. If {@link #setBatchId(String)} is
-     *            also specified, the two will be merged when the operation is executed
-     */
-    public void setDeletedDocumentIds(List<Long> deletedDocumentIds)
-    {
-        setProperty(DELETED_DOCUMENT_IDS, deletedDocumentIds);
-    }
-
-    /**
-     * @return whether or not to check the rights of the user executing the operation
-     */
-    public boolean isCheckRights()
-    {
-        return getProperty(CHECK_RIGHTS, true);
-    }
-
-    /**
-     * @param checkRights whether or not to check the rights of the user executing the operation
-     */
-    public void setCheckRights(boolean checkRights)
-    {
-        setProperty(CHECK_RIGHTS, checkRights);
-
-    }
-
-    /**
-     * @return the user executing the restore operation. This is also the user for which any rights might be checked if
-     *         {@link #setCheckRights(boolean)} is enabled
-     */
-    public DocumentReference getUserReference()
-    {
-        return getProperty(USER_REFERENCE);
-    }
-
-    /**
-     * @param userReference the user executing the restore operation. This is also the user for which any rights
-     *            might be checked if {@link #setCheckRights(boolean)} is enabled
-     */
-    public void setUserReference(DocumentReference userReference)
-    {
-        setProperty(USER_REFERENCE, userReference);
-    }
-
-    /**
-     * @return the wiki on which the restore operation is performed
-     */
-    public WikiReference getWikiReference()
-    {
-        return getProperty(WIKI_REFERENCE);
-    }
-
-    /**
-     * @param wikiReference the wiki on which the restore operation is performed
-     */
-    public void setWikiReference(WikiReference wikiReference)
-    {
-        setProperty(WIKI_REFERENCE, wikiReference);
-    }
 }

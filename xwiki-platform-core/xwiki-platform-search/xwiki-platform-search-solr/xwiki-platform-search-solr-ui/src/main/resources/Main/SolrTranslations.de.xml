@@ -40,6 +40,7 @@
 solr.admin.submit=Ausführen
 solr.admin.error.notallowed=Sie sind zur Ausführung dieser Aktion nicht berechtigt.
 solr.admin.error.norights=Sie benötigen Adminstratorenrechte, um diesen Abschnitt zu sehen.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Länge der Warteschlange

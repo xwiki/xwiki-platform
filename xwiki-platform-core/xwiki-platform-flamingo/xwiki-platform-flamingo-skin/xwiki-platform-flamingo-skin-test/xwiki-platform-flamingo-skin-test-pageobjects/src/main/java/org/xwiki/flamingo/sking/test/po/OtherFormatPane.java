@@ -31,7 +31,7 @@ import org.xwiki.tree.test.po.TreeElement;
  * Represents the opened panel "Other Formats" in the modal export.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class OtherFormatPane extends BaseElement
 {

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-minimaldependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Minimal Dependencies</name>
@@ -266,6 +266,35 @@
       <version>${project.version}</version>
       <type>zip</type>
       <scope>runtime</scope>
+    </dependency>
+
+    <!-- ********************************************************************** -->
+    <!-- Category for special problems -->
+
+    <!-- Jetty embeds an older version of ASM that XWiki uses and thus when we deploy XWiki extensions (that
+         transitively depend on ASM) inside an XWiki runtime based on the minimal WAR we get a version compatibility
+         violation. See https://jira.xwiki.org/browse/XWIKI-15764 -->
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>${asm.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-commons</artifactId>
+      <version>${asm.version}</version>
+    </dependency>
+
+    <!-- Some optional Maven dependencies that we don't want the Extension Manager to resolve/install. This is
+         because the meaning of optional is different in the Extension Manager than it is in Maven. See
+         https://jira.xwiki.org/browse/XWIKI-15803 -->
+
+    <!-- Ivy has a lot of optional dependencies that we don't want installed since1 1) they're not necessary and
+         take time to resolve/install, 2) some are invalid generating some errors in the logs -->
+    <dependency>
+      <groupId>org.apache.ivy</groupId>
+      <artifactId>ivy</artifactId>
+      <version>${ivy.version}</version>
     </dependency>
 
   </dependencies>

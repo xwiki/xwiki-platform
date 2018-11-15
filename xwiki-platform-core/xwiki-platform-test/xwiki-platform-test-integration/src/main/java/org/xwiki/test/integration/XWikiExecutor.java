@@ -101,6 +101,9 @@ public class XWikiExecutor
 
     private static final long PROCESS_FINISH_TIMEOUT = 5 * 60L * 1000L;
 
+    private static final int VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT =
+        Integer.valueOf(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
+
     private int port;
 
     private int stopPort;
@@ -230,7 +233,7 @@ public class XWikiExecutor
         if (VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
             LOGGER.info("Checking if an XWiki server is already started at [{}]", getURL());
             // First, verify if XWiki is started. If it is then don't start it again.
-            this.wasStarted = !this.watchdog.isXWikiStarted(getURL(), 15).timedOut;
+            this.wasStarted = !this.watchdog.isXWikiStarted(getURL(), VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT).timedOut;
         }
 
         if (!this.wasStarted) {
@@ -497,10 +500,11 @@ public class XWikiExecutor
     {
         String startCommand = START_COMMAND;
         if (startCommand == null) {
+            String scriptNamePrefix = DEBUG ? "start_xwiki_debug" : "start_xwiki";
             if (SystemUtils.IS_OS_WINDOWS) {
-                startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
+                startCommand = String.format("cmd /c %s.bat %s %s", scriptNamePrefix, port, stopPort);
             } else {
-                startCommand = String.format("bash start_xwiki.sh -p %s -sp %s", port, stopPort);
+                startCommand = String.format("bash %s.sh -p %s -sp %s", scriptNamePrefix, port, stopPort);
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));

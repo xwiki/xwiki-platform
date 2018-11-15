@@ -115,7 +115,7 @@ public class OfficeImporterTest extends AbstractTest
             confirmationPage.setAffectChildren(true);
         }
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
-        deletingPage.waitUntilIsTerminated();
+        deletingPage.waitUntilFinished();
         assertTrue(deletingPage.isSuccess());
     }
 

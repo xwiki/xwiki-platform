@@ -25,7 +25,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * A bridge between platform and rendering for centralising parsing needs.
+ * A bridge between platform and rendering for centralizing parsing needs.
  *
  * @version $Id$
  * @since 6.0M2

@@ -518,173 +518,61 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>(function() {
-  var addMembers = function(event) {
-    event &amp;&amp; event.stop();
-    var form = event.element().form;
-    var parameters = form.serialize(true);
-    var names = Object.isArray(parameters.name) ? parameters.name : [parameters.name];
-    if (names.join('').strip() === '') {
+      <code>require(['jquery'], function($) {
+  var userScope = $('input[type=radio][name=WikiManager\\.WikiUserClass_0_userScope]');
+  var userScopeChanged = function() {
+    var value = userScope.filter(':checked').val();
+    // Disable the membership type radio buttons when the user scope is local only.
+    $('input[type=radio][name=WikiManager\\.WikiUserClass_0_membershipType]').prop('disabled', value === 'local_only');
+  };
+  userScope.click(userScopeChanged);
+  userScopeChanged();
+});
+
+require(['jquery'], function($) {
+  $(document).on('click', '#addMembers', function(event) {
+    event.preventDefault();
+    var addMembersButton = $(event.target);
+    var form = addMembersButton.closest('form');
+    var parameters = form.serializeArray();
+    var names = parameters.map(function(parameter) {
+      return parameter.name === 'name' ? parameter.value.trim() : '';
+    }).join('');
+    if (addMembersButton.prop('disabled') || names === '') {
       // Nothing to add.
       return;
     }
-    new Ajax.Request("$xwiki.getURL('XWiki.XWikiAllGroup', 'get', 'xpage=adduorg')", {
-      parameters: parameters,
-      onSuccess: function() {
-        // Clear the list of selected users.
-        jQuery('#userInput')[0].selectize.clear(true);
-        // Reload the live table.
-        var end = editgrouptable.limit;
-        var start = Math.max(editgrouptable.lastOffset, 1);
-        editgrouptable.clearCache();
-        editgrouptable.getRows(start, end, start, end);
-        // Show notification message.
-        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
-      },
-      onFailure: function(response) {
-        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" + response.statusText, 'error', {timeout: 5});
-      }
+    addMembersButton.prop('disabled', true);
+    parameters.push({name: 'xpage', value: 'adduorg'});
+    var addMembersURL = new XWiki.Document('XWikiAllGroup', 'XWiki').getURL('get');
+    $.post(addMembersURL, parameters).done(function() {
+      // Clear the list of selected users.
+      $('#userInput')[0].selectize.clear(true);
+      // Reload the live table.
+      editgrouptable.refresh();
+      // Show notification message.
+      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+    }).fail(function(response) {
+      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" +
+        response.statusText, 'error', {timeout: 5});
+    }).always(function() {
+      addMembersButton.prop('disabled', false);
     });
-  }
-  var init = function() {
-    $('addMembers') &amp;&amp; $('addMembers').observe('click', addMembers);
-    return true;
-  };
-  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
-})();</code>
+  });
+});
+
+require(['jquery'], function($) {
+  // Refresh the members live table whenever an user is created or deleted.
+  $('#userstable').on('xwiki:user:created xwiki:user:deleted', function() {
+    editgrouptable.refresh();
+  });
+});</code>
     </property>
     <property>
-      <name>Code for adding members</name>
+      <name/>
     </property>
     <property>
       <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>WikiManager.WikiUsers</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>d8d01109-2ab9-4447-a8ed-b4ad084c0462</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>(function(){
-
-  /**
-   * Init
-   */
-  function init() {
-    userScopeChanged();
-    $$('input[type=radio][name=WikiManager\\.WikiUserClass_0_userScope]').each(function (item){
-      item.observe('click', userScopeChanged);
-    });
-  }
-  
-  function userScopeChanged(){
-    var value = $$('input:checked[type=radio][name=WikiManager\\.WikiUserClass_0_userScope]')[0].value
-    if (value=='local_only') {
-      // Disable membership type radio button
-      $$('input[type=radio][name=WikiManager\\.WikiUserClass_0_membershipType]').each(function (item){
-        item.disabled = true;
-      });
-    } else {
-      // Enable membership type radio button
-      $$('input[type=radio][name=WikiManager\\.WikiUserClass_0_membershipType]').each(function (item){
-        item.disabled = false;
-      });
-    }
-  }
-
-  /**
-   * Call Init
-   */
-  (XWiki &amp;&amp; XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
-
-})();
-</code>
-    </property>
-    <property>
-      <name>Code for the users configuration</name>
-    </property>
-    <property>
-      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

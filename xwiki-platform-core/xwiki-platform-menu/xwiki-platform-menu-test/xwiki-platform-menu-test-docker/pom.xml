@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-menu-test</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-menu-test-docker</artifactId>
   <name>XWiki Platform - Menu - Tests - Functional Tests</name>
@@ -37,8 +37,12 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <selenium.version>3.14.0</selenium.version>
   </properties>
   <dependencies>
+    <!-- ================================
+         Dependencies for tested features
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-menu-ui</artifactId>
@@ -59,7 +63,9 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Test dependencies -->
+    <!-- ================================
+         Test only dependencies
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>
@@ -78,6 +84,7 @@
       <version>${project.version}</version>
       <scope>test</scope>
       <exclusions>
+        <!-- Excluded since we use a more recent version in TestContainers-based tests -->
         <exclusion>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-java</artifactId>
@@ -113,13 +120,11 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!-- Required to fix conflicts resolution between XWiki & TestContainers -->
-
+    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>3.12.0</version>
+      <version>${selenium.version}</version>
       <exclusions>
         <!-- XWiki uses a more recent version of bytebuddy -->
         <exclusion>
@@ -128,13 +133,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- selenium-server requires Guava 23.6-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
+    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
       details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
       here. Note that the version needs to be checked when we change the version of selenium-server -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>23.6-jre</version>
+      <version>25.0-jre</version>
       <exclusions>
         <!-- Use the version from TestContainers which is newer -->
         <exclusion>
@@ -143,7 +148,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-
+    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

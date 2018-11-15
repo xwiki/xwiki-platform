@@ -49,6 +49,8 @@ import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.text.StringUtils;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -192,11 +194,11 @@ public class ExpressionNodeToHQLConverterTest
 
         ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
 
-        assertEquals(":date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357",
+        assertEquals(":date_" + DigestUtils.sha256Hex(date.toString()),
                 result.getQuery());
         assertEquals(date,
                 result.getQueryParameters().get(
-                        "date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357"));
+                        "date_" + DigestUtils.sha256Hex(date.toString())));
     }
 
     @Test

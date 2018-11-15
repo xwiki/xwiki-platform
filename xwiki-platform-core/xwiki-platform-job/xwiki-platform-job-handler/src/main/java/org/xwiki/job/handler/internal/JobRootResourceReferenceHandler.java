@@ -60,7 +60,7 @@ public class JobRootResourceReferenceHandler extends AbstractResourceReferenceHa
     public static final String HINT = "job";
 
     /**
-     * Represents a OpenID Connect Resource Type.
+     * Represents a Job Resource Type.
      */
     public static final ResourceType TYPE = new ResourceType(HINT);
 

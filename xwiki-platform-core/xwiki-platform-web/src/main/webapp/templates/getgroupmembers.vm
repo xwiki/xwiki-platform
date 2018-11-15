@@ -53,7 +53,7 @@
     'docurl': $doc.getURL(),
     'grayed': $grayed
   })
-  ## The following properties are kept for backward compatibility with XWiki versions older than 10.9RC1
+  ## The following properties are kept for backward compatibility with XWiki versions older than 10.9
   #set ($discard = $oldProperties.putAll({
     'member_url': $xwiki.getURL($memberReference),
     '_avatar': "#largeUserAvatar($member)",

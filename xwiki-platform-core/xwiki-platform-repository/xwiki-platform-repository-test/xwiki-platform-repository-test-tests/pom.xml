@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository-test</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-test-tests</artifactId>
   <name>XWiki Platform - Repository - Tests - Functional Tests</name>
@@ -37,16 +37,6 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
-    <!-- Test dependencies forced in front to workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=536868 -->
-    <!-- TODO: remove when Eclipse 4.9 final is released -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-repository-test-utils</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-repository-server-ui</artifactId>

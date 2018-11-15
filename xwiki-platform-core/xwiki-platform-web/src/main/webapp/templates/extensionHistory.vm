@@ -97,7 +97,7 @@
       #set ($message = $services.localization.render('extension.history.currentJobInfo.replay',
         ["<a href='$jobStatusURL'>", '</a>']))
     #else
-      #set ($jobType = $currentJobStatus.jobType))
+      #set ($jobType = $currentJobStatus.jobType)
       #set ($message = $services.localization.render('extension.history.currentJobInfo',
         ["<strong>$jobType</strong>", "<strong>$jobId</strong>"]))
     #end
@@ -138,6 +138,7 @@
             <input type="hidden" name="xredirect" value="$xredirect" />
           </div>
           <input type="file" name="filepath" />
+          <input type="submit" value="$services.localization.render('extension.history.sources.import')" class="btn btn-default" />
         </form>
       </div>
     </div>

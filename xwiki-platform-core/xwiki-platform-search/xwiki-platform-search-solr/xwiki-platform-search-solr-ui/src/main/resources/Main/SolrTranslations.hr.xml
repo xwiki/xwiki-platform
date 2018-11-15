@@ -40,6 +40,7 @@
 solr.admin.submit=Primijeni
 solr.admin.error.notallowed=Nije vam dozvoljeno obavljanje ove akcije.
 solr.admin.error.norights=Za pristup ovoj rubrici potrebne su administratorske ovlasti.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Veličina reda čekanja

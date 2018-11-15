@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering</artifactId>
   <name>XWiki Platform - Rendering - Parent POM</name>
@@ -33,6 +33,7 @@
   <description>XWiki Platform - Rendering - Parent POM</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-rendering-async</module>
     <module>xwiki-platform-rendering-configuration</module>
     <module>xwiki-platform-rendering-macros</module>
     <module>xwiki-platform-rendering-parser</module>

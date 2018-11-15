@@ -83,6 +83,9 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         when(this.xwiki.getDocument(space1Ref, this.xcontext)).thenReturn(space1Doc);
         when(this.xwiki.getDocument(space2Ref, this.xcontext)).thenReturn(space2Doc);
         when(this.xwiki.getDocument(pageRef, this.xcontext)).thenReturn(pageDoc);
+        when(space1Doc.getTranslatedDocument(this.xcontext)).thenReturn(space1Doc);
+        when(space2Doc.getTranslatedDocument(this.xcontext)).thenReturn(space2Doc);
+        when(pageDoc.getTranslatedDocument(this.xcontext)).thenReturn(pageDoc);
         when(space1Doc.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Space 1");
         when(space2Doc.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Space 2");
         when(pageDoc.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Page");
@@ -116,6 +119,10 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         when(this.xwiki.getDocument(space2Ref, this.xcontext)).thenReturn(page2Doc);
         when(this.xwiki.getDocument(page1Ref, this.xcontext)).thenReturn(page1Doc);
         when(this.xwiki.getDocument(page2Ref, this.xcontext)).thenReturn(page2Doc);
+        when(space1Doc.getTranslatedDocument(this.xcontext)).thenReturn(space1Doc);
+        when(space2Doc.getTranslatedDocument(this.xcontext)).thenReturn(space2Doc);
+        when(page1Doc.getTranslatedDocument(this.xcontext)).thenReturn(page1Doc);
+        when(page2Doc.getTranslatedDocument(this.xcontext)).thenReturn(page2Doc);
         when(space1Doc.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Space 1");
         when(space2Doc.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Space 2");
         when(page1Doc.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("Page 1");

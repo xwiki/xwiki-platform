@@ -81,10 +81,20 @@ public class ExportAction extends XWikiAction
     private static String PAGE_SEPARATOR = "&";
 
     /**
+     * Define the different format supported by the export.
+     */
+    private enum ExportFormat
+    {
+        XAR,
+        HTML,
+        OTHER
+    }
+
+    /**
      * Manage the arguments of the export and provides them in an object to simplify their usage in the different
      * methods.
      *
-     * @since 10.9RC1
+     * @since 10.9
      */
     private class ExportArguments
     {
@@ -104,19 +114,20 @@ public class ExportAction extends XWikiAction
          */
         private String description;
 
-        ExportArguments(XWikiContext context) throws XWikiException
+        ExportArguments(XWikiContext context, ExportFormat format) throws XWikiException
         {
             XWikiRequest request = context.getRequest();
 
             this.description = request.get("description");
 
             this.name = request.get("name");
-            if (StringUtils.isBlank(name)) {
-                this.name = context.getDoc().getFullName();
-            }
 
             String[] pages = request.getParameterValues("pages");
             String[] excludes = request.getParameterValues("excludes");
+
+            if (StringUtils.isBlank(name) && !format.equals(ExportFormat.XAR)) {
+                this.name = context.getDoc().getFullName();
+            }
 
             this.exportPages = new LinkedHashMap<>();
 
@@ -198,7 +209,7 @@ public class ExportAction extends XWikiAction
      */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
-        ExportArguments exportArguments = new ExportArguments(context);
+        ExportArguments exportArguments = new ExportArguments(context, ExportFormat.HTML);
 
         Collection<DocumentReference> pageList = resolvePages(exportArguments, context);
         if (pageList.isEmpty()) {
@@ -415,7 +426,7 @@ public class ExportAction extends XWikiAction
         String licence = request.get("licence");
         String version = request.get("version");
 
-        ExportArguments exportArguments = new ExportArguments(context);
+        ExportArguments exportArguments = new ExportArguments(context, ExportFormat.XAR);
 
         boolean all = exportArguments.exportPages.isEmpty();
 

@@ -44,7 +44,7 @@ import org.xwiki.rest.model.jaxb.JobRequest;
  * them as an extension inside a running XWiki.
  *
  * @version $Id$
- * @since 10.9RC1
+ * @since 10.9
  */
 public class ExtensionInstaller
 {
@@ -54,11 +54,21 @@ public class ExtensionInstaller
 
     private EmbeddableComponentManager ecm;
 
+    private ArtifactResolver artifactResolver;
+
+    private MavenResolver mavenResolver;
+
     /**
      * Initialize the Component Manager which is later needed to perform the REST calls.
+     *
+     * @param artifactResolver the resolver to resolve artifacts from Maven repositories
+     * @param mavenResolver the resolver to read Maven POMs
      */
-    public ExtensionInstaller()
+    public ExtensionInstaller(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
     {
+        this.artifactResolver = artifactResolver;
+        this.mavenResolver = mavenResolver;
+
         // Initialize XWiki Component system
         EmbeddableComponentManager cm = new EmbeddableComponentManager();
         cm.initialize(Thread.currentThread().getContextClassLoader());
@@ -99,12 +109,10 @@ public class ExtensionInstaller
         String installUserReference, List<String> namespaces) throws Exception
     {
         Set<Artifact> extensions = new LinkedHashSet<>();
-        ArtifactResolver artifactResolver = ArtifactResolver.getInstance();
-        MavenResolver mavenResolver = MavenResolver.getInstance();
-        String xwikiVersion = mavenResolver.getModelFromCurrentPOM().getVersion();
+        String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones)
-        Collection<ArtifactResult> artifactResults = artifactResolver.getDistributionDependencies(xwikiVersion);
+        Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion);
         for (ArtifactResult artifactResult : artifactResults) {
             Artifact artifact = artifactResult.getArtifact();
             if (artifact.getExtension().equalsIgnoreCase(XAR)) {
@@ -113,7 +121,7 @@ public class ExtensionInstaller
         }
 
         // Step 2: Get extensions from the current POM
-        Model model = mavenResolver.getModelFromCurrentPOM();
+        Model model = this.mavenResolver.getModelFromCurrentPOM();
         for (Dependency dependency : model.getDependencies()) {
             if (dependency.getType().equalsIgnoreCase(XAR)) {
                 Artifact artifact = new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(),

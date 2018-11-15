@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tika</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tika-parsers</artifactId>
   <name>XWiki Platform - Tika - Parsers</name>
@@ -43,8 +43,8 @@
     </dependency>
     <!-- Replace the version triggered by Tika by a more accurate one -->
     <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
+      <groupId>javax.activation</groupId>
+      <artifactId>javax.activation-api</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->

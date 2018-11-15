@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
-    <version>10.9-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-tomcat7-mysql</artifactId>
   <name>XWiki Platform - Distribution - Debian - Tomcat 7 - MySQL</name>

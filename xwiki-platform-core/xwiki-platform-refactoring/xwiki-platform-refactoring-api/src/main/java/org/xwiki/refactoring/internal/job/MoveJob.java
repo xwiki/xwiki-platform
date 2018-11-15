@@ -160,6 +160,26 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
         });
     }
 
+    private boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference)
+    {
+        if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
+            // The move operation is implemented as Copy + Delete.
+            this.logger.error("You are not allowed to delete [{}].", oldReference);
+            return false;
+        } else if (!hasAccess(Right.VIEW, oldReference)) {
+            this.logger.error("You don't have sufficient permissions over the source document [{}].",
+                oldReference);
+            return false;
+        } else if (!hasAccess(Right.EDIT, newReference)
+            || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference)))
+        {
+            this.logger.error("You don't have sufficient permissions over the destination document [{}].",
+                newReference);
+            return false;
+        }
+        return true;
+    }
+
     protected void maybeMove(DocumentReference oldReference, DocumentReference newReference)
     {
         // Perform checks that are specific to the document source/destination type.
@@ -170,14 +190,7 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
             this.logger.info("Skipping [{}] because it has been unselected.", oldReference);
         } else if (!this.modelBridge.exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
-        } else if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
-            // The move operation is implemented as Copy + Delete.
-            this.logger.error("You are not allowed to delete [{}].", oldReference);
-        } else if (!hasAccess(Right.VIEW, newReference) || !hasAccess(Right.EDIT, newReference)
-            || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
-            this.logger.error("You don't have sufficient permissions over the destination document [{}].",
-                newReference);
-        } else {
+        } else if (this.checkAllRights(oldReference, newReference)) {
             move(oldReference, newReference);
         }
     }

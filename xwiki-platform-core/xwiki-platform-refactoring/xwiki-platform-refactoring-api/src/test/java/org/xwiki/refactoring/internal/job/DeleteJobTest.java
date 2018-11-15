@@ -79,10 +79,13 @@ public class DeleteJobTest extends AbstractEntityJobTest
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
 
         EntityRequest request = createRequest(documentReference);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
         run(request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
@@ -99,7 +102,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void deleteDocumentWithoutDeleteRight() throws Throwable
+    public void deleteDocumentWithoutDeleteRightUser() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -107,9 +110,37 @@ public class DeleteJobTest extends AbstractEntityJobTest
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(false);
 
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, documentReference)).thenReturn(true);
+
         EntityRequest request = createRequest(documentReference);
         request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
         request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        run(request);
+
+        verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
+    }
+
+    @Test
+    public void deleteDocumentWithoutDeleteRightAuthor() throws Throwable
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, documentReference)).thenReturn(false);
+
+        EntityRequest request = createRequest(documentReference);
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
+        request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
         run(request);
 
         verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);

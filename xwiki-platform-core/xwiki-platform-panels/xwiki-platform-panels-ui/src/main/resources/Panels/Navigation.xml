@@ -154,6 +154,18 @@
       </type>
     </class>
     <property>
+      <async_cached>1</async_cached>
+    </property>
+    <property>
+      <async_context>
+        <value>doc.reference</value>
+        <value>wiki</value>
+      </async_context>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
       <category>Navigation</category>
     </property>
     <property>

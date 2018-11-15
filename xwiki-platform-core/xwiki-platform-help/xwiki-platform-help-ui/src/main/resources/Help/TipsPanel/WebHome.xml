@@ -154,6 +154,15 @@
       </type>
     </class>
     <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>1</async_enabled>
+    </property>
+    <property>
       <category>Information</category>
     </property>
     <property>

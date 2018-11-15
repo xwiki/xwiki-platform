@@ -142,17 +142,26 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>type</name>
-        <number>2</number>
+        <number>8</number>
         <prettyName>Panel type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>view|edit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
+    <property>
+      <async_cached>1</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>1</async_enabled>
+    </property>
     <property>
       <category>Information</category>
     </property>

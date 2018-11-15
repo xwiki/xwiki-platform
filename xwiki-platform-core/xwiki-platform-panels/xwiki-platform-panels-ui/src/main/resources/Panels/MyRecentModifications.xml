@@ -154,10 +154,23 @@
       </type>
     </class>
     <property>
+      <async_cached>1</async_cached>
+    </property>
+    <property>
+      <async_context>
+        <value>wiki</value>
+        <value>user</value>
+      </async_context>
+    </property>
+    <property>
+      <async_enabled>1</async_enabled>
+    </property>
+    <property>
       <category>Information</category>
     </property>
     <property>
       <content>{{velocity}}
+#set ($void = $services.async.useEntity("wiki:$xcontext.database"))
 #set ($query = $services.query.xwql('where doc.author = :author order by doc.date desc'))
 #set ($recentDocs = $query.addFilter('hidden').addFilter('unique').bindValue('author', $xcontext.user).setLimit(5).execute())
 #if ($recentDocs.size() &gt; 0 || $showEmptyPanels)

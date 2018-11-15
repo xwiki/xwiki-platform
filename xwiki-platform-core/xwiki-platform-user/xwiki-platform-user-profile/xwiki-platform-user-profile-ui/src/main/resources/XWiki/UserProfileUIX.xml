@@ -148,6 +148,20 @@
       </scope>
     </class>
     <property>
+      <async_cached>1</async_cached>
+    </property>
+    <property>
+      <async_context>
+        <value>doc.reference</value>
+        <value>wiki</value>
+        <value>locale</value>
+        <value>user</value>
+      </async_context>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
       <content>{{velocity}}
 {{html clean="false"}}
 #if ($xcontext.user != 'XWiki.XWikiGuest')

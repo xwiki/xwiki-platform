@@ -25,7 +25,7 @@
 <configuration>
 
   <!-- Register SLF4J against the JMX MBean Server automatically -->
-   <jmxConfigurator objectName="logback:type=xwiki"/>
+  <jmxConfigurator objectName="logback:type=xwiki"/>
 
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <!-- Direct log messages to stdout -->

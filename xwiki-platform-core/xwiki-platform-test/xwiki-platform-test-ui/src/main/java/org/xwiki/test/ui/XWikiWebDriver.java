@@ -633,16 +633,19 @@ public class XWikiWebDriver extends RemoteWebDriver
         return this.wrappedDriver.findElements(by);
     }
 
+    // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
+    // visible floating save bar would hide the element.
+    private WebElement scrollTo(WebElement element)
+    {
+        executeScript("arguments[0].scrollIntoView();", element);
+        return element;
+    }
+
     @Override
     public WebElement findElement(By by)
     {
         WebElement element = this.wrappedDriver.findElement(by);
-
-        // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
-        // visible floating save bar would hide the element.
-        executeScript("arguments[0].scrollIntoView();", element);
-
-        return element;
+        return this.scrollTo(element);
     }
 
     @Override
@@ -746,7 +749,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementById(String using)
     {
-        return this.wrappedDriver.findElementById(using);
+        return this.scrollTo(this.wrappedDriver.findElementById(using));
     }
 
     @Override
@@ -758,7 +761,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByLinkText(String using)
     {
-        return this.wrappedDriver.findElementByLinkText(using);
+        return this.scrollTo(this.wrappedDriver.findElementByLinkText(using));
     }
 
     @Override
@@ -770,7 +773,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByPartialLinkText(String using)
     {
-        return this.wrappedDriver.findElementByPartialLinkText(using);
+        return this.scrollTo(this.wrappedDriver.findElementByPartialLinkText(using));
     }
 
     @Override
@@ -782,7 +785,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByTagName(String using)
     {
-        return this.wrappedDriver.findElementByTagName(using);
+        return this.scrollTo(this.wrappedDriver.findElementByTagName(using));
     }
 
     @Override
@@ -794,7 +797,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByName(String using)
     {
-        return this.wrappedDriver.findElementByName(using);
+        return this.scrollTo(this.wrappedDriver.findElementByName(using));
     }
 
     @Override
@@ -806,7 +809,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByClassName(String using)
     {
-        return this.wrappedDriver.findElementByClassName(using);
+        return this.scrollTo(this.wrappedDriver.findElementByClassName(using));
     }
 
     @Override
@@ -818,7 +821,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByCssSelector(String using)
     {
-        return this.wrappedDriver.findElementByCssSelector(using);
+        return this.scrollTo(this.wrappedDriver.findElementByCssSelector(using));
     }
 
     @Override
@@ -830,7 +833,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByXPath(String using)
     {
-        return this.wrappedDriver.findElementByXPath(using);
+        return this.scrollTo(this.wrappedDriver.findElementByXPath(using));
     }
 
     @Override

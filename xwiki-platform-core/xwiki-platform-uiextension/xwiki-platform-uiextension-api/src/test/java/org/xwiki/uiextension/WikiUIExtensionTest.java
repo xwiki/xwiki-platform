@@ -35,6 +35,8 @@ import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -109,6 +111,8 @@ public class WikiUIExtensionTest
     public void createWikiUIExtension()
         throws ComponentLookupException, WikiComponentException, JobException, RenderingException
     {
+        when(this.contentParser.parse("", Syntax.XWIKI_2_1, DOC_REF)).thenReturn(XDOM.EMPTY);
+
         WikiUIExtension wikiUIX = new WikiUIExtension(this.baseObject, "roleHint", "id", "epId", this.componentManager);
         wikiUIX.setScope(WikiComponentScope.WIKI);
 

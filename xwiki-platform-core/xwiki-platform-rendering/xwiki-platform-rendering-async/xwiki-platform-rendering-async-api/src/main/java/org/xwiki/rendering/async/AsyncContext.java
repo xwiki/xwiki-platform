@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Contextual information related to asynchronous rendering.
@@ -31,6 +32,7 @@ import org.xwiki.model.reference.EntityReference;
  * @since 10.10RC1
  */
 @Role
+@Unstable
 public interface AsyncContext
 {
     /**

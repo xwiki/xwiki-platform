@@ -389,10 +389,22 @@ XWiki.index.trash.documents.confirmDeleteAll = function(event) {
 document.observe('xwiki:dom:loaded', function() {
   if ($('documentsTrash')) {
     $('documentsTrash').up('.hidden').removeClassName('hidden');
-    var actionAllContainer = $('documentsTrash').getElementsBySelector('td.xwiki-livetable-display-header-filter:nth-child(6)')[0];
+  }
+});
 
+// we need to wait the complete display of the livetable to get the number of rows
+document.observe('xwiki:livetable:displayComplete', function() {
+  if ($('documentsTrash')) {
+    var actionAllContainer = $('documentsTrash').getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
     var trashAllDisabled = (trashDocumentsLivetable.totalRows > 0) ? false : true;
+
+    // avoid to get multiple times the button
+    if ($('trashAllDeleted')) {
+      $('trashAllDeleted').remove();
+    }
+
     var trashAll = new Element('a', {
+        'id': 'trashAllDeleted',
         'class':'btn btn-danger',
         'href':'#',
         'disabled': trashAllDisabled

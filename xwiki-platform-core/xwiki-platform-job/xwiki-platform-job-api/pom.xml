@@ -23,14 +23,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-platform-job</artifactId>
     <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-job</artifactId>
     <version>10.10-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
 
   <artifactId>xwiki-platform-job-api</artifactId>
+  <name>XWiki Platform - Job - API</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Job - API</description>
+
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
 
   <dependencies>
     <dependency>

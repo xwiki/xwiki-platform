@@ -21,7 +21,7 @@
 -->
 
 <xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="hr">
-  <web>XWiki.Notifications.Code</web>
+  <web>XWiki.Notifications.Code.Macro</web>
   <name>Translations</name>
   <language>hr</language>
   <defaultLanguage>en</defaultLanguage>

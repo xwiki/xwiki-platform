@@ -21,7 +21,7 @@
 -->
 
 <xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.NotificationsMacro" locale="">
-  <web>XWiki.Notifications.Code</web>
+  <web>XWiki.Notifications.Code.Macro</web>
   <name>NotificationsMacro</name>
   <language/>
   <defaultLanguage/>

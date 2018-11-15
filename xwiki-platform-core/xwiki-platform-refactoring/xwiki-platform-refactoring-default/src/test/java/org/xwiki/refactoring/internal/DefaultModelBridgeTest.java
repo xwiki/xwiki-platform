@@ -26,17 +26,10 @@ import java.util.Locale;
 
 import javax.inject.Provider;
 
-<<<<<<< HEAD
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-=======
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mock;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
->>>>>>> 94aeb748ef... XWIKI-15819: Refactor platform-refactoring to take document author into account.
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -474,7 +467,7 @@ public class DefaultModelBridgeTest
         when(xwiki.getRightService()).thenReturn(rightService);
         when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        assertTrue(mocker.getComponentUnderTest().canRestoreDeletedDocument(deletedDocument, userReferenceToCheck));
+        assertTrue(((DefaultModelBridge)mocker.getComponentUnderTest()).canRestoreDeletedDocument(deletedDocument, userReferenceToCheck));
 
         // Verify that the rights were checked with the specified user as context user.
         verify(xcontext).setUserReference(userReferenceToCheck);

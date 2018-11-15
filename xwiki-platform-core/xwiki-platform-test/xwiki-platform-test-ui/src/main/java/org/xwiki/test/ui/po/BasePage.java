@@ -585,6 +585,9 @@ public class BasePage extends BaseElement
         // JQuery and dependencies
         // JQuery dropdown plugin needed for the edit button's dropdown menu.
         getDriver().waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+
+        // Make sure all asynchronous elements have been executed
+        getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
     }
 
     /**

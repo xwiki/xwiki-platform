@@ -240,11 +240,10 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
 
     protected boolean hasAccess(Right right, EntityReference reference)
     {
-        return !this.request.isCheckRights()
-            || (
-                this.authorization.hasAccess(right, this.request.getUserReference(), reference)
-                && this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)
-                );
+        return ((!this.request.isCheckRights()
+            || this.authorization.hasAccess(right, this.request.getUserReference(), reference))
+            && (!this.request.isCheckAuthorRights()
+            || this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)));
     }
 
     protected boolean isSpaceHomeReference(DocumentReference documentReference)

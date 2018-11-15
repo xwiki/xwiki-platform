@@ -131,9 +131,38 @@ public class MoveJobTest extends AbstractMoveJobTest
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(false);
 
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, documentReference)).thenReturn(true);
+
         MoveRequest request = createRequest(documentReference, new SpaceReference("Foo", new WikiReference("bar")));
         request.setCheckRights(true);
         request.setUserReference(userReference);
+        request.setCheckAuthorRights(true);
+        request.setAuthorReference(authorReference);
+        run(request);
+
+        verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);
+
+        verifyNoMove();
+    }
+
+    @Test
+    public void moveDocumentWithoutDeleteRightAuthor() throws Throwable
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, documentReference)).thenReturn(false);
+
+        MoveRequest request = createRequest(documentReference, new SpaceReference("Foo", new WikiReference("bar")));
+        request.setCheckRights(true);
+        request.setUserReference(userReference);
+        request.setCheckAuthorRights(true);
+        request.setAuthorReference(authorReference);
         run(request);
 
         verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);
@@ -151,11 +180,18 @@ public class MoveJobTest extends AbstractMoveJobTest
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.authorization.hasAccess(Right.DELETE, userReference, oldReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, userReference, newReference)).thenReturn(false);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, oldReference)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, oldReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, newReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, oldReference)).thenReturn(true);
 
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
         request.setUserReference(userReference);
-        request.setAuthorReference(userReference);
+        request.setAuthorReference(authorReference);
         run(request);
 
         verify(this.mocker.getMockedLogger()).error(
@@ -165,7 +201,97 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveDocumentToSpace() throws Exception
+    public void moveDocumentToRestrictedDestinationAuthor() throws Throwable
+    {
+        DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
+        DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
+        when(this.modelBridge.exists(oldReference)).thenReturn(true);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        when(this.authorization.hasAccess(Right.DELETE, userReference, oldReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, newReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, oldReference)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, oldReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, newReference)).thenReturn(false);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, oldReference)).thenReturn(true);
+
+        MoveRequest request = createRequest(oldReference, newReference.getParent());
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
+        request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        run(request);
+
+        verify(this.mocker.getMockedLogger()).error(
+            "You don't have sufficient permissions over the destination document [{}].", newReference);
+
+        verifyNoMove();
+    }
+
+    @Test
+    public void moveDocumentFromRestrictedSource() throws Throwable
+    {
+        DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
+        DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
+        when(this.modelBridge.exists(oldReference)).thenReturn(true);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        when(this.authorization.hasAccess(Right.DELETE, userReference, oldReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, newReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, oldReference)).thenReturn(false);
+
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, oldReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, newReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, oldReference)).thenReturn(true);
+
+        MoveRequest request = createRequest(oldReference, newReference.getParent());
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
+        request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        run(request);
+
+        verify(this.mocker.getMockedLogger()).error(
+            "You don't have sufficient permissions over the source document [{}].", oldReference);
+
+        verifyNoMove();
+    }
+
+    @Test
+    public void moveDocumentFromRestrictedSourceAuthor() throws Throwable
+    {
+        DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
+        DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
+        when(this.modelBridge.exists(oldReference)).thenReturn(true);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        when(this.authorization.hasAccess(Right.DELETE, userReference, oldReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, newReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, oldReference)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, oldReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, newReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, oldReference)).thenReturn(false);
+
+        MoveRequest request = createRequest(oldReference, newReference.getParent());
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
+        request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        run(request);
+
+        verify(this.mocker.getMockedLogger()).error(
+            "You don't have sufficient permissions over the source document [{}].", oldReference);
+
+        verifyNoMove();
+    }
+
+    @Test
+    public void moveDocumentToSpace() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
@@ -184,6 +310,7 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         request.setInteractive(false);
         request.setUserReference(userReference);
         run(request);
@@ -219,6 +346,7 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         request.setInteractive(false);
         request.setUpdateLinksOnFarm(true);
 
@@ -239,6 +367,9 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         MoveRequest request = createRequest(source, destination);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
+        request.setAutoRedirect(false);
+        request.setUpdateLinks(false);
         run(request);
 
         verify(this.modelBridge).copy(source, new DocumentReference("wiki", "C", "B"));
@@ -257,6 +388,7 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         MoveRequest request = createRequest(spaceHome, newWiki);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         request.setDeep(true);
         run(request);
 
@@ -275,6 +407,7 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         MoveRequest request = createRequest(sourceSpace, destination);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         run(request);
 
         verify(this.modelBridge).copy(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"));
@@ -291,6 +424,7 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         MoveRequest request = createRequest(sourceReference, copyReference.getParent());
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         request.setInteractive(false);
         request.setDeleteSource(false);
         Map<String, String> parameters = Collections.singletonMap("foo", "bar");

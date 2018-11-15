@@ -131,6 +131,7 @@ public class RenameJobTest extends AbstractMoveJobTest
 
         MoveRequest request = createRequest(oldReference, newReference);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         request.setInteractive(false);
         request.setUserReference(userReference);
         run(request);

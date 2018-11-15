@@ -154,9 +154,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             public void visit(DocumentReference oldChildReference)
             {
                 DocumentReference newChildReference = oldChildReference.replaceParent(source, destination);
-                if (MoveJob.this.hasAccess(Right.VIEW, newChildReference)) {
-                    maybeMove(oldChildReference, newChildReference);
-                }
+                maybeMove(oldChildReference, newChildReference);
             }
         });
     }

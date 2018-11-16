@@ -147,7 +147,7 @@ public interface XWikiRecycleBinStoreInterface
     /**
      * Get all the deleted documents ID or a specified number. Sorted by date.
      * @param context - used to load the deleted documents id.
-     * @param limit - if > 0 then all deleted documents id are returned. Else the specified number.
+     * @param limit - if &gt; 0 then all deleted documents id are returned. Else the specified number.
      * @return an array of IDs of deleted documents.
      * @throws XWikiException - if error in loading
      * @since 10.10RC1

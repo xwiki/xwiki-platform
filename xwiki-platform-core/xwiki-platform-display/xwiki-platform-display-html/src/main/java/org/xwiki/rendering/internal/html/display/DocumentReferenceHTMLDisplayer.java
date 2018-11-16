@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,27 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.rendering.internal.html.display;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>10.11-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-display</artifactId>
-  <name>XWiki Platform - Display</name>
-  <packaging>pom</packaging>
-  <description>Display module top level pom</description>
-  <modules>
-    <module>xwiki-platform-display-api</module>
-    <module>xwiki-platform-display-html</module>
-    <module>xwiki-platform-display-macro</module>
-  </modules>
-</project>
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+
+/**
+ * Implementation of {@code HTMLDisplayer} for @{@code DocumentReference}.
+ *
+ * @version $Id$
+ * @since 10.10RC1
+ */
+@Component
+@Singleton
+public class DocumentReferenceHTMLDisplayer extends AbstractHTMLDisplayer<DocumentReference>
+{
+    @Override
+    public String getTemplateName()
+    {
+        return "html_displayer_document_reference.vm";
+    }
+}

@@ -1,1 +1,2 @@
-org.xwiki.rendering.internal.html.display.DocumentReferenceHTMLDisplayer
+org.xwiki.rendering.display.html.internal.DocumentReferenceHTMLDisplayer
+org.xwiki.rendering.display.html.script.HTMLDisplayerScriptService

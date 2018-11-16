@@ -81,7 +81,8 @@ public class WARBuilder
         // TODO: extract code from ExtensionMojo so that we don't have to depend on a maven plugin....
         if (!reuse) {
             try {
-                this.extensionHelper = ExtensionMojoHelper.create(null, new File("./target/xwiki-data/"));
+                this.extensionHelper = ExtensionMojoHelper.create(null,
+                    new File(String.format("%s/xwiki-data/", testConfiguration.getOutputDirectory())));
             } catch (MojoExecutionException e) {
                 throw new RuntimeException("Failed to initialize resolver", e);
             }

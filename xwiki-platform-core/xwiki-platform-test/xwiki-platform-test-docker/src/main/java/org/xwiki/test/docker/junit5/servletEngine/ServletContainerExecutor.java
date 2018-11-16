@@ -50,15 +50,19 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private RepositoryResolver repositoryResolver;
 
+    private TestConfiguration testConfiguration;
+
     /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public ServletContainerExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
-        RepositoryResolver repositoryResolver)
+    public ServletContainerExecutor(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
-        this.jettyStandaloneExecutor = new JettyStandaloneExecutor(artifactResolver, mavenResolver);
+        this.testConfiguration = testConfiguration;
+        this.jettyStandaloneExecutor = new JettyStandaloneExecutor(testConfiguration, artifactResolver, mavenResolver);
         this.repositoryResolver = repositoryResolver;
     }
 

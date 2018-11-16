@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.junit5.ArtifactResolver;
 import org.xwiki.test.docker.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.MavenResolver;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 
 /**
@@ -52,8 +53,6 @@ public class JettyStandaloneExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyStandaloneExecutor.class);
 
-    private static final String JETTY_DIR = "./target/jetty";
-
     private static final String XWIKI_SUBDIR = "xwiki";
 
     private static final String DATA_SUBDIR = "data";
@@ -64,12 +63,17 @@ public class JettyStandaloneExecutor
 
     private MavenResolver mavenResolver;
 
+    private TestConfiguration testConfiguration;
+
     /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      */
-    public JettyStandaloneExecutor(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
+    public JettyStandaloneExecutor(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        MavenResolver mavenResolver)
     {
+        this.testConfiguration = testConfiguration;
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
     }
@@ -82,7 +86,7 @@ public class JettyStandaloneExecutor
     public void start() throws Exception
     {
         // For performance reason, skip creating the jetty packaging if it already exists
-        File jettyDirectory = new File(JETTY_DIR);
+        File jettyDirectory = new File(getJettyDirectory());
         if (!jettyDirectory.exists()) {
             // Step: Resolve the jetty resources
             String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
@@ -138,7 +142,7 @@ public class JettyStandaloneExecutor
 
     private XWikiExecutor getExecutor()
     {
-        System.setProperty("xwikiExecutionDirectory", JETTY_DIR);
+        System.setProperty("xwikiExecutionDirectory", getJettyDirectory());
         XWikiExecutor executor = new XWikiExecutor(0);
         return executor;
     }
@@ -159,5 +163,10 @@ public class JettyStandaloneExecutor
             result = StringUtils.replace(result, String.format("${%s}", key.toString()), value.toString());
         }
         return result;
+    }
+
+    private String getJettyDirectory()
+    {
+        return String.format("%s/jetty", this.testConfiguration.getOutputDirectory());
     }
 }

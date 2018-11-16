@@ -109,7 +109,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
             // Build the XWiki WAR
             LOGGER.info("(*) Building custom XWiki WAR...");
-            File targetWARDirectory = new File("./target/xwiki");
+            File targetWARDirectory = new File(String.format("%s/xwiki", testConfiguration.getOutputDirectory()));
             // If the directory exists, skip the rebuilding of the full XWiki WAR, allowing to re-run the test faster
             WARBuilder builder;
             if (!targetWARDirectory.exists()) {
@@ -168,7 +168,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             VncRecordingContainer vnc = loadVNC(extensionContext);
             // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the
             // test result status... See https://github.com/junit-team/junit5/issues/542
-            File recordingDir = new File("./target/");
+            File recordingDir = new File(testConfiguration.getOutputDirectory());
             File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
                 extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
             vnc.saveRecordingToFile(recordingFile);
@@ -185,7 +185,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        DockerTestUtils.takeScreenshot(extensionContext, loadXWikiWebDriver(extensionContext));
+        DockerTestUtils.takeScreenshot(extensionContext, loadTestConfiguration(extensionContext),
+            loadXWikiWebDriver(extensionContext));
         throw throwable;
     }
 
@@ -310,7 +311,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         ExtensionContext extensionContext) throws Exception
     {
         ServletContainerExecutor executor =
-            new ServletContainerExecutor(artifactResolver, mavenResolver, repositoryResolver);
+            new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver, repositoryResolver);
         saveServletContainerExecutor(extensionContext, executor);
         String xwikiURL = executor.start(testConfiguration, sourceWARDirectory);
 

@@ -52,12 +52,6 @@ public final class DockerTestUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerTestUtils.class);
 
-    /**
-     * The folder where to save the screenshot.
-     */
-    private static final String SCREENSHOT_DIR =
-        System.getProperty("xwiki.test.ui.screenshotDirectory", "./target/screenshots");
-
     private DockerTestUtils()
     {
         // Prevents instantiation.
@@ -136,9 +130,11 @@ public final class DockerTestUtils
      * Captures a screenshot of the browser window.
      *
      * @param extensionContext the test context from which to extract the failing test name
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param driver the Selenium Web Driver instance to use to take the screenshot
      */
-    public static void takeScreenshot(ExtensionContext extensionContext, WebDriver driver)
+    public static void takeScreenshot(ExtensionContext extensionContext, TestConfiguration testConfiguration,
+        WebDriver driver)
     {
         if (!(driver instanceof TakesScreenshot)) {
             LOGGER.warn("The WebDriver that is currently used doesn't support taking screenshots.");
@@ -151,7 +147,7 @@ public final class DockerTestUtils
         try {
             File sourceFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File screenshotFile;
-            File screenshotDir = new File(SCREENSHOT_DIR);
+            File screenshotDir = new File(testConfiguration.getOutputDirectory());
             screenshotDir.mkdirs();
             screenshotFile = new File(screenshotDir, String.format("%s-%s.png", testSimpleClass, testName));
             FileUtils.copyFile(sourceFile, screenshotFile);

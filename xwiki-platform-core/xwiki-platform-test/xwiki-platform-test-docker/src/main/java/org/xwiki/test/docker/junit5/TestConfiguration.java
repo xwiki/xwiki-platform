@@ -34,6 +34,8 @@ import org.xwiki.text.StringUtils;
  */
 public class TestConfiguration
 {
+    private static final String DEFAULT = "default";
+
     private static final String TRUE = "true";
 
     private static final String FALSE = "false";
@@ -312,5 +314,40 @@ public class TestConfiguration
     public Properties getProperties()
     {
         return this.properties;
+    }
+
+    /**
+     * @return the String representation of the configuration (used for example as a directory name where to save the
+     *         generated XWiki configuration - XWiki WAR file, etc)
+     * @since 10.10RC1
+     */
+    public String getName()
+    {
+        return String.format("%s-%s-%s-%s-%s-%s",
+            getDatabase().name().toLowerCase(),
+            StringUtils.isEmpty(getDatabaseTag()) ? DEFAULT : getDatabaseTag(),
+            StringUtils.isEmpty(getJDBCDriverVersion()) ? DEFAULT : getDatabaseTag(),
+            getServletEngine().name().toLowerCase(),
+            StringUtils.isEmpty(getServletEngineTag()) ? DEFAULT : getServletEngineTag(),
+            getBrowser().name().toLowerCase());
+    }
+
+    /**
+     * @return the output directory where to output files required for running the tests. If the {@code maven.build.dir}
+     *         system property is not defined then construct an output directory name based on the defined configuration
+     *         so that we can run different configurations one after another without them overriding each other.
+     *         The {@code maven.build.dir} system property is there to allow controlling where the Maven output
+     *         directory is located when running from Maven.
+     */
+    public String getOutputDirectory()
+    {
+        String outputDirectory;
+        String mavenBuildDir = System.getProperty("maven.build.dir");
+        if (mavenBuildDir == null) {
+            outputDirectory = String.format("./target/%s", getName());
+        } else {
+            outputDirectory = mavenBuildDir;
+        }
+        return outputDirectory;
     }
 }

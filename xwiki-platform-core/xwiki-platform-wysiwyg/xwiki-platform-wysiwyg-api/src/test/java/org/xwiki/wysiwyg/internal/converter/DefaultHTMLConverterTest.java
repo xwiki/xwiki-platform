@@ -31,7 +31,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -176,7 +175,8 @@ public class DefaultHTMLConverterTest
         BlockRenderer xhtmlRenderer = mocker.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
         verify(xhtmlRenderer).render(same(xdom), any(WikiPrinter.class));
 
-        // Verify that the syntax meta data has been set.
-        Assert.assertEquals(Syntax.valueOf("syntax/x.y"), xdom.getMetaData().getMetaData(MetaData.SYNTAX));
+        // Verify that the syntax has been set on the rendering context.
+        Syntax syntax = Syntax.valueOf(syntaxId);
+        verify(((MutableRenderingContext) renderingContext)).push(null, null, syntax, null, false, syntax);
     }
 }

@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -121,9 +120,12 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String fromHTML(String dirtyHTML, String syntaxId)
     {
+        boolean renderingContextPushed = false;
         try {
             // Clean
             String html = this.htmlCleaner.clean(dirtyHTML);
+
+            renderingContextPushed = maybeSetRenderingContextSyntax(Syntax.valueOf(syntaxId));
 
             // Parse & Render
             // Note that transformations are not executed when converting XHTML to source syntax.
@@ -136,6 +138,10 @@ public class DefaultHTMLConverter implements HTMLConverter
         } catch (Exception e) {
             this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while parsing HTML", e);
+        } finally {
+            if (renderingContextPushed) {
+                ((MutableRenderingContext) this.renderingContext).pop();
+            }
         }
     }
 
@@ -164,21 +170,19 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String parseAndRender(String dirtyHTML, String syntaxId)
     {
+        boolean renderingContextPushed = false;
         try {
             // Clean
             String html = this.htmlCleaner.clean(dirtyHTML);
 
+            Syntax syntax = Syntax.valueOf(syntaxId);
+            renderingContextPushed = maybeSetRenderingContextSyntax(syntax);
+
             // Parse
             XDOM xdom = this.xhtmlParser.parse(new StringReader(html));
 
-            // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
-            // data is used as the default syntax for macro content. We have to change this to the specified syntax
-            // because HTML is used only to be able to edit the source syntax in the WYSIWYG editor.
-            Syntax syntax = Syntax.valueOf(syntaxId);
-            xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
-
             // Execute the macro transformation
-            executeMacroTransformation(xdom, Syntax.valueOf(syntaxId));
+            executeMacroTransformation(xdom, syntax);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -188,7 +192,24 @@ public class DefaultHTMLConverter implements HTMLConverter
         } catch (Exception e) {
             this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while refreshing HTML", e);
+        } finally {
+            if (renderingContextPushed) {
+                ((MutableRenderingContext) this.renderingContext).pop();
+            }
         }
+    }
+
+    private boolean maybeSetRenderingContextSyntax(Syntax syntax)
+    {
+        if (this.renderingContext instanceof MutableRenderingContext) {
+            // Make sure we set the default syntax and the target syntax on the rendering context. This is needed
+            // for instance when the content of a macro that was edited in-line is converted to wiki syntax.
+            ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+                this.renderingContext.getXDOM(), syntax, this.renderingContext.getTransformationId(),
+                this.renderingContext.isRestricted(), syntax);
+            return true;
+        }
+        return false;
     }
 
     private void executeMacroTransformation(XDOM xdom, Syntax syntax) throws TransformationException, ParseException
@@ -202,6 +223,9 @@ public class DefaultHTMLConverter implements HTMLConverter
         // in the first one...
         txContext.setId(TRANSFORMATION_ID);
 
-        ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation, txContext, xdom);
+        if (this.renderingContext instanceof MutableRenderingContext) {
+            ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation, txContext,
+                xdom);
+        }
     }
 }

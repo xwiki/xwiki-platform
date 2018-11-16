@@ -225,6 +225,43 @@ public class WysiwygEditorScriptService implements ScriptService
     }
 
     /**
+     * Converts the given annotated HTML produced by the WYSIWYG editor to the specified target syntax.
+     * 
+     * @param html the annotated HTML to be converted
+     * @param targetSyntaxId the target syntax
+     * @return the result of converting the given annotated HTML to the specified target syntax
+     * @since 10.10RC1
+     */
+    public String fromAnnotatedXHTML(String html, String targetSyntaxId)
+    {
+        XWikiDocument originalSecurityDocument = setSecurityDocument(createSecurityDocument());
+
+        // Save the value of the "is in rendering engine" context property.
+        Object isInRenderingEngine = this.xcontextProvider.get().get(IS_IN_RENDERING_ENGINE);
+
+        try {
+            // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
+            // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
+            // templates using only Velocity for example).
+            this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
+
+            return this.htmlConverter.fromHTML(html, targetSyntaxId);
+        } catch (Exception e) {
+            // Return the HTML input in case of an exception.
+            return html;
+        } finally {
+            // Restore the value of the value of the "is in rendering engine" context property.
+            if (isInRenderingEngine != null) {
+                this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+            } else {
+                this.xcontextProvider.get().remove(IS_IN_RENDERING_ENGINE);
+            }
+
+            setSecurityDocument(originalSecurityDocument);
+        }
+    }
+
+    /**
      * When the user switches to the Source tab he'll be able to make modifications and when he switches back to the
      * WYSIWYG tab his changes will be rendered. If the document had PR, then we need to be sure that if the user
      * doesn't have PR he won't be able to execute the code. We do this by setting as security document a clone of the

@@ -12,7 +12,7 @@
     #set($pdfHeaderParentRef = $doc.documentReference.getParent())
     #set($pdfHeaderParentLabel = $xwiki.getDocument($pdfHeaderParentRef).plainTitle)
   #end
-  #if($pdfHeaderParentLabel != '')$pdfHeaderParentLabel - #{end}$tdoc.plainTitle
+  #if($pdfHeaderParentLabel != '')$!{escapetool.xml($pdfHeaderParentLabel)} - #{end}$!{escapetool.xml($tdoc.plainTitle)}
 #else
   $escapetool.xml($title)
 #end

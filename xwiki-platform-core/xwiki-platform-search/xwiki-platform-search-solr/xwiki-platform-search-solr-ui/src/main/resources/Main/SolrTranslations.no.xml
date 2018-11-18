@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>### Missing: solr.admin.title=Solr Search Administration
 ### Missing: solr.admin.submit=Apply
+### Missing: solr.admin.error.action={0} failed:
 ### Missing: solr.admin.error.notallowed=You are not allowed to perform this action.
 ### Missing: solr.admin.error.norights=Administration rights are required to access this section.
 ### Missing: solr.admin.success.action={0} successfully triggered.
@@ -57,6 +58,8 @@
 ### Missing: solr.admin.indexing.wiki.select_farm=Entire farm
 ### Missing: solr.admin.indexing.query.label=Custom query
 ### Missing: solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+
+### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
 
 solr.sortBy=Sorter etter
 solr.sortBy.score=Relevanse

@@ -3,7 +3,7 @@
   #set($pdfHeaderParentLabel = '')
   #if ($doc.name == 'WebHome')
     ## document is terminal, the parent is the previous last space in the list
-    #if($doc.documentReference.parent.parent && $doc.documentReference.parent.parent.type == 'SPACE')
+    #if("$!doc.documentReference.parent.parent.type" == 'SPACE')
       #set($pdfHeaderParentRef = $doc.documentReference.parent.parent)
       #set($pdfHeaderParentLabel = $xwiki.getDocument($pdfHeaderParentRef).plainTitle)
     #end

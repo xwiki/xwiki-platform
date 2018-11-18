@@ -166,7 +166,7 @@
   ##
   #set ($exception = $xcontext.lastexception)
   #if ("$!exception" != '')
-    #set ($message = "$stringtool.capitalize($request.action) failed: $exception.message ($exception.class)")
+    #set ($message = "$services.localization.render('solr.admin.error.action', $stringtool.capitalize($request.action)) $exception.message ($exception.class)")
     #if ($isAjaxRequest)
       $response.sendError(500, $message)
     #else
@@ -177,7 +177,7 @@
     ## Only administrators with programmings rights are allowed to execute a custom query.
     #if ($hasProgramming &amp;&amp; !$stringtool.isBlank($request.customQuery))
 
-      {{info}}Affected documents in the index: $targetReferences{{/info}}
+      {{info}}$services.localization.render('solr.admin.info.affectedDocuments') $targetReferences{{/info}}
     #end
 
     #displaySolrAdminSection()

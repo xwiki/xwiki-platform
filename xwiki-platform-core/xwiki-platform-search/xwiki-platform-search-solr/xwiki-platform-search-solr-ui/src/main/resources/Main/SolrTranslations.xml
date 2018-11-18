@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Solr Search Administration
 solr.admin.submit=Apply
+solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=You are not allowed to perform this action.
 solr.admin.error.norights=Administration rights are required to access this section.
 solr.admin.success.action={0} successfully triggered.
@@ -57,6 +58,8 @@ solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affec
 solr.admin.indexing.wiki.select_farm=Entire farm
 solr.admin.indexing.query.label=Custom query
 solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+
+solr.admin.info.affectedDocuments=Affected documents in the index:
 
 solr.sortBy=Sort by:
 solr.sortBy.score=Relevance

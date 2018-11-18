@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Administrácia Solr vyhľadávania
 solr.admin.submit=Aplikovať
+### Missing: solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=Nemáte oprávnenie na vykonávanie akcie.
 solr.admin.error.norights=Aby ste mohli pokračovať potrebujete administrátorské práva.
 ### Missing: solr.admin.success.action={0} successfully triggered.
@@ -57,6 +58,8 @@ solr.admin.indexing.wiki.hint=Má vplyv na všetky dokumenty Wiki.
 ### Missing: solr.admin.indexing.wiki.select_farm=Entire farm
 solr.admin.indexing.query.label=Vlastný dotaz
 solr.admin.indexing.query.hint=Voliteľný dotaz na obmedzenie počet dokumentov, ktoré budú ovplyvnené v indexe.
+
+### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
 
 solr.sortBy=Zoradiť podľa\:
 ### Missing: solr.sortBy.score=Relevance

@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Upravljanje Solr pretragom
 solr.admin.submit=Primijeni
+### Missing: solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=Nije vam dozvoljeno obavljanje ove akcije.
 solr.admin.error.norights=Za pristup ovoj rubrici potrebne su administratorske ovlasti.
 ### Missing: solr.admin.success.action={0} successfully triggered.
@@ -57,6 +58,8 @@ solr.admin.indexing.wiki.hint=Wiki na čije sve dokumente će odabrana akcija im
 solr.admin.indexing.wiki.select_farm=Cijela farma
 solr.admin.indexing.query.label=Korisnički upit
 solr.admin.indexing.query.hint=Neobavezni upit za ograničavanje dokumenata na koje će odabrana akcija nad indeksom imati utjecaj.
+
+### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
 
 solr.sortBy=Poredaj po\:
 solr.sortBy.score=Relevantnosti

@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Administration de la recherche Solr
 solr.admin.submit=Appliquer
+solr.admin.error.action={0} a échoué :
 solr.admin.error.notallowed=Vous n'êtes pas autorisé(e) à effectuer cette action.
 solr.admin.error.norights=Les droits d'administration sont nécessaires pour accéder à cette section.
 solr.admin.success.action=Le traitement {0} a été déclenché.
@@ -57,6 +58,8 @@ solr.admin.indexing.wiki.hint=Le wiki dont tous les documents seront affectés p
 solr.admin.indexing.wiki.select_farm=Ferme entière
 solr.admin.indexing.query.label=Recherche avancée
 solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
+
+solr.admin.info.affectedDocuments=Documents concernés dans l'index :
 
 solr.sortBy=Trier par :
 solr.sortBy.score=Pertinence

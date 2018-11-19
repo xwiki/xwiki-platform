@@ -58,27 +58,20 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     private final MacroDescriptor descriptor;
 
     /**
-     * Whether this macro supports inline mode or not.
-     */
-    private boolean supportsInlineMode;
-
-    /**
      * Constructs a new {@link DefaultWikiMacro}.
      * 
      * @param baseObject the object containing the component definition
-     * @param supportsInlineMode says if macro support inline mode or not
      * @param descriptor the {@link MacroDescriptor} describing this macro.
      * @param componentManager {@link ComponentManager} component used to look up for other components.
      * @throws WikiComponentException when failing to parse the content
      * @throws ComponentLookupException when failing to looked required components
      * @since 10.10RC1
      */
-    public DefaultWikiMacro(BaseObject baseObject, boolean supportsInlineMode, MacroDescriptor descriptor,
+    public DefaultWikiMacro(BaseObject baseObject, MacroDescriptor descriptor,
         ComponentManager componentManager) throws WikiComponentException, ComponentLookupException
     {
         super(baseObject, Macro.class, descriptor.getId().getId(), componentManager);
 
-        this.supportsInlineMode = supportsInlineMode;
         this.descriptor = descriptor;
     }
 
@@ -179,7 +172,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     @Override
     public boolean supportsInlineMode()
     {
-        return this.supportsInlineMode;
+        return this.descriptor.supportsInlineMode();
     }
 
     boolean isAsyncAllowed()

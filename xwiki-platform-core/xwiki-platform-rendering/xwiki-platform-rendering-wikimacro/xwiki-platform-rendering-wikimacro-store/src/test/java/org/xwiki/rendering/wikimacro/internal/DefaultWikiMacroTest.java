@@ -144,14 +144,15 @@ public class DefaultWikiMacroTest
     private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
         List<WikiMacroParameterDescriptor> parameterDescriptors) throws Exception
     {
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description",
-            "Test", WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().id(new MacroId(macroId)).name("Wiki Macro")
+            .description("Description").defaultCategory("Test").visibility(WikiMacroVisibility.GLOBAL)
+            .supportsInlineMode(true).contentDescriptor(new DefaultContentDescriptor(false))
+            .parameterDescriptors(parameterDescriptors).build();
 
         this.wikiMacroDocument.setSyntax(syntax);
         this.wikiMacroObject.setLargeStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, macroContent);
 
-        DefaultWikiMacro wikiMacro =
-            new DefaultWikiMacro(this.wikiMacroObject, true, descriptor, this.componentManager);
+        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(this.wikiMacroObject, descriptor, this.componentManager);
 
         this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
     }

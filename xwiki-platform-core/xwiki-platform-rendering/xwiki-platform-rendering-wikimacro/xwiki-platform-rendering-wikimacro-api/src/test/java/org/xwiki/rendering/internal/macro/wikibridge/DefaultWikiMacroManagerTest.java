@@ -254,9 +254,10 @@ public class DefaultWikiMacroManagerTest
     private WikiMacro generateWikiMacro(WikiMacroVisibility visibility) throws Exception
     {
         DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"), "space");
-        WikiMacroDescriptor descriptor =
-            new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro", "Description", "Test", visibility,
-                new DefaultContentDescriptor(), Collections.<WikiMacroParameterDescriptor>emptyList());
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().id(new MacroId("testwikimacro"))
+            .name("Test Wiki Macro").description("Description").defaultCategory("Test").visibility(visibility)
+            .contentDescriptor(new DefaultContentDescriptor())
+            .parameterDescriptors(Collections.<WikiMacroParameterDescriptor>emptyList()).build();
 
         WikiMacro wikiMacro = mock(WikiMacro.class);
         when(wikiMacro.getDocumentReference()).thenReturn(wikiMacroDocReference);

@@ -49,8 +49,9 @@ public class WikiMacroDescriptorTest
         List<WikiMacroParameterDescriptor> paramDescriptors = Arrays.asList(
             new WikiMacroParameterDescriptor("id1", "description1", true),
             new WikiMacroParameterDescriptor("id2", "description2", true));
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("name", "description", "category",
-            WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(), paramDescriptors);
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().name("name").description("description")
+            .defaultCategory("category").visibility(WikiMacroVisibility.GLOBAL)
+            .contentDescriptor(new DefaultContentDescriptor()).parameterDescriptors(paramDescriptors).build();
         Map<String, ParameterDescriptor> result = descriptor.getParameterDescriptorMap();
 
         Iterator<String> it = result.keySet().iterator();

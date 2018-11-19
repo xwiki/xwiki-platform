@@ -175,13 +175,14 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
         // macro for a given syntax only.
         MacroId id = new MacroId(macroId);
-        MacroDescriptor macroDescriptor = new WikiMacroDescriptor(id, macroName, macroDescription, macroDefaultCategory,
-            macroVisibility, contentDescriptor, parameterDescriptors);
+        MacroDescriptor macroDescriptor = new WikiMacroDescriptor.Builder().id(id).name(macroName)
+            .description(macroDescription).defaultCategory(macroDefaultCategory).visibility(macroVisibility)
+            .supportsInlineMode(macroSupportsInlineMode).contentDescriptor(contentDescriptor)
+            .parameterDescriptors(parameterDescriptors).build();
 
         // Create & return the macro.
         try {
-            return new DefaultWikiMacro(macroDefinition, macroSupportsInlineMode, macroDescriptor,
-                this.componentManager);
+            return new DefaultWikiMacro(macroDefinition, macroDescriptor, this.componentManager);
         } catch (Exception e) {
             throw new WikiMacroException("Failed to create the macro", e);
         }

@@ -154,6 +154,7 @@
       'description': "#maybeTranslate(""${macroTranslationKey}.content.description""
         $macroDescriptor.contentDescriptor.description)",
       'mandatory': $macroDescriptor.contentDescriptor.mandatory,
+      'type': "$!macroDescriptor.contentDescriptor.type",
       'index': $macroDescriptor.parameterDescriptorMap.size()
     })
   #end

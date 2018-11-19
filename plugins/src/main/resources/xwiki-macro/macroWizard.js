@@ -33,28 +33,45 @@ define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, ed
     return selectMacro(data).then(editMacro).then(selectOtherMacroOrFinish);
   },
 
-  editMacroWizard = function(macroCall, syntaxId) {
-    return editMacro({
-      macroCall: macroCall,
-      syntaxId: syntaxId
-    }).then(selectOtherMacroOrFinish);
+  editMacroWizard = function(data) {
+    return editMacro(data).then(selectOtherMacroOrFinish);
+  },
+
+  isMacroCall = function(input) {
+    return typeof input === 'object' && input !== null &&
+      ((typeof input.name === 'string' && input.name !== '') ||
+      (typeof input.parameters === 'object' && input.parameters !== null) ||
+      typeof input.content === 'string');
   };
 
-  return function(macroCall, syntaxId) {
-    if (typeof macroCall === 'object' && macroCall !== null &&
-        typeof macroCall.name === 'string' && macroCall.name !== '') {
-      macroCall.parameters = macroCall.parameters || {};
-      syntaxId = (typeof syntaxId === 'string' && syntaxId) || XWiki.docsyntax;
-      return editMacroWizard(macroCall, syntaxId);
-    } else {
-      // The macro wizard can be called passing just the syntax as the first parameter.
-      syntaxId = (typeof macroCall === 'string' && macroCall) ||
-        (typeof syntaxId === 'string' && syntaxId) || XWiki.docsyntax;
-      var data = {syntaxId: syntaxId};
-      if (typeof macroCall === 'object' && macroCall !== null) {
-        // We can pass default macro parameter values to the Insert Macro Wizard.
-        data.macroCall = macroCall;
+  /**
+   * The macro wizard can be called with (macroCall), (macroCall, syntaxId), (syntaxId) or (options) where options is an
+   * object that looks like: {macroCall: ..., syntaxId: ..., ...}.
+   */
+  return function() {
+    // Process the function arguments.
+    var data = {}, index = 0;
+    if (typeof arguments[index] === 'object' && arguments[index] !== null) {
+      if (isMacroCall(arguments[index])) {
+        data.macroCall = arguments[index++];
+      } else {
+        data = arguments[index];
       }
+    }
+    if (data.macroCall) {
+      data.macroCall.parameters = data.macroCall.parameters || {};
+    }
+    if (typeof arguments[index] === 'string') {
+      data.syntaxId = arguments[index];
+    }
+    if (typeof data.syntaxId !== 'string' || data.syntaxId === '') {
+      data.syntaxId = XWiki.docsyntax;
+    }
+    // Edit the macro call if the macro name is specified. Otherwise insert a new macro.
+    if (typeof data.macroCall === 'object' && data.macroCall !== null &&
+        typeof data.macroCall.name === 'string' && data.macroCall.name !== '') {
+      return editMacroWizard(data);
+    } else {
       return insertMacroWizard(data);
     }
   };

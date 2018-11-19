@@ -33,6 +33,9 @@
     '</div>';
   var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
 
+  var nestedEditableTypeAttribute = 'data-xwiki-unchanged-content';
+  var nestedEditableNameAttribute = 'data-xwiki-parameter-name';
+
   var withLowerCaseKeys = function(object) {
     var key, keys = Object.keys(object);
     var n = keys.length;
@@ -127,21 +130,6 @@
         toHtml: wrapMacroOutput
       });
 
-      // macroOutputWrapper: CKEDITOR.htmlParser.element
-      var unWrapMacroOutput = function(macroOutputWrapper) {
-        var startMacroComment = new CKEDITOR.htmlParser.comment(macroOutputWrapper.attributes['data-macro']);
-        var stopMacroComment = new CKEDITOR.htmlParser.comment('stopmacro');
-        var macro = new CKEDITOR.htmlParser.fragment();
-        macro.add(startMacroComment);
-        if (editor.config.fullData) {
-          macroOutputWrapper.children.forEach(function(child) {
-            macro.add(child);
-          });
-        }
-        macro.add(stopMacroComment);
-        return macro;
-      };
-
       editor.ui.addButton('xwiki-macro', {
         label: editor.localization.get('xwiki-macro.buttonHint'),
         command: 'xwiki-macro',
@@ -156,8 +144,34 @@
           return (element.name == 'div' || element.name == 'span') &&
             element.hasClass('macro') && element.attributes['data-macro'];
         },
-        downcast: unWrapMacroOutput,
+        // The passed widgetElement is actually a clone of the widget element, of type CKEDITOR.htmlParser.element
+        downcast: function(widgetElementClone) {
+          var startMacroComment = new CKEDITOR.htmlParser.comment(widgetElementClone.attributes['data-macro']);
+          var stopMacroComment = new CKEDITOR.htmlParser.comment('stopmacro');
+          var macro = new CKEDITOR.htmlParser.fragment();
+          macro.add(startMacroComment);
+          if (editor.config.fullData) {
+            widgetElementClone.children.forEach(function(child) {
+              macro.add(child);
+            });
+          } else {
+            // If the widget has nested editables we need to include them, otherwise their content is not saved.
+            widgetElementClone.forEach(function(element) {
+              // We look only for block-level nested editables because the in-line nested editables are not well
+              // supported. See https://github.com/ckeditor/ckeditor-dev/issues/1091
+              if (element.name === 'div' && element.attributes[nestedEditableTypeAttribute]) {
+                macro.add(element);
+                return false;
+              }
+            }, CKEDITOR.NODE_ELEMENT, true);
+          }
+          macro.add(stopMacroComment);
+          return macro;
+        },
         init: function() {
+          // Initialize the nested editables.
+          macroPlugin.initializeNestedEditables(this, editor);
+          // Initialize the widget data.
           var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
           // Preserve the macro type (in-line vs. block) as much as possible when editing a macro.
           data.inline = this.inline;
@@ -194,8 +208,13 @@
             inline: inline
           });
         },
-        showMacroWizard: function(input) {
+        showMacroWizard: function(macroCall) {
           var widget = this;
+          var nestedEditableTypes = (editor.config['xwiki-macro'] || {}).nestedEditableTypes || {};
+          var input = {
+            macroCall: macroCall,
+            hiddenMacroParameterTypes: Object.keys(nestedEditableTypes)
+          };
           // Show our custom insert/edit dialog.
           require(['macroWizard'], function(macroWizard) {
             macroWizard(input).done(function(data) {
@@ -305,6 +324,37 @@
         command: definition.commandId,
         toolbar: 'insert,50'
       });
+    },
+
+    initializeNestedEditables: function(widget, editor) {
+      var nestedEditableTypes = (editor.config['xwiki-macro'] || {}).nestedEditableTypes || {};
+      // We look only for block-level nested editables because the in-line nested editables are not well supported.
+      // See https://github.com/ckeditor/ckeditor-dev/issues/1091
+      var nestedEditables = widget.element.find('div[' + nestedEditableTypeAttribute + ']');
+      for (var i = 0; i < nestedEditables.count(); i++) {
+        var nestedEditable = nestedEditables.getItem(i);
+        // The specified widget can have nested widgets. Initialize only the nested editables that correspond to the
+        // current widget.
+        var nestedEditableOwner = nestedEditable.getAscendant(CKEDITOR.plugins.widget.isDomWidgetElement);
+        if (!widget.element.equals(nestedEditableOwner)) {
+          continue;
+        }
+        var nestedEditableName = 'content';
+        var nestedEditableSelector = 'div[' + nestedEditableTypeAttribute + ']:not([' +
+          nestedEditableNameAttribute + '])';
+        if (nestedEditable.hasAttribute(nestedEditableNameAttribute)) {
+          nestedEditableName = nestedEditable.getAttribute(nestedEditableNameAttribute);
+          nestedEditableSelector = 'div[' + nestedEditableNameAttribute + '="' + nestedEditableName + '"]';
+        }
+        var nestedEditableType = nestedEditable.getAttribute(nestedEditableTypeAttribute);
+        var nestedEditableConfig = nestedEditableTypes[nestedEditableType] || {};
+        widget.initEditable(nestedEditableName, {
+          selector: nestedEditableSelector,
+          allowedContent: nestedEditableConfig.allowedContent,
+          disallowedContent: nestedEditableConfig.disallowedContent,
+          pathName: nestedEditableName
+        });
+      }
     },
 
     parseMacroCall: function(startMacroComment) {

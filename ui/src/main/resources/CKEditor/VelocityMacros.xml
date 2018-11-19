@@ -54,8 +54,12 @@
     #end
     #set ($output = "#renderContentSheet")
   #else
-    #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
-    #set ($output = $services.rendering.render($xdom, $doc.syntax.toIdString()))
+    #set ($output = $services.wysiwyg.fromAnnotatedXHTML($text, $doc.syntax.toIdString()))
+    #if ("$!output" == '' &amp;&amp; $output != '')
+      ## $output is null, probably because $services.wysiwyg.fromAnnotatedXHTML() is not available (before 10.10RC1)
+      #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
+      #set ($output = $services.rendering.render($xdom, $doc.syntax.toIdString()))
+    #end
   #end
   #if ("$!output" != '' || $output == '')
     $output##

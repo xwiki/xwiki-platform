@@ -66,8 +66,19 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     var macroEditor = $(macroEditorTemplate);
     macroEditor.find('.macro-name').text(macroDescriptor.name);
     macroEditor.find('.macro-description').text(macroDescriptor.description);
-    macroEditor.find('.macro-parameters').append(addParameterSeparator(
-      sortMacroParameters(macroDescriptor, macroCall)).map(maybeDisplayMacroParameter));
+    var macroParameters = sortMacroParameters(macroDescriptor, macroCall);
+    var visibleMacroParameters = [];
+    var hiddenMacroParameters = [];
+    var hiddenMacroParameterTypes = this.data('hiddenMacroParameterTypes');
+    macroParameters.forEach(function(macroParameter) {
+      // We can't hide mandatory parameters that don't have a value set.
+      macroParameter.hidden = hiddenMacroParameterTypes.indexOf(macroParameter.type) >= 0 &&
+        (!macroParameter.mandatory || (typeof macroParameter.value === 'string' && macroParameter.value.length > 0));
+      (macroParameter.hidden ? hiddenMacroParameters : visibleMacroParameters).push(macroParameter);
+    });
+    // Put the hidden macro parameters first to prevent the macro parameter separator (More) from showing them.
+    macroParameters = hiddenMacroParameters.concat(addParameterSeparator(visibleMacroParameters));
+    macroEditor.find('.macro-parameters').append(macroParameters.map(maybeDisplayMacroParameter));
     macroEditor.find('.more').click(toggleMacroParameters).click();
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
   },
@@ -168,9 +179,8 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     output.attr('data-id', parameter.id).attr('data-type', parameter.type);
     output.find('.macro-parameter-name').text(parameter.name);
     output.find('.macro-parameter-description').text(parameter.description);
-    if (parameter.mandatory) {
-      output.addClass('mandatory');
-    }
+    output.toggleClass('mandatory', !!parameter.mandatory);
+    output.toggleClass('hidden', !!parameter.hidden);
     output.append(displayMacroParameterField(parameter));
     return output;
   },
@@ -336,6 +346,7 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
         var macroEditor = modal.find('.macro-editor');
         var macroEditorAPI = macroEditor.data('macroEditorAPI');
         var input = modal.data('input');
+        macroEditor.data('hiddenMacroParameterTypes', input.hiddenMacroParameterTypes || []);
         var macroCall = input.macroCall || {
           name: input.macroId,
           parameters: {}

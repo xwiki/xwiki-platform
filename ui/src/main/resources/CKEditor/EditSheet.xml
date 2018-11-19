@@ -1167,6 +1167,7 @@ td.cke_dialog_contents_body {
  * Custom tool bar icons (Glyphicon)
  */
 a.cke_button.cke_button__xwiki-macro &gt; span.cke_button_icon.cke_button__xwiki-macro_icon,
+a.cke_button.cke_button__xwiki-macro-edit &gt; span.cke_button_icon.cke_button__xwiki-macro-edit_icon,
 a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__officeimporter_icon {
   /* This is needed for XWiki versions older than 7.1M1 where we overwrite the icons path (see above). */
   background-image: none !important;
@@ -1175,6 +1176,7 @@ a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__of
   top: 1px;
 }
 .cke_button_icon.cke_button__xwiki-macro_icon::before,
+.cke_button_icon.cke_button__xwiki-macro-edit_icon::before,
 .cke_button_icon.cke_button__officeimporter_icon::before {
   display: inline-block;
   text-align: center;
@@ -1182,6 +1184,9 @@ a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__of
 }
 .cke_button_icon.cke_button__xwiki-macro_icon::before {
   content: "\e019";
+}
+.cke_button_icon.cke_button__xwiki-macro-edit_icon::before {
+  content: "\e032";
 }
 .cke_button_icon.cke_button__officeimporter_icon::before {
   content: "\e022";

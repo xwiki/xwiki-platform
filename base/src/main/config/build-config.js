@@ -52,6 +52,7 @@ var CKBUILDER_CONFIG = {
     about: 0,
     autocomplete: 1,
     autolink: 1,
+    balloontoolbar: 1,
     basicstyles: 1,
     bidi: 1,
     blockquote: 1,

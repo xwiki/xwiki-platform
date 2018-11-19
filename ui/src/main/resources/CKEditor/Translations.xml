@@ -65,6 +65,7 @@ ckeditor.plugin.link.openInNewTab=Open Link in New Tab
 
 ckeditor.plugin.macro.placeholder=macro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki Macro
+ckeditor.plugin.macro.editButtonHint=Edit Macro
 ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
 

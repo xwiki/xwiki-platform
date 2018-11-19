@@ -48,8 +48,9 @@
   };
 
   CKEDITOR.plugins.add('xwiki-macro', {
-    requires: 'widget,notification,xwiki-marker,xwiki-source,xwiki-localization',
-    init : function(editor) {
+    requires: 'widget,balloontoolbar,notification,xwiki-marker,xwiki-source,xwiki-localization',
+
+    init: function(editor) {
       var macroPlugin = this;
 
       // node: CKEDITOR.htmlParser.node
@@ -250,6 +251,46 @@
       // Register the dedicated insert macro buttons.
       ((editor.config['xwiki-macro'] || {}).insertButtons || []).forEach(function(definition) {
         macroPlugin.maybeRegisterDedicatedInsertMacroButton(editor, definition);
+      });
+    },
+
+    // Setup the balloon tool bar for the nested editables, after the balloontoolbar plugin has been fully initialized.
+    afterInit: function(editor) {
+      // When the selection is inside a nested editable the macro widget button will insert a new macro so we need
+      // another button to edit the current macro widget that holds the nested editable.
+      editor.addCommand('xwiki-macro-edit', {
+        // We want to enable the command only when the selection is inside a nested editable.
+        context: true,
+        contextSensitive: true,
+        startDisabled: true,
+        exec: function(editor) {
+          this.getCurrentWidget(editor).edit();
+        },
+        refresh: function(editor, path) {
+          var currentWidget = this.getCurrentWidget(editor);
+          if (currentWidget && currentWidget.name === 'xwiki-macro') {
+            this.enable();
+          } else {
+            this.disable();
+          }
+        },
+        getCurrentWidget: function(editor) {
+          return editor.widgets.focused || editor.widgets.widgetHoldingFocusedEditable;
+        }
+      });
+
+      editor.ui.addButton('xwiki-macro-edit', {
+        label: editor.localization.get('xwiki-macro.editButtonHint'),
+        command: 'xwiki-macro-edit',
+        // We use a tool bar group that is not shown on the main tool bar so that this button is shown only on the
+        // macro balloon tool bar.
+        toolbar: 'xwiki-macro'
+      });
+
+      editor.balloonToolbars.create({
+        buttons: 'xwiki-macro-edit,xwiki-macro',
+        // Show the macro balloon tool bar when a nested editable is focused.
+        cssSelector: 'div.macro div.xwiki-metadata-container.cke_widget_editable'
       });
     },
 

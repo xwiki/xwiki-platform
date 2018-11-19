@@ -72,7 +72,9 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     var hiddenMacroParameterTypes = this.data('hiddenMacroParameterTypes');
     macroParameters.forEach(function(macroParameter) {
       // We can't hide mandatory parameters that don't have a value set.
-      macroParameter.hidden = hiddenMacroParameterTypes.indexOf(macroParameter.type) >= 0 &&
+      // We can't hide macro parameters when the macro call is in-line because in-line nested editables are not well
+      // supported. See https://github.com/ckeditor/ckeditor-dev/issues/1091
+      macroParameter.hidden = !macroCall.inline && hiddenMacroParameterTypes.indexOf(macroParameter.type) >= 0 &&
         (!macroParameter.mandatory || (typeof macroParameter.value === 'string' && macroParameter.value.length > 0));
       (macroParameter.hidden ? hiddenMacroParameters : visibleMacroParameters).push(macroParameter);
     });

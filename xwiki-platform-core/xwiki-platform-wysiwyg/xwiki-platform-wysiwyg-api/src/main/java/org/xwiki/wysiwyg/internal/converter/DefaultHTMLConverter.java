@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -180,6 +181,11 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             // Parse
             XDOM xdom = this.xhtmlParser.parse(new StringReader(html));
+
+            // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
+            // data is used as the default syntax for macro content. We have to change this to the specified syntax
+            // because HTML is used only to be able to edit the source syntax in the WYSIWYG editor.
+            xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
 
             // Execute the macro transformation
             executeMacroTransformation(xdom, syntax);

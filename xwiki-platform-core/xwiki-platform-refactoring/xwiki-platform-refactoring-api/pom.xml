@@ -31,8 +31,8 @@
   <name>XWiki Platform - Refactoring - API</name>
   <description>Provides APIs to refactor XWiki entities</description>
   <properties>
-    <xwiki.pitest.mutationThreshold>95</xwiki.pitest.mutationThreshold>
-    <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>97</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Refactoring API</xwiki.extension.name>
   </properties>

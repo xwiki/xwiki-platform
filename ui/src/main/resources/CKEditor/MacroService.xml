@@ -95,6 +95,7 @@
 #end
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)
+  #set ($xmacro = $NULL)
   #set ($macroDescriptor = $NULL)
   #set ($macroId = $services.rendering.resolveMacroId($macroIdAsString))
   #if ($macroId)
@@ -114,6 +115,10 @@
   #end
   #if ($macroDescriptor)
     #getMacroDescriptor($macroDescriptor)
+    #if ($xmacro)
+      ## supportsInlineMode was not exposed on the macro descriptor before XWiki 10.10RC1.
+      #set ($data.supportsInlineMode = $xmacro.supportsInlineMode())
+    #end
   #end
 #end
 
@@ -143,7 +148,7 @@
     'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
     'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
     'defaultCategory': $macroDescriptor.defaultCategory,
-    'supportsInlineMode': $macro.supportsInlineMode(),
+    'supportsInlineMode': $macroDescriptor.supportsInlineMode(),
     'parameterDescriptorMap': {}
   })
   #if ($macroDescriptor.contentDescriptor)

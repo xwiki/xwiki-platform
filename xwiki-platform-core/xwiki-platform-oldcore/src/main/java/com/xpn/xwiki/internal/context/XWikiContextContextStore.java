@@ -21,11 +21,11 @@ package com.xpn.xwiki.internal.context;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -145,7 +145,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     }
 
     @Override
-    public void save(Map<String, Serializable> contextStore, Set<String> entries)
+    public void save(Map<String, Serializable> contextStore, Collection<String> entries)
     {
         XWikiContext xcontext = this.readProvider.get();
 
@@ -162,7 +162,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     }
 
     private void save(Map<String, Serializable> contextStore, String prefix, XWikiDocument document,
-        Set<String> entries)
+        Collection<String> entries)
     {
         save((key, subkey) -> {
             switch (subkey) {
@@ -178,7 +178,8 @@ public class XWikiContextContextStore extends AbstractContextStore
         }, prefix, entries);
     }
 
-    private void save(Map<String, Serializable> contextStore, String prefix, XWikiRequest request, Set<String> entries)
+    private void save(Map<String, Serializable> contextStore, String prefix, XWikiRequest request,
+        Collection<String> entries)
     {
         save((key, subkey) -> {
             switch (subkey) {

@@ -32,7 +32,7 @@
   <description>XWiki Platform - Refactoring - Default Implementation</description>
   <properties>
     <xwiki.pitest.mutationThreshold>83</xwiki.pitest.mutationThreshold>
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

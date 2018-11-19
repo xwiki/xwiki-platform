@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
@@ -93,6 +95,14 @@ public class DefaultModelBridgeTest
     @InjectMockComponents
     private DefaultModelBridge modelBridge;
 
+    @MockComponent
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
+
+    @MockComponent
+    @Named("compact")
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
+  
     @MockComponent
     private JobProgressManager progressManager;
 
@@ -305,6 +315,12 @@ public class DefaultModelBridgeTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
 
+        DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
+        String serializedParent = "xwiki:Path.To.WebHome";
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
+            .thenReturn(hierarchicalParent);
+
         this.modelBridge.update(documentReference, Collections.singletonMap("title", "foo"));
 
         verify(document).setTitle("foo");
@@ -319,12 +335,65 @@ public class DefaultModelBridgeTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
+        DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
+        String serializedParent = "xwiki:Path.To.WebHome";
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
+            .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome"));
+        verify(document).setParentReference(hierarchicalParent.getLocalDocumentReference());
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
+    }
+
+    @Test
+    public void dontUpdateParentDifferentWikiSameSpace() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+
+        DocumentReference parentReference = new DocumentReference("subwiki", Arrays.asList("Path", "To"), "WebHome");
+        when(document.getParentReference()).thenReturn(parentReference);
+        when(document.getRelativeParentReference()).thenReturn(parentReference.getLocalDocumentReference());
+
+        DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
+        String serializedParent = "wiki:Path.To.WebHome";
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
+            .thenReturn(hierarchicalParent.getLocalDocumentReference());
+
+        this.modelBridge.update(documentReference, Collections.emptyMap());
+
+        // no need to update the parent: different wiki but same relative reference
+        verify(document, never()).setParentReference(hierarchicalParent.getLocalDocumentReference());
+        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+    }
+
+    @Test
+    public void dontUpdateParentInCaseOfPageRename() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "Foo"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+
+        DocumentReference parentReference = new DocumentReference("wiki", Arrays.asList("Path"), "WebHome");
+        when(document.getParentReference()).thenReturn(parentReference);
+        when(document.getRelativeParentReference()).thenReturn(parentReference.getLocalDocumentReference());
+
+        DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path"), "WebHome");
+        String serializedParent = "wiki:Path.WebHome";
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
+            .thenReturn(hierarchicalParent.getLocalDocumentReference());
+
+        this.modelBridge.update(documentReference, Collections.emptyMap());
+
+        // no need to update the parent: different name but same parents
+        verify(document, never()).setParentReference(hierarchicalParent.getLocalDocumentReference());
+        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true, xcontext);
     }
 
     @Test
@@ -334,10 +403,15 @@ public class DefaultModelBridgeTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
+        DocumentReference hierarchicalParent = new DocumentReference("wiki", "Path", "WebHome");
+        String serializedParent = "xwiki:Path.WebHome";
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
+            .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(new DocumentReference("wiki", "Path", "WebHome"));
+        verify(document).setParentReference(hierarchicalParent.getLocalDocumentReference());
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
@@ -350,9 +424,15 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
+        DocumentReference hierarchicalParent = new DocumentReference("wiki", "Main", "WebHome");
+        String serializedParent = "xwiki:Main.WebHome";
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
+            .thenReturn(hierarchicalParent.getLocalDocumentReference());
+
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(new DocumentReference("wiki", "Main", "WebHome"));
+        verify(document).setParentReference(hierarchicalParent.getLocalDocumentReference());
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }

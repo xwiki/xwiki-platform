@@ -152,6 +152,17 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.rendering.macro.rss.RssMacroParameters",
+                    "new": "class org.xwiki.rendering.macro.rss.RssMacroParameters",
+                    "superClass": "org.xwiki.rendering.macro.box.BoxMacroParameters",
+                    "justification": "As RssMacro now inherits from AbstractBoxMacro, its parameter class needs to
+                    inherits from BoxMacroParameters. This could only break compatibility if a class inheriting from
+                    RssMacroParameters defines a method with same name and parameters than in BoxMacroParameters but
+                    different return type. We consider this risk as acceptable since the chances are very low and in
+                    case it occurs, the fix for the user would be easy."
+                  }
                 ]
               }
             }

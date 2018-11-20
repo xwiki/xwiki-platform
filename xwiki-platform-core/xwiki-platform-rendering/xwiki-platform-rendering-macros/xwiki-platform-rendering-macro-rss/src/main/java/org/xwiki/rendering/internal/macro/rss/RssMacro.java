@@ -39,10 +39,9 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.box.BoxMacroParameters;
+import org.xwiki.rendering.macro.box.AbstractBoxMacro;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -61,7 +60,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 @Component
 @Named("rss")
 @Singleton
-public class RssMacro extends AbstractMacro<RssMacroParameters>
+public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
 {
     /**
      * The name of the CSS class attribute.
@@ -79,13 +78,6 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      * The relative skin path of the feed icon to be displayed in the channel title.
      */
     private static final String FEED_ICON_RESOURCE_PATH = "icons/silk/feed.png";
-
-    /**
-     * The Box macro is used to draw boxes around RSS feed items and for the main around the RSS feed list.
-     */
-    @Inject
-    @Named("box")
-    protected Macro<BoxMacroParameters> boxMacro;
 
     /**
      * Used to get the RSS icon.
@@ -110,7 +102,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      */
     public RssMacro()
     {
-        super("RSS", DESCRIPTION, RssMacroParameters.class);
+        super("RSS", DESCRIPTION, new DefaultContentDescriptor(DESCRIPTION, false), RssMacroParameters.class);
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
@@ -128,21 +120,15 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
 
         if (parameters.isDecoration()) {
-            BoxMacroParameters boxParameters = new BoxMacroParameters();
             boolean hasImage = parameters.isImage() && (feed.getImage() != null);
-            boxParameters.setCssClass(FEED_CLASS_VALUE);
-
-            if (StringUtils.isNotEmpty(parameters.getWidth())) {
-                boxParameters.setWidth(parameters.getWidth());
-            }
-
-            boxParameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
+            parameters.setCssClass(FEED_CLASS_VALUE);
+            parameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
 
             if (hasImage) {
-                boxParameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
+                parameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
             }
 
-            result = this.boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
+            result = super.execute(parameters, content == null ? StringUtils.EMPTY : content, context);
         } else {
             result = Arrays.<Block>asList(new GroupBlock(Collections.singletonMap(CLASS_ATTRIBUTE, FEED_CLASS_VALUE)));
         }
@@ -150,6 +136,13 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         generateEntries(result.get(0), feed, parameters);
 
         return result;
+    }
+
+    @Override
+    protected List<Block> parseContent(RssMacroParameters parameters, String content,
+        MacroTransformationContext context) throws MacroExecutionException
+    {
+        return this.getMacroContentParser().parse(content, context, false, context.isInline()).getChildren();
     }
 
     /**

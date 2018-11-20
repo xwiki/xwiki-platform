@@ -25,6 +25,7 @@ import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 
 /**
@@ -33,7 +34,7 @@ import org.xwiki.rendering.macro.parameter.MacroParameterException;
  * @version $Id$
  * @since 1.8RC1
  */
-public class RssMacroParameters
+public class RssMacroParameters extends BoxMacroParameters
 {
     /**
      * The URL of the RSS feed.

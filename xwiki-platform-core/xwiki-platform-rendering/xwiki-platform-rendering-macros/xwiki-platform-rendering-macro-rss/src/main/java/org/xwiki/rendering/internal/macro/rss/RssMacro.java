@@ -39,11 +39,8 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
-import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
 import org.xwiki.rendering.parser.ParseException;
@@ -81,13 +78,6 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
      * The relative skin path of the feed icon to be displayed in the channel title.
      */
     private static final String FEED_ICON_RESOURCE_PATH = "icons/silk/feed.png";
-
-    /**
-     * The Box macro is used to draw boxes around RSS feed items and for the main around the RSS feed list.
-     */
-    @Inject
-    @Named("box")
-    protected Macro<BoxMacroParameters> boxMacro;
 
     /**
      * Used to get the RSS icon.
@@ -132,7 +122,6 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
         if (parameters.isDecoration()) {
             boolean hasImage = parameters.isImage() && (feed.getImage() != null);
             parameters.setCssClass(FEED_CLASS_VALUE);
-
             parameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
 
             if (hasImage) {
@@ -153,9 +142,6 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     protected List<Block> parseContent(RssMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        if (content == null) {
-            content = StringUtils.EMPTY;
-        }
         return this.getMacroContentParser().parse(content, context, false, context.isInline()).getChildren();
     }
 

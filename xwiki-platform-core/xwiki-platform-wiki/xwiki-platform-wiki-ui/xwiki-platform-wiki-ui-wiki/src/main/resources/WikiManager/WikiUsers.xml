@@ -180,7 +180,7 @@
               $services.localization.render('platform.wiki.currentwiki.candidates.reviewermessage.label')
           &lt;/label&gt;
           #if($status == 'pending' &amp;&amp; $type == 'request')
-            &lt;textarea name='reviewerComment'/&gt;
+            &lt;textarea name='reviewerComment'&gt;&lt;/textarea&gt;
           #else
             &lt;span class='reviewerCommentSpan'&gt;$!candidateMember.getValue('reviewerComment')&lt;/span&gt;
           #end
@@ -188,7 +188,7 @@
         &lt;div class='reviewerPrivateComment'&gt;
           &lt;label&gt;$services.localization.render('platform.wiki.currentwiki.candidates.reviewerprivatecomment.label')&lt;/label&gt;
           #if($status == 'pending' &amp;&amp; $type == 'request')
-            &lt;textarea name='reviewerPrivateComment'/&gt;
+            &lt;textarea name='reviewerPrivateComment'&gt;&lt;/textarea&gt;
           #else
             &lt;span class='reviewerPrivateCommentSpan'&gt;$!candidateMember.getValue('reviewerPrivateComment')&lt;/span&gt;
           #end

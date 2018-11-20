@@ -37,7 +37,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -96,10 +95,9 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
             @Override
             public Void doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                List<BaseObject> objects =
-                    getObjectsWithMissingProperties(className, xclass.getPropertyList(), session);
-                for (BaseObject object : objects) {
-                    addMissingProperties(object, xclass, session);
+                List<Long> objectIds = getObjectsWithMissingProperties(className, xclass.getPropertyList(), session);
+                for (Long objectId : objectIds) {
+                    addMissingProperties(objectId, xclass, session);
                 }
 
                 return null;
@@ -108,48 +106,48 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
     }
 
     @SuppressWarnings("unchecked")
-    private List<BaseObject> getObjectsWithMissingProperties(String className, Set<String> expectedProperties,
+    private List<Long> getObjectsWithMissingProperties(String className, Set<String> expectedProperties,
         Session session)
     {
         // Get all the objects that have less properties than what their class declares (the expected property count).
         // Note that we count only the expected properties (those declared by the class).
-        Query query = session.createQuery("select obj from BaseObject as obj, BaseProperty as prop "
+        Query query = session.createQuery("select obj.id from BaseObject as obj, BaseProperty as prop "
             + "where obj.id = prop.id.id and obj.className = :className and prop.id.name in :expectedProperties "
-            + "group by obj having count(prop) < :expectedPropertyCount");
+            + "group by obj.id having count(prop) < :expectedPropertyCount");
         query.setString("className", className);
         query.setParameterList("expectedProperties", expectedProperties);
         query.setLong("expectedPropertyCount", Integer.valueOf(expectedProperties.size()).longValue());
         return query.list();
     }
 
-    private void addMissingProperties(BaseObject object, BaseClass xclass, Session session)
+    private void addMissingProperties(Long objectId, BaseClass xclass, Session session)
     {
-        for (PropertyClass propertyClass : getMissingProperties(object, xclass, session)) {
+        for (PropertyClass propertyClass : getMissingProperties(objectId, xclass, session)) {
             // Add missing property.
             BaseProperty<?> property = propertyClass.newProperty();
             // The property has a composite id made of the object id and the property name.
             // We don't set the property name because newProperty() does it.
-            property.setId(object.getId());
+            property.setId(objectId);
             session.save(property);
         }
     }
 
-    private List<PropertyClass> getMissingProperties(BaseObject object, BaseClass xclass, Session session)
+    private List<PropertyClass> getMissingProperties(Long objectId, BaseClass xclass, Session session)
     {
         // Copy the property list so that we don't modify the cached class.
         Set<String> missingProperties = new HashSet<>(xclass.getPropertyList());
-        missingProperties.removeAll(getCurrentProperties(object, session));
+        missingProperties.removeAll(getCurrentProperties(objectId, session));
         return missingProperties.stream().map(propertyName -> (PropertyClass) xclass.get(propertyName))
             .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
-    private List<String> getCurrentProperties(BaseObject object, Session session)
+    private List<String> getCurrentProperties(Long objectId, Session session)
     {
         // The object was loaded from the database without its properties so we need to make a second query to get them.
         Query query = session.createQuery("select prop.id.name from BaseObject as obj, BaseProperty as prop "
             + "where obj.id = prop.id.id and obj.id = :objectId");
-        query.setLong("objectId", object.getId());
+        query.setLong("objectId", objectId);
         return query.list();
     }
 }

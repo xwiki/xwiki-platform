@@ -267,6 +267,10 @@
           this.getCurrentWidget(editor).edit();
         },
         refresh: function(editor, path) {
+          // The nested editables are not marked as focused right away in Chrome so we need to defer the refresh a bit.
+          setTimeout($.proxy(this, '_refresh', editor, path), 0);
+        },
+        _refresh: function(editor, path) {
           var currentWidget = this.getCurrentWidget(editor);
           if (currentWidget && currentWidget.name === 'xwiki-macro') {
             this.enable();

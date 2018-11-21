@@ -144,13 +144,19 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
 
     private boolean isDefaultInterval(Object interval)
     {
-        return interval == null && this.interval == NotificationEmailInterval.DAILY;
+        return (interval == null || StringUtils.isBlank((String) interval))
+                && this.interval == NotificationEmailInterval.DAILY;
     }
 
     private boolean isSameInterval(Object interval)
     {
-        return interval != null
-                && this.interval.equals(NotificationEmailInterval.valueOf(StringUtils.upperCase((String) interval)));
+        if (interval == null || !(interval instanceof String)) {
+            return false;
+        }
+
+        String stringInterval = (String) interval;
+        return StringUtils.isNotBlank(stringInterval)
+                && this.interval.equals(NotificationEmailInterval.valueOf(StringUtils.upperCase(stringInterval)));
     }
 
     @Override

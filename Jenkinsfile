@@ -99,7 +99,7 @@ def builds = [
     build(
       name: 'TestRelease',
       goals: 'clean install',
-      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
+      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
       properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true',
       xvnc: false
     )

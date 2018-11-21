@@ -76,6 +76,20 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
     }
 
     /**
+     * @return true if it's a translation document.
+     */
+    private boolean isTranslationDocument()
+    {
+        if (target instanceof DocumentReferenceTarget) {
+            DocumentReferenceTarget documentReferenceTarget = (DocumentReferenceTarget) target;
+
+            return documentReferenceTarget.getDocumentReference().getName().contains("Translations");
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Use the p (paragraph) element to indicate paragraphs. Do not use the br (linebreak) element to separate
      * paragraphs.
      */
@@ -83,7 +97,7 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
     public void validateRpd3s4()
     {
         if (!isPage("XWiki", "XWikiSyntax") && !isPage("XWiki", "XWikiSyntaxParagraphs")
-            && !isPage("XWiki", "XWikiSyntaxGeneralRemarks")) {
+            && !isPage("XWiki", "XWikiSyntaxGeneralRemarks") && !isTranslationDocument()) {
             super.validateRpd3s4();
         }
     }

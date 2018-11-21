@@ -70,7 +70,7 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
 
     private static final String FEED_CLASS_VALUE = "rssfeed";
 
-    private static final String FEED_PROPERTY = "feed";
+    private static final String FEED_PROPERTY = "RssMacro.feed";
 
     /**
      * The description of the macro.
@@ -121,14 +121,30 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
         return false;
     }
 
+    /**
+     * Allow to save the current processed feed in the context, to be able to retrieve without concurrency issue.
+     * @param feed the feed to save in the current context.
+     */
     private void setFeed(SyndFeed feed)
     {
         this.execution.getContext().setProperty(FEED_PROPERTY, feed);
     }
 
+    /**
+     * Retrieve the feed of the current context.
+     * @return the feed that is being processed in the macro.
+     */
     private SyndFeed getFeed()
     {
         return (SyndFeed) this.execution.getContext().getProperty(FEED_PROPERTY);
+    }
+
+    /**
+     * Remove the feed information from the current context.
+     */
+    private void removeContextFeed()
+    {
+        this.execution.getContext().removeProperty(FEED_PROPERTY);
     }
 
     @Override
@@ -146,13 +162,19 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     protected List<? extends Block> getBlockTitle(RssMacroParameters parameters, String content,
         MacroTransformationContext context)
     {
-        return generateBoxTitle("rsschanneltitle", getFeed());
+        List<? extends Block> blockTitle = super.getBlockTitle(parameters, content, context);
+
+        if (blockTitle == null) {
+            return generateBoxTitle("rsschanneltitle", getFeed());
+        } else {
+            return blockTitle;
+        }
     }
 
     @Override
     protected String getClassProperty()
     {
-        return super.getClassProperty() + " " + FEED_CLASS_VALUE;
+        return super.getClassProperty() + ' ' + FEED_CLASS_VALUE;
     }
 
     @Override
@@ -161,6 +183,9 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     {
         List<Block> result;
         SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
+
+        // we save the feed in the current context to be able to retrieve it
+        // we avoid to put it in a class field, to avoid concurrent exceptions
         this.setFeed(feed);
 
         if (parameters.isDecoration()) {
@@ -171,6 +196,8 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
 
         generateEntries(result.get(0), feed, parameters);
 
+        // clean the context
+        this.removeContextFeed();
         return result;
     }
 

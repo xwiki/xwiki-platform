@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
@@ -69,6 +70,8 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
 
     private static final String FEED_CLASS_VALUE = "rssfeed";
 
+    private static final String FEED_PROPERTY = "feed";
+
     /**
      * The description of the macro.
      */
@@ -93,6 +96,12 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     private Parser plainTextParser;
 
     /**
+     * Needed to keep the feed information.
+     */
+    @Inject
+    private Execution execution;
+
+    /**
      * Create a Feed object from a feed specified as a URL.
      */
     private RomeFeedFactory romeFeedFactory = new DefaultRomeFeedFactory();
@@ -112,22 +121,49 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
         return false;
     }
 
+    private void setFeed(SyndFeed feed)
+    {
+        this.execution.getContext().setProperty(FEED_PROPERTY, feed);
+    }
+
+    private SyndFeed getFeed()
+    {
+        return (SyndFeed) this.execution.getContext().getProperty(FEED_PROPERTY);
+    }
+
+    @Override
+    protected ResourceReference getImageReference(RssMacroParameters parameters, String content,
+        MacroTransformationContext context)
+    {
+        if (parameters.isDecoration() && parameters.isImage()) {
+            return new ResourceReference(getFeed().getImage().getUrl(), ResourceType.URL);
+        } else {
+            return super.getImageReference(parameters, content, context);
+        }
+    }
+
+    @Override
+    protected List<? extends Block> getBlockTitle(RssMacroParameters parameters, String content,
+        MacroTransformationContext context)
+    {
+        return generateBoxTitle("rsschanneltitle", getFeed());
+    }
+
+    @Override
+    protected String getClassProperty()
+    {
+        return super.getClassProperty() + " " + FEED_CLASS_VALUE;
+    }
+
     @Override
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         List<Block> result;
         SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
+        this.setFeed(feed);
 
         if (parameters.isDecoration()) {
-            boolean hasImage = parameters.isImage() && (feed.getImage() != null);
-            parameters.setCssClass(FEED_CLASS_VALUE);
-            parameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
-
-            if (hasImage) {
-                parameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
-            }
-
             result = super.execute(parameters, content == null ? StringUtils.EMPTY : content, context);
         } else {
             result = Arrays.<Block>asList(new GroupBlock(Collections.singletonMap(CLASS_ATTRIBUTE, FEED_CLASS_VALUE)));

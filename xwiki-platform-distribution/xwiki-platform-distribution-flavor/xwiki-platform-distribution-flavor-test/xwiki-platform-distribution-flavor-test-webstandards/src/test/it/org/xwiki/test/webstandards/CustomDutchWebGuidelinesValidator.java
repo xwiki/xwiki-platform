@@ -96,6 +96,9 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
     @Override
     public void validateRpd3s4()
     {
+        // Exclude translation documents as they are using plain syntax and line breaking are then translated with
+        // potentially multiple br tags. Now those translations pages are not supposed to be watched by the users,
+        // so we can ignore them.
         if (!isPage("XWiki", "XWikiSyntax") && !isPage("XWiki", "XWikiSyntaxParagraphs")
             && !isPage("XWiki", "XWikiSyntaxGeneralRemarks") && !isTranslationDocument()) {
             super.validateRpd3s4();

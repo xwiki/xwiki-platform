@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.10-SNAPSHOT</version>
+    <version>10.10-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-legacy</artifactId>
   <name>XWiki Platform - Legacy</name>

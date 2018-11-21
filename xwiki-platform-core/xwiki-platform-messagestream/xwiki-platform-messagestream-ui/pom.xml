@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-messagestream</artifactId>
-    <version>10.10-SNAPSHOT</version>
+    <version>10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-messagestream-ui</artifactId>
   <packaging>xar</packaging>

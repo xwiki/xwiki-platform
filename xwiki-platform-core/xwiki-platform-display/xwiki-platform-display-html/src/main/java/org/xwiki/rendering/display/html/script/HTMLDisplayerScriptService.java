@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.display.html.script;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -36,10 +35,10 @@ import org.xwiki.stability.Unstable;
  * Exposes {@link org.xwiki.displayer.HTMLDisplayer}s to scripts.
  *
  * @version $Id$
- * @since 10.10RC1
+ * @since 10.11RC1
  */
 @Unstable
-@Named("htmldisplayer")
+@Named("display.html")
 @Component
 @Singleton
 public class HTMLDisplayerScriptService implements ScriptService
@@ -52,9 +51,9 @@ public class HTMLDisplayerScriptService implements ScriptService
      * @return the html element based on the value and the type
      * @throws HTMLDisplayerException if an error occurs during the display
      */
-    String display(Object value) throws HTMLDisplayerException
+    public String display(Object value) throws HTMLDisplayerException
     {
-        return display(value, new HashMap<>());
+        return htmlDisplayerManager.display(value.getClass(), value);
     }
 
     /**
@@ -63,9 +62,9 @@ public class HTMLDisplayerScriptService implements ScriptService
      * @return the html element based on the value and the type
      * @throws HTMLDisplayerException if an error occurs during the display
      */
-    String display(Object value, Map<String, String> parameters) throws HTMLDisplayerException
+    public String display(Object value, Map<String, String> parameters) throws HTMLDisplayerException
     {
-        return display(value, parameters, "view");
+        return htmlDisplayerManager.display(value.getClass(), value, parameters);
     }
 
     /**
@@ -75,8 +74,8 @@ public class HTMLDisplayerScriptService implements ScriptService
      * @return the html element based on the value and the type
      * @throws HTMLDisplayerException if an error occurs during the display
      */
-    String display(Object value, Map<String, String> parameters, String mode) throws HTMLDisplayerException
+    public String display(Object value, Map<String, String> parameters, String mode) throws HTMLDisplayerException
     {
-        return htmlDisplayerManager.getHTMLDisplayer(value.getClass()).display(value, parameters, mode);
+        return htmlDisplayerManager.display(value.getClass(), value, parameters, mode);
     }
 }

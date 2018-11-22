@@ -25,30 +25,37 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.script.ScriptContext;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.displayer.HTMLDisplayer;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.TemplateManager;
 
 /**
- * Abstract class to ease the implementation of {@code HTMLDisplayer} using templates.
+ * Default implementation of {@code HTMLDisplayer} using templates.
  *
  * @param <T> the type of the {@code HTMLDisplayer}
  * @version $Id$
- * @since 10.10RC1
+ * @since 10.11RC1
  */
-public abstract class AbstractHTMLDisplayer<T> implements HTMLDisplayer<T>
+@Component
+public class DefaultTemplateHTMLDisplayer<T> implements HTMLDisplayer<T>
 {
+    /**
+     * Folder containing the HTML Displayers velocity templates.
+     */
+    public static final String TEMPLATE_FOLDER = "html_displayer";
+
+    /**
+     * Template extension (velocity).
+     */
+    public static final String TEMPLATE_EXTENSION = ".vm";
+
     @Inject
     protected TemplateManager templateManager;
 
     @Inject
     protected ScriptContextManager scriptContextManager;
-
-    /**
-     * @return the template name used to make the rendering
-     */
-    public abstract String getTemplateName();
 
     /**
      * {@inheritDoc}
@@ -81,9 +88,36 @@ public abstract class AbstractHTMLDisplayer<T> implements HTMLDisplayer<T>
             scriptContext.setAttribute("parameters", parameters, ScriptContext.ENGINE_SCOPE);
             scriptContext.setAttribute("mode", mode, ScriptContext.ENGINE_SCOPE);
 
-            return templateManager.render(getTemplateName());
+            return templateManager.render(getTemplateName(value, mode));
         } catch (Exception e) {
             throw new HTMLDisplayerException("Couldn't render the template", e);
         }
+    }
+
+    /**
+     * Computes the template name.
+     * The following names will be use in this priority order to find an existing template:
+     * <ul>
+     *   <li>html_displayer/[type]/[mode].vm
+     *   <li>html_displayer/[type].vm
+     *   <li>html_displayer/[mode].vm
+     *   <li>html_displayer/default.vm
+     * </ul>
+     * @return the template name used to make the rendering
+     */
+    protected String getTemplateName(T value, String mode) {
+        String type = value.getClass().getSimpleName().toLowerCase();
+        String templateName = TEMPLATE_FOLDER + '/' + type + "/" + mode + TEMPLATE_EXTENSION;
+        if (templateManager.getTemplate(templateName) == null) {
+            templateName = TEMPLATE_FOLDER + '/' + type + TEMPLATE_EXTENSION;
+        }
+        if (templateManager.getTemplate(templateName) == null) {
+            templateName = TEMPLATE_FOLDER + '/' + mode + TEMPLATE_EXTENSION;
+        }
+        if (templateManager.getTemplate(templateName) == null) {
+            templateName = TEMPLATE_FOLDER + '/' + "default" + TEMPLATE_EXTENSION;
+        }
+
+        return templateName;
     }
 }

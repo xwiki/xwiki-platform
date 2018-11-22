@@ -52,7 +52,7 @@ viewers.Tags = Class.create({
             onCreate : function () {
               // ignore "cascade" clicks
               item.disabled = true;
-              item.notification = new XWiki.widgets.Notification("Deleting tag...", "inprogress");
+              item.notification = new XWiki.widgets.Notification("$services.localization.render('core.tags.deleting')", "inprogress");
             },
             onSuccess : function () {
               // delete the corresponding element
@@ -87,7 +87,7 @@ viewers.Tags = Class.create({
               onCreate : function () {
                 // ignore "cascade" clicks
                 item.disabled = true;
-                item.notification = new XWiki.widgets.Notification("Fetching form...", "inprogress");
+                item.notification = new XWiki.widgets.Notification("$services.localization.render('core.tags.fetchform')", "inprogress");
               },
               onSuccess : function (response) {
                 var iParent = item.up();
@@ -132,7 +132,7 @@ viewers.Tags = Class.create({
             onCreate : function () {
               // ignore "cascade" clicks
               form.disable();
-              form.notification = new XWiki.widgets.Notification("Adding tag...", "inprogress");
+              form.notification = new XWiki.widgets.Notification("$services.localization.render('core.tags.adding')", "inprogress");
             },
             onSuccess : function (response) {
               var wrapper = new Element('span');

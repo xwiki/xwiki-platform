@@ -162,11 +162,47 @@ public class CompareVersionsTest extends AbstractTest
         getDriver().navigate().refresh();
     }
 
+    @Test
+    public void testCompareVersionScenario()
+    {
+        testAllChanges();
+        testVersionNavigation();
+        testUnifiedDiffShowsInlineChanges();
+        testNoChanges();
+        testDeleteVersions();
+    }
+
+    private void testDeleteVersions()
+    {
+        HistoryPane historyTab = testPage.openHistoryDocExtraPane().showMinorEdits();
+        HistoryPane historyPane = historyTab.deleteRangeVersions("1.3", "6.3");
+        String queryString = "viewer=changes&rev1=1.1&rev2=1.2";
+        getUtil().gotoPage(getTestClassName(), testPage.getMetaDataValue("page"), "view", queryString);
+        ChangesPane changesPane = new ChangesPane();
+        assertEquals("1.1", changesPane.getFromVersion());
+        assertEquals("1.2", changesPane.getToVersion());
+        assertFalse(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertFalse(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertFalse(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+        changesPane.clickNextChange();
+
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("6.4", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertFalse(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertFalse(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertFalse(changesPane.hasNextToVersion());
+    }
+
     /**
      * Tests that all changes are displayed.
      */
-    @Test
-    public void testAllChanges()
+    private void testAllChanges()
     {
         HistoryPane historyTab = testPage.openHistoryDocExtraPane().showMinorEdits();
         String currentVersion = historyTab.getCurrentVersion();
@@ -251,15 +287,12 @@ public class CompareVersionsTest extends AbstractTest
         assertDiff(ageDiff.getDiff("Pretty Name"), "+age");
         assertDiff(ageDiff.getDiff("Size"), "+30");
         assertDiff(ageDiff.getDiff("Number Type"), "+integer");
-
-        testVersionNavigation();
     }
 
     /**
      * Tests that a message is displayed when there are no changes.
      */
-    @Test
-    public void testNoChanges()
+    private void testNoChanges()
     {
         HistoryPane historyTab = testPage.openHistoryDocExtraPane();
         String currentVersion = historyTab.getCurrentVersion();
@@ -269,8 +302,7 @@ public class CompareVersionsTest extends AbstractTest
     /**
      * Tests that the unified diff (for multi-line text) shows the inline changes.
      */
-    @Test
-    public void testUnifiedDiffShowsInlineChanges()
+    private void testUnifiedDiffShowsInlineChanges()
     {
         ChangesPane changesPane =
             testPage.openHistoryDocExtraPane().showMinorEdits().compare("2.2", "2.3").getChangesPane();

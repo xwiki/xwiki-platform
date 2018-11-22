@@ -133,6 +133,23 @@ public class HistoryPane extends BaseElement
         return new HistoryPane();
     }
 
+
+    private void selectVersions(String fromVersion, String toVersion)
+    {
+        String versionXPath = ".//input[@name = 'rev%s' and @value = '%s']";
+        getDriver().findElementWithoutWaiting(pane, By.xpath(String.format(versionXPath, 1, fromVersion))).click();
+        getDriver().findElementWithoutWaiting(pane, By.xpath(String.format(versionXPath, 2, toVersion))).click();
+    }
+
+    public HistoryPane deleteRangeVersions(String fromVersion, String toVersion)
+    {
+        getDriver().makeConfirmDialogSilent(true);
+        this.selectVersions(fromVersion, toVersion);
+        getDriver().findElementWithoutWaiting(pane, By.xpath(".//input[@name = 'deleteVersions']")).click();
+
+        return new HistoryPane();
+    }
+
     /**
      * Selects the specified document versions and clicks the button to compare them.
      * 
@@ -142,9 +159,7 @@ public class HistoryPane extends BaseElement
      */
     public ComparePage compare(String fromVersion, String toVersion)
     {
-        String versionXPath = ".//input[@name = 'rev%s' and @value = '%s']";
-        getDriver().findElementWithoutWaiting(pane, By.xpath(String.format(versionXPath, 1, fromVersion))).click();
-        getDriver().findElementWithoutWaiting(pane, By.xpath(String.format(versionXPath, 2, toVersion))).click();
+        this.selectVersions(fromVersion, toVersion);
         getDriver().findElementWithoutWaiting(pane, By.xpath(".//input[@accesskey = 'c']")).click();
         return new ComparePage();
     }

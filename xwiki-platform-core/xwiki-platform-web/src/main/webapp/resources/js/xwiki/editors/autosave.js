@@ -96,7 +96,7 @@ editors.AutoSave = Class.create({
     // Labels
     var autosaveLabel = new Element('label', {'class': 'autosave', 'for' : "doAutosave"});
     autosaveLabel.appendChild(this.autosaveCheckbox);
-    autosaveLabel.appendChild(document.createTextNode("$services.localization.render('core.edit.autosave')"));
+    autosaveLabel.appendChild(document.createTextNode(" $services.localization.render('core.edit.autosave')"));
     var frequencyLabel = new Element('label', {'class': 'frequency'});
     frequencyLabel.appendChild(document.createTextNode("$services.localization.render('core.edit.autosave.every') "));
     frequencyLabel.appendChild(this.autosaveInput);

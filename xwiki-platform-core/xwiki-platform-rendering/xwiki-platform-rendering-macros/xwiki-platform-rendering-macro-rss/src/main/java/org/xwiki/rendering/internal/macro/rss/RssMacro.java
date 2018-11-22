@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
@@ -69,6 +70,8 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
 
     private static final String FEED_CLASS_VALUE = "rssfeed";
 
+    private static final String FEED_PROPERTY = "RssMacro.feed";
+
     /**
      * The description of the macro.
      */
@@ -93,6 +96,12 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     private Parser plainTextParser;
 
     /**
+     * Needed to keep the feed information.
+     */
+    @Inject
+    private Execution execution;
+
+    /**
      * Create a Feed object from a feed specified as a URL.
      */
     private RomeFeedFactory romeFeedFactory = new DefaultRomeFeedFactory();
@@ -112,6 +121,62 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
         return false;
     }
 
+    /**
+     * Allow to save the current processed feed in the context, to be able to retrieve without concurrency issue.
+     * @param feed the feed to save in the current context.
+     */
+    private void setFeed(SyndFeed feed)
+    {
+        this.execution.getContext().setProperty(FEED_PROPERTY, feed);
+    }
+
+    /**
+     * Retrieve the feed of the current context.
+     * @return the feed that is being processed in the macro.
+     */
+    private SyndFeed getFeed()
+    {
+        return (SyndFeed) this.execution.getContext().getProperty(FEED_PROPERTY);
+    }
+
+    /**
+     * Remove the feed information from the current context.
+     */
+    private void removeContextFeed()
+    {
+        this.execution.getContext().removeProperty(FEED_PROPERTY);
+    }
+
+    @Override
+    protected ResourceReference getImageReference(RssMacroParameters parameters, String content,
+        MacroTransformationContext context)
+    {
+        if (parameters.isDecoration() && parameters.isImage()) {
+            return new ResourceReference(getFeed().getImage().getUrl(), ResourceType.URL);
+        } else {
+            return super.getImageReference(parameters, content, context);
+        }
+    }
+
+    @Override
+    protected List<? extends Block> getBlockTitle(RssMacroParameters parameters, String content,
+        MacroTransformationContext context)
+    {
+        List<? extends Block> blockTitle = super.getBlockTitle(parameters, content, context);
+
+        if (blockTitle == null) {
+            return generateBoxTitle("rsschanneltitle", getFeed());
+        } else {
+            return blockTitle;
+        }
+    }
+
+    @Override
+    protected String getClassProperty()
+    {
+        return super.getClassProperty() + ' ' + FEED_CLASS_VALUE;
+    }
+
     @Override
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
@@ -119,15 +184,11 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
         List<Block> result;
         SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
 
+        // we save the feed in the current context to be able to retrieve it
+        // we avoid to put it in a class field, to avoid concurrent exceptions
+        this.setFeed(feed);
+
         if (parameters.isDecoration()) {
-            boolean hasImage = parameters.isImage() && (feed.getImage() != null);
-            parameters.setCssClass(FEED_CLASS_VALUE);
-            parameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
-
-            if (hasImage) {
-                parameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
-            }
-
             result = super.execute(parameters, content == null ? StringUtils.EMPTY : content, context);
         } else {
             result = Arrays.<Block>asList(new GroupBlock(Collections.singletonMap(CLASS_ATTRIBUTE, FEED_CLASS_VALUE)));
@@ -135,6 +196,8 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
 
         generateEntries(result.get(0), feed, parameters);
 
+        // clean the context
+        this.removeContextFeed();
         return result;
     }
 

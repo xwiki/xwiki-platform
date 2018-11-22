@@ -62,7 +62,7 @@
       #set ($joinedWikis = [])
       #set ($wikis = $services.wiki.getAll())
       #foreach ($wiki in $wikis)
-        #if($services.wiki.user.isMember($currentUser, $wiki.id))
+        #if($services.wiki.user.isMember($documentUser, $wiki.id))
           #set($temp = $joinedWikis.add($wiki))
         #end
       #end

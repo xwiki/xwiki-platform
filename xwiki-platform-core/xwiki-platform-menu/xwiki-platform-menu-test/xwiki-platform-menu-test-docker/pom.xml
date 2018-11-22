@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-menu-test</artifactId>
-    <version>10.10-SNAPSHOT</version>
+    <version>10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-menu-test-docker</artifactId>
   <name>XWiki Platform - Menu - Tests - Functional Tests</name>
@@ -37,7 +37,13 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <selenium.version>3.14.0</selenium.version>
+
+    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
+    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
+      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
+      here. Note that the version needs to be checked when we change the version of selenium-java -->
+    <guava.version>25.0-jre</guava.version>
+    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </properties>
   <dependencies>
     <!-- ================================
@@ -63,6 +69,7 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -83,13 +90,6 @@
       <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- Excluded since we use a more recent version in TestContainers-based tests -->
-        <exclusion>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-java</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -103,52 +103,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
-         systems go through SLF4J -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-      <exclusions>
-        <!-- XWiki uses a more recent version of bytebuddy -->
-        <exclusion>
-          <groupId>net.bytebuddy</groupId>
-          <artifactId>byte-buddy</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
-      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
-      here. Note that the version needs to be checked when we change the version of selenium-server -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>25.0-jre</version>
-      <exclusions>
-        <!-- Use the version from TestContainers which is newer -->
-        <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

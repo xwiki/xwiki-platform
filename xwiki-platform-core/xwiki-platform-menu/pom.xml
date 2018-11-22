@@ -33,6 +33,7 @@
   <description>Menu application</description>
   <modules>
     <module>xwiki-platform-menu-ui</module>
+    <module>xwiki-platform-menu-test</module>
   </modules>
   <dependencies>
     <!-- Display macro is used to be injected in administration -->
@@ -43,12 +44,4 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <profiles>
-    <profile>
-      <id>docker</id>
-      <modules>
-        <module>xwiki-platform-menu-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

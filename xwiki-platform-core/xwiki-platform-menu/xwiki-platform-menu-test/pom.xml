@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-menu</artifactId>
-    <version>10.10-SNAPSHOT</version>
+    <version>10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-menu-test</artifactId>
   <name>XWiki Platform - Menu - Tests - Parent POM</name>
@@ -38,7 +38,14 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-menu-test-docker</module>
     <module>xwiki-platform-menu-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-menu-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

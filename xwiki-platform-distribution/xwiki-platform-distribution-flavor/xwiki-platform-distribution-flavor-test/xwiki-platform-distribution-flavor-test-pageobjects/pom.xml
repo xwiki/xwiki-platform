@@ -89,10 +89,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-    </dependency>
-    <dependency>
       <groupId>cpsuite</groupId>
       <artifactId>cpsuite</artifactId>
       <version>1.2.5</version>

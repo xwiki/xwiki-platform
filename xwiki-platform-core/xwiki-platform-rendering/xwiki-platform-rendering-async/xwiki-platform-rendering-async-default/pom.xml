@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - Async - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.22</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -53,6 +53,14 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+
+    <!-- Testing Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

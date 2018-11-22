@@ -87,7 +87,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var displayCompareButton = $("input[type='submit'][name='displayCompare']");
     displayCompareButton.on("click", displayCompareFunc);
 
-    var deleteVersionButton = $("input[type='submit'][name='deleteVersion']");
+    var deleteVersionButton = $("input[type='submit'][name='deleteVersions']");
     deleteVersionButton.on("click", deleteVersionFunc);
 
     var viewMinorVersionsButton = $("input[type='submit'][name='viewMinorVersions']");

@@ -151,7 +151,7 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     protected ResourceReference getImageReference(RssMacroParameters parameters, String content,
         MacroTransformationContext context)
     {
-        if (parameters.isDecoration() && parameters.isImage()) {
+        if (parameters.isImage() && getFeed().getImage() != null) {
             return new ResourceReference(getFeed().getImage().getUrl(), ResourceType.URL);
         } else {
             return super.getImageReference(parameters, content, context);

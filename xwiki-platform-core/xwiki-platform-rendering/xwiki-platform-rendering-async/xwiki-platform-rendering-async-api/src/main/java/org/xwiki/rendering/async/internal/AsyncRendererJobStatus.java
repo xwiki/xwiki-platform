@@ -150,7 +150,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     /**
      * @param roleTypes the types of the components to invalidate the cache
      */
-    public void setRoleTypes(Set<Type> roleTypes)
+    void setRoleTypes(Set<Type> roleTypes)
     {
         this.roleTypes = roleTypes;
     }

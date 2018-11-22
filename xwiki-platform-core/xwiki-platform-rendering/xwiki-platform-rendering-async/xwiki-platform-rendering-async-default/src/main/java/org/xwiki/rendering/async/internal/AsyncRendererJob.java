@@ -81,10 +81,11 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
         getStatus().setResult(result);
-        // Get suff to invalidate the cache
+        // Remember various elements used during the execution (ro invalidate the cache or restore them when needed)
         ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
         getStatus().setReference(contextUse.getReferences());
         getStatus().setRoles(contextUse.getRoles());
+        getStatus().setRoleTypes(contextUse.getRoleTypes());
         getStatus().setUses(contextUse.getUses());
 
         this.cache.put(getStatus());

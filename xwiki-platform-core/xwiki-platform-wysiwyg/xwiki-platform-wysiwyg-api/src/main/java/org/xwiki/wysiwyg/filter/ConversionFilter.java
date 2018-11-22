@@ -37,6 +37,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.web.Utils;
@@ -83,8 +84,8 @@ public class ConversionFilter implements Filter
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
-        ServletException
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+        throws IOException, ServletException
     {
         // Take the list of request parameters that require HTML conversion.
         String[] parametersRequiringHTMLConversion = req.getParameterValues(REQUIRES_HTML_CONVERSION);
@@ -98,25 +99,7 @@ public class ConversionFilter implements Filter
             Map<String, Throwable> errors = new HashMap<String, Throwable>();
             // Save also the output to prevent loosing data in case of conversion exceptions.
             Map<String, String> output = new HashMap<String, String>();
-            for (int i = 0; i < parametersRequiringHTMLConversion.length; i++) {
-                String parameterName = parametersRequiringHTMLConversion[i];
-                String html = req.getParameter(parameterName);
-                // Remove the syntax parameter from the request to avoid interference with further request processing.
-                String syntax = mreq.removeParameter(parameterName + "_syntax");
-                if (html == null || syntax == null) {
-                    continue;
-                }
-                try {
-                    HTMLConverter converter = Utils.getComponent((Type) HTMLConverter.class);
-                    mreq.setParameter(parameterName, converter.fromHTML(html, syntax));
-                } catch (Exception e) {
-                    LOGGER.error(e.getLocalizedMessage(), e);
-                    errors.put(parameterName, e);
-                }
-                // If the conversion fails the output contains the value before the conversion.
-                output.put(parameterName, mreq.getParameter(parameterName));
-            }
-
+            convertHTMLWithExecutionContext(parametersRequiringHTMLConversion, mreq, output, errors);
             if (!errors.isEmpty()) {
                 handleConversionErrors(errors, output, mreq, res);
             } else {
@@ -130,6 +113,42 @@ public class ConversionFilter implements Filter
     @Override
     public void init(FilterConfig config) throws ServletException
     {
+    }
+
+    private void convertHTMLWithExecutionContext(String[] parametersRequiringHTMLConversion,
+        MutableServletRequest request, Map<String, String> output, Map<String, Throwable> errors)
+    {
+        new ExecutionContextRunnable(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                convertHTML(parametersRequiringHTMLConversion, request, output, errors);
+            }
+        }, Utils.getContextComponentManager()).run();
+    }
+
+    private void convertHTML(String[] parametersRequiringHTMLConversion, MutableServletRequest request,
+        Map<String, String> output, Map<String, Throwable> errors)
+    {
+        for (int i = 0; i < parametersRequiringHTMLConversion.length; i++) {
+            String parameterName = parametersRequiringHTMLConversion[i];
+            String html = request.getParameter(parameterName);
+            // Remove the syntax parameter from the request to avoid interference with further request processing.
+            String syntax = request.removeParameter(parameterName + "_syntax");
+            if (html == null || syntax == null) {
+                continue;
+            }
+            try {
+                HTMLConverter converter = Utils.getComponent((Type) HTMLConverter.class);
+                request.setParameter(parameterName, converter.fromHTML(html, syntax));
+            } catch (Exception e) {
+                LOGGER.error(e.getLocalizedMessage(), e);
+                errors.put(parameterName, e);
+            }
+            // If the conversion fails the output contains the value before the conversion.
+            output.put(parameterName, request.getParameter(parameterName));
+        }
     }
 
     private void handleConversionErrors(Map<String, Throwable> errors, Map<String, String> output,

@@ -167,11 +167,14 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
             format: 'alert',
             enabled: applications[i].eventTypes[j].getAlertState()
           });
-          data.push({
-            eventType: applications[i].eventTypes[j].eventType,
-            format: 'email',
-            enabled: applications[i].eventTypes[j].getEmailState()
-          });
+          // Email might be disabled, so we don't send info about the email settings if the corresponding buttons are not there
+          if ($('.notificationTypeCell[data-format="email"]').length &gt; 0) {
+            data.push({
+              eventType: applications[i].eventTypes[j].eventType,
+              format: 'email',
+              enabled: applications[i].eventTypes[j].getEmailState()
+            });
+          }
         }
       }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";

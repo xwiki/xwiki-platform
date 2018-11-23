@@ -55,9 +55,9 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     @Inject
     private CacheManager cacheManager;
 
-    private Cache<AsyncRendererJobStatus> uniqueCache;
+    private Cache<AsyncRendererJobStatus> asyncCache;
 
-    private Cache<AsyncRendererJobStatus> cache;
+    private Cache<AsyncRendererJobStatus> longCache;
 
     private Map<EntityReference, Set<String>> referenceMapping = new ConcurrentHashMap<>();
 
@@ -85,19 +85,18 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     {
         try {
             // Standard cache (long lived but small by default)
-            this.cache =
+            this.longCache =
                 this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer", 100, 86400));
 
-            // Cache of unique result (i.e. not cached) kept only for the small period between which the job is finished
-            // but it was not asked yet by the client (short live but by size)
-            LRUCacheConfiguration configuration = new LRUCacheConfiguration("rendering.asyncrenderer.nocache");
-            configuration.getLRUEvictionConfiguration().setLifespan(600);
-            this.uniqueCache = this.cacheManager.createNewCache(configuration);
+            // Cache to store asynchronous result kept only for the small period between which the job is finished
+            // but it was not been asked yet by the client (short live but big size)
+            this.asyncCache = this.cacheManager
+                .createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer.nocache", 10000, 600));
         } catch (CacheException e) {
             throw new InitializationException("Failed to initialize cache", e);
         }
 
-        this.cache.addCacheEntryListener(this);
+        this.longCache.addCacheEntryListener(this);
     }
 
     /**
@@ -109,17 +108,17 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         String cacheKey = toCacheKey(id);
 
         // Try standard cache
-        AsyncRendererJobStatus status = this.cache.get(cacheKey);
+        AsyncRendererJobStatus status = this.longCache.get(cacheKey);
 
         if (status != null) {
             return status;
         }
 
         // Try unique cache
-        status = this.uniqueCache.get(cacheKey);
+        status = this.asyncCache.get(cacheKey);
 
         if (status != null) {
-            this.uniqueCache.remove(cacheKey);
+            this.asyncCache.remove(cacheKey);
 
             return status;
         }
@@ -139,10 +138,15 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
 
         String cacheKey = toCacheKey(status.getRequest().getId());
 
+        // If cache is enabled, store the status in the long cache
         if (cacheAllowed) {
-            this.cache.set(cacheKey, status);
-        } else {
-            this.uniqueCache.set(cacheKey, status);
+            this.longCache.set(cacheKey, status);
+        }
+
+        // Asynchronous statuses are stored in the big cache to avoid race condition (result invalidated before it get a
+        // chance of being actually requested)
+        if (status.isAsync()) {
+            this.asyncCache.set(cacheKey, status);
         }
     }
 
@@ -151,8 +155,8 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public void flush()
     {
-        this.cache.removeAll();
-        this.uniqueCache.removeAll();
+        this.longCache.removeAll();
+        this.asyncCache.removeAll();
     }
 
     @Override
@@ -252,8 +256,8 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     {
         if (keys != null) {
             for (String key : keys) {
-                this.cache.remove(key);
-                this.uniqueCache.remove(key);
+                this.longCache.remove(key);
+                this.asyncCache.remove(key);
             }
         }
     }

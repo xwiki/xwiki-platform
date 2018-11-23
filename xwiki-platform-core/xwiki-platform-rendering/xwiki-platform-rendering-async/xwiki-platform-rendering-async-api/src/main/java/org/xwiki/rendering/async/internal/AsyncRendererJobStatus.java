@@ -57,6 +57,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
     private Map<String, Collection<Object>> uses;
 
+    private boolean async;
+
     /**
      * @param request the request provided when started the job
      * @param observationManager the observation manager component
@@ -69,6 +71,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
         // We are not ready to isolate asynchronous renderer, plus it's not stored right now so the log would be lost.
         setIsolated(false);
+
+        this.async = true;
     }
 
     /**
@@ -78,6 +82,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     AsyncRendererJobStatus(AsyncRendererJobRequest request, AsyncRendererResult result)
     {
         super(JOBTYPE, request, null, null, null);
+
+        this.async = false;
 
         this.result = result;
 
@@ -96,6 +102,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     {
         super(JOBTYPE, request, null, null, null);
 
+        this.async = false;
+
         setResult(result);
         setReferences(references);
         setRoleTypes(roleTypes);
@@ -103,6 +111,15 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         setUses(uses);
 
         setState(State.FINISHED);
+    }
+
+    /**
+     * @return true if this status is associated to an asynchronous execution
+     * @since 10.10
+     */
+    public boolean isAsync()
+    {
+        return async;
     }
 
     /**

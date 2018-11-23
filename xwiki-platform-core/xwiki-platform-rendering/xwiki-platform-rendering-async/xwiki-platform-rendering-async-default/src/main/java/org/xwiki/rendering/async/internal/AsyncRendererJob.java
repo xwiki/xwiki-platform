@@ -83,7 +83,7 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         getStatus().setResult(result);
         // Remember various elements used during the execution (ro invalidate the cache or restore them when needed)
         ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
-        getStatus().setReference(contextUse.getReferences());
+        getStatus().setReferences(contextUse.getReferences());
         getStatus().setRoles(contextUse.getRoles());
         getStatus().setRoleTypes(contextUse.getRoleTypes());
         getStatus().setUses(contextUse.getUses());

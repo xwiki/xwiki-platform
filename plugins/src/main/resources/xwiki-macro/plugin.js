@@ -36,6 +36,8 @@
   var nestedEditableTypeAttribute = 'data-xwiki-unchanged-content';
   var nestedEditableNameAttribute = 'data-xwiki-parameter-name';
 
+  var selectedMacroMarker = '__cke_selected_macro';
+
   var withLowerCaseKeys = function(object) {
     var key, keys = Object.keys(object);
     var n = keys.length;
@@ -174,9 +176,21 @@
           macroPlugin.initializeNestedEditables(this, editor);
           // Initialize the widget data.
           var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
+          // We need to focus the macro widget after it has been inserted or updated beause the edited content has been
+          // refreshed so the selection was lost.
+          if (data.parameters[selectedMacroMarker]) {
+            setTimeout($.proxy(this, 'scrollIntoViewAndFocus'), 0);
+          }
+          // Remove this meta data from the macro call so that it doesn't get saved.
+          delete data.parameters[selectedMacroMarker];
           // Preserve the macro type (in-line vs. block) as much as possible when editing a macro.
           data.inline = this.inline;
+          // Update the macro widget data.
           this.setData(data);
+        },
+        scrollIntoViewAndFocus: function() {
+          this.wrapper.scrollIntoView();
+          (this.editables.content || this).focus();
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
@@ -299,6 +313,9 @@
     },
 
     insertOrUpdateMacroWidget: function(editor, data, widget) {
+      // We're going to refresh the edited content after inserting / updating the macro widget so we mark the macro in
+      // order to be able to select it afterwards.
+      data.parameters[selectedMacroMarker] = true;
       // Prevent the editor from recording a history entry where the macro data is updated but the macro output is not
       // refreshed. The lock is removed by the call to setLoading(false) after the macro output is refreshed.
       editor.fire('lockSnapshot', {dontUpdate: true});

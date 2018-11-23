@@ -33,7 +33,7 @@
     '</div>';
   var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
 
-  var nestedEditableTypeAttribute = 'data-xwiki-unchanged-content';
+  var nestedEditableTypeAttribute = 'data-xwiki-non-generated-content';
   var nestedEditableNameAttribute = 'data-xwiki-parameter-name';
 
   var selectedMacroMarker = '__cke_selected_macro';

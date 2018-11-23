@@ -276,7 +276,7 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
       name: macroDescriptor.id.id,
       parameters: {}
     };
-    if (typeof formData.$content === 'string' && formData.$content !== '' && macroDescriptor.contentDescriptor) {
+    if (typeof formData.$content === 'string' && macroDescriptor.contentDescriptor) {
       macroCall.content = formData.$content;
     }
     for (var parameterId in formData) {

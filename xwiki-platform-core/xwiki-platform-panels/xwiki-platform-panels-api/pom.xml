@@ -31,7 +31,7 @@
   <name>XWiki Platform - Panels - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.27</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>1</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>

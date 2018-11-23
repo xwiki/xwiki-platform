@@ -58,6 +58,9 @@
   #displayPanelProperty($obj 'category')
   #displayPanelProperty($obj 'description')
   #displayPanelProperty($obj 'content')
+  #displayPanelProperty($obj 'async_enabled')
+  #displayPanelProperty($obj 'async_cached')
+  #displayPanelProperty($obj 'async_context')
 #end
 {{/velocity}}</content>
 </xwikidoc>

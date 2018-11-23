@@ -395,10 +395,9 @@ panels.MoreApplicationsButtonListener = Class.create({
 return XWiki;
 }(XWiki || {}));
 
-document.observe('xwiki:dom:loaded', function(e) {
-  $$('.applicationPanelMoreButton').each(function(button) {
-    new XWiki.panels.MoreApplicationsButtonListener(button);
-  });
+// Activate all buttons already in the DOM
+$$('.applicationPanelMoreButton').each(function(button) {
+  new XWiki.panels.MoreApplicationsButtonListener(button);
 });</code>
     </property>
     <property>

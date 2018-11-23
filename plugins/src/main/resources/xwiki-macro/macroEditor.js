@@ -276,6 +276,8 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
       name: macroDescriptor.id.id,
       parameters: {}
     };
+    // Note that we include the empty content in the macro call (instead of leaving it undefined) because we want to
+    // generate {{macro}}{{/macro}} instead of {{macro/}} when the macro supports content.
     if (typeof formData.$content === 'string' && macroDescriptor.contentDescriptor) {
       macroCall.content = formData.$content;
     }
@@ -309,7 +311,7 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
         var emptyMandatoryParams = macroEditor.find('.macro-parameter.mandatory ').filter(function() {
           var id = $(this).attr('data-id');
           var value = id === '$content' ? macroCall.content : macroCall.parameters[id];
-          return value === undefined;
+          return value === undefined || value === '';
         });
         emptyMandatoryParams.first().addClass('has-error').find(':input').not(':hidden').focus();
         setTimeout(function() {

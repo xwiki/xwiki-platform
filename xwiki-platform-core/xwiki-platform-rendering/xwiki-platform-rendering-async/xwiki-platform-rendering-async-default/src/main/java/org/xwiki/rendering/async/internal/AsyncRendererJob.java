@@ -27,6 +27,7 @@ import org.xwiki.job.AbstractJob;
 import org.xwiki.job.Request;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
+import org.xwiki.template.TemplateManager;
 
 /**
  * Default implementation of {@link AsyncRendererJob}.
@@ -43,6 +44,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
     @Inject
     private AsyncContext asyncContext;
+
+    @Inject
+    private TemplateManager templateManager;
 
     @Override
     protected AsyncRendererJobRequest castRequest(Request request)
@@ -76,6 +80,11 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         this.asyncContext.setEnabled(true);
         // Prepare to catch stuff to invalidate the cache
         ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+
+        // Many UI elements expect xwikivars.vm result to be in the context so we execute it
+        // FIXME: not very happy with that but can't find a better place yet
+        // (other than executing it at the beginning of every single element which might be executed asynchronously...)
+        this.templateManager.execute("xwikivars.vm");
 
         AsyncRenderer renderer = getRequest().getRenderer();
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());

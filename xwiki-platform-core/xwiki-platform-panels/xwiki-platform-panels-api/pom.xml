@@ -25,11 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>10.8.2-SNAPSHOT</version>
+    <version>10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels-api</artifactId>
   <name>XWiki Platform - Panels - API</name>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.28</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -38,8 +41,19 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-async-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

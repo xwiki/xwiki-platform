@@ -1,0 +1,5 @@
+#if ($mode == 'edit')
+  <input type="text" value="$value" #foreach ($parameter in $parameters.entrySet()) $parameter.key="$parameter.value"#end>
+#else
+  $value
+#end

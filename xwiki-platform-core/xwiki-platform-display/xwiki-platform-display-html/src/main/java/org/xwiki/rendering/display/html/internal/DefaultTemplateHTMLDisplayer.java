@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
@@ -34,12 +35,12 @@ import org.xwiki.template.TemplateManager;
 /**
  * Default implementation of {@code HTMLDisplayer} using templates.
  *
- * @param <T> the type of the {@code HTMLDisplayer}
  * @version $Id$
  * @since 10.11RC1
  */
 @Component
-public class DefaultTemplateHTMLDisplayer<T> implements HTMLDisplayer<T>
+@Singleton
+public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
 {
     /**
      * Folder containing the HTML Displayers velocity templates.
@@ -63,7 +64,7 @@ public class DefaultTemplateHTMLDisplayer<T> implements HTMLDisplayer<T>
      * Displays the value with the 'view' mode.
      */
     @Override
-    public String display(T value) throws HTMLDisplayerException
+    public String display(Object value) throws HTMLDisplayerException
     {
         return display(value, new HashMap<>());
     }
@@ -74,13 +75,13 @@ public class DefaultTemplateHTMLDisplayer<T> implements HTMLDisplayer<T>
      * Displays the value with the 'view' mode.
      */
     @Override
-    public String display(T value, Map<String, String> parameters) throws HTMLDisplayerException
+    public String display(Object value, Map parameters) throws HTMLDisplayerException
     {
         return display(value, parameters, "view");
     }
 
     @Override
-    public String display(T value, Map<String, String> parameters, String mode) throws HTMLDisplayerException
+    public String display(Object value, Map parameters, String mode) throws HTMLDisplayerException
     {
         try {
             ScriptContext scriptContext = scriptContextManager.getCurrentScriptContext();
@@ -105,7 +106,7 @@ public class DefaultTemplateHTMLDisplayer<T> implements HTMLDisplayer<T>
      * </ul>
      * @return the template name used to make the rendering
      */
-    protected String getTemplateName(T value, String mode) {
+    protected String getTemplateName(Object value, String mode) {
         String type = value.getClass().getSimpleName().toLowerCase();
         String templateName = TEMPLATE_FOLDER + '/' + type + "/" + mode + TEMPLATE_EXTENSION;
         if (templateManager.getTemplate(templateName) == null) {

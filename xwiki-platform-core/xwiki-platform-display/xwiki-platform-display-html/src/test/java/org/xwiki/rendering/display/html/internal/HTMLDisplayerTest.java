@@ -52,7 +52,7 @@ public class HTMLDisplayerTest
     public ScriptContextManager scriptContextManager;
 
     @InjectMockComponents
-    public DefaultTemplateHTMLDisplayer<DocumentReference> defaultTemplateHTMLDisplayer;
+    public DefaultTemplateHTMLDisplayer defaultTemplateHTMLDisplayer;
 
     @Test
     public void defaultTemplateHTMLDisplayerTest() throws Exception

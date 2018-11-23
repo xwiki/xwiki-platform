@@ -75,6 +75,11 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-displayer</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
     </dependency>

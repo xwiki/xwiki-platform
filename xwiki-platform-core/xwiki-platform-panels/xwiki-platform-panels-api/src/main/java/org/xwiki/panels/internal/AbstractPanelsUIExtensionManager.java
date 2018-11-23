@@ -20,6 +20,7 @@
 package org.xwiki.panels.internal;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,7 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
             // as we want to build a list ordered the same way than in the original panelConfigurationString
             Map<DocumentReference, Integer> panelReferenceWithPosition = new HashMap<>();
 
-            String[] panelStringReferences = getConfiguration().split(",");
+            String[] panelStringReferences = panelConfigurationString.split(",");
             for (int i = 0; i < panelStringReferences.length; i++) {
                 panelReferenceWithPosition.put(resolver.resolve(panelStringReferences[i].trim()), i);
             }
@@ -111,6 +112,7 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
             try {
                 List<UIExtension> allExtensions =
                     contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
+                Map<UIExtension, Integer> panelsPositions = new HashMap<>();
                 // TODO: This is not performant and will not scale well when the number of UIExtension instances
                 // increase in the wiki
                 for (UIExtension extension : allExtensions) {
@@ -131,13 +133,12 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
                     }
 
                     if (panelReferenceWithPosition.containsKey(extensionId)) {
-                        int position = panelReferenceWithPosition.get(extensionId);
-                        if (position > panels.size()) {
-                            position = panels.size();
-                        }
-                        panels.add(position, extension);
+                        panelsPositions.put(extension, panelReferenceWithPosition.get(extensionId));
                     }
                 }
+
+                panels.addAll(panelsPositions.keySet());
+                panels.sort(Comparator.comparing(panelsPositions::get));
             } catch (ComponentLookupException e) {
                 logger.error("Failed to lookup Panels instances, error: [{}]", e);
             }

@@ -97,7 +97,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         super(JOBTYPE, request, null, null, null);
 
         setResult(result);
-        setReference(references);
+        setReferences(references);
         setRoleTypes(roleTypes);
         setRoles(roles);
         setUses(uses);
@@ -131,8 +131,9 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
     /**
      * @param references the references to invalidate the cache
+     * @since 10.10
      */
-    void setReference(Set<EntityReference> references)
+    void setReferences(Set<EntityReference> references)
     {
         if (references != null) {
             this.references = Collections.unmodifiableSet(references);

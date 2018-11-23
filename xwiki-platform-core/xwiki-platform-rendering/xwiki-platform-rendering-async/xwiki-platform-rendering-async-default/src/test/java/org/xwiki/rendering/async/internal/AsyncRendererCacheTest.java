@@ -29,6 +29,11 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.internal.MapCache;
+import org.xwiki.component.descriptor.ComponentRole;
+import org.xwiki.component.descriptor.DefaultComponentRole;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -85,6 +90,16 @@ public class AsyncRendererCacheTest
         this.status.setRoleTypes(new HashSet<>(Arrays.asList(types)));
     }
 
+    private void setRoles(ComponentRole<?>... roles)
+    {
+        this.status.setRoles(new HashSet<>(Arrays.asList(roles)));
+    }
+
+    private void setReferences(EntityReference... references)
+    {
+        this.status.setReferences(new HashSet<>(Arrays.asList(references)));
+    }
+
     private List<String> getId()
     {
         return this.status.getRequest().getId();
@@ -93,21 +108,7 @@ public class AsyncRendererCacheTest
     // Tests
 
     @Test
-    public void invalidateOnComponent()
-    {
-        setRoleTypes(String.class);
-
-        this.asyncCache.put(this.status);
-
-        assertSame(this.status, this.asyncCache.get(getId()));
-
-        this.asyncCache.cleanCache(String.class, "hint");
-
-        assertNull(this.asyncCache.get(getId()));
-    }
-
-    @Test
-    public void noinvalidateOnDifferentComponent()
+    public void invalidateOnComponentType()
     {
         setRoleTypes(String.class);
 
@@ -118,5 +119,81 @@ public class AsyncRendererCacheTest
         this.asyncCache.cleanCache(Integer.class, "hint");
 
         assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache(String.class, "hint");
+
+        assertNull(this.asyncCache.get(getId()));
+    }
+
+    @Test
+    public void invalidateOnComponent()
+    {
+        setRoles(new DefaultComponentRole<>(String.class, "hint"));
+
+        this.asyncCache.put(this.status);
+
+        this.asyncCache.cleanCache(Integer.class, "hint");
+
+        assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache(String.class, "otherhint");
+
+        assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache(String.class, "hint");
+
+        assertNull(this.asyncCache.get(getId()));
+    }
+
+    @Test
+    public void invalidateOnSameReference()
+    {
+        setReferences(new ObjectReference("name", new DocumentReference("wiki", "Space", "Document")));
+
+        this.asyncCache.put(this.status);
+
+        this.asyncCache.cleanCache(new ObjectReference("other", new DocumentReference("wiki", "Space", "Document")));
+
+        assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache(new DocumentReference("wiki", "Space", "Document"));
+
+        assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache(new ObjectReference("name", new DocumentReference("wiki", "Space", "Document")));
+
+        assertNull(this.asyncCache.get(getId()));
+    }
+
+    @Test
+    public void invalidateOnChildReference()
+    {
+        setReferences(new DocumentReference("wiki", "Space", "Document"));
+
+        this.asyncCache.put(this.status);
+
+        assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache(new ObjectReference("name", new DocumentReference("wiki", "Space", "Document")));
+
+        assertNull(this.asyncCache.get(getId()));
+    }
+
+    @Test
+    public void invalidateOnWiki()
+    {
+        setReferences(new DocumentReference("wiki", "Space", "Document"));
+
+        this.asyncCache.put(this.status);
+
+        assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache("otherwiki");
+
+        assertSame(this.status, this.asyncCache.get(getId()));
+
+        this.asyncCache.cleanCache("wiki");
+
+        assertNull(this.asyncCache.get(getId()));
     }
 }

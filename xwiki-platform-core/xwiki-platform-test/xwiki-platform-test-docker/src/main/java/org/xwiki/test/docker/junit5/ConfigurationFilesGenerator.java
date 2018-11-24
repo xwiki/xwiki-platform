@@ -85,7 +85,7 @@ public class ConfigurationFilesGenerator
     public void generate(File configurationFileTargetDirectory, String version, ArtifactResolver resolver)
         throws Exception
     {
-        VelocityContext context = createVelocityContext(new Properties());
+        VelocityContext context = createVelocityContext();
         Artifact artifact = new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
             JAR, version);
         File configurationJARFile = resolver.resolveArtifact(artifact).getArtifact().getFile();
@@ -115,15 +115,12 @@ public class ConfigurationFilesGenerator
         }
     }
 
-    private VelocityContext createVelocityContext(Properties projectProperties)
+    private VelocityContext createVelocityContext()
     {
         Properties properties = new Properties();
 
         // Add default properties
         properties.putAll(getDefaultConfigurationProperties());
-        for (Object key : projectProperties.keySet()) {
-            properties.put(key.toString(), projectProperties.get(key).toString());
-        }
 
         // Add user-specified properties (with possible overrides for default properties)
         properties.putAll(this.testConfiguration.getProperties());

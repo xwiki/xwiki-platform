@@ -19,7 +19,7 @@
  */
 package org.xwiki.repository.test;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -31,8 +31,6 @@ import org.xwiki.test.ui.TestUtils;
  */
 public class SolrTestUtils
 {
-    public static final String PROPERTY_KEY = "solrutils";
-
     private static final String SOLRSERVICE_SPACE = "TestService";
 
     private static final String SOLRSERVICE_PAGE = "Solr";
@@ -70,8 +68,7 @@ public class SolrTestUtils
 
     public long getSolrQueueSize() throws Exception
     {
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("outputSyntax", "plain");
+        Map<String, String> parameters = Collections.singletonMap("outputSyntax", "plain");
 
         return Long
             .valueOf(this.testUtils.getString("/bin/get/" + SOLRSERVICE_SPACE + '/' + SOLRSERVICE_PAGE, parameters));

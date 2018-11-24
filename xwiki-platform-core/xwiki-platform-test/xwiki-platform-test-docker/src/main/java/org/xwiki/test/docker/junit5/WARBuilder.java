@@ -107,7 +107,7 @@ public class WARBuilder
 
         // Step: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
         LOGGER.info("Finding version ...");
-        String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
+        String xwikiVersion = this.mavenResolver.getPlatformVersion();
         LOGGER.info("Found version = [{}]", xwikiVersion);
 
         File webInfDirectory = new File(targetWARDirectory, "WEB-INF");

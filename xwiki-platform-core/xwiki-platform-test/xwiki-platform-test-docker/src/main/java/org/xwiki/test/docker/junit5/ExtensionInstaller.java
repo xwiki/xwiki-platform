@@ -109,7 +109,7 @@ public class ExtensionInstaller
         String installUserReference, List<String> namespaces) throws Exception
     {
         Set<Artifact> extensions = new LinkedHashSet<>();
-        String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
+        String xwikiVersion = this.mavenResolver.getPlatformVersion();
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones)
         Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion);

@@ -89,7 +89,7 @@ public class JettyStandaloneExecutor
         File jettyDirectory = new File(getJettyDirectory());
         if (!jettyDirectory.exists()) {
             // Step: Resolve the jetty resources
-            String xwikiVersion = this.mavenResolver.getModelFromCurrentPOM().getVersion();
+            String xwikiVersion = this.mavenResolver.getPlatformVersion();
             Artifact jettyArtifact =
                 new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-jetty-resources", "zip", xwikiVersion);
             File jettyArtifactFile = this.artifactResolver.resolveArtifact(jettyArtifact).getArtifact().getFile();

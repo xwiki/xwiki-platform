@@ -77,6 +77,19 @@ public class MavenResolver
     }
 
     /**
+     * @return the version of the XWiki platform artifacts to download/resolve
+     * @throws Exception if an error occurred during reading and parsing of the POM
+     */
+    public String getPlatformVersion() throws Exception
+    {
+        String platformVersion = getModelFromCurrentPOM().getProperties().getProperty("platform.version");
+        if (platformVersion == null) {
+            throw new Exception("Missing property <platform.version> in the current pom.xml");
+        }
+        return platformVersion;
+    }
+
+    /**
      * @param pomFile the location of the pom file to read
      * @return the Maven Model object for the {@code pom.xml} file passed in parameters
      * @throws Exception if an error occurred during reading and parsing of the POM

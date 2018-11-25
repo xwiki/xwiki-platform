@@ -27,23 +27,28 @@ import java.util.List;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.mail.test.po.MailStatusAdministrationSectionPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UI tests for the Mail application.
@@ -51,23 +56,42 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.4M2
  */
-public class MailTest extends AbstractTest
+@UITest(/*servletEngine = ServletEngine.TOMCAT,*/database = Database.MYSQL, verbose = true,
+    sshPorts = {
+        3025
+    },
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
+        // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
+        // the PR checker.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:MailIT\\..*"
+    },
+    extraJARs = {
+        "org.xwiki.platform:xwiki-platform-mail-send-storage"
+    }
+)
+public class MailIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     private GreenMail mail;
 
     private List<String> alreadyAssertedMessages = new ArrayList<>();
 
-    @Before
+    private String testClassName;
+
+    @BeforeEach
+    public void setUp(TestInfo info)
+    {
+        this.testClassName = info.getTestClass().get().getSimpleName();
+    }
+
+    @BeforeEach
     public void startMail()
     {
         this.mail = new GreenMail(ServerSetupTest.SMTP);
         this.mail.start();
     }
 
-    @After
+    @AfterEach
     public void stopMail()
     {
         if (this.mail != null) {
@@ -76,12 +100,16 @@ public class MailTest extends AbstractTest
     }
 
     @Test
-    public void testMail() throws Exception
+    public void verifyMail(TestUtils setup, XWikiWebDriver webDriver, TestConfiguration testConfiguration)
+        throws Exception
     {
+        // Log in as superadmin
+        setup.loginAsSuperAdmin();
+
         // Step 0: Delete all pre-existing mails to start clean. This also verifies the deleteAll() script service
         //         API.
         String content = "{{velocity}}$services.mailstorage.deleteAll(){{/velocity}}";
-        ViewPage deleteAllPage = getUtil().createPage(getTestClassName(), "DeleteAll", content, "");
+        ViewPage deleteAllPage = setup.createPage(this.testClassName, "DeleteAll", content, "");
         // Verify that the page doesn't display any content (unless there's an error!)
         assertEquals("", deleteAllPage.getContent());
 
@@ -89,9 +117,9 @@ public class MailTest extends AbstractTest
 
         AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
 
-        Assert.assertTrue(wikiAdministrationPage.hasSection("Mail", "Mail Sending"));
-        Assert.assertTrue(wikiAdministrationPage.hasSection("Mail", "Mail Sending Status"));
-        Assert.assertTrue(wikiAdministrationPage.hasSection("Mail", "Advanced"));
+        assertTrue(wikiAdministrationPage.hasSection("Mail", "Mail Sending"));
+        assertTrue(wikiAdministrationPage.hasSection("Mail", "Mail Sending Status"));
+        assertTrue(wikiAdministrationPage.hasSection("Mail", "Advanced"));
 
         // Verify we can click on Mail > Advanced
         wikiAdministrationPage.clickSection("Mail", "Advanced");
@@ -106,13 +134,13 @@ public class MailTest extends AbstractTest
         sendMailPage.clickSave();
 
         // Send the mail that's supposed to fail and validate that it fails
-        sendMailWithInvalidMailSetup();
+        sendMailWithInvalidMailSetup(setup);
 
         // Step 3: Navigate to each mail section and set the mail sending parameters (SMTP host/port)
         wikiAdministrationPage = AdministrationPage.gotoPage();
         wikiAdministrationPage.clickSection("Mail", "Mail Sending");
         sendMailPage = new SendMailAdministrationSectionPage();
-        sendMailPage.setHost("localhost");
+        sendMailPage.setHost(testConfiguration.getServletEngine().getHostIP());
         sendMailPage.setPort("3025");
         // Make sure we don't wait between email sending in order to speed up the test (and not incur timeouts when
         // we wait to receive the mails)
@@ -130,19 +158,20 @@ public class MailTest extends AbstractTest
         // current page was still the one before move to the XWiki space admin. Thus taking extra step to ensure we
         // wait. However I don't understand why this happens since getDriver().url() called by
         // gotoSpaceAdministrationPage() should wait for the page to be loaded before returning.
-        getDriver().waitUntilCondition(driver ->
+        webDriver.waitUntilCondition(driver ->
             spaceAdministrationPage.getMetaDataValue("reference").equals("xwiki:XWiki.WebPreferences"));
 
         // All those sections should not be present
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending Status"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Advanced"));
+        assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending"));
+        assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending Status"));
+        assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Advanced"));
 
         // Step 4: Prepare a Template Mail
-        getUtil().deletePage(getTestClassName(), "MailTemplate");
+        DocumentReference mailTemplateReference = new DocumentReference("xwiki", this.testClassName, "MailTemplate");
+        setup.rest().delete(mailTemplateReference);
 
         // Create a Wiki page containing a Mail Template (ie a XWiki.Mail object)
-        getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
+        setup.createPage(mailTemplateReference, "", "");
         // Note: We use the following bindings in the Template subject and content so that we ensure that they are
         // provided by default:
         // - "$xwiki"
@@ -156,23 +185,27 @@ public class MailTest extends AbstractTest
         String velocityContent = "Hello $name from $escapetool.xml($services.model.resolveDocument("
             + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString() - "
             + "url: $xwiki.getURL('Main.WebHome')";
-        getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
+        setup.addObject(this.testClassName, "MailTemplate", "XWiki.Mail",
             "subject", "#if ($xwiki.exists($doc.documentReference))Status for $name on $doc.fullName#{else}wrong#end",
             "language", "en",
             "html", "<strong>" + velocityContent + "</strong>",
             "text", velocityContent);
         // We also add an attachment to the Mail Template page to verify that it is sent in the mail
         ByteArrayInputStream bais = new ByteArrayInputStream("Content of attachment".getBytes());
-        getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
+        setup.attachFile(this.testClassName, "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
 
+        String xwikiURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
+            testConfiguration.getServletEngine().getInternalIP(),
+            testConfiguration.getServletEngine().getInternalPort());
+
         // Step 5: Send a template email (with an attachment) to a single email address
-        sendTemplateMailToEmail();
+        sendTemplateMailToEmail(setup, xwikiURLPrefix);
 
         // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users) + to
         // two other users (however since they're part of the group they'll receive only one mail each, we thus test
         // deduplicatio!).
-        sendTemplateMailToUsersAndGroup();
+        sendTemplateMailToUsersAndGroup(setup, xwikiURLPrefix);
 
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
@@ -195,10 +228,10 @@ public class MailTest extends AbstractTest
         assertTrue(liveTableElement.hasRow("Error", ""));
     }
 
-    private void sendMailWithInvalidMailSetup() throws Exception
+    private void sendMailWithInvalidMailSetup(TestUtils setup)
     {
         // Remove existing pages (for pages that we create below)
-        getUtil().deletePage(getTestClassName(), "SendInvalidMail");
+        setup.deletePage(this.testClassName, "SendInvalidMail");
 
         // Create a page with the Velocity script to send the template email.
         // Note that we don't set the type and thus this message should not appear in the LiveTable filter at the end
@@ -212,7 +245,7 @@ public class MailTest extends AbstractTest
             + "#end\n"
             + "{{/velocity}}";
         // This will create the page and execute its content and thus send the mail
-        ViewPage vp = getUtil().createPage(getTestClassName(), "SendInvalidMail", velocity, "");
+        ViewPage vp = setup.createPage(this.testClassName, "SendInvalidMail", velocity, "");
 
         // Verify that the page is not empty (and thus an error message is displayed). Note that it's difficult to
         // assert what is displayed because it could vary from system to system. This is why we only assert that
@@ -220,18 +253,18 @@ public class MailTest extends AbstractTest
         assertTrue(vp.getContent().matches("(?s)MSGID.*SUMMARY.*DESCRIPTION.*"));
     }
 
-    private void sendTemplateMailToEmail() throws Exception
+    private void sendTemplateMailToEmail(TestUtils setup, String xwikiURLPrefix) throws Exception
     {
         // Remove existing pages (for pages that we create below)
-        getUtil().deletePage(getTestClassName(), "SendMail");
+        setup.deletePage(this.testClassName, "SendMail");
 
         // Create another page with the Velocity script to send the template email
         // Note that we didn't need to bind the "$doc" velocity variable because the send is done synchronously and
         // thus the current XWiki Context is cloned before being passed to the template evaluation, and thus it
         // already contains the "$doc" binding!
         String velocity = "{{velocity}}\n"
-            + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
-            + "', 'MailTemplate'))\n"
+            + "#set ($templateReference = $services.model.createDocumentReference('', '" + this.testClassName
+                + "', 'MailTemplate'))\n"
             + "#set ($parameters = {'velocityVariables' : { 'name' : 'John' }, 'language' : 'en', "
                 + "'includeTemplateAttachments' : true})\n"
             + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
@@ -250,7 +283,7 @@ public class MailTest extends AbstractTest
             + "#end\n"
             + "{{/velocity}}";
         // This will create the page and execute its content and thus send the mail
-        ViewPage vp = getUtil().createPage(getTestClassName(), "SendMail", velocity, "");
+        ViewPage vp = setup.createPage(this.testClassName, "SendMail", velocity, "");
 
         // Verify that the page doesn't display any content (unless there's an error!)
         assertEquals("", vp.getContent());
@@ -259,11 +292,10 @@ public class MailTest extends AbstractTest
         this.mail.waitForIncomingEmail(30000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
         assertReceivedMessages(1,
-            "Subject: Status for John on " + getTestClassName() + ".SendMail",
-            "Hello John from superadmin - Served from http://localhost:8080/xwiki/bin/view/MailTest/SendMail",
-            "<strong>Hello John from superadmin - Served from "
-                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMail - "
-                + "url: http://localhost:8080/xwiki/bin/view/Main/</strong>",
+            "Subject: Status for John on " + this.testClassName + ".SendMail",
+            "Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMail",
+            "<strong>Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMail - "
+                + "url: " + xwikiURLPrefix + "/Main/</strong>",
             "X-MailType: Test",
             "Content-Type: text/plain; name=something.txt",
             "Content-ID: <something.txt>",
@@ -271,14 +303,14 @@ public class MailTest extends AbstractTest
             "Content of attachment");
     }
 
-    private void sendTemplateMailToUsersAndGroup() throws Exception
+    private void sendTemplateMailToUsersAndGroup(TestUtils setup, String xwikiURLPrefix) throws Exception
     {
         // Remove existing pages (for pages that we create below)
-        getUtil().deletePage(getTestClassName(), "SendMailGroupAndUsers");
+        setup.deletePage(this.testClassName, "SendMailGroupAndUsers");
 
         // Create 2 users
-        getUtil().createUser("user1", "password1", getUtil().getURLToNonExistentPage(), "email", "user1@doe.com");
-        getUtil().createUser("user2", "password2", getUtil().getURLToNonExistentPage(), "email", "user2@doe.com");
+        setup.createUser("user1", "password1", setup.getURLToNonExistentPage(), "email", "user1@doe.com");
+        setup.createUser("user2", "password2", setup.getURLToNonExistentPage(), "email", "user2@doe.com");
 
         // Create another page with the Velocity script to send the template email
         // Note: the $xcontext and $request bindings are present and have their values at the moment the call to send
@@ -287,10 +319,10 @@ public class MailTest extends AbstractTest
             + "#set ($templateParameters = "
             + "  {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
             + "  'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
-            + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
-            + "', 'MailTemplate'))\n"
+            + "#set ($templateReference = $services.model.createDocumentReference('', '" + this.testClassName
+                + "', 'MailTemplate'))\n"
             + "#set ($parameters = {'hint' : 'template', 'source' : $templateReference, "
-            + "'parameters' : $templateParameters, 'type' : 'Test'})\n"
+                + "'parameters' : $templateParameters, 'type' : 'Test'})\n"
             + "#set ($groupReference = $services.model.createDocumentReference('', 'XWiki', 'XWikiAllGroup'))\n"
             + "#set ($user1Reference = $services.model.createDocumentReference('', 'XWiki', 'user1'))\n"
             + "#set ($user2Reference = $services.model.createDocumentReference('', 'XWiki', 'user2'))\n"
@@ -308,7 +340,7 @@ public class MailTest extends AbstractTest
             + "#end\n"
             + "{{/velocity}}";
         // This will create the page and execute its content and thus send the mail
-        ViewPage vp = getUtil().createPage(getTestClassName(), "SendMailGroupAndUsers", velocity, "");
+        ViewPage vp = setup.createPage(testClassName, "SendMailGroupAndUsers", velocity, "");
 
         // Verify that the page doesn't display any content (unless there's an error!)
         assertEquals("", vp.getContent());
@@ -317,14 +349,12 @@ public class MailTest extends AbstractTest
         this.mail.waitForIncomingEmail(30000L, 3);
         assertEquals(3, this.mail.getReceivedMessages().length);
         assertReceivedMessages(2,
-            "Subject: Status for John on " + getTestClassName() + ".SendMailGroupAndUsers",
-            "Hello John from superadmin - Served from "
-                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMailGroupAndUsers - "
-                + "url: http://localhost:8080/xwiki/bin/view/Main/");
+            "Subject: Status for John on " + this.testClassName + ".SendMailGroupAndUsers",
+            "Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMailGroupAndUsers - "
+                + "url: " + xwikiURLPrefix + "/Main/");
     }
 
-    private void assertReceivedMessages(int expectedMatchingCount, String... expectedLines)
-        throws Exception
+    private void assertReceivedMessages(int expectedMatchingCount, String... expectedLines) throws Exception
     {
         StringBuilder builder = new StringBuilder();
         int count = 0;
@@ -353,8 +383,9 @@ public class MailTest extends AbstractTest
         for (int i = 0; i < expectedLines.length; i++) {
             expected.append("- '" + expectedLines[i] + "'").append('\n');
         }
-        assertEquals(String.format("We got [%s] mails matching the expected content instead of [%s]. We were expecting "
-            + "the following content:\n%s\nWe got the following:\n%s", count, expectedMatchingCount,
-            expected.toString(), builder.toString()), expectedMatchingCount, count);
+        assertEquals(expectedMatchingCount, count,
+            String.format("We got [%s] mails matching the expected content instead of [%s]. We were expecting "
+                + "the following content:\n%s\nWe got the following:\n%s", count, expectedMatchingCount,
+            expected.toString(), builder.toString()));
     }
 }

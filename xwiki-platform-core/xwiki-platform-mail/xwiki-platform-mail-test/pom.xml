@@ -40,6 +40,13 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-mail-test-pageobjects</module>
-    <module>xwiki-platform-mail-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-mail-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

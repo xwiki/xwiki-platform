@@ -27,32 +27,33 @@
     <artifactId>xwiki-platform-mail-test</artifactId>
     <version>10.11-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-mail-test-tests</artifactId>
+  <artifactId>xwiki-platform-mail-test-docker</artifactId>
   <name>XWiki Platform - Mail - Tests - Functional Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
-  <description>XWiki Platform - Mail - Functional Tests</description>
+  <description>XWiki Platform - Mail - Tests - Functional Tests in Docker</description>
   <properties>
-    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
-         the PR checker -->
-    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:MailTest\..*</xwikiPropertiesAdditionalProperties>
+    <selenium.version>3.14.0</selenium.version>
   </properties>
   <dependencies>
+    <!-- ================================
+         Dependencies for tested features
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Test dependencies -->
+    <!-- ================================
+         Test only dependencies
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -91,35 +92,51 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+      <exclusions>
+        <!-- XWiki uses a more recent version of bytebuddy -->
+        <exclusion>
+          <groupId>net.bytebuddy</groupId>
+          <artifactId>byte-buddy</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
+      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
+      here. Note that the version needs to be checked when we change the version of selenium-server -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>25.0-jre</version>
+      <exclusions>
+        <!-- Use the version from TestContainers which is newer -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
-           https://jira.xwiki.org/browse/XWIKI-7683 -->
       <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <dependencies>
-          <!-- TODO: remove the need for this dependency in the future. The reason we need it right now is because
-               the Packager Mojo will use the Import Mojo to import XARs but since we've defined the
-               xwikiDbHbmCommonExtraMappings property up there, it's using it and thus we need the mapping file to be
-               in the classpath. -->
-          <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-mail-send-storage</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*IT.java</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

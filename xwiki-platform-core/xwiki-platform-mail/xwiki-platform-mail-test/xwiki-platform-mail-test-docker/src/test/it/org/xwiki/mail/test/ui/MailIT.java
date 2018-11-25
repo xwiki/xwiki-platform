@@ -56,8 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 6.4M2
  */
-@UITest(/*servletEngine = ServletEngine.TOMCAT,*/database = Database.MYSQL, verbose = true,
-    sshPorts = {
+@UITest(sshPorts = {
         3025
     },
     properties = {

@@ -20,6 +20,7 @@
 package org.xwiki.test.docker.junit5;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -112,7 +113,8 @@ public class ExtensionInstaller
         String xwikiVersion = this.mavenResolver.getPlatformVersion();
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones)
-        Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion);
+        Collection<ArtifactResult> artifactResults =
+            this.artifactResolver.getDistributionDependencies(xwikiVersion, Collections.emptyList());
         for (ArtifactResult artifactResult : artifactResults) {
             Artifact artifact = artifactResult.getArtifact();
             if (artifact.getExtension().equalsIgnoreCase(XAR)) {

@@ -173,11 +173,13 @@ public class ArtifactResolver
 
     /**
      * @param xwikiVersion the version of the artifacts to resolve
+     * @param extraArtifacts the list of extra artifacts that should be added to {@code WEB-INF/lib}. Can be empty
      * @return the collection of resolved artifact results for the minimal XWiki distribution/flavor to be used for
      * functional tests
      * @throws Exception if an error occurred during resolving
      */
-    public Collection<ArtifactResult> getDistributionDependencies(String xwikiVersion) throws Exception
+    public Collection<ArtifactResult> getDistributionDependencies(String xwikiVersion, List<Artifact> extraArtifacts)
+        throws Exception
     {
         Artifact rootDistributionArtifact = new DefaultArtifact(PLATFORM_GROUPID,
             "xwiki-platform-distribution-war-minimaldependencies", "pom", xwikiVersion);
@@ -212,6 +214,9 @@ public class ArtifactResolver
         Artifact skinArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-flamingo-skin-resources",
             "zip", xwikiVersion);
         dependentArtifacts.add(skinArtifact);
+
+        // Add specified extra artifacts
+        dependentArtifacts.addAll(extraArtifacts);
 
         return getArtifactDependencies(rootDistributionArtifact, dependentArtifacts);
     }

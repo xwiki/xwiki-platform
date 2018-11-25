@@ -19,7 +19,11 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -34,6 +38,8 @@ import org.xwiki.text.StringUtils;
  */
 public class TestConfiguration
 {
+    private static final Pattern ARTIFACT_COORD_PATTERN = Pattern.compile("([^: ]+):([^: ]+)");
+
     private static final String DEFAULT = "default";
 
     private static final String TRUE = "true";
@@ -86,6 +92,8 @@ public class TestConfiguration
 
     private Properties properties;
 
+    private List<List<String>> extraJARs;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -103,6 +111,7 @@ public class TestConfiguration
         resolveJDBCDriverVersion();
         resolveVNC();
         resolveProperties();
+        resolveExtraJARs();
     }
 
     private void resolveBrowser()
@@ -216,6 +225,22 @@ public class TestConfiguration
         this.properties = newProperties;
     }
 
+    private void resolveExtraJARs()
+    {
+        List<List<String>> newExtraJARs = new ArrayList<>();
+        for (String coordinate : this.uiTestAnnotation.extraJARs()) {
+            Matcher matcher = ARTIFACT_COORD_PATTERN.matcher(coordinate);
+            if (!matcher.matches()) {
+                throw new IllegalArgumentException(String.format("Bad artifact coordinates [%s]", coordinate));
+            }
+            List<String> jarCoordinates = new ArrayList<>();
+            jarCoordinates.add(matcher.group(1));
+            jarCoordinates.add(matcher.group(2));
+            newExtraJARs.add(jarCoordinates);
+        }
+        this.extraJARs = newExtraJARs;
+    }
+
     /**
      * @return the browser to use
      */
@@ -314,6 +339,15 @@ public class TestConfiguration
     public Properties getProperties()
     {
         return this.properties;
+    }
+
+    /**
+     * @return the list of extra JARs to add to the {@code WEB-INF/lib} directory, specified as a List of Strings in
+     *         the following order: group id, artifact id.
+     */
+    public List<List<String>> getExtraJARs()
+    {
+        return this.extraJARs;
     }
 
     /**

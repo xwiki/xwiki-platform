@@ -64,7 +64,7 @@ public class WARBuilder
      *
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param reuse if true then reuse an already generated configuration and only regenerate parts that can be
-     *        different such as the Hibernate configuration since it contains IPs
+     * different such as the Hibernate configuration since it contains IPs
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
@@ -116,8 +116,8 @@ public class WARBuilder
 
             // Step: Gather all the required JARs for the minimal WAR
             LOGGER.info("Resolving distribution dependencies ...");
-            Collection<ArtifactResult> artifactResults =
-                this.artifactResolver.getDistributionDependencies(xwikiVersion);
+            Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion,
+                computeExtraArtifacts(testConfiguration));
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
@@ -161,6 +161,20 @@ public class WARBuilder
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
+    }
+
+    private List<Artifact> computeExtraArtifacts(TestConfiguration testConfiguration) throws Exception
+    {
+        List<Artifact> artifacts = new ArrayList<>();
+        if (!testConfiguration.getExtraJARs().isEmpty()) {
+            for (List<String> jarData : testConfiguration.getExtraJARs()) {
+                LOGGER.info("Adding extra JAR to WEB-INF/lib: [%s:%s]", jarData.get(0), jarData.get(1));
+                Artifact artifact = new DefaultArtifact(jarData.get(0), jarData.get(1), JAR,
+                    this.mavenResolver.getPlatformVersion());
+                artifacts.add(artifact);
+            }
+        }
+        return artifacts;
     }
 
     private void copyWebappResources(TestConfiguration testConfiguration, List<File> warDependencies,

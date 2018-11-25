@@ -114,4 +114,12 @@ public @interface UITest
      * @since 10.10RC1
      */
     String[] properties() default {};
+
+    /**
+     * @return the optional list of JARs (specified as artifact coordinates {@code groupId:artifactId}) that should be
+     *         added to {@code WEB-INF/lib}. For example this is useful for artifacts containing Hibernate mapping files
+     *         since those cannot currently be loaded as extensions.
+     * @since 10.11RC1
+     */
+    String[] extraJARs() default {};
 }

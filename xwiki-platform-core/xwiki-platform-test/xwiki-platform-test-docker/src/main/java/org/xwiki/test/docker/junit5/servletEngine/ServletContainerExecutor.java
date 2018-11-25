@@ -69,10 +69,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     /**
      * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
      * @param sourceWARDirectory the location where the built WAR is located
-     * @return the URL to the xwiki webapp context
      * @throws Exception if an error occurred during the build or start
      */
-    public String start(TestConfiguration testConfiguration, File sourceWARDirectory) throws Exception
+    public void start(TestConfiguration testConfiguration, File sourceWARDirectory) throws Exception
     {
         GenericContainer servletContainer = null;
         String xwikiIPAddress = "localhost";
@@ -133,8 +132,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             // start listening.
             servletContainer
                 .withNetwork(Network.SHARED)
-                .withNetworkAliases("xwikiweb")
-                .withExposedPorts(8080)
+                .withNetworkAliases(testConfiguration.getServletEngine().getInternalIP())
+                .withExposedPorts(testConfiguration.getServletEngine().getInternalPort())
                 .waitingFor(
                     Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                         .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
@@ -147,12 +146,11 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             start(servletContainer, testConfiguration);
 
             xwikiIPAddress = servletContainer.getContainerIpAddress();
-            xwikiPort = servletContainer.getMappedPort(8080);
+            xwikiPort = servletContainer.getMappedPort(testConfiguration.getServletEngine().getInternalPort());
         }
 
-        // URL to access XWiki from the host.
-        String xwikiURL = String.format("http://%s:%s/xwiki", xwikiIPAddress, xwikiPort);
-        return xwikiURL;
+        testConfiguration.getServletEngine().setIP(xwikiIPAddress);
+        testConfiguration.getServletEngine().setPort(xwikiPort);
     }
 
     /**

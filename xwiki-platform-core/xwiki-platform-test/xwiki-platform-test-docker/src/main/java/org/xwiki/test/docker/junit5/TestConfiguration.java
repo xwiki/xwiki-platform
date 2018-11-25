@@ -94,6 +94,8 @@ public class TestConfiguration
 
     private List<List<String>> extraJARs;
 
+    private List<Integer> sshPorts;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -112,6 +114,7 @@ public class TestConfiguration
         resolveVNC();
         resolveProperties();
         resolveExtraJARs();
+        resolveSSHPorts();
     }
 
     private void resolveBrowser()
@@ -241,6 +244,16 @@ public class TestConfiguration
         this.extraJARs = newExtraJARs;
     }
 
+    private void resolveSSHPorts()
+    {
+        List<Integer> newSSHPorts = new ArrayList<>();
+        newSSHPorts.add(8080);
+        for (int sshPort : this.uiTestAnnotation.sshPorts()) {
+            newSSHPorts.add(sshPort);
+        }
+        this.sshPorts = newSSHPorts;
+    }
+
     /**
      * @return the browser to use
      */
@@ -344,10 +357,23 @@ public class TestConfiguration
     /**
      * @return the list of extra JARs to add to the {@code WEB-INF/lib} directory, specified as a List of Strings in
      *         the following order: group id, artifact id.
+     * @since 10.11RC1
      */
     public List<List<String>> getExtraJARs()
     {
         return this.extraJARs;
+    }
+
+    /**
+     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the
+     *         host (i.e. when using the {@code host.testcontainers.internal} host name). This is in addition to port
+     *         {@code 8080} which is always added. For example if you need XWiki to send a mail to a SMTP server
+     *         running on port 3025 on the host, you should add port 3025 to the list.
+     * @since 10.11RC1
+     */
+    public List<Integer> getSSHPorts()
+    {
+        return this.sshPorts;
     }
 
     /**

@@ -186,7 +186,7 @@ public class ConfigurationFilesGenerator
         Properties props = new Properties();
 
         // Default configuration data for hibernate.cfg.xml
-        String ipAddress = this.testConfiguration.getDatabase().getIpAddress();
+        String ipAddress = this.testConfiguration.getDatabase().getIP();
         int port = this.testConfiguration.getDatabase().getPort();
         if (this.testConfiguration.getDatabase().equals(Database.MYSQL)) {
             props.putAll(getDBProperties(Arrays.asList(

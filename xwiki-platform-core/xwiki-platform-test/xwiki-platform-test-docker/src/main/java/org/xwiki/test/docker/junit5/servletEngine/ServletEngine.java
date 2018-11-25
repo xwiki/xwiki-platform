@@ -60,7 +60,13 @@ public enum ServletEngine
      */
     EXTERNAL(true);
 
+    private static final String LOCALHOST = "localhost";
+
     private boolean isOutsideDocker;
+
+    private String ip;
+
+    private int port;
 
     ServletEngine()
     {
@@ -78,5 +84,71 @@ public enum ServletEngine
     public boolean isOutsideDocker()
     {
         return this.isOutsideDocker;
+    }
+
+    /**
+     * @param ip see {@link #getIP()}
+     * @since 10.11RC1
+     */
+    public void setIP(String ip)
+    {
+        this.ip = ip;
+    }
+
+    /**
+     * @return the IP address to use to connect to the Servlet Engine from the host
+     *         (it is different if it runs locally or in a Docker container).
+     * @since 10.11RC1
+     */
+    public String getIP()
+    {
+        return this.ip;
+    }
+
+    /**
+     * @param port see {@link #getPort()}
+     * @since 10.11RC1
+     */
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
+
+    /**
+     * @return the port to use to connect to the Servlet Engine from the host
+     *         (it is different if it runs locally or in a Docker container)
+     * @since 10.11RC1
+     */
+    public int getPort()
+    {
+        return this.port;
+    }
+
+    /**
+     * @return the IP to the host from inside XWiki
+     * @since 10.11RC1
+     */
+    public String getHostIP()
+    {
+        return isOutsideDocker() ? LOCALHOST : "host.testcontainers.internal";
+    }
+
+    /**
+     * @return the IP of the container from inside itself (it is different if it runs locally or in a Docker container)
+     * @since 10.11RC1
+     */
+    public String getInternalIP()
+    {
+        return isOutsideDocker ? LOCALHOST : "xwikiweb";
+    }
+
+    /**
+     * @return the port of the container from inside itself (it is different if it runs locally or in a Docker
+     *         container)
+     * @since 10.11RC1
+     */
+    public int getInternalPort()
+    {
+        return 8080;
     }
 }

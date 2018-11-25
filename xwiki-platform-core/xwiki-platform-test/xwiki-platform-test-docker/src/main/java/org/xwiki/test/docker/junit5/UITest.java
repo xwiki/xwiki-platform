@@ -122,4 +122,13 @@ public @interface UITest
      * @since 10.11RC1
      */
     String[] extraJARs() default {};
+
+    /**
+     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the
+     *         host (i.e. when using the {@code host.testcontainers.internal} host name). This is in addition to port
+     *         {@code 8080} which is always added. For example if you need XWiki to send a mail to a SMTP server
+     *         running on port 3025 on the host, you should add port 3025 to the list.
+     * @since 10.11RC1
+     */
+    int[] sshPorts() default {};
 }

@@ -64,7 +64,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
                 // We don't need a Docker image/container since HSQLDB can work in embedded mode.
                 // It's configured automatically in the custom XWiki WAR.
                 // Thus, nothing to do here!
-                testConfiguration.getDatabase().setIpAddress("localhost");
+                testConfiguration.getDatabase().setIP("localhost");
                 break;
             default:
                 throw new RuntimeException(String.format("Database [%s] is not yet supported!",
@@ -182,10 +182,10 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         start(databaseContainer, testConfiguration);
 
         if (testConfiguration.getServletEngine().isOutsideDocker()) {
-            testConfiguration.getDatabase().setIpAddress(databaseContainer.getContainerIpAddress());
+            testConfiguration.getDatabase().setIP(databaseContainer.getContainerIpAddress());
             testConfiguration.getDatabase().setPort(databaseContainer.getMappedPort(port));
         } else {
-            testConfiguration.getDatabase().setIpAddress((String) databaseContainer.getNetworkAliases().get(0));
+            testConfiguration.getDatabase().setIP((String) databaseContainer.getNetworkAliases().get(0));
             testConfiguration.getDatabase().setPort(port);
         }
     }

@@ -43,6 +43,8 @@ import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 
+import com.google.common.primitives.Ints;
+
 /**
  * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that peforms the
  * following tasks.
@@ -89,6 +91,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
         // Save the test configuration so that we can access it in afterAll()
         saveTestConfiguration(extensionContext, testConfiguration);
+
+        // Expose ports for SSH port forwarding so that containers can communicate with the host using the
+        // "host.testcontainers.internal" host name.
+        Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
 
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration);
@@ -194,7 +200,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
     {
         Class<?> type = parameterContext.getParameter().getType();
-        return XWikiWebDriver.class.isAssignableFrom(type) || TestUtils.class.isAssignableFrom(type);
+        return XWikiWebDriver.class.isAssignableFrom(type) || TestUtils.class.isAssignableFrom(type)
+            || TestConfiguration.class.isAssignableFrom(type);
     }
 
     @Override
@@ -203,6 +210,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         Class<?> type = parameterContext.getParameter().getType();
         if (XWikiWebDriver.class.isAssignableFrom(type)) {
             return loadXWikiWebDriver(extensionContext);
+        } else if (TestConfiguration.class.isAssignableFrom(type)) {
+            return loadTestConfiguration(extensionContext);
         } else {
             return loadPersistentTestContext(extensionContext).getUtil();
         }
@@ -232,12 +241,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         ExtensionContext extensionContext)
     {
         LOGGER.info("(*) Starting browser [{}]...", testConfiguration.getBrowser());
-
-        // If XWiki is not running inside a Docker container, then it's not sharing a shared network and we need
-        // to expose its port so that the container running Selenium can do ssh port forwarding to the host.
-        if (testConfiguration.getServletEngine().isOutsideDocker()) {
-            Testcontainers.exposeHostPorts(8080);
-        }
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
@@ -277,7 +280,9 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (testConfiguration.getServletEngine().isOutsideDocker()) {
             testContext.getUtil().setURLPrefix("http://host.testcontainers.internal:8080/xwiki");
         } else {
-            testContext.getUtil().setURLPrefix("http://xwikiweb:8080/xwiki");
+            testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
+                testConfiguration.getServletEngine().getInternalIP(),
+                testConfiguration.getServletEngine().getInternalPort()));
         }
 
         // - the one used by RestTestUtils, i.e. outside of any container
@@ -313,9 +318,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         ServletContainerExecutor executor =
             new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver, repositoryResolver);
         saveServletContainerExecutor(extensionContext, executor);
-        String xwikiURL = executor.start(testConfiguration, sourceWARDirectory);
+        executor.start(testConfiguration, sourceWARDirectory);
 
+        // URL to access XWiki from the host.
+        String xwikiURL = computeXWikiURLPrefix(testConfiguration.getServletEngine().getIP(),
+            testConfiguration.getServletEngine().getPort());
         saveXWikiURL(extensionContext, xwikiURL);
+
         if (testConfiguration.isVerbose()) {
             LOGGER.info("XWiki ping URL = " + xwikiURL);
         }
@@ -335,5 +344,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         String xwikiRESTURL = String.format("%s/rest", loadXWikiURL(context));
         ExtensionInstaller extensionInstaller = new ExtensionInstaller(artifactResolver, mavenResolver);
         extensionInstaller.installExtensions(xwikiRESTURL, SUPERADMIN, "pass", SUPERADMIN);
+    }
+
+    private String computeXWikiURLPrefix(String ip, int port)
+    {
+        return String.format("http://%s:%s/xwiki", ip, port);
     }
 }

@@ -60,25 +60,25 @@ public enum Database
      */
     ORACLE;
 
-    private String ipAddress;
+    private String ip;
 
     private int port;
 
     /**
-     * @param ipAddress see {@link #getIpAddress()}
+     * @param ip see {@link #getIP()}
      */
-    public void setIpAddress(String ipAddress)
+    public void setIP(String ip)
     {
-        this.ipAddress = ipAddress;
+        this.ip = ip;
     }
 
     /**
      * @return the IP address to use to connect to the database (it can be different if the DB runs locally or in a
      *         Docker container)
      */
-    public String getIpAddress()
+    public String getIP()
     {
-        return this.ipAddress;
+        return this.ip;
     }
 
     /**

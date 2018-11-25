@@ -168,7 +168,7 @@ public class WARBuilder
         List<Artifact> artifacts = new ArrayList<>();
         if (!testConfiguration.getExtraJARs().isEmpty()) {
             for (List<String> jarData : testConfiguration.getExtraJARs()) {
-                LOGGER.info("Adding extra JAR to WEB-INF/lib: [%s:%s]", jarData.get(0), jarData.get(1));
+                LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}:{}]", jarData.get(0), jarData.get(1));
                 Artifact artifact = new DefaultArtifact(jarData.get(0), jarData.get(1), JAR,
                     this.mavenResolver.getPlatformVersion());
                 artifacts.add(artifact);

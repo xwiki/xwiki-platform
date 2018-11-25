@@ -62,6 +62,8 @@ public enum ServletEngine
 
     private static final String LOCALHOST = "localhost";
 
+    private static final String HOST_INTERNAL = "host.testcontainers.internal";
+
     private boolean isOutsideDocker;
 
     private String ip;
@@ -96,7 +98,7 @@ public enum ServletEngine
     }
 
     /**
-     * @return the IP address to use to connect to the Servlet Engine from the host
+     * @return the IP address to use to connect to the Servlet Engine from the outside
      *         (it is different if it runs locally or in a Docker container).
      * @since 10.11RC1
      */
@@ -115,7 +117,7 @@ public enum ServletEngine
     }
 
     /**
-     * @return the port to use to connect to the Servlet Engine from the host
+     * @return the port to use to connect to the Servlet Engine from the outside
      *         (it is different if it runs locally or in a Docker container)
      * @since 10.11RC1
      */
@@ -125,12 +127,12 @@ public enum ServletEngine
     }
 
     /**
-     * @return the IP to the host from inside XWiki
+     * @return the IP to the host from inside the Servlet Engine
      * @since 10.11RC1
      */
     public String getHostIP()
     {
-        return isOutsideDocker() ? LOCALHOST : "host.testcontainers.internal";
+        return isOutsideDocker() ? LOCALHOST : HOST_INTERNAL;
     }
 
     /**
@@ -139,7 +141,7 @@ public enum ServletEngine
      */
     public String getInternalIP()
     {
-        return isOutsideDocker ? LOCALHOST : "xwikiweb";
+        return isOutsideDocker ? HOST_INTERNAL : "xwikiweb";
     }
 
     /**

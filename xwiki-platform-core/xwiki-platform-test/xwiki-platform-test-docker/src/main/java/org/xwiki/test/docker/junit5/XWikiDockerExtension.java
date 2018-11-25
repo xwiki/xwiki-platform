@@ -276,14 +276,9 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
         // Set the URLs to access XWiki:
         // - the one used inside the Selenium container
-
-        if (testConfiguration.getServletEngine().isOutsideDocker()) {
-            testContext.getUtil().setURLPrefix("http://host.testcontainers.internal:8080/xwiki");
-        } else {
-            testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
-                testConfiguration.getServletEngine().getInternalIP(),
-                testConfiguration.getServletEngine().getInternalPort()));
-        }
+        testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
+            testConfiguration.getServletEngine().getInternalIP(),
+            testConfiguration.getServletEngine().getInternalPort()));
 
         // - the one used by RestTestUtils, i.e. outside of any container
         testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));

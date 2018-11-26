@@ -37,6 +37,7 @@
 
     <!-- The point of those test is to install the flavor so we don't need the pre packaged one -->
     <xwikiExecutionArtifactId>xwiki-platform-distribution-jetty-hsqldb</xwikiExecutionArtifactId>
+    <xwikiExecutionXIPArtifactId>xwiki-platform-distribution-flavor-xip</xwikiExecutionXIPArtifactId>
 
     <!-- The extension containing previous version data -->
     <upgradetest.previousflavor.name>${xwiki.extension.distribution.ui.name}</upgradetest.previousflavor.name>
@@ -49,6 +50,12 @@
     <upgradetest.previousdata.version>${upgradetest.previousflavor.version}</upgradetest.previousdata.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-upgrade</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Make sure the flavor is available when the test try to download it -->
     <dependency>
       <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
@@ -57,10 +64,12 @@
       <type>xar</type>
       <scope>test</scope>
     </dependency>
+    <!-- Pull the XIP package which will trigger all optional dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-upgrade</artifactId>
+      <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
+      <artifactId>${xwikiExecutionXIPArtifactId}</artifactId>
       <version>${project.version}</version>
+      <type>xip</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

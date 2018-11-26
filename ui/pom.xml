@@ -33,6 +33,11 @@
   <name>CKEditor Integration UI</name>
   <packaging>xar</packaging>
   <description>Adds support for editing wiki pages using CKEditor.</description>
+  <scm>
+    <!-- Point to the root of the sources since this artifact is the one loaded on extensions.xwiki.org and we want 
+         that the sources button there points to the full sources for CKEditor -->
+    <url>https://github.com/xwiki-contrib/application-ckeditor/tree/master</url>
+  </scm>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor Integration</xwiki.extension.name>

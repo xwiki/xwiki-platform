@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>application-ckeditor-pom</artifactId>
-    <version>1.28-SNAPSHOT</version>
+    <version>1.28</version>
   </parent>
   <artifactId>application-ckeditor-ui</artifactId>
   <name>CKEditor Integration UI</name>
@@ -37,6 +37,7 @@
     <!-- Point to the root of the sources since this artifact is the one loaded on extensions.xwiki.org and we want 
          that the sources button there points to the full sources for CKEditor -->
     <url>https://github.com/xwiki-contrib/application-ckeditor/tree/master</url>
+    <tag>application-ckeditor-1.28</tag>
   </scm>
   <properties>
     <!-- Name to display by the Extension Manager -->

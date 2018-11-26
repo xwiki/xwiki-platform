@@ -36,7 +36,7 @@ public interface ContextualLocalizationManager
      * Find a translation in the current language.
      * 
      * @param key the key identifying the message to look for
-     * @return the translation in the current language
+     * @return the translation in the current language, null if no translation could be found
      * @see LocalizationManager#getTranslation(String, java.util.Locale)
      * @see LocalizationContext#getCurrentLocale()
      */
@@ -47,8 +47,8 @@ public interface ContextualLocalizationManager
      * 
      * @param key the key identifying the message to look for
      * @param parameters the parameters
-     * @return the translation in the current language rendered as plain text
+     * @return the translation in the current language rendered as plain text, null if no translation could be found
      * @see #getTranslation(String)
      */
-    String getTranslationPlain(String key, Object...parameters);
+    String getTranslationPlain(String key, Object... parameters);
 }

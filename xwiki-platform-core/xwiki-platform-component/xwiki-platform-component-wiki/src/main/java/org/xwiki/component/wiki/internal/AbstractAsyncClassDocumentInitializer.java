@@ -24,10 +24,10 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.concurrent.ContextStoreManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
@@ -43,6 +43,9 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
 {
     @Inject
     private ContextStoreManager contextStore;
+
+    @Inject
+    private ContextualLocalizationManager localization;
 
     @Inject
     private Logger logger;
@@ -64,7 +67,7 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
         xclass.addBooleanField(AbstractAsyncBaseObjectWikiComponent.XPROPERTY_ASYNC_CACHED, "Cached", null,
             Boolean.FALSE);
 
-        // TODO: replace this with a custom displayer to be less static
+        // TODO: move all that in a custom displayer to be less static
         Collection<String> contextEntries;
         try {
             contextEntries = this.contextStore.getSupportedEntries();
@@ -73,7 +76,20 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
 
             contextEntries = Collections.emptyList();
         }
+        StringBuilder entriesString = new StringBuilder();
+        for (String entry : contextEntries) {
+            if (entriesString.length() > 0) {
+                entriesString.append('|');
+            }
+            entriesString.append(entry);
+
+            String translation = this.localization.getTranslationPlain("rendering.async.context.entry." + entry);
+            if (translation != null) {
+                entriesString.append('=');
+                entriesString.append(translation);
+            }
+        }
         xclass.addStaticListField(AbstractAsyncBaseObjectWikiComponent.XPROPERTY_ASYNC_CONTEXT, "Context elements", 5,
-            true, StringUtils.join(contextEntries, '|'));
+            true, entriesString.toString());
     }
 }

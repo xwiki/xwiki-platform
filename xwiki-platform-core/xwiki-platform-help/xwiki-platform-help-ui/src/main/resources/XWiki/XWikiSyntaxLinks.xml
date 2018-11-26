@@ -188,11 +188,15 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 * **##resource##**: A required string with the link reference in one of the following forms
 ** **URL**: Any URL in the form of **##[url:] (protocol:~/~/path)##**. Examples: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
 *** **##url:##** An optional string identifying the resource as an URL.
-** **Wiki page** reference in the form **##(doc: ) ~[~[wikiName:] spaceNameList.] (pageName)##**. Examples: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##
+** **Wiki page** {{info}}Since 10.6{{/info}} reference in the form ##(page: ) [wikiName:] (pageNameList)##**. Examples: ##page:Page##, ##page:myxwiki:Page##, ##page:ParentPage.ChildPage.SubChildPage##, ##page:../SiblingPage##, ##page:./ChildPage##
+*** **##page:##** A required string identifying the resource as an XWiki page. The same reference can be use for either a terminal or non-terminal page, both both exist it will lead to the non-terminal page.
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##
+*** **##pageNameList##**: A required list of slash-separated wiki Pages names pointing to the final linked wiki Page syntax. It's also possible to us ##.## and ##..## to indicate current or parent page/wiki. Examples: ##Main##, ##A/B##, ##A/B/C##, ##../Sibling##, ##./Child##
+** **Wiki document** reference in the form **##(doc: ) ~[~[wikiName:] spaceNameList.] (documentName)##**. Examples: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##
 *** **##doc:##** A required string identifying the resource as an XWiki terminal page. A non-terminal page can also be referenced this way, but it must append its ##.WebHome## part (e.g. ##doc:Sandbox.WebHome##).
 *** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
 *** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
-*** **##pageName##**: A required string containing the name of the linked wiki page. Example: ##Welcome##
+*** **##documentName##**: A required string containing the name of the linked wiki page. Example: ##Welcome##
 ** **Wiki space** {{info}}Since 7.4.1{{/info}} reference in the form **##(space: ) [wikiName:] (spaceNameList)##**. Examples: ##space:Main##, ##space:mywiki:Main##, ##space:A.B.C##
 *** **##space:##** A required string identifying the resource as an XWiki non-terminal page (i.e. a space).
 *** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##

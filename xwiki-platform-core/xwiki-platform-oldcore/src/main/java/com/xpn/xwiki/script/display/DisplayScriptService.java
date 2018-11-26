@@ -258,6 +258,7 @@ public class DisplayScriptService implements ScriptService
      * @param <S> the type of the {@link ScriptService}
      * @param serviceName the name of the sub {@link ScriptService}
      * @return the {@link ScriptService} or null of none could be found
+     * @since 10.11RC1
      */
     @SuppressWarnings("unchecked")
     public <S extends ScriptService> S get(String serviceName)

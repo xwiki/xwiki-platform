@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.display.html.internal;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.displayer.HTMLDisplayer;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
 /**
@@ -46,6 +49,11 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
      * Folder containing the HTML Displayers velocity templates.
      */
     public static final String TEMPLATE_FOLDER = "html_displayer";
+
+    /**
+     * Name of the velocity variable containing the value, the mode and parameters of the displayer.
+     */
+    public static final String DISPLAYER_VELOCITY_NAME = "displayer";
 
     /**
      * Template extension (velocity).
@@ -83,15 +91,22 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
     @Override
     public String display(Object value, Map parameters, String mode) throws HTMLDisplayerException
     {
+        ScriptContext scriptContext = scriptContextManager.getCurrentScriptContext();
         try {
-            ScriptContext scriptContext = scriptContextManager.getCurrentScriptContext();
-            scriptContext.setAttribute("value", value, ScriptContext.ENGINE_SCOPE);
-            scriptContext.setAttribute("parameters", parameters, ScriptContext.ENGINE_SCOPE);
-            scriptContext.setAttribute("mode", mode, ScriptContext.ENGINE_SCOPE);
+            Map<String, Object> displayer = new HashMap<>();
+            displayer.put("value", value);
+            displayer.put("parameters", parameters);
+            displayer.put("mode", mode);
+            scriptContext.setAttribute(DISPLAYER_VELOCITY_NAME, displayer, ScriptContext.ENGINE_SCOPE);
 
-            return templateManager.render(getTemplateName(value, mode));
+            Writer writer = new StringWriter();
+            templateManager.render(getTemplate(value, mode), writer);
+
+            return writer.toString();
         } catch (Exception e) {
             throw new HTMLDisplayerException("Couldn't render the template", e);
+        } finally {
+            scriptContext.removeAttribute(DISPLAYER_VELOCITY_NAME, ScriptContext.ENGINE_SCOPE);
         }
     }
 
@@ -106,19 +121,19 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
      * </ul>
      * @return the template name used to make the rendering
      */
-    protected String getTemplateName(Object value, String mode) {
+    private Template getTemplate(Object value, String mode) {
         String type = value.getClass().getSimpleName().toLowerCase();
-        String templateName = TEMPLATE_FOLDER + '/' + type + "/" + mode + TEMPLATE_EXTENSION;
-        if (templateManager.getTemplate(templateName) == null) {
-            templateName = TEMPLATE_FOLDER + '/' + type + TEMPLATE_EXTENSION;
+        Template template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + type + "/" + mode + TEMPLATE_EXTENSION);
+        if (template == null) {
+            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + type + TEMPLATE_EXTENSION);
         }
-        if (templateManager.getTemplate(templateName) == null) {
-            templateName = TEMPLATE_FOLDER + '/' + mode + TEMPLATE_EXTENSION;
+        if (template == null) {
+            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + mode + TEMPLATE_EXTENSION);
         }
-        if (templateManager.getTemplate(templateName) == null) {
-            templateName = TEMPLATE_FOLDER + '/' + "default" + TEMPLATE_EXTENSION;
+        if (template == null) {
+            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + "default" + TEMPLATE_EXTENSION);
         }
 
-        return templateName;
+        return template;
     }
 }

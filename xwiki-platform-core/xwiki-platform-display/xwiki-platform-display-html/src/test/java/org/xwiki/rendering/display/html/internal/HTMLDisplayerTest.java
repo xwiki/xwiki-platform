@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.display.html.internal;
 
+import java.io.StringWriter;
+
 import javax.script.ScriptContext;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,10 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -58,30 +63,24 @@ public class HTMLDisplayerTest
     public void defaultTemplateHTMLDisplayerTest() throws Exception
     {
         ScriptContext scriptContext = mock(ScriptContext.class);
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         Template template = mock(Template.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        assertEquals("html_displayer/default.vm",
-                this.defaultTemplateHTMLDisplayer.getTemplateName(documentReference, "view"));
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContext);
 
-        when(templateManager.getTemplate("html_displayer/view.vm")).thenReturn(template);
-        assertEquals("html_displayer/view.vm",
-                this.defaultTemplateHTMLDisplayer.getTemplateName(documentReference, "view"));
+        this.defaultTemplateHTMLDisplayer.display(documentReference);
+        verify(this.templateManager).getTemplate("html_displayer/documentreference/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/documentreference.vm");
+        verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/default.vm");
 
-        when(templateManager.getTemplate("html_displayer/documentreference.vm")).thenReturn(template);
-        assertEquals("html_displayer/documentreference.vm",
-                this.defaultTemplateHTMLDisplayer.getTemplateName(documentReference, "view"));
-
-        when(templateManager.getTemplate("html_displayer/documentreference/view.vm")).thenReturn(template);
-        assertEquals("html_displayer/documentreference/view.vm",
-                this.defaultTemplateHTMLDisplayer.getTemplateName(documentReference, "view"));
-
-        when(scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContext);
-        when(templateManager.render(any())).thenReturn("displayer");
+        doAnswer(i -> ((StringWriter) i.getArgument(1)).append("displayer"))
+                .when(templateManager).render(any(Template.class), any());
+        when(this.templateManager.getTemplate(any())).thenReturn(template);
 
         assertEquals("displayer", this.defaultTemplateHTMLDisplayer.display(documentReference));
 
-        when(templateManager.render(any())).thenThrow(new Exception());
+        doThrow(new Exception()).when(this.templateManager).render(any(Template.class), any());
 
         assertThrows(HTMLDisplayerException.class,
                 () -> this.defaultTemplateHTMLDisplayer.display(documentReference));

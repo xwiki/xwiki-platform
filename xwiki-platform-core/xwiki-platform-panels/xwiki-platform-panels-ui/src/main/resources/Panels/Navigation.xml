@@ -160,6 +160,7 @@
       <async_context>
         <value>doc.reference</value>
         <value>wiki</value>
+        <value>locale</value>
       </async_context>
     </property>
     <property>

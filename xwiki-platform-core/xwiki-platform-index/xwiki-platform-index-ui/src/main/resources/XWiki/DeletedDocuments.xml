@@ -350,7 +350,7 @@ XWiki.index.trash.documents.confirmDelete = function(event, table, rowIdx) {
  */
 XWiki.index.trash.documents.confirmDeleteAll = function(event) {
   event.stop();
-  if (this.disabled) {
+  if (this.hasClassName('disabled')) {
     // Do nothing if the button was already clicked and it's waiting for a response from the server.
     return;
   } else {
@@ -361,16 +361,12 @@ XWiki.index.trash.documents.confirmDeleteAll = function(event) {
       {
         onCreate : function() {
           // Disable the button, to avoid a cascade of clicks from impatient users
-          this.disabled = true;
+          this.addClassName('disabled');;
         }.bind(this),
         onSuccess : function() {
           // Update the livetable
           trashDocumentsLivetable.refresh();
-        }.bindAsEventListener(this),
-        onComplete : function() {
-          // In the end: re-enable the button
-          this.disabled = false;
-        }.bind(this)
+        }.bindAsEventListener(this)
       },
       /* Interaction parameters */
       {
@@ -394,29 +390,21 @@ document.observe('xwiki:dom:loaded', function() {
 
 // we need to wait the complete display of the livetable to get the number of rows
 document.observe('xwiki:livetable:documentsTrash:displayComplete', function() {
-  if ($('documentsTrash')) {
-    var actionAllContainer = $('documentsTrash').
-        getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
+  var actionAllContainer = $('documentsTrash').
+      getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
 
-    if (trashDocumentsLivetable.totalRows > 0) {
-      var trashAllClass = 'btn btn-danger';
-    } else {
-      var trashAllClass = 'btn btn-danger disabled';
-    }
-
-    // avoid to get multiple times the button
-    if ($('trashAllDeleted')) {
-      $('trashAllDeleted').writeAttribute('class', trashAllClass);
-    } else {
-      var trashAll = new Element('a', {
-          'id': 'trashAllDeleted',
-          'class': trashAllClass,
-          'href':'#'
-          }).update('$services.localization.render('index.deletedDocuments.deleteAll')');
-      actionAllContainer.insert(trashAll);
-      trashAll.observe('click', XWiki.index.trash.documents.confirmDeleteAll.bindAsEventListener(trashAll));
-    }
+  // avoid to get multiple times the button
+  if (!$('trashAllDeleted')) {
+    var trashAll = new Element('a', {
+      'id': 'trashAllDeleted',
+      'class': 'btn btn-danger',
+      'href':'#'
+    }).update("$services.localization.render('index.deletedDocuments.deleteAll')");
+    actionAllContainer.insert(trashAll);
+    trashAll.observe('click', XWiki.index.trash.documents.confirmDeleteAll.bindAsEventListener(trashAll));
   }
+
+  $('trashAllDeleted').toggleClassName('disabled', trashDocumentsLivetable.totalRows &lt;= 0);
 });
       </code>
     </property>

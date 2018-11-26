@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.jodconverter.LocalConverter;
 import org.jodconverter.document.JsonDocumentFormatRegistry;
+import org.jodconverter.filter.text.LinkedImagesEmbedderFilter;
 import org.jodconverter.office.LocalOfficeManager;
 import org.jodconverter.office.ExternalOfficeManagerBuilder;
 import org.jodconverter.office.OfficeManager;
@@ -149,6 +150,7 @@ public class DefaultOfficeServer implements OfficeServer
             try {
                 this.jodConverter = LocalConverter.builder().officeManager(this.jodManager)
                     .formatRegistry(JsonDocumentFormatRegistry.create(input))
+                    .filterChain(new LinkedImagesEmbedderFilter())
                     .build();
             } catch (Exception e) {
                 this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
@@ -160,7 +162,8 @@ public class DefaultOfficeServer implements OfficeServer
         }
         if (this.jodConverter == null) {
             // Use the default document format registry.
-            this.jodConverter = LocalConverter.builder().officeManager(this.jodManager).build();
+            this.jodConverter = LocalConverter.builder().officeManager(this.jodManager)
+                .filterChain(new LinkedImagesEmbedderFilter()).build();
         }
 
         File workDir = this.environment.getTemporaryDirectory();

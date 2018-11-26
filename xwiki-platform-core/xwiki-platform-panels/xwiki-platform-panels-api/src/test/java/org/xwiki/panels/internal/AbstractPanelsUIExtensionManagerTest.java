@@ -19,7 +19,6 @@
  */
 package org.xwiki.panels.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,20 +27,15 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.LogLevel;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 
@@ -60,47 +54,33 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class AbstractPanelsUIExtensionManagerTest
 {
-    @InjectComponentManager
-    private MockitoComponentManager componentManager;
-
     @MockComponent
     @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
+
     @InjectMockComponents
     private TestablePanelsUIExtensionManager panelUIExtensionManager;
-
-    @MockComponent
-    @Named("bar")
-    private UIExtension barUIExtension;
-
-    @MockComponent
-    @Named("foo")
-    private UIExtension fooExtension;
-
-    @Mock
-    private WikiUIExtension wikiUIExtensionMenu1;
-
-    @Mock
-    private PanelWikiUIExtension subwikiPanelExtension;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
-    private Provider<ComponentManager> contextComponentManagerProvider;
-
-    @BeforeComponent
-    public void setup() throws Exception
-    {
-        this.contextComponentManagerProvider = this.componentManager.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context"
-        );
-    }
-
     @Test
     public void get() throws Exception
     {
-        when(contextComponentManagerProvider.get()).thenReturn(this.componentManager);
+        // We create a mock of the component manager to control the order on which the extensions will be retreived.
+        WikiUIExtension wikiUIExtensionMenu1 = mock(WikiUIExtension.class);
+        UIExtension fooExtension = mock(UIExtension.class);
+        UIExtension barUIExtension = mock(UIExtension.class);
+        PanelWikiUIExtension subwikiPanelExtension = mock(PanelWikiUIExtension.class);
+        ComponentManager customComponentManager = mock(ComponentManager.class);
+
+        when(contextComponentManagerProvider.get()).thenReturn(customComponentManager);
+        when(customComponentManager.getInstanceList(UIExtension.class))
+                .thenReturn(Arrays.asList(subwikiPanelExtension, barUIExtension, wikiUIExtensionMenu1, fooExtension));
 
         String panelsReferences = "Foo.WebHome,Menu.Menu1.WebHome,subwiki:Menu.WebHome";
         panelUIExtensionManager.setConfiguration(panelsReferences);
@@ -110,10 +90,8 @@ public class AbstractPanelsUIExtensionManagerTest
         // document reference is checked.
         DocumentReference wikiUIExtensionMenu1DocumentReference = new DocumentReference("wiki",
             Arrays.asList("Menu", "Menu1"), "WebHome");
-
         when(resolver.resolve("Menu.Menu1.WebHome")).thenReturn(wikiUIExtensionMenu1DocumentReference);
         when(wikiUIExtensionMenu1.getDocumentReference()).thenReturn(wikiUIExtensionMenu1DocumentReference);
-        componentManager.registerComponent(UIExtension.class, "menu1", wikiUIExtensionMenu1);
 
         // Second UIExtension which should not match any panel reference
         // Here we simulate a UIExtension that is not a WikiUIExtension & which has an ID not containing a document
@@ -125,7 +103,6 @@ public class AbstractPanelsUIExtensionManagerTest
         DocumentReference subwikiPanelExtensionReference = new DocumentReference("subwiki", "Menu", "WebHome");
         when(resolver.resolve("subwiki:Menu.WebHome")).thenReturn(subwikiPanelExtensionReference);
         when(subwikiPanelExtension.getDocumentReference()).thenReturn(subwikiPanelExtensionReference);
-        componentManager.registerComponent(UIExtension.class, "menu", subwikiPanelExtension);
 
         // Fourth UIExtension which should match the first panel reference
         // Here we simulate a a UIExtension that is not a WikiComponent but which has an ID being a document reference
@@ -134,11 +111,7 @@ public class AbstractPanelsUIExtensionManagerTest
         DocumentReference fooExtensionReference = new DocumentReference("wiki", "Foo", "WebHome");
         when(resolver.resolve("Foo.WebHome")).thenReturn(fooExtensionReference);
 
-        List<UIExtension> expectedList = new ArrayList<>();
-        expectedList.add(fooExtension);
-        expectedList.add(wikiUIExtensionMenu1);
-        expectedList.add(subwikiPanelExtension);
-
+        List<UIExtension> expectedList = Arrays.asList(fooExtension, wikiUIExtensionMenu1, subwikiPanelExtension);
         assertEquals(expectedList, panelUIExtensionManager.get(""));
     }
 

@@ -157,7 +157,9 @@
       <async_cached>1</async_cached>
     </property>
     <property>
-      <async_context/>
+      <async_context>
+        <value>locale</value>
+      </async_context>
     </property>
     <property>
       <async_enabled>1</async_enabled>

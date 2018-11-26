@@ -159,6 +159,7 @@
     <property>
       <async_context>
         <value>wiki</value>
+        <value>locale</value>
         <value>user</value>
       </async_context>
     </property>

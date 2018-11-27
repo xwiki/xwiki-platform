@@ -47,6 +47,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.properties.ConverterManager;
+import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -91,6 +92,9 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
     @Inject
     protected ConverterManager converter;
+
+    @Inject
+    protected AsyncContext asyncContext;
 
     @Inject
     protected Logger logger;
@@ -301,6 +305,12 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
     protected <T> T getPropertyValue(String key, Class<T> valueClass)
     {
+        // Indicate that the current execution is linked to this configuration document's lifecycle
+        DocumentReference reference = getFailsafeDocumentReference();
+        if (reference != null) {
+            this.asyncContext.useEntity(getDocumentReference());
+        }
+
         String cacheKey = getCacheKeyPrefix() + ':' + (valueClass != null ? valueClass.getName() : null) + ':' + key;
 
         Object result = this.cache.get(cacheKey);

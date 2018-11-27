@@ -50,6 +50,15 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
      */
     protected Map<EntityReference, EntitySelection> concernedEntities = new HashMap<>();
 
+    /**
+     * @return true means that the deletion check will be skipped.
+     * @since 10.11RC1
+     */
+    protected boolean isSkipChecks()
+    {
+        return false;
+    }
+
     @Override
     protected void runInternal() throws Exception
     {
@@ -61,15 +70,17 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
                 progressManager.startStep(this);
                 getEntities(entityReferences);
 
-                // Send the event
-                DocumentsDeletingEvent event = new DocumentsDeletingEvent();
-                observationManager.notify(event, this, concernedEntities);
+                if (!isSkipChecks()) {
+                    // Send the event
+                    DocumentsDeletingEvent event = new DocumentsDeletingEvent();
+                    observationManager.notify(event, this, concernedEntities);
 
-                // Stop the job if some listener has canceled the action
-                if (event.isCanceled()) {
-                    getStatus().cancel();
+                    // Stop the job if some listener has canceled the action
+                    if (event.isCanceled()) {
+                        getStatus().cancel();
 
-                    return;
+                        return;
+                    }
                 }
 
                 // Process

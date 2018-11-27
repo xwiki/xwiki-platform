@@ -46,6 +46,13 @@ public class RenameJob extends MoveJob
     }
 
     @Override
+    protected boolean isDeleteSources()
+    {
+        // rename always delete original sources
+        return true;
+    }
+
+    @Override
     protected void process(Collection<EntityReference> entityReferences)
     {
         if (entityReferences.size() == 1) {

@@ -75,18 +75,17 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
     }
 
     @Override
-    protected boolean isSkipChecks()
-    {
-        // skip check if it's only a copy
-        return !this.request.isDeleteSource();
-    }
-
-    @Override
     protected void runInternal() throws Exception
     {
         if (this.request.getDestination() != null) {
             super.runInternal();
         }
+    }
+
+    @Override
+    protected boolean isDeleteSources()
+    {
+        return this.request.isDeleteSource();
     }
 
     @Override
@@ -169,7 +168,7 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
 
     private boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference)
     {
-        if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
+        if (this.isDeleteSources() && !hasAccess(Right.DELETE, oldReference)) {
             // The move operation is implemented as Copy + Delete.
             this.logger.error("You are not allowed to delete [{}].", oldReference);
             return false;
@@ -239,14 +238,14 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
 
             // Step 6: Delete the source document.
             this.progressManager.startStep(this);
-            if (this.request.isDeleteSource()) {
+            if (this.isDeleteSources()) {
                 this.modelBridge.delete(oldReference);
             }
             this.progressManager.endStep(this);
 
             // Step 7: Create an automatic redirect.
             this.progressManager.startStep(this);
-            if (this.request.isDeleteSource() && this.request.isAutoRedirect()) {
+            if (this.isDeleteSources() && this.request.isAutoRedirect()) {
                 this.modelBridge.createRedirect(oldReference, newReference);
             }
         } finally {
@@ -301,7 +300,7 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
         try {
             // Step 1: Update the links that target the old reference to point to the new reference.
             this.progressManager.startStep(this);
-            if (this.request.isDeleteSource()) {
+            if (this.isDeleteSources()) {
                 updateBackLinks(oldReference, newReference);
             }
             this.progressManager.endStep(this);

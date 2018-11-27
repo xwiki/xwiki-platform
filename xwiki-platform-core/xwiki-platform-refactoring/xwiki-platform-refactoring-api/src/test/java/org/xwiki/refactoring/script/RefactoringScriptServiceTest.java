@@ -198,8 +198,7 @@ public class RefactoringScriptServiceTest
         getService().copy(source, destination);
 
         ArgumentCaptor<MoveRequest> request = ArgumentCaptor.forClass(MoveRequest.class);
-        // The MOVE job can perform a COPY too.
-        verify(this.jobExecutor).execute(eq(RefactoringJobs.MOVE), request.capture());
+        verify(this.jobExecutor).execute(eq(RefactoringJobs.COPY), request.capture());
 
         assertEquals(RefactoringJobs.COPY, request.getValue().getJobType());
         assertFalse(request.getValue().isDeleteSource());
@@ -215,8 +214,7 @@ public class RefactoringScriptServiceTest
         getService().copyAs(spaceReference, "Bob");
 
         ArgumentCaptor<MoveRequest> request = ArgumentCaptor.forClass(MoveRequest.class);
-        // The RENAME job can perform a COPY too.
-        verify(this.jobExecutor).execute(eq(RefactoringJobs.RENAME), request.capture());
+        verify(this.jobExecutor).execute(eq(RefactoringJobs.COPY), request.capture());
 
         assertEquals(RefactoringJobs.COPY_AS, request.getValue().getJobType());
         assertEquals(Arrays.asList(spaceReference), request.getValue().getEntityReferences());

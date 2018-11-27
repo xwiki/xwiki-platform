@@ -5,5 +5,6 @@ org.xwiki.refactoring.internal.job.MoveJob
 org.xwiki.refactoring.internal.job.RenameJob
 org.xwiki.refactoring.internal.job.RestoreJob
 org.xwiki.refactoring.internal.job.PermanentlyDeleteJob
+org.xwiki.refactoring.internal.job.CopyJob
 org.xwiki.refactoring.internal.splitter.DefaultDocumentSplitter
 org.xwiki.refactoring.script.RefactoringScriptService

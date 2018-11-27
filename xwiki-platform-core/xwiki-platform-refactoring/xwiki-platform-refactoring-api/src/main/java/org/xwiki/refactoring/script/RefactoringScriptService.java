@@ -413,8 +413,7 @@ public class RefactoringScriptService implements ScriptService
      */
     public Job copy(MoveRequest request)
     {
-        // The MOVE job can perform a COPY too.
-        return execute(RefactoringJobs.MOVE, request);
+        return execute(RefactoringJobs.COPY, request);
     }
 
     /**
@@ -452,8 +451,7 @@ public class RefactoringScriptService implements ScriptService
      */
     public Job copyAs(MoveRequest request)
     {
-        // The RENAME job can perform a COPY too.
-        return execute(RefactoringJobs.RENAME, request);
+        return execute(RefactoringJobs.COPY, request);
     }
 
     /**

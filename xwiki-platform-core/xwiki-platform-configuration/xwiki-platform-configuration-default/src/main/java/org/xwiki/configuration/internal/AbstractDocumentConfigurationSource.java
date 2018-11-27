@@ -308,7 +308,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         // Indicate that the current execution is linked to this configuration document's lifecycle
         DocumentReference reference = getFailsafeDocumentReference();
         if (reference != null) {
-            this.asyncContext.useEntity(getDocumentReference());
+            this.asyncContext.useEntity(reference);
         }
 
         String cacheKey = getCacheKeyPrefix() + ':' + (valueClass != null ? valueClass.getName() : null) + ':' + key;

@@ -53,11 +53,10 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
     /**
      * Specify if the job needs to check that the entities can be deleted.
      */
-    private boolean skipChecks;
+    protected boolean skipChecks;
 
     /**
      * @param skipChecks set true to skip the deletion check.
-     * @since 10.11RC1
      */
     protected void setSkipChecks(boolean skipChecks)
     {
@@ -66,7 +65,6 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
 
     /**
      * @return true means that the deletion check will be skipped.
-     * @since 10.11RC1
      */
     protected boolean isSkipChecks()
     {

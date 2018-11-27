@@ -128,7 +128,7 @@
 {{html}}
   &lt;div class="XWikiColorThemeDisplayer"&gt;
     #set ($colorThemeExists = $xwiki.exists($services.model.resolveDocument($value)))
-    #if ($value &amp;&amp; !$colorThemeExists)
+    #if ("$!value" != '' &amp;&amp; !$colorThemeExists)
       &lt;p class="errormessage"&gt;$services.localization.render('admin.colorthemes.invalidtheme', $escapetool.xml($value))&lt;/p&gt;
     #end
 
@@ -140,7 +140,7 @@
     #end
 
     &lt;select name="${prefix}${name}" id="${prefix}${name}" data-current-scope="$currentScope"&gt;
-      #if (!$value || !$colorThemeExists)
+      #if ("$!value" == '' || !$colorThemeExists)
         &lt;option value="$!escapetool.xml($value)" selected="selected"&gt;---&lt;/option&gt;
       #end
       #displaySkinLines($flamingoThemesFromThisWiki, $services.localization.render('admin.colorthemes.flamingothemes'), 'local')

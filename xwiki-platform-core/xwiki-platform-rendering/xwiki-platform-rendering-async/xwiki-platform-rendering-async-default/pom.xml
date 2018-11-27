@@ -33,6 +33,7 @@
   <description>XWiki Platform - Rendering - Async - Default</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.27</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>30</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

@@ -114,6 +114,70 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     });
   });
 
+  it('handles nested editable macros', function(done) {
+    editor.setData([
+      '<!--startmacro:info|-|-->',
+      '<div class="box infomessage">',
+        'Info',
+        '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+          '<p>before</p>',
+          '<!--startmacro:error|-|-->',
+          '<div class="box errormessage">',
+            'Error',
+            '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+              '<p>test</p>',
+            '</div>',
+          '</div>',
+          '<!--stopmacro-->',
+          '<p>after</p>',
+        '</div>',
+      '</div>',
+      '<!--stopmacro-->'
+    ].join(''), {
+      callback: function() {
+        var wikiMacroWidgets = getWikiMacroWidgets(editor);
+        expect(wikiMacroWidgets.length).toBe(2);
+
+        expect(wikiMacroWidgets[1].editables.content.getData()).toBe('<p>test</p>');
+
+        expect(wikiMacroWidgets[0].editables.content.getData()).toBe([
+          '<p>before</p>',
+          '<!--startmacro:error|-|-->',
+          '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+            '<p>test</p>',
+          '</div>',
+          '<!--stopmacro-->',
+          '<p>after</p>',
+        ].join(''));
+
+        expect(editor.getData()).toBe([
+          '<!--startmacro:info|-|-->',
+          '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+            '<p>before</p>',
+            '<!--startmacro:error|-|-->',
+            '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+              '<p>test</p>',
+            '</div>',
+            '<!--stopmacro-->',
+            '<p>after</p>',
+          '</div>',
+          '<!--stopmacro-->'
+        ].join(''));
+
+        done();
+      }
+    });
+  });
+
+  it('handles nested sibling macro markers', function(done) {
+    testUtils.assertData(
+      editor,
+      '<p><!--startmacro:foo|-|--><!--startmacro:bar|-|--><!--stopmacro--><!--stopmacro--></p>',
+      // The nested macro is not submitted because it can't be edited.
+      '<p><!--startmacro:foo|-|--><!--stopmacro--></p>'
+    ).then(done);
+  });
+
   it('checks if the edited content remains unchanged after performing data round-trips', function(done) {
     jQuery.when.apply(jQuery, [
       // CKEDITOR-48: Wiki Page source gets into bad state when macro that produces no output is used with CKEditor

@@ -54,7 +54,18 @@
       var getMarker = function(startComment) {
         var content = [];
         var nextSibling = startComment.next;
-        while (nextSibling && (nextSibling.type !== CKEDITOR.NODE_COMMENT || nextSibling.value !== stopMarker)) {
+        // We can have nested markers as sibling nodes: start ... start ... stop ... stop
+        // We need to find the corresponding stop marker, skipping the nested markers.
+        var depth = 0;
+        while (nextSibling && (nextSibling.type !== CKEDITOR.NODE_COMMENT || nextSibling.value !== stopMarker ||
+            depth > 0)) {
+          if (nextSibling.type === CKEDITOR.NODE_COMMENT) {
+            if (nextSibling.value.substring(0, startMarkerPrefix.length) === startMarkerPrefix) {
+              depth++;
+            } else if (nextSibling.value === stopMarker) {
+              depth--;
+            }
+          }
           content.push(nextSibling);
           nextSibling = nextSibling.next;
         }

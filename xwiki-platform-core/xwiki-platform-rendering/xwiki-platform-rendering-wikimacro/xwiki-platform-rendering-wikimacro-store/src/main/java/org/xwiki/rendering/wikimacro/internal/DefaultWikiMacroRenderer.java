@@ -338,7 +338,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
             Block syncMetaDataBlock;
 
-            if (async) {
+            if (!async) {
                 block = macroXDOM;
                 xdom = macroXDOM;
 

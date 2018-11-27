@@ -116,8 +116,11 @@ public class RepositoryResolver
 
     private RepositorySystemSession newSession(RepositorySystem system)
     {
+        // If the local repository is configured when calling Maven, we should use the configured repo.
+        // This is done by passing the maven.repo.local system property.
+        String localRepoLocation = System.getProperty("maven.repo.local",
+            String.format("%s/.m2/repository", System.getProperty("user.home")));
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-        String localRepoLocation = String.format("%s/.m2/repository", System.getProperty("user.home"));
         LocalRepository localRepo = new LocalRepository(localRepoLocation);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 

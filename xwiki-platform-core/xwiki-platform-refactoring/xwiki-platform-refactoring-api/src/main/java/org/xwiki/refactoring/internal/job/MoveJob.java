@@ -78,8 +78,6 @@ public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobS
     protected void runInternal() throws Exception
     {
         if (this.request.getDestination() != null) {
-            // skip checks if it's only a copy.
-            this.setSkipChecks(!this.request.isDeleteSource());
             super.runInternal();
         }
     }

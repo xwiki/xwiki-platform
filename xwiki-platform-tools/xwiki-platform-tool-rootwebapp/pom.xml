@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>10.10-SNAPSHOT</version>
+    <version>10.10</version>
   </parent>
   <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
   <packaging>war</packaging>

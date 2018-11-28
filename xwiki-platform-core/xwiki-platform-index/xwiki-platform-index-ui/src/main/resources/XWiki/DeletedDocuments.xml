@@ -356,12 +356,18 @@ XWiki.index.trash.documents.confirmDeleteAll = function(event) {
   } else {
     new XWiki.widgets.ConfirmedAjaxRequest(
       /* Ajax request URL */
-      this.href = "$xwiki.getURL($doc.fullName, 'delete', '&amp;confirm=1&amp;emptybin=true')" + "&amp;form_token=$!{services.csrf.getToken()}" + (Prototype.Browser.Opera ? "" : "&amp;ajax=1"),
+      this.href = XWiki.currentDocument.getURL('delete'),
       /* Ajax request parameters */
       {
+        parameters : {
+          'confirm': 1,
+          'emptybin': 'true',
+          'form_token': "$!{services.csrf.getToken()}",
+          'ajax': 1
+        },
         onCreate : function() {
           // Disable the button, to avoid a cascade of clicks from impatient users
-          this.addClassName('disabled');;
+          this.addClassName('disabled');
         }.bind(this),
         onSuccess : function() {
           // Update the livetable
@@ -390,11 +396,11 @@ document.observe('xwiki:dom:loaded', function() {
 
 // we need to wait the complete display of the livetable to get the number of rows
 document.observe('xwiki:livetable:documentsTrash:displayComplete', function() {
-  var actionAllContainer = $('documentsTrash').
-      getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
-
   // avoid to get multiple times the button
   if (!$('trashAllDeleted')) {
+    var actionAllContainer = $('documentsTrash').
+    getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
+
     var trashAll = new Element('a', {
       'id': 'trashAllDeleted',
       'class': 'btn btn-danger',

@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.title=Vezi administrarea spațiului
 index.spacesMacro.createSpace.link=Creează un spațiu nou
 index.spacesMacro.createSpace.defaultSpaceName=Nume spațiu
 index.spacesMacro.createSpace.submit=Creează
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

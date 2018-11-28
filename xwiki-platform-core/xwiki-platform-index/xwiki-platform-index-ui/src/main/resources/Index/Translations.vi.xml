@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.title=Thấy quản trị space
 index.spacesMacro.createSpace.link=Tạo trang mới
 index.spacesMacro.createSpace.defaultSpaceName=Tên Space
 index.spacesMacro.createSpace.submit=Tạo
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.alt=Yönet alanı
 index.spacesMacro.createSpace.link=yeni bir alan oluşturma
 index.spacesMacro.createSpace.defaultSpaceName=Uzay isim
 index.spacesMacro.createSpace.submit=Oluştur
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

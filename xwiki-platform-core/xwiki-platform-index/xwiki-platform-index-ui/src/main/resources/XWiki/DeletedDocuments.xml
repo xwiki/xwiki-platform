@@ -53,7 +53,8 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 #set($options = {
     'url'               : "$xwiki.getURL('XWiki.DeletedDocumentsJSON', 'view', 'list=1&amp;xpage=plain&amp;outputSyntax=plain')",
     'callback'          : 'XWiki.index.trash.documents.displayEntry',
-    'translationPrefix' : 'platform.index.trashDocuments.'
+    'translationPrefix' : 'platform.index.trashDocuments.',
+    'javascriptName'    : 'trashDocumentsLivetable'
   })##
 ##
 ##
@@ -341,6 +342,48 @@ XWiki.index.trash.documents.confirmDelete = function(event, table, rowIdx) {
       );
   }
 }
+
+/**
+ * Event listener, called when clicking the "delete all" button.
+ *
+ * @param event the link activation event
+ */
+XWiki.index.trash.documents.confirmDeleteAll = function(event) {
+  event.stop();
+  if (this.hasClassName('disabled')) {
+    // Do nothing if the button was already clicked and it's waiting for a response from the server.
+    return;
+  } else {
+    new XWiki.widgets.ConfirmedAjaxRequest(
+      /* Ajax request URL */
+      XWiki.currentDocument.getURL('delete'),
+      /* Ajax request parameters */
+      {
+        parameters : {
+          'confirm': 1,
+          'emptybin': true,
+          'form_token': "$!{services.csrf.getToken()}",
+          'ajax': 1
+        },
+        onCreate : function() {
+          // Disable the button, to avoid a cascade of clicks from impatient users
+          this.addClassName('disabled');
+        }.bind(this),
+        onSuccess : function() {
+          // Update the livetable
+          trashDocumentsLivetable.refresh();
+        }.bindAsEventListener(this)
+      },
+      /* Interaction parameters */
+      {
+         confirmationText: "$services.localization.render('core.recyclebin.completelyDeleteConfirm')",
+         progressMessageText : "$services.localization.render('platform.index.trashDocumentsDeleteInProgress')",
+         successMessageText : "$services.localization.render('platform.index.trashDocumentsDeleteDone')",
+         failureMessageText : "$services.localization.render('platform.index.trashDocumentsDeleteFailed')"
+      }
+      );
+  }
+}
 /*
  * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
  * Re-display it when the document loads and Javascript is available.
@@ -349,7 +392,27 @@ document.observe('xwiki:dom:loaded', function() {
   if ($('documentsTrash')) {
     $('documentsTrash').up('.hidden').removeClassName('hidden');
   }
-});</code>
+});
+
+// we need to wait the complete display of the livetable to get the number of rows
+document.observe('xwiki:livetable:documentsTrash:displayComplete', function() {
+  // avoid to get multiple times the button
+  if (!$('trashAllDeleted')) {
+    var actionAllContainer = $('documentsTrash').
+      getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
+
+    var trashAll = new Element('a', {
+      'id': 'trashAllDeleted',
+      'class': 'btn btn-danger',
+      'href':'#'
+    }).update("$services.localization.render('index.deletedDocuments.deleteAll')");
+    actionAllContainer.insert(trashAll);
+    trashAll.observe('click', XWiki.index.trash.documents.confirmDeleteAll.bindAsEventListener(trashAll));
+  }
+
+  $('trashAllDeleted').toggleClassName('disabled', trashDocumentsLivetable.totalRows &lt;= 0);
+});
+      </code>
     </property>
     <property>
       <name/>

@@ -356,12 +356,12 @@ XWiki.index.trash.documents.confirmDeleteAll = function(event) {
   } else {
     new XWiki.widgets.ConfirmedAjaxRequest(
       /* Ajax request URL */
-      this.href = XWiki.currentDocument.getURL('delete'),
+      XWiki.currentDocument.getURL('delete'),
       /* Ajax request parameters */
       {
         parameters : {
           'confirm': 1,
-          'emptybin': 'true',
+          'emptybin': true,
           'form_token': "$!{services.csrf.getToken()}",
           'ajax': 1
         },
@@ -399,7 +399,7 @@ document.observe('xwiki:livetable:documentsTrash:displayComplete', function() {
   // avoid to get multiple times the button
   if (!$('trashAllDeleted')) {
     var actionAllContainer = $('documentsTrash').
-    getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
+      getElementsBySelector('td.xwiki-livetable-display-header-filter:last-child')[0];
 
     var trashAll = new Element('a', {
       'id': 'trashAllDeleted',

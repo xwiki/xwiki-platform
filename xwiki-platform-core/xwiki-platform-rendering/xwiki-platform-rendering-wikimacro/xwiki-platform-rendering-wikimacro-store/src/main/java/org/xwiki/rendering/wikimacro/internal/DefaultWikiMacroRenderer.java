@@ -198,14 +198,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         return block;
     }
 
-    /**
-     * Extract result of the wiki macro execution.
-     * 
-     * @param blocks the wiki macro content
-     * @param macroContext the wiki macro context
-     * @return the result
-     */
-    private Block extractResult(Block block, Map<String, Object> macroContext)
+    private Block extractResult(Block block, Map<String, Object> macroContext, boolean async)
     {
         Object resultObject = macroContext.get(MACRO_RESULT_KEY);
 
@@ -215,7 +208,12 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         } else if (resultObject instanceof Block) {
             result = (Block) resultObject;
         } else {
-            result = block;
+            if (!async) {
+                // If synchronized the top level block is a temporary macro marker so we need to get rid of it
+                result = new CompositeBlock(block.getChildren());
+            } else {
+                result = block;
+            }
 
             // If in inline mode remove any top level paragraph.
             if (this.inline) {
@@ -359,8 +357,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
                 // "Emulate" the fact that wiki macro block is still part of the XDOM (what is in the XDOM is a
                 // MacroMarkerBlock and MacroTransformationContext current macro block only support MacroBlock so we
-                // can't
-                // switch it without breaking some APIs)
+                // can't switch it without breaking some APIs)
                 wikiMacroBlock.setParent(syncMetaDataBlock.getParent());
                 wikiMacroBlock.setNextSiblingBlock(syncMetaDataBlock.getNextSibling());
                 wikiMacroBlock.setPreviousSiblingBlock(syncMetaDataBlock.getPreviousSibling());
@@ -376,7 +373,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             } finally {
                 if (syncMetaDataBlock != null) {
                     // Restore context XDOM to its previous state
-                    syncMetaDataBlock.getParent().replaceChild(this.syncContext.getCurrentMacroBlock(), syncMetaDataBlock);
+                    syncMetaDataBlock.getParent().replaceChild(this.syncContext.getCurrentMacroBlock(),
+                        syncMetaDataBlock);
                 }
 
                 this.observation.notify(ENDEXECUTION_EVENT, this.wikimacro);
@@ -405,6 +403,6 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         transform(block, transformationContext, this.wikimacro.getAuthorReference());
 
-        return extractResult(block, macroBinding);
+        return extractResult(block, macroBinding, async);
     }
 }

@@ -19,8 +19,6 @@
  */
 package org.xwiki.refactoring.job;
 
-import org.xwiki.model.reference.EntityReference;
-
 /**
  * A job request that can be used to move a collection of entities to a specified destination. This request can also be
  * used to rename an entity.
@@ -28,17 +26,12 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 7.2M1
  */
-public class MoveRequest extends EntityRequest
+public class MoveRequest extends AbstractCopyOrMoveRequest
 {
     /**
      * Serialization identifier.
      */
     private static final long serialVersionUID = 2L;
-
-    /**
-     * @see #getDestination()
-     */
-    private static final String PROPERTY_DESTINATION = "destination";
 
     /**
      * @see #isDeleteSource()
@@ -64,24 +57,6 @@ public class MoveRequest extends EntityRequest
      * @see #isUpdateParentField()
      */
     private static final String PROPERTY_UPDATE_PARENT_FIELD = "updateParentField";
-
-    /**
-     * @return the destination entity, where to move the entities specified by {@link #getEntityReferences()}
-     */
-    public EntityReference getDestination()
-    {
-        return getProperty(PROPERTY_DESTINATION);
-    }
-
-    /**
-     * Sets the destination entity, where to move the entities specified by {@link #getEntityReferences()}.
-     * 
-     * @param destination the destination entity
-     */
-    public void setDestination(EntityReference destination)
-    {
-        setProperty(PROPERTY_DESTINATION, destination);
-    }
 
     /**
      * @return {@code true} if the source entities specified by {@link #getEntityReferences()} should be deleted,

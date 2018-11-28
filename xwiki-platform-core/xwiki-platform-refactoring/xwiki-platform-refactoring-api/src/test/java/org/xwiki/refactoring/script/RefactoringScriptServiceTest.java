@@ -42,6 +42,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
@@ -197,13 +198,10 @@ public class RefactoringScriptServiceTest
 
         getService().copy(source, destination);
 
-        ArgumentCaptor<MoveRequest> request = ArgumentCaptor.forClass(MoveRequest.class);
+        ArgumentCaptor<CopyRequest> request = ArgumentCaptor.forClass(CopyRequest.class);
         verify(this.jobExecutor).execute(eq(RefactoringJobs.COPY), request.capture());
 
         assertEquals(RefactoringJobs.COPY, request.getValue().getJobType());
-        assertFalse(request.getValue().isDeleteSource());
-        assertFalse(request.getValue().isAutoRedirect());
-        assertFalse(request.getValue().isUpdateParentField());
     }
 
     @Test
@@ -213,15 +211,12 @@ public class RefactoringScriptServiceTest
             new SpaceReference("Alice", new SpaceReference("Users", new WikiReference("dev")));
         getService().copyAs(spaceReference, "Bob");
 
-        ArgumentCaptor<MoveRequest> request = ArgumentCaptor.forClass(MoveRequest.class);
+        ArgumentCaptor<CopyRequest> request = ArgumentCaptor.forClass(CopyRequest.class);
         verify(this.jobExecutor).execute(eq(RefactoringJobs.COPY), request.capture());
 
         assertEquals(RefactoringJobs.COPY_AS, request.getValue().getJobType());
         assertEquals(Arrays.asList(spaceReference), request.getValue().getEntityReferences());
         assertEquals(new SpaceReference("Bob", spaceReference.getParent()), request.getValue().getDestination());
-        assertFalse(request.getValue().isDeleteSource());
-        assertFalse(request.getValue().isAutoRedirect());
-        assertFalse(request.getValue().isUpdateParentField());
     }
 
     @Test
@@ -296,30 +291,6 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void createRestoreRequest() throws Exception
-    {
-        List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
-        RestoreRequest restoreRequest =
-            this.getService().createRestoreRequest(documentIds);
-        assertEquals(documentIds, restoreRequest.getDeletedDocumentIds());
-        assertTrue(StringUtils.join(restoreRequest.getId(), '/')
-            .startsWith(RefactoringJobs.RESTORE));
-        assertTrue(restoreRequest.isCheckRights());
-    }
-
-    @Test
-    public void createRestoreRequestBatchId() throws Exception
-    {
-        String batchId = "batch-id";
-        RestoreRequest restoreRequest =
-            this.getService().createRestoreRequest(batchId);
-        assertEquals(batchId, restoreRequest.getBatchId());
-        assertTrue(StringUtils.join(restoreRequest.getId(), '/')
-            .startsWith(RefactoringJobs.RESTORE));
-        assertTrue(restoreRequest.isCheckRights());
-    }
-
-    @Test
     public void restore() throws Exception
     {
         List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
@@ -347,30 +318,6 @@ public class RefactoringScriptServiceTest
         assertTrue(StringUtils.join(request.getValue().getId(), '/')
             .startsWith(RefactoringJobs.RESTORE));
         assertTrue(request.getValue().isCheckRights());
-    }
-
-    @Test
-    public void createPermanentlyDeleteRequest() throws Exception
-    {
-        List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
-        PermanentlyDeleteRequest permanentlyDeleteRequest =
-            this.getService().createPermanentlyDeleteRequest(documentIds);
-        assertEquals(documentIds, permanentlyDeleteRequest.getDeletedDocumentIds());
-        assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
-            .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
-        assertTrue(permanentlyDeleteRequest.isCheckRights());
-    }
-
-    @Test
-    public void createPermanentlyDeleteRequestBatch() throws Exception
-    {
-        String batchId = "batch-id";
-        PermanentlyDeleteRequest permanentlyDeleteRequest =
-            this.getService().createPermanentlyDeleteRequest(batchId);
-        assertEquals(batchId, permanentlyDeleteRequest.getBatchId());
-        assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
-            .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
-        assertTrue(permanentlyDeleteRequest.isCheckRights());
     }
 
     @Test

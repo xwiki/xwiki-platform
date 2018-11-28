@@ -156,7 +156,8 @@ public class DeleteAction extends XWikiAction
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        PermanentlyDeleteRequest deleteRequest = refactoring.createPermanentlyDeleteRequest(Collections.emptyList());
+        PermanentlyDeleteRequest deleteRequest = refactoring.getRequestFactory()
+            .createPermanentlyDeleteRequest(Collections.emptyList());
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
 
@@ -262,7 +263,8 @@ public class DeleteAction extends XWikiAction
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        EntityRequest deleteRequest = refactoring.createDeleteRequest(Arrays.asList(entityReference));
+        EntityRequest deleteRequest = refactoring.getRequestFactory()
+            .createDeleteRequest(Arrays.asList(entityReference));
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
 

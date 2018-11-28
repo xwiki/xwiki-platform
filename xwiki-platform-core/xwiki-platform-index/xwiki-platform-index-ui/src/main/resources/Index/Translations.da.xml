@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.alt=Administrer område
 index.spacesMacro.createSpace.link=Opret nyt område
 index.spacesMacro.createSpace.defaultSpaceName=Navn på område
 index.spacesMacro.createSpace.submit=Opret
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

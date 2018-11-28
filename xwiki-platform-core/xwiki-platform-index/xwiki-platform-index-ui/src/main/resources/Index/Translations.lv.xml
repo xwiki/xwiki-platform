@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.alt=Pārvaldīt vietu
 index.spacesMacro.createSpace.link=Izveidot jaunu vietu
 index.spacesMacro.createSpace.defaultSpaceName=Vietas nosaukums
 index.spacesMacro.createSpace.submit=Izveidot
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

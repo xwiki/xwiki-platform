@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.alt=Administrera rum
 index.spacesMacro.createSpace.link=Skapa ett nytt rum
 index.spacesMacro.createSpace.defaultSpaceName=Rumsnamn
 index.spacesMacro.createSpace.submit=Skapa
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.alt=Upravljaj prostorom
 index.spacesMacro.createSpace.link=Izradi novi prostor
 index.spacesMacro.createSpace.defaultSpaceName=Ime prostora
 index.spacesMacro.createSpace.submit=Izradi
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

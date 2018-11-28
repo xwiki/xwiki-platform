@@ -44,5 +44,6 @@ index.spacesMacro.spaceAdministration.alt=管理空间
 index.spacesMacro.createSpace.link=创建新空间
 index.spacesMacro.createSpace.defaultSpaceName=空间名
 index.spacesMacro.createSpace.submit=创建
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

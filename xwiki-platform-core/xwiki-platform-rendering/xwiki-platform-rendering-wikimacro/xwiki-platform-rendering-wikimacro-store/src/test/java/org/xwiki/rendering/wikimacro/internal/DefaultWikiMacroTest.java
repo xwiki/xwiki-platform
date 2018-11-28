@@ -32,7 +32,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.converter.ConversionException;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.macro.MacroId;
@@ -162,6 +164,30 @@ public class DefaultWikiMacroTest
         registerWikiMacro(macroId, macroContent, Syntax.XWIKI_2_0);
     }
 
+    private void assertXDOM(String expectEvents, String inputXWiki) throws ComponentLookupException, ConversionException
+    {
+        assertMacro(expectEvents, Syntax.XDOMXML_CURRENT, inputXWiki);
+    }
+
+    private void assertXHTML(String expectXHTML, String inputXWiki) throws ComponentLookupException, ConversionException
+    {
+        assertMacro(expectXHTML, Syntax.XHTML_1_0, inputXWiki);
+    }
+
+    private void assertMacro(String expect, Syntax expectSyntax, String inputXWiki)
+        throws ComponentLookupException, ConversionException
+    {
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader(inputXWiki), Syntax.XWIKI_2_0, expectSyntax, printer);
+
+        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
+        assertEquals(expect, printer.toString());
+
+        assertFalse(this.oldcore.getXWikiContext().containsKey("macro"));
+    }
+
     // Tests
 
     /**
@@ -172,16 +198,12 @@ public class DefaultWikiMacroTest
     {
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
 
-        Converter converter = this.componentManager.getInstance(Converter.class);
-
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        converter.convert(new StringReader("{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}"), Syntax.XWIKI_2_0,
-            Syntax.XHTML_1_0, printer);
-
-        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        assertEquals("<p>This is <strong>bold</strong></p>", printer.toString());
-
-        assertFalse(this.oldcore.getXWikiContext().containsKey("macro"));
+        assertXHTML("<p>This is <strong>bold</strong></p>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
+        assertXDOM("<document><p><metadata><metadata><entry><string>syntax</string>"
+            + "<org.xwiki.rendering.syntax.Syntax><type><name>XWiki</name><id>xwiki</id></type><version>2.0</version></org.xwiki.rendering.syntax.Syntax></entry></metadata></metadata></p>"
+            + "<macroMarker name=\"wikimacro1\"><p><parameters><m><entry><string>param1</string><string>value1</string></entry><entry><string>param2</string><string>value2</string></entry></m></parameters></p>"
+            + "<paragraph><word>This</word><space></space><word>is</word><space></space><format format=\"BOLD\"><word>bold</word></format></paragraph>"
+            + "</macroMarker></document>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
     }
 
     /**
@@ -194,15 +216,9 @@ public class DefaultWikiMacroTest
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
         registerWikiMacro("wikimacro2", "{{wikimacro1 param1=\"v1\" param2=\"v2\"/}}", Syntax.XWIKI_2_0);
 
-        Converter converter = this.componentManager.getInstance(Converter.class);
-
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
         // Note: We're putting the macro after the "Hello" text to force it as an inline macro.
-        converter.convert(new StringReader("Hello {{wikimacro2 param1=\"value1\" param2=\"value2\"/}}"),
-            Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
-
-        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        assertEquals("<p>Hello This is <strong>bold</strong></p>", printer.toString());
+        assertXHTML("<p>Hello This is <strong>bold</strong></p>",
+            "Hello {{wikimacro2 param1=\"value1\" param2=\"value2\"/}}");
     }
 
     /**
@@ -217,17 +233,10 @@ public class DefaultWikiMacroTest
         reference.setAnchor("Hheading");
         when(this.mockWikiModel.getDocumentViewURL(reference)).thenReturn("url");
 
-        Converter converter = this.componentManager.getInstance(Converter.class);
-
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        converter.convert(new StringReader("= heading\n\n{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}"),
-            Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
-
-        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        assertEquals(
+        assertXHTML(
             "<h1 id=\"Hheading\" class=\"wikigeneratedid\"><span>heading</span></h1>"
                 + "<ul><li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li></ul>",
-            printer.toString());
+            "= heading\n\n{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
     }
 
     /**
@@ -238,15 +247,10 @@ public class DefaultWikiMacroTest
     {
         registerWikiMacro("wikimacro", "{{groovy}}println \"[[path:/some/path]]\"{{/groovy}}", Syntax.XWIKI_2_1);
 
-        Converter converter = this.componentManager.getInstance(Converter.class);
-
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        converter.convert(new StringReader("{{wikimacro param1=\"value1\" param2=\"value2\"/}}"), Syntax.XWIKI_2_0,
-            Syntax.XHTML_1_0, printer);
-
-        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        assertEquals("<p><span class=\"wikiinternallink\"><a href=\"/some/path\">"
-            + "<span class=\"wikigeneratedlinkcontent\">/some/path</span></a></span></p>", printer.toString());
+        assertXHTML(
+            "<p><span class=\"wikiinternallink\"><a href=\"/some/path\">"
+                + "<span class=\"wikigeneratedlinkcontent\">/some/path</span></a></span></p>",
+            "{{wikimacro param1=\"value1\" param2=\"value2\"/}}");
     }
 
     /**
@@ -260,15 +264,7 @@ public class DefaultWikiMacroTest
             + "xcontext.macro.result = java.util.Collections.singletonList(new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));"
             + "{{/groovy}}", Syntax.XWIKI_2_0);
 
-        Converter converter = this.componentManager.getInstance(Converter.class);
-
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        // Note: We're putting the macro after the "Hello" text to force it as an inline macro.
-        converter.convert(new StringReader("Hello {{wikimacrowithresult param1=\"World\" param2=\"param2\"/}}"),
-            Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
-
-        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        assertEquals("<p>Hello World</p>", printer.toString());
+        assertXHTML("<p>Hello World</p>", "Hello {{wikimacrowithresult param1=\"World\" param2=\"param2\"/}}");
     }
 
     /**

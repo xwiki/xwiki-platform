@@ -32,6 +32,7 @@
   <packaging>jar</packaging>
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <testcontainers.version>1.10.1</testcontainers.version>
 
     <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->

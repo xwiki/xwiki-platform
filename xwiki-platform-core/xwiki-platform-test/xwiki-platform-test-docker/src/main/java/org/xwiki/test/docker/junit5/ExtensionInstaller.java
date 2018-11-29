@@ -59,6 +59,8 @@ public class ExtensionInstaller
 
     private MavenResolver mavenResolver;
 
+    private MavenTimestampVersionConverter mavenVersionConverter;
+
     /**
      * Initialize the Component Manager which is later needed to perform the REST calls.
      *
@@ -74,6 +76,8 @@ public class ExtensionInstaller
         EmbeddableComponentManager cm = new EmbeddableComponentManager();
         cm.initialize(Thread.currentThread().getContextClassLoader());
         this.ecm = cm;
+
+        this.mavenVersionConverter = new MavenTimestampVersionConverter();
     }
 
     /**
@@ -132,21 +136,21 @@ public class ExtensionInstaller
             }
         }
 
-        installExtensions(extensions, xwikiVersion, xwikiRESTURL, credentials, installUserReference, namespaces);
+        installExtensions(extensions, xwikiRESTURL, credentials, installUserReference, namespaces);
     }
 
-    private void installExtensions(Collection<Artifact> extensions, String xwikiVersion, String xwikiRESTURL,
+    private void installExtensions(Collection<Artifact> extensions, String xwikiRESTURL,
         UsernamePasswordCredentials credentials, String installUserReference, List<String> namespaces) throws Exception
     {
         try {
-            installExtensions(extensions, xwikiVersion, xwikiRESTURL, installUserReference, namespaces, credentials);
+            installExtensions(extensions, xwikiRESTURL, installUserReference, namespaces, credentials);
         } catch (Exception e) {
             throw new Exception(String.format("Failed to install Extension(s) into XWiki at [%s]", xwikiRESTURL), e);
         }
     }
 
-    private void installExtensions(Collection<Artifact> extensions, String xwikiVersion, String xwikiRESTURL,
-        String installUserReference, List<String> namespaces, UsernamePasswordCredentials credentials) throws Exception
+    private void installExtensions(Collection<Artifact> extensions, String xwikiRESTURL, String installUserReference,
+        List<String> namespaces, UsernamePasswordCredentials credentials) throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
 
@@ -157,8 +161,14 @@ public class ExtensionInstaller
 
         // Set the extension list to install
         for (Artifact artifact : extensions) {
+            // Convert XXX-<DATE>.<HOUR>-<ID> into XXX-SNAPSHOT to avoid EM resolution conflicts such as:
+            // Caused by: java.lang.Exception: Job execution failed. Response status code [500], reason
+            // [The job failed with error [InstallException: Extension feature
+            // [org.xwiki.platform:xwiki-platform-tree-macro/10.11-20181128.193513-21] is incompatible with existing
+            // constraint [[10.11-SNAPSHOT]]]]
             org.xwiki.extension.ExtensionId extId = new org.xwiki.extension.ExtensionId(
-                String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId()), xwikiVersion);
+                String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId()),
+                    this.mavenVersionConverter.convert(artifact.getVersion()));
             LOGGER.info(String.format("...Adding extension [%s] to the list of extensions to provision...", extId));
             installRequest.addExtension(extId);
         }

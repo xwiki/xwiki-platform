@@ -284,7 +284,6 @@ public class RequestFactory
         return request;
     }
 
-
     /**
      * Creates a request to restore a specified batch of deleted documents from the recycle bin.
      *

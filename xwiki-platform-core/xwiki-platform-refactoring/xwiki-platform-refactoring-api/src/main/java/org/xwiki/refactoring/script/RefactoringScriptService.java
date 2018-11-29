@@ -21,16 +21,12 @@ package org.xwiki.refactoring.script;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -259,20 +255,6 @@ public class RefactoringScriptService implements ScriptService, Initializable
     }
 
     /**
-     * Schedules an asynchronous job to perform the given copy request.
-     *
-     * @param request the copy request to perform
-     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
-     *         {@code null} in case of failure
-     * @deprecated Use {@link #copy(CopyRequest)} instead.
-     */
-    @Deprecated
-    public Job copy(MoveRequest request)
-    {
-        return execute(RefactoringJobs.COPY, request);
-    }
-
-    /**
      * Schedules an asynchronous job to copy the specified source entities to the specified destination entity.
      *
      * @param sources specifies the entities to be copied
@@ -306,18 +288,6 @@ public class RefactoringScriptService implements ScriptService, Initializable
      *         {@code null} in case of failure
      */
     public Job copyAs(CopyRequest request)
-    {
-        return execute(RefactoringJobs.COPY, request);
-    }
-
-    /**
-     * Schedules an asynchronous job to perform the given copy-as request.
-     *
-     * @param request the copy-as request to perform
-     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
-     *         {@code null} in case of failure
-     */
-    public Job copyAs(MoveRequest request)
     {
         return execute(RefactoringJobs.COPY, request);
     }

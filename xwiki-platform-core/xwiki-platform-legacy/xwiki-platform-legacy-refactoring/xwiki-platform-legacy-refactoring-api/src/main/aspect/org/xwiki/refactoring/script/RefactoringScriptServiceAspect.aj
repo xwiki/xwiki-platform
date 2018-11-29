@@ -22,6 +22,7 @@ package org.xwiki.refactoring.script;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.job.Job;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
@@ -40,6 +42,11 @@ import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.RestoreRequest;
 
+/**
+ * Deprecated methods from RefactoringScriptService.
+ * @since 10.11RC1
+ * @version $Id$
+ */
 public privileged aspect RefactoringScriptServiceAspect
 {
     /**
@@ -77,8 +84,11 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param sources specifies the entities to be moved
      * @param destination specifies the place where to move the entities (their new parent entity)
      * @return the move request
+     * @deprecated Use {@link RequestFactory#createMoveRequest(Collection, EntityReference)} instead
      */
-    public MoveRequest RefactoringScriptService.createMoveRequest(Collection<EntityReference> sources, EntityReference destination)
+    @Deprecated
+    public MoveRequest RefactoringScriptService.createMoveRequest(Collection<EntityReference> sources,
+        EntityReference destination)
     {
         return createMoveRequest(RefactoringJobs.MOVE, sources, destination);
     }
@@ -90,7 +100,9 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param source specifies the entity to be moved
      * @param destination specifies the place where to move the source entity (its new parent entity)
      * @return the move request
+     * @deprecated Use {@link RequestFactory#createMoveRequest(EntityReference, EntityReference)} instead
      */
+    @Deprecated
     public MoveRequest RefactoringScriptService.createMoveRequest(EntityReference source, EntityReference destination)
     {
         return createMoveRequest(Arrays.asList(source), destination);
@@ -102,8 +114,11 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param oldReference the entity to rename
      * @param newReference the new entity reference after the rename
      * @return the rename request
+     * @deprecated Use {@link RequestFactory#createRenameRequest(EntityReference, EntityReference)} instead
      */
-    public MoveRequest RefactoringScriptService.createRenameRequest(EntityReference oldReference, EntityReference newReference)
+    @Deprecated
+    public MoveRequest RefactoringScriptService.createRenameRequest(EntityReference oldReference,
+        EntityReference newReference)
     {
         return createMoveRequest(RefactoringJobs.RENAME, Collections.singletonList(oldReference), newReference);
     }
@@ -114,7 +129,9 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param reference the entity to rename
      * @param newName the new entity name
      * @return the rename request
+     * @deprecated Use {@link RequestFactory#createRenameRequest(EntityReference, String)} instead
      */
+    @Deprecated
     public MoveRequest RefactoringScriptService.createRenameRequest(EntityReference reference, String newName)
     {
         return createRenameRequest(reference, new EntityReference(newName, reference.getType(), reference.getParent()));
@@ -125,8 +142,11 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param sources specifies the entities to be copied
      * @param destination specifies the place where to copy the entities (becomes the parent of the copies)
      * @return the copy request
+     * @deprecated Use {@link RequestFactory#createCopyRequest(Collection, EntityReference)} instead
      */
-    public MoveRequest RefactoringScriptService.createCopyRequest(Collection<EntityReference> sources, EntityReference destination)
+    @Deprecated
+    public MoveRequest RefactoringScriptService.createCopyRequest(Collection<EntityReference> sources,
+        EntityReference destination)
     {
         MoveRequest request = createMoveRequest(RefactoringJobs.COPY, sources, destination);
         request.setDeleteSource(false);
@@ -141,7 +161,9 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param source specifies the entity to be copied
      * @param destination specifies the place where to copy the source entity (becomes the parent of the copy)
      * @return the copy request
+     * @deprecated Use {@link RequestFactory#createCopyRequest(EntityReference, EntityReference)} instead
      */
+    @Deprecated
     public MoveRequest RefactoringScriptService.createCopyRequest(EntityReference source, EntityReference destination)
     {
         return createCopyRequest(Arrays.asList(source), destination);
@@ -153,9 +175,11 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param sourceReference the entity to copy
      * @param copyReference the reference to use for the copy
      * @return the copy-as request
+     * @deprecated Use {@link RequestFactory#createCopyAsRequest(EntityReference, EntityReference)} instead.
      */
     @Deprecated
-    public MoveRequest RefactoringScriptService.createCopyAsRequest(EntityReference sourceReference, EntityReference copyReference)
+    public MoveRequest RefactoringScriptService.createCopyAsRequest(EntityReference sourceReference,
+        EntityReference copyReference)
     {
         MoveRequest request = createMoveRequest(RefactoringJobs.COPY_AS, Arrays.asList(sourceReference), copyReference);
         request.setDeleteSource(false);
@@ -170,6 +194,7 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param reference the entity to copy
      * @param copyName the name of the entity copy
      * @return the copy-as request
+     * @deprecated Use {@link RequestFactory#createCopyAsRequest(EntityReference, String)} instead.
      */
     @Deprecated
     public MoveRequest RefactoringScriptService.createCopyAsRequest(EntityReference reference, String copyName)
@@ -183,7 +208,9 @@ public privileged aspect RefactoringScriptServiceAspect
      *
      * @param entityReferences the entities to delete
      * @return the delete request
+     * @deprecated Use {@link RequestFactory#createDeleteRequest(Collection)} instead.
      */
+    @Deprecated
     public EntityRequest RefactoringScriptService.createDeleteRequest(Collection<EntityReference> entityReferences)
     {
         EntityRequest request = new EntityRequest();
@@ -197,7 +224,9 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param entityReferences the entities to create
      * @return the create request
      * @since 7.4M2
+     * @deprecated Use {@link RequestFactory#createCreateRequest(Collection)} instead.
      */
+    @Deprecated
     public CreateRequest RefactoringScriptService.createCreateRequest(Collection<EntityReference> entityReferences)
     {
         CreateRequest request = new CreateRequest();
@@ -208,7 +237,8 @@ public privileged aspect RefactoringScriptServiceAspect
         return request;
     }
 
-    private void RefactoringScriptService.initEntityRequest(EntityRequest request, String type, Collection<EntityReference> entityReferences)
+    private void RefactoringScriptService.initEntityRequest(EntityRequest request, String type,
+        Collection<EntityReference> entityReferences)
     {
         request.setId(generateJobId(type));
         request.setJobType(type);
@@ -216,7 +246,8 @@ public privileged aspect RefactoringScriptServiceAspect
         setRightsProperties(request);
     }
 
-    private MoveRequest RefactoringScriptService.createMoveRequest(String type, Collection<EntityReference> sources, EntityReference destination)
+    private MoveRequest RefactoringScriptService.createMoveRequest(String type, Collection<EntityReference> sources,
+        EntityReference destination)
     {
         MoveRequest request = new MoveRequest();
         initEntityRequest(request, type, sources);
@@ -233,7 +264,9 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param batchId the ID of the batch of deleted documents to permanently delete
      * @return the permanently delete request
      * @since 10.10RC1
+     * @deprecated Use {@link RequestFactory#createPermanentlyDeleteRequest(String)} instead.
      */
+    @Deprecated
     public PermanentlyDeleteRequest RefactoringScriptService.createPermanentlyDeleteRequest(String batchId)
     {
         PermanentlyDeleteRequest request = initializePermanentlyDeleteRequest();
@@ -247,8 +280,11 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param deletedDocumentIds the list of IDs of the deleted documents to permanently delete
      * @return the permanently delete request
      * @since 10.10RC1
+     * @deprecated Use {@link RequestFactory#createPermanentlyDeleteRequest(List)} instead.
      */
-    public PermanentlyDeleteRequest RefactoringScriptService.createPermanentlyDeleteRequest(List<Long> deletedDocumentIds)
+    @Deprecated
+    public PermanentlyDeleteRequest RefactoringScriptService.createPermanentlyDeleteRequest(
+        List<Long> deletedDocumentIds)
     {
         PermanentlyDeleteRequest request = initializePermanentlyDeleteRequest();
         request.setDeletedDocumentIds(deletedDocumentIds);
@@ -274,7 +310,9 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param batchId the ID of the batch of deleted documents to restore
      * @return the restore request
      * @since 9.4RC1
+     * @deprecated Use {@link RequestFactory#createRestoreRequest(String)} instead.
      */
+    @Deprecated
     public RestoreRequest RefactoringScriptService.createRestoreRequest(String batchId)
     {
         RestoreRequest request = initializeRestoreRequest();
@@ -288,7 +326,9 @@ public privileged aspect RefactoringScriptServiceAspect
      * @param deletedDocumentIds the list of IDs of the deleted documents to restore
      * @return the restore request
      * @since 9.4RC1
+     * @deprecated Use {@link RequestFactory#createRestoreRequest(List)} instead.
      */
+    @Deprecated
     public RestoreRequest RefactoringScriptService.createRestoreRequest(List<Long> deletedDocumentIds)
     {
         RestoreRequest request = initializeRestoreRequest();
@@ -322,5 +362,33 @@ public privileged aspect RefactoringScriptServiceAspect
         }
 
         return result;
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given copy-as request.
+     *
+     * @param request the copy-as request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @deprecated Use {@link #copyAs(CopyRequest)} instead.
+     */
+    @Deprecated
+    public Job RefactoringScriptService.copyAs(MoveRequest request)
+    {
+        return execute(RefactoringJobs.COPY, request);
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given copy request.
+     *
+     * @param request the copy request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @deprecated Use {@link #copy(CopyRequest)} instead.
+     */
+    @Deprecated
+    public Job RefactoringScriptService.copy(MoveRequest request)
+    {
+        return execute(RefactoringJobs.COPY, request);
     }
 }

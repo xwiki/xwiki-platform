@@ -24,9 +24,7 @@ import java.util.Collection;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
@@ -61,42 +59,9 @@ public class RenameJob extends MoveJob
     }
 
     @Override
-    protected void process(EntityReference source)
+    protected boolean processOnlySameSourceDestinationTypes()
     {
-        // Perform generic checks that don't depend on the source/destination type.
-
-        EntityReference destination = this.request.getDestination();
-        if (source.getType() != destination.getType()) {
-            this.logger.error("You cannot change the entity type (from [{}] to [{}]).", source.getType(),
-                destination.getType());
-            return;
-        }
-
-        super.process(source);
-    }
-
-    @Override
-    protected void process(DocumentReference source, EntityReference destination)
-    {
-        // We know the destination is a document (see above).
-        DocumentReference destinationDocumentReference = new DocumentReference(destination);
-        if (this.request.isDeep() && isSpaceHomeReference(source)) {
-            if (isSpaceHomeReference(destinationDocumentReference)) {
-                // Rename an entire space.
-                process(source.getLastSpaceReference(), destinationDocumentReference.getLastSpaceReference());
-            } else {
-                this.logger.error("You cannot transform a non-terminal document [{}] into a terminal document [{}]"
-                    + " and preserve its child documents at the same time.", source, destinationDocumentReference);
-            }
-        } else {
-            maybeMove(source, destinationDocumentReference);
-        }
-    }
-
-    @Override
-    protected void process(SpaceReference source, EntityReference destination)
-    {
-        // We know the destination is a space (see above).
-        process(source, new SpaceReference(destination));
+        // rename always process same destination types
+        return true;
     }
 }

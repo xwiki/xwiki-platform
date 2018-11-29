@@ -35,18 +35,11 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
 
     /**
      * @see #isDeleteSource()
+     *
+     * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
      */
+    @Deprecated
     private static final String PROPERTY_DELETE_SOURCE = "deleteSource";
-
-    /**
-     * @see #isUpdateLinks()
-     */
-    private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
-
-    /**
-     * @see #isUpdateLinksOnFarm()
-     */
-    private static final String PROPERTY_UPDATE_LINKS_ON_FARM = "updateLinksOnFarm";
 
     /**
      * @see #isAutoRedirect()
@@ -63,7 +56,9 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      *         {@code false} otherwise; in a standard move operation the source is deleted but sometimes you may want to
      *         keep the source as a backup; this option can also be used to perform a copy instead of a move; note that
      *         the difference between a copy and a standard move without delete is that the back-links are not updated
+     * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
      */
+    @Deprecated
     public boolean isDeleteSource()
     {
         return getProperty(PROPERTY_DELETE_SOURCE, true);
@@ -73,54 +68,12 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      * Sets whether the source entities specified by {@link #getEntityReferences()} should be deleted or not.
      * 
      * @param deleteSource {@code true} to delete the source, {@code false} to keep it as a backup
+     * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
      */
+    @Deprecated
     public void setDeleteSource(boolean deleteSource)
     {
         setProperty(PROPERTY_DELETE_SOURCE, deleteSource);
-    }
-
-    /**
-     * @return {@code true} if the links that target the old entity reference (before the move) should be updated to
-     *         target the new reference (after the move), {@code false} to preserve the old link target
-     */
-    public boolean isUpdateLinks()
-    {
-        return getProperty(PROPERTY_UPDATE_LINKS, true);
-    }
-
-    /**
-     * Sets whether the links that target the old entity reference (before the move) should be updated to target the new
-     * reference (after the move) or not.
-     * 
-     * @param updateLinks {@code true} to update the links, {@code false} to preserve the old link target
-     */
-    public void setUpdateLinks(boolean updateLinks)
-    {
-        setProperty(PROPERTY_UPDATE_LINKS, updateLinks);
-    }
-
-    /**
-     * @return {@code true} if the job should update the links that target the old entity reference (before the move)
-     *         from anywhere on the farm, {@code false} if the job should update only the links from the wiki where the
-     *         entity was located before the move
-     */
-    public boolean isUpdateLinksOnFarm()
-    {
-        return getProperty(PROPERTY_UPDATE_LINKS_ON_FARM, false);
-    }
-
-    /**
-     * Sets whether the job should update the links that target the old entity reference (before the move) from anywhere
-     * on the farm, or only from the wiki where the entity was located before the mode.
-     * <p>
-     * Note that this parameter has no effect if {@link #isUpdateLinks()} is {@code false}.
-     * 
-     * @param updateLinksOnFarm {@code true} to update the links from anywhere on the farm, {@code false} to update only
-     *            the links from the wiki where the entity is located
-     */
-    public void setUpdateLinksOnFarm(boolean updateLinksOnFarm)
-    {
-        setProperty(PROPERTY_UPDATE_LINKS_ON_FARM, updateLinksOnFarm);
     }
 
     /**

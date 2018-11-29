@@ -116,6 +116,41 @@ define('entityResourcePicker', [
     };
   };
 
+  var getEntityNodeId = function(entityReference) {
+    return XWiki.EntityType.getName(entityReference.type) + ':' + XWiki.Model.serialize(entityReference);
+  };
+
+  var resolveDocumentReference = function(entityReference) {
+    var documentReference = entityReference.extractReference(XWiki.EntityType.DOCUMENT);
+    if (!documentReference) {
+      var spaceReference = entityReference.extractReference(XWiki.EntityType.SPACE);
+      if (!spaceReference) {
+        var wikiReference = entityReference.extractReference(XWiki.EntityType.WIKI) ||
+          new XWiki.WikiReference(XWiki.currentWiki);
+        spaceReference = new XWiki.EntityReference('Main', XWiki.EntityType.SPACE, wikiReference);
+      }
+      documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
+    }
+    return documentReference;
+  };
+
+  var getNodeToOpenTo = function(targetEntityType, entityReference) {
+    var targetEntityReference = entityReference.extractReference(targetEntityType);
+    if (targetEntityReference) {
+      // The target entity is a parent of the specified entity.
+      return getEntityNodeId(targetEntityReference);
+
+    // The target entity might be a child of the specified entity.
+    } else if (targetEntityType === XWiki.EntityType.DOCUMENT) {
+      return getEntityNodeId(resolveDocumentReference(entityReference));
+    } else if (targetEntityType === XWiki.EntityType.ATTACHMENT) {
+      return 'attachments:' + XWiki.Model.serialize(resolveDocumentReference(entityReference));
+    }
+
+    // Otherwise just try to open to the specified entity.
+    return getEntityNodeId(entityReference);
+  };
+
   var createEntityTreePicker = function(modal, handler) {
     var treePickerHandler = createTreePicker(modal, {
       canSelect: function(node) {
@@ -126,8 +161,7 @@ define('entityResourcePicker', [
       }
     });
     handler.open = function(entityReference) {
-      var openToNodeId = XWiki.EntityType.getName(entityReference.type) + ':' + XWiki.Model.serialize(entityReference);
-      treePickerHandler.open(openToNodeId);
+      treePickerHandler.open(getNodeToOpenTo(XWiki.EntityType.byName(handler.entityType), entityReference));
     };
     return handler;
   };

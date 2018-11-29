@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.aether.artifact.Artifact;
@@ -174,6 +175,17 @@ public class WARBuilder
                 artifacts.add(artifact);
             }
         }
+
+        // Add the Clover JAR if it's defined in the current pom.xml since it's needed when the clover profile is
+        // enabled. Note that we need this since by default we don't add any JAR to WEB-INF/lib (since we install
+        // module artifacts as XWiki Extensions).
+        Model model = this.mavenResolver.getModelFromCurrentPOM();
+        for (Dependency dependency : model.getDependencies()) {
+            if (dependency.getArtifactId().equals("clover") && dependency.getGroupId().equals("org.openclover")) {
+                artifacts.add(this.mavenResolver.convertToArtifact(dependency));
+            }
+        }
+
         return artifacts;
     }
 

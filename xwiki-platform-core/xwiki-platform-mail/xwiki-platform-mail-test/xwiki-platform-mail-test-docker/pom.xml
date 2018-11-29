@@ -153,6 +153,20 @@
       </dependencies>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemProperties combine.children="append">
+                <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
+                     WEB-INF/lib -->
+                <property>
+                  <name>xwiki.test.ui.profiles</name>
+                  <value>clover</value>
+                </property>
+              </systemProperties>
+            </configuration>
+          </plugin>
           <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
                that have been instrumented with Clover (XWiki oldcore for example) -->
           <plugin>

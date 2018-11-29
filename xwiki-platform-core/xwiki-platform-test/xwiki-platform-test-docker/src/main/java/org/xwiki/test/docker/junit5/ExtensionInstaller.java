@@ -30,7 +30,6 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,9 +129,7 @@ public class ExtensionInstaller
         Model model = this.mavenResolver.getModelFromCurrentPOM();
         for (Dependency dependency : model.getDependencies()) {
             if (dependency.getType().equalsIgnoreCase(XAR)) {
-                Artifact artifact = new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(),
-                    dependency.getClassifier(), dependency.getType(), dependency.getVersion());
-                extensions.add(artifact);
+                extensions.add(this.mavenResolver.convertToArtifact(dependency));
             }
         }
 

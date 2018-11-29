@@ -131,4 +131,10 @@ public @interface UITest
      * @since 10.11RC1
      */
     int[] sshPorts() default {};
+
+    /**
+     * @return the list of Maven profiles to activate when resolving dependencies for the current POM.
+     * @since 10.11RC1
+     */
+    String[] profiles() default {};
 }

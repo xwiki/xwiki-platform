@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -34,6 +35,7 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.ProjectModelResolver;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,16 +54,21 @@ public class MavenResolver
 
     private Map<String, Model> modelCache = new HashMap<>();
 
+    private TestConfiguration testConfiguration;
+
     private ArtifactResolver artifactResolver;
 
     private RepositoryResolver repositoryResolver;
 
     /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public MavenResolver(ArtifactResolver artifactResolver, RepositoryResolver repositoryResolver)
+    public MavenResolver(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        RepositoryResolver repositoryResolver)
     {
+        this.testConfiguration = testConfiguration;
         this.artifactResolver = artifactResolver;
         this.repositoryResolver = repositoryResolver;
     }
@@ -104,6 +111,7 @@ public class MavenResolver
 
             DefaultModelBuildingRequest modelBuildingRequest = new DefaultModelBuildingRequest()
                 .setPomFile(pomFile)
+                .setActiveProfileIds(this.testConfiguration.getProfiles())
                 .setModelResolver(resolver)
                 // We don't care about many things in the POM such as plugins for example so asking for minimal
                 // validation.
@@ -149,5 +157,16 @@ public class MavenResolver
             props.putAll(dominant);
         }
         return props;
+    }
+
+    /**
+     * @param dependency the dependency to convert to an Artifact instance
+     * @return the converted Artifact instance
+     * @since 10.11RC1
+     */
+    public Artifact convertToArtifact(Dependency dependency)
+    {
+        return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(),
+            dependency.getClassifier(), dependency.getType(), dependency.getVersion());
     }
 }

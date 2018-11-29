@@ -99,7 +99,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration);
         ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration, repositoryResolver);
-        MavenResolver mavenResolver = new MavenResolver(artifactResolver, repositoryResolver);
+        MavenResolver mavenResolver = new MavenResolver(testConfiguration, artifactResolver, repositoryResolver);
 
         // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {

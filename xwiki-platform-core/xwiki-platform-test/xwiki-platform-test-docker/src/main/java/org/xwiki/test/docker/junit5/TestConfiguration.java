@@ -20,6 +20,7 @@
 package org.xwiki.test.docker.junit5;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -68,6 +69,8 @@ public class TestConfiguration
 
     private static final String PROPERTIES_PREFIX_PROPERTY = "xwiki.test.ui.properties.";
 
+    private static final String PROFILES_PROPERTY = "xwiki.test.ui.profiles";
+
     private UITest uiTestAnnotation;
 
     private Browser browser;
@@ -96,6 +99,8 @@ public class TestConfiguration
 
     private List<Integer> sshPorts;
 
+    private List<String> profiles;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -115,6 +120,7 @@ public class TestConfiguration
         resolveProperties();
         resolveExtraJARs();
         resolveSSHPorts();
+        resolveProfiles();
     }
 
     private void resolveBrowser()
@@ -254,6 +260,17 @@ public class TestConfiguration
         this.sshPorts = newSSHPorts;
     }
 
+    private void resolveProfiles()
+    {
+        List<String> newProfiles = new ArrayList<>();
+        if (this.uiTestAnnotation.profiles().length > 0) {
+            newProfiles.addAll(Arrays.asList(this.uiTestAnnotation.profiles()));
+        } else {
+            newProfiles.addAll(Arrays.asList(System.getProperty(PROFILES_PROPERTY, "").split(",")));
+        }
+        this.profiles = newProfiles;
+    }
+
     /**
      * @return the browser to use
      */
@@ -374,6 +391,15 @@ public class TestConfiguration
     public List<Integer> getSSHPorts()
     {
         return this.sshPorts;
+    }
+
+    /**
+     * @return the list of Maven profiles to activate when resolving dependencies for the current POM.
+     * @since 10.11RC1
+     */
+    public List<String> getProfiles()
+    {
+        return this.profiles;
     }
 
     /**

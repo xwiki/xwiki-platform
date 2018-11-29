@@ -39,7 +39,12 @@
         var startMarker = '<!--startimage:' + CKEDITOR.tools.escapeComment(
           upload.responseData.resourceReference) + '-->';
         var stopMarker = '<!--stopimage-->';
-        return startMarker + html + stopMarker;
+        // We need to overwrite the HTML because the upload image widget sets the image width and height and we don't
+        // want to save them unless the user resizes the image explicitly.
+        // See CKEDITOR-223: Image larger than the screen inserted with drag & drop gets distorted (explicit image size
+        // is added by default)
+        var image = '<img src="' + upload.url + '"/>';
+        return startMarker + image + stopMarker;
       });
 
       // Chrome uses 'image.png' as file name when pasting images, instead of leaving the file name empty, and this

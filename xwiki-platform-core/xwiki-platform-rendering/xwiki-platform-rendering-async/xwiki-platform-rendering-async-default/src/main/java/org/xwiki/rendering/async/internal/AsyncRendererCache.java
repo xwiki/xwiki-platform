@@ -257,7 +257,9 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         if (keys != null) {
             for (String key : keys) {
                 this.longCache.remove(key);
-                this.asyncCache.remove(key);
+
+                // Not cleaning the async cache to avoid race condition (cache invalidated between the moment it was
+                // stored and the moment is was used for the first time)
             }
         }
     }

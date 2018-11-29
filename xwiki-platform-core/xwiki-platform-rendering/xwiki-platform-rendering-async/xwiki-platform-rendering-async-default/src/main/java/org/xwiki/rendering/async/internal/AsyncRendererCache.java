@@ -114,11 +114,14 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
             return status;
         }
 
-        // Try unique cache
+        // Try async cache
         status = this.asyncCache.get(cacheKey);
 
         if (status != null) {
-            this.asyncCache.remove(cacheKey);
+            // Not removing the entry from the cache because several clients might count on it at the same time so it's
+            // a bit dangerous. It will be removed from the cache after 600s (by default).
+            // TODO: store an id for each client waiting for the same result so that we can invalidate the cache a bit
+            // earlier instead of letting it die of old age (even if it means 600s here)
 
             return status;
         }
@@ -144,7 +147,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         }
 
         // Asynchronous statuses are stored in the big cache to avoid race condition (result invalidated before it get a
-        // chance of being actually requested)
+        // chance of being requested)
         if (status.isAsync()) {
             this.asyncCache.set(cacheKey, status);
         }

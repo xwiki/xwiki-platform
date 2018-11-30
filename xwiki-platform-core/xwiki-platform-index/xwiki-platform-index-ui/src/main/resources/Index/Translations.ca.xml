@@ -38,12 +38,12 @@
   <hidden>true</hidden>
   <content>index.spacesMacro.title=Espais
 index.spacesMacro.spaceIndex.title=Vegeu l'índex de l'espai
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceIndex.alt=Índex de documents de l'espai
 index.spacesMacro.spaceAdministration.title=Vegeu l'administració de l'espai
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.alt=Administrar l'espai
 index.spacesMacro.createSpace.link=Crear un nou espai
 index.spacesMacro.createSpace.defaultSpaceName=Nom de l'espai
 index.spacesMacro.createSpace.submit=Crear
-### Missing: index.deletedDocuments.deleteAll=Delete all
+index.deletedDocuments.deleteAll=Eliminar tot
 </content>
 </xwikidoc>

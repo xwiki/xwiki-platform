@@ -20,10 +20,14 @@
 package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.script.ScriptContext;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.ScriptContextManager;
@@ -51,38 +55,96 @@ import static org.mockito.Mockito.when;
 public class HTMLDisplayerTest
 {
     @MockComponent
-    public TemplateManager templateManager;
+    private TemplateManager templateManager;
 
     @MockComponent
-    public ScriptContextManager scriptContextManager;
+    private ScriptContextManager scriptContextManager;
 
     @InjectMockComponents
-    public DefaultTemplateHTMLDisplayer defaultTemplateHTMLDisplayer;
+    private DefaultTemplateHTMLDisplayer defaultTemplateHTMLDisplayer;
 
-    @Test
-    public void defaultTemplateHTMLDisplayerTest() throws Exception
+    private DocumentReference documentReference;
+
+    @BeforeEach
+    public void setup()
     {
         ScriptContext scriptContext = mock(ScriptContext.class);
-        Template template = mock(Template.class);
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        this.documentReference = new DocumentReference("wiki", "space", "page");
 
         when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContext);
+    }
 
-        this.defaultTemplateHTMLDisplayer.display(documentReference);
+    @Test
+    public void getTemplateTest() throws Exception
+    {
+        this.defaultTemplateHTMLDisplayer.display(DocumentReference.class, documentReference);
         verify(this.templateManager).getTemplate("html_displayer/documentreference/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/documentreference.vm");
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
 
+    @Test
+    public void getTemplateWithNullTypeTest() throws Exception
+    {
+        this.defaultTemplateHTMLDisplayer.display(null, "test");
+        verify(this.templateManager).getTemplate("html_displayer/string/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/string.vm");
+        verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
+
+    @Test
+    public void getTemplateWithNullValueTest() throws Exception
+    {
+        this.defaultTemplateHTMLDisplayer.display((new ArrayList<String>()).getClass(), null);
+        verify(this.templateManager).getTemplate("html_displayer/arraylist/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/arraylist.vm");
+        verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
+
+    @Test
+    public void getTemplateWithNullValueAndSpecialTypeTest() throws Exception
+    {
+        this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(List.class, String.class), null);
+        verify(this.templateManager).getTemplate("html_displayer/java.util.list.java.lang.string/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/java.util.list.java.lang.string.vm");
+        verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
+
+    @Test
+    public void getTemplateWithNullTypeAndNullValueTest() throws Exception
+    {
+        this.defaultTemplateHTMLDisplayer.display(null, null);
+        verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
+
+    @Test
+    public void displayTest() throws Exception
+    {
+        Template template = mock(Template.class);
+
+        when(this.templateManager.getTemplate(any())).thenReturn(template);
         doAnswer(i -> ((StringWriter) i.getArgument(1)).append("displayer"))
                 .when(templateManager).render(any(Template.class), any());
+
+        assertEquals("displayer",
+                this.defaultTemplateHTMLDisplayer.display(DocumentReference.class, documentReference));
+    }
+
+    @Test
+    public void displayWithExceptionTest() throws Exception
+    {
+        Template template = mock(Template.class);
+
         when(this.templateManager.getTemplate(any())).thenReturn(template);
-
-        assertEquals("displayer", this.defaultTemplateHTMLDisplayer.display(documentReference));
-
         doThrow(new Exception()).when(this.templateManager).render(any(Template.class), any());
 
-        assertThrows(HTMLDisplayerException.class,
-                () -> this.defaultTemplateHTMLDisplayer.display(documentReference));
+        Throwable exception = assertThrows(HTMLDisplayerException.class,
+                () -> this.defaultTemplateHTMLDisplayer.display(DocumentReference.class, documentReference));
+        assertEquals("Couldn't render the template", exception.getMessage());
     }
 }

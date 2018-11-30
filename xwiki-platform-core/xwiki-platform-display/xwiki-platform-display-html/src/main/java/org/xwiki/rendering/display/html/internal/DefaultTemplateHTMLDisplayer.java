@@ -21,6 +21,7 @@ package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,9 +73,9 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
      * Displays the value with the 'view' mode.
      */
     @Override
-    public String display(Object value) throws HTMLDisplayerException
+    public String display(Type type, Object value) throws HTMLDisplayerException
     {
-        return display(value, new HashMap<>());
+        return display(type, value, new HashMap<>());
     }
 
     /**
@@ -83,13 +84,13 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
      * Displays the value with the 'view' mode.
      */
     @Override
-    public String display(Object value, Map parameters) throws HTMLDisplayerException
+    public String display(Type type, Object value, Map parameters) throws HTMLDisplayerException
     {
-        return display(value, parameters, "view");
+        return display(type, value, parameters, "view");
     }
 
     @Override
-    public String display(Object value, Map parameters, String mode) throws HTMLDisplayerException
+    public String display(Type type, Object value, Map parameters, String mode) throws HTMLDisplayerException
     {
         ScriptContext scriptContext = scriptContextManager.getCurrentScriptContext();
         try {
@@ -100,7 +101,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
             scriptContext.setAttribute(DISPLAYER_VELOCITY_NAME, displayer, ScriptContext.ENGINE_SCOPE);
 
             Writer writer = new StringWriter();
-            templateManager.render(getTemplate(value, mode), writer);
+            templateManager.render(getTemplate(type, value, mode), writer);
 
             return writer.toString();
         } catch (Exception e) {
@@ -121,11 +122,24 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
      * </ul>
      * @return the template name used to make the rendering
      */
-    private Template getTemplate(Object value, String mode) {
-        String type = value.getClass().getSimpleName().toLowerCase();
-        Template template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + type + "/" + mode + TEMPLATE_EXTENSION);
-        if (template == null) {
-            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + type + TEMPLATE_EXTENSION);
+    private Template getTemplate(Type type, Object value, String mode) {
+        Template template = null;
+        String typeName = "";
+        if (type != null) {
+            if (type instanceof Class) {
+                typeName = ((Class) type).getSimpleName().toLowerCase();
+            } else {
+                typeName = type.getTypeName().toLowerCase();
+            }
+        } else if (value != null) {
+            typeName = value.getClass().getSimpleName().toLowerCase();
+        }
+
+        if (!typeName.isEmpty()) {
+            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + typeName + "/" + mode + TEMPLATE_EXTENSION);
+            if (template == null) {
+                template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + typeName + TEMPLATE_EXTENSION);
+            }
         }
         if (template == null) {
             template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + mode + TEMPLATE_EXTENSION);

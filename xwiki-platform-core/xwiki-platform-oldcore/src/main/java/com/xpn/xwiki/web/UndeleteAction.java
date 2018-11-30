@@ -185,10 +185,11 @@ public class UndeleteAction extends XWikiAction
         if (TRUE.equals(request.getParameter(INCLUDE_BATCH_PARAMETER))) {
             // Restore the entire batch, including the current document.
             String batchId = deletedDocument.getBatchId();
-            restoreRequest = refactoring.createRestoreRequest(batchId);
+            restoreRequest = refactoring.getRequestFactory().createRestoreRequest(batchId);
         } else {
             // Restore just the current document.
-            restoreRequest = refactoring.createRestoreRequest(Arrays.asList(deletedDocument.getId()));
+            restoreRequest = refactoring.getRequestFactory()
+                .createRestoreRequest(Arrays.asList(deletedDocument.getId()));
         }
         restoreRequest.setInteractive(isAsync(request));
         restoreRequest.setCheckAuthorRights(false);

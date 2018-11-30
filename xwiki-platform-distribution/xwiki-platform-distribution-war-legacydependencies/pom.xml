@@ -68,6 +68,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-rendering-macro-include</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-refactoring-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -168,6 +172,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-refactoring-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -233,6 +241,21 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-refactoring-api</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

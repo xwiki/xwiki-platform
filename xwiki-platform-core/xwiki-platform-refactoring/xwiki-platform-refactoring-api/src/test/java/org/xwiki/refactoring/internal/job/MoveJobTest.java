@@ -441,35 +441,6 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void copyDocument() throws Throwable
-    {
-        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
-        when(this.modelBridge.exists(sourceReference)).thenReturn(true);
-
-        DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
-        when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);
-
-        MoveRequest request = createRequest(sourceReference, copyReference.getParent());
-        request.setCheckRights(false);
-        request.setCheckAuthorRights(false);
-        request.setInteractive(false);
-        request.setDeleteSource(false);
-        Map<String, String> parameters = Collections.singletonMap("foo", "bar");
-        request.setEntityParameters(sourceReference, parameters);
-        run(request);
-
-        verify(this.modelBridge).update(copyReference, parameters);
-
-        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
-        verify(linkRefactoring, never()).renameLinks(any(DocumentReference.class), any(DocumentReference.class),
-            any(DocumentReference.class));
-        verify(linkRefactoring).updateRelativeLinks(sourceReference, copyReference);
-
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
-        verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
-    }
-
-    @Test
     public void getGroupPath() throws Exception
     {
         DocumentReference alice = new DocumentReference("chess", Arrays.asList("A", "B"), "C");

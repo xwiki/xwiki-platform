@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
+import org.xwiki.refactoring.script.RequestFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
@@ -92,6 +93,8 @@ public class UndeleteActionTest
 
     private RefactoringScriptService refactoringScriptService = mock(RefactoringScriptService.class);
 
+    private RequestFactory requestFactory = mock(RequestFactory.class);
+
     private JobExecutor jobExecutor;
 
     private Job job = mock(Job.class);
@@ -118,8 +121,9 @@ public class UndeleteActionTest
         when(jobExecutor.execute(anyString(), any())).thenReturn(job);
 
         jobRequest = mock(RestoreRequest.class);
-        when(refactoringScriptService.createRestoreRequest(any(List.class))).thenReturn(jobRequest);
-        when(refactoringScriptService.createRestoreRequest(anyString())).thenReturn(jobRequest);
+        when(refactoringScriptService.getRequestFactory()).thenReturn(requestFactory);
+        when(requestFactory.createRestoreRequest(any(List.class))).thenReturn(jobRequest);
+        when(requestFactory.createRestoreRequest(anyString())).thenReturn(jobRequest);
     }
 
     /**
@@ -144,7 +148,7 @@ public class UndeleteActionTest
 
         assertFalse(undeleteAction.action(context));
 
-        verify(refactoringScriptService).createRestoreRequest(Arrays.asList(id));
+        verify(requestFactory).createRestoreRequest(Arrays.asList(id));
         verify(jobExecutor).execute(RefactoringJobs.RESTORE, jobRequest);
         verify(job).join();
     }
@@ -189,7 +193,7 @@ public class UndeleteActionTest
         assertFalse(undeleteAction.action(context));
 
         // Verify that we never get this far.
-        verify(refactoringScriptService, never()).createRestoreRequest(Arrays.asList(id));
+        verify(requestFactory, never()).createRestoreRequest(Arrays.asList(id));
     }
 
     /**
@@ -217,7 +221,7 @@ public class UndeleteActionTest
         assertEquals("restore", undeleteAction.render(context));
 
         // Just make sure that we stop to the display, since the "confirm=true" parameter was not passed.
-        verify(refactoringScriptService, never()).createRestoreRequest(Arrays.asList(id));
+        verify(requestFactory, never()).createRestoreRequest(Arrays.asList(id));
     }
 
     /**
@@ -253,7 +257,7 @@ public class UndeleteActionTest
 
         assertFalse(undeleteAction.action(context));
 
-        verify(refactoringScriptService).createRestoreRequest(batchId);
+        verify(requestFactory).createRestoreRequest(batchId);
         verify(jobExecutor).execute(RefactoringJobs.RESTORE, jobRequest);
         verify(job).join();
     }
@@ -284,7 +288,7 @@ public class UndeleteActionTest
         assertEquals("accessdenied", undeleteAction.render(context));
 
         // Just make sure we don`t go any further.
-        verify(refactoringScriptService, never()).createRestoreRequest(Arrays.asList(id));
+        verify(requestFactory, never()).createRestoreRequest(Arrays.asList(id));
     }
 
     /**
@@ -325,6 +329,6 @@ public class UndeleteActionTest
         assertEquals("accessdenied", undeleteAction.render(context));
 
         // Just make sure we don`t go any further.
-        verify(refactoringScriptService, never()).createRestoreRequest(batchId);
+        verify(requestFactory, never()).createRestoreRequest(batchId);
     }
 }

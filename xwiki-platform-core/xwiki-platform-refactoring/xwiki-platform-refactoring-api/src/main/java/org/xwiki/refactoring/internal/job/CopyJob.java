@@ -19,49 +19,52 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Collection;
-
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
- * A job that can rename entities.
- * 
+ * Job used to copy entities without removing them afterwards.
+ *
+ * @since 10.11RC1
  * @version $Id$
- * @since 7.2M1
  */
 @Component
-@Named(RefactoringJobs.RENAME)
-public class RenameJob extends MoveJob
+@Named(RefactoringJobs.COPY)
+public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
 {
     @Override
     public String getType()
     {
-        return RefactoringJobs.RENAME;
+        return RefactoringJobs.COPY;
     }
 
     @Override
     protected boolean isDeleteSources()
     {
-        // rename always delete original sources
-        return true;
+        // copy never deletes sources
+        return false;
     }
 
     @Override
-    protected void process(Collection<EntityReference> entityReferences)
+    protected void postMove(DocumentReference oldReference, DocumentReference newReference)
     {
-        if (entityReferences.size() == 1) {
-            process(entityReferences.iterator().next());
-        }
+        // do nothing
+    }
+
+    @Override
+    protected void postUpdateDocuments(DocumentReference oldReference, DocumentReference newReference)
+    {
+        // do nothing
     }
 
     @Override
     protected boolean processOnlySameSourceDestinationTypes()
     {
-        // rename always process same destination types
+        // copy always process same destination types
         return true;
     }
 }

@@ -34,7 +34,7 @@
     <!-- Skipping revapi since xwiki-platform-legacy-refactoring-api wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.pitest.mutationThreshold>97</xwiki.pitest.mutationThreshold>
-    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Refactoring API</xwiki.extension.name>
   </properties>

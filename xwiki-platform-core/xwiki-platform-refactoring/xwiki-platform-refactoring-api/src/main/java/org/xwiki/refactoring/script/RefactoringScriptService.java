@@ -27,17 +27,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -62,7 +58,7 @@ import org.xwiki.security.authorization.Right;
 @Component
 @Named(RefactoringJobs.GROUP)
 @Singleton
-public class RefactoringScriptService implements ScriptService, Initializable
+public class RefactoringScriptService implements ScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.
@@ -87,25 +83,11 @@ public class RefactoringScriptService implements ScriptService, Initializable
     @Inject
     private ContextualAuthorizationManager authorization;
 
-    /**
-     * Needed for getting the current user reference.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
 
     @Inject
-    private ModelContext modelContext;
-
     private RequestFactory requestFactory;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.requestFactory = new RequestFactory(documentAccessBridge, modelContext);
-    }
 
     /**
      * @return the standard request factory for creating the different refactoring requests.
@@ -289,7 +271,7 @@ public class RefactoringScriptService implements ScriptService, Initializable
      */
     public Job copyAs(CopyRequest request)
     {
-        return execute(RefactoringJobs.COPY, request);
+        return execute(RefactoringJobs.COPY_AS, request);
     }
 
     /**

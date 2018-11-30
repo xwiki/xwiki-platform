@@ -22,9 +22,11 @@ package org.xwiki.refactoring.script;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.job.Job;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 
 import java.util.Collection;
@@ -32,6 +34,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.inject.Inject;
 
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CopyRequest;
@@ -49,6 +53,12 @@ import org.xwiki.refactoring.job.RestoreRequest;
  */
 public privileged aspect RefactoringScriptServiceAspect
 {
+    @Inject
+    private DocumentAccessBridge RefactoringScriptService.documentAccessBridge;
+
+    @Inject
+    private ModelContext RefactoringScriptService.modelContext;
+
     /**
      * @param type the type of refactoring
      * @return an id for a job to perform the specified type of refactoring

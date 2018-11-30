@@ -26,8 +26,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
@@ -47,20 +51,18 @@ import org.xwiki.refactoring.job.RestoreRequest;
  * @version $Id$
  * @since 10.11RC1
  */
+@Component(roles = RequestFactory.class)
+@Singleton
 public class RequestFactory
 {
     /**
      * Needed for getting the current user reference.
      */
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
+    @Inject
     private ModelContext modelContext;
-
-    protected RequestFactory(DocumentAccessBridge documentAccessBridge, ModelContext modelContext)
-    {
-        this.documentAccessBridge = documentAccessBridge;
-        this.modelContext = modelContext;
-    }
 
     /**
      * @param type the type of refactoring

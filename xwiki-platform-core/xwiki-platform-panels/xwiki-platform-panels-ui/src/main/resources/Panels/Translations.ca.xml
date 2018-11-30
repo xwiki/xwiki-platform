@@ -36,15 +36,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: panels.available=Available Panels
-### Missing: panels.name=Name
-### Missing: panels.description=Description
-### Missing: panels.type=Type
-### Missing: panels.category=Category
+  <content>panels.available=Panells Disponibles
+panels.name=Nom
+panels.description=Descripció
+panels.type=Tipus
+panels.category=Categoria
 panels._actions=Accions
 panels.emptyvalue=
 panels.children.title=Pàgines Filles
 panels.siblings.title=Pàgines Germanes
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.documentInformation.configureSyntaxes=Configurar més sintaxis
 </content>
 </xwikidoc>

@@ -74,7 +74,7 @@ public class IncludeMacroParameters
      * @since 3.4M1
      */
     @PropertyDescription("the reference of the resource to display")
-    @PropertyGroup({"stringReference"})
+    @PropertyGroup("stringReference")
     @PropertyFeature("reference")
     public void setReference(String reference)
     {
@@ -95,7 +95,7 @@ public class IncludeMacroParameters
      * @since 3.4M1
      */
     @PropertyDescription("the type of the reference")
-    @PropertyGroup({"stringReference"})
+    @PropertyGroup("stringReference")
     public EntityType getType()
     {
         return this.type;

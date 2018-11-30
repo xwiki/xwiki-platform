@@ -46,9 +46,9 @@ public abstract class AbstractUIExtensionClassDocumentInitializer extends Abstra
     @Override
     protected void createClass(BaseClass xclass)
     {
-        super.createClass(xclass);
-
         // The content property supports wiki syntax, but it uses script macros most of the time.
         xclass.addTextAreaField(CONTENT_PROPERTY, "Executed Content", 120, 25, EditorType.TEXT);
+
+        super.createClass(xclass);
     }
 }

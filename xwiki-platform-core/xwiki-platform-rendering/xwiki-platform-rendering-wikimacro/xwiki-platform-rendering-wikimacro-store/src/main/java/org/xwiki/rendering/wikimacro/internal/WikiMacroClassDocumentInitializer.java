@@ -55,8 +55,6 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
     @Override
     protected void createClass(BaseClass xclass)
     {
-        super.createClass(xclass);
-
         xclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
         xclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
         // The Macro description is using plain text (same as for Java Macros).
@@ -73,5 +71,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
             "Content description (Not applicable for \"No content\" type)", 40, 5, TextAreaClass.ContentType.PURE_TEXT);
         // The code property contains wiki markup
         xclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20, TextAreaClass.EditorType.TEXT);
+
+        super.createClass(xclass);
     }
 }

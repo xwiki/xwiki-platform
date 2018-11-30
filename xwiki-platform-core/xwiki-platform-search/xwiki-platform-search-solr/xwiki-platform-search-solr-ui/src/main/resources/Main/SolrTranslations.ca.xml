@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Missing: solr.admin.title=Solr Search Administration
-### Missing: solr.admin.submit=Apply
+solr.admin.submit=Aplicar
 ### Missing: solr.admin.error.action={0} failed:
 ### Missing: solr.admin.error.notallowed=You are not allowed to perform this action.
 ### Missing: solr.admin.error.norights=Administration rights are required to access this section.

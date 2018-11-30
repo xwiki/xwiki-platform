@@ -37,25 +37,25 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>platform.core.profile.category.notifications=Notificacions
-### Missing: notifications.filters.cancel=Cancel
-### Missing: notifications.filters.submit=Save
-### Missing: notifications.filters.type.label=Filter type:
+notifications.filters.cancel=Cancel·lar
+notifications.filters.submit=Desa
+notifications.filters.type.label=Tipus de filtre:
 ### Missing: notifications.filters.type.hint=How the filter should act towards an event in the given location
-### Missing: notifications.filters.location.label=Filter scope:
+notifications.filters.location.label=Àmbit de filtre:
 ### Missing: notifications.filters.location.hint=What part of the wiki should be concerned by the filter?
 
 ## Advanced filters options
-### Missing: notifications.settings.filters.advanced=Advanced filtering options
+notifications.settings.filters.advanced=Opcions avançades de filtratge
 ### Missing: notifications.filters.advanced.toggles.hint=These filters are activated by default, you can disable them by using the button next to each filter.
-### Missing: notifications.filters.advanced.toggles.table.name=Filter name
-### Missing: notifications.filters.advanced.toggles.table.description=Description
-### Missing: notifications.filters.advanced.toggles.table.toggle=Toggle
-### Missing: notifications.filters.advanced.modal.close=Close
+notifications.filters.advanced.toggles.table.name=Nom del filtre
+notifications.filters.advanced.toggles.table.description=Descripció
+notifications.filters.advanced.toggles.table.toggle=Commuta
+notifications.filters.advanced.modal.close=Tanca
 
 ## Filters names
-### Missing: notifications.filters.name.systemUserNotificationFilter=System Filter
-### Missing: notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user
-### Missing: notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
+notifications.filters.name.systemUserNotificationFilter=Filtre de cerca
+notifications.filters.description.systemUserNotificationFilter=Amaga les notificacions de l'usuari de sistema
+notifications.filters.name.ownEventsNotificationFilter=Filtre d'esdeveniments propis
 ### Missing: notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity
 ### Missing: notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
 ### Missing: notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read

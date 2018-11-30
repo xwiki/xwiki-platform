@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>10.8.2</version>
+    <version>10.8.3-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -35,7 +35,7 @@
          By using an empty value we force Maven to resolve the parent from the Maven repositories,
          see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
     -->
-    <relativePath />
+    <relativePath/>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>

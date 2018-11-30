@@ -188,7 +188,8 @@ public class UndeleteAction extends XWikiAction
             restoreRequest = refactoring.getRequestFactory().createRestoreRequest(batchId);
         } else {
             // Restore just the current document.
-            restoreRequest = refactoring.getRequestFactory().createRestoreRequest(Arrays.asList(deletedDocument.getId()));
+            restoreRequest = refactoring.getRequestFactory()
+                .createRestoreRequest(Arrays.asList(deletedDocument.getId()));
         }
         restoreRequest.setInteractive(isAsync(request));
         restoreRequest.setCheckAuthorRights(false);

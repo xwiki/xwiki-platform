@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.display.html.script;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -47,35 +48,39 @@ public class HTMLDisplayerScriptService implements ScriptService
     private HTMLDisplayerManager htmlDisplayerManager;
 
     /**
+     * @param type the type used to retrieve the HTML Displayer
      * @param value the value on which the display is based on
      * @return the html element based on the value and the type
      * @throws HTMLDisplayerException if an error occurs during the display
      */
-    public String display(Object value) throws HTMLDisplayerException
+    public String display(Type type, Object value) throws HTMLDisplayerException
     {
-        return htmlDisplayerManager.display(value.getClass(), value);
+        return htmlDisplayerManager.display(type, value);
     }
 
     /**
+     * @param type the type used to retrieve the HTML Displayer
      * @param value the value on which the display is based on
      * @param parameters parameters used while generating the html. Could be the attributes of an input for instance.
      * @return the html element based on the value and the type
      * @throws HTMLDisplayerException if an error occurs during the display
      */
-    public String display(Object value, Map<String, String> parameters) throws HTMLDisplayerException
+    public String display(Type type, Object value, Map<String, String> parameters) throws HTMLDisplayerException
     {
-        return htmlDisplayerManager.display(value.getClass(), value, parameters);
+        return htmlDisplayerManager.display(type, value, parameters);
     }
 
     /**
+     * @param type the type used to retrieve the HTML Displayer
      * @param value the value on which the display is based on
      * @param parameters parameters used while generating the html. Could be the attributes of an input for instance.
      * @param mode the display mode (view, edit, ...)
      * @return the html element based on the value and the type
      * @throws HTMLDisplayerException if an error occurs during the display
      */
-    public String display(Object value, Map<String, String> parameters, String mode) throws HTMLDisplayerException
+    public String display(Type type, Object value, Map<String, String> parameters, String mode)
+            throws HTMLDisplayerException
     {
-        return htmlDisplayerManager.display(value.getClass(), value, parameters, mode);
+        return htmlDisplayerManager.display(type, value, parameters, mode);
     }
 }

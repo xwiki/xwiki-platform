@@ -71,10 +71,10 @@ public class HTMLDisplayerScriptServiceTest
             put("class", "testClass");
         }};
 
-        assertEquals("<input >test</input>", this.htmlDisplayerScriptService.display("test"));
+        assertEquals("<input >test</input>", this.htmlDisplayerScriptService.display(String.class, "test"));
         assertEquals("<input id='testId' class='testClass'>test</input>",
-                this.htmlDisplayerScriptService.display("test", parameters));
+                this.htmlDisplayerScriptService.display(String.class, "test", parameters));
         assertEquals("<input id='testId' class='testClass'>test</input>",
-                this.htmlDisplayerScriptService.display("test", parameters, "view"));
+                this.htmlDisplayerScriptService.display(String.class, "test", parameters, "view"));
     }
 }

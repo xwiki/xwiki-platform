@@ -84,12 +84,12 @@ rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
 
 index.documentTree.empty=No s'han trobat pàgines
-### Missing: index.documentTree.more={0} more ...
+index.documentTree.more={0} més ...
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
-### Missing: rendering.macro.documentTree.parameter.showChildDocuments.name=Show Child Documents
+rendering.macro.documentTree.parameter.showChildDocuments.name=Mostra els documents fills
 ### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
 </content>
 </xwikidoc>

@@ -22,6 +22,7 @@ package org.xwiki.rendering.display.html.internal;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,7 +76,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
     @Override
     public String display(Type type, Object value) throws HTMLDisplayerException
     {
-        return display(type, value, new HashMap<>());
+        return display(type, value, Collections.emptyMap());
     }
 
     /**

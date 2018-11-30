@@ -213,8 +213,8 @@ public class PasswordClass extends StringClass
         String result = plainPassword;
         if (storedPassword != null && plainPassword != null) {
             if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-                result =
-                        getPasswordHash(result, getAlgorithmFromPassword(storedPassword), getSaltFromPassword(storedPassword));
+                result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
+                        getSaltFromPassword(storedPassword));
             } else if (storedPassword.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
                 result = getPasswordCrypt(result, getAlgorithmFromPassword(storedPassword));
             }

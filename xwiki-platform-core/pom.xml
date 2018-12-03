@@ -205,6 +205,72 @@
                     "methodName": "postNotifications",
                     "elementKind": "method",
                     "justification": "Adding a new REST API is actually not a blocker."
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterManager::deleteFilterPreference(java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::deleteFilterPreference(org.xwiki.model.reference.DocumentReference, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterManager",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "deleteFilterPreference",
+                    "elementKind": "method",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterManager::saveFilterPreferences(java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>)",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::saveFilterPreferences(org.xwiki.model.reference.DocumentReference, java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterManager",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "saveFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterManager::setFilterPreferenceEnabled(java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::setFilterPreferenceEnabled(org.xwiki.model.reference.DocumentReference, java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterManager",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "setFilterPreferenceEnabled",
+                    "elementKind": "method",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::deleteFilterPreference(java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::deleteFilterPreference(org.xwiki.model.reference.DocumentReference, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreferenceProvider",
+                    "classSimpleName": "NotificationFilterPreferenceProvider",
+                    "methodName": "deleteFilterPreference",
+                    "elementKind": "method",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::saveFilterPreferences(java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::saveFilterPreferences(org.xwiki.model.reference.DocumentReference, java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreferenceProvider",
+                    "classSimpleName": "NotificationFilterPreferenceProvider",
+                    "methodName": "saveFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setFilterPreferenceEnabled(java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setFilterPreferenceEnabled(org.xwiki.model.reference.DocumentReference, java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classQualifiedName": "org.xwiki.notifications.filters.NotificationFilterPreferenceProvider",
+                    "classSimpleName": "NotificationFilterPreferenceProvider",
+                    "methodName": "setFilterPreferenceEnabled",
+                    "elementKind": "method",
+                    "justification": "Bad design at fist attempt"
                   }
                 ]
               }

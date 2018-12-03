@@ -131,8 +131,8 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
     {
-
-        notificationFilterManager.deleteFilterPreference(filterPreferenceId);
+        notificationFilterManager.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(),
+                filterPreferenceId);
     }
 
     /**
@@ -145,7 +145,8 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException
     {
-        notificationFilterManager.setFilterPreferenceEnabled(filterPreferenceId, enabled);
+        notificationFilterManager.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
+                filterPreferenceId, enabled);
     }
 
     /**

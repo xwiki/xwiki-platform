@@ -161,14 +161,14 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     }
 
     @Override
-    public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
+    public void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> filterPreferences)
     {
         // We do not want to create any new preference for the watchlist application, since we want to migrate
         // smoothly to the new notification mechanism
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceId)
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceId)
     {
         if (!configuration.isEnabled()) {
             return;
@@ -183,12 +183,11 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
 
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
-        DocumentReference user = context.getUserReference();
 
         try {
             XWikiDocument document = xwiki.getDocument(user, context);
             List<BaseObject> objects = document.getXObjects(
-                CLASS_REFERENCE.appendParent(context.getUserReference().getWikiReference()));
+                CLASS_REFERENCE.appendParent(user.getWikiReference()));
             if (objects == null) {
                 return;
             }
@@ -240,7 +239,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     }
 
     @Override
-    public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled)
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
     {
         // Watchlist preferences are always enabled
     }

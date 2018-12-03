@@ -162,6 +162,42 @@
                     RssMacroParameters defines a method with same name and parameters than in BoxMacroParameters but
                     different return type. We consider this risk as acceptable since the chances are very low and in
                     case it occurs, the fix for the user would be easy."
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceManager::deleteFilterPreference(java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceManager::deleteFilterPreference(org.xwiki.model.reference.DocumentReference, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceManager::saveFilterPreferences(java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>)",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceManager::saveFilterPreferences(org.xwiki.model.reference.DocumentReference, java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>)",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceManager::setFilterPreferenceEnabled(java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceManager::setFilterPreferenceEnabled(org.xwiki.model.reference.DocumentReference, java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::deleteFilterPreference(java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::deleteFilterPreference(org.xwiki.model.reference.DocumentReference, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::saveFilterPreferences(java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::saveFilterPreferences(org.xwiki.model.reference.DocumentReference, java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>) throws org.xwiki.notifications.NotificationException",
+                    "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setFilterPreferenceEnabled(java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setFilterPreferenceEnabled(org.xwiki.model.reference.DocumentReference, java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "justification": "Bad design at fist attempt"
                   }
                 ]
               }

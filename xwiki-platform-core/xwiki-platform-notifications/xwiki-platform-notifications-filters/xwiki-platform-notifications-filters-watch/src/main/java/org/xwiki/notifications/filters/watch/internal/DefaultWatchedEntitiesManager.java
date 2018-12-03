@@ -117,17 +117,17 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
 
                 if (notificationFilterPreference.getFilterType() == NotificationFilterType.INCLUSIVE
                         && notificationFilterPreference.isEnabled() != shouldBeWatched) {
-                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference);
+                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference, user);
                 } else if (notificationFilterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE
                         && notificationFilterPreference.isEnabled() == shouldBeWatched) {
-                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference);
+                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference, user);
                 }
             }
         }
 
         // But it might been still unwatched because of an other filter!
         if (!thereIsAMatch || entity.isWatched(user) != shouldBeWatched) {
-            notificationFilterPreferenceManager.saveFilterPreferences(
+            notificationFilterPreferenceManager.saveFilterPreferences(user,
                     Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
         }
     }
@@ -139,17 +139,17 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         return !xwikiEventTypesEnabler.isNotificationDisabled(user) && entity.isWatched(user) == desiredState;
     }
 
-    private void enableOrDeleteFilter(boolean enable,
-            NotificationFilterPreference notificationFilterPreference) throws NotificationException
+    private void enableOrDeleteFilter(boolean enable, NotificationFilterPreference notificationFilterPreference,
+        DocumentReference user) throws NotificationException
     {
         if (enable) {
-            notificationFilterPreferenceManager.setFilterPreferenceEnabled(
+            notificationFilterPreferenceManager.setFilterPreferenceEnabled(user,
                     notificationFilterPreference.getId(),
                     true);
         } else  {
             // Delete this filter instead of just disabling it, because we don't want to let remaining
             // filters
-            notificationFilterPreferenceManager.deleteFilterPreference(
+            notificationFilterPreferenceManager.deleteFilterPreference(user,
                     notificationFilterPreference.getId());
         }
     }

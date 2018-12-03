@@ -108,7 +108,7 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
     }
 
     @Override
-    public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
+    public void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> filterPreferences)
     {
         Map<String, Set<NotificationFilterPreference>> preferencesMapping = new HashMap<>();
 
@@ -130,7 +130,7 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
                 NotificationFilterPreferenceProvider provider =
                         componentManager.getInstance(NotificationFilterPreferenceProvider.class, providerHint);
 
-                provider.saveFilterPreferences(preferencesMapping.get(providerHint));
+                provider.saveFilterPreferences(user, preferencesMapping.get(providerHint));
 
             } catch (ComponentLookupException e) {
                 logger.error("Unable to retrieve the notification filter preference provider for hint [{}]: [{}]",
@@ -143,13 +143,13 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
         try {
             for (NotificationFilterPreferenceProvider provider
                     : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
                     NotificationFilterPreferenceProvider.class)) {
-                provider.deleteFilterPreference(filterPreferenceId);
+                provider.deleteFilterPreference(user, filterPreferenceId);
             }
 
         } catch (ComponentLookupException e) {
@@ -159,14 +159,14 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
 
 
     @Override
-    public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled)
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
         try {
             for (NotificationFilterPreferenceProvider provider
                     : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
                     NotificationFilterPreferenceProvider.class)) {
-                provider.setFilterPreferenceEnabled(filterPreferenceId, enabled);
+                provider.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
             }
 
         } catch (ComponentLookupException e) {

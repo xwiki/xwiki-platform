@@ -73,6 +73,8 @@ public class TestConfiguration
 
     private static final String PROFILES_PROPERTY = "xwiki.test.ui.profiles";
 
+    private static final String OFFICE_PROPERTY = "xwiki.test.ui.office";
+
     private UITest uiTestAnnotation;
 
     private Browser browser;
@@ -105,6 +107,8 @@ public class TestConfiguration
 
     private List<String> profiles;
 
+    private boolean office;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -126,6 +130,7 @@ public class TestConfiguration
         resolveExtraJARs();
         resolveSSHPorts();
         resolveProfiles();
+        resolveOffice();
     }
 
     private void resolveBrowser()
@@ -227,6 +232,15 @@ public class TestConfiguration
             newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, TRUE));
         }
         this.vnc = newVNC;
+    }
+
+    private void resolveOffice()
+    {
+        boolean office = this.uiTestAnnotation.office();
+        if (!office) {
+            office = Boolean.valueOf(System.getProperty(OFFICE_PROPERTY, FALSE));
+        }
+        this.office = office;
     }
 
     private void resolveProperties()
@@ -458,5 +472,14 @@ public class TestConfiguration
             outputDirectory = mavenBuildDir;
         }
         return outputDirectory;
+    }
+
+    /**
+     * @return true if an office container is provided to run the test.
+     * @since 10.11RC1
+     */
+    public boolean isOffice()
+    {
+        return this.office;
     }
 }

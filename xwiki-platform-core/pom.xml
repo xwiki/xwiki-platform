@@ -289,7 +289,6 @@
                     "classSimpleName": "NotificationsResource",
                     "methodName": "postNotifications",
                     "elementKind": "method",
-<<<<<<< HEAD
                     "justification": "Adding a REST API is actually not a breakage."
                   },
                   {
@@ -331,8 +330,6 @@
                     "classSimpleName": "RestoreRequest",
                     "elementKind": "class",
                     "justification": "False positive"
-=======
-                    "justification": "Adding a new REST API is actually not a blocker."
                   },
                   {
                     "code": "java.method.numberOfParametersChanged",
@@ -399,7 +396,6 @@
                     "methodName": "setFilterPreferenceEnabled",
                     "elementKind": "method",
                     "justification": "Bad design at fist attempt"
->>>>>>> 2c7c7bddb2... XWIKI-15848: A user cannot programatically unwatch the main wiki upon creation.
                   }
                 ]
               }

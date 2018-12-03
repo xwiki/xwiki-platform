@@ -108,25 +108,25 @@ public class AsyncRendererCacheTest
     // Tests
 
     @Test
-    public void invalidateOnComponentType()
+    public void invalidateSyncOnComponentType()
     {
         setRoleTypes(String.class);
 
         this.asyncCache.put(this.status);
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache(Integer.class, "hint");
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache(String.class, "hint");
 
-        assertNull(this.asyncCache.get(getId()));
+        assertNull(this.asyncCache.getSync(getId()));
     }
 
     @Test
-    public void invalidateOnComponent()
+    public void invalidateSyncOnComponent()
     {
         setRoles(new DefaultComponentRole<>(String.class, "hint"));
 
@@ -134,19 +134,19 @@ public class AsyncRendererCacheTest
 
         this.asyncCache.cleanCache(Integer.class, "hint");
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache(String.class, "otherhint");
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache(String.class, "hint");
 
-        assertNull(this.asyncCache.get(getId()));
+        assertNull(this.asyncCache.getSync(getId()));
     }
 
     @Test
-    public void invalidateOnSameReference()
+    public void invalidateSyncOnSameReference()
     {
         setReferences(new ObjectReference("name", new DocumentReference("wiki", "Space", "Document")));
 
@@ -154,46 +154,75 @@ public class AsyncRendererCacheTest
 
         this.asyncCache.cleanCache(new ObjectReference("other", new DocumentReference("wiki", "Space", "Document")));
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache(new DocumentReference("wiki", "Space", "Document"));
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache(new ObjectReference("name", new DocumentReference("wiki", "Space", "Document")));
 
-        assertNull(this.asyncCache.get(getId()));
+        assertNull(this.asyncCache.getSync(getId()));
     }
 
     @Test
-    public void invalidateOnChildReference()
+    public void invalidateSyncOnChildReference()
     {
         setReferences(new DocumentReference("wiki", "Space", "Document"));
 
         this.asyncCache.put(this.status);
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache(new ObjectReference("name", new DocumentReference("wiki", "Space", "Document")));
 
-        assertNull(this.asyncCache.get(getId()));
+        assertNull(this.asyncCache.getSync(getId()));
     }
 
     @Test
-    public void invalidateOnWiki()
+    public void invalidateSyncOnWiki()
     {
         setReferences(new DocumentReference("wiki", "Space", "Document"));
 
         this.asyncCache.put(this.status);
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache("otherwiki");
 
-        assertSame(this.status, this.asyncCache.get(getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
 
         this.asyncCache.cleanCache("wiki");
 
-        assertNull(this.asyncCache.get(getId()));
+        assertNull(this.asyncCache.getSync(getId()));
+    }
+
+    @Test
+    public void getAsyncSingleClient()
+    {
+        this.status.addClient(42);
+
+        this.asyncCache.put(this.status);
+
+        assertSame(this.status, this.asyncCache.getAsync(getId(), 42));
+
+        assertNull(this.asyncCache.getAsync(getId(), 42));
+    }
+
+    @Test
+    public void getAsyncSeveralClients()
+    {
+        this.status.addClient(1);
+        this.status.addClient(2);
+
+        this.asyncCache.put(this.status);
+
+        assertSame(this.status, this.asyncCache.getAsync(getId(), 1));
+
+        assertNull(this.asyncCache.getAsync(getId(), 1));
+
+        assertSame(this.status, this.asyncCache.getAsync(getId(), 2));
+
+        assertNull(this.asyncCache.getAsync(getId(), 2));
     }
 }

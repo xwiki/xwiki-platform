@@ -44,12 +44,10 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.event.status.JobStatus.State;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Default implementation of {@link AsyncRendererExecutor}.
@@ -84,10 +82,10 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     @Inject
     private Logger logger;
 
-    private AtomicLong uniqueId = new AtomicLong();
+    private AtomicLong clientIdCount = new AtomicLong();
 
     @Override
-    public AsyncRendererJobStatus getResult(List<String> id)
+    public AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId)
     {
         //////////////////////////////////////////////
         // Try running job
@@ -101,7 +99,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         //////////////////////////////////////////////
         // Try cache
 
-        AsyncRendererJobStatus status = this.cache.get(id);
+        AsyncRendererJobStatus status = this.cache.getAsync(id, clientId);
 
         if (status != null) {
             return status;
@@ -111,9 +109,10 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     }
 
     @Override
-    public AsyncRendererJobStatus getResult(List<String> id, long time, TimeUnit unit) throws InterruptedException
+    public AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId, long time, TimeUnit unit)
+        throws InterruptedException
     {
-        AsyncRendererJobStatus status = getResult(id);
+        AsyncRendererJobStatus status = getAsyncStatus(id, clientId);
 
         if (status != null && status.getState() != State.FINISHED) {
             Job job = this.executor.getJob(id);
@@ -127,15 +126,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     }
 
     @Override
-    public AsyncRendererJobStatus render(AsyncRenderer renderer, Set<String> contextEntries)
+    public AsyncRendererExecutorResponse render(AsyncRenderer renderer, Set<String> contextEntries)
         throws JobException, RenderingException
-    {
-        return render(renderer, contextEntries, null, null);
-    }
-
-    @Override
-    public AsyncRendererJobStatus render(AsyncRenderer renderer, Set<String> contextEntries, Right right,
-        EntityReference rightEntity) throws JobException, RenderingException
     {
         boolean async = renderer.isAsyncAllowed() && this.asyncContext.isEnabled();
 
@@ -153,14 +145,14 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                     injectUses(status);
                 }
 
-                return status;
+                return new AsyncRendererExecutorResponse(status);
             }
         }
 
         ////////////////////////////////
         // Execute the renderer
 
-        AsyncRendererJobStatus status;
+        AsyncRendererExecutorResponse response;
 
         AsyncRendererJobRequest request = new AsyncRendererJobRequest();
         request.setRenderer(renderer);
@@ -170,18 +162,25 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                 request.setContext(context);
             }
 
+            long asyncClientId = this.clientIdCount.incrementAndGet();
+
             // If cache is disabled make sure the id is unique
             if (!renderer.isCacheAllowed()) {
-                jobId.add(String.valueOf(this.uniqueId.incrementAndGet()));
+                jobId.add(String.valueOf(asyncClientId));
             }
 
             request.setId(jobId);
-            request.setRight(right, rightEntity);
 
             Job job = this.executor.execute(AsyncRendererJobStatus.JOBTYPE, request);
 
-            status = (AsyncRendererJobStatus) job.getStatus();
+            AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
+
+            status.addClient(asyncClientId);
+
+            response = new AsyncRendererExecutorResponse(status, asyncClientId);
         } else {
+            AsyncRendererJobStatus status;
+
             // If async is disabled run the renderer in the current thread
             if (renderer.isCacheAllowed()) {
                 // Prepare to catch stuff to invalidate the cache
@@ -205,9 +204,11 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                 // Ceate a pseudo job status
                 status = new AsyncRendererJobStatus(request, result);
             }
+
+            response = new AsyncRendererExecutorResponse(status);
         }
 
-        return status;
+        return response;
     }
 
     private void injectUses(AsyncRendererJobStatus status)
@@ -255,7 +256,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         }
 
         // Try to find the job status in the cache
-        AsyncRendererJobStatus status = this.cache.get(jobId);
+        AsyncRendererJobStatus status = this.cache.getSync(jobId);
 
         // Found a cache entry, return it
         if (status != null) {

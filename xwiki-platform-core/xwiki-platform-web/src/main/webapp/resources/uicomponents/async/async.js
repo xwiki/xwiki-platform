@@ -36,6 +36,12 @@ require(["jquery"], function($) {
       return ;
     }
 
+    var clientId = element.dataset.xwikiAsyncClientId;
+
+    if (clientId) {
+      url += '?clientId=' + clientId;
+    }
+
     element = $(element);
 
     // Insert spinner (it will replaced by the result)

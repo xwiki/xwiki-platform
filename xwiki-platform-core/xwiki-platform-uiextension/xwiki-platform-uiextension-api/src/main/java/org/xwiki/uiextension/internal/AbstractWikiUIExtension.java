@@ -109,8 +109,7 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         try {
             BlockAsyncRendererConfiguration executorConfiguration = configure();
 
-            // TODO: add right checking (view on current document ?)
-            result = this.executor.execute(executorConfiguration, this.contextEntries, null, null);
+            result = this.executor.execute(executorConfiguration, this.contextEntries);
         } catch (Exception e) {
             result = new CompositeBlock(this.errorBlockGenerator
                 .generateErrorBlocks(String.format("Failed to execute UIX with id [%s]", getId()), e, false));

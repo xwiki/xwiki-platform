@@ -26,9 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -43,18 +41,23 @@ public interface AsyncRendererExecutor
 {
     /**
      * @param id the identifier of the execution
+     * @param clientId the identifier of the client associated to the result
      * @return the status corresponding to the passed id or null if not could be found
+     * @since 10.11RC1
      */
-    AsyncRendererJobStatus getResult(List<String> id);
+    AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId);
 
     /**
      * @param id the identifier of the execution
+     * @param clientId the identifier of the client associated to the result
      * @param time the maximum time to wait
      * @param unit the time unit of the {@code time} argument
      * @return the result of the {@link AsyncRenderer} execution for the passed id
      * @throws InterruptedException when the thread is interrupted while waiting
+     * @since 10.11RC1
      */
-    AsyncRendererJobStatus getResult(List<String> id, long time, TimeUnit unit) throws InterruptedException;
+    AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId, long time, TimeUnit unit)
+        throws InterruptedException;
 
     /**
      * Start and cache or return the status of the job corresponding to the passed renderer.
@@ -64,21 +67,8 @@ public interface AsyncRendererExecutor
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
      * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
+     * @since 10.11RC1
      */
-    AsyncRendererJobStatus render(AsyncRenderer renderer, Set<String> contextEntries)
+    AsyncRendererExecutorResponse render(AsyncRenderer renderer, Set<String> contextEntries)
         throws JobException, RenderingException;
-
-    /**
-     * Start and cache or return the status of the job corresponding to the passed renderer.
-     * 
-     * @param renderer the execution
-     * @param contextEntries the list of context entries to take remember for the execution
-     * @param right the right required to access the result
-     * @param rightEntity the reference on which the right is required to access the result
-     * @return the {@link JobStatus}
-     * @throws JobException when failing to start the job
-     * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
-     */
-    AsyncRendererJobStatus render(AsyncRenderer renderer, Set<String> contextEntries, Right right,
-        EntityReference rightEntity) throws JobException, RenderingException;
 }

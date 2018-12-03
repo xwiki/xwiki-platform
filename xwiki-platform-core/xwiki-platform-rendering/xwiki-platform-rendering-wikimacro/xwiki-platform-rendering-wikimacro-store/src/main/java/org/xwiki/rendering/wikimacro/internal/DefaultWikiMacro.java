@@ -67,8 +67,8 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
      * @throws ComponentLookupException when failing to looked required components
      * @since 10.10RC1
      */
-    public DefaultWikiMacro(BaseObject baseObject, MacroDescriptor descriptor,
-        ComponentManager componentManager) throws WikiComponentException, ComponentLookupException
+    public DefaultWikiMacro(BaseObject baseObject, MacroDescriptor descriptor, ComponentManager componentManager)
+        throws WikiComponentException, ComponentLookupException
     {
         super(baseObject, Macro.class, descriptor.getId().getId(), componentManager);
 
@@ -102,7 +102,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         Block result;
         try {
             // TODO: add right checking (view on current document ?)
-            result = this.executor.execute(renderer, this.contextEntries, null, null);
+            result = this.executor.execute(renderer, this.contextEntries);
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to execute wiki macro", e);
         }

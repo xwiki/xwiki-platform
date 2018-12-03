@@ -100,28 +100,34 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     }
 
     /**
-     * @param id the if of the job.
+     * @param id the identifier of the job.
      * @return the status associated with the provided key, or {@code null} if there is no value.
      */
-    public AsyncRendererJobStatus get(List<String> id)
+    public AsyncRendererJobStatus getSync(List<String> id)
     {
         String cacheKey = toCacheKey(id);
 
-        // Try standard cache
-        AsyncRendererJobStatus status = this.longCache.get(cacheKey);
+        return this.longCache.get(cacheKey);
+    }
 
-        if (status != null) {
-            return status;
-        }
+    /**
+     * @param id the identifier of the job.
+     * @param clientId the client associated with the status
+     * @return the status associated with the provided key and client, or {@code null} if there is no value.
+     * @since 10.11RC1
+     */
+    public AsyncRendererJobStatus getAsync(List<String> id, long clientId)
+    {
+        String cacheKey = toCacheKey(id);
 
         // Try async cache
-        status = this.asyncCache.get(cacheKey);
+        AsyncRendererJobStatus status = this.asyncCache.get(cacheKey);
 
-        if (status != null) {
-            // Not removing the entry from the cache because several clients might count on it at the same time so it's
-            // a bit dangerous. It will be removed from the cache after 600s (by default).
-            // TODO: store an id for each client waiting for the same result so that we can invalidate the cache a bit
-            // earlier instead of letting it die of old age (even if it means 600s here)
+        if (status != null && status.removeClient(clientId)) {
+            // If there is no asynchronous client associated with the status get rid of it
+            if (!status.hasClients()) {
+                this.asyncCache.remove(cacheKey);
+            }
 
             return status;
         }

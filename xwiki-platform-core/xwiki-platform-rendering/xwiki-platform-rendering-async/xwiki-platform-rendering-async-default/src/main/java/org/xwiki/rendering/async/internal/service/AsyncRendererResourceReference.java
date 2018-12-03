@@ -32,19 +32,23 @@ import org.xwiki.resource.ResourceType;
  */
 public class AsyncRendererResourceReference extends AbstractResourceReference
 {
-    private List<String> id;
+    private final List<String> id;
+
+    private final String clientId;
 
     /**
      * Default constructor.
      * 
      * @param type see {@link #getType()}
      * @param id the id of the async renderer
+     * @param clientId the id of the client associated with the async execution
      */
-    public AsyncRendererResourceReference(ResourceType type, List<String> id)
+    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId)
     {
         setType(type);
 
         this.id = id;
+        this.clientId = clientId;
     }
 
     /**
@@ -53,6 +57,14 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
     public List<String> getId()
     {
         return this.id;
+    }
+
+    /**
+     * @return the clientId
+     */
+    public String getClientId()
+    {
+        return this.clientId;
     }
 
     @Override

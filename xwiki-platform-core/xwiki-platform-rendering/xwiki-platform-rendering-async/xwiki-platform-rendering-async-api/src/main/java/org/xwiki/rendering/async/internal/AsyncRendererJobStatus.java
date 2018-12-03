@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.xwiki.component.descriptor.ComponentRole;
 import org.xwiki.job.AbstractJobStatus;
@@ -58,6 +59,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     private Map<String, Collection<Object>> uses;
 
     private boolean async;
+
+    private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
     /**
      * @param request the request provided when started the job
@@ -205,6 +208,34 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     public void setUses(Map<String, Collection<Object>> uses)
     {
         this.uses = uses;
+    }
+
+    /**
+     * @param client the identifier of the client to associated to this status
+     * @since 10.11RC1
+     */
+    public void addClient(long client)
+    {
+        this.clients.add(client);
+    }
+
+    /**
+     * @param client the identifier of the client associated to this status
+     * @return true if the passed client was associated to this status
+     * @since 10.11RC1
+     */
+    public boolean removeClient(long client)
+    {
+        return this.clients.remove(client);
+    }
+
+    /**
+     * @return true if the status contains associated clients
+     * @since 10.11RC1
+     */
+    public boolean hasClients()
+    {
+        return !this.clients.isEmpty();
     }
 
     /**

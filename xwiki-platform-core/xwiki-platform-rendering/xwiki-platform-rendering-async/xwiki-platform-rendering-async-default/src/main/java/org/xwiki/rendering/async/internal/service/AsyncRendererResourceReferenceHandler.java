@@ -95,11 +95,19 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     {
         AsyncRendererResourceReference reference = (AsyncRendererResourceReference) resourceReference;
 
+        String clientIdString = reference.getClientId();
+
+        if (clientIdString == null) {
+            throw new ResourceReferenceHandlerException("Client id is mandatory");
+        }
+
+        long clientId = Long.parseLong(clientIdString);
+
         // Get the asynchronous renderer status
         AsyncRendererJobStatus status;
         try {
             // TODO: don't wait forever and return the job progress if not finished
-            status = this.executor.getResult(reference.getId(), Long.MAX_VALUE, TimeUnit.DAYS);
+            status = this.executor.getAsyncStatus(reference.getId(), clientId, Long.MAX_VALUE, TimeUnit.DAYS);
         } catch (InterruptedException e) {
             throw new ResourceReferenceHandlerException("Failed to get content", e);
         }
@@ -109,6 +117,16 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
             throw new ResourceReferenceHandlerException("Cannot find any status for id [" + reference.getId() + "]");
         }
 
+        // Send the result back
+        sendReponse(status);
+
+        // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
+        // Resource Reference.
+        chain.handleNext(reference);
+    }
+
+    private void sendReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
+    {
         // Send the result back
         Response response = this.container.getResponse();
         response.setContentType("text/html");
@@ -139,9 +157,5 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException("Failed to send content", e);
         }
-
-        // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
-        // Resource Reference.
-        chain.handleNext(reference);
     }
 }

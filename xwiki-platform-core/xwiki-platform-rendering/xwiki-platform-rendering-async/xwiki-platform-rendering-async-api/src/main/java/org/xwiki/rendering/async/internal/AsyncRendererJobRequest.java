@@ -21,8 +21,6 @@ package org.xwiki.rendering.async.internal;
 
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.security.authorization.Right;
 
 /**
  * The request of the asynchronous renderer job.
@@ -32,10 +30,6 @@ import org.xwiki.security.authorization.Right;
  */
 public class AsyncRendererJobRequest extends AbstractRequest
 {
-    private static final String PROPERTY_RIGHT = "right";
-
-    private static final String PROPERTY_RIGHT_ENTITY = "right.entity";
-
     private transient AsyncRenderer renderer;
 
     /**
@@ -70,31 +64,5 @@ public class AsyncRendererJobRequest extends AbstractRequest
     public void setRenderer(AsyncRenderer renderer)
     {
         this.renderer = renderer;
-    }
-
-    /**
-     * @param right the right required to access the result
-     * @param rightEntity the reference on which the right is required to access the result
-     */
-    public void setRight(Right right, EntityReference rightEntity)
-    {
-        setProperty(PROPERTY_RIGHT, right);
-        setProperty(PROPERTY_RIGHT_ENTITY, rightEntity);
-    }
-
-    /**
-     * @return the right required to access the result
-     */
-    public Right getRight()
-    {
-        return getProperty(PROPERTY_RIGHT);
-    }
-
-    /**
-     * @return the reference on which the right is required to access the result
-     */
-    public EntityReference getRightEntity()
-    {
-        return getProperty(PROPERTY_RIGHT_ENTITY);
     }
 }

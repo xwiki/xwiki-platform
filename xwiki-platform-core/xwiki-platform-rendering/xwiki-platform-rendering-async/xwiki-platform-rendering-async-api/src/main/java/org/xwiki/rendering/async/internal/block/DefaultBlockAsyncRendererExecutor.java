@@ -19,10 +19,7 @@
  */
 package org.xwiki.rendering.async.internal.block;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -31,15 +28,13 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
-import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
+import org.xwiki.rendering.async.internal.AsyncRendererExecutorResponse;
 import org.xwiki.rendering.async.internal.AsyncRendererWrapper;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Default implementation of {@link BlockAsyncRendererExecutor}.
@@ -93,13 +88,6 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
     public Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries)
         throws JobException, RenderingException
     {
-        return execute(configuration, contextEntries, null, null);
-    }
-
-    @Override
-    public Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries, Right right,
-        EntityReference rightEntity) throws JobException, RenderingException
-    {
         this.progress.pushLevelProgress(3, this);
 
         try {
@@ -119,22 +107,21 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
 
             // Start renderer execution if there is none already running/available
             return execute(configuration.getDecorator() != null
-                ? new DecoratorWrapper(configuration.getDecorator(), renderer) : renderer, contextEntries, right,
-                rightEntity);
+                ? new DecoratorWrapper(configuration.getDecorator(), renderer) : renderer, contextEntries);
         } finally {
             this.progress.popLevelProgress(this);
         }
     }
 
     @Override
-    public Block execute(BlockAsyncRenderer renderer, Set<String> contextEntries, Right right,
-        EntityReference rightEntity) throws JobException, RenderingException
+    public Block execute(BlockAsyncRenderer renderer, Set<String> contextEntries)
+        throws JobException, RenderingException
     {
         // Start renderer execution if there is none already running/available
-        AsyncRendererJobStatus status = this.executor.render(renderer, contextEntries, right, rightEntity);
+        AsyncRendererExecutorResponse response = this.executor.render(renderer, contextEntries);
 
         // Get result
-        BlockAsyncRendererResult result = (BlockAsyncRendererResult) status.getResult();
+        BlockAsyncRendererResult result = (BlockAsyncRendererResult) response.getStatus().getResult();
 
         if (result != null) {
             return result.getBlock();
@@ -149,19 +136,9 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         }
         placeholder.setParameter("class", "xwiki-async");
         // Provide it directly as it's going to be used in the client side (the URL fragment to use in the ajax request)
-        placeholder.setParameter("data-xwiki-async-id",
-            status.getRequest().getId().stream().map(this::encodeURL).collect(Collectors.joining("/")));
+        placeholder.setParameter("data-xwiki-async-id", response.getJobIdHTTPPath());
+        placeholder.setParameter("data-xwiki-async-client-id", response.getAsyncClientId().toString());
 
         return placeholder;
-    }
-
-    private String encodeURL(String element)
-    {
-        try {
-            return URLEncoder.encode(element, "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            // If Java does not support UTF8 we probably won't reach this point anyway
-            throw new RuntimeException("UTF8 encoding is not supported", e);
-        }
     }
 }

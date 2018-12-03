@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceReference;
@@ -66,6 +67,12 @@ public class AsyncRendererResourceReferenceResolver extends AbstractResourceRefe
             }
         }
 
-        return new AsyncRendererResourceReference(resourceType, pathSegments);
+        String clientId = null;
+        List<String> clientIds = representation.getParameters().get("clientId");
+        if (CollectionUtils.isNotEmpty(clientIds)) {
+            clientId = clientIds.get(0);
+        }
+
+        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId);
     }
 }

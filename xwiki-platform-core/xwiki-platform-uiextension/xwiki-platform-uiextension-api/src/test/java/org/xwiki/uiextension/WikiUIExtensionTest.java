@@ -124,7 +124,7 @@ public class WikiUIExtensionTest
         assertEquals(WikiComponentScope.WIKI, wikiUIX.getScope());
         assertEquals(MapUtils.EMPTY_MAP, wikiUIX.getParameters());
 
-        when(this.blockAsyncRendererExecutor.execute(any(BlockAsyncRendererConfiguration.class), any(), any(), any()))
+        when(this.blockAsyncRendererExecutor.execute(any(BlockAsyncRendererConfiguration.class), any()))
             .thenReturn(new WordBlock(""));
 
         assertEquals(new WordBlock(""), wikiUIX.execute());

@@ -1,0 +1,6 @@
+#if ($displayer.mode == 'edit')
+  <input type="text" value="$escapetool.xml($displayer.value)"
+  #foreach ($parameter in $displayer.parameters.entrySet()) $parameter.key="$escapetool.xml($parameter.value)"#end>
+#else
+  $escapetool.xml($displayer.value)
+#end

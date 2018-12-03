@@ -154,9 +154,14 @@ public interface NotificationFilterManager
      * Save the given set of {@link NotificationFilterPreference} against their respective
      * {@link NotificationFilterPreferenceProvider}.
      *
+     * @param user the user to use
      * @param notificationFilterPreferences a set of {@link NotificationFilterPreference} to save
+     *
+     * @since 10.11RC1
+     * @since 10.8.3
+     * @since 9.11.9
      */
-    void saveFilterPreferences(Set<NotificationFilterPreference> notificationFilterPreferences);
+    void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> notificationFilterPreferences);
 
     /**
      * Render a {@link NotificationFilter} using an associated {@link NotificationFilterPreference}.
@@ -171,22 +176,29 @@ public interface NotificationFilterManager
 
     /**
      * Delete a filter preference.
+     * @param user the user to use
      * @param filterPreferenceId id of the filter preference
      * @throws NotificationException if an error happens
      *
-     * @since 9.8RC1
+     * @since 10.11RC1
+     * @since 10.8.3
+     * @since 9.11.9
      */
-    void deleteFilterPreference(String filterPreferenceId) throws NotificationException;
+    void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
+     * @param user the user to use
      * @param filterPreferenceId id of the filter preference
      * @param enabled either or not the filter preference should be enabled
      * @throws NotificationException if an error happens
      *
-     * @since 9.8RC1
+     * @since 10.11RC1
+     * @since 10.8.3
+     * @since 9.11.9
      */
-    void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException;
+    void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
+            throws NotificationException;
 
     /**
      * Update the start date for every filter preference that the user has.

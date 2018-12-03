@@ -60,24 +60,23 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     }
 
     @Override
-    public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
+    public void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> filterPreferences)
             throws NotificationException
     {
-        modelBridge.saveFilterPreferences(documentAccessBridge.getCurrentUserReference(), filterPreferences);
+        modelBridge.saveFilterPreferences(user, filterPreferences);
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
-        modelBridge.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(), filterPreferenceId);
+        modelBridge.deleteFilterPreference(user, filterPreferenceId);
     }
 
     @Override
-    public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled)
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
-        modelBridge.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
-                filterPreferenceId, enabled);
+        modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
     }
 
     @Override

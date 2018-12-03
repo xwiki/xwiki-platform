@@ -255,28 +255,28 @@ public class DefaultNotificationFilterManagerTest
         when(testPref1.getProviderHint()).thenReturn("testProvider");
         testSet.add(testPref1);
 
-        mocker.getComponentUnderTest().saveFilterPreferences(testSet);
+        mocker.getComponentUnderTest().saveFilterPreferences(testUser, testSet);
 
-        verify(testProvider, times(1)).saveFilterPreferences(testSet);
+        verify(testProvider, times(1)).saveFilterPreferences(testUser, testSet);
     }
 
     @Test
     public void deleteFilterPreference() throws Exception
     {
-        mocker.getComponentUnderTest().deleteFilterPreference("myFilter");
+        mocker.getComponentUnderTest().deleteFilterPreference(testUser, "myFilter");
 
-        verify(testProvider, times(1)).deleteFilterPreference(eq("myFilter"));
+        verify(testProvider, times(1)).deleteFilterPreference(eq(testUser), eq("myFilter"));
     }
 
     @Test
     public void setFilterPreferenceEnabled() throws Exception
     {
-        mocker.getComponentUnderTest().setFilterPreferenceEnabled("myFilter1", true);
-        mocker.getComponentUnderTest().setFilterPreferenceEnabled("myFilter2", false);
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled(testUser, "myFilter1", true);
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled(testUser, "myFilter2", false);
 
-        verify(testProvider, times(1)).setFilterPreferenceEnabled(
+        verify(testProvider, times(1)).setFilterPreferenceEnabled(eq(testUser),
                 eq("myFilter1"), eq(true));
-        verify(testProvider, times(1)).setFilterPreferenceEnabled(
+        verify(testProvider, times(1)).setFilterPreferenceEnabled(eq(testUser),
                 eq("myFilter2"), eq(false));
     }
 

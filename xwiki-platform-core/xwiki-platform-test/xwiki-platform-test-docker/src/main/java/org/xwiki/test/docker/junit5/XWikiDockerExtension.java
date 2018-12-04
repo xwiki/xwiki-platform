@@ -233,7 +233,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             stopDatabase(testConfiguration);
 
             // Stop the Servlet Engine
-            stopServletEngine(testConfiguration, extensionContext);
+            stopServletEngine(extensionContext);
         }
     }
 
@@ -313,7 +313,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         ServletContainerExecutor executor =
             new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver, repositoryResolver);
         saveServletContainerExecutor(extensionContext, executor);
-        executor.start(testConfiguration, sourceWARDirectory);
+        executor.start(sourceWARDirectory);
 
         // URL to access XWiki from the host.
         String xwikiURL = computeXWikiURLPrefix(testConfiguration.getServletEngine().getIP(),
@@ -325,11 +325,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         }
     }
 
-    private void stopServletEngine(TestConfiguration testConfiguration, ExtensionContext extensionContext)
-        throws Exception
+    private void stopServletEngine(ExtensionContext extensionContext) throws Exception
     {
         ServletContainerExecutor executor = loadServletContainerExecutor(extensionContext);
-        executor.stop(testConfiguration);
+        if (executor != null) {
+            executor.stop();
+        }
     }
 
     private void provisionExtensions(ArtifactResolver artifactResolver, MavenResolver mavenResolver,

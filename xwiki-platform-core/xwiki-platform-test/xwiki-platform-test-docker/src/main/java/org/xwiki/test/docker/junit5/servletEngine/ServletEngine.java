@@ -60,6 +60,10 @@ public enum ServletEngine
      */
     EXTERNAL(true);
 
+    private static final String PERMANENT_DIRECTORY = "/var/local/xwiki";
+
+    private static final String TEST_RESOURCES_PATH = String.format("%s/testResources", PERMANENT_DIRECTORY);
+
     private static final String LOCALHOST = "localhost";
 
     private static final String HOST_INTERNAL = "host.testcontainers.internal";
@@ -152,5 +156,24 @@ public enum ServletEngine
     public int getInternalPort()
     {
         return 8080;
+    }
+
+    /**
+     * @return the location of the XWiki permanent directory inside the Docker container for the Servlet Engine.
+     * @since 10.11RC1
+     */
+    public String getPermanentDirectory()
+    {
+        return PERMANENT_DIRECTORY;
+    }
+
+    /**
+     * @return the location inside the Docker container for resources used by tests. They make it possible for tests to
+     *         use test resource data (e.g. a word doc to import in the XWiki for office tests).
+     * @since 10.11RC1
+     */
+    public String getTestResourcesPath()
+    {
+        return TEST_RESOURCES_PATH;
     }
 }

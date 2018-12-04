@@ -152,6 +152,8 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiCfgDefaultBaseSkin", SKIN);
         props.setProperty("xwikiCfgEncoding", "UTF-8");
 
+        // Default configuration data for xwiki.properties
+
         // Configure the extension repositories.
         // We configure the local maven repo to be the first repo in the list for performance reasons.
         // If we're offline then only configure the local maven repo. This is to improve XWiki performances and also
@@ -177,6 +179,12 @@ public class ConfigurationFilesGenerator
         }
 
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));
+
+        // Set the permanent directory but only when using docker as otherwise it's already available locally.
+        if (!this.testConfiguration.getServletEngine().isOutsideDocker()) {
+            props.setProperty("xwikiPropertiesEnvironmentPermanentDirectory",
+                this.testConfiguration.getServletEngine().getPermanentDirectory());
+        }
 
         return props;
     }

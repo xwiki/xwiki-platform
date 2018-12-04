@@ -67,17 +67,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     }
 
     /**
-     * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
      * @param sourceWARDirectory the location where the built WAR is located
      * @throws Exception if an error occurred during the build or start
      */
-    public void start(TestConfiguration testConfiguration, File sourceWARDirectory) throws Exception
+    public void start(File sourceWARDirectory) throws Exception
     {
         GenericContainer servletContainer = null;
         String xwikiIPAddress = "localhost";
         int xwikiPort = 8080;
 
-        switch (testConfiguration.getServletEngine()) {
+        switch (this.testConfiguration.getServletEngine()) {
             case TOMCAT:
                 // Configure Tomcat logging for debugging. Create a logging.properties file
                 File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
@@ -88,10 +87,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
 
-                String tomcatTag = String.format("tomcat:%s", testConfiguration.getServletEngineTag() != null
-                    ? testConfiguration.getServletEngineTag() : LATEST);
+                String tomcatTag = String.format("tomcat:%s", this.testConfiguration.getServletEngineTag() != null
+                    ? this.testConfiguration.getServletEngineTag() : LATEST);
                 servletContainer = new GenericContainer<>(tomcatTag);
-                setWebappMount(servletContainer, sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
+                mountFromHostToContainer(servletContainer, sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
 
                 servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
                     + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
@@ -100,17 +99,19 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
                 break;
             case JETTY:
-                String jettyTag = String.format("jetty:%s", testConfiguration.getServletEngineTag() != null
-                    ? testConfiguration.getServletEngineTag() : LATEST);
+                String jettyTag = String.format("jetty:%s", this.testConfiguration.getServletEngineTag() != null
+                    ? this.testConfiguration.getServletEngineTag() : LATEST);
                 servletContainer = new GenericContainer<>(jettyTag);
-                setWebappMount(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
+                mountFromHostToContainer(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
 
                 break;
             case WILDFLY:
-                String wildflyTag = String.format("jboss/wildfly:%s", testConfiguration.getServletEngineTag() != null
-                    ? testConfiguration.getServletEngineTag() : LATEST);
+                String wildflyTag = String.format("jboss/wildfly:%s",
+                    this.testConfiguration.getServletEngineTag() != null
+                    ? this.testConfiguration.getServletEngineTag() : LATEST);
                 servletContainer = new GenericContainer<>(wildflyTag);
-                setWebappMount(servletContainer, sourceWARDirectory, "/opt/jboss/wildfly/standalone/deployments/xwiki");
+                mountFromHostToContainer(servletContainer, sourceWARDirectory,
+                    "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
                 break;
             case JETTY_STANDALONE:
@@ -124,42 +125,55 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    testConfiguration.getServletEngine()));
+                    this.testConfiguration.getServletEngine()));
         }
 
         if (servletContainer != null) {
-            // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
-            // start listening.
-            servletContainer
-                .withNetwork(Network.SHARED)
-                .withNetworkAliases(testConfiguration.getServletEngine().getInternalIP())
-                .withExposedPorts(testConfiguration.getServletEngine().getInternalPort())
-                .waitingFor(
-                    Wait.forHttp("/xwiki/bin/get/Main/WebHome")
-                        .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-            if (testConfiguration.isOffline()) {
-                String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
-                servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
-            }
-
-            start(servletContainer, testConfiguration);
+            startContainer(servletContainer);
 
             xwikiIPAddress = servletContainer.getContainerIpAddress();
-            xwikiPort = servletContainer.getMappedPort(testConfiguration.getServletEngine().getInternalPort());
+            xwikiPort = servletContainer.getMappedPort(this.testConfiguration.getServletEngine().getInternalPort());
         }
 
-        testConfiguration.getServletEngine().setIP(xwikiIPAddress);
-        testConfiguration.getServletEngine().setPort(xwikiPort);
+        this.testConfiguration.getServletEngine().setIP(xwikiIPAddress);
+        this.testConfiguration.getServletEngine().setPort(xwikiPort);
+    }
+
+    private void startContainer(GenericContainer servletContainer)
+    {
+        // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
+        // start listening.
+        servletContainer
+            .withNetwork(Network.SHARED)
+            .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
+            .withExposedPorts(this.testConfiguration.getServletEngine().getInternalPort())
+            .waitingFor(
+                Wait.forHttp("/xwiki/bin/get/Main/WebHome")
+                    .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+
+        // Mount the test resources directory from the host into the container so that it's possible for tests to
+        // use test resource data (e.g. a word doc to import in the XWiki for office tests).
+        File testResoucesDirectory = new File(this.testConfiguration.getOutputDirectory(), "test-classes");
+        if (testResoucesDirectory.exists()) {
+            mountFromHostToContainer(servletContainer, testResoucesDirectory,
+                this.testConfiguration.getServletEngine().getTestResourcesPath());
+        }
+
+        if (this.testConfiguration.isOffline()) {
+            String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
+            servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
+        }
+
+        start(servletContainer, this.testConfiguration);
     }
 
     /**
-     * @param testConfiguration the configuration to build (servlet engine, debug mode, etc)
      * @throws Exception if an error occurred during the stop
      */
-    public void stop(TestConfiguration testConfiguration) throws Exception
+    public void stop() throws Exception
     {
-        switch (testConfiguration.getServletEngine()) {
+        switch (this.testConfiguration.getServletEngine()) {
             case JETTY_STANDALONE:
                 this.jettyStandaloneExecutor.stop();
                 break;
@@ -168,16 +182,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
     }
 
-    private void setWebappMount(GenericContainer servletContainer, File sourceWARDirectory, String webappDirectory)
+    private void mountFromHostToContainer(GenericContainer servletContainer, File sourceDirectory,
+        String targetDirectory)
     {
         // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
         // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.startsWith("mac os x")) {
-            MountableFile xwikiDirectory = MountableFile.forHostPath(sourceWARDirectory.toString());
-            servletContainer.withCopyFileToContainer(xwikiDirectory, webappDirectory);
+            MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory.toString());
+            servletContainer.withCopyFileToContainer(mountableDirectory, targetDirectory);
         } else {
-            servletContainer.withFileSystemBind(sourceWARDirectory.toString(), webappDirectory);
+            servletContainer.withFileSystemBind(sourceDirectory.toString(), targetDirectory);
         }
     }
 }

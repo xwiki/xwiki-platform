@@ -226,8 +226,14 @@ public class XWikiWebDriver extends RemoteWebDriver
                             return condition.apply(webDriver);
                         }
                     });
-                } catch (IllegalAccessException|InvocationTargetException e) {
+                } catch (IllegalAccessException e) {
                     throw new RuntimeException("Error converting to selenium3", e);
+                } catch (InvocationTargetException e) {
+                    if (e.getCause() instanceof RuntimeException) {
+                        throw (RuntimeException) e.getCause();
+                    } else {
+                        throw new RuntimeException("Failed to invoke 'until' method for Selenium3", e);
+                    }
                 }
             } catch (NoSuchMethodException e) {
                 // We're in Selenium 2!

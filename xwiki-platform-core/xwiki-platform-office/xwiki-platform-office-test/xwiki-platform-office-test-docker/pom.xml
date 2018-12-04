@@ -1,40 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office-test</artifactId>
+    <groupId>org.xwiki.platform</groupId>
     <version>10.11-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-office-test-tests</artifactId>
-  <name>XWiki Platform - Office - Test - Functional Tests</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Office - Test - Functional Tests</description>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>xwiki-platform-office-docker-tests</artifactId>
   <properties>
-    <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
-    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <xwikiCfgPlugins>\
       com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
@@ -48,10 +24,25 @@
          the "officemanager" ScriptService which requires PR and that pages is executed in the context of
          XWiki.XWikiPreferences (which is the current doc) -->
     <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.XWikiPreferences</xwikiPropertiesAdditionalProperties>
+    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
+    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
+      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
+      here. Note that the version needs to be checked when we change the version of selenium-java -->
+    <guava.version>25.0-jre</guava.version>
+    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </properties>
+
   <dependencies>
-    <!-- Note: We depend on the POM of xwiki-platform-office-ui in order to include its transitive
-         dependencies in the generated XWiki runtime -->
+
+    <!-- ================================
+         Test only dependencies
+         ================================ -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-office-ui</artifactId>
@@ -68,16 +59,19 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-office-importer</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-office-macro</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-office-viewer</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
@@ -125,31 +119,13 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
-           https://jira.xwiki.org/browse/XWIKI-7683 -->
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
-           browser several times -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
+        <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <includes>
-            <include>**/AllTests.java</include>
+            <include>**/*IT.java</include>
           </includes>
-
         </configuration>
       </plugin>
     </plugins>
@@ -167,6 +143,20 @@
       </dependencies>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemProperties combine.children="append">
+                <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
+                     WEB-INF/lib -->
+                <property>
+                  <name>xwiki.test.ui.profiles</name>
+                  <value>clover</value>
+                </property>
+              </systemProperties>
+            </configuration>
+          </plugin>
           <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
                that have been instrumented with Clover (XWiki oldcore for example) -->
           <plugin>

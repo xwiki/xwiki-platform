@@ -236,11 +236,11 @@ public class TestConfiguration
 
     private void resolveOffice()
     {
-        boolean office = this.uiTestAnnotation.office();
-        if (!office) {
-            office = Boolean.valueOf(System.getProperty(OFFICE_PROPERTY, FALSE));
+        boolean withOffice = this.uiTestAnnotation.office();
+        if (!withOffice) {
+            withOffice = Boolean.valueOf(System.getProperty(OFFICE_PROPERTY, FALSE));
         }
-        this.office = office;
+        this.office = withOffice;
     }
 
     private void resolveProperties()

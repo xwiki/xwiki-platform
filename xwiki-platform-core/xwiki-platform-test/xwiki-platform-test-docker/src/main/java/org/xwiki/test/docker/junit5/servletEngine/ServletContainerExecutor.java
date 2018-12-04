@@ -22,6 +22,7 @@ package org.xwiki.test.docker.junit5.servletEngine;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -40,7 +41,6 @@ import org.xwiki.test.docker.junit5.RepositoryResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.model.Image;
-import com.github.dockerjava.api.model.SearchItem;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -129,8 +129,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 this.jettyStandaloneExecutor.start();
                 break;
             default:
-                throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    this.testConfiguration.getServletEngine()));
+                this.manageDefaultServletEngine(testConfiguration);
         }
 
         if (this.servletContainer != null) {
@@ -166,6 +165,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         start(this.servletContainer, this.testConfiguration);
     }
 
+    private void manageDefaultServletEngine(TestConfiguration testConfiguration)
+    {
+        throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
+            testConfiguration.getServletEngine()));
+    }
+
     private GenericContainer getServletContainerImage(TestConfiguration testConfiguration)
     {
         final String baseImageName;
@@ -187,14 +192,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
 
             default:
-                throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    testConfiguration.getServletEngine()));
+                this.manageDefaultServletEngine(testConfiguration);
+                baseImageName = null;
         }
 
         // we want to use libreoffice so we need a custom image
         if (testConfiguration.isOffice()) {
             // name of the image that we will create
-            String imageName = StringUtils.join("xwiki", "_", baseImageName, "_", "office").replace(':', '_');
+            String imageName = StringUtils.join(Arrays.asList("xwiki", baseImageName, "office"), '_').replace(':', '_');
 
             // we won't delete the image, so it's possible that the image already exists: it would avoid us to create
             // it again

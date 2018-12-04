@@ -176,5 +176,14 @@
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
+         they get all the required dependencies in the local maven repository where the tests execute -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-war-minimaldependencies</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>pom</type>
+    </dependency>
   </dependencies>
 </project>

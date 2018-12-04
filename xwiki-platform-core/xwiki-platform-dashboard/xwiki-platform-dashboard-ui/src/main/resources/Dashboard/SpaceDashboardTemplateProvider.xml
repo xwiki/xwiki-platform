@@ -129,17 +129,29 @@
         <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
       </spaces>
       <template>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>template</name>
         <number>2</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>template</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </template>
       <terminal>
         <customDisplay/>

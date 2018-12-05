@@ -59,8 +59,8 @@ public class RequestFactoryTest
     @MockComponent
     private ModelContext modelContext;
 
-    private DocumentReference userReference = new DocumentReference("wiki1", "Users", "Carol");
-    private WikiReference wikiReference = new WikiReference("wiki1");
+    private DocumentReference userReference = new DocumentReference("wiki", "Users", "Carol");
+    private WikiReference wikiReference = new WikiReference("wiki");
 
     @BeforeEach
     public void configure() throws Exception

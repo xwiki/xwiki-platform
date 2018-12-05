@@ -142,8 +142,6 @@ public class RequestFactoryTest
         assertTrue(moveRequest.isAutoRedirect());
         assertFalse(moveRequest.isInteractive());
         assertTrue(moveRequest.isCheckRights());
-
-        // check added for fixing pseudo-tested method
         moveRequest.setUpdateParentField(false);
         assertFalse(moveRequest.isUpdateParentField());
     }

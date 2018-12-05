@@ -45,6 +45,7 @@ import org.xwiki.extension.test.po.distribution.WelcomeDistributionStep;
 import org.xwiki.extension.test.po.flavor.FlavorPane;
 import org.xwiki.extension.test.po.flavor.FlavorPicker;
 import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -285,6 +286,11 @@ public class UpgradeTest extends AbstractTest
 
             // Start upgrade
             upgradeFlavor = upgradeFlavor.upgrade();
+
+            // Make sure there hasn't been any error or warning during the install plan
+            assertNoErrorWarningLog("Unexpected error(s) found in the log during flavor install plan.",
+                upgradeFlavor.openProgressSection());
+
             // Confirm upgrade
             upgradeFlavor = upgradeFlavor.confirm();
 
@@ -302,17 +308,22 @@ public class UpgradeTest extends AbstractTest
             }
 
             // Make sure there hasn't been any error or warning during the install
-            List<LogItemPane> logs = upgradeFlavor.openProgressSection().getJobLog().stream()
-                .filter(l -> l.getLevel().equals("error") || l.getLevel().equals("warning"))
-                .collect(Collectors.toList());
-            if (!logs.isEmpty()) {
-                fail("Warning and/or errors found in the log during flavor install");
-            }
+            assertNoErrorWarningLog("Unexpected error(s) found in the log during flavor install.",
+                upgradeFlavor.openProgressSection());
         } finally {
             getUtil().getDriver().setTimeout(timeout);
         }
 
         assertEquals("installed", upgradeFlavor.getStatus());
+    }
+
+    private void assertNoErrorWarningLog(String message, ExtensionProgressPane progress)
+    {
+        List<LogItemPane> logs = progress.getJobLog(LogLevel.ERROR);
+
+        if (!logs.isEmpty()) {
+            fail("First one is [" + logs.get(0).getMessage() + "]");
+        }
     }
 
     private void extensionsStep()

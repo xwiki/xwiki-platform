@@ -46,7 +46,7 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
-    <Page>
+    <page>
       <cache>0</cache>
       <classname/>
       <customDisplay/>
@@ -70,7 +70,7 @@
       <validationRegExp/>
       <valueField/>
       <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
-    </Page>
+    </page>
   </class>
   <object>
     <name>AppWithinMinutes.Pages</name>

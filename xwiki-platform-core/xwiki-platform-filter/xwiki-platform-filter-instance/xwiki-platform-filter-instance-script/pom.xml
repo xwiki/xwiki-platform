@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-filter-instance-script</artifactId>
   <name>XWiki Platform - Filter - Instance - Script</name>
-  <description>Expose script oriented API ro manipulate instance wiki stream</description>
+  <description>Expose script oriented API to manipulate instance wiki stream</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>

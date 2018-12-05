@@ -12,7 +12,7 @@ function debugwrite(sometext) {
 }
 
 function isPanel(node) {
-  return node && node.nodeType === 1 && $(node).hasClassName('panel') &&
+  return node && node.nodeType === 1 && node.classList.contains('panel') &&
     $(node).up('#leftPanels, #rightPanels, #allviewpanels');
 }
 
@@ -344,6 +344,14 @@ function attachDragHandler(el) {
   };
 }
 
+function isAttachedPanel(element) {
+  if (element.ondblclick) {
+    return true;
+  }
+
+  return false;
+}
+
 function getBlocNameList(el) {
   var list = "";
   var nb = el.childNodes.length;
@@ -563,6 +571,11 @@ function setPanelWidth() {
 //----------------------------------------------------------------
 
 function panelEditorInit() {
+  // Indicate that we started initialize the panel editor to avoid race conditions
+  panelInitStarted = true;
+  // Stop listening from inserted elements
+  panelsObserver.disconnect()
+
   tipobj = $("dhtmltooltip");
 
   parentNode = null;
@@ -601,5 +614,30 @@ function panelEditorInit() {
   changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().size());
 }
 
-(XWiki && XWiki.isInitialized && panelEditorInit())
-|| document.observe('xwiki:dom:loading', panelEditorInit);
+// Listen to asynchronously panels
+panelsObserver = new MutationObserver(function(mutations)
+{
+  mutations.forEach(function(mutation) {
+    mutation.addedNodes.forEach(function(element) {
+      if (element.tagName == 'DIV') {
+        if (isPanel(element) && !isAttachedPanel(element)) {
+          maybePanelEditorInit();
+        }
+      }
+    });
+  });
+});
+panelsObserver.observe(document, { childList: true, subtree : true});
+
+function maybePanelEditorInit() {
+  // Wait until all asyncrhonous panels are loaded before initializing panels editor
+  if (!panelInitStarted && !document.getElementsByClassName('xwiki-async').length) {
+    panelEditorInit()
+  }
+}
+
+// Initialize panelInitStarted variable
+panelInitStarted = false;
+
+(XWiki && XWiki.isInitialized && maybePanelEditorInit())
+|| document.observe('xwiki:dom:loading', maybePanelEditorInit);

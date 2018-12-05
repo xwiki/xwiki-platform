@@ -52,6 +52,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private TestConfiguration testConfiguration;
 
+    private GenericContainer servletContainer;
+
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
@@ -72,7 +74,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
      */
     public void start(File sourceWARDirectory) throws Exception
     {
-        GenericContainer servletContainer = null;
         String xwikiIPAddress = "localhost";
         int xwikiPort = 8080;
 
@@ -89,10 +90,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
                 String tomcatTag = String.format("tomcat:%s", this.testConfiguration.getServletEngineTag() != null
                     ? this.testConfiguration.getServletEngineTag() : LATEST);
-                servletContainer = new GenericContainer<>(tomcatTag);
-                mountFromHostToContainer(servletContainer, sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
+                this.servletContainer = new GenericContainer<>(tomcatTag);
+                mountFromHostToContainer(sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
 
-                servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
+                this.servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
                     + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
                     + "-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true "
                     + "-Dsecurerandom.source=file:/dev/urandom");
@@ -101,16 +102,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             case JETTY:
                 String jettyTag = String.format("jetty:%s", this.testConfiguration.getServletEngineTag() != null
                     ? this.testConfiguration.getServletEngineTag() : LATEST);
-                servletContainer = new GenericContainer<>(jettyTag);
-                mountFromHostToContainer(servletContainer, sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
+                this.servletContainer = new GenericContainer<>(jettyTag);
+                mountFromHostToContainer(sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
 
                 break;
             case WILDFLY:
                 String wildflyTag = String.format("jboss/wildfly:%s",
                     this.testConfiguration.getServletEngineTag() != null
-                    ? this.testConfiguration.getServletEngineTag() : LATEST);
-                servletContainer = new GenericContainer<>(wildflyTag);
-                mountFromHostToContainer(servletContainer, sourceWARDirectory,
+                        ? this.testConfiguration.getServletEngineTag() : LATEST);
+                this.servletContainer = new GenericContainer<>(wildflyTag);
+                mountFromHostToContainer(sourceWARDirectory,
                     "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
                 break;
@@ -128,23 +129,24 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     this.testConfiguration.getServletEngine()));
         }
 
-        if (servletContainer != null) {
+        if (this.servletContainer != null) {
 
-            startContainer(servletContainer);
+            startContainer();
 
-            xwikiIPAddress = servletContainer.getContainerIpAddress();
-            xwikiPort = servletContainer.getMappedPort(this.testConfiguration.getServletEngine().getInternalPort());
+            xwikiIPAddress = this.servletContainer.getContainerIpAddress();
+            xwikiPort =
+                this.servletContainer.getMappedPort(this.testConfiguration.getServletEngine().getInternalPort());
         }
 
         this.testConfiguration.getServletEngine().setIP(xwikiIPAddress);
         this.testConfiguration.getServletEngine().setPort(xwikiPort);
     }
 
-    private void startContainer(GenericContainer servletContainer)
+    private void startContainer() throws Exception
     {
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
         // start listening.
-        servletContainer
+        this.servletContainer
             .withNetwork(Network.SHARED)
             .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
             .withExposedPorts(this.testConfiguration.getServletEngine().getInternalPort())
@@ -154,18 +156,18 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         // Mount the test resources directory from the host into the container so that it's possible for tests to
         // use test resource data (e.g. a word doc to import in the XWiki for office tests).
-        File testResoucesDirectory = new File(this.testConfiguration.getOutputDirectory(), "test-classes");
-        if (testResoucesDirectory.exists()) {
-            mountFromHostToContainer(servletContainer, testResoucesDirectory,
+        File testResourcesDirectory = new File(this.testConfiguration.getOutputDirectory(), "test-classes");
+        if (testResourcesDirectory.exists()) {
+            mountFromHostToContainer(testResourcesDirectory,
                 this.testConfiguration.getServletEngine().getTestResourcesPath());
         }
 
         if (this.testConfiguration.isOffline()) {
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
-            servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
+            this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
         }
 
-        start(servletContainer, this.testConfiguration);
+        start(this.servletContainer, this.testConfiguration);
     }
 
     /**
@@ -178,21 +180,20 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 this.jettyStandaloneExecutor.stop();
                 break;
             default:
-                // Nothing to do, stopped by TestContainers automatically
+                // Nothing else to do, TestContainers automatically stops the container
         }
     }
 
-    private void mountFromHostToContainer(GenericContainer servletContainer, File sourceDirectory,
-        String targetDirectory)
+    private void mountFromHostToContainer(File sourceDirectory, String targetDirectory)
     {
         // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
         // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.startsWith("mac os x")) {
             MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory.toString());
-            servletContainer.withCopyFileToContainer(mountableDirectory, targetDirectory);
+            this.servletContainer.withCopyFileToContainer(mountableDirectory, targetDirectory);
         } else {
-            servletContainer.withFileSystemBind(sourceDirectory.toString(), targetDirectory);
+            this.servletContainer.withFileSystemBind(sourceDirectory.toString(), targetDirectory);
         }
     }
 }

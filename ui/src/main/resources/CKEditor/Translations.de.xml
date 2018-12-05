@@ -44,9 +44,11 @@ CKEditor.ConfigClass_removePlugins.hint=Die Liste der deaktivierten Plugins.
 CKEditor.ConfigClass_removeButtons=Deaktivierte Toolbar Funktionen
 CKEditor.ConfigClass_removeButtons.hint=Die Liste der deaktivierten Toolbar Funktionen.
 CKEditor.ConfigClass_linkShowAdvancedTab=Link: Registerkarte Erweitert anzeigen
-### Missing: CKEditor.ConfigClass_linkShowAdvancedTab.hint=Allows you to set link attributes such as id, name, class or style.
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Ermöglicht das Festlegen von Linkattributen wie ID, Name, Klasse oder Stil.
 CKEditor.ConfigClass_linkShowTargetTab=Link: Registerkarte Ziel anzeigen
-### Missing: CKEditor.ConfigClass_linkShowTargetTab.hint=Allows you to set the link target attribute (e.g. to open the link in a new tab).
+CKEditor.ConfigClass_linkShowTargetTab.hint=Ermöglicht das Festlegen des Link Ziel Attributs (z.B. Link in neuem Tab öffnen)
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Load JavaScript Skin Extensions
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
 CKEditor.ConfigClass_advanced=Erweiterte Konfiguration
 ### Missing: CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
 
@@ -63,6 +65,7 @@ ckeditor.plugin.link.openInNewTab=Link in neuem Tab öffnen
 
 ckeditor.plugin.macro.placeholder=Makro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki Makro
+### Missing: ckeditor.plugin.macro.editButtonHint=Edit Macro
 ckeditor.plugin.macro.refreshFailed=Fehler beim Aktualisieren des bearbeiteten Inhalts.
 ckeditor.plugin.macro.dedicatedInsertButtonHint={0} Makro einfügen
 

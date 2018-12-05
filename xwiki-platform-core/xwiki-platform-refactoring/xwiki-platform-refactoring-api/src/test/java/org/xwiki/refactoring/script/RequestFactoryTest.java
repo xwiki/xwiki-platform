@@ -30,6 +30,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
@@ -58,7 +59,8 @@ public class RequestFactoryTest
     @MockComponent
     private ModelContext modelContext;
 
-    private DocumentReference userReference = new DocumentReference("wiki", "Users", "Carol");
+    private DocumentReference userReference = new DocumentReference("wiki1", "Users", "Carol");
+    private WikiReference wikiReference = new WikiReference("wiki1");
 
     @BeforeEach
     public void configure() throws Exception
@@ -66,6 +68,7 @@ public class RequestFactoryTest
         MockitoAnnotations.initMocks(this);
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(this.userReference);
         when(documentAccessBridge.getCurrentAuthorReference()).thenReturn(this.userReference);
+        when(modelContext.getCurrentEntityReference()).thenReturn(this.userReference);
     }
 
     @Test
@@ -78,6 +81,7 @@ public class RequestFactoryTest
         assertTrue(StringUtils.join(restoreRequest.getId(), '/')
             .startsWith(RefactoringJobs.RESTORE));
         assertTrue(restoreRequest.isCheckRights());
+        assertEquals(wikiReference, restoreRequest.getWikiReference());
     }
 
     @Test
@@ -90,6 +94,7 @@ public class RequestFactoryTest
         assertTrue(StringUtils.join(restoreRequest.getId(), '/')
             .startsWith(RefactoringJobs.RESTORE));
         assertTrue(restoreRequest.isCheckRights());
+        assertEquals(wikiReference, restoreRequest.getWikiReference());
     }
 
     @Test
@@ -102,6 +107,7 @@ public class RequestFactoryTest
         assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
             .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
         assertTrue(permanentlyDeleteRequest.isCheckRights());
+        assertEquals(wikiReference, permanentlyDeleteRequest.getWikiReference());
     }
 
     @Test
@@ -114,6 +120,7 @@ public class RequestFactoryTest
         assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
             .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
         assertTrue(permanentlyDeleteRequest.isCheckRights());
+        assertEquals(wikiReference, permanentlyDeleteRequest.getWikiReference());
     }
 
     @Test
@@ -135,6 +142,10 @@ public class RequestFactoryTest
         assertTrue(moveRequest.isAutoRedirect());
         assertFalse(moveRequest.isInteractive());
         assertTrue(moveRequest.isCheckRights());
+
+        // check added for fixing pseudo-tested method
+        moveRequest.setUpdateParentField(false);
+        assertFalse(moveRequest.isUpdateParentField());
     }
 
     @Test

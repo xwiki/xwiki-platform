@@ -56,6 +56,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String LATEST = "latest";
 
+    private static final char CUSTOM_IMAGE_NAME_SEPARATOR = '_';
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -97,7 +99,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
-                servletContainer = getServletContainerImage(testConfiguration);
+                servletContainer = getServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/usr/local/tomcat/webapps/xwiki");
 
@@ -108,13 +110,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
                 break;
             case JETTY:
-                this.servletContainer = getServletContainerImage(testConfiguration);
+                this.servletContainer = getServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/var/lib/jetty/webapps/xwiki");
 
                 break;
             case WILDFLY:
-                this.servletContainer = getServletContainerImage(testConfiguration);
+                this.servletContainer = getServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
@@ -129,7 +131,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 this.jettyStandaloneExecutor.start();
                 break;
             default:
-                this.manageDefaultServletEngine(testConfiguration);
+                this.throwExceptionForServletEngineNotYetSupported(testConfiguration);
         }
 
         if (this.servletContainer != null) {
@@ -157,6 +159,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
+        // Mount the test resources directory from the host into the container so that it's possible for tests to
+        // use test resource data (e.g. a word doc to import in the XWiki for office tests).
+        File testResoucesDirectory = new File("./target/", "test-classes");
+        if (testResoucesDirectory.exists()) {
+            mountFromHostToContainer(testResoucesDirectory,
+                this.testConfiguration.getServletEngine().getTestResourcesPath());
+        }
+
         if (this.testConfiguration.isOffline()) {
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
@@ -165,15 +175,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         start(this.servletContainer, this.testConfiguration);
     }
 
-    private void manageDefaultServletEngine(TestConfiguration testConfiguration)
+    private void throwExceptionForServletEngineNotYetSupported(TestConfiguration testConfiguration)
     {
         throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
             testConfiguration.getServletEngine()));
     }
 
-    private GenericContainer getServletContainerImage(TestConfiguration testConfiguration)
+    private GenericContainer getServletContainer(TestConfiguration testConfiguration)
     {
         final String baseImageName;
+
+        final GenericContainer container;
 
         switch (testConfiguration.getServletEngine()) {
             case TOMCAT:
@@ -192,14 +204,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
 
             default:
-                this.manageDefaultServletEngine(testConfiguration);
+                this.throwExceptionForServletEngineNotYetSupported(testConfiguration);
                 baseImageName = null;
         }
 
         // we want to use libreoffice so we need a custom image
         if (testConfiguration.isOffice()) {
             // name of the image that we will create
-            String imageName = StringUtils.join(Arrays.asList("xwiki", baseImageName, "office"), '_').replace(':', '_');
+            String imageName = StringUtils.join(Arrays.asList("xwiki", baseImageName, "office"),
+                CUSTOM_IMAGE_NAME_SEPARATOR).replace(':', CUSTOM_IMAGE_NAME_SEPARATOR);
 
             // we won't delete the image, so it's possible that the image already exists: it would avoid us to create
             // it again
@@ -212,7 +225,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 LOGGER.info("(*) Build a dedicated image embedding libre office...");
                 // let's create it with the appropriate name
                 // the flag indicates that we don't want it to be deleted
-                return new GenericContainer(new ImageFromDockerfile(imageName, false)
+                container = new GenericContainer(new ImageFromDockerfile(imageName, false)
                     .withDockerfileFromBuilder(builder ->
                         builder
                             .from(baseImageName)
@@ -224,10 +237,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + " procps")
                             .build()));
             } else {
-                return new GenericContainer(imageName);
+                container = new GenericContainer(imageName);
             }
+        } else {
+            container = new GenericContainer(baseImageName);
         }
-        return new GenericContainer(baseImageName);
+
+        return container;
     }
 
     /**

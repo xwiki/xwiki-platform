@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeImporterPage;
 import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
@@ -53,9 +54,16 @@ import static org.junit.Assert.assertTrue;
 public class OfficeImporterIT
 {
 
+    TestUtils testUtils;
+
+    TestConfiguration testConfiguration;
+
     @BeforeEach
-    public void setUp(TestUtils testUtils)
+    public void setUp(TestUtils testUtils, TestConfiguration testConfiguration)
     {
+        this.testUtils = testUtils;
+        this.testConfiguration = testConfiguration;
+
         testUtils.loginAsSuperAdmin();
         // Connect the wiki to the office server if it is not already done
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
@@ -74,9 +82,14 @@ public class OfficeImporterIT
      * @param fileName name of the file to import (the file should be located in test /resources/ folder)
      * @return the result page
      */
-    private ViewPage importFile(TestUtils testUtils, String testName, String fileName)
+    private ViewPage importFile(String testName, String fileName)
     {
-        return importFile(testUtils, testName, fileName, false);
+        return importFile(testName, fileName, false);
+    }
+
+    private File getResourceFile(String filename)
+    {
+        return new File(this.testConfiguration.getServletEngine().getTestResourcesPath(), filename);
     }
 
     /**
@@ -86,16 +99,20 @@ public class OfficeImporterIT
      * @param splitByHeadings either the option splitByHeadings should be use or not
      * @return the result page
      */
-    private ViewPage importFile(TestUtils testUtils, String testName, String fileName, boolean splitByHeadings)
+    private ViewPage importFile(String testName, String fileName, boolean splitByHeadings)
     {
-        ViewPage page = testUtils.gotoPage(
+        ViewPage page = this.testUtils.gotoPage(
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome"));
         CreatePagePage createPage = page.createPage();
         createPage.setType("office");
         createPage.clickCreate();
 
         OfficeImporterPage officeImporterPage = new OfficeImporterPage();
-        officeImporterPage.setFile(new File(getClass().getResource(fileName).getPath()));
+        File resourceFile = this.getResourceFile(fileName);
+
+        //assertTrue(String.format("The following resource file should exist for import test: %s",
+        //    resourceFile.getPath()), resourceFile.exists());
+        officeImporterPage.setFile(resourceFile);
         officeImporterPage.setFilterStyle(true);
         officeImporterPage.setSplitDocument(splitByHeadings);
 
@@ -124,11 +141,11 @@ public class OfficeImporterIT
     /**
      * Delete the page created by the test.
      */
-    private void deletePage(TestUtils testUtils, String testName)
+    private void deletePage(String testName)
     {
         DocumentReference pageToDelete =
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome");
-        testUtils.deletePage(pageToDelete);
+        this.testUtils.deletePage(pageToDelete);
     }
 
     /**
@@ -140,44 +157,44 @@ public class OfficeImporterIT
     {
         String testName = "testImports";
         // Test word file
-        ViewPage resultPage = importFile(testUtils, testName, "/msoffice.97-2003/Test.doc");
+        ViewPage resultPage = importFile(testName, "msoffice.97-2003/Test.doc");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
-        deletePage(testUtils, testName);
+        deletePage(testName);
 
         // Test power point file
-        resultPage = importFile(testUtils, testName, "/msoffice.97-2003/Test.ppt");
+        resultPage = importFile(testName, "msoffice.97-2003/Test.ppt");
         AttachmentsPane attachmentsPane = resultPage.openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide3.jpg"));
-        deletePage(testUtils, testName);
+        deletePage(testName);
 
         // Test excel file
-        resultPage = importFile(testUtils, testName, "/msoffice.97-2003/Test.xls");
+        resultPage = importFile(testName, "msoffice.97-2003/Test.xls");
         assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
         assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet2"));
-        deletePage(testUtils, testName);
+        deletePage(testName);
 
         // Test ODT file
-        resultPage = importFile(testUtils, testName, "/ooffice.3.0/Test.odt");
+        resultPage = importFile(testName, "ooffice.3.0/Test.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
-        deletePage(testUtils, testName);
+        deletePage(testName);
 
         // Test ODP file
-        resultPage = importFile(testUtils, testName, "/ooffice.3.0/Test.odp");
+        resultPage = importFile(testName, "ooffice.3.0/Test.odp");
         attachmentsPane = resultPage.openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide3.jpg"));
-        deletePage(testUtils, testName);
+        deletePage(testName);
 
         // Test ODS file
-        resultPage = importFile(testUtils, testName, "/ooffice.3.0/Test.ods");
+        resultPage = importFile(testName, "ooffice.3.0/Test.ods");
         assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
         assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet2"));
-        deletePage(testUtils, testName);
+        deletePage(testName);
     }
 
     /**
@@ -196,7 +213,7 @@ public class OfficeImporterIT
     public void testSplitByHeadings(TestUtils testUtils)
     {
         String testName = "testSplitByHeadings";
-        ViewPage resultPage = importFile(testUtils, testName, "/ToSplit.odt", true);
+        ViewPage resultPage = importFile(testName, "ToSplit.odt", true);
         assertTrue(StringUtils.contains(resultPage.getContent(), "Introduction"));
 
         // See children

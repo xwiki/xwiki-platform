@@ -33,7 +33,7 @@
   <description>XWiki Platform - Office - Test -Parent POM</description>
   <modules>
     <module>xwiki-platform-office-test-pageobjects</module>
-    <module>xwiki-platform-office-test-tests</module>
+    <module>xwiki-platform-office-test-docker</module>
   </modules>
   <properties>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->

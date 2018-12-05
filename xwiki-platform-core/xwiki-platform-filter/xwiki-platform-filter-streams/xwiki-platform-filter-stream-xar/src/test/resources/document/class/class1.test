@@ -14,7 +14,7 @@
     <defaultWeb>defaultWeb</defaultWeb>
     <nameField>nameField</nameField>
     <validationScript>validationScript</validationScript>
-    <name>
+    <notprop1>
       <disabled>0</disabled>
       <name>prop1</name>
       <number>1</number>
@@ -23,7 +23,7 @@
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-    </name>
+    </notprop1>
   </class>
 </xwikidoc>
 .#------------------------------------------------------------------------------
@@ -96,7 +96,7 @@
               </entry>
             </parameters>
           </p>
-          <wikiClassProperty name="name" type="com.xpn.xwiki.objects.classes.NumberClass">
+          <wikiClassProperty name="prop1" type="com.xpn.xwiki.objects.classes.NumberClass">
             <wikiClassPropertyField name="disabled" value="0"/>
             <wikiClassPropertyField name="name" value="prop1"/>
             <wikiClassPropertyField name="number" value="1"/>

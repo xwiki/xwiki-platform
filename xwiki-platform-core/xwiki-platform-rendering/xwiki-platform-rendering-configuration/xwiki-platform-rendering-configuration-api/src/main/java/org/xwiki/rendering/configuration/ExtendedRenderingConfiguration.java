@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Extends {@link RenderingConfiguration} with XWiki-specific configuration properties.
@@ -81,4 +82,14 @@ public interface ExtendedRenderingConfiguration
      *         by default)
      */
     List<Syntax> getDisabledSyntaxes();
+
+    /**
+     * @return the default Syntax to use when creating new content (Documents, etc).
+     * @since 10.11RC1
+     */
+    @Unstable
+    default Syntax getDefaultContentSyntax()
+    {
+        return Syntax.XWIKI_2_1;
+    }
 }

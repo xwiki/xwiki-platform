@@ -41,7 +41,7 @@ import com.xpn.xwiki.CoreConfiguration;
 
 /**
  * Extended configuration options for the Rendering subsystem.
- * 
+ *
  * @version $Id$
  * @since 8.2M1
  */
@@ -115,7 +115,7 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
             // the Extension Manager.
             if (configuredSyntaxes == null || configuredSyntaxes.isEmpty()) {
                 disabledSyntaxes.addAll(computeDisabledSyntaxes(
-                    Collections.singletonList(this.coreConfiguration.getDefaultDocumentSyntax())));
+                    Collections.singletonList(getDefaultContentSyntax())));
             } else {
                 // Disable all syntaxes except those in xwiki.rendering.syntaxes
                 disabledSyntaxes.addAll(computeDisabledSyntaxes(configuredSyntaxes));
@@ -138,6 +138,14 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
             }
         }
         return configuredSyntaxes;
+    }
+
+    @Override
+    public Syntax getDefaultContentSyntax()
+    {
+        // TODO: Move the code from DefaultCoreConfiguration here and introduce a new property for it, for ex:
+        // rendering.defaultContentSyntax
+        return this.coreConfiguration.getDefaultDocumentSyntax();
     }
 
     private List<Syntax> convertList(List<String> syntaxesAsStrings)

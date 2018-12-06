@@ -70,8 +70,11 @@ public class DefaultCoreConfiguration implements CoreConfiguration
     /**
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      * @since 2.3M1
+     * @deprecated starting with 10.11RC1, use
+     *     {@link org.xwiki.rendering.configuration.ExtendedRenderingConfiguration#getDefaultContentSyntax()}
      */
     @Override
+    @Deprecated
     public Syntax getDefaultDocumentSyntax()
     {
         // If the found value is an empty string then default to the configuration value in the main configuration

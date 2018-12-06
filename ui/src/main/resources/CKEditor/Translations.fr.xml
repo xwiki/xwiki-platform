@@ -47,6 +47,8 @@ CKEditor.ConfigClass_linkShowAdvancedTab=Lien : Afficher l'onglet Avancé
 CKEditor.ConfigClass_linkShowAdvancedTab.hint=Vous permet de définir les attributs du lien comme son nom, son id, sa classe ou son style.
 CKEditor.ConfigClass_linkShowTargetTab=Lien : Afficher l'onglet Destination
 CKEditor.ConfigClass_linkShowTargetTab.hint=Vous permet de définir l'attribut target du lien, par exemple pour ouvrir le lien dans un nouvel onglet.
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Load JavaScript Skin Extensions
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
 CKEditor.ConfigClass_advanced=Configuration avancée
 CKEditor.ConfigClass_advanced.hint=Vous pouvez écrire un snippet Javascript pour modifier directement l''objet configuration. Voir la {0}documentation de CKEditor{1} pour la liste des propriétés de configuration disponibles.
 
@@ -63,6 +65,7 @@ ckeditor.plugin.link.openInNewTab=Ouvrir le lien dans un nouvel onglet
 
 ckeditor.plugin.macro.placeholder=macro : {0}
 ckeditor.plugin.macro.buttonHint=Macro XWiki
+### Missing: ckeditor.plugin.macro.editButtonHint=Edit Macro
 ckeditor.plugin.macro.refreshFailed=La réactualisation du contenu édité a échoué.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insérer macro {0}
 

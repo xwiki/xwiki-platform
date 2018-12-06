@@ -30,6 +30,8 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
@@ -56,7 +58,7 @@ import org.xwiki.security.authorization.Right;
 @Component
 @Named("display")
 @Singleton
-public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
+public class DisplayMacro extends AbstractMacro<DisplayMacroParameters> implements Disposable
 {
     /**
      * The description of the macro.
@@ -220,5 +222,12 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         }
 
         return this.macroEntityReferenceResolver.resolve(reference, parameters.getType(), block);
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // Clean up the ThreadLocal to avoid memory leak.
+        this.displaysBeingExecuted.remove();
     }
 }

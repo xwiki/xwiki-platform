@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.display;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -98,7 +97,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters> implemen
     /**
      * A stack of all currently executing include macros with context=new for catching recursive inclusion.
      */
-    private ThreadLocal<Stack<Object>> displaysBeingExecuted = new ThreadLocal<Stack<Object>>();
+    private ThreadLocal<Stack<Object>> displaysBeingExecuted = new ThreadLocal<>();
 
     /**
      * Default constructor.
@@ -121,7 +120,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters> implemen
 
     /**
      * Allows overriding the Document Access Bridge used (useful for unit tests).
-     * 
+     *
      * @param documentAccessBridge the new Document Access Bridge to use
      */
     public void setDocumentAccessBridge(DocumentAccessBridge documentAccessBridge)
@@ -141,7 +140,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters> implemen
 
         EntityReference includedReference = resolve(context.getCurrentMacroBlock(), parameters);
 
-        checkRecursiveDisplay(context.getCurrentMacroBlock(), includedReference);
+        checkRecursiveDisplay(includedReference);
 
         // Step 2: Retrieve the included document.
         DocumentModelBridge documentBridge;
@@ -172,7 +171,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters> implemen
 
         Stack<Object> references = this.displaysBeingExecuted.get();
         if (references == null) {
-            references = new Stack<Object>();
+            references = new Stack<>();
             this.displaysBeingExecuted.set(references);
         }
         references.push(includedReference);
@@ -193,17 +192,16 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters> implemen
         metadata.getMetaData().addMetaData(MetaData.SOURCE, source);
         metadata.getMetaData().addMetaData(MetaData.BASE, source);
 
-        return Arrays.<Block>asList(metadata);
+        return Collections.singletonList(metadata);
     }
 
     /**
      * Protect form recursive display.
-     * 
-     * @param currrentBlock the child block to check
+     *
      * @param reference the reference of the document being included
      * @throws MacroExecutionException recursive inclusion has been found
      */
-    private void checkRecursiveDisplay(Block currrentBlock, EntityReference reference) throws MacroExecutionException
+    private void checkRecursiveDisplay(EntityReference reference) throws MacroExecutionException
     {
         // Try to find recursion in the thread
         Stack<Object> references = this.displaysBeingExecuted.get();
@@ -225,7 +223,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters> implemen
     }
 
     @Override
-    public void dispose() throws ComponentLifecycleException
+    public void dispose()
     {
         // Clean up the ThreadLocal to avoid memory leak.
         this.displaysBeingExecuted.remove();

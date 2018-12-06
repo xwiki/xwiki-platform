@@ -48,7 +48,9 @@ import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the office importer APIs to server-side scripts.
@@ -126,6 +128,9 @@ public class OfficeImporterScriptService implements ScriptService
      */
     @Inject
     private XDOMOfficeDocumentSplitter xdomSplitter;
+
+    @Inject
+    private ExtendedRenderingConfiguration extendedRenderingConfiguration;
 
     /**
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
@@ -297,6 +302,26 @@ public class OfficeImporterScriptService implements ScriptService
     {
         return split(xdomDocument, headingLevels, namingCriterionHint,
             this.currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
+    }
+
+    /**
+     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments (using
+     * the default content syntax, see {@link ExtendedRenderingConfiguration#getDefaultContentSyntax()}).
+     *
+     * @param doc {@link XDOMOfficeDocument} to be saved
+     * @param documentReference the reference of the target wiki page
+     * @param parentReference the reference of the parent wiki page or {@code null}
+     * @param title title of the target wiki page or {@code null}
+     * @param append whether to append content if the target wiki page exists
+     * @return true if the operation completes successfully, false otherwise
+     * @since 10.11RC1
+     */
+    @Unstable
+    public boolean save(XDOMOfficeDocument doc, DocumentReference documentReference, DocumentReference parentReference,
+        String title, boolean append)
+    {
+        return save(doc, documentReference, this.extendedRenderingConfiguration.getDefaultContentSyntax().toIdString(),
+            parentReference, title, append);
     }
 
     /**

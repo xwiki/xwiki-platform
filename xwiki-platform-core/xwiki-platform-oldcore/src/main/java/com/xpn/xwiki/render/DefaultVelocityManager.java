@@ -335,7 +335,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                                     template.getContent().getContent());
 
                                 return null;
-                            }, template.getContent().getAuthorReference());
+                            }, template.getContent().getAuthorReference(),
+                                template.getContent().getDocumentReference());
                         } catch (Exception e) {
                             this.logger.error("Failed to evaluate macros templates [{}]", template.getPath(), e);
                         }

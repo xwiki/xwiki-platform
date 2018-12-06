@@ -153,7 +153,8 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
         transformationContext.setId(this.configuration.getTransformationId());
 
         if (this.configuration.isAuthorReferenceSet()) {
-            transform(block, transformationContext, configuration.getAuthorReference());
+            transform(block, transformationContext, this.configuration.getAuthorReference(),
+                this.configuration.getSourceReference());
         } else {
             transform(block, transformationContext);
         }

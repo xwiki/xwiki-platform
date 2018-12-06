@@ -56,15 +56,15 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
     @Inject
     protected RenderingContext renderingContext;
 
-    protected void transform(Block block, TransformationContext transformationContext, DocumentReference author)
-        throws TransformationException
+    protected void transform(Block block, TransformationContext transformationContext, DocumentReference author,
+        DocumentReference secureDocument) throws TransformationException
     {
         try {
             this.authorExecutor.call(() -> {
                 transform(block, transformationContext);
 
                 return null;
-            }, author);
+            }, author, secureDocument);
         } catch (Exception e) {
             throw new TransformationException("Failed to execute transformations", e);
         }

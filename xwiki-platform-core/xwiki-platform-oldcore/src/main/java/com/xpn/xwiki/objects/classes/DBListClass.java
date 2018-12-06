@@ -125,7 +125,7 @@ public class DBListClass extends ListClass
                 AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
                 list = makeList(authorExecutor.call(() -> {
                     return dbListQueryBuilder.build(this).execute();
-                }, getOwnerDocument().getAuthorReference()));
+                }, getOwnerDocument().getAuthorReference(), getDocumentReference()));
             } catch (Exception e) {
                 LOGGER.warn("Failed to get the Database List values. Root cause is [{}].",
                     ExceptionUtils.getRootCauseMessage(e));
@@ -225,9 +225,8 @@ public class DBListClass extends ListClass
                     // If only the classname is specified, return a query that selects all the
                     // document names which have an object of that type.
                     if (hasClassname) {
-                        sql =
-                            "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
-                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
+                        sql = "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
+                            + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the 3 properties is specified, return a query that always
                         // returns no rows.
@@ -537,14 +536,13 @@ public class DBListClass extends ListClass
                     }
                 }
 
-                String script =
-                    "\"" + path + "?xpage=suggest&classname=" + classname + "&fieldname=" + fieldname + "&firCol="
-                        + firstCol + "&secCol=" + secondCol + "&\"";
+                String script = "\"" + path + "?xpage=suggest&classname=" + classname + "&fieldname=" + fieldname
+                    + "&firCol=" + firstCol + "&secCol=" + secondCol + "&\"";
                 String varname = "\"input\"";
                 String seps = "\"" + this.getSeparators() + "\"";
                 if (isMultiSelect()) {
-                    input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + ", seps:"
-                        + seps + "} )");
+                    input.setOnFocus(
+                        "new ajaxSuggest(this, {script:" + script + ", varname:" + varname + ", seps:" + seps + "} )");
                 } else {
                     input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + "} )");
                 }

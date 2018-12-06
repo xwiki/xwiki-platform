@@ -112,7 +112,8 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
         DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
         PropertyValues values = new PropertyValues();
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
+        when(this.authorExecutor.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
+            .thenReturn(values);
 
         assertSame(values, this.provider.getValues(propertyReference, 3));
 
@@ -126,7 +127,8 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
         PropertyValues values = new PropertyValues();
         values.getPropertyValues().add(new PropertyValue());
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
+        when(this.authorExecutor.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
+            .thenReturn(values);
 
         assertSame(values, this.provider.getValues(propertyReference, 1, "foo"));
         assertEquals(1, values.getPropertyValues().size());
@@ -146,7 +148,8 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         red.setMetaData(new HashMap<>());
         red.getMetaData().put("label", "Red");
         values.getPropertyValues().add(red);
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
+        when(this.authorExecutor.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
+            .thenReturn(values);
 
         Query query = mock(Query.class);
         QueryParameter queryParameter = mock(QueryParameter.class);
@@ -154,7 +157,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         when(query.bindValue("text")).thenReturn(queryParameter);
         when(queryParameter.anyChars()).thenReturn(queryParameter);
         when(queryParameter.literal("bar")).thenReturn(queryParameter);
-        when(query.execute()).thenReturn(Arrays.asList(new Object[]{ "blue", 21L }, new Object[]{ "red", 17L }));
+        when(query.execute()).thenReturn(Arrays.asList(new Object[] { "blue", 21L }, new Object[] { "red", 17L }));
 
         assertSame(values, this.provider.getValues(propertyReference, 3, "bar"));
 

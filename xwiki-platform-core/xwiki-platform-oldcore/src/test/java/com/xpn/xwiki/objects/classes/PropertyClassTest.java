@@ -118,7 +118,7 @@ public class PropertyClassTest
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", "Alice");
         this.xclass.getOwnerDocument().setAuthorReference(authorReference);
 
-        displayCustomWithAuthor(authorReference);
+        displayCustomWithAuthor(authorReference, this.xclass.getDocumentReference());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class PropertyClassTest
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "Alice");
         this.oldCore.getXWikiContext().setUserReference(userReference);
 
-        displayCustomWithAuthor(userReference);
+        displayCustomWithAuthor(userReference, this.xclass.getDocumentReference());
     }
 
     @Test
@@ -138,12 +138,14 @@ public class PropertyClassTest
 
         this.xclass.getOwnerDocument().setNew(false);
 
-        displayCustomWithAuthor(null);
+        displayCustomWithAuthor(null, this.xclass.getDocumentReference());
     }
 
-    private void displayCustomWithAuthor(DocumentReference authorReference) throws Exception
+    private void displayCustomWithAuthor(DocumentReference authorReference, DocumentReference secureDocument)
+        throws Exception
     {
-        when(this.authorExecutor.call(any(Callable.class), eq(authorReference))).thenReturn("output");
+        when(this.authorExecutor.call(any(Callable.class), eq(authorReference), eq(secureDocument)))
+            .thenReturn("output");
 
         PropertyClass propertyClass = new PropertyClass();
         propertyClass.setCustomDisplay("test");

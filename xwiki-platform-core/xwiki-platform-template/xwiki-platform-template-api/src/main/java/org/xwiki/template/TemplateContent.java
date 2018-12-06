@@ -76,6 +76,16 @@ public interface TemplateContent
     DocumentReference getAuthorReference();
 
     /**
+     * @return the reference of the document to use as secure document (generally the document containing the code to
+     *         execute)
+     * @since 10.11RC1
+     */
+    default DocumentReference getDocumentReference()
+    {
+        return null;
+    }
+
+    /**
      * @return used to make the difference between null author and no author
      * @since 9.4RC1
      */

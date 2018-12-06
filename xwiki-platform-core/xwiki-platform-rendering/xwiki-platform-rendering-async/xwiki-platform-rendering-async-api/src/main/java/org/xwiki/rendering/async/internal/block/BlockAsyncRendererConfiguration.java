@@ -50,6 +50,8 @@ public class BlockAsyncRendererConfiguration
 
     private DocumentReference authorReference;
 
+    private DocumentReference sourceReference;
+
     private boolean asyncAllowed;
 
     private boolean cacheAllowed;
@@ -140,6 +142,24 @@ public class BlockAsyncRendererConfiguration
     {
         this.authorReference = authorReference;
         this.authorReferenceSet = true;
+    }
+
+    /**
+     * @return the reference of the executed block
+     * @since 10.11RC1
+     */
+    public DocumentReference getSourceReference()
+    {
+        return this.sourceReference;
+    }
+
+    /**
+     * @param sourceReference the reference of the executed block
+     * @since 10.11RC1
+     */
+    public void setSourceReference(DocumentReference sourceReference)
+    {
+        this.sourceReference = sourceReference;
     }
 
     /**

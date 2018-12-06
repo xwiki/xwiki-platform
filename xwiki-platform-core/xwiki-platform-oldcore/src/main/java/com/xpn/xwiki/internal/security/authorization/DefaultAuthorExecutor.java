@@ -19,12 +19,14 @@
  */
 package com.xpn.xwiki.internal.security.authorization;
 
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -33,6 +35,7 @@ import org.xwiki.security.authorization.AuthorExecutor;
 
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -47,6 +50,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 // to have it in oldcore right now
 public class DefaultAuthorExecutor implements AuthorExecutor
 {
+    @Inject
+    private Logger logger;
+
     /**
      * Contain the informations to restore.
      *
@@ -81,13 +87,61 @@ public class DefaultAuthorExecutor implements AuthorExecutor
     @Override
     public <V> V call(Callable<V> callable, DocumentReference authorReference) throws Exception
     {
-        try (AutoCloseable context = before(authorReference)) {
+        return call(callable, authorReference, null);
+    }
+
+    @Override
+    public <V> V call(Callable<V> callable, DocumentReference authorReference, DocumentReference sourceReference)
+        throws Exception
+    {
+        try (AutoCloseable context = before(authorReference, sourceReference)) {
             return callable.call();
         }
     }
 
     @Override
     public AutoCloseable before(DocumentReference authorReference)
+    {
+        return before(authorReference, null);
+    }
+
+    private XWikiDocument getSecureDocument(XWikiContext xwikiContext, DocumentReference sourceReference,
+        DocumentReference authorReference)
+    {
+        XWikiDocument secureDocument = null;
+
+        if (sourceReference != null) {
+            try {
+                // Get the actual document to be as close as possible to the reality
+                secureDocument = xwikiContext.getWiki().getDocument(sourceReference, xwikiContext);
+
+                // If the document does not exist or have a different content author we need to customize it a bit
+                if (secureDocument.isNew()
+                    || !Objects.equals(secureDocument.getContentAuthorReference(), authorReference)) {
+                    // Let's try to not mess with the cache
+                    secureDocument = secureDocument.clone();
+
+                    secureDocument.setContentAuthorReference(authorReference);
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to get document [{}]", sourceReference, e);
+            }
+        }
+
+        if (secureDocument == null) {
+            secureDocument = new XWikiDocument(new DocumentReference(
+                authorReference != null ? authorReference.getWikiReference().getName() : "xwiki", "SUSpace", "SUPage"));
+
+            secureDocument.setContentAuthorReference(authorReference);
+            secureDocument.setAuthorReference(authorReference);
+            secureDocument.setCreatorReference(authorReference);
+        }
+
+        return secureDocument;
+    }
+
+    @Override
+    public AutoCloseable before(DocumentReference authorReference, DocumentReference sourceReference)
     {
         DefaultAuthorExecutorContext suContext;
 
@@ -98,12 +152,9 @@ public class DefaultAuthorExecutor implements AuthorExecutor
 
             // Make sure to have the right secure document
             suContext.currentSecureDocument = (XWikiDocument) xwikiContext.get(XWikiDocument.CKEY_SDOC);
-            XWikiDocument secureDocument = new XWikiDocument(new DocumentReference(
-                authorReference != null ? authorReference.getWikiReference().getName() : "xwiki", "SUSpace", "SUPage"));
-            secureDocument.setContentAuthorReference(authorReference);
-            secureDocument.setAuthorReference(authorReference);
-            secureDocument.setCreatorReference(authorReference);
-            xwikiContext.put(XWikiDocument.CKEY_SDOC, secureDocument);
+
+            xwikiContext.put(XWikiDocument.CKEY_SDOC,
+                getSecureDocument(xwikiContext, sourceReference, authorReference));
 
             // Make sure to disable XWikiContext#dropPermission hack
             suContext.xwikiContextDropPermissionHack = xwikiContext.remove(XWikiConstant.DROPPED_PERMISSIONS);

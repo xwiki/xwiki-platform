@@ -56,8 +56,8 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * Rights to be checked for the content author instead of the current user.
      */
-    private static final Set<Right> CONTENT_AUTHOR_RIGHTS = new HashSet<Right>(Arrays.asList(Right.SCRIPT,
-        Right.PROGRAM));
+    private static final Set<Right> CONTENT_AUTHOR_RIGHTS =
+        new HashSet<Right>(Arrays.asList(Right.SCRIPT, Right.PROGRAM));
 
     @Inject
     private AuthorizationManager authorizationManager;
@@ -76,14 +76,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     public void checkAccess(Right right) throws AccessDeniedException
     {
         if (CONTENT_AUTHOR_RIGHTS.contains(right)) {
-            EntityReference entity;
-            if (right == Right.PROGRAM) {
-                // Defaults to the main wiki reference.
-                entity = null;
-            } else {
-                entity = getCurrentEntity();
-            }
-            checkAccess(right, getCurrentUser(right, null), entity);
+            checkAccess(right, getCurrentUser(right, null), getCurrentAuthorDocumentReference(right));
         } else {
             checkAccess(right, getCurrentEntity());
         }
@@ -110,14 +103,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     public boolean hasAccess(Right right)
     {
         if (CONTENT_AUTHOR_RIGHTS.contains(right)) {
-            EntityReference entity;
-            if (right == Right.PROGRAM) {
-                // Defaults to the main wiki reference.
-                entity = null;
-            } else {
-                entity = getCurrentEntity();
-            }
-            return hasAccess(right, getCurrentUser(right, null), entity);
+            return hasAccess(right, getCurrentUser(right, null), getCurrentAuthorDocumentReference(right));
         }
 
         return hasAccess(right, getCurrentEntity());
@@ -171,6 +157,18 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
         }
 
         return this.xcontextProvider.get().getUserReference();
+    }
+
+    private DocumentReference getCurrentAuthorDocumentReference(Right right)
+    {
+        if (right == Right.PROGRAM) {
+            // Defaults to the main wiki reference.
+            return null;
+        }
+
+        XWikiDocument doc = getProgrammingDocument();
+
+        return doc != null ? doc.getDocumentReference() : null;
     }
 
     private XWikiDocument getDocument(EntityReference entity)

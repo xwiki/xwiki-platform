@@ -73,9 +73,9 @@ public class PageClassPropertyValuesProvider extends AbstractDocumentListClassPr
     protected PropertyValues getAllowedValues(PageClass pageClass, int limit, String filter) throws Exception
     {
         // Execute the query with the rights of the class last author because the query may not be safe.
-        return this.authorExecutor.call(() -> getValues(
-            this.allowedValuesQueryBuilder.build(pageClass), limit, filter, pageClass
-        ), pageClass.getOwnerDocument().getAuthorReference());
+        return this.authorExecutor.call(
+            () -> getValues(this.allowedValuesQueryBuilder.build(pageClass), limit, filter, pageClass),
+            pageClass.getOwnerDocument().getAuthorReference(), pageClass.getDocumentReference());
     }
 
     @Override
@@ -127,8 +127,7 @@ public class PageClassPropertyValuesProvider extends AbstractDocumentListClassPr
             parentSpace = parentSpace.getParent();
         }
         return parentSpace.getReversedReferenceChain().stream()
-            .filter(entityReference -> !(entityReference instanceof WikiReference))
-            .map(this::getLabel)
+            .filter(entityReference -> !(entityReference instanceof WikiReference)).map(this::getLabel)
             .collect(Collectors.joining(" / "));
     }
 }

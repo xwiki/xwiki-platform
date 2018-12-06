@@ -401,7 +401,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             transformationContext.setId(this.syncContext.getTransformationContext().getId());
         }
 
-        transform(block, transformationContext, this.wikimacro.getAuthorReference());
+        transform(block, transformationContext, this.wikimacro.getAuthorReference(),
+            this.wikimacro.getDocumentReference());
 
         return extractResult(block, macroBinding, async);
     }

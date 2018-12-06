@@ -137,6 +137,7 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
 
         // The author of the source
         executorConfiguration.setAuthorReference(getAuthorReference());
+        executorConfiguration.setSourceReference(getDocumentReference());
 
         // The syntax in which the result will be rendered
         executorConfiguration.setTargetSyntax(this.renderingContext.getTargetSyntax());

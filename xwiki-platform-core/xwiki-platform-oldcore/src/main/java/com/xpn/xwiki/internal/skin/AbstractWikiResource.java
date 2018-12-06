@@ -35,22 +35,25 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 6.4M1
  */
-public abstract class AbstractWikiResource<R extends EntityReference, I extends InputSource> extends
-    AbstractResource<I> implements WikiResource<I>
+public abstract class AbstractWikiResource<R extends EntityReference, I extends InputSource> extends AbstractResource<I>
+    implements WikiResource<I>
 {
-    protected  final Provider<XWikiContext> xcontextProvider;
+    protected final Provider<XWikiContext> xcontextProvider;
 
     protected final R reference;
 
     protected final DocumentReference authorReference;
 
-    public AbstractWikiResource(String id, String path, String resourceName, ResourceRepository repository,
-        R reference, DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
+    protected final DocumentReference documentReference;
+
+    public AbstractWikiResource(String id, String path, String resourceName, ResourceRepository repository, R reference,
+        DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
     {
         super(id, path, resourceName, repository);
 
         this.reference = reference;
         this.authorReference = authorReference;
+        this.documentReference = (DocumentReference) this.reference.extractReference(EntityType.DOCUMENT);
         this.xcontextProvider = xcontextProvider;
     }
 
@@ -60,13 +63,17 @@ public abstract class AbstractWikiResource<R extends EntityReference, I extends 
         return this.authorReference;
     }
 
+    @Override
+    public DocumentReference getDocumentReference()
+    {
+        return this.documentReference;
+    }
+
     protected XWikiDocument getDocument() throws XWikiException
     {
-        EntityReference documentReference = this.reference.extractReference(EntityType.DOCUMENT);
-
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.getWiki().getDocument(documentReference, xcontext);
+        return xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
     }
 
     @Override

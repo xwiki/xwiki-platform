@@ -85,7 +85,8 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
 
         AuthorExecutor authorExector = this.mocker.getInstance(AuthorExecutor.class);
         String evaluatedStatement = "test";
-        when(authorExector.call(any(), eq(authorReference))).thenReturn(evaluatedStatement);
+        when(authorExector.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
+            .thenReturn(evaluatedStatement);
 
         Query query = mock(Query.class);
         when(this.secureQueryManager.createQuery(evaluatedStatement, Query.HQL)).thenReturn(query);

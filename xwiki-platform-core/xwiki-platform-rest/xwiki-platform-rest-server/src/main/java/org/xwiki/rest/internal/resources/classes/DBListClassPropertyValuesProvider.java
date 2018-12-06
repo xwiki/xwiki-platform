@@ -57,8 +57,8 @@ public class DBListClassPropertyValuesProvider extends AbstractListClassProperty
     protected PropertyValues getAllowedValues(DBListClass dbListClass, int limit, String filter) throws Exception
     {
         // Execute the query with the rights of the class last author because the query may not be safe.
-        return this.authorExecutor.call(() -> {
-            return getValues(this.allowedValuesQueryBuilder.build(dbListClass), limit, filter, dbListClass);
-        }, dbListClass.getOwnerDocument().getAuthorReference());
+        return this.authorExecutor.call(
+            () -> getValues(this.allowedValuesQueryBuilder.build(dbListClass), limit, filter, dbListClass),
+            dbListClass.getOwnerDocument().getAuthorReference(), dbListClass.getDocumentReference());
     }
 }

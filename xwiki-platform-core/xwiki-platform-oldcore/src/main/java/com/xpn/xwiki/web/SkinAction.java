@@ -278,7 +278,8 @@ public class SkinAction extends XWikiAction
                     // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
                     DocumentReference superadminUserReference = new DocumentReference(context.getMainXWiki(),
                         XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
-                    String evaluatedContent = evaluateVelocity(rawContent, path, superadminUserReference, context);
+                    String evaluatedContent =
+                        evaluateVelocity(rawContent, path, superadminUserReference, null, context);
 
                     byte[] newdata = evaluatedContent.getBytes(ENCODING);
                     // If the content contained velocity code, then it should not be cached
@@ -342,7 +343,8 @@ public class SkinAction extends XWikiAction
                     new ObjectPropertyReference(filename, object.getReference());
 
                 // Evaluate the content with the rights of the document's author.
-                content = evaluateVelocity(content, propertyReference, doc.getAuthorReference(), context);
+                content = evaluateVelocity(content, propertyReference, doc.getAuthorReference(),
+                    doc.getDocumentReference(), context);
             }
 
             // Prepare the response.
@@ -365,22 +367,22 @@ public class SkinAction extends XWikiAction
     }
 
     private String evaluateVelocity(String content, EntityReference reference, DocumentReference author,
-        XWikiContext context)
+        final DocumentReference sourceDocument, XWikiContext context)
     {
         EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         String namespace = serializer.serialize(reference);
 
-        return evaluateVelocity(content, namespace, author, context);
+        return evaluateVelocity(content, namespace, author, sourceDocument, context);
     }
 
     private String evaluateVelocity(final String content, final String namespace, final DocumentReference author,
-        final XWikiContext context)
+        final DocumentReference sourceDocument, final XWikiContext context)
     {
         String result = content;
 
         try {
             result = Utils.getComponent(AuthorExecutor.class)
-                .call(() -> context.getWiki().evaluateVelocity(content, namespace), author);
+                .call(() -> context.getWiki().evaluateVelocity(content, namespace), author, sourceDocument);
         } catch (Exception e) {
             // Should not happen since there is nothing in the call() method throwing an exception.
             LOGGER.error("Failed to evaluate velocity content for namespace {} with the rights of the user {}",
@@ -419,7 +421,8 @@ public class SkinAction extends XWikiAction
 
                 // Evaluate the content with the rights of the document's author.
                 String evaluatedContent =
-                    evaluateVelocity(velocityCode, attachment.getReference(), doc.getAuthorReference(), context);
+                    evaluateVelocity(velocityCode, attachment.getReference(), doc.getAuthorReference(),
+                        doc.getDocumentReference(), context);
 
                 // Prepare the response.
                 response.setCharacterEncoding(ENCODING);

@@ -45,6 +45,23 @@ public interface AuthorExecutor
     <V> V call(Callable<V> callable, DocumentReference authorReference) throws Exception;
 
     /**
+     * Execute the passed {@link Callable} with the rights of the passed user.
+     *
+     * @param callable the the task to execute
+     * @param authorReference the user to check rights on
+     * @param sourceReference the reference of the document associated with the {@link Callable}
+     * @return computed result
+     * @throws Exception if unable to compute a result
+     * @param <V> the result type of method <tt>call</tt>
+     * @since 10.11RC1
+     */
+    default <V> V call(Callable<V> callable, DocumentReference authorReference, DocumentReference sourceReference)
+        throws Exception
+    {
+        return call(callable, authorReference);
+    }
+
+    /**
      * Setup the context so that following code is executed with provided user rights.
      * 
      * <pre>
@@ -60,6 +77,28 @@ public interface AuthorExecutor
      * @see #after(AutoCloseable)
      */
     AutoCloseable before(DocumentReference authorReference);
+
+    /**
+     * Setup the context so that following code is executed with provided user rights.
+     * 
+     * <pre>
+     * {@code
+     * try (AutoCloseable context = this.executor.before(author, sourceDocument)) {
+     *   ...
+     * }
+     * }
+     * </pre>
+     *
+     * @param authorReference the user to check rights on
+     * @param sourceReference the reference of the document associated with the {@link Callable}
+     * @return the context to restore
+     * @see #after(AutoCloseable)
+     * @since 10.11RC1
+     */
+    default AutoCloseable before(DocumentReference authorReference, DocumentReference sourceReference)
+    {
+        return before(authorReference);
+    }
 
     /**
      * Restore the context to it's previous state as defined by the provided {@link AutoCloseable}.

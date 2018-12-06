@@ -284,18 +284,29 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </default_language>
       <documentBundles>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>documentBundles</name>
         <number>52</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Internationalization Document Bundles</prettyName>
         <size>60</size>
-        <tooltip/>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </documentBundles>
       <edit_anonymous>
         <cache>0</cache>
@@ -919,18 +930,29 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </showinformation>
       <skin>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>skin</name>
         <number>2</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Skin</prettyName>
         <size>20</size>
-        <tooltip/>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </skin>
       <smtp_port>
         <customDisplay/>

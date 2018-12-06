@@ -85,17 +85,29 @@
       <nameField/>
       <validationScript/>
       <sheet>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>sheet</name>
         <number>1</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Sheet</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
     <property>
@@ -145,17 +157,30 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </codeToExecute>
       <configurationClass>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>configurationClass</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </configurationClass>
       </configurationClass>
       <configureGlobally>
         <customDisplay/>
@@ -489,17 +514,29 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -638,17 +675,29 @@ qf=title^2 name</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -787,17 +836,29 @@ qf=doccontent^2 doccontentraw</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -936,17 +997,29 @@ qf=filename</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -1085,17 +1158,29 @@ qf=attcontent</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -1235,17 +1320,29 @@ qf=object.Blog.BlogPostClass</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -1385,17 +1482,29 @@ qf=property.XWiki.XWikiUsers.last_name^10 property.XWiki.XWikiUsers.first_name^5
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>

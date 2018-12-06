@@ -80,17 +80,29 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </codeToExecute>
       <configurationClass>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>configurationClass</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
       <configureGlobally>
         <customDisplay/>
@@ -299,17 +311,29 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </codeToExecute>
       <configurationClass>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>configurationClass</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
       <configureGlobally>
         <customDisplay/>
@@ -518,17 +542,29 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </codeToExecute>
       <configurationClass>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>configurationClass</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
       <configureGlobally>
         <customDisplay/>

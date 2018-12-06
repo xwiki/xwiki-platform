@@ -272,18 +272,29 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </default_language>
     <documentBundles>
+      <cache>0</cache>
+      <classname/>
       <customDisplay/>
       <disabled>0</disabled>
+      <displayType>input</displayType>
+      <hint/>
+      <idField/>
+      <multiSelect>0</multiSelect>
       <name>documentBundles</name>
       <number>49</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>Internationalization Document Bundles</prettyName>
       <size>60</size>
-      <tooltip/>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </documentBundles>
     <edit_anonymous>
       <cache>0</cache>
@@ -1013,18 +1024,29 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </showinformation>
     <skin>
+      <cache>0</cache>
+      <classname/>
       <customDisplay/>
       <disabled>0</disabled>
+      <displayType>input</displayType>
+      <hint/>
+      <idField/>
+      <multiSelect>0</multiSelect>
       <name>skin</name>
       <number>7</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>Skin</prettyName>
       <size>30</size>
-      <tooltip/>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </skin>
     <smtp_port>
       <customDisplay/>
@@ -1248,17 +1270,29 @@
       <nameField/>
       <validationScript/>
       <sheet>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>sheet</name>
         <number>1</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Sheet</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
     <property>
@@ -1280,17 +1314,29 @@
       <nameField/>
       <validationScript/>
       <sheet>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>sheet</name>
         <number>1</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Sheet</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
     <property>
@@ -1703,18 +1749,29 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </default_language>
       <documentBundles>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>documentBundles</name>
         <number>49</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Internationalization Document Bundles</prettyName>
         <size>60</size>
-        <tooltip/>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </documentBundles>
       <edit_anonymous>
         <cache>0</cache>
@@ -2444,18 +2501,29 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </showinformation>
       <skin>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>skin</name>
         <number>7</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Skin</prettyName>
         <size>30</size>
-        <tooltip/>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </skin>
       <smtp_port>
         <customDisplay/>

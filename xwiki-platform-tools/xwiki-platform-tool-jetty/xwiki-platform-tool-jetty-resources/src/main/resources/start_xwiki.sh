@@ -111,6 +111,8 @@ done
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
 
 if [ -e $XWIKI_LOCK_FILE ]; then
+  # Note that there could be rare cases when the computer was rebooted without Jetty stopped and when it restarted
+  # another process used the same process id...
   if ps -p `cat $XWIKI_LOCK_FILE` > /dev/null; then
     echo An XWiki instance is already running on port ${JETTY_PORT}. Aborting...
     echo Consider calling stop_xwiki.sh to stop it.

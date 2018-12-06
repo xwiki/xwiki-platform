@@ -197,7 +197,7 @@ public class RefactoringScriptServiceTest
         when(this.requestFactory.createCopyAsRequest(spaceReference, newName)).thenReturn(copyRequest);
         this.refactoringScriptService.copyAs(spaceReference, newName);
         verify(this.requestFactory).createCopyAsRequest(spaceReference, newName);
-        verify(this.jobExecutor).execute(RefactoringJobs.COPY_AS, copyRequest);
+        verify(this.jobExecutor).execute(RefactoringJobs.COPY, copyRequest);
     }
 
     @Test

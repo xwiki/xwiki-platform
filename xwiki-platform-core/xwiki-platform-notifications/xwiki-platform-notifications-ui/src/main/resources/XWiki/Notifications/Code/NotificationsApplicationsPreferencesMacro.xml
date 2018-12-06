@@ -871,18 +871,18 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 &lt;table class="notifPreferences" data-target="$escapetool.xml($xcontext.macro.params.target)"&gt;
   &lt;thead&gt;
     &lt;tr&gt;
-      &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
-      &lt;th&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('notifications.settings.menu'))
+      &lt;th scope="col"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
+      &lt;th scope="col"&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('notifications.settings.menu'))
         &lt;small class="xHint"&gt;$services.localization.render('notifications.settings.menu.hint', [$services.icon.renderHTML('bell')])&lt;/small&gt;
       &lt;/th&gt;
       #set ($colsCount = 2)
       #if ($services.notification.areEmailsEnabled())
-        &lt;th&gt;$services.icon.renderHTML('envelope') $escapetool.xml($services.localization.render('notifications.settings.email'))
+        &lt;th scope="col"&gt;$services.icon.renderHTML('envelope') $escapetool.xml($services.localization.render('notifications.settings.email'))
           &lt;small class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.hint'))&lt;/small&gt;
         &lt;/th&gt;
         #set ($colsCount = 3)
       #end
-      &lt;th&gt;&lt;/th&gt;
+      &lt;th scope="col"&gt;&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   ##
@@ -906,7 +906,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     ##
     &lt;tr&gt;
       ## Application Name and Icon
-      &lt;th style="vertical-align: top;"&gt;
+      &lt;th style="vertical-align: top;" scope="row"&gt;
         $type.applicationIcon $escapetool.xml($type.applicationName)
       &lt;/th&gt;
       ## Alert switch

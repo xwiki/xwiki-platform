@@ -183,7 +183,10 @@
     </property>
     <property>
       <code>#body[contenteditable="true"] {
-  padding: 1em;
+  /* We use margin instead of padding because of https://github.com/ckeditor/ckeditor-dev/issues/2655 (Nested editable
+    can't be focused under certain circumstances) */
+  margin: 1em;
+  padding: 0;
 }
 
 /* Fix the link styles. The HTML structure is a bit different in edit mode. */

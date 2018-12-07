@@ -29,17 +29,9 @@
     <artifactId>xwiki-platform-office-test</artifactId>
     <version>10.11-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-office-docker-tests</artifactId>
+  <artifactId>xwiki-platform-office-test-docker</artifactId>
   <properties>
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <xwikiCfgPlugins>\
-      com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin, \
-      com.xpn.xwiki.plugin.fileupload.FileUploadPlugin
-    </xwikiCfgPlugins>
     <!-- Exclude the XWiki.XWikiPreferences from the PR checker since the XWiki.OfficeImporterAdmin page calls
          the "officemanager" ScriptService which requires PR and that pages is executed in the context of
          XWiki.XWikiPreferences (which is the current doc) -->

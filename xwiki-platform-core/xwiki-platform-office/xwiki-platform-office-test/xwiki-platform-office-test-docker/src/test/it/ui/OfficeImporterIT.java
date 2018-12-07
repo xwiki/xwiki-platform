@@ -50,7 +50,14 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 7.3M1
  */
-@UITest(office = true, servletEngine = ServletEngine.JETTY, verbose = true)
+@UITest(office = true, properties = {
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+})
 public class OfficeImporterIT
 {
 
@@ -89,7 +96,7 @@ public class OfficeImporterIT
 
     private File getResourceFile(String filename)
     {
-        return new File(this.testConfiguration.getServletEngine().getTestResourcesPath(), filename);
+        return new File(this.testConfiguration.getTestResourcesPath(), filename);
     }
 
     /**
@@ -109,9 +116,6 @@ public class OfficeImporterIT
 
         OfficeImporterPage officeImporterPage = new OfficeImporterPage();
         File resourceFile = this.getResourceFile(fileName);
-
-        //assertTrue(String.format("The following resource file should exist for import test: %s",
-        //    resourceFile.getPath()), resourceFile.exists());
         officeImporterPage.setFile(resourceFile);
         officeImporterPage.setFilterStyle(true);
         officeImporterPage.setSplitDocument(splitByHeadings);

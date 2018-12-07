@@ -154,14 +154,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-        // Mount the test resources directory from the host into the container so that it's possible for tests to
-        // use test resource data (e.g. a word doc to import in the XWiki for office tests).
-        File testResourcesDirectory = new File(this.testConfiguration.getOutputDirectory(), "test-classes");
-        if (testResourcesDirectory.exists()) {
-            mountFromHostToContainer(testResourcesDirectory,
-                this.testConfiguration.getServletEngine().getTestResourcesPath());
-        }
-
         if (this.testConfiguration.isOffline()) {
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");

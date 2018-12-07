@@ -73,6 +73,8 @@ public class TestConfiguration
 
     private static final String PROFILES_PROPERTY = "xwiki.test.ui.profiles";
 
+    private static final String TEST_RESOURCES_PATH = "/tmp/test-resources";
+
     private UITest uiTestAnnotation;
 
     private Browser browser;
@@ -458,5 +460,14 @@ public class TestConfiguration
             outputDirectory = mavenBuildDir;
         }
         return outputDirectory;
+    }
+
+    /**
+     * @return the path of the directory containing the test resources on the container.
+     * @since 10.11RC1
+     */
+    public String getTestResourcesPath()
+    {
+        return TEST_RESOURCES_PATH;
     }
 }

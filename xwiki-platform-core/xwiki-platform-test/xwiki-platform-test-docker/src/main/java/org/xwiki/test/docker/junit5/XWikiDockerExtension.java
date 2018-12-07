@@ -84,6 +84,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
     private static final String SUPERADMIN = "superadmin";
 
+    private static final String TEST_RESOURCES_HOST_PATH = "target/test-classes";
+
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
@@ -247,7 +249,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             .withDesiredCapabilities(testConfiguration.getBrowser().getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
-            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
+            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
+            .withFileSystemBind(TEST_RESOURCES_HOST_PATH, testConfiguration.getTestResourcesPath());
 
         if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]",

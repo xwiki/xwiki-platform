@@ -19,7 +19,7 @@
 #set ($discard = $collectionstool.reverse($versions))
 #set ($totalVersions = $versions.size())
 #if ($totalVersions == 0)
-  #warning ($services.localization.render('thispagedoesnotexist'))
+  #warning ($services.localization.render('core.viewers.history.empty'))
 #else
   #set ($paginationParameters = {'url' : "?${viewer}&amp;showminor=${minorVersions}", 'totalItems' : $totalVersions, 'defaultItemsPerPage' : 20, 'position': 'top'})
   #pagination ($paginationParameters)

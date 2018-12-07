@@ -210,8 +210,16 @@ a[data-linktype="create"]::after {
 }
 
 .macro-placeholder {
+  /* Hide the placeholder by default and show it only if the macro is editable. */
+  display: none;
   font-family: monospace;
   font-size: smaller;
+}
+.macro[data-widget="xwiki-macro"] &gt; span.macro-placeholder {
+  display: inline;
+}
+.macro[data-widget="xwiki-macro"] &gt; div.macro-placeholder {
+  display: block;
 }
 
 /* Prevent the horizontal scroll bar on IE11. We already limit the image width from the skin (in order to have

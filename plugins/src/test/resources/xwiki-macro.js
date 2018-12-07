@@ -230,6 +230,27 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     ).then(done);
   });
 
+  // We generate the macro placeholder for nested empty macros even if they are outside of a nested editable (so they
+  // cannot be edited) because CKEditor removes empty in-line elements and this can lead to empty in-line widgets which
+  // are not well supported by CKEditor (we end up with widgets that don't have the widget element; the widget is not
+  // fully removed because of its drag handler).
+  it("adds placeholder for nested empty macros that are outside of a nested editable", function(done) {
+    testUtils.assertData(
+      editor,
+      '<p><!--startmacro:outer|-|--><!--startmacro:inner|-|--><!--stopmacro--><!--stopmacro--></p>',
+      [
+        '<p>',
+          '<!--startmacro:outer|-|-->',
+            '<span class="macro" data-macro="startmacro:inner|-|">',
+              '<span class="macro-placeholder">macro:inner</span>',
+            '</span>',
+          '<!--stopmacro-->',
+        '</p>'
+      ].join(''),
+      true
+    ).then(done);
+  });
+
   it('checks if the edited content remains unchanged after performing data round-trips', function(done) {
     jQuery.when.apply(jQuery, [
       // CKEDITOR-48: Wiki Page source gets into bad state when macro that produces no output is used with CKEditor

@@ -201,7 +201,7 @@
           // widget plugin only once, based on the initial pathName property from the widget definition. We have to
           // update the attribute ourselves in order to have a dynamic path name (since the user can change the macro).
           this.wrapper.data('cke-display-name', this.pathName);
-          $(this.element.$).find('.macro-placeholder').text(this.pathName);
+          $(this.element.$).children('.macro-placeholder').text(this.pathName);
         },
         edit: function(event) {
           // Prevent the default behavior because we want to use our custom dialog.

@@ -158,12 +158,14 @@
               macro.add(child);
             });
           } else {
+            var thisWidget = this;
             // If the widget has nested editables we need to include them, otherwise their content is not saved.
             widgetElementClone.forEach(function(element) {
-              // We look only for block-level nested editables because the in-line nested editables are not well
-              // supported. See https://github.com/ckeditor/ckeditor-dev/issues/1091
-              if (element.name === 'div' && element.attributes[nestedEditableTypeAttribute]) {
+              if (element.attributes[nestedEditableTypeAttribute] && element.attributes.contenteditable) {
                 macro.add(element);
+                return false;
+              } else if (thisWidget.upcast(element)) {
+                // Skip nested macros that are outside of a nested editable.
                 return false;
               }
             }, CKEDITOR.NODE_ELEMENT, true);
@@ -397,7 +399,7 @@
         var nestedEditable = nestedEditables.getItem(i);
         // The specified widget can have nested widgets. Initialize only the nested editables that correspond to the
         // current widget.
-        var nestedEditableOwner = nestedEditable.getAscendant(CKEDITOR.plugins.widget.isDomWidgetElement);
+        var nestedEditableOwner = nestedEditable.getAscendant($.proxy(this, 'isDomMacroElement'));
         if (!widget.element.equals(nestedEditableOwner)) {
           continue;
         }
@@ -417,6 +419,13 @@
           pathName: nestedEditableName
         });
       }
+    },
+
+    // The passed element is of type CKEDITOR.dom.element (unlike the element passed to Widget#upcast which is of type
+    // CKEDITOR.htmlParser.element, so we can't reuse that code).
+    isDomMacroElement: function(element) {
+      return (element.getName() == 'div' || element.getName() == 'span') &&
+            element.hasClass('macro') && element.hasAttribute('data-macro');
     },
 
     parseMacroCall: function(startMacroComment) {

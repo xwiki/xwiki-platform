@@ -169,6 +169,58 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     });
   });
 
+  it("doesn't initialize nested editables inside nested macros that are outside of a nested editable", function(done) {
+    editor.setData([
+      '<!--startmacro:outer|-|-->',
+        '<!--startmacro:inner|-|-->',
+          // The nested editable that shouldn't be initialized.
+          '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+            '<p>test</p>',
+          '</div>',
+        '<!--stopmacro-->',
+      '<!--stopmacro-->'
+    ].join(''), {
+      callback: function() {
+        var wikiMacroWidgets = getWikiMacroWidgets(editor);
+        expect(wikiMacroWidgets.length).toBe(1);
+        expect(wikiMacroWidgets[0].editables).toEqual({});
+
+        // Skips nested macros that are outside of a nested editable
+        expect(editor.getData()).toBe('<!--startmacro:outer|-|--><!--stopmacro-->');
+
+        done();
+      }
+    });
+  });
+
+  it("doesn't initialize nested editables inside in-line macros", function(done) {
+    editor.setData([
+      '<p>',
+        'before',
+        '<!--startmacro:outer|-|-->',
+          '<em>',
+            '<!--startmacro:inner|-|-->',
+              '<span data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+                'test',
+              '</span>',
+            '<!--stopmacro-->',
+          '</em>',
+        '<!--stopmacro-->',
+        'after',
+      '</p>'
+    ].join(''), {
+      callback: function() {
+        var wikiMacroWidgets = getWikiMacroWidgets(editor);
+        expect(wikiMacroWidgets.length).toBe(1);
+        expect(wikiMacroWidgets[0].editables).toEqual({});
+
+        expect(editor.getData()).toBe('<p>before<!--startmacro:outer|-|--><!--stopmacro-->after</p>');
+
+        done();
+      }
+    });
+  });
+
   it('handles nested sibling macro markers', function(done) {
     testUtils.assertData(
       editor,

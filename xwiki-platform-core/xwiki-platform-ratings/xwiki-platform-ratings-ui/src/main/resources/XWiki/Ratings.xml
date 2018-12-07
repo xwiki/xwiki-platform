@@ -220,16 +220,22 @@ document.observe("dom:loaded", function()
   {
      if(! el.hasClassName('locked')) 
      {
-        var url = "$xwiki.getURL("XWiki.Ratings", "view", "xpage=plain&amp;outputSyntax=plain")" + "&amp;doc=" + el.up('.rating-wrapper').id.substring(7);
-        var msgdiv = el.up('.rating-container').down('.rating-message');
+       var id = el.up('.rating-wrapper').id;
+       var PREFIX = 'rating-';
+       if (id &amp;&amp; id.length &gt; PREFIX.length)
+       {
+         id = id.substring(PREFIX.length);
+         var url = "$xwiki.getURL("XWiki.Ratings", "view", "xpage=plain&amp;outputSyntax=plain")" + "&amp;doc=" + encodeURIComponent(id);
+         var msgdiv = el.up('.rating-container').down('.rating-message');
 
-        el.select('a').each(function(astar, i) 
-        {  
+         el.select('a').each(function(astar, i) 
+         {
             Event.observe(astar, 'click', setVote(el, url, i + 1));
             msgdiv.prevmsg = "";
             Event.observe(astar, 'mouseover', showMsg(msgdiv, i));
             Event.observe(astar, 'mouseout', hideMsg(msgdiv));
-        });
+         });
+       }
      }
   }); 
 });</code>

@@ -149,8 +149,7 @@ public class ArtifactResolver
                 this.repositoryResolver.getSession(), collectRequest).getRoot();
             if (this.testConfiguration.isDebug()) {
                 LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
-                node.accept(new FilteringDependencyVisitor(
-                    new DebuggingDependencyVisitor(this.testConfiguration.isDebug()), filter));
+                node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
             }
 
             DependencyRequest request = new DependencyRequest(node, filter);

@@ -147,17 +147,22 @@ public class ArtifactResolver
             long t1 = System.currentTimeMillis();
             DependencyNode node = this.repositoryResolver.getSystem().collectDependencies(
                 this.repositoryResolver.getSession(), collectRequest).getRoot();
-            LOGGER.debug("collect = {} ms", (System.currentTimeMillis() - t1));
+            if (this.testConfiguration.isDebug()) {
+                LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
+            }
 
             if (LOGGER.isDebugEnabled()) {
-                node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
+                node.accept(new FilteringDependencyVisitor(
+                    new DebuggingDependencyVisitor(this.testConfiguration.isDebug()), filter));
             }
 
             DependencyRequest request = new DependencyRequest(node, filter);
             t1 = System.currentTimeMillis();
             DependencyResult result = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
-            LOGGER.debug("resolve = {} ms", (System.currentTimeMillis() - t1));
+            if (this.testConfiguration.isDebug()) {
+                LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
+            }
 
             //TODO: Find how to generate an error if a dep is not found! To reproduce remove the minimaldependencies
             // war from the local FS

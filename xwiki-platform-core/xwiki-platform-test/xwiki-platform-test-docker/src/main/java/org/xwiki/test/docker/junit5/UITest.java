@@ -69,6 +69,12 @@ public @interface UITest
     boolean verbose() default false;
 
     /**
+     * @return true if the test should output debug console logs or not
+     * @since 10.11RC1
+     */
+    boolean debug() default false;
+
+    /**
      * @return true if the database data should be mapped to a local directory on the host computer so that it can be
      * saved and reused for another run
      * @since 10.10RC1

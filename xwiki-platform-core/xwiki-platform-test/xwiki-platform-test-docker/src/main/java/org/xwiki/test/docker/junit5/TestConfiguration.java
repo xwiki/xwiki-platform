@@ -55,6 +55,8 @@ public class TestConfiguration
 
     private static final String VERBOSE_PROPERTY = "xwiki.test.ui.verbose";
 
+    private static final String DEBUG_PROPERTY = "xwiki.test.ui.debug";
+
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
     private static final String OFFLINE_PROPERTY = "xwiki.test.ui.offline";
@@ -80,6 +82,8 @@ public class TestConfiguration
     private ServletEngine servletEngine;
 
     private boolean verbose;
+
+    private boolean debug;
 
     private boolean saveDatabaseData;
 
@@ -111,6 +115,7 @@ public class TestConfiguration
         resolveDatabase();
         resolveServletEngine();
         resolveVerbose();
+        resolveDebug();
         resolveSaveDatabaseData();
         resolveOffline();
         resolveDatabaseTag();
@@ -159,6 +164,15 @@ public class TestConfiguration
             newVerbose = Boolean.valueOf(System.getProperty(VERBOSE_PROPERTY, FALSE));
         }
         this.verbose = newVerbose;
+    }
+
+    private void resolveDebug()
+    {
+        boolean newDebug = this.uiTestAnnotation.debug();
+        if (!newDebug) {
+            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, FALSE));
+        }
+        this.debug = newDebug;
     }
 
     private void resolveSaveDatabaseData()
@@ -301,6 +315,15 @@ public class TestConfiguration
     public boolean isVerbose()
     {
         return this.verbose;
+    }
+
+    /**
+     * @return true if the test should output debug console logs or not
+     * @since 10.11RC1
+     */
+    public boolean isDebug()
+    {
+        return this.debug;
     }
 
     /**

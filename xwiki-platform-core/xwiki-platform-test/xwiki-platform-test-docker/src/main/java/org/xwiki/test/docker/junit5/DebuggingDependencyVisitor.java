@@ -34,17 +34,31 @@ public class DebuggingDependencyVisitor implements DependencyVisitor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DebuggingDependencyVisitor.class);
 
+    private boolean debug;
+
+    /**
+     * @param debug if true then output debug information about visited nodes
+     */
+    public DebuggingDependencyVisitor(boolean debug)
+    {
+        this.debug = debug;
+    }
+
     @Override
     public boolean visitEnter(DependencyNode dependencyNode)
     {
-        LOGGER.debug("Node enter: {}", dependencyNode.getArtifact());
+        if (this.debug) {
+            LOGGER.info("Node enter: {}", dependencyNode.getArtifact());
+        }
         return true;
     }
 
     @Override
     public boolean visitLeave(DependencyNode dependencyNode)
     {
-        LOGGER.debug("Node leave: {}", dependencyNode.getArtifact());
+        if (this.debug) {
+            LOGGER.info("Node leave: {}", dependencyNode.getArtifact());
+        }
         return true;
     }
 }

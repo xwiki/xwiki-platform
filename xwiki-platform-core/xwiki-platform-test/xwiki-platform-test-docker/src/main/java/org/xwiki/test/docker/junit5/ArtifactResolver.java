@@ -149,9 +149,6 @@ public class ArtifactResolver
                 this.repositoryResolver.getSession(), collectRequest).getRoot();
             if (this.testConfiguration.isDebug()) {
                 LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
-            }
-
-            if (LOGGER.isDebugEnabled()) {
                 node.accept(new FilteringDependencyVisitor(
                     new DebuggingDependencyVisitor(this.testConfiguration.isDebug()), filter));
             }

@@ -181,7 +181,6 @@
         <valueField/>
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
-      </configurationClass>
       <configureGlobally>
         <customDisplay/>
         <defaultValue/>

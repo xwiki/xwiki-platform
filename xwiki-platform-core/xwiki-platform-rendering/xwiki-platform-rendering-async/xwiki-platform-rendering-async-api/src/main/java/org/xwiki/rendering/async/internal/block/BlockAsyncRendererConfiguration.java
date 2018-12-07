@@ -145,7 +145,7 @@ public class BlockAsyncRendererConfiguration
     }
 
     /**
-     * @return the reference of the executed block
+     * @return the reference of the document containing the executed block
      * @since 10.11RC1
      */
     public DocumentReference getSourceReference()
@@ -154,7 +154,7 @@ public class BlockAsyncRendererConfiguration
     }
 
     /**
-     * @param sourceReference the reference of the executed block
+     * @param sourceReference the reference of the document containing the executed block
      * @since 10.11RC1
      */
     public void setSourceReference(DocumentReference sourceReference)

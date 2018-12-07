@@ -293,7 +293,7 @@ public class InternalTemplateManager
 
         protected DocumentReference authorReference;
 
-        protected DocumentReference sourceReference;
+        protected DocumentReference documentReference;
 
         @PropertyId("source.syntax")
         public Syntax sourceSyntax;
@@ -321,7 +321,7 @@ public class InternalTemplateManager
         {
             this(content, authorReference);
 
-            setSourceReference(sourceReference);
+            setDocumentReference(sourceReference);
         }
 
         @Override
@@ -399,21 +399,21 @@ public class InternalTemplateManager
             return this.authorReference;
         }
 
-        @Override
-        public DocumentReference getDocumentReference()
-        {
-            return this.sourceReference;
-        }
-
         protected void setAuthorReference(DocumentReference authorReference)
         {
             this.authorReference = authorReference;
             this.authorProvided = true;
         }
 
-        protected void setSourceReference(DocumentReference sourceReference)
+        @Override
+        public DocumentReference getDocumentReference()
         {
-            this.sourceReference = sourceReference;
+            return this.documentReference;
+        }
+
+        protected void setDocumentReference(DocumentReference documentReference)
+        {
+            this.documentReference = documentReference;
         }
 
         // RawProperties

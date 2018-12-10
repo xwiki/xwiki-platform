@@ -85,6 +85,10 @@ public class XWikiAttachmentEventGenerator
         if (StringUtils.isNotEmpty(attachment.getMimeType())) {
             attachmentParameters.put(WikiAttachmentFilter.PARAMETER_MIMETYPE, attachment.getMimeType());
         }
+        if (StringUtils.isNotEmpty(attachment.getCharset())) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CHARSET,
+                attachment.getCharset());
+        }
 
         if (properties.isWithJRCSRevisions()) {
             try {

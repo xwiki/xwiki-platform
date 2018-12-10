@@ -197,6 +197,9 @@ public class UploadAction extends XWikiAction
         // Calculate and store mime type
         attachment.resetMimeType(context);
 
+        // Remember character encoding
+        attachment.setCharset(context.getRequest().getCharacterEncoding());
+
         // Add a comment to the attachment history.
         String attachmentComment = StringUtils.defaultString(context.getRequest().getParameter("comment"));
         attachment.setComment(attachmentComment);

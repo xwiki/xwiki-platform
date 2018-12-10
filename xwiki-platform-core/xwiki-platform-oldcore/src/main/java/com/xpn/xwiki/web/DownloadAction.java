@@ -442,10 +442,11 @@ public class DownloadAction extends XWikiAction
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
-        try {
-            response.setCharacterEncoding("");
-        } catch (IllegalCharsetNameException ex) {
-            response.setCharacterEncoding(XWiki.DEFAULT_ENCODING);
+
+        // Set the character encoding
+        String characterEncoding = attachment.getCharset();
+        if (characterEncoding != null) {
+            response.setCharacterEncoding(characterEncoding);
         }
 
         String ofilename =

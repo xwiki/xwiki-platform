@@ -46,7 +46,7 @@
   </dependencies>
   <profiles>
     <profile>
-      <id>office-tests</id>
+      <id>integration-tests</id>
       <modules>
         <module>xwiki-platform-office-test</module>
       </modules>

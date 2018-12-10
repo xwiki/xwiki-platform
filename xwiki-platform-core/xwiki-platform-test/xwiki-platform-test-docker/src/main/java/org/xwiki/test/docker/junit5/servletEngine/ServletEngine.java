@@ -30,7 +30,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 public enum ServletEngine
 {
     /**
-     * The servlet engine is selected based on a system property value.
+     * The Servlet Engine is selected based on a system property value.
      * @see TestConfiguration#resolveServletEngine()
      */
     SYSTEM,
@@ -75,7 +75,7 @@ public enum ServletEngine
     private String dockerImageName;
 
     /**
-     * Constructor for a ServletEngine using a docker image.
+     * Constructor for a Servlet Engine using a Docker image. This image must be available on DockerHub.
      * @param dockerImageName the name of the docker image to use.
      */
     ServletEngine(String dockerImageName)
@@ -175,7 +175,7 @@ public enum ServletEngine
     }
 
     /**
-     * @return the docker image name for this servlet engine.
+     * @return the Docker image name for this Servlet Engine. This image must be available on DockerHub.
      * @since 10.11RC1
      */
     public String getDockerImageName()

@@ -27,7 +27,6 @@ import org.apache.commons.io.IOUtils;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.ArtifactResolver;
 import org.xwiki.test.docker.junit5.MavenResolver;
@@ -91,7 +90,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 String tomcatTag = String.format("tomcat:%s", this.testConfiguration.getServletEngineTag() != null
                     ? this.testConfiguration.getServletEngineTag() : LATEST);
                 this.servletContainer = new GenericContainer<>(tomcatTag);
-                mountFromHostToContainer(sourceWARDirectory, "/usr/local/tomcat/webapps/xwiki");
+                mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
+                    "/usr/local/tomcat/webapps/xwiki");
 
                 this.servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
                     + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
@@ -103,7 +103,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 String jettyTag = String.format("jetty:%s", this.testConfiguration.getServletEngineTag() != null
                     ? this.testConfiguration.getServletEngineTag() : LATEST);
                 this.servletContainer = new GenericContainer<>(jettyTag);
-                mountFromHostToContainer(sourceWARDirectory, "/var/lib/jetty/webapps/xwiki");
+                mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
+                    "/var/lib/jetty/webapps/xwiki");
 
                 break;
             case WILDFLY:
@@ -111,7 +112,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     this.testConfiguration.getServletEngineTag() != null
                         ? this.testConfiguration.getServletEngineTag() : LATEST);
                 this.servletContainer = new GenericContainer<>(wildflyTag);
-                mountFromHostToContainer(sourceWARDirectory,
+                mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
                 break;
@@ -154,14 +155,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-        // Mount the test resources directory from the host into the container so that it's possible for tests to
-        // use test resource data (e.g. a word doc to import in the XWiki for office tests).
-        File testResourcesDirectory = new File(this.testConfiguration.getOutputDirectory(), "test-classes");
-        if (testResourcesDirectory.exists()) {
-            mountFromHostToContainer(testResourcesDirectory,
-                this.testConfiguration.getServletEngine().getTestResourcesPath());
-        }
-
         if (this.testConfiguration.isOffline()) {
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
@@ -181,19 +174,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
             default:
                 // Nothing else to do, TestContainers automatically stops the container
-        }
-    }
-
-    private void mountFromHostToContainer(File sourceDirectory, String targetDirectory)
-    {
-        // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
-        // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
-        String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.startsWith("mac os x")) {
-            MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory.toString());
-            this.servletContainer.withCopyFileToContainer(mountableDirectory, targetDirectory);
-        } else {
-            this.servletContainer.withFileSystemBind(sourceDirectory.toString(), targetDirectory);
         }
     }
 }

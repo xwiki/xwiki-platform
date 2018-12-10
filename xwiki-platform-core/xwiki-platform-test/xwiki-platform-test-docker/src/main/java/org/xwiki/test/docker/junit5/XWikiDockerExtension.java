@@ -33,9 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.VncRecordingContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.xwiki.test.docker.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.junit5.servletEngine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
@@ -240,26 +239,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext)
     {
-        LOGGER.info("(*) Starting browser [{}]...", testConfiguration.getBrowser());
-
-        // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
-        BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
-            .withDesiredCapabilities(testConfiguration.getBrowser().getCapabilities())
-            .withNetwork(Network.SHARED)
-            .withNetworkAliases("vnchost")
-            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
-
-        if (testConfiguration.isVerbose()) {
-            LOGGER.info(String.format("Docker image used: [%s]",
-                BrowserWebDriverContainer.getImageForCapabilities(testConfiguration.getBrowser().getCapabilities())));
-            webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
-        }
-
-        webDriverContainer.start();
-
-        if (testConfiguration.vnc()) {
-            LOGGER.info("VNC server address = " + webDriverContainer.getVncAddress());
-        }
+        BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor();
+        BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start(testConfiguration);
 
         // Store it so that we can retrieve it later on.
         // Note that we don't need to stop it as this is taken care of by TestContainers

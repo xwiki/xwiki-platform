@@ -46,6 +46,11 @@ public enum Browser
      */
     CHROME(DesiredCapabilities.chrome());
 
+    /**
+     * The path where to store the test-resources on the browser container.
+     */
+    private static final String TEST_RESOURCES_PATH = "/tmp/test-resources";
+
     private DesiredCapabilities capabilities;
 
     Browser()
@@ -64,5 +69,14 @@ public enum Browser
     public DesiredCapabilities getCapabilities()
     {
         return this.capabilities;
+    }
+
+    /**
+     * @return the path of the directory containing the test resources on the browser container.
+     * @since 10.11RC1
+     */
+    public String getTestResourcesPath()
+    {
+        return TEST_RESOURCES_PATH;
     }
 }

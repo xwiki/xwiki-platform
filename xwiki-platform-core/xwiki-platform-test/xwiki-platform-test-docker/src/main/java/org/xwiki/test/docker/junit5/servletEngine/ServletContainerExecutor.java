@@ -22,11 +22,9 @@ package org.xwiki.test.docker.junit5.servletEngine;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -55,8 +53,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final Logger LOGGER = LoggerFactory.getLogger(ServletContainerExecutor.class);
 
     private static final String LATEST = "latest";
-
-    private static final char CUSTOM_IMAGE_NAME_SEPARATOR = '_';
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -99,7 +95,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
-                servletContainer = getServletContainer(testConfiguration);
+                servletContainer = createServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/usr/local/tomcat/webapps/xwiki");
 
@@ -110,13 +106,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
                 break;
             case JETTY:
-                this.servletContainer = getServletContainer(testConfiguration);
+                this.servletContainer = createServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/var/lib/jetty/webapps/xwiki");
 
                 break;
             case WILDFLY:
-                this.servletContainer = getServletContainer(testConfiguration);
+                this.servletContainer = createServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
@@ -131,7 +127,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 this.jettyStandaloneExecutor.start();
                 break;
             default:
-                this.throwExceptionForServletEngineNotYetSupported(testConfiguration);
+                throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
+                    testConfiguration.getServletEngine()));
         }
 
         if (this.servletContainer != null) {
@@ -159,14 +156,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
-        // Mount the test resources directory from the host into the container so that it's possible for tests to
-        // use test resource data (e.g. a word doc to import in the XWiki for office tests).
-        File testResoucesDirectory = new File("./target/", "test-classes");
-        if (testResoucesDirectory.exists()) {
-            mountFromHostToContainer(testResoucesDirectory,
-                this.testConfiguration.getServletEngine().getTestResourcesPath());
-        }
-
         if (this.testConfiguration.isOffline()) {
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
@@ -175,61 +164,38 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         start(this.servletContainer, this.testConfiguration);
     }
 
-    private void throwExceptionForServletEngineNotYetSupported(TestConfiguration testConfiguration)
+    private String getDockerImageTag(TestConfiguration testConfiguration)
     {
-        throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-            testConfiguration.getServletEngine()));
+        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
     }
 
-    private GenericContainer getServletContainer(TestConfiguration testConfiguration)
+    private GenericContainer createServletContainer(TestConfiguration testConfiguration)
     {
-        final String baseImageName;
-
+        final String baseImageName = String.format("%s:%s", testConfiguration.getServletEngine().getDockerImageName(),
+            getDockerImageTag(testConfiguration));
         final GenericContainer container;
 
-        switch (testConfiguration.getServletEngine()) {
-            case TOMCAT:
-                baseImageName = String.format("tomcat:%s", testConfiguration.getServletEngineTag() != null
-                    ? testConfiguration.getServletEngineTag() : LATEST);
-                break;
-
-            case JETTY:
-                baseImageName = String.format("jetty:%s", testConfiguration.getServletEngineTag() != null
-                    ? testConfiguration.getServletEngineTag() : LATEST);
-                break;
-
-            case WILDFLY:
-                baseImageName = String.format("jboss/wildfly:%s", testConfiguration.getServletEngineTag() != null
-                    ? testConfiguration.getServletEngineTag() : LATEST);
-                break;
-
-            default:
-                this.throwExceptionForServletEngineNotYetSupported(testConfiguration);
-                baseImageName = null;
-        }
-
-        // we want to use libreoffice so we need a custom image
         if (testConfiguration.isOffice()) {
-            // name of the image that we will create
-            String imageName = StringUtils.join(Arrays.asList("xwiki", baseImageName, "office"),
-                CUSTOM_IMAGE_NAME_SEPARATOR).replace(':', CUSTOM_IMAGE_NAME_SEPARATOR);
+            // We only build the image once for performance reason.
+            // So we provide a name to the image we will built and we check that the image does not exist yet.
+            String imageName = String.format("xwiki-%s-office:%s",
+                testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
 
-            // we won't delete the image, so it's possible that the image already exists: it would avoid us to create
-            // it again
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
                 .withImageNameFilter(imageName).exec();
 
-            // the image does not exist
             if (imageSearchResults.isEmpty()) {
-
                 LOGGER.info("(*) Build a dedicated image embedding libre office...");
-                // let's create it with the appropriate name
-                // the flag indicates that we don't want it to be deleted
+                // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
+                // at the end of the test container execution.
                 container = new GenericContainer(new ImageFromDockerfile(imageName, false)
                     .withDockerfileFromBuilder(builder ->
                         builder
                             .from(baseImageName)
                             .user("root")
+                            // This command is inspired from XWiki dockerfiles
+                            // see for example:
+                            // https://github.com/xwiki-contrib/docker-xwiki/blob/master/10/mysql-tomcat/Dockerfile
                             .run("apt-get update && apt-get install -y"
                                 + " curl"
                                 + " libreoffice"

@@ -475,7 +475,7 @@ public class TestConfiguration
     }
 
     /**
-     * @return true if an office container is provided to run the test.
+     * @return true if an office container must be provided to run the tests.
      * @since 10.11RC1
      */
     public boolean isOffice()

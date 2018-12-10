@@ -30,35 +30,35 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 public enum ServletEngine
 {
     /**
-     * The browser is selected based on a system property value.
-     * @see TestConfiguration
+     * The servlet engine is selected based on a system property value.
+     * @see TestConfiguration#resolveServletEngine()
      */
     SYSTEM,
 
     /**
      * Represents the Tomcat Servlet engine.
      */
-    TOMCAT,
+    TOMCAT("tomcat"),
 
     /**
      * Represents the Jetty Servlet engine (running inside Docker).
      */
-    JETTY,
+    JETTY("jetty"),
 
     /**
      * Represents the Jetty Servlet engine but running outside of Docker.
      */
-    JETTY_STANDALONE(true),
+    JETTY_STANDALONE,
 
     /**
      * Represents the JBoss Wildfly engine.
      */
-    WILDFLY,
+    WILDFLY("jboss/wildfly"),
 
     /**
      * Represents an external Servlet Engine already configured and running (we won't start or stop it).
      */
-    EXTERNAL(true);
+    EXTERNAL;
 
     private static final String PERMANENT_DIRECTORY = "/var/local/xwiki";
 
@@ -72,14 +72,23 @@ public enum ServletEngine
 
     private int port;
 
-    ServletEngine()
+    private String dockerImageName;
+
+    /**
+     * Constructor for a ServletEngine using a docker image.
+     * @param dockerImageName the name of the docker image to use.
+     */
+    ServletEngine(String dockerImageName)
     {
-        // By default all servlet engines run inside docker containers.
+        this.dockerImageName = dockerImageName;
     }
 
-    ServletEngine(boolean isOutsideDocker)
+    /**
+     * Constructor for an external ServletEngine: in that case, it is running outside docker.
+     */
+    ServletEngine()
     {
-        this.isOutsideDocker = isOutsideDocker;
+        this.isOutsideDocker = true;
     }
 
     /**
@@ -163,5 +172,14 @@ public enum ServletEngine
     public String getPermanentDirectory()
     {
         return PERMANENT_DIRECTORY;
+    }
+
+    /**
+     * @return the docker image name for this servlet engine.
+     * @since 10.11RC1
+     */
+    public String getDockerImageName()
+    {
+        return dockerImageName;
     }
 }

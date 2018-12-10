@@ -32,7 +32,6 @@ import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -96,7 +95,7 @@ public class OfficeImporterIT
 
     private File getResourceFile(String filename)
     {
-        return new File(this.testConfiguration.getTestResourcesPath(), filename);
+        return new File(this.testConfiguration.getBrowser().getTestResourcesPath(), filename);
     }
 
     /**
@@ -157,9 +156,9 @@ public class OfficeImporterIT
      * about styling and content
      */
     @Test
-    public void testImports(TestUtils testUtils)
+    public void verifyImports(TestUtils testUtils)
     {
-        String testName = "testImports";
+        String testName = "verifyImports";
         // Test word file
         ViewPage resultPage = importFile(testName, "msoffice.97-2003/Test.doc");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
@@ -204,7 +203,7 @@ public class OfficeImporterIT
     /**
      * Test if the expected child exists at the expected place (as a children of the target page).
      */
-    private void testChild(TestUtils testUtils, String testName, String expectedName, String expectedContent)
+    private void verifyChild(TestUtils testUtils, String testName, String expectedName, String expectedContent)
     {
         ViewPage child = testUtils.gotoPage(
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), expectedName));
@@ -214,16 +213,16 @@ public class OfficeImporterIT
     }
 
     @Test
-    public void testSplitByHeadings(TestUtils testUtils)
+    public void verifySplitByHeadings(TestUtils testUtils)
     {
-        String testName = "testSplitByHeadings";
+        String testName = "verifySplitByHeadings";
         ViewPage resultPage = importFile(testName, "ToSplit.odt", true);
         assertTrue(StringUtils.contains(resultPage.getContent(), "Introduction"));
 
         // See children
-        testChild(testUtils, testName, "First Part", "Hello, this is the first part of my story!");
-        testChild(testUtils, testName, "Second Part", "This is the second part of my story!");
-        testChild(testUtils, testName, "Last Part", "It's finished. Thanks you!");
+        verifyChild(testUtils, testName, "First Part", "Hello, this is the first part of my story!");
+        verifyChild(testUtils, testName, "Second Part", "This is the second part of my story!");
+        verifyChild(testUtils, testName, "Last Part", "It's finished. Thanks you!");
 
         // Go back to the parent
         resultPage = testUtils.gotoPage(new DocumentReference("xwiki", getClass().getSimpleName(), testName));
@@ -234,11 +233,11 @@ public class OfficeImporterIT
      * Depending on if the target page is terminal or not, the "childNamingMethod" input is displayed or not.
      */
     @Test
-    public void testChildNamingMethodInputVisibility(TestUtils testUtils)
+    public void verifyChildNamingMethodInputVisibility(TestUtils testUtils)
     {
         DocumentReference testDocument =
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName()),
-                "testChildNamingMethodInputVisibility");
+                "verifyChildNamingMethodInputVisibility");
 
         // Cleaning
         testUtils.deletePage(testDocument);

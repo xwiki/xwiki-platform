@@ -59,6 +59,9 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
+
+            // In case some test-resources are provided, they need to be available from the browser
+            // for example in order to upload some files on the wiki.
             .withFileSystemBind(TEST_RESOURCES_HOST_PATH, browser.getTestResourcesPath());
 
         if (testConfiguration.isVerbose()) {

@@ -32,6 +32,7 @@ import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -44,12 +45,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Functional tests for the office importer
+ * Functional tests for the office importer.
+ * By default these tests run with {@link ServletEngine#JETTY} servlet engine since they need libreoffice to be
+ * installed, and we cannot guarantee that it is installed on the host machine.
  * 
  * @version $Id$
  * @since 7.3M1
  */
-@UITest(office = true, properties = {
+@UITest(office = true, servletEngine = ServletEngine.JETTY, properties = {
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
         + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
         + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"

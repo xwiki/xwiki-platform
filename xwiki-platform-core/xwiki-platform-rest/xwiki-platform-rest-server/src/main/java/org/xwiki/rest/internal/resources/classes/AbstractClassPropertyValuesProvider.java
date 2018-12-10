@@ -148,6 +148,8 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
      */
     protected PropertyValue getValue(Query query, String filter, T propertyDefinition) throws QueryException
     {
+        PropertyValue propertyValue = null;
+
         if (!StringUtils.isEmpty(filter)) {
             query.addFilter(this.textFilter);
             query.bindValue(TEXT_FILTER).literal(filter);
@@ -155,10 +157,10 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
 
         List<T> result = query.execute();
         if (!result.isEmpty()) {
-            return getValueFromQueryResult(result.get(0), propertyDefinition);
-        } else {
-            return null;
+            propertyValue = getValueFromQueryResult(result.get(0), propertyDefinition);
         }
+
+        return propertyValue;
     }
 
     protected abstract PropertyValues getAllowedValues(T propertyDefinition, int limit, String filter) throws Exception;

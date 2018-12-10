@@ -60,7 +60,7 @@ public abstract class AbstractContainerExecutor
      * @param targetDirectory the target where to mount the directory in the container.
      * @since 10.11RC1
      */
-    protected static void mountFromHostToContainer(GenericContainer container, String sourceDirectory,
+    protected void mountFromHostToContainer(GenericContainer container, String sourceDirectory,
         String targetDirectory)
     {
         // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes

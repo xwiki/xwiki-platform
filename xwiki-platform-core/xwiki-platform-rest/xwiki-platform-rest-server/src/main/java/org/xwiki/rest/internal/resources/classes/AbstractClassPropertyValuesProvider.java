@@ -60,6 +60,8 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
 
     protected static final String META_DATA_URL = "url";
 
+    protected static final String TEXT_FILTER = "text";
+
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
 
@@ -130,9 +132,33 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         }
         if (!StringUtils.isEmpty(filter)) {
             query.addFilter(this.textFilter);
-            query.bindValue("text").anyChars().literal(filter).anyChars();
+            query.bindValue(TEXT_FILTER).anyChars().literal(filter).anyChars();
         }
         return getValuesFromQueryResults(query.execute(), propertyDefinition);
+    }
+
+    /**
+     * Execute the given query and create a {@see PropertyValue} with the first result (null if no results).
+     *
+     * @param query the query to execute
+     * @param filter the text filter
+     * @param propertyDefinition the property definition
+     * @return value of {@see getValueFromQueryResult} with the first query result or null if no results.
+     * @throws QueryException if an error occured during the query execution
+     */
+    protected PropertyValue getValue(Query query, String filter, T propertyDefinition) throws QueryException
+    {
+        if (!StringUtils.isEmpty(filter)) {
+            query.addFilter(this.textFilter);
+            query.bindValue(TEXT_FILTER).literal(filter);
+        }
+
+        List<T> result = query.execute();
+        if (!result.isEmpty()) {
+            return getValueFromQueryResult(result.get(0), propertyDefinition);
+        } else {
+            return null;
+        }
     }
 
     protected abstract PropertyValues getAllowedValues(T propertyDefinition, int limit, String filter) throws Exception;

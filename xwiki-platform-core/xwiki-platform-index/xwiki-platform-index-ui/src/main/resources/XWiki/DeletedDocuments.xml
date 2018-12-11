@@ -374,7 +374,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
   // Delete All
   //
   var deleteDocumentConfirmModal = $('#deleteDocumentConfirmModal');
-  deleteDocumentConfirmModal.on('show.bs.modal').find('.btn-danger').click(function() {
+  deleteDocumentConfirmModal.find('.btn-danger').on('click', function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteInProgress')),
       'inprogress'
@@ -397,7 +397,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       ));
     });
   });
-  $(document).on('xwiki:livetable:documentsTrash:displayComplete', function(event, data) {
+  var createTrashAllButton = function() {
     if ($('#trashAllDeleted').length == 0) {
       var actionAllContainer = $('#documentsTrash td.xwiki-livetable-display-header-filter:last-child');
       var trashAll = $('&lt;a&gt;').attr({
@@ -410,7 +410,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       trashAll.appendTo(actionAllContainer);
     }
     $('#trashAllDeleted').toggleClass('disabled', trashDocumentsLivetable.totalRows &lt;= 0);
-  });
+  };
+
+  $(document).on('xwiki:livetable:documentsTrash:displayComplete', createTrashAllButton);
+
+  // we call the method in case the livetable has already been loaded and the event triggered.
+  createTrashAllButton();
 });
 
 /*

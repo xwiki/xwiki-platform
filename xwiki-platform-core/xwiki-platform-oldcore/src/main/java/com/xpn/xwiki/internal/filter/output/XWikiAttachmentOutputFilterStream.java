@@ -70,7 +70,9 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
         }
 
         this.entity.setFilename(name);
-        this.entity.setLongSize(size);
+        if (size != null) {
+            this.entity.setLongSize(size);
+        }
         this.entity.setMimeType(getString(WikiAttachmentFilter.PARAMETER_MIMETYPE, parameters, null));
         this.entity
             .setCharset(getString(WikiAttachmentFilter.PARAMETER_CHARSET, parameters, null));

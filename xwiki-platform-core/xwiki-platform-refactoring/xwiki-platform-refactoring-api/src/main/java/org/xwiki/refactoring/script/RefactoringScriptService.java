@@ -271,7 +271,7 @@ public class RefactoringScriptService implements ScriptService
      */
     public Job copyAs(CopyRequest request)
     {
-        return execute(RefactoringJobs.COPY, request);
+        return execute(RefactoringJobs.COPY_AS, request);
     }
 
     /**

@@ -159,7 +159,7 @@ public class RequestFactory
 
         // in case of a simple copy request, we only want it to be placed under the given destination document.
         if (destination.getType().equals(EntityType.DOCUMENT)) {
-            DocumentReference documentReference = (DocumentReference) destination;
+            DocumentReference documentReference = new DocumentReference(destination);
             dest = documentReference.getLastSpaceReference();
         } else {
             dest = destination;

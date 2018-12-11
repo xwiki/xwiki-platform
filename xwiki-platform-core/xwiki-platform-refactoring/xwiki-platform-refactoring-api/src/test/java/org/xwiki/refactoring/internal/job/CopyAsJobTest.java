@@ -26,10 +26,7 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.job.Job;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -44,10 +41,10 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class CopyJobTest extends AbstractEntityJobTest
+public class CopyAsJobTest extends AbstractEntityJobTest
 {
     @Rule
-    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(CopyJob.class);
+    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(CopyAsJob.class);
 
     @Override
     protected MockitoComponentMockingRule<Job> getMocker()
@@ -55,19 +52,8 @@ public class CopyJobTest extends AbstractEntityJobTest
         return this.mocker;
     }
 
-    private CopyRequest createRequest(EntityReference source, EntityReference destination)
-    {
-        CopyRequest request = new CopyRequest();
-        request.setEntityReferences(Arrays.asList(source));
-        request.setDestination(destination);
-        request.setCheckRights(false);
-        request.setCheckAuthorRights(false);
-        request.setInteractive(false);
-        return request;
-    }
-
     @Test
-    public void copyDocumentThrowErrorInCaseOfDocuments() throws Throwable
+    public void copyAsDocument() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
@@ -75,35 +61,24 @@ public class CopyJobTest extends AbstractEntityJobTest
         DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
         when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);
 
-        CopyRequest request = this.createRequest(sourceReference, copyReference);
-        run(request);
-        verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a document.",
-            EntityType.DOCUMENT);
-    }
-
-    @Test
-    public void copyDocument() throws Throwable
-    {
-        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Foo");
-        when(this.modelBridge.exists(sourceReference)).thenReturn(true);
-
-        SpaceReference copyReference = new SpaceReference("wiki", "Copy", "Page");
-        DocumentReference copyDestination = new DocumentReference("Foo", copyReference);
-        when(this.modelBridge.copy(sourceReference, copyDestination)).thenReturn(true);
-
-        CopyRequest request = this.createRequest(sourceReference, copyReference);
+        CopyRequest request = new CopyRequest();
+        request.setEntityReferences(Arrays.asList(sourceReference));
+        request.setDestination(copyReference);
+        request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
+        request.setInteractive(false);
         Map<String, String> parameters = Collections.singletonMap("foo", "bar");
         request.setEntityParameters(sourceReference, parameters);
         run(request);
-        verify(this.modelBridge).copy(sourceReference, copyDestination);
+
+        verify(this.modelBridge).copy(sourceReference, copyReference);
 
         LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
         verify(linkRefactoring, never()).renameLinks(any(DocumentReference.class), any(DocumentReference.class),
             any(DocumentReference.class));
-        verify(linkRefactoring).updateRelativeLinks(sourceReference, copyDestination);
+        verify(linkRefactoring).updateRelativeLinks(sourceReference, copyReference);
 
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
         verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
-        verify(this.mocker.getMockedLogger(), never()).error(any());
     }
 }

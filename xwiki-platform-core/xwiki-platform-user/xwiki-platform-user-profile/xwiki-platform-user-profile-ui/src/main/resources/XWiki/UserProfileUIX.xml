@@ -152,6 +152,7 @@
     </property>
     <property>
       <async_context>
+        <value>request.base</value>
         <value>doc.reference</value>
         <value>wiki</value>
         <value>locale</value>

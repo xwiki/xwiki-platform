@@ -125,9 +125,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        // Only take into account initial request if it's a "real" one
+        // Only take into account initial request if it's meant to be
         XWikiRequest request = context.getRequest();
-        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)
+            || !((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon()) {
             this.defaultURL = this.originalURL.toString();
             setDefaultURL(context.getOriginalWikiId(), this.originalURL);
         }

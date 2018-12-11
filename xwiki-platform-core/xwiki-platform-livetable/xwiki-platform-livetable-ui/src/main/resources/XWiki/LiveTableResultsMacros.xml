@@ -712,8 +712,8 @@
   #set ($timestamps = $filterValue.split('-'))
   #if ($timestamps.size() == 2)
     #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
-    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
-    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
+    #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[0]))))
+    #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[1]))))
   #else
     ## Fall back to the older string matching
     #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(?)")

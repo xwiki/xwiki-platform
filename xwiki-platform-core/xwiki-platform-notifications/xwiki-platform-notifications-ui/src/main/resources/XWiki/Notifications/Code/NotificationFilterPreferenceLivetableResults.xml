@@ -44,7 +44,7 @@
 ##
 ## Offset = item # at which to start displaying data
 ##
-#set ($offset = $numbertool.toNumber($request.get('offset')))
+#set ($offset = $mathtool.toNumber($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set ($offset = $offset - 1)
 #if ($offset &lt; 0)
@@ -53,7 +53,7 @@
 ##
 ## Limit = # of items to display
 ##
-#set ($limit = $numbertool.toNumber($request.get('limit')))
+#set ($limit = $mathtool.toNumber($request.get('limit')))
 #set ($limitOffset = $offset + $limit)
 ##
 ## Build the list of NotificationFilterPreference related to the given user.
@@ -153,7 +153,7 @@
 ## JSON.
 ##
 #set ($discard = $response.setContentType('application/json'))
-#set ($offset = $numbertool.toNumber($request.offset))
+#set ($offset = $mathtool.toNumber($request.offset))
 #if (!$offset)
   #set ($offset = 1)
 #end

@@ -768,11 +768,11 @@ $value##
   #end
   ##
   ## Pagination
-  #set ($rows = $numbertool.integer($request.rows))
+  #set ($rows = $mathtool.toInteger($request.rows))
   #if ("$!rows" == '')
     #set ($rows = 10)
   #end
-  #set ($start = $numbertool.integer($request.firstIndex))
+  #set ($start = $mathtool.toInteger($request.firstIndex))
   #if ("$!start" == '')
     #set ($start = 0)
   #end

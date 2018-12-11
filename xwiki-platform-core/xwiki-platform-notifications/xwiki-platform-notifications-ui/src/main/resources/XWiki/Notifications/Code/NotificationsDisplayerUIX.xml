@@ -63,7 +63,7 @@
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'setStartDate' == $request.action)
   #set ($startDate = $datetool.date)
   #if ("$!request.date" != '')
-    #set ($startDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.date).longValue()).toDate())
+    #set ($startDate = $xwiki.jodatime.getDateTime($mathtool.toNumber($request.date).longValue()).toDate())
   #end
   #set ($discard = $services.notification.preferences.setStartDate($startDate))
   #set ($discard = $services.notification.filters.setStartDate($startDate))

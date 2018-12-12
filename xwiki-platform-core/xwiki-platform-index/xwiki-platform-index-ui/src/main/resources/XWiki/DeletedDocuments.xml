@@ -62,7 +62,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 {{html wiki="true" clean="false"}}
 &lt;div class="hidden"&gt;
     &lt;div class="modal" id="deleteDocumentConfirmModal" tabindex="-1" role="dialog"
-    aria-labelledby="deleteDocumentConfirmModal-label" data-liveTable="#documentsTrash"&gt;
+    aria-labelledby="deleteDocumentConfirmModal-label"&gt;
       &lt;div class="modal-dialog" role="document"&gt;
         &lt;div class="modal-content"&gt;
           &lt;div class="modal-header"&gt;
@@ -411,23 +411,24 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     }
     $('#trashAllDeleted').toggleClass('disabled', trashDocumentsLivetable.totalRows &lt;= 0);
   };
+  var displayLivetable = function () {
+    if ($('#documentsTrash').length > 0) {
+      $('#documentsTrash').parents('.hidden').removeClass('hidden');
+    }
+  };
 
   $(document).on('xwiki:livetable:documentsTrash:displayComplete', createTrashAllButton);
-
+  $(document).on('xwiki:dom:loaded', displayLivetable);
   // we call the method in case the livetable has already been loaded and the event triggered.
   createTrashAllButton();
-});
 
-/*
-* The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
-* Re-display it when the document loads and Javascript is available.
-*/
-document.observe('xwiki:dom:loaded', function () {
-  if ($('documentsTrash')) {
-      $('documentsTrash').up('.hidden').removeClassName('hidden');
-  }
+  /*
+  * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
+  * Re-display it when the document loads and Javascript is available.
+  */
+  displayLivetable();
 });
-    </code>
+      </code>
     </property>
     <property>
       <name/>

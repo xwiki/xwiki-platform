@@ -221,6 +221,43 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     });
   });
 
+  it("doesn't save nested editables that don't match the parameter type", function(done) {
+    editor.setData([
+      '<!--startmacro:test|-|-->',
+        '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;"',
+            ' data-xwiki-parameter-name="title">',
+          '<p>Title</p>',
+        '</div>',
+        '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+          '<p>Content</p>',
+        '</div>',
+      '<!--stopmacro-->'
+    ].join(''), {
+      callback: function() {
+        var wikiMacroWidgets = getWikiMacroWidgets(editor);
+        expect(wikiMacroWidgets.length).toBe(1);
+
+        expect(wikiMacroWidgets[0].editables.title.getData()).toBe('<p>Title</p>');
+        expect(wikiMacroWidgets[0].editables.content.getData()).toBe('<p>Content</p>');
+
+        wikiMacroWidgets[0].data.descriptor = {
+          contentDescriptor: {
+            type: 'foo'
+          },
+          parameterDescriptorMap: {
+            title: {
+              type: 'bar'
+            }
+          }
+        };
+
+        expect(editor.getData()).toBe('<!--startmacro:test|-|--><!--stopmacro-->');
+
+        done();
+      }
+    });
+  });
+
   it('handles nested sibling macro markers', function(done) {
     testUtils.assertData(
       editor,

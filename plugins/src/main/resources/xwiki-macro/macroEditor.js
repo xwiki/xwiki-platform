@@ -275,6 +275,7 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     }
     var macroCall = {
       name: macroDescriptor.id.id,
+      content: undefined,
       parameters: {}
     };
     // Note that we include the empty content in the macro call (instead of leaving it undefined) because we want to
@@ -375,12 +376,13 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
         if (macroEditorAPI.validate()) {
           var output = modal.data('input');
           delete output.action;
+          var macroDescriptor = macroEditor.data('macroDescriptor');
           // Preserve the in-line/block mode if possible. Note that we consider the macro in-line if no value is
           // specified, because the caret is placed in an in-line context most of the time (e.g. inside a paragraph) in
           // order to allow the user to type text).
-          var inline = (!output.macroCall || output.macroCall.inline !== false) &&
-            macroEditor.data('macroDescriptor').supportsInlineMode;
+          var inline = (!output.macroCall || output.macroCall.inline !== false) && macroDescriptor.supportsInlineMode;
           output.macroCall = macroEditorAPI.getMacroCall();
+          output.macroCall.descriptor = macroDescriptor;
           output.macroCall.inline = inline;
           modal.data('output', output).modal('hide');
         }
@@ -388,8 +390,11 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
       changeMacroButton.click(function(event) {
         var macroEditorAPI = modal.find('.macro-editor').xwikiMacroEditor();
         var output = modal.data('input');
-        output.macroCall = macroEditorAPI.getMacroCall();
         output.action = 'changeMacro';
+        // Preserve the in-line/block mode if possible.
+        var inline = output.macroCall ? output.macroCall.inline : undefined;
+        output.macroCall = macroEditorAPI.getMacroCall();
+        output.macroCall.inline = inline;
         modal.data('output', output).modal('hide');
       });
     }

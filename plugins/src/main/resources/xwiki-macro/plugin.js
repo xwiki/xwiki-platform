@@ -161,8 +161,13 @@
             var thisWidget = this;
             // If the widget has nested editables we need to include them, otherwise their content is not saved.
             widgetElementClone.forEach(function(element) {
-              if (element.attributes[nestedEditableTypeAttribute] && element.attributes.contenteditable) {
-                macro.add(element);
+              var nestedEditableType = element.attributes[nestedEditableTypeAttribute];
+              if (nestedEditableType && element.attributes.contenteditable) {
+                var parameterType = thisWidget.getParameterType(element.attributes[nestedEditableNameAttribute]);
+                // Skip the nested editable if it doesn't match the expected parameter type.
+                if (!parameterType || nestedEditableType === parameterType) {
+                  macro.add(element);
+                }
                 return false;
               } else if (thisWidget.upcast(element)) {
                 // Skip nested macros that are outside of a nested editable.
@@ -172,6 +177,15 @@
           }
           macro.add(stopMacroComment);
           return macro;
+        },
+        getParameterType: function(name) {
+          var descriptor = this.data.descriptor || {};
+          if (name === undefined) {
+            descriptor = descriptor.contentDescriptor || {};
+          } else if (typeof name === 'string') {
+            descriptor = (descriptor.parameterDescriptorMap || {})[name.toLowerCase()] || {};
+          }
+          return descriptor.type;
         },
         init: function() {
           // Initialize the nested editables.

@@ -187,7 +187,9 @@ public class XWikiContextContextStore extends AbstractContextStore
 
         if (xcontext != null) {
             save(contextStore, PROP_WIKI, xcontext.getWikiId(), entries);
-            if (!StringUtils.equals(xcontext.getWikiId(), xcontext.getOriginalWikiId())) {
+
+            // No need to save the request wiki if it's the same as the current wiki
+            if (!StringUtils.equals((String) contextStore.get(PROP_WIKI), xcontext.getOriginalWikiId())) {
                 save(contextStore, PROP_REQUEST_WIKI, xcontext.getOriginalWikiId(), entries);
             }
 
@@ -204,47 +206,51 @@ public class XWikiContextContextStore extends AbstractContextStore
     private void save(Map<String, Serializable> contextStore, String prefix, XWikiDocument document,
         Collection<String> entries)
     {
-        save((key, subkey) -> {
-            switch (subkey) {
-                case SUFFIX_PROP_DOCUMENT_REFERENCE:
-                    contextStore.put(key, document.getDocumentReferenceWithLocale());
-                    break;
+        if (document != null) {
+            save((key, subkey) -> {
+                switch (subkey) {
+                    case SUFFIX_PROP_DOCUMENT_REFERENCE:
+                        contextStore.put(key, document.getDocumentReferenceWithLocale());
+                        break;
 
-                // TODO: support other properties ?
+                    // TODO: support other properties ?
 
-                default:
-                    break;
-            }
-        }, prefix, entries);
+                    default:
+                        break;
+                }
+            }, prefix, entries);
+        }
     }
 
     private void save(Map<String, Serializable> contextStore, String prefix, XWikiRequest request,
         Collection<String> entries)
     {
-        save((key, subkey) -> {
-            switch (subkey) {
-                case SUFFIX_PROP_REQUEST_BASE:
-                    saveRequestBase(contextStore, key, request);
-                    break;
+        if (request != null) {
+            save((key, subkey) -> {
+                switch (subkey) {
+                    case SUFFIX_PROP_REQUEST_BASE:
+                        saveRequestBase(contextStore, key, request);
+                        break;
 
-                case SUFFIX_PROP_REQUEST_URL:
-                    saveRequestURL(contextStore, key, request);
-                    break;
+                    case SUFFIX_PROP_REQUEST_URL:
+                        saveRequestURL(contextStore, key, request);
+                        break;
 
-                case SUFFIX_PROP_REQUEST_PARAMETERS:
-                    saveRequestParameters(contextStore, key, request);
-                    break;
+                    case SUFFIX_PROP_REQUEST_PARAMETERS:
+                        saveRequestParameters(contextStore, key, request);
+                        break;
 
-                case SUFFIX_PROP_REQUEST_WIKI:
-                    // Handled in a different place
-                    break;
+                    case SUFFIX_PROP_REQUEST_WIKI:
+                        // Handled in a different place
+                        break;
 
-                // TODO: add support for request input stream
+                    // TODO: add support for request input stream
 
-                default:
-                    saveRequestAll(contextStore, key, request);
-            }
-        }, prefix, entries);
+                    default:
+                        saveRequestAll(contextStore, key, request);
+                }
+            }, prefix, entries);
+        }
     }
 
     private void saveRequestBase(Map<String, Serializable> contextStore, String key, XWikiRequest request)
@@ -339,11 +345,12 @@ public class XWikiContextContextStore extends AbstractContextStore
             restoreDocument((DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE), xcontext);
         } else if (storedWikiId != null) {
             // If no document reference is provided get the wiki home page
-            WikiDescriptor wikiDescriptor;
             try {
-                wikiDescriptor = this.wikis.getById(storedWikiId);
+                WikiDescriptor wikiDescriptor = this.wikis.getById(storedWikiId);
 
-                restoreDocument(wikiDescriptor.getMainPageReference(), xcontext);
+                if (wikiDescriptor != null) {
+                    restoreDocument(wikiDescriptor.getMainPageReference(), xcontext);
+                }
             } catch (WikiManagerException e) {
                 this.logger.warn("Can't access the descriptor of the restored context wiki [{}]", storedWikiId, e);
             }

@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for {@link CopyJob}.
+ * Unit test for {@link CopyAsJob}.
  *
  * @version $Id$
  */

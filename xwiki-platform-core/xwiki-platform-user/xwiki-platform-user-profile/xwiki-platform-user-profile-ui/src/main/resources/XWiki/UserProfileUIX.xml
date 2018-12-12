@@ -57,7 +57,7 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>2</number>
+        <number>3</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -68,14 +68,14 @@
         <displayType>select</displayType>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>3</number>
+        <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>author|doc.reference|wiki|request.parameters|request.url|locale|user</values>
+        <values>request.wiki=Request wiki|request.base=Base request URL|author=Author|doc.reference=Document|wiki=Wiki|request.parameters=Request parameters|request.url=Request URL|locale=Language|user=User</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -84,7 +84,7 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>1</number>
+        <number>2</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -93,7 +93,7 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
-        <number>4</number>
+        <number>1</number>
         <prettyName>Executed Content</prettyName>
         <rows>25</rows>
         <size>120</size>
@@ -152,7 +152,6 @@
     </property>
     <property>
       <async_context>
-        <value>request.base</value>
         <value>doc.reference</value>
         <value>wiki</value>
         <value>locale</value>

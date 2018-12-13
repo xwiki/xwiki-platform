@@ -185,16 +185,23 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             // If async is disabled run the renderer in the current thread
             if (renderer.isCacheAllowed()) {
                 // Prepare to catch stuff to invalidate the cache
-                ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext) {
+                    ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                }
 
                 AsyncRendererResult result = renderer.render(false, true);
 
                 // Get suff to invalidate the cache
-                ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext) {
+                    ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
 
-                // Create a pseudo job status
-                status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),
-                    contextUse.getRoleTypes(), contextUse.getRoles(), contextUse.getUses());
+                    // Create a pseudo job status
+                    status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),
+                        contextUse.getRoleTypes(), contextUse.getRoles(), contextUse.getUses());
+                } else {
+                    // Create a pseudo job status
+                    status = new AsyncRendererJobStatus(request, result, null, null, null, null);
+                }
 
                 request.setId(jobId);
 
@@ -290,7 +297,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         return id;
     }
 
-    public static String encodeId(String value)
+    private String encodeId(String value)
     {
         StringBuilder builder = new StringBuilder(value.length() * 3);
 
@@ -321,7 +328,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         return builder.toString();
     }
 
-    private static void encode(char c, StringBuilder builder)
+    private void encode(char c, StringBuilder builder)
     {
         byte[] ba = String.valueOf(c).getBytes(StandardCharsets.UTF_8);
 

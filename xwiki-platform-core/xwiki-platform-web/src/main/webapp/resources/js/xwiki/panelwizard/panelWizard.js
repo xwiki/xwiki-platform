@@ -617,9 +617,12 @@ function panelEditorInit() {
 // Listen to asynchronously panels
 panelsObserver = new MutationObserver(function(mutations)
 {
-  for(var mutation of mutations) {
-    for(var i = 0; i < mutation.addedNodes.length; i++) {
-      var element = mutation.addedNodes[i];
+  for (var i = 0; i < mutations.length; i++) {
+    var mutation = mutations[i];
+
+    for (var j = 0; i < mutation.addedNodes.length; j++) {
+      var element = mutation.addedNodes[j];
+
       if (element.tagName == 'DIV') {
         if (isPanel(element) && !isAttachedPanel(element)) {
           maybePanelEditorInit();

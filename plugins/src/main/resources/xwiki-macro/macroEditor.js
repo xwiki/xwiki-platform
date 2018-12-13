@@ -199,7 +199,7 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
   displayMacroParameterField = function(parameter) {
     var field;
     if (parameter.id === '$content') {
-      field = $('<textarea/>');
+      field = $('<textarea rows="7"/>');
     } else if (parameter.type === 'boolean') {
       field = $(
         '<div>' +

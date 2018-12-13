@@ -33,13 +33,13 @@ import org.xwiki.refactoring.job.RefactoringJobs;
  * @version $Id$
  */
 @Component
-@Named(RefactoringJobs.COPY)
-public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
+@Named(RefactoringJobs.COPY_AS)
+public class CopyAsJob extends AbstractCopyOrMoveJob<CopyRequest>
 {
     @Override
     public String getType()
     {
-        return RefactoringJobs.COPY;
+        return RefactoringJobs.COPY_AS;
     }
 
     @Override
@@ -64,6 +64,7 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     @Override
     protected boolean processOnlySameSourceDestinationTypes()
     {
-        return false;
+        // copyas only process same destination types
+        return true;
     }
 }

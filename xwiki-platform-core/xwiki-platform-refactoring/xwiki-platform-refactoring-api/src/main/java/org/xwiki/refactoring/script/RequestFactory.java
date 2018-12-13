@@ -35,6 +35,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CopyRequest;
@@ -153,7 +154,17 @@ public class RequestFactory
     {
         CopyRequest request = new CopyRequest();
         this.initEntityRequest(request, RefactoringJobs.COPY, sources);
-        request.setDestination(destination);
+
+        EntityReference dest;
+
+        // in case of a simple copy request, we only want it to be placed under the given destination document.
+        if (destination.getType().equals(EntityType.DOCUMENT)) {
+            DocumentReference documentReference = new DocumentReference(destination);
+            dest = documentReference.getLastSpaceReference();
+        } else {
+            dest = destination;
+        }
+        request.setDestination(dest);
         return request;
     }
 

@@ -222,13 +222,14 @@ document.observe("dom:loaded", function()
      {
        var id = el.up('.rating-wrapper').id;
        var PREFIX = 'rating-';
-       if (id &amp;&amp; id.length &gt; PREFIX.length)
+       if (id &amp;&amp; id.indexOf(PREFIX) == 0)
        {
          id = id.substring(PREFIX.length);
-         var url = "$xwiki.getURL("XWiki.Ratings", "view", "xpage=plain&amp;outputSyntax=plain")" + "&amp;doc=" + encodeURIComponent(id);
+         var queryString = Object.toQueryString({ xpage: 'plain', outputSyntax: 'plain', doc: id });
+         var url = new XWiki.Document('Ratings', 'XWiki').getURL('view', queryString);
          var msgdiv = el.up('.rating-container').down('.rating-message');
 
-         el.select('a').each(function(astar, i) 
+         el.select('a').each(function(astar, i)
          {
             Event.observe(astar, 'click', setVote(el, url, i + 1));
             msgdiv.prevmsg = "";

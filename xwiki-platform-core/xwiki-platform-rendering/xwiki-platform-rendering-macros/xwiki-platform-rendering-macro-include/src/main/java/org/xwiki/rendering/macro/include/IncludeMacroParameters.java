@@ -21,6 +21,8 @@ package org.xwiki.rendering.macro.include;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyFeature;
+import org.xwiki.properties.annotation.PropertyGroup;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
@@ -72,6 +74,8 @@ public class IncludeMacroParameters
      * @since 3.4M1
      */
     @PropertyDescription("the reference of the resource to display")
+    @PropertyGroup("stringReference")
+    @PropertyFeature("reference")
     public void setReference(String reference)
     {
         this.reference = reference;
@@ -91,6 +95,7 @@ public class IncludeMacroParameters
      * @since 3.4M1
      */
     @PropertyDescription("the type of the reference")
+    @PropertyGroup("stringReference")
     public EntityType getType()
     {
         return this.type;
@@ -148,6 +153,7 @@ public class IncludeMacroParameters
      * @since 10.6RC1
      */
     @PropertyDescription("The reference of the page to include")
+    @PropertyFeature("reference")
     public void setPage(String page)
     {
         this.reference = page;

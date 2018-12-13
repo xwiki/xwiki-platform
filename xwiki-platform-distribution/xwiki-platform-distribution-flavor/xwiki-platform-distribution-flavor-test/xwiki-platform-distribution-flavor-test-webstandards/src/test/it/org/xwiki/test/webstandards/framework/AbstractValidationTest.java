@@ -20,12 +20,18 @@
 package org.xwiki.test.webstandards.framework;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Credentials;
@@ -36,6 +42,8 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -43,7 +51,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.validator.Validator;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarPackage;
-import org.xwiki.xar.internal.type.DefaultXarEntryType;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -212,20 +219,62 @@ public class AbstractValidationTest extends TestCase
         String path = System.getProperty("pathToDocuments");
         String patternFilter = System.getProperty("documentsToTest");
 
-        for (DocumentReference documentReference : readXarContents(path, patternFilter)) {
+        boolean skipTechnicalPages;
+        try {
+            Field isSkipTechnicalPages = validationTest.getDeclaredField("skipTechnicalPages");
+            isSkipTechnicalPages.setAccessible(true);
+            skipTechnicalPages = isSkipTechnicalPages.getBoolean(null);
+        } catch (NoSuchFieldException e) {
+            skipTechnicalPages = false;
+        }
+
+        for (DocumentReference documentReference : readXarContents(path, patternFilter, skipTechnicalPages)) {
             suite.addTest(validationTest.getConstructor(Target.class, HttpClient.class, Validator.class, String.class)
                 .newInstance(new DocumentReferenceTarget(documentReference), client, validator, "Admin:admin"));
         }
     }
 
-    private static boolean isNotTechnicalPage(XarEntry entry)
+    private static boolean isTechnicalPage(String directoryPath, XarEntry entry, DocumentBuilder documentBuilder)
+        throws Exception
     {
-        return DefaultXarEntryType.HINT.equals(entry.getEntryType());
+        InputStream inputStream = new FileInputStream(new File(directoryPath, entry.getEntryName()));
+        Document parsedDocument = documentBuilder.parse(inputStream);
+
+        NodeList elements = parsedDocument.getElementsByTagName("hidden");
+
+        boolean isHiddenPage = false;
+        if (elements.getLength() == 1) {
+            isHiddenPage = "true".equals(elements.item(0).getTextContent());
+        }
+        return isHiddenPage;
     }
 
     protected static List<DocumentReference> readXarContents(String fileName, String patternFilter) throws Exception
     {
-        Collection<XarEntry> entries = XarPackage.getEntries(new File(fileName));
+        return readXarContents(fileName, patternFilter, false);
+    }
+
+    private static boolean isPageIncluded(Pattern pattern, XarEntry entry)
+    {
+        return (pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches());
+    }
+
+    private static boolean shouldSkipPage(boolean skipTechnicalPages, String directoryPath, XarEntry entry,
+        DocumentBuilder documentBuilder) throws Exception
+    {
+        if (!skipTechnicalPages) {
+            return false;
+        } else {
+            return isTechnicalPage(directoryPath, entry, documentBuilder);
+        }
+    }
+
+    protected static List<DocumentReference> readXarContents(String fileName, String patternFilter,
+        boolean skipTechnicalPages) throws Exception
+    {
+        File file = new File(fileName);
+        XarPackage xarPackage = new XarPackage(file);
+        Collection<XarEntry> entries = xarPackage.getEntries();
 
         List<DocumentReference> result = new ArrayList<DocumentReference>(entries.size());
 
@@ -233,9 +282,12 @@ public class AbstractValidationTest extends TestCase
 
         Pattern pattern = patternFilter == null ? null : Pattern.compile(patternFilter);
 
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+
         for (XarEntry entry : entries) {
-            if (isNotTechnicalPage(entry)
-                && (pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches())) {
+            if (isPageIncluded(pattern, entry)
+                && !shouldSkipPage(skipTechnicalPages, fileName, entry, documentBuilder)) {
                 result.add(new DocumentReference(entry, wikiReference));
             }
         }

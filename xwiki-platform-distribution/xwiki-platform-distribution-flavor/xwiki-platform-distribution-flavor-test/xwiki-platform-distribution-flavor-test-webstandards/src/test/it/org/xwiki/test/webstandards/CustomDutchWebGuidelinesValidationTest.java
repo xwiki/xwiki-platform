@@ -27,6 +27,11 @@ import org.xwiki.test.webstandards.framework.Target;
 
 public class CustomDutchWebGuidelinesValidationTest extends DefaultValidationTest
 {
+    /**
+     * This field is needed to skip technical pages. It is read by reflexivity.
+     */
+    private static boolean skipTechnicalPages = true;
+
     public CustomDutchWebGuidelinesValidationTest(Target target, HttpClient client, Validator validator,
         String credentials) throws Exception
     {

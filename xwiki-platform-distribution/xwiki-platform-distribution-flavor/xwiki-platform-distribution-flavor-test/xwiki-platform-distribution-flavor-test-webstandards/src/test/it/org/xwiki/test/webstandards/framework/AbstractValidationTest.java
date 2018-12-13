@@ -43,6 +43,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.validator.Validator;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarPackage;
+import org.xwiki.xar.internal.type.DefaultXarEntryType;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -217,6 +218,11 @@ public class AbstractValidationTest extends TestCase
         }
     }
 
+    private static boolean isNotTechnicalPage(XarEntry entry)
+    {
+        return DefaultXarEntryType.HINT.equals(entry.getEntryType());
+    }
+
     protected static List<DocumentReference> readXarContents(String fileName, String patternFilter) throws Exception
     {
         Collection<XarEntry> entries = XarPackage.getEntries(new File(fileName));
@@ -228,7 +234,8 @@ public class AbstractValidationTest extends TestCase
         Pattern pattern = patternFilter == null ? null : Pattern.compile(patternFilter);
 
         for (XarEntry entry : entries) {
-            if (pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches()) {
+            if (isNotTechnicalPage(entry)
+                && (pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches())) {
                 result.add(new DocumentReference(entry, wikiReference));
             }
         }

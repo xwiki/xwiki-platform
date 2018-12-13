@@ -129,7 +129,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     {
         // Send the result back
         Response response = this.container.getResponse();
-        response.setContentType("text/html");
+        response.setContentType("text/html; charset=utf-8");
 
         // Create the asynchronous HTML meta
         StringBuilder head = new StringBuilder();

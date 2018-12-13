@@ -411,14 +411,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     }
     $('#trashAllDeleted').toggleClass('disabled', trashDocumentsLivetable.totalRows &lt;= 0);
   };
+
   var displayLivetable = function () {
-    if ($('#documentsTrash').length > 0) {
-      $('#documentsTrash').parents('.hidden').removeClass('hidden');
-    }
+    $('#documentsTrash').parents('.hidden').removeClass('hidden');
   };
 
   $(document).on('xwiki:livetable:documentsTrash:displayComplete', createTrashAllButton);
-  $(document).on('xwiki:dom:loaded', displayLivetable);
   // we call the method in case the livetable has already been loaded and the event triggered.
   createTrashAllButton();
 

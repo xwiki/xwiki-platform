@@ -45,7 +45,7 @@ platform.panels.applications.ajax.success=La configuration a été enregistrée.
 platform.panels.applications.ajax.csrf=La validation CSRF a échoué. Merci de recharger la page.
 platform.panels.applications.ajax.noright=Vous n'êtes pas autorisés à modifier PanelsCode.ApplicationsPanelConfiguration.
 platform.panels.applications.ajax.error=Enregistrement impossible.
-admin.panels.applications=Panel d'applications
+admin.panels.applications=Panneau d'applications
 admin.panels.applications.description=Gérer quelles sont les applications à afficher dans le panneau des applications.
 
 admin.panels.navigation=Panneau de navigation

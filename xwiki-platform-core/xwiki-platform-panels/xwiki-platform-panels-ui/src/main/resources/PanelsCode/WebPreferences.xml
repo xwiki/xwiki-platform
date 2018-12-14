@@ -1110,7 +1110,7 @@
       </showinformation>
       <skin>
         <cache>0</cache>
-        <classname/>
+        <classname>XWiki.XWikiSkins</classname>
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>

@@ -34,6 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 
@@ -111,7 +112,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
         xclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
-        xclass.addPageField("skin", "Skin", 30);
+        xclass.addPageField("skin", "Skin", 30, false, false, "", "XWiki.XWikiSkins", ListClass.DISPLAYTYPE_INPUT,
+                true);
         xclass.addDBListField("colorTheme", "Color theme",
             "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
                 + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "

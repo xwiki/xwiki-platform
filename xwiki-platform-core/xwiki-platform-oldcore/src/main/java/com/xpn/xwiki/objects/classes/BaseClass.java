@@ -1069,7 +1069,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String hqlQuery)
     {
-        return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, hqlQuery,
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, hqlQuery, "",
             ListClass.DISPLAYTYPE_INPUT, true);
     }
 
@@ -1085,6 +1085,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param hqlQuery the optional HQL query to execute to return allowed document references. If null or empty, the
      *            {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass)
      *            implicit page query builder} is used
+     * @param className optional class name used to filter suggested documents containing an object of this class
      * @param displayType either {@link ListClass#DISPLAYTYPE_CHECKBOX}, {@link ListClass#DISPLAYTYPE_INPUT},
      *            {@link ListClass#DISPLAYTYPE_RADIO} or {@link ListClass#DISPLAYTYPE_SELECT}
      * @param hasPicker enables auto suggestion display
@@ -1092,7 +1093,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @since 10.8RC1
      */
     public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
-        boolean relationalStorage, String hqlQuery, String displayType, boolean hasPicker)
+        boolean relationalStorage, String hqlQuery, String className, String displayType, boolean hasPicker)
     {
         if (getField(fieldName) == null) {
             PageClass pageClass = new PageClass();
@@ -1105,6 +1106,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             pageClass.setDisplayType(displayType);
             pageClass.setPicker(hasPicker);
             pageClass.setObject(this);
+            pageClass.setClassname(className);
             put(fieldName, pageClass);
 
             return true;

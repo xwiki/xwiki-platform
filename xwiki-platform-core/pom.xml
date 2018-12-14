@@ -198,6 +198,34 @@
                     "old": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setFilterPreferenceEnabled(java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
                     "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setFilterPreferenceEnabled(org.xwiki.model.reference.DocumentReference, java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
                     "justification": "Bad design at fist attempt"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method org.xwiki.model.EntityType org.xwiki.rendering.macro.include.IncludeMacroParameters::getType()",
+                    "new": "method org.xwiki.model.EntityType org.xwiki.rendering.macro.include.IncludeMacroParameters::getType()",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyGroup({\"stringReference\"})",
+                    "justification": "Handles conflicting macro parameters"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
+                    "justification": "Handles conflicting macro parameters"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
+                    "justification": "Handles conflicting macro parameters"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyGroup({\"stringReference\"})",
+                    "justification": "Handles conflicting macro parameters"
                   }
                 ]
               }

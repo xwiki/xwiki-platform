@@ -48,7 +48,7 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
       };
     }
 
-    return {
+    var options = {
       create: true,
       load: getLoad(function(text) {
         return { 'fp': text, 'limit': 10 }
@@ -57,6 +57,18 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
         return { 'fp': text, 'exactMatch': true }
       })
     };
+
+    var freeText = select.attr('data-freeText');
+    if (freeText) {
+      freeText = freeText.toLowerCase();
+      if (freeText === 'allowed') {
+        options.createOnBlur = true;
+      } else if (freeText === 'forbidden') {
+        options.create = false;
+      }
+    }
+
+    return options;
   };
 
   var getSuggestion = function(propertyValue) {

@@ -271,6 +271,25 @@ public abstract class ListClass extends PropertyClass
         setStringValue("defaultValue", separator);
     }
 
+
+    /**
+     * @return the value of freeText (forbidden, discouraged or allowed)
+     * @since 10.11RC1
+     */
+    public String getFreeText()
+    {
+        return getStringValue("freeText");
+    }
+
+    /**
+     * @param type the value of freeText (forbidden, discouraged or allowed)
+     * @since 10.11RC1
+     */
+    public void setFreeText(String type)
+    {
+        setStringValue("freeText", type);
+    }
+
     /**
      * Convenience method, using {@value #DEFAULT_SEPARATOR} as separator and parsing key=value items.
      *

@@ -244,8 +244,8 @@ public class AbstractValidationTest extends TestCase
 
             boolean isHiddenPage = false;
             if (elements.getLength() == 1) {
-                    isHiddenPage = "true".equals(elements.item(0).getTextContent());
-                }
+               isHiddenPage = "true".equals(elements.item(0).getTextContent());
+            }
             return isHiddenPage;
         }
     }

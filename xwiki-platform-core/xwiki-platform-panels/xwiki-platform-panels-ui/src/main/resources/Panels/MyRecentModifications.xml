@@ -173,7 +173,7 @@
     <property>
       <content>{{velocity}}
 #set ($void = $services.async.useEntity("wiki:$xcontext.database"))
-#set ($query = $services.query.xwql('select doc.fullName, doc.language from XWikiDocument doc where doc.author = :author order by doc.date desc'))
+#set ($query = $services.query.xwql('select doc.fullName, doc.language from Document doc where doc.author = :author order by doc.date desc'))
 #set ($recentDocs = $query.addFilter('hidden').addFilter('unique').bindValue('author', $xcontext.user).setLimit(5).execute())
 ## We count the occurence of a document to specify the document language when there are duplicates
 #set ($docNamesCounter = {})

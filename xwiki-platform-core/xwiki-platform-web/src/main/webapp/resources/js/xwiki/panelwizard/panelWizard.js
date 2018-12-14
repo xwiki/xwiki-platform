@@ -620,7 +620,7 @@ panelsObserver = new MutationObserver(function(mutations)
   for (var i = 0; i < mutations.length; i++) {
     var mutation = mutations[i];
 
-    for (var j = 0; i < mutation.addedNodes.length; j++) {
+    for (var j = 0; j < mutation.addedNodes.length; j++) {
       var element = mutation.addedNodes[j];
 
       if (element.tagName == 'DIV') {

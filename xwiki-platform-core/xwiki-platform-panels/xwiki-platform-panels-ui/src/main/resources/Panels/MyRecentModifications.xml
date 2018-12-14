@@ -186,8 +186,8 @@
 #end
 #if ($recentDocs.size() &gt; 0 || $showEmptyPanels)
   #panelheader($services.localization.render('xe.panels.modifications.my'))
-  #foreach ($doc in $recentDocs)
-    #set ($recentDoc = $xwiki.getDocument($doc[0]).getTranslatedDocument($doc[1]))
+  #foreach ($recentDocResult in $recentDocs)
+    #set ($recentDoc = $xwiki.getDocument($recentDocResult[0]).getTranslatedDocument($recentDocResult[1]))
     #if ($recentDoc)
       #set ($docLocale = $recentDoc.locale)
       #if ("$docLocale" == '')
@@ -199,7 +199,7 @@
         #set ($docUrl = $recentDoc.getURL())
       #end
       ## We use HTML here because we don't have a tool to escape wiki syntax in document title.
-      * {{html}}&lt;a href="${docUrl}"&gt;$escapetool.xml($recentDoc.plainTitle)#if ($docNamesCounter[$doc[0]] &gt; 1) &lt;em&gt;($docLocale)&lt;/em&gt;#end&lt;/a&gt;{{/html}}
+      * {{html}}&lt;a href="${docUrl}"&gt;$escapetool.xml($recentDoc.plainTitle)#if ($docNamesCounter[$recentDocResult[0]] &gt; 1) &lt;em&gt;($docLocale)&lt;/em&gt;#end&lt;/a&gt;{{/html}}
     #end
   #end
   #panelfooter()

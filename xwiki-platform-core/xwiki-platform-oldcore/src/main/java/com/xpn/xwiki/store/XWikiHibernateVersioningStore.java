@@ -38,6 +38,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
@@ -218,6 +219,16 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             doc.setDocumentReference(basedoc.getDocumentReference());
 
             doc.setStore(basedoc.getStore());
+
+            // Make sure the attachment of the revision document have the right store
+            for (XWikiAttachment revisionAttachment : doc.getAttachmentList()) {
+                XWikiAttachment attachment = basedoc.getAttachment(revisionAttachment.getFilename());
+
+                if (attachment != null) {
+                    revisionAttachment.setContentStore(attachment.getContentStore());
+                    revisionAttachment.setArchiveStore(attachment.getArchiveStore());
+                }
+            }
 
             return doc;
         } finally {

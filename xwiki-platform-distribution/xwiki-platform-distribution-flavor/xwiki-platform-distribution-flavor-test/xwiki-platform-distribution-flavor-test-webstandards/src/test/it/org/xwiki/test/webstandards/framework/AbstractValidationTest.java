@@ -237,16 +237,17 @@ public class AbstractValidationTest extends TestCase
     private static boolean isTechnicalPage(String directoryPath, XarEntry entry, DocumentBuilder documentBuilder)
         throws Exception
     {
-        InputStream inputStream = new FileInputStream(new File(directoryPath, entry.getEntryName()));
-        Document parsedDocument = documentBuilder.parse(inputStream);
+        try (InputStream inputStream = new FileInputStream(new File(directoryPath, entry.getEntryName()))) {
+            Document parsedDocument = documentBuilder.parse(inputStream);
 
-        NodeList elements = parsedDocument.getElementsByTagName("hidden");
+            NodeList elements = parsedDocument.getElementsByTagName("hidden");
 
-        boolean isHiddenPage = false;
-        if (elements.getLength() == 1) {
-            isHiddenPage = "true".equals(elements.item(0).getTextContent());
+            boolean isHiddenPage = false;
+            if (elements.getLength() == 1) {
+                    isHiddenPage = "true".equals(elements.item(0).getTextContent());
+                }
+            return isHiddenPage;
         }
-        return isHiddenPage;
     }
 
     protected static List<DocumentReference> readXarContents(String fileName, String patternFilter) throws Exception

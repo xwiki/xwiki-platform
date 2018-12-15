@@ -172,7 +172,7 @@ public class TestConfiguration
      */
     private String resolve(String annotationValue, String propertyName)
     {
-        String result = annotationValue;
+        String result = StringUtils.isEmpty(annotationValue) ? null : annotationValue;
         String propertyValue = System.getProperty(propertyName);
         if (!StringUtils.isEmpty(propertyValue)) {
             result = propertyValue;

@@ -25,6 +25,7 @@ import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestConfigurationTest
@@ -55,7 +56,7 @@ public class TestConfigurationTest
         TestConfiguration configuration = new TestConfiguration(uiTest);
         assertEquals(ServletEngine.JETTY_STANDALONE, configuration.getServletEngine());
         assertFalse(configuration.isVerbose());
-        assertEquals("", configuration.getDatabaseTag());
+        assertNull(configuration.getDatabaseTag());
     }
 
     @Test

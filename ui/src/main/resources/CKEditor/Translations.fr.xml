@@ -65,7 +65,7 @@ ckeditor.plugin.link.openInNewTab=Ouvrir le lien dans un nouvel onglet
 
 ckeditor.plugin.macro.placeholder=macro : {0}
 ckeditor.plugin.macro.buttonHint=Macro XWiki
-### Missing: ckeditor.plugin.macro.editButtonHint=Edit Macro
+ckeditor.plugin.macro.editButtonHint=Modifier la Macro
 ckeditor.plugin.macro.refreshFailed=La réactualisation du contenu édité a échoué.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insérer macro {0}
 

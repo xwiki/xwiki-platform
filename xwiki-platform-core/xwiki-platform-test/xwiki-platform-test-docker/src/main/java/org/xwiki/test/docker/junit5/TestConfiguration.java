@@ -128,105 +128,126 @@ public class TestConfiguration
         resolveProfiles();
     }
 
+    /**
+     * Utility method to choose the right enum value for a given enum class, between the annotation value and
+     * the property value.
+     * Current strategy is to prioritize the property value over the annotation value. Moreover, if the given system
+     * value is retrieved, the default value will be systematically used.
+     *
+     * @param enumType the type of the enum for which we want to retrieve a value.
+     * @param annotationValue the value contained in the {@link #uiTestAnnotation}.
+     * @param propertyName the name of the property which might contain a value for this enum.
+     * @param systemValue the value that is used to indicate to always use the property value or the default one.
+     * @param defaultValue the default value to fallback on.
+     * @param <T> type of the value necessarily extends enum.
+     * @return a value following the strategy described above.
+     */
+    private <T extends Enum> T useRightValue(Class<T> enumType, T annotationValue, String propertyName, T systemValue,
+        T defaultValue)
+    {
+        T result = annotationValue;
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue != null) {
+            result = (T) Enum.valueOf(enumType, propertyValue.toUpperCase());
+        }
+        if (result == null || result == systemValue) {
+            result = defaultValue;
+        }
+        return result;
+    }
+
+    /**
+     * Utility method to choose the right boolean value for a property between the annotation value and the property
+     * one. The current strategy is to prioritize the property over the annotation value.
+     *
+     * @param annotationValue the value retrieved from {@link #uiTestAnnotation}.
+     * @param propertyName the name of the property where the value might be stored.
+     * @param defaultValue the default value to fallback on.
+     * @return a boolean value following the strategy described above.
+     */
+    private Boolean useRightValue(Boolean annotationValue, String propertyName, Boolean defaultValue)
+    {
+        String propertyValue = System.getProperty(propertyName);
+
+        if (propertyValue != null) {
+            return Boolean.valueOf(propertyValue);
+        }
+        return annotationValue || defaultValue;
+    }
+
+    /**
+     * Utility method to choose the right string value for a property between the annotation value and the property one.
+     * The current strategy is to prioritize the property over the annotation value.
+     *
+     * @param annotationValue the value retrieved from {@link #uiTestAnnotation}.
+     * @param propertyName the name of the property where the value might be stored.
+     * @return a string value following the strategy described above.
+     */
+    private String useRightValue(String annotationValue, String propertyName)
+    {
+        String propertyValue = System.getProperty(propertyName);
+        if (StringUtils.isEmpty(propertyValue)) {
+            return annotationValue;
+        }
+        return propertyValue;
+    }
+
     private void resolveBrowser()
     {
-        Browser newBrowser = this.uiTestAnnotation.browser();
-        if (newBrowser == Browser.SYSTEM) {
-            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.FIREFOX.name()).toUpperCase());
-        }
-        this.browser = newBrowser;
+        this.browser = useRightValue(Browser.class, this.uiTestAnnotation.browser(), BROWSER_PROPERTY, Browser.SYSTEM,
+            Browser.FIREFOX);
     }
 
     private void resolveDatabase()
     {
-        Database newDatabase = this.uiTestAnnotation.database();
-        if (newDatabase == Database.SYSTEM) {
-            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY,
-                Database.HSQLDB_EMBEDDED.name()).toUpperCase());
-        }
-        this.database = newDatabase;
+        this.database = useRightValue(Database.class, this.uiTestAnnotation.database(), DATABASE_PROPERTY,
+            Database.SYSTEM, Database.HSQLDB_EMBEDDED);
     }
 
     private void resolveServletEngine()
     {
-        ServletEngine newServletEngine = this.uiTestAnnotation.servletEngine();
-        if (newServletEngine == ServletEngine.SYSTEM) {
-            newServletEngine = ServletEngine.valueOf(System.getProperty(SERVLETENGINE_PROPERTY,
-                ServletEngine.JETTY_STANDALONE.name()).toUpperCase());
-        }
-        this.servletEngine = newServletEngine;
+        this.servletEngine = useRightValue(ServletEngine.class, this.uiTestAnnotation.servletEngine(),
+            SERVLETENGINE_PROPERTY, ServletEngine.SYSTEM, ServletEngine.JETTY_STANDALONE);
     }
 
     private void resolveVerbose()
     {
-        boolean newVerbose = this.uiTestAnnotation.verbose();
-        if (!newVerbose) {
-            newVerbose = Boolean.valueOf(System.getProperty(VERBOSE_PROPERTY, FALSE));
-        }
-        this.verbose = newVerbose;
+        this.verbose = useRightValue(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY, false);
     }
 
     private void resolveDebug()
     {
-        boolean newDebug = this.uiTestAnnotation.debug();
-        if (!newDebug) {
-            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, FALSE));
-        }
-        this.debug = newDebug;
+        this.debug = useRightValue(this.uiTestAnnotation.debug(), DEBUG_PROPERTY, false);
     }
 
     private void resolveSaveDatabaseData()
     {
-        boolean newSaveDatabaseData = this.uiTestAnnotation.saveDatabaseData();
-        if (!newSaveDatabaseData) {
-            newSaveDatabaseData = Boolean.valueOf(System.getProperty(SAVEDBDATA_PROPERTY, FALSE));
-        }
-        this.saveDatabaseData = newSaveDatabaseData;
+        this.saveDatabaseData = useRightValue(this.uiTestAnnotation.saveDatabaseData(), SAVEDBDATA_PROPERTY, false);
     }
 
     private void resolveOffline()
     {
-        boolean newOffline = this.uiTestAnnotation.offline();
-        if (!newOffline) {
-            newOffline = Boolean.valueOf(System.getProperty(OFFLINE_PROPERTY, FALSE));
-        }
-        this.isOffline = newOffline;
+        this.isOffline = useRightValue(this.uiTestAnnotation.offline(), OFFLINE_PROPERTY, false);
     }
 
     private void resolveDatabaseTag()
     {
-        String newDatabaseTag = this.uiTestAnnotation.databaseTag();
-        if (StringUtils.isEmpty(newDatabaseTag)) {
-            newDatabaseTag = System.getProperty(DATABASETAG_PROPERTY);
-        }
-        this.databaseTag = newDatabaseTag;
+        this.databaseTag = useRightValue(this.uiTestAnnotation.databaseTag(), DATABASETAG_PROPERTY);
     }
 
     private void resolveServletEngineTag()
     {
-        String newServletEngineTag = this.uiTestAnnotation.servletEngineTag();
-        if (StringUtils.isEmpty(newServletEngineTag)) {
-            newServletEngineTag = System.getProperty(SERVLETENGINETAG_PROPERTY);
-        }
-        this.servletEngineTag = newServletEngineTag;
+        this.servletEngineTag = useRightValue(this.uiTestAnnotation.servletEngineTag(), SERVLETENGINETAG_PROPERTY);
     }
 
     private void resolveJDBCDriverVersion()
     {
-        String newJDBCDriverVersion = this.uiTestAnnotation.jdbcDriverVersion();
-        if (StringUtils.isEmpty(newJDBCDriverVersion)) {
-            newJDBCDriverVersion = System.getProperty(JDBCDRIVERVERSION_PROPERTY);
-        }
-        this.jdbcDriverVersion = newJDBCDriverVersion;
+        this.jdbcDriverVersion = useRightValue(this.uiTestAnnotation.jdbcDriverVersion(), JDBCDRIVERVERSION_PROPERTY);
     }
 
     private void resolveVNC()
     {
-        boolean newVNC = this.uiTestAnnotation.vnc();
-        if (newVNC) {
-            newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, TRUE));
-        }
-        this.vnc = newVNC;
+        this.vnc = useRightValue(this.uiTestAnnotation.vnc(), VNC_PROPERTY, true);
     }
 
     private void resolveProperties()

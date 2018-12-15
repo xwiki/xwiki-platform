@@ -38,13 +38,13 @@
   <hidden>true</hidden>
   <content>admin.ratings=Votes
 admin.ratings.activateratings=Activer les votes sur ce wiki
-admin.ratings.activateratingsinfo=Activer les votes sur ce Wiki affichera une note moyenne représentée par des étoiles en haut à droite de chaque document (sauf dans l'espace *XWiki*). Les utilisateurs connectés pourront voter pour les documents en sélectionnant les étoiles. Vous pouvez aussi activer les votes sur certains espaces uniquement, en utilisant *l'assistant panel*.
-admin.ratings.resetratings=Effacer tous les votes sur ce Wiki va remettre à zéro la note de tous les documents. Soyez conscient que cette opération est irréversible. Cette opération peut être longue si les documents et les votes sont nombreux.
+admin.ratings.activateratingsinfo=Activer les votes sur ce Wiki affichera une note moyenne représentée par des étoiles en haut à droite de chaque page (sauf dans l'espace *XWiki*). Les utilisateurs connectés pourront voter pour les pages en sélectionnant les étoiles. Vous pouvez aussi activer les votes sur certains espaces uniquement, en utilisant *l'assistant panneau* depuis l'administration.
+admin.ratings.resetratings=Effacer tous les votes sur ce Wiki va remettre à zéro la note de toutes les pages. Soyez conscient que cette opération est irréversible (sauf à restaurer chaque document unitairement). Par ailleurs cette opération peut être longue si les pages et les votes sont nombreux.
 admin.ratings.uninstallratings=Dé-installer l'application de gestion des votes va supprimer tous les documents composant l'application mais *conservera tous les votes*. Si, plus tard, vous réinstallez l'application les documents retrouverons les votes obtenus précédemment.
 admin.ratings.ratingsactivated=Les votes ont été activés
 admin.ratings.ratingsdeactivated=Les votes ont été désactivés
 admin.ratings.illegalrequest=Requête interdite
-rating.rate=Votez \!
+rating.rate=Votez !
 rating.yourvote=Votre vote
 rating.logintorate=Connectez-vous pour voter
 rating.novotes=Aucun vote

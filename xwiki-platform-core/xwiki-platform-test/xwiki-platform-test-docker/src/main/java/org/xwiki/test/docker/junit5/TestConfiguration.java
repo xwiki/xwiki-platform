@@ -43,10 +43,6 @@ public class TestConfiguration
 
     private static final String DEFAULT = "default";
 
-    private static final String TRUE = "true";
-
-    private static final String FALSE = "false";
-
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
 
     private static final String DATABASE_PROPERTY = "xwiki.test.ui.database";
@@ -129,125 +125,115 @@ public class TestConfiguration
     }
 
     /**
-     * Utility method to choose the right enum value for a given enum class, between the annotation value and
-     * the property value.
-     * Current strategy is to prioritize the property value over the annotation value. Moreover, if the given system
-     * value is retrieved, the default value will be systematically used.
+     * Resolve the passed Enum property by getting the value from the System property and if not found, from the
+     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
      *
-     * @param enumType the type of the enum for which we want to retrieve a value.
-     * @param annotationValue the value contained in the {@link #uiTestAnnotation}.
-     * @param propertyName the name of the property which might contain a value for this enum.
-     * @param systemValue the value that is used to indicate to always use the property value or the default one.
-     * @param defaultValue the default value to fallback on.
+     * @param enumType the type of the enum for which we want to resolve the value.
+     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
+     * @param propertyName the name of the System property key which might contain a value for this enum.
      * @param <T> type of the value necessarily extends enum.
-     * @return a value following the strategy described above.
+     * @return the resolved value following the strategy described above.
      */
-    private <T extends Enum> T useRightValue(Class<T> enumType, T annotationValue, String propertyName, T systemValue,
-        T defaultValue)
+    private <T extends Enum> T resolve(Class<T> enumType, T annotationValue, String propertyName)
     {
         T result = annotationValue;
         String propertyValue = System.getProperty(propertyName);
         if (propertyValue != null) {
             result = (T) Enum.valueOf(enumType, propertyValue.toUpperCase());
         }
-        if (result == null || result == systemValue) {
-            result = defaultValue;
+        return result;
+    }
+
+    /**
+     * Resolve the passed Boolean property by getting the value from the System property and if not found, from the
+     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
+     *
+     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
+     * @param propertyName the name of the System property key which might contain a value for this boolean.
+     * @return the resolved value following the strategy described above.
+     */
+    private Boolean resolve(Boolean annotationValue, String propertyName)
+    {
+        Boolean result = annotationValue;
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue != null) {
+            result = Boolean.valueOf(propertyValue);
         }
         return result;
     }
 
     /**
-     * Utility method to choose the right boolean value for a property between the annotation value and the property
-     * one. The current strategy is to prioritize the property over the annotation value.
+     * Resolve the passed String property by getting the value from the System property and if not found, from the
+     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
      *
-     * @param annotationValue the value retrieved from {@link #uiTestAnnotation}.
-     * @param propertyName the name of the property where the value might be stored.
-     * @param defaultValue the default value to fallback on.
-     * @return a boolean value following the strategy described above.
+     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
+     * @param propertyName the name of the System property key which might contain a value for this string.
+     * @return the resolved value following the strategy described above.
      */
-    private Boolean useRightValue(Boolean annotationValue, String propertyName, Boolean defaultValue)
+    private String resolve(String annotationValue, String propertyName)
     {
+        String result = annotationValue;
         String propertyValue = System.getProperty(propertyName);
-
-        if (propertyValue != null) {
-            return Boolean.valueOf(propertyValue);
+        if (!StringUtils.isEmpty(propertyValue)) {
+            result = propertyValue;
         }
-        return annotationValue || defaultValue;
-    }
-
-    /**
-     * Utility method to choose the right string value for a property between the annotation value and the property one.
-     * The current strategy is to prioritize the property over the annotation value.
-     *
-     * @param annotationValue the value retrieved from {@link #uiTestAnnotation}.
-     * @param propertyName the name of the property where the value might be stored.
-     * @return a string value following the strategy described above.
-     */
-    private String useRightValue(String annotationValue, String propertyName)
-    {
-        String propertyValue = System.getProperty(propertyName);
-        if (StringUtils.isEmpty(propertyValue)) {
-            return annotationValue;
-        }
-        return propertyValue;
+        return result;
     }
 
     private void resolveBrowser()
     {
-        this.browser = useRightValue(Browser.class, this.uiTestAnnotation.browser(), BROWSER_PROPERTY, Browser.SYSTEM,
-            Browser.FIREFOX);
+        this.browser = resolve(Browser.class, this.uiTestAnnotation.browser(), BROWSER_PROPERTY);
     }
 
     private void resolveDatabase()
     {
-        this.database = useRightValue(Database.class, this.uiTestAnnotation.database(), DATABASE_PROPERTY,
-            Database.SYSTEM, Database.HSQLDB_EMBEDDED);
+        this.database = resolve(Database.class, this.uiTestAnnotation.database(), DATABASE_PROPERTY);
     }
 
     private void resolveServletEngine()
     {
-        this.servletEngine = useRightValue(ServletEngine.class, this.uiTestAnnotation.servletEngine(),
-            SERVLETENGINE_PROPERTY, ServletEngine.SYSTEM, ServletEngine.JETTY_STANDALONE);
+        this.servletEngine = resolve(ServletEngine.class, this.uiTestAnnotation.servletEngine(),
+            SERVLETENGINE_PROPERTY);
     }
 
     private void resolveVerbose()
     {
-        this.verbose = useRightValue(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY, false);
+        this.verbose = resolve(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY);
     }
 
     private void resolveDebug()
     {
-        this.debug = useRightValue(this.uiTestAnnotation.debug(), DEBUG_PROPERTY, false);
+        this.debug = resolve(this.uiTestAnnotation.debug(), DEBUG_PROPERTY);
     }
 
     private void resolveSaveDatabaseData()
     {
-        this.saveDatabaseData = useRightValue(this.uiTestAnnotation.saveDatabaseData(), SAVEDBDATA_PROPERTY, false);
+        this.saveDatabaseData = resolve(this.uiTestAnnotation.saveDatabaseData(), SAVEDBDATA_PROPERTY);
     }
 
     private void resolveOffline()
     {
-        this.isOffline = useRightValue(this.uiTestAnnotation.offline(), OFFLINE_PROPERTY, false);
+        this.isOffline = resolve(this.uiTestAnnotation.offline(), OFFLINE_PROPERTY);
     }
 
     private void resolveDatabaseTag()
     {
-        this.databaseTag = useRightValue(this.uiTestAnnotation.databaseTag(), DATABASETAG_PROPERTY);
+        this.databaseTag = resolve(this.uiTestAnnotation.databaseTag(), DATABASETAG_PROPERTY);
     }
 
     private void resolveServletEngineTag()
     {
-        this.servletEngineTag = useRightValue(this.uiTestAnnotation.servletEngineTag(), SERVLETENGINETAG_PROPERTY);
+        this.servletEngineTag = resolve(this.uiTestAnnotation.servletEngineTag(), SERVLETENGINETAG_PROPERTY);
     }
 
     private void resolveJDBCDriverVersion()
     {
-        this.jdbcDriverVersion = useRightValue(this.uiTestAnnotation.jdbcDriverVersion(), JDBCDRIVERVERSION_PROPERTY);
+        this.jdbcDriverVersion = resolve(this.uiTestAnnotation.jdbcDriverVersion(), JDBCDRIVERVERSION_PROPERTY);
     }
 
     private void resolveVNC()
     {
-        this.vnc = useRightValue(this.uiTestAnnotation.vnc(), VNC_PROPERTY, true);
+        this.vnc = resolve(this.uiTestAnnotation.vnc(), VNC_PROPERTY);
     }
 
     private void resolveProperties()

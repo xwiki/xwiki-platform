@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.docker.junit5.database;
 
-import org.xwiki.test.docker.junit5.TestConfiguration;
-
 /**
  * The database to use for the UI tests.
  *
@@ -29,12 +27,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
  */
 public enum Database
 {
-    /**
-     * The browser is selected based on a system property value.
-     * @see TestConfiguration
-     */
-    SYSTEM,
-
     /**
      * Represents the MySQL database.
      */
@@ -74,7 +66,7 @@ public enum Database
 
     /**
      * @return the IP address to use to connect to the database (it can be different if the DB runs locally or in a
-     *         Docker container)
+     * Docker container)
      */
     public String getIP()
     {
@@ -90,8 +82,8 @@ public enum Database
     }
 
     /**
-     * @return the port to use to connect to the database (it can be different if the DB runs locally or in a
-     *         Docker container)
+     * @return the port to use to connect to the database (it can be different if the DB runs locally or in a Docker
+     * container)
      */
     public int getPort()
     {

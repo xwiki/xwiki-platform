@@ -20,7 +20,6 @@
 package org.xwiki.test.docker.junit5.browser;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 
 /**
  * The browser to use for the UI tests.
@@ -30,12 +29,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
  */
 public enum Browser
 {
-    /**
-     * The browser is selected based on a system property value.
-     * @see TestConfiguration
-     */
-    SYSTEM,
-
     /**
      * the Firefox Browser.
      */

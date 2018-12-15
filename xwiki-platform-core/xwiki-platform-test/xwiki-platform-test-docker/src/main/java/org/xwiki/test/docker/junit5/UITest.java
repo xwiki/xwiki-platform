@@ -48,19 +48,19 @@ public @interface UITest
     /**
      * @return the browser to use, see {@link Browser}
      */
-    Browser browser() default Browser.SYSTEM;
+    Browser browser() default Browser.FIREFOX;
 
     /**
      * @return the database to use, see {@link Database}
      * @since 10.9
      */
-    Database database() default Database.SYSTEM;
+    Database database() default Database.HSQLDB_EMBEDDED;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
      * @since 10.9
      */
-    ServletEngine servletEngine() default ServletEngine.SYSTEM;
+    ServletEngine servletEngine() default ServletEngine.JETTY_STANDALONE;
 
     /**
      * @return true if the test should output verbose console logs or not

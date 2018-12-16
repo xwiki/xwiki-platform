@@ -22,16 +22,23 @@ package org.xwiki.test.docker.junit5.servletEngine;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.ArtifactResolver;
 import org.xwiki.test.docker.junit5.MavenResolver;
 import org.xwiki.test.docker.junit5.RepositoryResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+
+import com.github.dockerjava.api.model.Image;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -43,6 +50,8 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class ServletContainerExecutor extends AbstractContainerExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServletContainerExecutor.class);
+
     private static final String LATEST = "latest";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
@@ -86,10 +95,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
-
-                String tomcatTag = String.format("tomcat:%s", this.testConfiguration.getServletEngineTag() != null
-                    ? this.testConfiguration.getServletEngineTag() : LATEST);
-                this.servletContainer = new GenericContainer<>(tomcatTag);
+                servletContainer = createServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/usr/local/tomcat/webapps/xwiki");
 
@@ -100,18 +106,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
                 break;
             case JETTY:
-                String jettyTag = String.format("jetty:%s", this.testConfiguration.getServletEngineTag() != null
-                    ? this.testConfiguration.getServletEngineTag() : LATEST);
-                this.servletContainer = new GenericContainer<>(jettyTag);
+                this.servletContainer = createServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/var/lib/jetty/webapps/xwiki");
 
                 break;
             case WILDFLY:
-                String wildflyTag = String.format("jboss/wildfly:%s",
-                    this.testConfiguration.getServletEngineTag() != null
-                        ? this.testConfiguration.getServletEngineTag() : LATEST);
-                this.servletContainer = new GenericContainer<>(wildflyTag);
+                this.servletContainer = createServletContainer(testConfiguration);
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
@@ -127,7 +128,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    this.testConfiguration.getServletEngine()));
+                    testConfiguration.getServletEngine()));
         }
 
         if (this.servletContainer != null) {
@@ -161,6 +162,54 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         start(this.servletContainer, this.testConfiguration);
+    }
+
+    private String getDockerImageTag(TestConfiguration testConfiguration)
+    {
+        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
+    }
+
+    private GenericContainer createServletContainer(TestConfiguration testConfiguration)
+    {
+        final String baseImageName = String.format("%s:%s", testConfiguration.getServletEngine().getDockerImageName(),
+            getDockerImageTag(testConfiguration));
+        final GenericContainer container;
+
+        if (testConfiguration.isOffice()) {
+            // We only build the image once for performance reason.
+            // So we provide a name to the image we will built and we check that the image does not exist yet.
+            String imageName = String.format("xwiki-%s-office:%s",
+                testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
+
+            List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
+                .withImageNameFilter(imageName).exec();
+
+            if (imageSearchResults.isEmpty()) {
+                LOGGER.info("(*) Build a dedicated image embedding libre office...");
+                // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
+                // at the end of the test container execution.
+                container = new GenericContainer(new ImageFromDockerfile(imageName, false)
+                    .withDockerfileFromBuilder(builder ->
+                        builder
+                            .from(baseImageName)
+                            .user("root")
+                            // This command is inspired from XWiki dockerfiles
+                            // see for example:
+                            // https://github.com/xwiki-contrib/docker-xwiki/blob/master/10/mysql-tomcat/Dockerfile
+                            .run("apt-get update && apt-get install -y"
+                                + " curl"
+                                + " libreoffice"
+                                + " unzip"
+                                + " procps")
+                            .build()));
+            } else {
+                container = new GenericContainer(imageName);
+            }
+        } else {
+            container = new GenericContainer(baseImageName);
+        }
+
+        return container;
     }
 
     /**

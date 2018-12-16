@@ -33,7 +33,6 @@
   <description>XWiki Platform - Office - Test -Parent POM</description>
   <modules>
     <module>xwiki-platform-office-test-pageobjects</module>
-    <module>xwiki-platform-office-test-tests</module>
   </modules>
   <properties>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
@@ -41,4 +40,12 @@
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-office-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

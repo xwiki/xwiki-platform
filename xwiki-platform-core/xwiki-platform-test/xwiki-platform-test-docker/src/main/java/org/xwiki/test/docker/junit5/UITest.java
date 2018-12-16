@@ -143,4 +143,10 @@ public @interface UITest
      * @since 10.11RC1
      */
     String[] profiles() default {};
+
+    /**
+     * @return true if an office docker container must be provided to run the tests.
+     * @since 10.11RC1
+     */
+    boolean office() default false;
 }

@@ -30,27 +30,27 @@ public enum ServletEngine
     /**
      * Represents the Tomcat Servlet engine.
      */
-    TOMCAT,
+    TOMCAT("tomcat"),
 
     /**
      * Represents the Jetty Servlet engine (running inside Docker).
      */
-    JETTY,
+    JETTY("jetty"),
 
     /**
      * Represents the Jetty Servlet engine but running outside of Docker.
      */
-    JETTY_STANDALONE(true),
+    JETTY_STANDALONE,
 
     /**
      * Represents the JBoss Wildfly engine.
      */
-    WILDFLY,
+    WILDFLY("jboss/wildfly"),
 
     /**
      * Represents an external Servlet Engine already configured and running (we won't start or stop it).
      */
-    EXTERNAL(true);
+    EXTERNAL;
 
     private static final String PERMANENT_DIRECTORY = "/var/local/xwiki";
 
@@ -64,14 +64,23 @@ public enum ServletEngine
 
     private int port;
 
-    ServletEngine()
+    private String dockerImageName;
+
+    /**
+     * Constructor for a Servlet Engine using a Docker image. This image must be available on DockerHub.
+     * @param dockerImageName the name of the docker image to use.
+     */
+    ServletEngine(String dockerImageName)
     {
-        // By default all servlet engines run inside docker containers.
+        this.dockerImageName = dockerImageName;
     }
 
-    ServletEngine(boolean isOutsideDocker)
+    /**
+     * Constructor for an external ServletEngine: in that case, it is running outside docker.
+     */
+    ServletEngine()
     {
-        this.isOutsideDocker = isOutsideDocker;
+        this.isOutsideDocker = true;
     }
 
     /**
@@ -155,5 +164,14 @@ public enum ServletEngine
     public String getPermanentDirectory()
     {
         return PERMANENT_DIRECTORY;
+    }
+
+    /**
+     * @return the Docker image name for this Servlet Engine. This image must be available on DockerHub.
+     * @since 10.11RC1
+     */
+    public String getDockerImageName()
+    {
+        return dockerImageName;
     }
 }

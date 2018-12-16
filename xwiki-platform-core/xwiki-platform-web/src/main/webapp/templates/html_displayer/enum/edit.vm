@@ -1,0 +1,17 @@
+#set ($enumValues = $displayer.value.values())
+#if (!$enumValues)
+  ## We attempt to read the list of enum values from the enum type, which is currently forbidden, but at least it will
+  ## generate a warning in the logs that will help us investigate the problem.
+  #set ($enumValues = $displayer.type.getEnumConstants())
+#end
+<select
+  #foreach ($parameter in $displayer.parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
+>
+  #foreach ($enumValue in $enumValues)
+    <option value="$escapetool.xml($enumValue)"#if ($enumValue == $displayer.value) selected#end>
+      $escapetool.xml($enumValue)
+    </option>
+  #end
+</select>

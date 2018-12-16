@@ -22,8 +22,10 @@ package org.xwiki.rendering.display.html.internal;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -45,7 +47,7 @@ import org.xwiki.template.TemplateManager;
  */
 @Component
 @Singleton
-public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
+public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
 {
     /**
      * Folder containing the HTML Displayers velocity templates.
@@ -70,7 +72,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Displays the value with the 'view' mode.
      */
     @Override
@@ -81,21 +83,23 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Displays the value with the 'view' mode.
      */
     @Override
-    public String display(Type type, Object value, Map parameters) throws HTMLDisplayerException
+    public String display(Type type, Object value, Map<String, String> parameters) throws HTMLDisplayerException
     {
         return display(type, value, parameters, "view");
     }
 
     @Override
-    public String display(Type type, Object value, Map parameters, String mode) throws HTMLDisplayerException
+    public String display(Type type, Object value, Map<String, String> parameters, String mode)
+        throws HTMLDisplayerException
     {
         ScriptContext scriptContext = scriptContextManager.getCurrentScriptContext();
         try {
             Map<String, Object> displayer = new HashMap<>();
+            displayer.put("type", type);
             displayer.put("value", value);
             displayer.put("parameters", parameters);
             displayer.put("mode", mode);
@@ -114,41 +118,67 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer
 
     /**
      * Computes the template name.
+     * <p>
      * The following names will be use in this priority order to find an existing template:
      * <ul>
-     *   <li>html_displayer/[type]/[mode].vm
-     *   <li>html_displayer/[type].vm
-     *   <li>html_displayer/[mode].vm
-     *   <li>html_displayer/default.vm
+     * <li>html_displayer/[type]/[mode].vm
+     * <li>html_displayer/[type].vm
+     * <li>html_displayer/[mode].vm
+     * <li>html_displayer/default.vm
      * </ul>
+     * 
      * @return the template name used to make the rendering
      */
-    private Template getTemplate(Type type, Object value, String mode) {
-        Template template = null;
-        String typeName = "";
-        if (type != null) {
-            if (type instanceof Class) {
-                typeName = ((Class) type).getSimpleName().toLowerCase();
-            } else {
-                typeName = type.getTypeName().toLowerCase();
-            }
-        } else if (value != null) {
-            typeName = value.getClass().getSimpleName().toLowerCase();
+    private Template getTemplate(Type type, Object value, String mode)
+    {
+        if (type != null || value == null) {
+            return getTemplate(type, mode);
+        } else {
+            return getTemplate(value.getClass(), mode);
         }
+    }
 
-        if (!typeName.isEmpty()) {
-            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + typeName + "/" + mode + TEMPLATE_EXTENSION);
-            if (template == null) {
-                template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + typeName + TEMPLATE_EXTENSION);
+    private Template getTemplate(Type type, String mode)
+    {
+        Template template = null;
+        for (String path : getTemplatePaths(type, mode)) {
+            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + path + TEMPLATE_EXTENSION);
+            if (template != null) {
+                break;
             }
-        }
-        if (template == null) {
-            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + mode + TEMPLATE_EXTENSION);
-        }
-        if (template == null) {
-            template = templateManager.getTemplate(TEMPLATE_FOLDER + '/' + "default" + TEMPLATE_EXTENSION);
         }
 
         return template;
+    }
+
+    private List<String> getTemplatePaths(Type type, String mode)
+    {
+        List<String> paths = new ArrayList<>();
+        for (String typeName : getTypeNames(type)) {
+            if (mode != null) {
+                paths.add(typeName + '/' + mode);
+            }
+            paths.add(typeName);
+        }
+        if (mode != null) {
+            paths.add(mode);
+        }
+        paths.add("default");
+        return paths;
+    }
+
+    private List<String> getTypeNames(Type type)
+    {
+        List<String> typeNames = new ArrayList<>();
+        if (type instanceof Class) {
+            Class<?> aClass = (Class<?>) type;
+            typeNames.add(aClass.getSimpleName().toLowerCase());
+            if (aClass.isEnum()) {
+                typeNames.add("enum");
+            }
+        } else if (type != null) {
+            typeNames.add(type.getTypeName().toLowerCase());
+        }
+        return typeNames;
     }
 }

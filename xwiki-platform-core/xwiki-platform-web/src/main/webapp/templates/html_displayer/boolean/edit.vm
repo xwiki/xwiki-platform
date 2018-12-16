@@ -1,0 +1,8 @@
+<input type="checkbox" value="true"
+  #if ("$!displayer.value" == 'true')checked#end
+  #foreach ($parameter in $displayer.parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
+/>
+## We need to submit something in case the checkbox is not checked.
+<input type="hidden" name="$!escapetool.xml($displayer.parameters.name)" value="false"/>

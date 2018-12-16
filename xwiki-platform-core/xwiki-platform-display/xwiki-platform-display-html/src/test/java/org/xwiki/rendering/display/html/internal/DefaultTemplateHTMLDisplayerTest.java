@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.displayer.HTMLDisplayerException;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
@@ -47,12 +48,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.displayer.HTMLDisplayer}.
+ * Unit tests for {@link DefaultTemplateHTMLDisplayer}.
  *
  * @version $Id$
  */
 @ComponentTest
-public class HTMLDisplayerTest
+public class DefaultTemplateHTMLDisplayerTest
 {
     @MockComponent
     private TemplateManager templateManager;
@@ -80,6 +81,18 @@ public class HTMLDisplayerTest
         this.defaultTemplateHTMLDisplayer.display(DocumentReference.class, documentReference);
         verify(this.templateManager).getTemplate("html_displayer/documentreference/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/documentreference.vm");
+        verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
+    
+    @Test
+    public void getTemplateForEnum() throws Exception
+    {
+        this.defaultTemplateHTMLDisplayer.display(EntityType.class, EntityType.DOCUMENT);
+        verify(this.templateManager).getTemplate("html_displayer/entitytype/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/entitytype.vm");
+        verify(this.templateManager).getTemplate("html_displayer/enum/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/enum.vm");
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/default.vm");
     }

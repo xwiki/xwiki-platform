@@ -46,13 +46,16 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Functional tests for the office importer.
- * By default these tests run with {@link ServletEngine#JETTY} servlet engine since they need libreoffice to be
- * installed, and we cannot guarantee that it is installed on the host machine.
+ * <p>
+ * By default these tests need to have XWiki running inside a Docker container (we chose Tomcat since it's the most
+ * used one), because they need LibreOffice to be installed, and we cannot guarantee that it is installed on the
+ * host machine.
  * 
  * @version $Id$
  * @since 7.3M1
  */
-@UITest(office = true, servletEngine = ServletEngine.JETTY, properties = {
+@UITest(office = true, servletEngine = ServletEngine.TOMCAT, properties = {
+    // Overridden to add the FileUploadPlugin which is needed by the test to upload some office files to import
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
         + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
         + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
@@ -62,18 +65,17 @@ import static org.junit.Assert.assertTrue;
 })
 public class OfficeImporterIT
 {
+    private TestUtils setup;
 
-    TestUtils testUtils;
-
-    TestConfiguration testConfiguration;
+    private TestConfiguration testConfiguration;
 
     @BeforeEach
-    public void setUp(TestUtils testUtils, TestConfiguration testConfiguration)
+    public void setUp(TestUtils setup, TestConfiguration testConfiguration)
     {
-        this.testUtils = testUtils;
+        this.setup = setup;
         this.testConfiguration = testConfiguration;
 
-        testUtils.loginAsSuperAdmin();
+        setup.loginAsSuperAdmin();
         // Connect the wiki to the office server if it is not already done
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         administrationPage.clickSection("Content", "Office Server");
@@ -110,7 +112,7 @@ public class OfficeImporterIT
      */
     private ViewPage importFile(String testName, String fileName, boolean splitByHeadings)
     {
-        ViewPage page = this.testUtils.gotoPage(
+        ViewPage page = this.setup.gotoPage(
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome"));
         CreatePagePage createPage = page.createPage();
         createPage.setType("office");
@@ -151,7 +153,7 @@ public class OfficeImporterIT
     {
         DocumentReference pageToDelete =
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome");
-        this.testUtils.deletePage(pageToDelete);
+        this.setup.deletePage(pageToDelete);
     }
 
     /**

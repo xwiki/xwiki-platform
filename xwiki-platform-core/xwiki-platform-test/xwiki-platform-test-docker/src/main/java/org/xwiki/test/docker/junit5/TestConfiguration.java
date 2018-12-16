@@ -105,6 +105,8 @@ public class TestConfiguration
 
     private boolean office;
 
+    private List<ServletEngine> forbiddenServletEngines;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -127,6 +129,7 @@ public class TestConfiguration
         resolveSSHPorts();
         resolveProfiles();
         resolveOffice();
+        resolveForbiddenServletEngines();
     }
 
     /**
@@ -300,6 +303,15 @@ public class TestConfiguration
             newProfiles.addAll(Arrays.asList(System.getProperty(PROFILES_PROPERTY, "").split(",")));
         }
         this.profiles = newProfiles;
+    }
+
+    private void resolveForbiddenServletEngines()
+    {
+        List<ServletEngine> newForbiddenServletEngines = new ArrayList<>();
+        if (this.uiTestAnnotation.forbiddenEngines().length > 0) {
+            newForbiddenServletEngines.addAll(Arrays.asList(this.uiTestAnnotation.forbiddenEngines()));
+        }
+        this.forbiddenServletEngines = newForbiddenServletEngines;
     }
 
     /**
@@ -484,5 +496,15 @@ public class TestConfiguration
     public boolean isOffice()
     {
         return this.office;
+    }
+
+    /**
+     * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
+     *         then the test will be skipped
+     * @since 10.11RC1
+     */
+    public List<ServletEngine> getForbiddenServletEngines()
+    {
+        return this.forbiddenServletEngines;
     }
 }

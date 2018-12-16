@@ -47,23 +47,27 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Functional tests for the office importer.
- * <p>
- * By default these tests need to have XWiki running inside a Docker container (we chose Tomcat since it's the most
- * used one), because they need LibreOffice to be installed, and we cannot guarantee that it is installed on the
- * host machine.
- * 
+ *
  * @version $Id$
  * @since 7.3M1
  */
-@UITest(office = true, servletEngine = ServletEngine.TOMCAT, properties = {
-    // Overridden to add the FileUploadPlugin which is needed by the test to upload some office files to import
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
-})
+@UITest(office = true, servletEngine = ServletEngine.TOMCAT,
+    forbiddenEngines = {
+        // These tests need to have XWiki running inside a Docker container (we chose Tomcat since it's the most
+        // used one), because they need LibreOffice to be installed, and we cannot guarantee that it is installed on the
+        // host machine.
+        ServletEngine.JETTY_STANDALONE
+    },
+    properties = {
+        // Overridden to add the FileUploadPlugin which is needed by the test to upload some office files to import
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    }
+)
 public class OfficeImporterIT
 {
     private TestUtils setup;

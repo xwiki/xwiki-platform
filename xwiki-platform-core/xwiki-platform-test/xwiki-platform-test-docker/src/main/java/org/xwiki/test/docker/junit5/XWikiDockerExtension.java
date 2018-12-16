@@ -25,6 +25,8 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
@@ -77,7 +79,7 @@ import com.google.common.primitives.Ints;
  * @since 10.6RC1
  */
 public class XWikiDockerExtension extends AbstractExtension implements BeforeAllCallback, AfterAllCallback,
-    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler
+    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler, ExecutionCondition
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
@@ -86,10 +88,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
-        TestConfiguration testConfiguration = new TestConfiguration(
-            extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
-        // Save the test configuration so that we can access it in afterAll()
-        saveTestConfiguration(extensionContext, testConfiguration);
+        // Note: TestConfiguration is created in evaluateExecutionCondition()à which executes before beforeAll()
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
         // "host.testcontainers.internal" host name.
@@ -229,6 +229,23 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         }
     }
 
+    @Override
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
+    {
+        TestConfiguration testConfiguration = new TestConfiguration(
+            extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
+        // Save the test configuration so that we can access it in afterAll()
+        saveTestConfiguration(extensionContext, testConfiguration);
+
+        // Skip the test if the Servlet Engine selected is in the forbidden list
+        if (isServletEngineForbidden(testConfiguration)) {
+            return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
+                testConfiguration.getServletEngine()));
+        } else {
+            return ConditionEvaluationResult.enabled("Servlet Engine [%s] is supported, continuing");
+        }
+    }
+
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext)
     {
@@ -319,5 +336,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private String computeXWikiURLPrefix(String ip, int port)
     {
         return String.format("http://%s:%s/xwiki", ip, port);
+    }
+
+    private boolean isServletEngineForbidden(TestConfiguration testConfiguration)
+    {
+        return testConfiguration.getForbiddenServletEngines().contains(testConfiguration.getServletEngine());
     }
 }

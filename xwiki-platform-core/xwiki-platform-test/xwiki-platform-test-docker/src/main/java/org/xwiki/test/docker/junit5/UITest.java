@@ -149,4 +149,11 @@ public @interface UITest
      * @since 10.11RC1
      */
     boolean office() default false;
+
+    /**
+     * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
+     *         then the test will be skipped
+     * @since 10.11RC1
+     */
+    ServletEngine[] forbiddenEngines() default {};
 }

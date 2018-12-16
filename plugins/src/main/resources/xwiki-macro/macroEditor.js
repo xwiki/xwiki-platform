@@ -84,6 +84,8 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     macroEditor.find('.macro-parameters').append(macroParameters.map(maybeDisplayMacroParameter));
     macroEditor.find('.more').click(toggleMacroParameters).click();
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
+    // Load the pickers.
+    $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
   },
 
   maybeSetParameterValue = function(parameter, macroCall) {
@@ -188,38 +190,34 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     return output;
   },
 
-  booleanValue = function(value) {
-    if (typeof value === 'string') {
-      return value === 'true';
-    } else {
-      return !!value;
-    }
-  },
-
   displayMacroParameterField = function(parameter) {
-    var field;
-    if (parameter.id === '$content') {
-      field = $('<textarea rows="7"/>');
-    } else if (parameter.type === 'boolean') {
-      field = $(
-        '<div>' +
-          '<input type="checkbox" value="true"/>' +
-          '<input type="hidden" value="false"/>' +
-        '</div>'
-      );
-      field.children('input').attr('name', parameter.id);
-      var checked = booleanValue(parameter.hasOwnProperty('value') ? parameter.value : parameter.defaultValue);
-      field.children('input[type=checkbox]').prop('checked', checked);
-    } else if (parameter.type === 'enum') {
-      field = $('<select/>');
-      field.append(parameter.values.map(function(value) {
-        return $('<option/>').attr('value', value.id).text(value.label);
-      }));
+    var field = $('<div/>').addClass('macro-parameter-field').html(parameter.editTemplate);
+    // Look for input elements whose name matches the parameter id.
+    var valueInputs = field.find(':input').filter(function() {
+      return $(this).attr('name') === parameter.id;
+    });
+    var firstInputType = valueInputs.prop('type');
+    var value = parameter.hasOwnProperty('value') ? parameter.value : parameter.defaultValue;
+    if (firstInputType === 'checkbox' || firstInputType === 'radio') {
+      // Keep only the input elements with the same type as the first one.
+      valueInputs = valueInputs.filter(function() {
+        return $(this).prop('type') === firstInputType;
+      });
     } else {
-      field = $('<input type="text"/>');
+      // Keep only the first input element.
+      valueInputs = valueInputs.first();
+      // For select inputs we should add the value to the list of options if it's missing.
+      if (value && valueInputs.is('select')) {
+        var found = valueInputs.find('option').filter(function() {
+          return $(this).val() === value;
+        }).length > 0;
+        if (!found) {
+          $('<option/>').val(value).text(value).appendTo(valueInputs);
+        }
+      }
     }
-    field.addClass('macro-parameter-field').filter(':input').attr('name', parameter.id)
-      .val(parameter.value || parameter.defaultValue);
+    // We pass the value as an array in order to properly handle radio inputs and checkboxes.
+    valueInputs.val([value]);
     return field;
   },
 
@@ -289,7 +287,7 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
       if (parameterDescriptor) {
         var value = formData[parameterId];
         if ($.isArray(value)) {
-          value = parameterDescriptor.type === 'boolean' ? value[0] : value.join();
+          value = parameterDescriptor.type === 'java.lang.Boolean' ? value[0] : value.join();
         }
         var defaultValue = parameterDescriptor.defaultValue;
         if (value !== '' && (defaultValue === undefined || defaultValue === null || (defaultValue + '') !== value)) {

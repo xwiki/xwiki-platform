@@ -159,7 +159,9 @@
       'description': "#maybeTranslate(""${macroTranslationKey}.content.description""
         $macroDescriptor.contentDescriptor.description)",
       'mandatory': $macroDescriptor.contentDescriptor.mandatory,
+      'defaultValue': $macroDescriptor.contentDescriptor.defaultValue,
       'type': "$!macroDescriptor.contentDescriptor.type",
+      'editTemplate': '&lt;textarea name="$content" rows="7"&gt;&lt;/textarea&gt;',
       'index': $macroDescriptor.parameterDescriptorMap.size()
     })
   #end
@@ -176,34 +178,49 @@
       'type': $parameterDescriptor.parameterType,
       'index': $foreach.index
     })
-    #if ($parameterDescriptor.parameterType.isEnum())
-      ## Collect the allowed parameter values.
-      #set ($translatedParameterDescriptor.type = 'enum')
-      #if ($parameterDescriptor.defaultValue)
-        #set ($parameterValues = $parameterDescriptor.defaultValue.values())
-      #else
-        ## A parameter of type enum that doesn't have a default value is very unlikely. We attempt to read the list of
-        ## possible values from the enum type in this case, which is currently forbidden, but at least it will generate
-        ## a warning in the logs that will help us investigate the problem.
-        #set ($parameterValues = $parameterDescriptor.parameterType.getEnumConstants())
-      #end
-      #set ($translatedParameterDescriptor.values = [])
-      ## Translate the allowed parameter values.
-      #foreach ($parameterValue in $parameterValues)
-        #set ($discard = $translatedParameterDescriptor.values.add({
-          'id': $parameterValue,
-          'label': "#maybeTranslate(""${parameterTranslationKey}.value.$parameterValue"" $parameterValue)"
-        }))
-      #end
-    #elseif (($parameterDescriptor.defaultValue == 'false' || $parameterDescriptor.defaultValue == 'true')
+    #if ($translatedParameterDescriptor.type.getName() == 'java.lang.String'
+        &amp;&amp; ($parameterDescriptor.defaultValue == 'false' || $parameterDescriptor.defaultValue == 'true')
         &amp;&amp; $macroDescriptor.parametersBeanClass.getSimpleName() == 'WikiMacroParameters')
-      #set ($translatedParameterDescriptor.type = 'boolean')
       #set ($translatedParameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
+      #set ($translatedParameterDescriptor.type = $translatedParameterDescriptor.defaultValue.getClass())
     #end
+    #set ($translatedParameterDescriptor.editTemplate = $services.display.html.display(
+      $translatedParameterDescriptor.type, $translatedParameterDescriptor.defaultValue,
+      {'name': $parameterDescriptor.id}, 'edit'))
+    #if ("$!translatedParameterDescriptor.editTemplate" == '')
+      #set ($translatedParameterDescriptor.editTemplate = "#getMacroParameterEditTemplate(
+        $translatedParameterDescriptor)")
+    #end
+    #set ($translatedParameterDescriptor.editTemplate = $translatedParameterDescriptor.editTemplate.trim())
     ## Make sure the key is lowercase (for XWiki &lt;9.0).
     ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
     ## descriptor map keys
     #set ($discard = $data.parameterDescriptorMap.put($entry.key.toLowerCase(), $translatedParameterDescriptor))
+  #end
+#end
+
+#macro (getMacroParameterEditTemplate $translatedParameterDescriptor)
+  #if ($translatedParameterDescriptor.type.getName() == 'java.lang.Boolean')
+    &lt;input type="checkbox" name="$escapetool.xml($translatedParameterDescriptor.id)" value="true"/&gt;##
+    ## We need to submit something in case the checkbox is not checked.
+    &lt;input type="hidden" name="$escapetool.xml($translatedParameterDescriptor.id)" value="false"/&gt;
+  #elseif ($translatedParameterDescriptor.type.isEnum())
+    #if ($translatedParameterDescriptor.defaultValue)
+      #set ($parameterValues = $translatedParameterDescriptor.defaultValue.values())
+    #else
+      ## A parameter of type enum that doesn't have a default value is very unlikely. We attempt to read the list of
+      ## possible values from the enum type in this case, which is currently forbidden, but at least it will generate
+      ## a warning in the logs that will help us investigate the problem.
+      #set ($parameterValues = $translatedParameterDescriptor.type.getEnumConstants())
+    #end
+    &lt;select name="$escapetool.xml($translatedParameterDescriptor.id)"&gt;##
+      #foreach ($parameterValue in $parameterValues)
+        #set ($label = "#maybeTranslate(""${parameterTranslationKey}.value.$parameterValue"" $parameterValue)")
+        &lt;option value="$escapetool.xml($parameterValue)"&gt;$escapetool.xml($label)&lt;/option&gt;##
+      #end
+    &lt;/select&gt;
+  #else
+    &lt;input type="text" name="$escapetool.xml($translatedParameterDescriptor.id)"/&gt;
   #end
 #end
 

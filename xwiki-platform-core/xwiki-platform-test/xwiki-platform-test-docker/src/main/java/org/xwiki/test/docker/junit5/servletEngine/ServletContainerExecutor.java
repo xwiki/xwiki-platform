@@ -185,7 +185,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 .withImageNameFilter(imageName).exec();
 
             if (imageSearchResults.isEmpty()) {
-                LOGGER.info("(*) Build a dedicated image embedding libre office...");
+                LOGGER.info("(*) Build a dedicated image embedding LibreOffice...");
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
                 container = new GenericContainer(new ImageFromDockerfile(imageName, false)

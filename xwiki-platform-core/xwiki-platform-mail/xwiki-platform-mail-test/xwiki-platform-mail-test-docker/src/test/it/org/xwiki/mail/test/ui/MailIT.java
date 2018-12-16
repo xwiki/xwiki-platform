@@ -37,8 +37,6 @@ import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -57,15 +55,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 6.4M2
  */
 @UITest(sshPorts = {
-        3025
-    },
+    // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
+    // by GreenMail running on the host.
+    3025
+},
     properties = {
+        // The Mail module contribures a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:MailIT\\..*"
     },
     extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib -->
         "org.xwiki.platform:xwiki-platform-mail-send-storage"
     }
 )
@@ -316,8 +319,8 @@ public class MailIT
         // the mail asynchronously was done.
         String velocity = "{{velocity}}\n"
             + "#set ($templateParameters = "
-            + "  {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
-            + "  'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
+                + "  {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
+                + "  'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + this.testClassName
                 + "', 'MailTemplate'))\n"
             + "#set ($parameters = {'hint' : 'template', 'source' : $templateReference, "
@@ -385,6 +388,6 @@ public class MailIT
         assertEquals(expectedMatchingCount, count,
             String.format("We got [%s] mails matching the expected content instead of [%s]. We were expecting "
                 + "the following content:\n%s\nWe got the following:\n%s", count, expectedMatchingCount,
-            expected.toString(), builder.toString()));
+                expected.toString(), builder.toString()));
     }
 }

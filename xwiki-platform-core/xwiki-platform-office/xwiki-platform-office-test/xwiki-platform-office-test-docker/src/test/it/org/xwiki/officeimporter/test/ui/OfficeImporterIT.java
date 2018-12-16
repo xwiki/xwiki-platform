@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeImporterPage;
@@ -87,83 +88,21 @@ public class OfficeImporterIT
         }
     }
 
-    /**
-     * Import an office file in the wiki.
-     * 
-     * @param fileName name of the file to import (the file should be located in test /resources/ folder)
-     * @return the result page
-     */
-    private ViewPage importFile(String testName, String fileName)
+    @Test
+    public void verifyImport(TestInfo info)
     {
-        return importFile(testName, fileName, false);
-    }
-
-    private File getResourceFile(String filename)
-    {
-        return new File(this.testConfiguration.getBrowser().getTestResourcesPath(), filename);
-    }
-
-    /**
-     * Import an office file in the wiki.
-     * 
-     * @param fileName name of the file to import (the file should be located in test /resources/ folder)
-     * @param splitByHeadings either the option splitByHeadings should be use or not
-     * @return the result page
-     */
-    private ViewPage importFile(String testName, String fileName, boolean splitByHeadings)
-    {
-        ViewPage page = this.setup.gotoPage(
-            new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome"));
-        CreatePagePage createPage = page.createPage();
-        createPage.setType("office");
-        createPage.clickCreate();
-
-        OfficeImporterPage officeImporterPage = new OfficeImporterPage();
-        File resourceFile = this.getResourceFile(fileName);
-        officeImporterPage.setFile(resourceFile);
-        officeImporterPage.setFilterStyle(true);
-        officeImporterPage.setSplitDocument(splitByHeadings);
-
-        OfficeImporterResultPage officeImporterResultPage = officeImporterPage.clickImport();
-        assertEquals("Conversion succeeded. You can view the result, or you can Go back to convert another document.",
-            officeImporterResultPage.getMessage());
-        return officeImporterResultPage.viewResult();
-    }
-
-    /**
-     * Delete a page with all its children.
-     * 
-     * @param pageToDelete the page to delete
-     */
-    private void deletePageWithChildren(ViewPage pageToDelete)
-    {
-        ConfirmationPage confirmationPage = pageToDelete.delete();
-        if (confirmationPage.hasAffectChildrenOption()) {
-            confirmationPage.setAffectChildren(true);
-        }
-        DeletingPage deletingPage = confirmationPage.confirmDeletePage();
-        deletingPage.waitUntilFinished();
-        assertTrue(deletingPage.isSuccess());
-    }
-
-    /**
-     * Delete the page created by the test.
-     */
-    private void deletePage(String testName)
-    {
-        DocumentReference pageToDelete =
-            new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome");
-        this.setup.deletePage(pageToDelete);
+        verifyImports(info);
+        verifySplitByHeadings(info);
+        verifyChildNamingMethodInputVisibility(info);
     }
 
     /**
      * A basic test that imports some documents and verify they are correctly imported TODO: do a more advanced check
      * about styling and content
      */
-    @Test
-    public void verifyImports(TestUtils testUtils)
+    private void verifyImports(TestInfo info)
     {
-        String testName = "verifyImports";
+        String testName = info.getTestMethod().get().getName();
         // Test word file
         ViewPage resultPage = importFile(testName, "msoffice.97-2003/Test.doc");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
@@ -205,50 +144,48 @@ public class OfficeImporterIT
         deletePage(testName);
     }
 
+    public void verifySplitByHeadings(TestInfo info)
+    {
+        String testName = info.getTestMethod().get().getName();
+        ViewPage resultPage = importFile(testName, "ToSplit.odt", true);
+        assertTrue(StringUtils.contains(resultPage.getContent(), "Introduction"));
+
+        // See children
+        verifyChild(testName, "First Part", "Hello, this is the first part of my story!");
+        verifyChild(testName, "Second Part", "This is the second part of my story!");
+        verifyChild(testName, "Last Part", "It's finished. Thanks you!");
+
+        // Go back to the parent
+        resultPage = this.setup.gotoPage(new DocumentReference("xwiki", getClass().getSimpleName(), testName));
+        deletePageWithChildren(resultPage);
+    }
+
     /**
      * Test if the expected child exists at the expected place (as a children of the target page).
      */
-    private void verifyChild(TestUtils testUtils, String testName, String expectedName, String expectedContent)
+    private void verifyChild(String testName, String expectedName, String expectedContent)
     {
-        ViewPage child = testUtils.gotoPage(
+        ViewPage child = this.setup.gotoPage(
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), expectedName));
         assertTrue(child.exists());
         assertEquals(expectedName, child.getDocumentTitle());
         assertTrue(StringUtils.contains(child.getContent(), expectedContent));
     }
 
-    @Test
-    public void verifySplitByHeadings(TestUtils testUtils)
-    {
-        String testName = "verifySplitByHeadings";
-        ViewPage resultPage = importFile(testName, "ToSplit.odt", true);
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Introduction"));
-
-        // See children
-        verifyChild(testUtils, testName, "First Part", "Hello, this is the first part of my story!");
-        verifyChild(testUtils, testName, "Second Part", "This is the second part of my story!");
-        verifyChild(testUtils, testName, "Last Part", "It's finished. Thanks you!");
-
-        // Go back to the parent
-        resultPage = testUtils.gotoPage(new DocumentReference("xwiki", getClass().getSimpleName(), testName));
-        deletePageWithChildren(resultPage);
-    }
-
     /**
      * Depending on if the target page is terminal or not, the "childNamingMethod" input is displayed or not.
      */
-    @Test
-    public void verifyChildNamingMethodInputVisibility(TestUtils testUtils)
+    public void verifyChildNamingMethodInputVisibility(TestInfo info)
     {
         DocumentReference testDocument =
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName()),
-                "verifyChildNamingMethodInputVisibility");
+                info.getTestMethod().get().getName());
 
         // Cleaning
-        testUtils.deletePage(testDocument);
+        this.setup.deletePage(testDocument);
 
         // 1: create a terminal page
-        CreatePagePage createPagePage = testUtils.gotoPage(testDocument).createPage();
+        CreatePagePage createPagePage = this.setup.gotoPage(testDocument).createPage();
         createPagePage.setType("office");
         createPagePage.setTerminalPage(true);
         createPagePage.clickCreate();
@@ -257,12 +194,81 @@ public class OfficeImporterIT
         assertTrue(officeImporterPage.isChildPagesNamingMethodDisplayed());
 
         // 2: create a non terminal page
-        createPagePage = testUtils.gotoPage(testDocument).createPage();
+        createPagePage = this.setup.gotoPage(testDocument).createPage();
         createPagePage.setType("office");
         createPagePage.setTerminalPage(false);
         createPagePage.clickCreate();
         officeImporterPage = new OfficeImporterPage();
         // Test
         assertFalse(officeImporterPage.isChildPagesNamingMethodDisplayed());
+    }
+
+    /**
+     * Import an office file in the wiki.
+     *
+     * @param fileName name of the file to import (the file should be located in test /resources/ folder)
+     * @return the result page
+     */
+    private ViewPage importFile(String testName, String fileName)
+    {
+        return importFile(testName, fileName, false);
+    }
+
+    private File getResourceFile(String filename)
+    {
+        return new File(this.testConfiguration.getBrowser().getTestResourcesPath(), filename);
+    }
+
+    /**
+     * Import an office file in the wiki.
+     *
+     * @param fileName name of the file to import (the file should be located in test /resources/ folder)
+     * @param splitByHeadings either the option splitByHeadings should be use or not
+     * @return the result page
+     */
+    private ViewPage importFile(String testName, String fileName, boolean splitByHeadings)
+    {
+        ViewPage page = this.setup.gotoPage(
+            new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome"));
+        CreatePagePage createPage = page.createPage();
+        createPage.setType("office");
+        createPage.clickCreate();
+
+        OfficeImporterPage officeImporterPage = new OfficeImporterPage();
+        File resourceFile = this.getResourceFile(fileName);
+        officeImporterPage.setFile(resourceFile);
+        officeImporterPage.setFilterStyle(true);
+        officeImporterPage.setSplitDocument(splitByHeadings);
+
+        OfficeImporterResultPage officeImporterResultPage = officeImporterPage.clickImport();
+        assertEquals("Conversion succeeded. You can view the result, or you can Go back to convert another document.",
+            officeImporterResultPage.getMessage());
+        return officeImporterResultPage.viewResult();
+    }
+
+    /**
+     * Delete a page with all its children.
+     *
+     * @param pageToDelete the page to delete
+     */
+    private void deletePageWithChildren(ViewPage pageToDelete)
+    {
+        ConfirmationPage confirmationPage = pageToDelete.delete();
+        if (confirmationPage.hasAffectChildrenOption()) {
+            confirmationPage.setAffectChildren(true);
+        }
+        DeletingPage deletingPage = confirmationPage.confirmDeletePage();
+        deletingPage.waitUntilFinished();
+        assertTrue(deletingPage.isSuccess());
+    }
+
+    /**
+     * Delete the page created by the test.
+     */
+    private void deletePage(String testName)
+    {
+        DocumentReference pageToDelete =
+            new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome");
+        this.setup.deletePage(pageToDelete);
     }
 }

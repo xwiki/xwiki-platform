@@ -69,13 +69,17 @@ require(["jquery"], function($) {
 
   var onMutations = function(mutations)
   {
-    mutations.forEach(function(mutation) {
-      mutation.addedNodes.forEach(function(element) {
+    for (var i = 0; i < mutations.length; i++) {
+      var mutation = mutations[i];
+
+      for (var j = 0; j < mutation.addedNodes.length; j++) {
+        var element = mutation.addedNodes[j];
+
         if (element.className == 'xwiki-async') {
           activateAsyncPlaceHolder(element);
         }
-      });
-    });
+      }
+    }
   }
 
   // Register a callback for when inserting an async placeholder in the DOM

@@ -40,7 +40,7 @@
 index.spacesMacro.spaceIndex.title=Viz obsah prostoru
 index.spacesMacro.spaceIndex.alt=Index prostoru
 index.spacesMacro.spaceAdministration.title=Viz administrace prostoru
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.alt=Administrovat prostor
 index.spacesMacro.createSpace.link=Vytvořit nový prostor
 index.spacesMacro.createSpace.defaultSpaceName=Jméno prostoru
 index.spacesMacro.createSpace.submit=Vytvořit

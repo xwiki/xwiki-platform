@@ -43,10 +43,6 @@ public class TestConfiguration
 
     private static final String DEFAULT = "default";
 
-    private static final String TRUE = "true";
-
-    private static final String FALSE = "false";
-
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
 
     private static final String DATABASE_PROPERTY = "xwiki.test.ui.database";
@@ -133,105 +129,116 @@ public class TestConfiguration
         resolveOffice();
     }
 
+    /**
+     * Resolve the passed Enum property by getting the value from the System property and if not found, from the
+     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
+     *
+     * @param enumType the type of the enum for which we want to resolve the value.
+     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
+     * @param propertyName the name of the System property key which might contain a value for this enum.
+     * @param <T> type of the value necessarily extends enum.
+     * @return the resolved value following the strategy described above.
+     */
+    private <T extends Enum> T resolve(Class<T> enumType, T annotationValue, String propertyName)
+    {
+        T result = annotationValue;
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue != null) {
+            result = (T) Enum.valueOf(enumType, propertyValue.toUpperCase());
+        }
+        return result;
+    }
+
+    /**
+     * Resolve the passed Boolean property by getting the value from the System property and if not found, from the
+     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
+     *
+     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
+     * @param propertyName the name of the System property key which might contain a value for this boolean.
+     * @return the resolved value following the strategy described above.
+     */
+    private Boolean resolve(Boolean annotationValue, String propertyName)
+    {
+        Boolean result = annotationValue;
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue != null) {
+            result = Boolean.valueOf(propertyValue);
+        }
+        return result;
+    }
+
+    /**
+     * Resolve the passed String property by getting the value from the System property and if not found, from the
+     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
+     *
+     * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
+     * @param propertyName the name of the System property key which might contain a value for this string.
+     * @return the resolved value following the strategy described above.
+     */
+    private String resolve(String annotationValue, String propertyName)
+    {
+        String result = StringUtils.isEmpty(annotationValue) ? null : annotationValue;
+        String propertyValue = System.getProperty(propertyName);
+        if (!StringUtils.isEmpty(propertyValue)) {
+            result = propertyValue;
+        }
+        return result;
+    }
+
     private void resolveBrowser()
     {
-        Browser newBrowser = this.uiTestAnnotation.browser();
-        if (newBrowser == Browser.SYSTEM) {
-            newBrowser = Browser.valueOf(System.getProperty(BROWSER_PROPERTY, Browser.FIREFOX.name()).toUpperCase());
-        }
-        this.browser = newBrowser;
+        this.browser = resolve(Browser.class, this.uiTestAnnotation.browser(), BROWSER_PROPERTY);
     }
 
     private void resolveDatabase()
     {
-        Database newDatabase = this.uiTestAnnotation.database();
-        if (newDatabase == Database.SYSTEM) {
-            newDatabase = Database.valueOf(System.getProperty(DATABASE_PROPERTY,
-                Database.HSQLDB_EMBEDDED.name()).toUpperCase());
-        }
-        this.database = newDatabase;
+        this.database = resolve(Database.class, this.uiTestAnnotation.database(), DATABASE_PROPERTY);
     }
 
     private void resolveServletEngine()
     {
-        ServletEngine newServletEngine = this.uiTestAnnotation.servletEngine();
-        if (newServletEngine == ServletEngine.SYSTEM) {
-            newServletEngine = ServletEngine.valueOf(System.getProperty(SERVLETENGINE_PROPERTY,
-                ServletEngine.JETTY_STANDALONE.name()).toUpperCase());
-        }
-        this.servletEngine = newServletEngine;
+        this.servletEngine = resolve(ServletEngine.class, this.uiTestAnnotation.servletEngine(),
+            SERVLETENGINE_PROPERTY);
     }
 
     private void resolveVerbose()
     {
-        boolean newVerbose = this.uiTestAnnotation.verbose();
-        if (!newVerbose) {
-            newVerbose = Boolean.valueOf(System.getProperty(VERBOSE_PROPERTY, FALSE));
-        }
-        this.verbose = newVerbose;
+        this.verbose = resolve(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY);
     }
 
     private void resolveDebug()
     {
-        boolean newDebug = this.uiTestAnnotation.debug();
-        if (!newDebug) {
-            newDebug = Boolean.valueOf(System.getProperty(DEBUG_PROPERTY, FALSE));
-        }
-        this.debug = newDebug;
+        this.debug = resolve(this.uiTestAnnotation.debug(), DEBUG_PROPERTY);
     }
 
     private void resolveSaveDatabaseData()
     {
-        boolean newSaveDatabaseData = this.uiTestAnnotation.saveDatabaseData();
-        if (!newSaveDatabaseData) {
-            newSaveDatabaseData = Boolean.valueOf(System.getProperty(SAVEDBDATA_PROPERTY, FALSE));
-        }
-        this.saveDatabaseData = newSaveDatabaseData;
+        this.saveDatabaseData = resolve(this.uiTestAnnotation.saveDatabaseData(), SAVEDBDATA_PROPERTY);
     }
 
     private void resolveOffline()
     {
-        boolean newOffline = this.uiTestAnnotation.offline();
-        if (!newOffline) {
-            newOffline = Boolean.valueOf(System.getProperty(OFFLINE_PROPERTY, FALSE));
-        }
-        this.isOffline = newOffline;
+        this.isOffline = resolve(this.uiTestAnnotation.offline(), OFFLINE_PROPERTY);
     }
 
     private void resolveDatabaseTag()
     {
-        String newDatabaseTag = this.uiTestAnnotation.databaseTag();
-        if (StringUtils.isEmpty(newDatabaseTag)) {
-            newDatabaseTag = System.getProperty(DATABASETAG_PROPERTY);
-        }
-        this.databaseTag = newDatabaseTag;
+        this.databaseTag = resolve(this.uiTestAnnotation.databaseTag(), DATABASETAG_PROPERTY);
     }
 
     private void resolveServletEngineTag()
     {
-        String newServletEngineTag = this.uiTestAnnotation.servletEngineTag();
-        if (StringUtils.isEmpty(newServletEngineTag)) {
-            newServletEngineTag = System.getProperty(SERVLETENGINETAG_PROPERTY);
-        }
-        this.servletEngineTag = newServletEngineTag;
+        this.servletEngineTag = resolve(this.uiTestAnnotation.servletEngineTag(), SERVLETENGINETAG_PROPERTY);
     }
 
     private void resolveJDBCDriverVersion()
     {
-        String newJDBCDriverVersion = this.uiTestAnnotation.jdbcDriverVersion();
-        if (StringUtils.isEmpty(newJDBCDriverVersion)) {
-            newJDBCDriverVersion = System.getProperty(JDBCDRIVERVERSION_PROPERTY);
-        }
-        this.jdbcDriverVersion = newJDBCDriverVersion;
+        this.jdbcDriverVersion = resolve(this.uiTestAnnotation.jdbcDriverVersion(), JDBCDRIVERVERSION_PROPERTY);
     }
 
     private void resolveVNC()
     {
-        boolean newVNC = this.uiTestAnnotation.vnc();
-        if (newVNC) {
-            newVNC = Boolean.valueOf(System.getProperty(VNC_PROPERTY, TRUE));
-        }
-        this.vnc = newVNC;
+        this.vnc = resolve(this.uiTestAnnotation.vnc(), VNC_PROPERTY);
     }
 
     private void resolveOffice()

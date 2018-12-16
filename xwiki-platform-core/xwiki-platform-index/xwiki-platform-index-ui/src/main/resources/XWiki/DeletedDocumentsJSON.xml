@@ -69,8 +69,8 @@ $response.setContentType('application/json')
   #if($dates.size() == 2)
     ## Date range matching
     #set($sql = "${sql} and ddoc.date between ? and ? ")
-    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[0]))))
-    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[1]))))
+    #set($discard = $params.add($datetool.toDate($mathtool.toNumber($dates[0]))))
+    #set($discard = $params.add($datetool.toDate($mathtool.toNumber($dates[1]))))
   #else
     ## Single value matching
     #set($sql = "${sql} and upper(str(ddoc.date)) like upper(str(?)) ")

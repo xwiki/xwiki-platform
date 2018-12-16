@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>panels.available=Liste des Panels
+  <content>panels.available=Panneaux disponibles
 panels.name=Nom
 panels.description=Description
 panels.type=Type

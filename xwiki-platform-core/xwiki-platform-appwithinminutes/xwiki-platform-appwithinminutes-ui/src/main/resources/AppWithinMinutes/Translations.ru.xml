@@ -48,7 +48,7 @@ platform.appwithinminutes.appsLiveTable._actions=Действия
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Предоставить права на администрирование раздела
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Создайте свое собственное\!
+platform.appwithinminutes.appPanelCreateEntry=Создайте свое собственное!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Шаг {0} — {1}
@@ -104,7 +104,7 @@ platform.appwithinminutes.classEditorUpdateTranslationsLabel=Обновить с
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Обновить перевод названий полей и список значений ({0}).
 
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Этот класс имеет несколько страниц класса.
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Класс содержить два поля с одинаковыми именами\: {0}
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Класс содержить два поля с одинаковыми именами: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Обновить значения по умолчанию
 platform.appwithinminutes.classEditorBindSheetSaveComment=Связать страницу класса
 platform.appwithinminutes.classEditorSheetSaveComment=Обновить страницу класса
@@ -126,7 +126,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Длинный текст
 platform.appwithinminutes.classEditorStringFieldName=Короткий текст
 platform.appwithinminutes.classEditorContentFieldName=Содержимое
 platform.appwithinminutes.classEditorTitleFieldName=Заголовок
-### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
+platform.appwithinminutes.classEditorPageFieldName=Страница
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Удалить
 platform.appwithinminutes.classEditorConfigureFieldLabel=Настройка
@@ -194,7 +194,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Обновить интер
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Для изменения порядка перемещайте мышью
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Удалить
 platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href\=""&gt;Да&lt;/a&gt; / &lt;a href\=""&gt;Нет&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Иконка
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
@@ -205,7 +205,7 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Удалить
 platform.appwithinminutes.appHomePageActionsHeading=Действия
 platform.appwithinminutes.appHomePageAddEntryLabel=Добавить
 platform.appwithinminutes.appHomePageAddEntryHint=Добавить новую запись
-platform.appwithinminutes.appHomePageEntryNameLabel=Название записи\:
+platform.appwithinminutes.appHomePageEntryNameLabel=Название записи:
 ### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
 platform.appwithinminutes.appHomePageEditAppLabel=Редактировать приложение
 platform.appwithinminutes.appHomePageTranslateAppLabel=Перевести приложение

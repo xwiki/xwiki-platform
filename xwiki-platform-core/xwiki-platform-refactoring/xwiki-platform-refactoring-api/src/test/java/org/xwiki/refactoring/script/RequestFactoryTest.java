@@ -198,7 +198,7 @@ public class RequestFactoryTest
             new DocumentReference("code", Arrays.asList("Model", "Entity"), "WebHome");
         CopyRequest copyRequest = requestFactory.createCopyRequest(source, destination);
         assertEquals(Arrays.asList(source), copyRequest.getEntityReferences());
-        assertEquals(destination, copyRequest.getDestination());
+        assertEquals(destination.getParent(), copyRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "copy"), copyRequest.getId().subList(0, 2));
         assertEquals(RefactoringJobs.COPY, copyRequest.getJobType());
         assertEquals(this.userReference, copyRequest.getUserReference());

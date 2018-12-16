@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.docker.junit5.servletEngine;
 
-import org.xwiki.test.docker.junit5.TestConfiguration;
-
 /**
  * The Servlet Engine to use for the UI tests.
  *
@@ -29,12 +27,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
  */
 public enum ServletEngine
 {
-    /**
-     * The Servlet Engine is selected based on a system property value.
-     * @see TestConfiguration#resolveServletEngine()
-     */
-    SYSTEM,
-
     /**
      * Represents the Tomcat Servlet engine.
      */
@@ -109,8 +101,8 @@ public enum ServletEngine
     }
 
     /**
-     * @return the IP address to use to connect to the Servlet Engine from the outside
-     *         (it is different if it runs locally or in a Docker container).
+     * @return the IP address to use to connect to the Servlet Engine from the outside (it is different if it runs
+     * locally or in a Docker container).
      * @since 10.11RC1
      */
     public String getIP()
@@ -128,8 +120,8 @@ public enum ServletEngine
     }
 
     /**
-     * @return the port to use to connect to the Servlet Engine from the outside
-     *         (it is different if it runs locally or in a Docker container)
+     * @return the port to use to connect to the Servlet Engine from the outside (it is different if it runs locally or
+     * in a Docker container)
      * @since 10.11RC1
      */
     public int getPort()
@@ -157,7 +149,7 @@ public enum ServletEngine
 
     /**
      * @return the port of the container from inside itself (it is different if it runs locally or in a Docker
-     *         container)
+     * container)
      * @since 10.11RC1
      */
     public int getInternalPort()

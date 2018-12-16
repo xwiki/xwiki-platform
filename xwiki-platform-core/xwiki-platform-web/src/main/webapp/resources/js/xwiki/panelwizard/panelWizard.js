@@ -617,15 +617,19 @@ function panelEditorInit() {
 // Listen to asynchronously panels
 panelsObserver = new MutationObserver(function(mutations)
 {
-  mutations.forEach(function(mutation) {
-    mutation.addedNodes.forEach(function(element) {
+  for (var i = 0; i < mutations.length; i++) {
+    var mutation = mutations[i];
+
+    for (var j = 0; j < mutation.addedNodes.length; j++) {
+      var element = mutation.addedNodes[j];
+
       if (element.tagName == 'DIV') {
         if (isPanel(element) && !isAttachedPanel(element)) {
           maybePanelEditorInit();
         }
       }
-    });
-  });
+    }
+  }
 });
 panelsObserver.observe(document, { childList: true, subtree : true});
 

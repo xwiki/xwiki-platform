@@ -21,6 +21,7 @@ package org.xwiki.rendering.async.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -75,7 +76,9 @@ public class AsyncRendererExecutorResponse
      */
     public String getJobIdHTTPPath()
     {
-        return getStatus().getRequest().getId().stream().map(this::encodeURL).collect(Collectors.joining("/"));
+        List<String> id = getStatus().getRequest().getId();
+
+        return id != null ? id.stream().map(this::encodeURL).collect(Collectors.joining("/")) : null;
     }
 
     private String encodeURL(String element)

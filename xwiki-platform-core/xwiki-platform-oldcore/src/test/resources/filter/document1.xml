@@ -250,6 +250,10 @@
                     <string>mimetype</string>
                     <string>text/plain</string>
                   </entry>
+                  <entry>
+                    <string>charset</string>
+                    <string>UTF-8</string>
+                  </entry>
                 </parameters>
               </p>
             </wikiAttachment>

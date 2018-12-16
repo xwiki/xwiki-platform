@@ -20,6 +20,7 @@
 package org.xwiki.rendering.async.internal;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -184,16 +185,23 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             // If async is disabled run the renderer in the current thread
             if (renderer.isCacheAllowed()) {
                 // Prepare to catch stuff to invalidate the cache
-                ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext) {
+                    ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                }
 
                 AsyncRendererResult result = renderer.render(false, true);
 
                 // Get suff to invalidate the cache
-                ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext) {
+                    ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
 
-                // Create a pseudo job status
-                status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),
-                    contextUse.getRoleTypes(), contextUse.getRoles(), contextUse.getUses());
+                    // Create a pseudo job status
+                    status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),
+                        contextUse.getRoleTypes(), contextUse.getRoles(), contextUse.getUses());
+                } else {
+                    // Create a pseudo job status
+                    status = new AsyncRendererJobStatus(request, result, null, null, null, null);
+                }
 
                 request.setId(jobId);
 
@@ -281,9 +289,57 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         id.addAll(rendererId);
         for (Map.Entry<String, Serializable> entry : orderedMap.entrySet()) {
             id.add(entry.getKey());
-            id.add(String.valueOf(entry.getValue()));
+            // We don't really need actual value so let's play it safe regarding values not well supported by
+            // application servers in URLs
+            id.add(encodeId(String.valueOf(entry.getValue())));
         }
 
         return id;
+    }
+
+    private String encodeId(String value)
+    {
+        StringBuilder builder = new StringBuilder(value.length() * 3);
+
+        for (int i = 0; i < value.length(); ++i) {
+            char c = value.charAt(i);
+
+            boolean encode = false;
+
+            switch (c) {
+                // '/' and '\' has been known to cause issues with various default server setup (Tomcat for example)
+                case '/':
+                case '\\':
+                    encode = true;
+
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (encode) {
+                encode(c, builder);
+            } else {
+                builder.append(c);
+            }
+        }
+
+        return builder.toString();
+    }
+
+    private void encode(char c, StringBuilder builder)
+    {
+        byte[] ba = String.valueOf(c).getBytes(StandardCharsets.UTF_8);
+
+        for (int j = 0; j < ba.length; j++) {
+            builder.append('%');
+
+            char ch = Character.forDigit((ba[j] >> 4) & 0xF, 16);
+            builder.append(ch);
+
+            ch = Character.forDigit(ba[j] & 0xF, 16);
+            builder.append(ch);
+        }
     }
 }

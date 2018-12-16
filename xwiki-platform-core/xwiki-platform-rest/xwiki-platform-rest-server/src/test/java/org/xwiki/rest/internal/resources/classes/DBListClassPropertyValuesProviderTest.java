@@ -20,7 +20,9 @@
 package org.xwiki.rest.internal.resources.classes;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.rest.XWikiRestException;
@@ -71,6 +74,9 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
     @MockComponent
     private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    protected QueryBuilder<DBListClass> allowedValuesQueryBuilder;
 
     @BeforeEach
     public void configure() throws Exception
@@ -170,5 +176,31 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         assertEquals(17L, values.getPropertyValues().get(0).getMetaData().get("count"));
         assertEquals("blue", values.getPropertyValues().get(1).getValue());
         assertEquals(21L, values.getPropertyValues().get(1).getMetaData().get("count"));
+    }
+
+    @Test
+    public void getValue() throws Exception
+    {
+        ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
+        when(this.authorExecutor.call(any(), any(), any()))
+                .thenAnswer(answer -> ((Callable) answer.getArgument(0)).call());
+
+        PropertyValue red = new PropertyValue();
+        red.setValue("red");
+        red.setMetaData(new HashMap<>());
+        red.getMetaData().put("label", "Red");
+
+        Query query = mock(Query.class);
+        QueryParameter queryParameter = mock(QueryParameter.class);
+        when(this.allowedValuesQueryBuilder.build(dbListClass)).thenReturn(query);
+        when(query.bindValue("text")).thenReturn(queryParameter);
+        when(queryParameter.literal("red")).thenReturn(queryParameter);
+        when(query.execute()).thenReturn(Collections.singletonList(new Object[] { "red", "Red" }));
+
+        PropertyValue propertyValue = this.provider.getValue(propertyReference, "red");
+        assertEquals(red.getValue(), propertyValue.getValue());
+        assertEquals(red.getMetaData(), propertyValue.getMetaData());
+
+        verify(query).addFilter(this.componentManager.getInstance(QueryFilter.class, "text"));
     }
 }

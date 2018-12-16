@@ -83,6 +83,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private StringBuffer requestURL;
 
+    private boolean daemon = true;
+
     public XWikiServletRequestStub()
     {
     }
@@ -676,5 +678,24 @@ public class XWikiServletRequestStub implements XWikiRequest
     public DispatcherType getDispatcherType()
     {
         return null;
+    }
+
+    /**
+     * @return true if the request is intended to be used in a long standing daemon thread (mails, etc.) and should not
+     *         be taken into account when generating a URL
+     * @since 10.11RC1
+     */
+    public boolean isDaemon()
+    {
+        return this.daemon;
+    }
+
+    /**
+     * @param daemon the daemon to set
+     * @since 10.11RC1
+     */
+    public void setDaemon(boolean daemon)
+    {
+        this.daemon = daemon;
     }
 }

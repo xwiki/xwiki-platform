@@ -24,7 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.query.QueryBuilder;
+import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.security.authorization.AuthorExecutor;
 
@@ -60,5 +63,27 @@ public class DBListClassPropertyValuesProvider extends AbstractListClassProperty
         return this.authorExecutor.call(
             () -> getValues(this.allowedValuesQueryBuilder.build(dbListClass), limit, filter, dbListClass),
             dbListClass.getOwnerDocument().getAuthorReference(), dbListClass.getDocumentReference());
+    }
+
+    @Override
+    public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue) throws XWikiRestException
+    {
+        PropertyValue propertyValue = null;
+        DBListClass dbListClass = getPropertyDefinition(propertyReference);
+        if (rawValue != null) {
+            try {
+                propertyValue = this.authorExecutor
+                        .call(() -> getValue(this.allowedValuesQueryBuilder.build(dbListClass), rawValue.toString(),
+                                dbListClass), dbListClass.getOwnerDocument().getAuthorReference(),
+                                dbListClass.getDocumentReference());
+            } catch (Exception e) {
+                throw new XWikiRestException(e);
+            }
+        }
+        if (propertyValue == null) {
+            propertyValue = super.getValue(propertyReference, rawValue);
+        }
+
+        return propertyValue;
     }
 }

@@ -47,7 +47,6 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.resource.annotations.Authenticate;
 
 /**
  * Async renderer resource handler.
@@ -58,7 +57,6 @@ import org.xwiki.resource.annotations.Authenticate;
 @Component
 @Named(AsyncRendererResourceReferenceHandler.HINT)
 @Singleton
-@Authenticate
 public class AsyncRendererResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
 {
     /**
@@ -129,7 +127,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     {
         // Send the result back
         Response response = this.container.getResponse();
-        response.setContentType("text/html");
+        response.setContentType("text/html; charset=utf-8");
 
         // Create the asynchronous HTML meta
         StringBuilder head = new StringBuilder();

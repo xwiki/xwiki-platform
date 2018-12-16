@@ -95,7 +95,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
                         + "java.util.logging.ConsoleHandler\n", writer);
                 }
-                servletContainer = createServletContainer(testConfiguration);
+                this.servletContainer = createServletContainer();
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/usr/local/tomcat/webapps/xwiki");
 
@@ -106,13 +106,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
                 break;
             case JETTY:
-                this.servletContainer = createServletContainer(testConfiguration);
+                this.servletContainer = createServletContainer();
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/var/lib/jetty/webapps/xwiki");
 
                 break;
             case WILDFLY:
-                this.servletContainer = createServletContainer(testConfiguration);
+                this.servletContainer = createServletContainer();
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/opt/jboss/wildfly/standalone/deployments/xwiki");
 
@@ -169,17 +169,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
     }
 
-    private GenericContainer createServletContainer(TestConfiguration testConfiguration)
+    private GenericContainer createServletContainer()
     {
-        final String baseImageName = String.format("%s:%s", testConfiguration.getServletEngine().getDockerImageName(),
-            getDockerImageTag(testConfiguration));
+        final String baseImageName = String.format("%s:%s",
+            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
         final GenericContainer container;
 
-        if (testConfiguration.isOffice()) {
+        if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
             // So we provide a name to the image we will built and we check that the image does not exist yet.
             String imageName = String.format("xwiki-%s-office:%s",
-                testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
+                this.testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
 
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
                 .withImageNameFilter(imageName).exec();

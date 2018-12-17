@@ -220,7 +220,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         for (XWikiAttachment revisionAttachment : doc.getAttachmentList()) {
             XWikiAttachment attachment = basedoc.getAttachment(revisionAttachment.getFilename());
 
-             if (attachment != null) {
+            if (attachment != null) {
                 revisionAttachment.setContentStore(attachment.getContentStore());
                 revisionAttachment.setArchiveStore(attachment.getArchiveStore());
             }

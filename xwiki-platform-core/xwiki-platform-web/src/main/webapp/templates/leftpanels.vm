@@ -4,7 +4,8 @@
 #set($xwikiPanelWidth = $leftPanelsWidth)
 #set($panelUixs = $services.uix.getExtensions('platform.panels.leftPanels'))
 #foreach($panelUix in $panelUixs)
-  #if($xwiki.hasAccessLevel('view', $panelUix.getId()))
+  #set($panelDocName = $panelUix.getDocumentReference())
+  #if($panelDocName && $services.security.authorization.hasAccess('view', $panelDocName))
     $services.rendering.render($panelUix.execute(), "html/5.0")
   #end
 #end

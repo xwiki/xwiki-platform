@@ -108,9 +108,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
         }
 
-        databaseContainer.addParameter("character-set-server", "utf8");
-        databaseContainer.addParameter("collation-server", "utf8_bin");
-        databaseContainer.addParameter("explicit-defaults-for-timestamp", "1");
+        databaseContainer.withCommand(
+            "--character-set-server=utf8 --collation-server=utf8_bin --explicit-defaults-for-timestamp=1");
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
     }

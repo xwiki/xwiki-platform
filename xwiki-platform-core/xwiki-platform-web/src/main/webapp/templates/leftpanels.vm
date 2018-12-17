@@ -4,10 +4,11 @@
 #set($xwikiPanelWidth = $leftPanelsWidth)
 #set($panelUixs = $services.uix.getExtensions('platform.panels.leftPanels'))
 #foreach($panelUix in $panelUixs)
-  ## We need to set this because the panelheader macro used in panels needs it
-  #set($paneldoc = $xwiki.getDocument($panelUix.getId()))
-  #if($paneldoc && $!xwiki.hasAccessLevel('view', $paneldoc))
-  $services.rendering.render($panelUix.execute(), "xhtml/1.0")
+  #set($panelDocName = $panelUix.getDocumentReference())
+  #if($panelDocName && $services.security.authorization.hasAccess('view', $panelDocName))
+    ## We need to set this because the panelheader macro used in panels needs it
+    #set($paneldoc = $xwiki.getDocument($panelDocName))
+    $services.rendering.render($panelUix.execute(), "html/5.0")
   #end
 #end
 </div>

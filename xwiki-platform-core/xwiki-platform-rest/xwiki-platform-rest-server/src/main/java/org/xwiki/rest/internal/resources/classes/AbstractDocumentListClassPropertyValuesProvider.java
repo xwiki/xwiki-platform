@@ -81,7 +81,6 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
         throws XWikiRestException
     {
         XWikiContext xcontext = xcontextProvider.get();
-        T propertyDefinition = getPropertyDefinition(propertyReference);
 
         String reference = "";
         if (rawValue != null) {
@@ -103,7 +102,6 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
         }
 
         propertyValue.setValue(reference);
-        propertyValue.getMetaData().put("freeText", propertyDefinition.getFreeText());
 
         return propertyValue;
     }

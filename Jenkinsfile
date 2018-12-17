@@ -55,7 +55,8 @@ stage ('Platform Builds') {
       // Build the Flavor Test POM, required for the pageobjects module below.
       buildFunctionalTest(
         name: 'Flavor Test - POM',
-        pom: 'pom.xml'
+        pom: 'pom.xml',
+        properties: '-N'
       )
 
       // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
@@ -164,6 +165,7 @@ def buildFunctionalTest(map)
     goals: 'clean deploy',
     profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
     mavenOpts: map.mavenOpts,
-    pom: "${sharedPOMPrefix}/${map.pom}"
+    pom: "${sharedPOMPrefix}/${map.pom}",
+    properties: map.properties
   )
 }

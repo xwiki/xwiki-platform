@@ -204,28 +204,28 @@
                     "old": "method org.xwiki.model.EntityType org.xwiki.rendering.macro.include.IncludeMacroParameters::getType()",
                     "new": "method org.xwiki.model.EntityType org.xwiki.rendering.macro.include.IncludeMacroParameters::getType()",
                     "annotation": "@org.xwiki.properties.annotation.PropertyGroup({\"stringReference\"})",
-                    "justification": "Handles conflicting macro parameters"
+                    "justification": "Handles conflicting macro parameters. This change is backward compatible."
                   },
                   {
                     "code": "java.annotation.added",
                     "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)",
                     "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
-                    "justification": "Handles conflicting macro parameters"
+                    "justification": "Handles conflicting macro parameters. This change is backward compatible."
                   },
                   {
                     "code": "java.annotation.added",
                     "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
                     "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
-                    "justification": "Handles conflicting macro parameters"
+                    "justification": "Handles conflicting macro parameters. This change is backward compatible."
                   },
                   {
                     "code": "java.annotation.added",
                     "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
                     "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyGroup({\"stringReference\"})",
-                    "justification": "Handles conflicting macro parameters"
+                    "justification": "Handles conflicting macro parameters. This change is backward compatible."
                   }
                 ]
               }

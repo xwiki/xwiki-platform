@@ -1070,7 +1070,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         boolean relationalStorage, String hqlQuery)
     {
         return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, hqlQuery, "",
-            ListClass.DISPLAYTYPE_INPUT, true);
+            ListClass.DISPLAYTYPE_INPUT, true, ListClass.FREE_TEXT_DISCOURAGED);
     }
 
     /**
@@ -1089,11 +1089,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param displayType either {@link ListClass#DISPLAYTYPE_CHECKBOX}, {@link ListClass#DISPLAYTYPE_INPUT},
      *            {@link ListClass#DISPLAYTYPE_RADIO} or {@link ListClass#DISPLAYTYPE_SELECT}
      * @param hasPicker enables auto suggestion display
+     * @param freeText indicate how non document reference values are handled (forbidden, discouraged or allowed)
      * @return true if the field has been added
      * @since 10.8RC1
      */
     public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
-        boolean relationalStorage, String hqlQuery, String className, String displayType, boolean hasPicker)
+            boolean relationalStorage, String hqlQuery, String className, String displayType, boolean hasPicker,
+            String freeText)
     {
         if (getField(fieldName) == null) {
             PageClass pageClass = new PageClass();
@@ -1107,6 +1109,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             pageClass.setPicker(hasPicker);
             pageClass.setObject(this);
             pageClass.setClassname(className);
+            pageClass.setFreeText(freeText);
             put(fieldName, pageClass);
 
             return true;

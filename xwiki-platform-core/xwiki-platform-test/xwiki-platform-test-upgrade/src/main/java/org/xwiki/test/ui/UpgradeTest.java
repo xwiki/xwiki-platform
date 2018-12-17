@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -104,20 +103,6 @@ public class UpgradeTest extends AbstractTest
     public static void init() throws Exception
     {
         XWikiExecutor executor = new XWikiExecutor(0);
-
-        /////////////////////
-        // Configure
-
-        PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
-
-        // Put self and Maven as extensions repository
-        properties.setProperty("extension.repositories",
-            "localmaven:maven:file://" + System.getProperty("user.home") + "/.m2/repository");
-        // Local Maven repository does not maintain any checksum and we don't want false positive warning in the install
-        // log
-        properties.setProperty("extension.repositories.localmaven.checksumPolicy", "ignore");
-
-        executor.saveXWikiProperties();
 
         /////////////////////
         // Init and start
@@ -288,7 +273,7 @@ public class UpgradeTest extends AbstractTest
             upgradeFlavor = upgradeFlavor.upgrade();
 
             // Make sure there hasn't been any error or warning during the install plan
-            assertNoErrorWarningLog("Unexpected error(s) found in the log during flavor install plan.",
+            assertNoErrorWarningLog("Unexpected error(s) or warning(s) found in the log during flavor install plan.",
                 upgradeFlavor.openProgressSection());
 
             // Confirm upgrade
@@ -308,7 +293,7 @@ public class UpgradeTest extends AbstractTest
             }
 
             // Make sure there hasn't been any error or warning during the install
-            assertNoErrorWarningLog("Unexpected error(s) found in the log during flavor install.",
+            assertNoErrorWarningLog("Unexpected error(s) or warning(s) found in the log during flavor install.",
                 upgradeFlavor.openProgressSection());
         } finally {
             getUtil().getDriver().setTimeout(timeout);
@@ -319,7 +304,7 @@ public class UpgradeTest extends AbstractTest
 
     private void assertNoErrorWarningLog(String message, ExtensionProgressPane progress)
     {
-        List<LogItemPane> logs = progress.getJobLog(LogLevel.ERROR);
+        List<LogItemPane> logs = progress.getJobLog(LogLevel.WARN, LogLevel.ERROR);
 
         if (!logs.isEmpty()) {
             fail("First one is [" + logs.get(0).getMessage() + "]");

@@ -64,7 +64,7 @@
       <type>xar</type>
       <scope>test</scope>
     </dependency>
-    <!-- Pull the XIP package which will trigger all optional dependencies -->
+    <!-- The flavor to upgrade to -->
     <dependency>
       <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
       <artifactId>${xwikiExecutionXIPArtifactId}</artifactId>
@@ -123,6 +123,27 @@
                   </artifactItem>
                 </artifactItems>
                 <outputDirectory>${xwikiExecutionDirectory}/data/</outputDirectory>
+                <!-- Allow skipping the unpack -->
+                <skip>${xwiki.test.skipUnpack}</skip>
+              </configuration>
+            </execution>
+            <!-- Unpack new flavor extensions -->
+            <execution>
+              <id>unzip-flavor</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
+                    <artifactId>${xwikiExecutionXIPArtifactId}</artifactId>
+                    <version>${project.version}</version>
+                    <type>xip</type>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${xwikiExecutionDirectory}/data/extension/repository</outputDirectory>
                 <!-- Allow skipping the unpack -->
                 <skip>${xwiki.test.skipUnpack}</skip>
               </configuration>

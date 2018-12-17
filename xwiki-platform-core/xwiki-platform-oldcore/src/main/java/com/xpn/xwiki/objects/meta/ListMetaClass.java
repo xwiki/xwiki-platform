@@ -96,7 +96,7 @@ public class ListMetaClass extends PropertyMetaClass
         StaticListClass freeTextClass = new StaticListClass(this);
         freeTextClass.setName("freeText");
         freeTextClass.setPrettyName("Free text");
-        freeTextClass.setValues("forbidden|discouraged|allowed");
+        freeTextClass.setValues("discouraged|forbidden|allowed");
         safeput(freeTextClass.getName(), freeTextClass);
     }
 

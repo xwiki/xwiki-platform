@@ -1072,6 +1072,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText>allowed</freeText>
         <hint/>
         <idField/>
         <multiSelect>0</multiSelect>

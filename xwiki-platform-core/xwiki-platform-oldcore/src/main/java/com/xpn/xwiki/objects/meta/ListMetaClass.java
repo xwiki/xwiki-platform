@@ -91,6 +91,13 @@ public class ListMetaClass extends PropertyMetaClass
         sortClass.setPrettyName("Sort");
         sortClass.setValues("none|id|value");
         safeput(sortClass.getName(), sortClass);
+
+
+        StaticListClass freeTextClass = new StaticListClass(this);
+        freeTextClass.setName("freeText");
+        freeTextClass.setPrettyName("Free text");
+        freeTextClass.setValues("discouraged|forbidden|allowed");
+        safeput(freeTextClass.getName(), freeTextClass);
     }
 
     /**

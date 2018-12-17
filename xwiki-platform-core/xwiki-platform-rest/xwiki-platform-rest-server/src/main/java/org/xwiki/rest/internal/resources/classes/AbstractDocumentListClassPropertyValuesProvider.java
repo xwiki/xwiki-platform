@@ -80,6 +80,9 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
         throws XWikiRestException
     {
+        XWikiContext xcontext = xcontextProvider.get();
+        T propertyDefinition = getPropertyDefinition(propertyReference);
+
         String reference = "";
         if (rawValue != null) {
             reference = rawValue.toString();
@@ -89,10 +92,18 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
         }
 
         DocumentReference documentReference = this.documentReferenceResolver.resolve(reference, propertyReference);
-        PropertyValue propertyValue = super.getValue(propertyReference, documentReference);
-        if (propertyValue != null) {
-            propertyValue.setValue(reference);
+
+        PropertyValue propertyValue = null;
+        if (xcontext.getWiki().exists(documentReference, xcontext)) {
+            propertyValue = super.getValue(propertyReference, documentReference);
         }
+
+        if (propertyValue == null) {
+            propertyValue = new PropertyValue();
+        }
+
+        propertyValue.setValue(reference);
+        propertyValue.getMetaData().put("freeText", propertyDefinition.getFreeText());
 
         return propertyValue;
     }

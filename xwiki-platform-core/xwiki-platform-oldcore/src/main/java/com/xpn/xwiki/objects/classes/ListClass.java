@@ -87,6 +87,21 @@ public abstract class ListClass extends PropertyClass
      */
     public static final char SEPARATOR_ESCAPE = '\\';
 
+    /**
+     * @since 10.11RC1
+     */
+    public static final String FREE_TEXT_DISCOURAGED = "discouraged";
+
+    /**
+     * @since 10.11RC1
+     */
+    public static final String FREE_TEXT_FORBIDDEN = "forbidden";
+
+    /**
+     * @since 10.11RC1
+     */
+    public static final String FREE_TEXT_ALLOWED = "allowed";
+
     private static final String XCLASSNAME = "list";
 
     /**
@@ -269,6 +284,25 @@ public abstract class ListClass extends PropertyClass
     public void setDefaultValue(String separator)
     {
         setStringValue("defaultValue", separator);
+    }
+
+
+    /**
+     * @return the value of freeText (forbidden, discouraged or allowed)
+     * @since 10.11RC1
+     */
+    public String getFreeText()
+    {
+        return getStringValue("freeText");
+    }
+
+    /**
+     * @param type the value of freeText (forbidden, discouraged or allowed)
+     * @since 10.11RC1
+     */
+    public void setFreeText(String type)
+    {
+        setStringValue("freeText", type);
     }
 
     /**

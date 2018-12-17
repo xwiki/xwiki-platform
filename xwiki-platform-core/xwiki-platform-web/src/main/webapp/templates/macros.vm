@@ -2573,6 +2573,7 @@ Recursive title display detected!##
   #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
     {'forceSkinAction': true, 'language': $xcontext.locale}))
   #set ($id = "${prefix}${name}")
+  #set ($freeText = $!field.getValue('freeText'))
   #set ($parameters = {
     'id': $id,
     'name': $id,
@@ -2581,6 +2582,10 @@ Recursive title display detected!##
     'data-className': $field.className,
     'data-propertyName': $name
   })
+  #if ("$!freeText" != '')
+    #set ($discard = $parameters.put('data-freeText', $freeText))
+  #end
+
   #if ($field.getProperty('disabled').value == 1)
     #set ($parameters.disabled = 'disabled')
   #end

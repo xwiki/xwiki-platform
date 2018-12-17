@@ -113,7 +113,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
         xclass.addPageField("skin", "Skin", 30, false, false, "", "XWiki.XWikiSkins", ListClass.DISPLAYTYPE_INPUT,
-                true);
+                true, ListClass.FREE_TEXT_ALLOWED);
         xclass.addDBListField("colorTheme", "Color theme",
             "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
                 + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "

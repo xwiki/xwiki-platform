@@ -173,15 +173,33 @@
     <property>
       <content>{{velocity}}
 #set ($void = $services.async.useEntity("wiki:$xcontext.database"))
-#set ($query = $services.query.xwql('where doc.author = :author order by doc.date desc'))
+#set ($query = $services.query.xwql('select doc.fullName, doc.language from Document doc where doc.author = :author order by doc.date desc'))
 #set ($recentDocs = $query.addFilter('hidden').addFilter('unique').bindValue('author', $xcontext.user).setLimit(5).execute())
+## We count the occurence of a document to specify the document language when there are duplicates
+#set ($docNamesCounter = {})
+#foreach ($doc in $recentDocs)
+  #if ($docNamesCounter.containsKey($doc[0]))
+    #set ($docNamesCounter[$doc[0]] = $docNamesCounter[$doc[0]] + 1)
+  #else
+    #set ($docNamesCounter[$doc[0]] = 1)
+  #end
+#end
 #if ($recentDocs.size() &gt; 0 || $showEmptyPanels)
   #panelheader($services.localization.render('xe.panels.modifications.my'))
-  #foreach ($docName in $recentDocs)
-    #set ($recentDoc = $xwiki.getDocument($docName).getTranslatedDocument())
+  #foreach ($recentDocResult in $recentDocs)
+    #set ($recentDoc = $xwiki.getDocument($recentDocResult[0]).getTranslatedDocument($recentDocResult[1]))
     #if ($recentDoc)
+      #set ($docLocale = $recentDoc.locale)
+      #if ("$docLocale" == '')
+        #set ($docLocale = $recentDoc.defaultLocale)
+      #end
+      #if ("$docLocale" != '' &amp;&amp; $docLocale != $xcontext.locale)
+        #set ($docUrl = $recentDoc.getURL('view', "language=${docLocale}"))
+      #else
+        #set ($docUrl = $recentDoc.getURL())
+      #end
       ## We use HTML here because we don't have a tool to escape wiki syntax in document title.
-      * {{html}}&lt;a href="$recentDoc.getURL()"&gt;$escapetool.xml($recentDoc.plainTitle)&lt;/a&gt;{{/html}}
+      * {{html}}&lt;a href="${docUrl}"&gt;$escapetool.xml($recentDoc.plainTitle)#if ($docNamesCounter[$recentDocResult[0]] &gt; 1) &lt;em&gt;($docLocale)&lt;/em&gt;#end&lt;/a&gt;{{/html}}
     #end
   #end
   #panelfooter()

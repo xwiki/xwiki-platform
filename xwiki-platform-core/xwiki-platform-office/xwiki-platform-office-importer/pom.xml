@@ -80,7 +80,7 @@
     <dependency>
       <groupId>org.jodconverter</groupId>
       <artifactId>jodconverter-local</artifactId>
-      <version>4.2.2-SNAPSHOT</version>
+      <version>4.2.2</version>
     </dependency>
     <dependency>
       <!--

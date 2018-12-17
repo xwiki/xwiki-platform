@@ -38,11 +38,6 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserContainerExecutor.class);
 
     /**
-     * This path represents the standard path where the test-resources are stored with Maven after test compilation.
-     */
-    private static final String TEST_RESOURCES_HOST_PATH = "target/test-classes";
-
-    /**
      * Create and start the {@link BrowserWebDriverContainer} based on the test given test configuration.
      *
      * @param testConfiguration the configuration used to parameterize this container.
@@ -62,9 +57,11 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
 
             // In case some test-resources are provided, they need to be available from the browser
             // for example in order to upload some files on the wiki.
-            .withFileSystemBind(TEST_RESOURCES_HOST_PATH, browser.getTestResourcesPath());
+            .withFileSystemBind(getTestResourcePathOnHost(testConfiguration), browser.getTestResourcesPath());
 
         if (testConfiguration.isVerbose()) {
+            LOGGER.info(String.format("Test resource path mapped: On Host [%s], in Docker: [%s]",
+                getTestResourcePathOnHost(testConfiguration), browser.getTestResourcesPath()));
             LOGGER.info(String.format("Docker image used: [%s]",
                 BrowserWebDriverContainer.getImageForCapabilities(testConfiguration.getBrowser().getCapabilities())));
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
@@ -77,5 +74,20 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         }
 
         return webDriverContainer;
+    }
+
+    /**
+     * @return the path where the test resources are stored by Maven after test compilation, on the host.
+     */
+    private String getTestResourcePathOnHost(TestConfiguration testConfiguration)
+    {
+        String testClassesDirectory;
+        String mavenBuildDir = System.getProperty("maven.build.dir");
+        if (mavenBuildDir == null) {
+            testClassesDirectory = "target/test-classes";
+        } else {
+            testClassesDirectory = String.format("%s/test-classes", testConfiguration.getOutputDirectory());
+        }
+        return testClassesDirectory;
     }
 }

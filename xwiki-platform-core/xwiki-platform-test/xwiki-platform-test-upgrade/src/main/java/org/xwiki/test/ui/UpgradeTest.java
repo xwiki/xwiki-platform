@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,6 +104,16 @@ public class UpgradeTest extends AbstractTest
     public static void init() throws Exception
     {
         XWikiExecutor executor = new XWikiExecutor(0);
+
+        /////////////////////
+        // Configure
+
+        PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
+
+        // Disable extension repositories to make sure it only look at local extensions
+        properties.setProperty("extension.repositories", "");
+
+        executor.saveXWikiProperties();
 
         /////////////////////
         // Init and start

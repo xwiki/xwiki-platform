@@ -45,7 +45,7 @@ public class XWikiWatchdog
      *         allowing the caller to know if the XWiki instance is up or not
      * @throws Exception if a thread has interrupted the thread in which this code is executing
      */
-    public WatchdogResponse isXWikiStarted(String url, int timeout) throws Exception
+    public WatchdogResponse isXWikiStarted(String url, long timeout) throws Exception
     {
         HttpClient client = new HttpClient();
 

@@ -105,6 +105,9 @@ public class UpgradeTest extends AbstractTest
     {
         XWikiExecutor executor = new XWikiExecutor(0);
 
+        // Initializing XWiki takes longer with the migrations
+        executor.setTimeoutSeconds(300);
+
         /////////////////////
         // Configure
 

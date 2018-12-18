@@ -53,8 +53,8 @@ import org.slf4j.LoggerFactory;
 public class XWikiExecutor
 {
     /**
-     * Only start XWiki if the System property {@code xwiki.test.startXWiki} is undefined or has a value of true.
-     * This allows the build to start XWiki (this is the case for example when running functional tests with Docker).
+     * Only start XWiki if the System property {@code xwiki.test.startXWiki} is undefined or has a value of true. This
+     * allows the build to start XWiki (this is the case for example when running functional tests with Docker).
      */
     private static final boolean SHOULD_START_XWIKI =
         Boolean.valueOf(System.getProperty("xwiki.test.startXWiki", "true"));
@@ -97,8 +97,6 @@ public class XWikiExecutor
 
     private static final String XWIKIPROPERTIES_PATH = WEBINF_PATH + "/xwiki.properties";
 
-    private static final int TIMEOUT_SECONDS = 120;
-
     private static final long PROCESS_FINISH_TIMEOUT = 5 * 60L * 1000L;
 
     private static final int VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT =
@@ -129,6 +127,8 @@ public class XWikiExecutor
     private boolean managed;
 
     private XWikiWatchdog watchdog = new XWikiWatchdog();
+
+    private long startTimeout = 120;
 
     public XWikiExecutor(int index)
     {
@@ -196,6 +196,16 @@ public class XWikiExecutor
         addEnvironmentVariable("XWIKI_OPTS", opts);
     }
 
+    /**
+     * Change the timeout checked when starting and initializing XWiki.
+     * 
+     * @since 10.11RC1
+     */
+    public void setTimeoutSeconds(long timeoutSeconds)
+    {
+        this.startTimeout = timeoutSeconds;
+    }
+
     public void addEnvironmentVariable(String key, String value)
     {
         this.environment.put(key, value);
@@ -214,11 +224,11 @@ public class XWikiExecutor
     /**
      * Start XWiki using the following strategy:
      * <ul>
-     *   <li>If the {@code xwiki.test.startXWiki} system property is set to "false" then don't start/stop XWiki</li>
-     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
-     *       running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
-     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance
-     *       is already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
+     * <li>If the {@code xwiki.test.startXWiki} system property is set to "false" then don't start/stop XWiki</li>
+     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
+     * running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
+     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance is
+     * already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
      * </ul>
      * 
      * @throws Exception when failing to start XWiki
@@ -315,10 +325,10 @@ public class XWikiExecutor
         // Wait till the main page becomes available which means the server is started fine
         LOGGER.info("Checking that XWiki is up and running...");
 
-        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), TIMEOUT_SECONDS);
+        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), this.startTimeout);
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
-                TIMEOUT_SECONDS, response.responseCode, new String(response.responseBody));
+                this.startTimeout, response.responseCode, new String(response.responseBody));
             LOGGER.info(message);
             stop();
             throw new RuntimeException(message);

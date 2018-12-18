@@ -19,7 +19,12 @@
  */
 package org.xwiki.wiki.test.ui;
 
+import java.util.List;
+
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.runner.RunWith;
+import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.XWikiExecutorSuite;
 import org.xwiki.test.ui.PageObjectSuite;
 
 /**
@@ -31,4 +36,20 @@ import org.xwiki.test.ui.PageObjectSuite;
 @RunWith(PageObjectSuite.class)
 public class AllTests
 {
+    @XWikiExecutorSuite.PreStart
+    public void preStart(List<XWikiExecutor> executors) throws Exception
+    {
+        XWikiExecutor executor = executors.get(0);
+
+        PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
+
+        // Put local Maven as extensions repository to speed up resolution
+        properties.setProperty("extension.repositories",
+            "localmaven:maven:file://" + System.getProperty("user.home") + "/.m2/repository");
+        // Local Maven repository does not maintain any checksum and we don't want false positive warning in the install
+        // log
+        properties.setProperty("extension.repositories.localmaven.checksumPolicy", "ignore");
+
+        executor.saveXWikiProperties();
+    }
 }

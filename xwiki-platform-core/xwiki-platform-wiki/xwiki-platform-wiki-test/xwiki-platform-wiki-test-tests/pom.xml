@@ -76,7 +76,15 @@
       <artifactId>xwiki-platform-extension-handler-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>

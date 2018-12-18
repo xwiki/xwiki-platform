@@ -36,3 +36,6 @@
 #mapping("notificationInfoColor", "@brand-info")
 #mapping("notificationWarningColor", "@brand-warning")
 #mapping("notificationErrorColor", "@brand-danger")
+#mapping("notificationEmailBg", "@notification-email-bg")
+#mapping("notificationEmailInnerBg", "@notification-email-inner-bg")
+#mapping("notificationEmailTextColor", "@notification-email-text-color")

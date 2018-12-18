@@ -76,6 +76,9 @@
   @brand-info:                          $theme.notificationInfoColor;
   @brand-warning:                       $theme.notificationWarningColor;
   @brand-danger:                        $theme.notificationErrorColor;
+  @notification-email-bg:               $theme.notificationEmailBg;
+  @notification-email-inner-bg:         $theme.notificationEmailInnerBg;
+  @notification-email-text-color:       $theme.notificationEmailTextColor;
 
   @panel-bg:                            $theme.panelBackgroundColor;
   @panel-default-text:                  $theme.panelTextColor;
@@ -180,7 +183,10 @@
       "breadcrumb-separator": "escapedText",
       "table-bg": "color",
       "table-bg-hover": "color",
-      "table-border-color": "color"
+      "table-border-color": "color",
+      "notification-email-bg": "color",
+      "notification-email-inner-bg": "color",
+      "notification-email-text-color": "color"
       })
     #set($themeClass = $xwiki.getClass('FlamingoThemesCode.ThemeClass'))
     #foreach($property in $variables.keySet())

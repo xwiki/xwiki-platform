@@ -48,7 +48,10 @@
 'notificationInfoColor'            : '#336699',
 'notificationSuccessColor'         : '#008000',
 'notificationWarningColor'         : '#D09000',
-'notificationErrorColor'           : '#CC3333'
+'notificationErrorColor'           : '#CC3333',
+'notificationEmailBg'              : '#f5f5f5',
+'notificationEmailInnerBg'         : '#ffffff',
+'notificationEmailTextColor'       : '#1d1f24'
 })
 ##
 ## Overwrite with the values set in the custom theme

@@ -123,8 +123,9 @@
     </class>
     <property>
       <html>#template('notification/email/macros.vm')
+#template('colorThemeInit.vm')
 ## Main Div
-&lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; background-color:#F5F5F5; padding:15px; margin:0 auto; color: #1d1f24; "&gt;
+&lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; background-color:$!{theme.notificationEmailBg}; padding:15px; margin:0 auto; color: $!{theme.notificationEmailTextColor}; "&gt;
   ## Main centered table
   &lt;table style="max-width: 570px; margin:0 auto" cellspacing="0" cellpadding="0" width="100%" align="center"&gt;&lt;tr&gt;&lt;td&gt;
     ## Logo table
@@ -137,7 +138,7 @@
     &lt;/tr&gt;&lt;/table&gt;
 
     ## Events div
-    &lt;div style="background:white;padding:1em; border-left: 1px solid #eaeaea;border-right: 1px solid #eaeaea;border-bottom: 1px solid #ddd;border-top: 1px solid #f0f0f0;"&gt;
+    &lt;div style="background:$!{theme.notificationEmailInnerBg};padding:1em; border-left: 1px solid #eaeaea;border-right: 1px solid #eaeaea;border-bottom: 1px solid #ddd;border-top: 1px solid #f0f0f0;"&gt;
       &lt;h1 style="font-size:30px;font-style:normal;font-weight:500;line-height:42px;letter-spacing:normal; margin-top: 0;font-size:21px;"&gt;$escapetool.xml($services.localization.render('notifications.email.title'))&lt;/h1&gt;
       ## Display a table of content
       #displayTOC($sortedEvents)

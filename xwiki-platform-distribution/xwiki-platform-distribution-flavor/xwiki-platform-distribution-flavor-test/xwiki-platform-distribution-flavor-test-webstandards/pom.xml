@@ -98,7 +98,10 @@
           <useFile>false</useFile>
           <reportFormat>plain</reportFormat>
           <systemPropertyVariables>
-            <whitelistedWCAGClasses>Panels.PanelClass</whitelistedWCAGClasses>
+            <whitelistedWCAGClasses>
+              Panels.PanelClass
+              XWiki.XWikiGroups
+            </whitelistedWCAGClasses>
           </systemPropertyVariables>
         </configuration>
       </plugin>

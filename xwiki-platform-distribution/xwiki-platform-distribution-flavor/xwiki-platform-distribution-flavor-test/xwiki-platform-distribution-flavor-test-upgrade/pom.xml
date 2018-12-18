@@ -56,14 +56,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Make sure the flavor is available when the test try to download it -->
-    <dependency>
-      <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
-      <artifactId>${xwiki.extension.distribution.ui.artifactId}</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>test</scope>
-    </dependency>
     <!-- The flavor to upgrade to -->
     <dependency>
       <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>

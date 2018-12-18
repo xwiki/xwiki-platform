@@ -143,6 +143,7 @@
 #macro (getMacroDescriptor $macroDescriptor)
   ## Translate the macro name and description.
   #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
+  #initRequiredSkinExtensions
   #set ($data = {
     'id': $macroDescriptor.id,
     'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
@@ -196,6 +197,24 @@
     ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
     ## descriptor map keys
     #set ($discard = $data.parameterDescriptorMap.put($entry.key.toLowerCase(), $translatedParameterDescriptor))
+  #end
+  #set ($data.requiredSkinExtensions = "#getRequiredSkinExtensions")
+#end
+
+#macro (initRequiredSkinExtensions)
+  #set ($requiredSkinExtensions = $collectionstool.orderedMap)
+  ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
+  ## (they are aready available on the edit page so there's no need to load them).
+  #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
+    #set ($discard = $requiredSkinExtensions.put($pluginName, $xwiki.get($pluginName).importString))
+  #end
+#end
+
+#macro (getRequiredSkinExtensions)
+  #foreach ($entry in $requiredSkinExtensions.entrySet())
+    #set ($importString = $xwiki.get($entry.key).importString)
+    ## Remove the always used skin extensions, keep only those that have been requested by the macro parameter pickers.
+    $!stringtool.removeStart($importString, $entry.value).trim()##
   #end
 #end
 

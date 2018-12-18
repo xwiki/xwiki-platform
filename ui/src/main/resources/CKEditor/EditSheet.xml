@@ -1010,6 +1010,10 @@ body &gt; .modal-backdrop {
 body .modal {
   z-index: 10050;
 }
+/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
+body &gt; .selectize-dropdown {
+  z-index: 10051;
+}
 
 /**
  * Full-screen styles.

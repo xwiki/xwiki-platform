@@ -85,7 +85,24 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     macroEditor.find('.more').click(toggleMacroParameters).click();
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
     // Load the pickers.
+    loadRequiredSkinExtensions(macroDescriptor.requiredSkinExtensions);
     $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+  },
+
+  loadRequiredSkinExtensions = function(requiredSkinExtensions) {
+    var existingSkinExtensions;
+    var getExistingSkinExtensions = function() {
+      return $('link, script').map(function() {
+        return $(this).attr('href') || $(this).attr('src');
+      }).get();
+    };
+    $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
+      if (!existingSkinExtensions) {
+        existingSkinExtensions = getExistingSkinExtensions();
+      }
+      var url = $(this).attr('href') || $(this).attr('src');
+      return existingSkinExtensions.indexOf(url) < 0;
+    }).appendTo('head');
   },
 
   maybeSetParameterValue = function(parameter, macroCall) {

@@ -244,7 +244,7 @@ public class AbstractValidationTest extends TestCase
             whitelistedClasses = "";
         }
 
-        List<String> whitelistedClassesList = Arrays.asList(whitelistedClasses.split(":"));
+        List<String> whitelistedClassesList = Arrays.asList(whitelistedClasses.split("\\s"));
 
         if (skipTechnicalPages) {
             logger.info(String.format("[%s] will skip technical pages, except those containing the following classes:"

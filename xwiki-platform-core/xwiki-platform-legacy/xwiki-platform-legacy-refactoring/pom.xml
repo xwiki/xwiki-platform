@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-legacy</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>10.11-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

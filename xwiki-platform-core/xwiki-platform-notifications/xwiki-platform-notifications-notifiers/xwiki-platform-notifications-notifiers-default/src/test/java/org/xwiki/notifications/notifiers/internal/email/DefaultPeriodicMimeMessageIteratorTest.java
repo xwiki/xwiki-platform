@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.internet.InternetAddress;
@@ -146,6 +147,9 @@ public class DefaultPeriodicMimeMessageIteratorTest
         assertEquals(Arrays.asList("eventHTML1"), velocityVariables.get("htmlEvents"));
         assertEquals(Arrays.asList("event1"), velocityVariables.get("plainTextEvents"));
 
+        // Count the number of attachments
+        assertEquals(1, ((List)factoryParameters.get("attachments")).size());
+
         // Second iteration
         assertTrue(iterator.hasNext());
         assertEquals(message, iterator.next());
@@ -156,6 +160,9 @@ public class DefaultPeriodicMimeMessageIteratorTest
         assertEquals(Arrays.asList(event2), velocityVariables.get("events"));
         assertEquals(Arrays.asList("eventHTML2"), velocityVariables.get("htmlEvents"));
         assertEquals(Arrays.asList("event2"), velocityVariables.get("plainTextEvents"));
+
+        // Make sure there is no duplicated attachments
+        assertEquals(1, ((List)factoryParameters.get("attachments")).size());
 
         // End
         assertFalse(iterator.hasNext());

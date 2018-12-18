@@ -172,6 +172,10 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private void updateFactoryParameters() throws NotificationException, AddressException
     {
+        // We need to clear all the attachments that have been put in the previous iteration, otherwise, we end up
+        // duplicating the wiki logo, the user avatars, and every attachments that are common to several emails...
+        getAttachments().clear();
+
         handleEvents();
         handleWikiLogo();
         handleImageAttachmentsFromTemplate();

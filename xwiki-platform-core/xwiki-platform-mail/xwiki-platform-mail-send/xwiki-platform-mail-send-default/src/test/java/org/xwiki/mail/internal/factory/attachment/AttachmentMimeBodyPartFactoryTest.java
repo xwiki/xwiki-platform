@@ -49,9 +49,8 @@ import static org.mockito.Mockito.when;
  */
 public class AttachmentMimeBodyPartFactoryTest
 {
-    // Passed at the Maven level in the pom.xml file.
-    private static final String TEMPORARY_DIRECTORY =
-            System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
+    private static final String TEMPORARY_DIRECTORY = "target/"
+        + AttachmentMimeBodyPartFactoryTest.class.getSimpleName();
 
     @Rule
     public MockitoComponentMockingRule<AttachmentMimeBodyPartFactory> mocker =

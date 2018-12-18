@@ -53,6 +53,9 @@ import static org.mockito.Mockito.when;
  */
 public class SerializedFilesMimeMessageIteratorTest
 {
+    private static final String TEMPORARY_DIRECTORY = "target/"
+        + SerializedFilesMimeMessageIteratorTest.class.getSimpleName();
+
     @Rule
     public LogRule logRule = new LogRule()
     {
@@ -61,10 +64,6 @@ public class SerializedFilesMimeMessageIteratorTest
             recordLoggingForType(SerializedFilesMimeMessageIterator.class);
         }
     };
-
-    // Passed at the Maven level in the pom.xml file.
-    private static final String TEMPORARY_DIRECTORY =
-        System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
 
     private String batchId;
 

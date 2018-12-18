@@ -103,18 +103,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <!-- Used by unit tests to set the temporary directory to be the Maven target directory -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <systemPropertyVariables>
-            <temporaryDirectory>${project.build.directory}</temporaryDirectory>
-          </systemPropertyVariables>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

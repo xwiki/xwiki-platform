@@ -64,9 +64,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class FileSystemMailContentStoreTest
 {
-    // Passed at the Maven level in the pom.xml file.
-    private static final String TEMPORARY_DIRECTORY =
-        System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
+    private static final String TEMPORARY_DIRECTORY = "target/" + FileSystemMailContentStoreTest.class.getSimpleName();
 
     @InjectMockComponents
     private FileSystemMailContentStore store;
@@ -75,8 +73,7 @@ public class FileSystemMailContentStoreTest
     public void deleteMailStore() throws Exception
     {
         // Delete content of the mails store directory
-        FileUtils.deleteDirectory(
-            new File(TEMPORARY_DIRECTORY, this.store.ROOT_DIRECTORY));
+        FileUtils.deleteDirectory(new File(TEMPORARY_DIRECTORY, this.store.ROOT_DIRECTORY));
     }
 
     @BeforeComponent

@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.webstandards;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.xwiki.test.webstandards.framework.DefaultValidationTest;
 import org.xwiki.validator.Validator;
@@ -27,6 +30,16 @@ import org.xwiki.test.webstandards.framework.Target;
 
 public class CustomDutchWebGuidelinesValidationTest extends DefaultValidationTest
 {
+    /**
+     * This field is needed to skip technical pages. It is read by reflexivity.
+     */
+    private static final boolean skipTechnicalPages = true;
+
+    /**
+     * This field is needed to whitelist some classes from the technical pages. It is read by reflexivity.
+     */
+    private static final String whitelistedClasses = System.getProperty("whitelistedWCAGClasses", "");
+
     public CustomDutchWebGuidelinesValidationTest(Target target, HttpClient client, Validator validator,
         String credentials) throws Exception
     {

@@ -20,12 +20,20 @@
 package org.xwiki.test.webstandards.framework;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Credentials;
@@ -36,6 +44,11 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -52,6 +65,8 @@ public class AbstractValidationTest extends TestCase
 {
     private static final DefaultStringEntityReferenceSerializer SERIALIZER =
         new DefaultStringEntityReferenceSerializer();
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractValidationTest.class);
 
     protected HttpClient client;
 
@@ -211,15 +226,104 @@ public class AbstractValidationTest extends TestCase
         String path = System.getProperty("pathToDocuments");
         String patternFilter = System.getProperty("documentsToTest");
 
-        for (DocumentReference documentReference : readXarContents(path, patternFilter)) {
+        boolean skipTechnicalPages;
+        try {
+            Field isSkipTechnicalPages = validationTest.getDeclaredField("skipTechnicalPages");
+            isSkipTechnicalPages.setAccessible(true);
+            skipTechnicalPages = isSkipTechnicalPages.getBoolean(null);
+        } catch (NoSuchFieldException e) {
+            skipTechnicalPages = false;
+        }
+
+        String whitelistedClasses;
+        try {
+            Field whiteListedClassesField = validationTest.getDeclaredField("whitelistedClasses");
+            whiteListedClassesField.setAccessible(true);
+            whitelistedClasses = (String) whiteListedClassesField.get(null);
+        } catch (NoSuchFieldException e) {
+            whitelistedClasses = "";
+        }
+
+        List<String> whitelistedClassesList = Arrays.asList(whitelistedClasses.split("\\s"));
+
+        if (skipTechnicalPages) {
+            logger.info(String.format("[%s] will skip technical pages, except those containing the following classes:"
+                + " %s", validationTest.getName(), whitelistedClasses));
+        }
+
+        for (DocumentReference documentReference : readXarContents(path, patternFilter, skipTechnicalPages,
+            whitelistedClassesList)) {
             suite.addTest(validationTest.getConstructor(Target.class, HttpClient.class, Validator.class, String.class)
                 .newInstance(new DocumentReferenceTarget(documentReference), client, validator, "Admin:admin"));
         }
     }
 
+    private static boolean isTechnicalPage(String directoryPath, XarEntry entry, DocumentBuilder documentBuilder,
+        List<String> whitelistedClasses)
+        throws Exception
+    {
+        try (InputStream inputStream = new FileInputStream(new File(directoryPath, entry.getEntryName()))) {
+            Document parsedDocument = documentBuilder.parse(inputStream);
+
+            NodeList hiddenElements = parsedDocument.getElementsByTagName("hidden");
+            NodeList objectElements = parsedDocument.getDocumentElement().getElementsByTagName("object");
+
+            boolean isHiddenPage = false;
+
+            // if a page is hidden, then it's considered as a technical page
+            if (hiddenElements.getLength() == 1) {
+               isHiddenPage = "true".equals(hiddenElements.item(0).getTextContent());
+            }
+
+            // if there's a whitelist, we check the document does not contain any object
+            // of the class of any of the whitelisted classes
+            if (!whitelistedClasses.isEmpty()) {
+                for (int i = 0; i < objectElements.getLength(); i++) {
+                    Node objectElement = objectElements.item(i);
+                    NodeList childNodes = objectElement.getChildNodes();
+                    for (int j = 0; j < childNodes.getLength(); j++) {
+                        Node objectAttribute = childNodes.item(j);
+
+                        // if we find an object with a className corresponding to one of those whitelisted
+                        // then we immediately consider the page as not technical: it must be checked
+                        if ("className".equals(objectAttribute.getNodeName())
+                            && whitelistedClasses.contains(objectAttribute.getTextContent())) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return isHiddenPage;
+        }
+    }
+
     protected static List<DocumentReference> readXarContents(String fileName, String patternFilter) throws Exception
     {
-        Collection<XarEntry> entries = XarPackage.getEntries(new File(fileName));
+        return readXarContents(fileName, patternFilter, false, Collections.emptyList());
+    }
+
+    private static boolean isPageIncluded(Pattern pattern, XarEntry entry)
+    {
+        return (pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches());
+    }
+
+    private static boolean shouldSkipPage(boolean skipTechnicalPages, String directoryPath, XarEntry entry,
+        DocumentBuilder documentBuilder, List<String> whitelistedClasses) throws Exception
+    {
+        if (!skipTechnicalPages) {
+            return false;
+        } else {
+            return isTechnicalPage(directoryPath, entry, documentBuilder, whitelistedClasses);
+        }
+    }
+
+    protected static List<DocumentReference> readXarContents(String fileName, String patternFilter,
+        boolean skipTechnicalPages, List<String> whitelistedClasses) throws Exception
+    {
+        File file = new File(fileName);
+        XarPackage xarPackage = new XarPackage(file);
+        Collection<XarEntry> entries = xarPackage.getEntries();
 
         List<DocumentReference> result = new ArrayList<DocumentReference>(entries.size());
 
@@ -227,8 +331,12 @@ public class AbstractValidationTest extends TestCase
 
         Pattern pattern = patternFilter == null ? null : Pattern.compile(patternFilter);
 
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+
         for (XarEntry entry : entries) {
-            if (pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches()) {
+            if (isPageIncluded(pattern, entry)
+                && !shouldSkipPage(skipTechnicalPages, fileName, entry, documentBuilder, whitelistedClasses)) {
                 result.add(new DocumentReference(entry, wikiReference));
             }
         }

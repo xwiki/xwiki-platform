@@ -39,9 +39,9 @@
   <content>activity.page.link.title=Находится в {0}
 activity.rss.pages.modified=RSS-лента измененных страниц
 activity.rss.feed.description=RSS-лента изменений документа
-### Missing: activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
-### Missing: activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"
-### Missing: activity.rss.feed.tagsAndSpaces.description=RSS feed for documents tagged with "{0}" in space(s) "{1}"
+activity.rss.feed.tags.description=RSS-канал для документов с тегом "{0}"
+activity.rss.feed.spaces.description=RSS-канал для документов в пространстве (ах) "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS-канал для документов, помеченных "{0}" в пробелах "{1}"
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

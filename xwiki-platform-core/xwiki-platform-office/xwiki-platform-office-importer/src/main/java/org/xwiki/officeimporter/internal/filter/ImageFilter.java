@@ -181,6 +181,10 @@ public class ImageFilter extends AbstractHTMLFilter
             try {
                 // We have to decode the image file name in case it contains URL special characters.
                 fileName = URLDecoder.decode(fileName, UTF_8);
+
+                // we also need to replace the "&amp;" by "&" since the fileName of the image could contain "&".
+                // note that if the image name contains "&amp;" the produced html would contain "&amp;amp;"
+                fileName = fileName.replaceAll("&amp;","&");
             } catch (Exception e) {
                 // This shouldn't happen. Use the encoded image file name.
             }

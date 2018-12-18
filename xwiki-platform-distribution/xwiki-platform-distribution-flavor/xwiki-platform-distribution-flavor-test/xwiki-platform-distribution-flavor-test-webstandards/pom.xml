@@ -97,6 +97,9 @@
           <!-- Display report on screen when all tests are completed -->  
           <useFile>false</useFile>
           <reportFormat>plain</reportFormat>
+          <systemPropertyVariables>
+            <whitelistedWCAGClasses>Panels.PanelClass</whitelistedWCAGClasses>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
     </plugins>

@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +44,8 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,6 +65,8 @@ public class AbstractValidationTest extends TestCase
 {
     private static final DefaultStringEntityReferenceSerializer SERIALIZER =
         new DefaultStringEntityReferenceSerializer();
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractValidationTest.class);
 
     protected HttpClient client;
 
@@ -230,17 +235,24 @@ public class AbstractValidationTest extends TestCase
             skipTechnicalPages = false;
         }
 
-        List<String> whitelistedClasses;
+        String whitelistedClasses;
         try {
             Field whiteListedClassesField = validationTest.getDeclaredField("whitelistedClasses");
             whiteListedClassesField.setAccessible(true);
-            whitelistedClasses = (List<String>) whiteListedClassesField.get(null);
+            whitelistedClasses = (String) whiteListedClassesField.get(null);
         } catch (NoSuchFieldException e) {
-            whitelistedClasses = Collections.emptyList();
+            whitelistedClasses = "";
+        }
+
+        List<String> whitelistedClassesList = Arrays.asList(whitelistedClasses.split(":"));
+
+        if (skipTechnicalPages) {
+            logger.info(String.format("[%s] will skip technical pages, except those containing the following classes:"
+                + " %s", validationTest.getName(), whitelistedClasses));
         }
 
         for (DocumentReference documentReference : readXarContents(path, patternFilter, skipTechnicalPages,
-            whitelistedClasses)) {
+            whitelistedClassesList)) {
             suite.addTest(validationTest.getConstructor(Target.class, HttpClient.class, Validator.class, String.class)
                 .newInstance(new DocumentReferenceTarget(documentReference), client, validator, "Admin:admin"));
         }

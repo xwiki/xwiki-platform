@@ -33,12 +33,12 @@ public class CustomDutchWebGuidelinesValidationTest extends DefaultValidationTes
     /**
      * This field is needed to skip technical pages. It is read by reflexivity.
      */
-    private static boolean skipTechnicalPages = true;
+    private static final boolean skipTechnicalPages = true;
 
     /**
      * This field is needed to whitelist some classes from the technical pages. It is read by reflexivity.
      */
-    private static List<String> whitelistedClasses = Arrays.asList("Panels.PanelClass");
+    private static final String whitelistedClasses = System.getProperty("whitelistedWCAGClasses", "");
 
     public CustomDutchWebGuidelinesValidationTest(Target target, HttpClient client, Validator validator,
         String credentials) throws Exception

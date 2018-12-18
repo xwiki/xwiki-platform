@@ -25,10 +25,10 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-alerts</artifactId>
-    <version>10.11-SNAPSHOT</version>
+    <version>10.11-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-alerts-ui</artifactId>
-  <version>10.11-SNAPSHOT</version>
+  <version>10.11-rc-1</version>
   <name>XWiki Platform - Alerts - UI</name>
   <packaging>xar</packaging>
   <properties>

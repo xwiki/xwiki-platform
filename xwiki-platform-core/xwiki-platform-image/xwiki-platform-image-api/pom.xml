@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-image</artifactId>
-    <version>10.11-SNAPSHOT</version>
+    <version>10.11-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-image-api</artifactId>
   <name>XWiki Platform - Image - API</name>

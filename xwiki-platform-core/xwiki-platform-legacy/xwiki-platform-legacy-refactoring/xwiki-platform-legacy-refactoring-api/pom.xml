@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-legacy-refactoring</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>10.11-SNAPSHOT</version>
+    <version>10.11-rc-1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

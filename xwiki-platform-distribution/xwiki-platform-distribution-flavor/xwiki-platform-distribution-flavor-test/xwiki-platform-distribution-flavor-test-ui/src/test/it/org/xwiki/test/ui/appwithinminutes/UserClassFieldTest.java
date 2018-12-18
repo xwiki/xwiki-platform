@@ -254,8 +254,7 @@ public class UserClassFieldTest extends AbstractClassEditorTest
         userPicker = new SuggestClassFieldEditPane("user1").getPicker();
         selectedUsers = userPicker.getSelectedSuggestions();
         Assert.assertEquals(3, selectedUsers.size());
-        // Should we display the user icon for values that don't match an existing user?
-        assertUserSuggestion(selectedUsers.get(2), "foobar", "foobar", "fa-user");
+        assertUserSuggestion(selectedUsers.get(2), "foobar", "foobar", null);
         Assert.assertEquals(Arrays.asList("XWiki.tmortagne", "XWiki.Admin", "foobar"), userPicker.getValues());
 
         // Delete the fake user.

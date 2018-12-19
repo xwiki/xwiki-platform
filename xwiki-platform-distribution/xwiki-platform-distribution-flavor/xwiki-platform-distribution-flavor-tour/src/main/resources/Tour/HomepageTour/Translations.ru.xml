@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="ru">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+<content>## Homepage Tour (by steps order)
+### Missing: tour.homepageTour.welcome.title=Welcome to XWiki
+### Missing: tour.homepageTour.welcome.content=In the next couple of minutes you will discover your wiki's interface and basic functionalities.
+### Missing: tour.homepageTour.panels.title=Panels
+### Missing: tour.homepageTour.panels.contentA=The current panels allow you to access your wiki's applications and pages.
+### Missing: tour.homepageTour.panels.contentB=Administrators can customize them and decide which panels are shown.
+### Missing: tour.homepageTour.breadcrumbs.title=Breadcrumbs
+### Missing: tour.homepageTour.breadcrumbs.contentA=The breadcrumbs allow you to identify where your page is located and navigate the hierarchy.
+### Missing: tour.homepageTour.breadcrumbs.contentB=The {0} button will always take you to the wiki''s home page.
+### Missing: tour.homepageTour.pageContent.title=Page Content
+### Missing: tour.homepageTour.pageContent.contentA=This is the place where the content of the current page is displayed.
+### Missing: tour.homepageTour.pageContent.contentB=Edit this page to add tables, lists, macros and structure in order to organize your knowledge.
+### Missing: tour.homepageTour.pageMenu.title=Page Menu
+### Missing: tour.homepageTour.pageMenu.contentA=This menu contains page related actions. With the appropriate rights, you can edit, create, administer or delete pages.
+### Missing: tour.homepageTour.pageMenu.contentB=The {0} button reveals more actions like Export, Print and Share.
+### Missing: tour.homepageTour.pageTabs.title=Page Tabs
+### Missing: tour.homepageTour.pageTabs.contentA=Comments are a great way for users to discuss the page content.
+### Missing: tour.homepageTour.pageTabs.contentB=You can also attach files, compare page versions or see page information.
+### Missing: tour.homepageTour.header.title=Header
+### Missing: tour.homepageTour.header.contentA=You can Search for content, Watch for page changes or access your User Profile.
+### Missing: tour.homepageTour.header.contentB=The {0} button opens a Drawer which contains wiki related actions like Administration and Indexes.
+### Missing: tour.homepageTour.tourComplete.title=Tour Complete
+### Missing: tour.homepageTour.tourComplete.contentA=This completes your tour on XWiki's interface and basic functionalities.
+### Missing: tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.</content>
+</xwikidoc>

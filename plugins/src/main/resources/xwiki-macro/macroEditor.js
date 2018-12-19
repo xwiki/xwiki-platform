@@ -67,6 +67,21 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
     macroEditor.find('.macro-name').text(macroDescriptor.name);
     macroEditor.find('.macro-description').text(macroDescriptor.description);
     var macroParameters = sortMacroParameters(macroDescriptor, macroCall);
+    macroParameters = hideSomeMacroParameters.call(this, macroParameters, macroCall);
+    macroEditor.find('.macro-parameters').append(macroParameters.map(maybeDisplayMacroParameter));
+    macroEditor.find('.more').click(toggleMacroParameters).click();
+    this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
+    // Load the pickers.
+    loadRequiredSkinExtensions(macroDescriptor.requiredSkinExtensions);
+    $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+  },
+
+  /**
+   * The following macro parameters are hidden:
+   * - deprecated parameters that don't have a value set
+   * - parameters that can be edited in-place (as long as they are not mandatory and without a value set)
+   */
+  hideSomeMacroParameters = function(macroParameters, macroCall) {
     var visibleMacroParameters = [];
     var hiddenMacroParameters = [];
     var hiddenMacroParameterTypes = this.data('hiddenMacroParameterTypes');
@@ -74,19 +89,20 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
       // We can't hide mandatory parameters that don't have a value set.
       // We can't hide macro parameters when the macro call is in-line because in-line nested editables are not well
       // supported. See https://github.com/ckeditor/ckeditor-dev/issues/1091
-      macroParameter.hidden = macroCall.inline === false &&
-        hiddenMacroParameterTypes.indexOf(macroParameter.type) >= 0 &&
-        (!macroParameter.mandatory || (typeof macroParameter.value === 'string' && macroParameter.value.length > 0));
+      macroParameter.hidden = isDeprecatedParameterUnset(macroParameter) || (macroCall.inline === false &&
+        hiddenMacroParameterTypes.indexOf(macroParameter.type) >= 0 && !isMandatoryParameterEmpty(macroParameter));
       (macroParameter.hidden ? hiddenMacroParameters : visibleMacroParameters).push(macroParameter);
     });
     // Put the hidden macro parameters first to prevent the macro parameter separator (More) from showing them.
-    macroParameters = hiddenMacroParameters.concat(addParameterSeparator(visibleMacroParameters));
-    macroEditor.find('.macro-parameters').append(macroParameters.map(maybeDisplayMacroParameter));
-    macroEditor.find('.more').click(toggleMacroParameters).click();
-    this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
-    // Load the pickers.
-    loadRequiredSkinExtensions(macroDescriptor.requiredSkinExtensions);
-    $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+    return hiddenMacroParameters.concat(addParameterSeparator(visibleMacroParameters));
+  },
+
+  isDeprecatedParameterUnset = function(macroParameter) {
+    return macroParameter.deprecated && macroParameter.value === undefined;
+  },
+
+  isMandatoryParameterEmpty = function(macroParameter) {
+    return macroParameter.mandatory && (typeof macroParameter.value !== 'string' || macroParameter.value.length === 0);
   },
 
   loadRequiredSkinExtensions = function(requiredSkinExtensions) {

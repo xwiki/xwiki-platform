@@ -409,7 +409,6 @@ public class LocalizationScriptService implements ScriptService
      * @since 8.4.6
      * @since 9.6.1
      */
-    @Unstable
     public Set<Locale> getAvailableLocales()
     {
         Set<Locale> locales = new HashSet<>();

@@ -36,26 +36,26 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.XWikiUsers_displayHiddenDocuments.hint=The wiki contains documents that are not displayed by default. These hidden documents represent technical content, like application classes, configuration pages, macros, styles, scripts, etc.
-### Missing: XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
-### Missing: XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
-### Missing: XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
-### Missing: XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
-### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=Indicate if you want Extension Manager to ask you to confirm conflict resolution default rules (for example tell Extension Manager to ask you what to do if the document to upgrade has been removed from the wiki).
-### Missing: userprofile.default=Default
-### Missing: user.profile.groups.title=My Groups
-### Missing: user.profile.groups.description=Here are listed all the groups your user belongs to.
-### Missing: user.profile.groups.table.group=Group
-### Missing: platform.core.profile.category.groups=My Groups
-### Missing: user.profile.notifications=Notifications
-### Missing: user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
-### Missing: user.profile.network.unfollow.question.yes=Yes, unfollow
-### Missing: user.profile.network.unfollow.question.no=No, cancel
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Вики содержит документы, которые не отображаются по умолчанию. Эти скрытые документы представляют технический контент, такой как классы приложений, страницы конфигурации, макросы, стили, сценарии и т. Д.
+XWiki.XWikiUsers_accessibility.hint=Дополнительная доступность обеспечит различные визуальные улучшения, такие как: большие шрифты, подчеркнутые ссылки и т. Д.
+XWiki.XWikiUsers_timezone.hint=Используйте определенный часовой пояс, чтобы даты отражали ваше текущее местоположение.
+XWiki.XWikiUsers_editor.hint=Выберите, какой редактор будет редактором по умолчанию, переопределяя редактор по умолчанию, установленный глобально. Если не определено, выбирается редактор по умолчанию, в зависимости от того, что редактируется.
+XWiki.XWikiUsers_usertype.hint=Выберите, какой тип пользователя будет по умолчанию. Опытные пользователи получат доступ к нескольким функциям редактирования, созданию терминальных страниц и т. Д.
+XWiki.XWikiUsers_extensionConflictSetup.hint=Укажите, хотите ли вы, чтобы Менеджер Расширений требовал подтвердить правила по умолчанию для разрешения конфликтов (например, попросите Extension Manager спросить вас, что делать, если документ для обновления был удален из вики).
+userprofile.default=По-умолчанию
+user.profile.groups.title=Мои группы
+user.profile.groups.description=Здесь перечислены все группы, в которых вы состоите.
+user.profile.groups.table.group=Группа
+platform.core.profile.category.groups=Мои группы
+user.profile.notifications=Уведомления
+user.profile.network.unfollow.question=Вы уверены, что хотите отписаться от этого пользователя?
+user.profile.network.unfollow.question.yes=Да, отписаться
+user.profile.network.unfollow.question.no=Нет, отмена
 ### Missing: user.profile.network.following=Following
 ### Missing: user.profile.network.notfollowing=Not following
-### Missing: user.profile.network.follow=Start following
-### Missing: user.profile.network.unfollow=Stop following
-### Missing: user.profile.network.done=Done
-### Missing: user.profile.network.saving=Saving...
-### Missing: user.profile.network.error=Error saving the notification setting</content>
+user.profile.network.follow=Подписаться
+user.profile.network.unfollow=Отписаться
+user.profile.network.done=Готово
+user.profile.network.saving=Сохранение...
+user.profile.network.error=Ошибка сохранения настроек уведомления</content>
 </xwikidoc>

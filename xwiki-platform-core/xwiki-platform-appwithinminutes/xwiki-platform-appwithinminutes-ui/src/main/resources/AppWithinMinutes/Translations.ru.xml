@@ -45,7 +45,7 @@ platform.appwithinminutes.appsLiveTable.doc.space=Название прилож�
 platform.appwithinminutes.appsLiveTable.doc.author=Последний автор
 platform.appwithinminutes.appsLiveTable.doc.date=Дата изменения
 platform.appwithinminutes.appsLiveTable._actions=Действия
-platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Предоставить права на администрирование раздела
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Предоставить права на администрирование раздела.
 
 ### AWM Applications panel entry
 platform.appwithinminutes.appPanelCreateEntry=Создайте свое собственное!
@@ -54,44 +54,44 @@ platform.appwithinminutes.appPanelCreateEntry=Создайте свое собс
 platform.appwithinminutes.wizardStepHeading=Шаг {0} — {1}
 appWithinMinutes.wizardStep.name.name=Имя
 appWithinMinutes.wizardStep.name.title=Назовите свое приложение
-appWithinMinutes.wizardStep.name.description=Укажите имя приложения.
+appWithinMinutes.wizardStep.name.description=Укажите имя приложения
 appWithinMinutes.wizardStep.structure.name=Структура
 appWithinMinutes.wizardStep.structure.title=Определить структуру приложения
-appWithinMinutes.wizardStep.structure.description=Создайте структуру вашего приложения указав состав и типы полей, которые оно будет содержать.
-### Missing: appWithinMinutes.wizardStep.entries.name=Entries
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
-### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.structure.description=Создайте структуру вашего приложения указав состав и типы полей, которые оно будет содержать
+appWithinMinutes.wizardStep.entries.name=Записи
+appWithinMinutes.wizardStep.entries.title=Укажите расположение ваших данных
+appWithinMinutes.wizardStep.entries.description=Укажите где сохранить данные
 appWithinMinutes.wizardStep.presentation.name=Внешний вид
 appWithinMinutes.wizardStep.presentation.title=Настройка домашней страницы приложения
 appWithinMinutes.wizardStep.presentation.description=Персонализировать домашнюю страницу приложения
 platform.appwithinminutes.wizardStepNextButtonLabel=Следующий шаг
 platform.appwithinminutes.wizardStepNextButtonTip=Перейти к следующему шагу
 platform.appwithinminutes.wizardStepFinishButtonLabel=Завершить
-platform.appwithinminutes.wizardStepFinishButtonTip=Перейти к домашней странице приложения.
+platform.appwithinminutes.wizardStepFinishButtonTip=Перейти к домашней странице приложения
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Предыдущий шаг
 platform.appwithinminutes.wizardStepPreviousButtonTip=Вернуться к предыдущему шагу
 platform.appwithinminutes.wizardStepHelpTitle=Шаги
-platform.appwithinminutes.wizardStepHelpDescription=Этот Мастер поможет вам создать ваше приложение. Последующие шаги помогут вам настроить внешний вид вашего приложения и указать информацию, которую оно будет содержать.
+platform.appwithinminutes.wizardStepHelpDescription=Этот Мастер поможет вам создать ваше приложение. Последующие шаги помогут вам настроить внешний вид вашего приложения и указать информацию, которую оно будет содержать:
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
+appWithinMinutes.createApp.location.label=Расположение
+appWithinMinutes.createApp.location.hint=Расположение в иерархии страниц, где будет создано приложение.
+appWithinMinutes.createApp.parent.label=Родитель
+appWithinMinutes.createApp.parent.hint=Родитель нового приложения. Оставьте это поле пустым, если вы хотите создать приложение верхнего уровня.
 ### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
-### Missing: appWithinMinutes.codeSpace.title=Code
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+appWithinMinutes.codeSpace.title=Код
+appWithinMinutes.codeSpace.description=Это место, где находится код приложения.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Скрытые страницы также перечислены, даже если ваши текущие настройки профиля пользователя не позволяют этого сделать, иначе ни одна из кодовых страниц приложения не будет видна, поскольку все они по умолчанию скрыты.
 platform.appwithinminutes.appNamePageTitle=Создать приложение
 platform.appwithinminutes.appNameLabel=Название приложения
 platform.appwithinminutes.appNameHint=Название приложения определяет адрес домашней страницы приложения, раздел, где приложение будет хранить свои данные, а также имя класса, который описывает структуру приложения.
 platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Адрес главной страницы приложения
-### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Расположение исходного кода приложения
 platform.appwithinminutes.appNameIsUsedWarning=Такое приложение уже существует. Если вы перейдете к следующему шагу, вы будете редактировать существующее приложение.
-platform.appwithinminutes.appNameEmptyError=Пожалуйста, введите название приложения
+platform.appwithinminutes.appNameEmptyError=Пожалуйста, введите название приложения.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
+appWithinMinutes.classEditor.title={0} Структура
 platform.appwithinminutes.classEditorPaletteTitle=Палитра полей
 platform.appwithinminutes.classEditorPaletteHint=Перетяните поля из палитры для создание формы.
 platform.appwithinminutes.classEditorCanvasHint=Перетяните поля из палитры в эту область.
@@ -149,17 +149,17 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Идентиф�
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Добавить
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Удалить
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
-### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+appWithinMinutes.templateProviderEditor.title={0} Записей
+appWithinMinutes.templateProviderEditor.hint=Записи приложения - это вики-страницы, которые содержат структурированные данные.
+appWithinMinutes.templateProviderEditor.icon.hint=Значок, связанный с приложением.
+appWithinMinutes.templateProviderEditor.description.hint=Короткое описание приложения.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Где создавать записи из
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Если расположение не выбрано, записи могут быть созданы с любой страницы.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Где создавать записи
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Если расположение не выбрано, записи могут быть созданы в любом месте вики.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Не применять расположение входа
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Используйте расположения, указанные выше, только в качестве подсказок, позволяя пользователю выбирать другое расположение при создании записи приложения.
+appWithinMinutes.templateProviderEditor.terminal.hint=Должны ли записи приложения быть терминальными страницами или нет.
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Поля класса
@@ -170,8 +170,8 @@ platform.appwithinminutes.liveTableEditorDocTitleColumnName=Заголовок �
 platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Название страницы, которая содержит первую страницу вашего приложения
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Имя страницы
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Название страницы, которая содержит страницу приложения
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Расположение
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Расположение страницы, содержащей данные приложения
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Последний автор
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Пользователь, который последний раз изменял страницу приложения
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Создатель
@@ -196,7 +196,7 @@ platform.appwithinminutes.liveTableEditorDeleteColumnHint=Удалить
 platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Иконка
-### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=Значок приложения. Вы можете выбрать значок в палитре значков или сослаться на прикрепленное изображение.
 
 ### Application home page
 platform.appwithinminutes.appLiveTableHeading=Записи
@@ -206,17 +206,17 @@ platform.appwithinminutes.appHomePageActionsHeading=Действия
 platform.appwithinminutes.appHomePageAddEntryLabel=Добавить
 platform.appwithinminutes.appHomePageAddEntryHint=Добавить новую запись
 platform.appwithinminutes.appHomePageEntryNameLabel=Название записи:
-### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=Удалить все записи
 platform.appwithinminutes.appHomePageEditAppLabel=Редактировать приложение
 platform.appwithinminutes.appHomePageTranslateAppLabel=Перевести приложение
 platform.appwithinminutes.appHomePageDeleteAppLabel=Удалить приложение
 
 ### Delete application dialog
-### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
-### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
-### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+platform.appwithinminutes.deleteAppConfirmation=Приложение {0} и ВСЕ его записи будут удалены. Вы уверены что хотите продолжить?
+platform.appwithinminutes.deleteAppEntriesConfirmation=ВСЕ записи приложения {0} будут удалены. Вы уверены что хотите продолжить?
+platform.appwithinminutes.deleteAppDoesNotExistError=Указанное приложение не существует.
+platform.appwithinminutes.deleteAppInvalidAppError=Указанное имя не является действительным приложением.
+platform.appwithinminutes.deleteAppNotSpecifiedError=Имя приложения не указано.
 
 ### Deprecated keys
 ### Since 8.4
@@ -233,13 +233,13 @@ platform.appwithinminutes.wizardStep1Name=Имя
 #@deprecated appWithinMinutes.wizardStep.name.title
 platform.appwithinminutes.wizardStep1Title=Назовите свое приложение
 #@deprecated appWithinMinutes.wizardStep.name.description
-platform.appwithinminutes.wizardStep1Description=Укажите имя приложения.
+platform.appwithinminutes.wizardStep1Description=Укажите имя приложения
 #@deprecated appWithinMinutes.wizardStep.structure.name
 platform.appwithinminutes.wizardStep2Name=Структура
 #@deprecated appWithinMinutes.wizardStep.structure.title
 platform.appwithinminutes.wizardStep2Title=Определить структуру приложения
 #@deprecated appWithinMinutes.wizardStep.structure.description
-platform.appwithinminutes.wizardStep2Description=Создайте структуру вашего приложения указав состав и типы полей, которые оно будет содержать.
+platform.appwithinminutes.wizardStep2Description=Создайте структуру вашего приложения указав состав и типы полей, которые оно будет содержать
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=Внешний вид
 #@deprecated appWithinMinutes.wizardStep.presentation.title

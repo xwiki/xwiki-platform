@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: admin.email=Mail
+### Missing: admin.email.description=Configure mail sending parameters and view mail statuses.
+### Missing: admin.emailgeneral=Advanced
+### Missing: admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
+### Missing: admin.emailsend=Mail Sending
+### Missing: admin.emailsend.description=Configure mail sending parameters.
+### Missing: admin.emailstatus=Mail Sending Status
+### Missing: admin.emailstatus.description=View the statuses of sent mails and resend mails that resulted in failure.
+### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
+### Missing: Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
+### Missing: Mail.GeneralMailConfigClass_obfuscate.hint=This only affects the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
+### Missing: Mail.SendMailConfigClass_from=Email address to send from
+### Missing: Mail.SendMailConfigClass_from.hint=The default email address used to send notification emails from
+### Missing: Mail.SendMailConfigClass_bcc=BCC email addresses
+### Missing: Mail.SendMailConfigClass_bcc.hint=A default comma-separated list of BCC email addresses to use when sending mail
+### Missing: Mail.SendMailConfigClass_host=Email Server
+### Missing: Mail.SendMailConfigClass_host.hint=The SMTP server to send to. Defaults to "localhost"
+### Missing: Mail.SendMailConfigClass_port=Email Server Port
+### Missing: Mail.SendMailConfigClass_port.hint=The port of the SMTP server to use. Defaults to 25
+### Missing: Mail.SendMailConfigClass_username=Email Server Username
+### Missing: Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server, only when authentication is required
+### Missing: Mail.SendMailConfigClass_password=Email Server Password
+### Missing: Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, only when authentication is required
+### Missing: Mail.SendMailConfigClass_properties=Additional Properties
+### Missing: Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
+### Missing: Mail.SendMailConfigClass_sendWaitTime=Send Wait Time
+### Missing: Mail.SendMailConfigClass_sendWaitTime.hint=The delay between each mail being sent, in milliseconds (defaults to 8 seconds)
+### Missing: Mail.SendMailConfigClass_discardSuccessStatuses=Discard Success Statuses?
+### Missing: Mail.SendMailConfigClass_discardSuccessStatuses.hint=No matter whether mail statuses are kept or not for mail that has been sent successfully (defaults to true)
+### Missing: Mail.SendMailStatus_livetable.date=Date
+### Missing: Mail.SendMailStatus_livetable.batchId=Batch ID
+### Missing: Mail.SendMailStatus_livetable.type=Type
+### Missing: Mail.SendMailStatus_livetable.recipients=Recipients
+### Missing: Mail.SendMailStatus_livetable.state=Status
+### Missing: Mail.SendMailStatus_livetable.wiki=Wiki
+### Missing: Mail.SendMailStatus_livetable.error=Error
+### Missing: Mail.SendMailStatus_livetable.actions=Actions
+### Missing: Mail.SendMailStatus_livetable.resend=Resend
+### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
+### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
+</xwikidoc>

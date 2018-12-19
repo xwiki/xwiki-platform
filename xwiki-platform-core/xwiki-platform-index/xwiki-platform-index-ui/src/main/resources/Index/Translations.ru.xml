@@ -44,6 +44,6 @@ index.spacesMacro.spaceAdministration.alt=Администрирование р�
 index.spacesMacro.createSpace.link=Создать новый раздел
 index.spacesMacro.createSpace.defaultSpaceName=Имя раздела
 index.spacesMacro.createSpace.submit=Создать
-### Missing: index.deletedDocuments.deleteAll=Delete all
+index.deletedDocuments.deleteAll=Удалить всё
 </content>
 </xwikidoc>

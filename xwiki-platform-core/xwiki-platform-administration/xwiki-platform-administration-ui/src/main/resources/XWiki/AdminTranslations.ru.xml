@@ -40,10 +40,10 @@
 administration.title.page=Управление страницей
 administration.title.wiki=Администрирование Wiki
 administration.title.global=Глобальное администрирование
-### Missing: administration.sectionTitle=Administration: {0}
-### Missing: administration.sectionTitle.page=Page Administration: {0}
-### Missing: administration.sectionTitle.wiki=Wiki Administration: {0}
-### Missing: administration.sectionTitle.global=Global Administration: {0}
+administration.sectionTitle=Администрирование: {0}
+administration.sectionTitle.page=Администрирование страницы: {0}
+administration.sectionTitle.wiki=Администрирование Wiki: {0}
+administration.sectionTitle.global=Глобальное администрирование: {0}
 administration.menu.search.hint=Искать...
 administration.menu.search.noResults=Ничего не найдено.
 
@@ -55,67 +55,67 @@ XWiki.XWikiPreferences_confirmation_email_content.hint=Шаблон сообще
 XWiki.XWikiPreferences_invitation_email_content.hint=Шаблон электронной почты, который будет отправлен пользователям, приглашенным для регистрации.
 
 XWiki.Registration_heading.hint=Это строка в верхней части страницы, которая показывается людям, которые регистрируются и когда они только что зарегистрировались. Velocity and wiki syntax may be used.
-### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
+XWiki.Registration_welcomeMessage.hint=Это отображается только тогда, когда люди заполняют форму. Скорость и вики-код синтаксиса могут быть использованы.
 XWiki.Registration_liveValidation_enabled.hint=Установите значение false, чтобы отключить код JavaScript для динамической проверки (поля будут по-прежнему проверяться на стороне сервера).
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
-### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
-### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
-### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
-### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
-### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Проверка в реальном времени показывает сообщение, указывающее пользователям, что они заполнили поле удовлетворительно. Это сообщение, которое они получат, если оно не будет переопределено для определенного поля. Код может быть использован.
+XWiki.Registration_loginButton_enabled.hint=Когда пользователь зарегистрировался, мы предоставляем ему кнопку, по которой можно щелкнуть, после чего его имя пользователя и пароль будут добавлены в действие входа в систему, и они сразу же войдут в систему. Однако это приводит к тому, что имя пользователя и пароль передаются обратно в HTML, что может быть неприемлемо в зависимости от ваших потребностей в безопасности.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Если кнопка входа в систему включена, то вы можете иметь фрагмент JavaScript, нажав кнопку входа в систему для пользователя.
+XWiki.Registration_defaultRedirect.hint=Это URL, на который пользователь будет перенаправлен после нажатия кнопки входа в систему, если не указан параметр xredirect. Код может быть использован.
+XWiki.Registration_requireCaptcha.hint=Установите это значение true, чтобы потребовать от пользователя решения CAPTCHA для регистрации.
+XWiki.Registration_registrationSuccessMessage.hint=Это показано пользователю, когда они успешно зарегистрировались. Можно использовать код синтаксиса и вики.
 
 # Look &amp; Feel Sections
-### Missing: admin.themes=Themes
-### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
-### Missing: admin.colorthemes.local=Local
-### Missing: admin.colorthemes.global=Global
-### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
-### Missing: XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
-### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
-### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
-### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
-### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
-### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
-### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
-### Missing: XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
-### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+admin.themes=Темы
+admin.themes.description=Настройте цвет и значок темы, скин и логотип.
+admin.colorthemes.local=Локальный
+admin.colorthemes.global=Глобальные
+XWiki.XWikiPreferences_showannotations.hint=Отображать раздел аннотаций в макете страницы.
+XWiki.XWikiPreferences_showcomments.hint=Отображать раздел комментариев в макете страницы.
+XWiki.XWikiPreferences_showattachments.hint=Отображать раздел вложений в макете страницы.
+XWiki.XWikiPreferences_showhistory.hint=Отображать раздел истории в макете страницы.
+XWiki.XWikiPreferences_showinformation.hint=Отображать информационный раздел в макете страницы.
+XWiki.XWikiPreferences_title.hint=Определите формат заголовка страницы в браузерах.
+XWiki.XWikiPreferences_meta.hint=Определите метаданные, добавленные на каждую страницу, указав описание страницы, автора, ключевые слова и т. Д.
+XWiki.XWikiPreferences_webcopyright.hint=Определите информацию, отображаемую в разделе об авторских правах нижнего колонтитула.
+XWiki.XWikiPreferences_version.hint=Определите информацию, отображаемую в разделе версии нижнего колонтитула.
+XWiki.XWikiPreferences_skin.hint=Укажите используемый по умолчанию скин. Это может быть оболочка файловой системы, например "фламинго", или пользовательская обложка страницы, например "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Укажите тему значков для использования по умолчанию.
+XWiki.XWikiPreferences_colorTheme.hint=Укажите цветовую тему для использования по умолчанию.
 
 # Editing Sections
-### Missing: admin.edit=Editing
-### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
-### Missing: admin.title=Title
-### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
-### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
+admin.edit=Редактирование
+admin.edit.description=Настройте режим редактирования, редактор WYSIWYG и доступные синтаксисы.
+admin.title=Заголовок
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Запретить пользователям создавать вики-страницы с пустым заголовком.
+XWiki.XWikiPreferences_editor.hint=Выберите тип редактора, который будет использоваться по умолчанию для редактирования содержимого страницы.
 XWiki.XWikiPreferences_editcomment.hint=Разрешить ввод сообщения при создании новой версии страницы.
-### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
-### Missing: XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Для каждого внесенного изменения страница не будет сохранена, пока не будет предоставлено описание версии.
+XWiki.XWikiPreferences_minoredit.hint=Разрешить страницам иметь основные (x.1) и второстепенные (1.x) версии. Младшие версии можно увидеть с помощью кнопки «Показать незначительные правки» на странице «История».
 admin.wysiwyg.description=Выберите редактор WYSIWYG по умолчанию и настройте его.
-### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Синтаксис разметки, используемый по умолчанию для содержимого страницы при создании новой вики-страницы.
 
 # Localization Section
-### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
-### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
-XWiki.XWikiPreferences_default_language.hint=Выберите язык wiki по умолчанию
-### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
-XWiki.XWikiPreferences_timezone.hint=Глобально установить часовой пояс для дат
+XWiki.XWikiPreferences_multilingual.hint=Включите многоязычный режим, если ваша вики имеет контент на нескольких языках. Это позволит вашим пользователям переводить вики-страницы и просматривать интерфейс на предпочитаемом им языке.
+XWiki.XWikiPreferences_languages.hint=Выберите языки, которые будут доступны в интерфейсе. Пользователи смогут переводить страницы вашей вики на любой из этих языков (если включен многоязычный режим).
+XWiki.XWikiPreferences_default_language.hint=Выберите язык по умолчанию
+XWiki.XWikiPreferences_dateformat.hint=Укажите формат, используемый для отображения дат (например, дата создания страницы)
+XWiki.XWikiPreferences_timezone.hint=Глобальные настройки для даты и часового пояса
 
 # Import Section
-### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+administration.section.import.hint=Начните с загрузки нового пакета или выбора одного из списка доступных пакетов. Содержимое выбранного пакета будет отображаться справа вместе с параметрами импорта.
 
 # Export Section
-### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported content.
+administration.section.export.packageName.hint=Имя файла, используемого при создании архива с экспортированным содержимым.
 administration.section.export.description.hint=Описание пакета, отображаемое при импорте пакета.
-### Missing: administration.section.export.licence.hint=The content licence. E.g.: LGPL, GPLV2, etc.
+administration.section.export.licence.hint=Содержание лицензии. Например: LGPL, GPLV2 и т. Д.
 administration.section.export.author.hint=Автор пакета.
 administration.section.export.version.hint=Версия пакета.
 administration.section.export.withHistory.hint=Включить историю страниц в экспорт. В противном случае экспортируется только последняя версия страницы.
-### Missing: administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.
+administration.section.export.backupPack.hint=Укажите, будет ли пакет использоваться в качестве резервной копии. Эта опция не влияет на экспортируемый контент. Единственный эффект заключается в том, что при импорте пакета будет предварительно выбран параметр «Импортировать как резервную копию». Разница между пакетом резервного копирования и обычным пакетом заключается в том, что в первом случае последний автор страницы сохраняется во время импорта, а во втором случае пользователь, выполняющий импорт, становится последним автором каждой импортированной страницы.
 
 # Other Category
 admin.other=Прочее
 admin.other.description=Различные конфигурации для расширений.
 administration.section.analytics.status=Статус
-### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
+administration.section.analytics.status.hint=Определите, активно ли отслеживание в Google Analytics ™</content>
 </xwikidoc>

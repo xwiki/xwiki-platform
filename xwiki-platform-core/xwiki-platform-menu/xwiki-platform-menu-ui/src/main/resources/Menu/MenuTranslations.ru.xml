@@ -37,20 +37,20 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-### Missing: Menu.MenuClass_content1=Menu Structure
+Menu.MenuClass_content1=Структура меню
 
 # Live table generic keys
-### Missing: menu.livetable.doc.title=Page title
-### Missing: menu.livetable.doc.name=Page name
-### Missing: menu.livetable.doc.location=Location
-### Missing: menu.livetable.doc.space=Space
-### Missing: menu.livetable.doc.fullname=Page full name
-### Missing: menu.livetable.doc.author=Last Author
-### Missing: menu.livetable.doc.creator=Creator
-### Missing: menu.livetable.doc.date=Update date
-### Missing: menu.livetable.doc.creationDate=Creation date
-### Missing: menu.livetable._avatar=Avatar
-### Missing: menu.livetable._images=Images
+menu.livetable.doc.title=Заголовок страницы
+menu.livetable.doc.name=Название страницы
+menu.livetable.doc.location=Расположение
+menu.livetable.doc.space=Раздел
+menu.livetable.doc.fullname=Полное имя страницы
+menu.livetable.doc.author=Последний автор
+menu.livetable.doc.creator=Создатель
+menu.livetable.doc.date=Дата изменения
+menu.livetable.doc.creationDate=Дата создания
+menu.livetable._avatar=Аватар
+menu.livetable._images=Изображения
 ### Missing: menu.livetable._attachments=Attachments
 ### Missing: menu.livetable._actions=Actions
 ### Missing: menu.livetable._actions.edit=Edit

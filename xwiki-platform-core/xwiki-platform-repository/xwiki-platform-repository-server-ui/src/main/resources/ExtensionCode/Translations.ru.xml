@@ -38,16 +38,16 @@
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
 extension.repository.emptyvalue=
-### Missing: extension.repository.name=Name
-### Missing: extension.repository.summary=Summary
-### Missing: extension.repository.type=Type
-### Missing: extension.repository.category=Category
-### Missing: extension.repository.authors=Authors
-### Missing: extension.repository.doc.creationDate=Created On
-### Missing: extension.repository.doc.date=Last Modified
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.name=Название
+extension.repository.summary=Комментарий
+extension.repository.type=Тип
+extension.repository.category=Категория
+extension.repository.authors=Авторы
+extension.repository.doc.creationDate=Создано
+extension.repository.doc.date=Последние изменения
+extension.repository.rating=Рейтинг
+extension.repository.installedCount=Количество установок
 
 ## Administration UI
-### Missing: admin.repository=Extension Repository</content>
+admin.repository=Репозиторий расширений</content>
 </xwikidoc>

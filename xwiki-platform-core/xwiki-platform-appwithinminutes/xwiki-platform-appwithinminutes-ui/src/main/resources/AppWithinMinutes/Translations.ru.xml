@@ -52,7 +52,7 @@ platform.appwithinminutes.appPanelCreateEntry=Создайте свое собс
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Шаг {0} — {1}
-appWithinMinutes.wizardStep.name.name=Имя
+appWithinMinutes.wizardStep.name.name=Название
 appWithinMinutes.wizardStep.name.title=Назовите свое приложение
 appWithinMinutes.wizardStep.name.description=Укажите имя приложения
 appWithinMinutes.wizardStep.structure.name=Структура
@@ -182,7 +182,7 @@ platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Дата со
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Дата создания страницы приложения
 platform.appwithinminutes.liveTableEditorActionsColumnName=Действия
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=Перечень действий, которые могут осуществляться на странице приложения, такие как редактирование и удаление
-platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Приложения
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Вложения
 platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Специальная колонка для вывода ссылок на вложенные файлы на странице приложения
 platform.appwithinminutes.liveTableEditorImagesColumnName=Изображения
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Специальная колонка для демонстрации изображений, которые прикреплены к странице
@@ -229,7 +229,7 @@ platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Полное им
 platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Название страницы, которая содержит страницу приложения (в формате НазваниеРаздела.НазваниеСтраницы)
 
 #@deprecated appWithinMinutes.wizardStep.name.name
-platform.appwithinminutes.wizardStep1Name=Имя
+platform.appwithinminutes.wizardStep1Name=Название
 #@deprecated appWithinMinutes.wizardStep.name.title
 platform.appwithinminutes.wizardStep1Title=Назовите свое приложение
 #@deprecated appWithinMinutes.wizardStep.name.description

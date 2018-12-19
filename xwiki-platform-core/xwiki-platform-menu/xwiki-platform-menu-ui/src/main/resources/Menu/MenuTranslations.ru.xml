@@ -51,39 +51,39 @@ menu.livetable.doc.date=Дата изменения
 menu.livetable.doc.creationDate=Дата создания
 menu.livetable._avatar=Аватар
 menu.livetable._images=Изображения
-### Missing: menu.livetable._attachments=Attachments
-### Missing: menu.livetable._actions=Actions
-### Missing: menu.livetable._actions.edit=Edit
-### Missing: menu.livetable._actions.delete=Delete
-### Missing: menu.livetable.emptyvalue=-
+menu.livetable._attachments=Вложения
+menu.livetable._actions=Действия
+menu.livetable._actions.edit=Редактировать
+menu.livetable._actions.delete=Удалить
+menu.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: menu.livetable.content1=Menu Structure
+menu.livetable.content1=Структура меню
 
 # Administration keys
-### Missing: admin.menu.name=Menu
+admin.menu.name=Меню
 
 # UIX keys
-### Missing: menu.uix.extensionPoint.label=Menu Display Location
-### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
-### Missing: menu.uix.extensionPoint.value.nowhere=Nowhere
-### Missing: menu.uix.extensionPoint.value.template.header.after=After the Page Header
-### Missing: menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel
-### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
-### Missing: menu.uix.content.label=UI Extension Content
-### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
-### Missing: menu.uix.scope.label=Menu Visibility Scope
-### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
+menu.uix.extensionPoint.label=Расположение отображения меню
+menu.uix.extensionPoint.hint=Определяет, где отображать меню. Меню отображается горизонтально или вертикально в зависимости от выбранного расположения.
+menu.uix.extensionPoint.value.nowhere=Нигде
+menu.uix.extensionPoint.value.template.header.after=После заголовка страницы
+menu.uix.extensionPoint.value.panels.rightPanels=Внутри правой панели
+menu.uix.extensionPoint.value.panels.leftPanels=Внутри левой панели
+menu.uix.content.label=Расширение пользовательского интерфейса
+menu.uix.content.hint=Если вы видите это, вероятно, что у вас отключен JavaScript. Вы должны выбрать то же значение, что и для расположения отображения меню.
+menu.uix.scope.label=Область видимости меню
+menu.uix.scope.hint=Указывает, в каком контексте отображается меню.
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=Menu
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
-### Missing: rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
-### Missing: rendering.macro.menu.parameter.type.name=Type
-### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+rendering.macro.menu.name=Меню
+rendering.macro.menu.description=Отображает меню, созданное с использованием простого синтаксиса вики (вложенные списки и ссылки).
+rendering.macro.menu.parameter.id.name=ID
+rendering.macro.menu.parameter.id.description=Необязательный идентификатор меню, который будет установлен для HTML-элемента, который оборачивает меню. Вы можете использовать этот идентификатор в коде JavaScript для доступа к DOM меню или в функциональных тестах для подтверждения пунктов меню.
+rendering.macro.menu.parameter.type.name=Тип
+rendering.macro.menu.parameter.type.description=Необязательный тип меню определяет внешний вид и поведение меню. Поддерживаемые значения: горизонтальный (значение по умолчанию) и вертикальный.
+rendering.macro.menu.content.description=Определите структуру меню, используя синтаксис вики. Каждый пункт меню должен быть элементом списка и содержать метку или ссылку на пункт меню. Вы можете использовать вложенные списки для пунктов подменю.
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
+menu.description=Это простое приложение, которое помогает вам создавать навигационные меню, которые будут отображаться либо горизонтально в виде верхней панели после заголовка страницы, либо вертикально на боковой панели.</content>
 </xwikidoc>

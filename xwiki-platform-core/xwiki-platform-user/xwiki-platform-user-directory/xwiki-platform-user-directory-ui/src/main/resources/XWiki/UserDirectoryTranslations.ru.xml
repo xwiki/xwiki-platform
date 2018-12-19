@@ -36,12 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: userdirectory.userScopeFilter=User scope:
-### Missing: userdirectory.userScopeFilter.hint=Select the category of users you want to display.
-### Missing: userdirectory.userScopeFilter.local=Local users
-### Missing: userdirectory.userScopeFilter.global=Global users who are members of this wiki
-### Missing: platform.userdirectory.customizeNotAllowed=You are not allowed to customize this User Directory.
-### Missing: platform.userdirectory.configTitle=User Directory Configuration
-### Missing: platform.userdirectory.configSheetTitle=User Directory Configuration Sheet
-### Missing: platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.</content>
+  <content>userdirectory.userScopeFilter=Пользовательская область:
+userdirectory.userScopeFilter.hint=Выберите категорию пользователей, которых вы хотите отобразить.
+userdirectory.userScopeFilter.local=Локальные пользователи
+userdirectory.userScopeFilter.global=Глобальные пользователи, которые являются членами этой вики
+platform.userdirectory.customizeNotAllowed=Вам не разрешено настраивать этот каталог пользователей.
+platform.userdirectory.configTitle=Конфигурация каталога пользователя
+platform.userdirectory.configSheetTitle=Лист конфигурации каталога пользователя
+platform.userdirectory.configSheetApplyOnConfiguration=Этот лист должен быть применен к документу конфигурации UserDirectory.</content>
 </xwikidoc>

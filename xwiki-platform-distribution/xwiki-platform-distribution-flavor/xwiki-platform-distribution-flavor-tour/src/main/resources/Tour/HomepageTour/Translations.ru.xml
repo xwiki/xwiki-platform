@@ -40,27 +40,27 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
 <content>## Homepage Tour (by steps order)
-### Missing: tour.homepageTour.welcome.title=Welcome to XWiki
-### Missing: tour.homepageTour.welcome.content=In the next couple of minutes you will discover your wiki's interface and basic functionalities.
-### Missing: tour.homepageTour.panels.title=Panels
-### Missing: tour.homepageTour.panels.contentA=The current panels allow you to access your wiki's applications and pages.
-### Missing: tour.homepageTour.panels.contentB=Administrators can customize them and decide which panels are shown.
-### Missing: tour.homepageTour.breadcrumbs.title=Breadcrumbs
-### Missing: tour.homepageTour.breadcrumbs.contentA=The breadcrumbs allow you to identify where your page is located and navigate the hierarchy.
-### Missing: tour.homepageTour.breadcrumbs.contentB=The {0} button will always take you to the wiki''s home page.
-### Missing: tour.homepageTour.pageContent.title=Page Content
-### Missing: tour.homepageTour.pageContent.contentA=This is the place where the content of the current page is displayed.
-### Missing: tour.homepageTour.pageContent.contentB=Edit this page to add tables, lists, macros and structure in order to organize your knowledge.
-### Missing: tour.homepageTour.pageMenu.title=Page Menu
-### Missing: tour.homepageTour.pageMenu.contentA=This menu contains page related actions. With the appropriate rights, you can edit, create, administer or delete pages.
-### Missing: tour.homepageTour.pageMenu.contentB=The {0} button reveals more actions like Export, Print and Share.
-### Missing: tour.homepageTour.pageTabs.title=Page Tabs
-### Missing: tour.homepageTour.pageTabs.contentA=Comments are a great way for users to discuss the page content.
-### Missing: tour.homepageTour.pageTabs.contentB=You can also attach files, compare page versions or see page information.
-### Missing: tour.homepageTour.header.title=Header
-### Missing: tour.homepageTour.header.contentA=You can Search for content, Watch for page changes or access your User Profile.
-### Missing: tour.homepageTour.header.contentB=The {0} button opens a Drawer which contains wiki related actions like Administration and Indexes.
-### Missing: tour.homepageTour.tourComplete.title=Tour Complete
-### Missing: tour.homepageTour.tourComplete.contentA=This completes your tour on XWiki's interface and basic functionalities.
-### Missing: tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.</content>
+tour.homepageTour.welcome.title=Добро пожаловать в XWiki
+tour.homepageTour.welcome.content=В течение следующих нескольких минут вы откроете для себя интерфейс вашей вики и основные функции.
+tour.homepageTour.panels.title=Панели
+tour.homepageTour.panels.contentA=Текущие панели позволяют вам получить доступ к приложениям и страницам вашей вики.
+tour.homepageTour.panels.contentB=Администраторы могут настроить их и решить, какие панели отображаются.
+tour.homepageTour.breadcrumbs.title=Хлебные крошки
+tour.homepageTour.breadcrumbs.contentA=Хлебные крошки позволяют вам определить, где находится ваша страница, и перемещаться по иерархии.
+tour.homepageTour.breadcrumbs.contentB=Кнопка {0} всегда приведет вас на домашнюю страницу вики.
+tour.homepageTour.pageContent.title=Содержание страницы
+tour.homepageTour.pageContent.contentA=Это место, где отображается содержимое текущей страницы.
+tour.homepageTour.pageContent.contentB=Отредактируйте эту страницу, чтобы добавить таблицы, списки, макросы и структуру, чтобы упорядочить свои знания.
+tour.homepageTour.pageMenu.title=Меню cтраницы
+tour.homepageTour.pageMenu.contentA=Это меню содержит действия, связанные со страницей. Обладая соответствующими правами, вы можете редактировать, создавать, администрировать или удалять страницы.
+tour.homepageTour.pageMenu.contentB=Кнопка {0} отображает больше действий, таких как Экспорт, Печать и Поделиться.
+tour.homepageTour.pageTabs.title=Вкладки страницы
+tour.homepageTour.pageTabs.contentA=Комментарии - отличный способ обсудить содержание страницы.
+tour.homepageTour.pageTabs.contentB=Вы также можете прикрепить файлы, сравнить версии страницы или просмотреть информацию о странице.
+tour.homepageTour.header.title=Заголовок
+tour.homepageTour.header.contentA=Вы можете искать контент, следить за изменениями страницы или получить доступ к своему профилю пользователя.
+tour.homepageTour.header.contentB=Кнопка {0} отображает действия, связанные с вики, такие как Администрирование и Индексы.
+tour.homepageTour.tourComplete.title=Тур завершен
+tour.homepageTour.tourComplete.contentA=На этом ваш тур по интерфейсу и основным функциям XWiki завершен.
+tour.homepageTour.tourComplete.contentB=Для получения более подробной информации о каждой функции, обратитесь к {0} документации {1}.</content>
 </xwikidoc>

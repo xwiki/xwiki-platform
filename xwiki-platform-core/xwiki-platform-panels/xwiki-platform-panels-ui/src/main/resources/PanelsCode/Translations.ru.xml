@@ -36,30 +36,30 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: platform.panels.applications.helper=Here, you can select which applications are displayed in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. You can also re-order the applications as you want. Don't forget to save your changes!
-### Missing: platform.panels.applications.displayedapps=Applications in the bar
-### Missing: platform.panels.applications.blacklistedapps=Applications not in the bar
-### Missing: platform.panels.applications.save=Save
-### Missing: platform.panels.applications.revert=Reset
-### Missing: platform.panels.applications.ajax.success=The configuration has been saved.
-### Missing: platform.panels.applications.ajax.csrf=CSRF validation failed. Try reloading the page.
-### Missing: platform.panels.applications.ajax.noright=You do not have the right to edit PanelsCode.ApplicationsPanelConfiguration.
-### Missing: platform.panels.applications.ajax.error=Failed to save your change(s).
-### Missing: admin.panels.applications=Applications Panel
-### Missing: admin.panels.applications.description=Manage what applications are displayed in the Applications Panel.
+  <content>platform.panels.applications.helper=Здесь вы можете выбрать, какие приложения будут отображаться на панели приложений (слева, по умолчанию). Любое новое приложение будет отображаться там. Если вы хотите удалить некоторые из них, вам просто нужно перетащить значок из первого поля в другое. Вы также можете изменить порядок приложений, как вы хотите. Не забудьте сохранить свои изменения!
+platform.panels.applications.displayedapps=Приложения на панели
+platform.panels.applications.blacklistedapps=Приложения вне панели
+platform.panels.applications.save=Сохранить
+platform.panels.applications.revert=Сброс
+platform.panels.applications.ajax.success=Настройка сохранена.
+platform.panels.applications.ajax.csrf=Ошибка проверки CSRF. Попробуйте перезагрузить страницу.
+platform.panels.applications.ajax.noright=У вас нет полномочий для редактирования PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Ошибка сохранения изменений.
+admin.panels.applications=Панель приложений
+admin.panels.applications.description=Управляйте отображением приложений на панели приложений.
 
-### Missing: admin.panels.navigation=Navigation Panel
-### Missing: admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration</content>
+admin.panels.navigation=Панель навигации
+admin.panels.navigation.description=Управляйте отображением страниц в Панели навигации.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Исключить страницы расширения верхнего уровня
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Этот динамический фильтр удаляет из дерева навигации страницы верхнего уровня, которые принадлежат установленному расширению, если они не предназначены для изменения.
+PanelsCode.NavigationConfigurationClass_exclusions=Исключения
+PanelsCode.NavigationConfigurationClass_exclusions.hint=Список страниц для исключения из дерева навигации.
+PanelsCode.NavigationConfigurationClass_inclusions=Включения
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Список страниц, включаемых в дерево навигации, даже если они были исключены предыдущим фильтром.
+platform.panels.navigation.configuration.excludedPages=Исключенные страницы
+platform.panels.navigation.configuration.excludedPages.hint=Используйте перетаскивание, чтобы переместить страницы из дерева навигации или вернуть их обратно.
+platform.panels.navigation.configuration.excludedPages.empty=Ничего
+platform.panels.navigation.configuration.topLevelExtensionPages=Страницы расширения верхнего уровня
+platform.panels.navigation.configuration.otherPages=Другие страницы
+platform.panels.navigation.configuration.saveComment=Конфигурация панели навигации обновлена администратором</content>
 </xwikidoc>

@@ -37,25 +37,25 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>
-### Missing: skin.sheet.title=Skin
-### Missing: skin.sheet.properties=Skin Properties
-### Missing: skin.sheet.deprecatedProperties=Deprecated properties
-### Missing: skin.sheet.overriddenTemplates=Overridden templates
-### Missing: skin.sheet.addTemplate=Add a new overriding template
-### Missing: skin.sheet.add=Add
-### Missing: skin.sheet.overrideTemplateWarning=This section allows you to override a template of the skin. This is technical and you should be aware of the consequences.
-### Missing: skin.sheet.deprecatedPropertiesWarning=This section is here for retro-compatibility reasons. You should use the 'overridden templates' mechanism above.
-### Missing: skin.sheet.nojs=Without JavaScript, you cannot use this section. But you can use the {0}Object Editor{1} instead, and manually add {2} objects.
+skin.sheet.title=Скин
+skin.sheet.properties=Свойства скина
+skin.sheet.deprecatedProperties=Устаревшие свойства
+skin.sheet.overriddenTemplates=Переопределенные шаблоны
+skin.sheet.addTemplate=Добавить новый переопределяющий шаблон
+skin.sheet.add=Добавить
+skin.sheet.overrideTemplateWarning=Этот раздел позволяет переопределить шаблон скина. Это технический вопрос, и вы должны знать о последствиях.
+skin.sheet.deprecatedPropertiesWarning=Этот раздел здесь для целей ретро-совместимости. Вы должны использовать механизм «переопределенных шаблонов» выше.
+skin.sheet.nojs=Без JavaScript вы не сможете использовать этот раздел. Но вместо этого вы можете использовать {0} Редактор объектов {1} и вручную добавить {2} объекты.
 
-### Missing: skin.sheet.js.deleting=Deleting...
-### Missing: skin.sheet.js.deletingDone=The template has been deleted!
-### Missing: skin.sheet.js.error.csrf=CSRF validation failed when saving. Refresh your browser to try again.
-### Missing: skin.sheet.js.error.rights=Failed to save the skins because of insufficient permissions.
-### Missing: skin.sheet.js.deleteConfirmationText=Are you sure you want to delete this template?
-### Missing: skin.sheet.js.deleteConfirmationYes=Yes, delete it
-### Missing: skin.sheet.js.deleteConfirmationNo=No, cancel
-### Missing: skin.sheet.js.adding=Adding...
-### Missing: skin.sheet.js.addingDone=The template has been added!
+skin.sheet.js.deleting=Удаление...
+skin.sheet.js.deletingDone=Шаблон был удален!
+skin.sheet.js.error.csrf=Проверка CSRF не удалась при сохранении. Обновите ваш браузер, чтобы повторить попытку.
+skin.sheet.js.error.rights=Не удалось сохранить скины из-за недостаточных прав доступа.
+skin.sheet.js.deleteConfirmationText=Вы уверены что хотите удалить этот шаблон?
+skin.sheet.js.deleteConfirmationYes=Да, удалить
+skin.sheet.js.deleteConfirmationNo=Нет, отмена
+skin.sheet.js.adding=Добавление...
+skin.sheet.js.addingDone=Шаблон добавлен!
 
 ###############################################################################
 ## Deprecated

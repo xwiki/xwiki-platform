@@ -234,11 +234,10 @@ public class LocalizationScriptService implements ScriptService
      *            {@code fr_FR} one).
      * @return the rendered translation message
      * @since 9.0RC1
-     * @since 8.4.2
      */
     public String render(String key, Collection<?> parameters, Locale locale)
     {
-        return render(key, Syntax.PLAIN_1_0, parameters);
+        return render(key, Syntax.PLAIN_1_0, parameters, locale);
     }
 
     /**
@@ -252,7 +251,7 @@ public class LocalizationScriptService implements ScriptService
      */
     public String render(Collection<String> keys, Collection<?> parameters, Locale locale)
     {
-        return render(keys, Syntax.PLAIN_1_0, parameters);
+        return render(keys, Syntax.PLAIN_1_0, parameters, locale);
     }
 
     /**
@@ -285,7 +284,6 @@ public class LocalizationScriptService implements ScriptService
      *            {@code fr_FR} one).
      * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
      * @since 9.0RC1
-     * @since 8.4.2
      */
     public String render(String key, Syntax syntax, Locale locale)
     {
@@ -338,7 +336,6 @@ public class LocalizationScriptService implements ScriptService
      *            {@code fr_FR} one).
      * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
      * @since 9.0RC1
-     * @since 8.4.2
      */
     public String render(String key, Syntax syntax, Collection<?> parameters, Locale locale)
     {

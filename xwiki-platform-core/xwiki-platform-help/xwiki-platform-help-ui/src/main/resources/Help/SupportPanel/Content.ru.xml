@@ -31,10 +31,12 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>Нужна помощь?</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>Если Вам нужна помощь с XWiki вы можете связаться с:
+* [[Community Support&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Main/Support#HCommunitySupport]]
+* [[Professional Support&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Main/Support#HProfessionalSupport]]</content>
 </xwikidoc>

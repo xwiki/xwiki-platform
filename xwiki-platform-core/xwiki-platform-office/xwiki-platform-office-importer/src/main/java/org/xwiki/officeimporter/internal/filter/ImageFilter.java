@@ -184,7 +184,7 @@ public class ImageFilter extends AbstractHTMLFilter
 
                 // we also need to replace the "&amp;" by "&" since the fileName of the image could contain "&".
                 // note that if the image name contains "&amp;" the produced html would contain "&amp;amp;"
-                fileName = fileName.replaceAll("&amp;","&");
+                fileName = fileName.replaceAll("&amp;", "&");
             } catch (Exception e) {
                 // This shouldn't happen. Use the encoded image file name.
             }

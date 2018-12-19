@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Priority;
@@ -74,7 +75,6 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -112,6 +112,7 @@ import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -2756,6 +2757,31 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Set the locale in the given context.
+     * <p>
+     * If {@code forceSupported} is true, then the locale will be set only if it is in the {@see availableLocales}. Note
+     * that all the parent locales are checked.
+     *
+     * @param locale the locale to use
+     * @param context the context
+     * @param availableLocales the accepted locales. Used only if {@see forceSupported} is true
+     * @param forceSupported determine if the {@see locale} should be checked against the {@see availableLocales}
+     * @return the locale that has been set or null
+     */
+    private Locale setLocale(Locale locale, XWikiContext context, Set<Locale> availableLocales, boolean forceSupported)
+    {
+        while (locale != null) {
+            if (!forceSupported || availableLocales.contains(locale)) {
+                context.setLocale(locale);
+                break;
+            }
+            locale = LocaleUtils.getParentLocale(locale);
+        }
+
+        return locale;
+    }
+
+    /**
      * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
      * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get the
      * locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists then use
@@ -2767,9 +2793,119 @@ public class XWiki implements EventListener
      */
     public Locale getLocalePreference(XWikiContext context)
     {
-        String language = getLanguagePreference(context);
+        Locale defaultLocale = this.getDefaultLocale(context);
+        Set<Locale> availableLocales = new HashSet<>(this.getAvailableLocales(context));
+        boolean forceSupported = getConfiguration().getProperty("xwiki.language.forceSupported", "0").equals("1");
 
-        return LocaleUtils.toLocale(language);
+        // First we try to get the language from the XWiki Context. This is the current language
+        // being used.
+        Locale locale = context.getLocale();
+        if (locale != null) {
+            return locale;
+        }
+
+        // If the wiki is non multilingual then the language is the default language.
+        if (!context.getWiki().isMultiLingual(context)) {
+            locale = defaultLocale;
+            context.setLocale(locale);
+            return locale;
+        }
+
+        // As the wiki is multilingual try to find the language to use from the request by looking
+        // for a language parameter. If the language value is "default" use the default language
+        // from the XWiki preferences settings. Otherwise set a cookie to remember the language
+        // in use.
+        try {
+            String language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
+            if (!StringUtils.isEmpty(language)) {
+                locale = LocaleUtils.toLocale(language);
+                if ("default".equals(language)) {
+                    // forgetting language cookie
+                    Cookie cookie = new Cookie("language", "");
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/");
+                    context.getResponse().addCookie(cookie);
+                    context.setLocale(defaultLocale);
+                    return defaultLocale;
+                } else {
+                    locale = setLocale(locale, context, availableLocales, forceSupported);
+                    if (locale != null) {
+                        // setting language cookie
+                        Cookie cookie = new Cookie("language", context.getLocale().toString());
+                        cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+                        cookie.setPath("/");
+                        context.getResponse().addCookie(cookie);
+                        return locale;
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        // As no language parameter was passed in the request, try to get the language to use
+        // from a cookie.
+        try {
+            // First we get the language from the cookie
+            String language = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
+            if (!StringUtils.isEmpty(language)) {
+                locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
+                if (locale != null) {
+                    return locale;
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        // Next from the default user preference
+        try {
+            String user = context.getUser();
+            XWikiDocument userdoc;
+            userdoc = getDocument(user, context);
+            if (userdoc != null) {
+                String language =
+                        Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
+                if (!StringUtils.isEmpty(language)) {
+                    locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
+                    if (locale != null) {
+                        return locale;
+                    }
+                }
+            }
+        } catch (XWikiException e) {
+        }
+
+        // If the default language is preferred, and since the user didn't explicitly ask for a
+        // language already, then use the default wiki language.
+        if (getConfiguration().getProperty("xwiki.language.preferDefault", "0").equals("1")
+                || getSpacePreference("preferDefaultLanguage", "0", context).equals("1"))
+        {
+            locale = defaultLocale;
+            context.setLocale(locale);
+            return locale;
+        }
+
+        // Then from the navigator language setting
+        if (context.getRequest() != null) {
+            String acceptHeader = context.getRequest().getHeader("Accept-Language");
+            // If the client didn't specify some languages, skip this phase
+            if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
+                List<Locale> acceptedLocales = getAcceptedLanguages(context.getRequest()).stream()
+                        .map(LocaleUtils::toLocale)
+                        .collect(Collectors.toList());
+                for (Locale acceptedLocale : acceptedLocales) {
+                    locale = setLocale(acceptedLocale, context, availableLocales, forceSupported);
+                    if (locale != null) {
+                        return locale;
+                    }
+                }
+                // If none of the languages requested by the client is acceptable, skip to next
+                // phase (use default language).
+            }
+        }
+
+        // Finally, use the default language from the global preferences.
+        context.setLocale(defaultLocale);
+        return defaultLocale;
     }
 
     /**
@@ -2783,113 +2919,9 @@ public class XWiki implements EventListener
      * @deprecated since 8.0M1, use {@link #getLocalePreference(XWikiContext)} instead
      */
     @Deprecated
-    // TODO: move implementation to #getLocalePreference
     public String getLanguagePreference(XWikiContext context)
     {
-        // First we try to get the language from the XWiki Context. This is the current language
-        // being used.
-        String language = context.getLanguage();
-        if (language != null) {
-            return language;
-        }
-
-        String defaultLanguage = getDefaultLanguage(context);
-
-        // If the wiki is non multilingual then the language is the default language.
-        if (!context.getWiki().isMultiLingual(context)) {
-            language = defaultLanguage;
-            context.setLanguage(language);
-            return language;
-        }
-
-        // As the wiki is multilingual try to find the language to use from the request by looking
-        // for a language parameter. If the language value is "default" use the default language
-        // from the XWiki preferences settings. Otherwise set a cookie to remember the language
-        // in use.
-        try {
-            language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
-            if ((language != null) && (!language.equals(""))) {
-                if (language.equals("default")) {
-                    // forgetting language cookie
-                    Cookie cookie = new Cookie("language", "");
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    context.getResponse().addCookie(cookie);
-                    language = defaultLanguage;
-                } else {
-                    // setting language cookie
-                    Cookie cookie = new Cookie("language", language);
-                    cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                    cookie.setPath("/");
-                    context.getResponse().addCookie(cookie);
-                }
-                context.setLanguage(language);
-                return language;
-            }
-        } catch (Exception e) {
-        }
-
-        // As no language parameter was passed in the request, try to get the language to use
-        // from a cookie.
-        try {
-            // First we get the language from the cookie
-            language = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
-            if ((language != null) && (!language.equals(""))) {
-                context.setLanguage(language);
-                return language;
-            }
-        } catch (Exception e) {
-        }
-
-        // Next from the default user preference
-        try {
-            String user = context.getUser();
-            XWikiDocument userdoc = null;
-            userdoc = getDocument(user, context);
-            if (userdoc != null) {
-                language = Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
-                if (!language.equals("")) {
-                    context.setLanguage(language);
-                    return language;
-                }
-            }
-        } catch (XWikiException e) {
-        }
-
-        // If the default language is preferred, and since the user didn't explicitly ask for a
-        // language already, then use the default wiki language.
-        if (getConfiguration().getProperty("xwiki.language.preferDefault", "0").equals("1")
-            || getSpacePreference("preferDefaultLanguage", "0", context).equals("1")) {
-            language = defaultLanguage;
-            context.setLanguage(language);
-            return language;
-        }
-
-        // Then from the navigator language setting
-        if (context.getRequest() != null) {
-            String acceptHeader = context.getRequest().getHeader("Accept-Language");
-            // If the client didn't specify some languages, skip this phase
-            if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
-                List<String> acceptedLanguages = getAcceptedLanguages(context.getRequest());
-                // We can force one of the configured languages to be accepted
-                if (getConfiguration().getProperty("xwiki.language.forceSupported", "0").equals("1")) {
-                    List<String> available = Arrays.asList(getXWikiPreference("languages", context).split("[, |]"));
-                    // Filter only configured languages
-                    acceptedLanguages.retainAll(available);
-                }
-                if (acceptedLanguages.size() > 0) {
-                    // Use the "most-preferred" language, as requested by the client.
-                    context.setLanguage(acceptedLanguages.get(0));
-                    return acceptedLanguages.get(0);
-                }
-                // If none of the languages requested by the client is acceptable, skip to next
-                // phase (use default language).
-            }
-        }
-
-        // Finally, use the default language from the global preferences.
-        context.setLanguage(defaultLanguage);
-        return defaultLanguage;
+        return getLocalePreference(context).toString();
     }
 
     /**

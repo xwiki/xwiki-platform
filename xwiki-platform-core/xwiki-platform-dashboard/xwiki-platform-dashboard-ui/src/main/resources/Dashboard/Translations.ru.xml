@@ -36,11 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: dashboard.templateProvider.description=Customisable gadgets
+  <content>dashboard.templateProvider.description=Настраиваемые гаджеты
 
-### Missing: dashboard.gadgetSelector.title=Select Gadget
-### Missing: dashboard.gadgetEditor.title=Edit Gadget
-### Missing: dashboard.gadgetEditor.changeGadget.label=Change Gadget
-### Missing: dashboard.gadgetEditor.gadgetTitle.label=Gadget Title
-### Missing: dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget appears at the top of the gadget panel on the dashboard (may contain velocity code).</content>
+dashboard.gadgetSelector.title=Выбрать гаджет
+dashboard.gadgetEditor.title=Редактировать гаджет
+dashboard.gadgetEditor.changeGadget.label=Изменить гаджет
+dashboard.gadgetEditor.gadgetTitle.label=Заголовок гаджета
+dashboard.gadgetEditor.gadgetTitle.hint=Название этого гаджета отображается в верхней части панели гаджетов на панели инструментов (может содержать код).</content>
 </xwikidoc>

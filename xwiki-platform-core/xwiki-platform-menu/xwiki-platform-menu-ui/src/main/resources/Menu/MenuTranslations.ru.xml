@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="ru">
+  <web>Menu</web>
+  <name>MenuTranslations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>MenuClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+### Missing: Menu.MenuClass_content1=Menu Structure
+
+# Live table generic keys
+### Missing: menu.livetable.doc.title=Page title
+### Missing: menu.livetable.doc.name=Page name
+### Missing: menu.livetable.doc.location=Location
+### Missing: menu.livetable.doc.space=Space
+### Missing: menu.livetable.doc.fullname=Page full name
+### Missing: menu.livetable.doc.author=Last Author
+### Missing: menu.livetable.doc.creator=Creator
+### Missing: menu.livetable.doc.date=Update date
+### Missing: menu.livetable.doc.creationDate=Creation date
+### Missing: menu.livetable._avatar=Avatar
+### Missing: menu.livetable._images=Images
+### Missing: menu.livetable._attachments=Attachments
+### Missing: menu.livetable._actions=Actions
+### Missing: menu.livetable._actions.edit=Edit
+### Missing: menu.livetable._actions.delete=Delete
+### Missing: menu.livetable.emptyvalue=-
+
+# Live table specific keys
+### Missing: menu.livetable.content1=Menu Structure
+
+# Administration keys
+### Missing: admin.menu.name=Menu
+
+# UIX keys
+### Missing: menu.uix.extensionPoint.label=Menu Display Location
+### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
+### Missing: menu.uix.extensionPoint.value.nowhere=Nowhere
+### Missing: menu.uix.extensionPoint.value.template.header.after=After the Page Header
+### Missing: menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel
+### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
+### Missing: menu.uix.content.label=UI Extension Content
+### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
+### Missing: menu.uix.scope.label=Menu Visibility Scope
+### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
+
+# Menu Macro
+### Missing: rendering.macro.menu.name=Menu
+### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+### Missing: rendering.macro.menu.parameter.id.name=Id
+### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+### Missing: rendering.macro.menu.parameter.type.name=Type
+### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
+### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+
+# Menu WebHome
+### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
+</xwikidoc>

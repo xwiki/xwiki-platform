@@ -161,6 +161,7 @@
         $macroDescriptor.contentDescriptor.description)",
       'mandatory': $macroDescriptor.contentDescriptor.mandatory,
       'deprecated': $macroDescriptor.contentDescriptor.deprecated,
+      'advanced': $macroDescriptor.contentDescriptor.advanced,
       'defaultValue': $macroDescriptor.contentDescriptor.defaultValue,
       'type': "$!macroDescriptor.contentDescriptor.type",
       'editTemplate': '&lt;textarea name="$content" rows="7"&gt;&lt;/textarea&gt;',
@@ -177,6 +178,7 @@
       'description': "#maybeTranslate(""${parameterTranslationKey}.description"" $parameterDescriptor.description)",
       'mandatory': $parameterDescriptor.mandatory,
       'deprecated': $parameterDescriptor.deprecated,
+      'advanced': $parameterDescriptor.advanced,
       'defaultValue': $parameterDescriptor.defaultValue,
       'type': $parameterDescriptor.parameterType,
       'index': $foreach.index

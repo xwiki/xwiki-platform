@@ -149,6 +149,9 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
         id: '$content',
         name: translations.get('content')
       }, macroDescriptor.contentDescriptor);
+      // We set the parameter value even if it's empty because we want the macro content to have the priority of a
+      // macro parameter that is explicitly set. This means that the macro content text area will be displayed on top
+      // of the macro parameters that don't have a value set.
       if (typeof macroCall.content === 'string') {
         parameter.value = macroCall.content;
       }
@@ -163,8 +166,13 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
       var aliceHasValue = alice.hasOwnProperty('value');
       var bobHasValue = bob.hasOwnProperty('value');
       if (aliceHasValue === bobHasValue) {
-        // Macro descriptor order.
-        return alice.index - bob.index;
+        if (alice.advanced === bob.advanced) {
+          // Macro descriptor order.
+          return alice.index - bob.index;
+        } else {
+          // Advanced parameters last.
+          return !!alice.advanced - !!bob.advanced;
+        }
       } else {
         // Parameters with value first.
         return bobHasValue - aliceHasValue;
@@ -177,19 +185,23 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
 
   addParameterSeparator = function(parameters) {
     var i = 0;
-    // Show the mandatory parameters and those that have been set.
+    // Show all the mandatory parameters and those that have been set.
     while (i < parameters.length && (parameters[i].mandatory || parameters[i].hasOwnProperty('value'))) {
       i++;
     }
-    // If there are no mandatory parameters and no parameter is set then show the first three parameters.
-    if (i === 0 && parameters.length > 3) {
-      i = 3;
+    var limit = 3;
+    // Show simple parameters until we reach the limit.
+    while (i < parameters.length && i < limit && !parameters[i].advanced) {
+      i++;
     }
+    // If there are no mandatory parameters and no parameter is set and all parameters are advanced then we're forced
+    // to show some advanced parameters.
+    i = i || Math.min(parameters.length, limit);
+    // Show a 'more' link to toggle the remaining parameters.
     if (i > 0 && i < parameters.length) {
-      // Show a 'more' link to toggle the remaining parameters.
       parameters.splice(i, 0, {id: 'more'});
+    // Show a message for the empty list of parameters.
     } else if (parameters.length === 0) {
-      // Show a message for the empty list of parameters.
       parameters.push({id: 'empty'});
     }
     return parameters;

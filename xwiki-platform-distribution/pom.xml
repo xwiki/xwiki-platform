@@ -41,7 +41,6 @@
     <module>xwiki-platform-distribution-war</module>
     <module>xwiki-platform-distribution-war-dependencies</module>
     <module>xwiki-platform-distribution-war-legacydependencies</module>
-    <module>xwiki-platform-distribution-war-minimaldependencies</module>
     <module>xwiki-platform-distribution-ui</module>
   </modules>
   <properties>

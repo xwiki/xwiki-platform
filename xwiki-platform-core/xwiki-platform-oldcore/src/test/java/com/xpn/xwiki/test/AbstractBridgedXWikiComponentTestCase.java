@@ -82,6 +82,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         // Make sure response.encodeURL() calls don't fail
         Mock xwikiResponse = mock(XWikiResponse.class);
         xwikiResponse.stubs().method("setLocale");
+        xwikiResponse.stubs().method("addCookie");
         xwikiResponse.stubs().method("encodeURL").will(
             new CustomStub("Implements XWikiResponse.encodeURL")
             {

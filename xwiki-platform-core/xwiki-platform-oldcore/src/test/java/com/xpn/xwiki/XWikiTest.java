@@ -45,12 +45,9 @@ import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -59,7 +56,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -625,5 +621,99 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             this.xwiki.checkActive("xwiki:" + XWikiRightService.SUPERADMIN_USER_FULLNAME, this.getContext());
 
         Assert.assertEquals(1, isUserActive);
+    }
+
+    public void testGetLocalePreferenceWithContext() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null));
+        getContext().setLocale(Locale.FRENCH);
+
+        assertEquals(Locale.FRENCH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceDefaultNonMultilingual() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null));
+
+        assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithParameter() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public String getParameter(String s)
+            {
+                if ("language".equals(s)) {
+                    return "fr_CA";
+                }
+                return null;
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        assertEquals(Locale.CANADA_FRENCH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithParameterDefault() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public String getParameter(String s)
+            {
+                if ("language".equals(s)) {
+                    return "default";
+                }
+                return null;
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithCookie() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public Cookie[] getCookies()
+            {
+                return new Cookie[]{ new Cookie("language", "fr_CA") };
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        assertEquals(Locale.CANADA_FRENCH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithNavigatorLanguages() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public Enumeration<Locale> getLocales()
+            {
+                ArrayList<Locale> locales = new ArrayList<>();
+                locales.add(new Locale("*"));
+                locales.add(new Locale("en_US"));
+                locales.add(new Locale("fr"));
+                locales.add(new Locale("de"));
+                return IteratorUtils.asEnumeration(locales.iterator());
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        assertEquals(Locale.FRENCH, this.xwiki.getLocalePreference(getContext()));
     }
 }

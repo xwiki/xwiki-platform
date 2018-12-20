@@ -50,7 +50,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Priority;
@@ -2817,8 +2816,7 @@ public class XWiki implements EventListener
         // in use.
         try {
             String language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
-            if (!StringUtils.isEmpty(language)) {
-                locale = LocaleUtils.toLocale(language);
+            if (StringUtils.isNotEmpty(language)) {
                 if ("default".equals(language)) {
                     // forgetting language cookie
                     Cookie cookie = new Cookie("language", "");
@@ -2828,8 +2826,8 @@ public class XWiki implements EventListener
                     context.setLocale(defaultLocale);
                     return defaultLocale;
                 } else {
-                    locale = setLocale(locale, context, availableLocales, forceSupported);
-                    if (locale != null) {
+                    locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
+                    if (LocaleUtils.isAvailableLocale(locale)) {
                         // setting language cookie
                         Cookie cookie = new Cookie("language", context.getLocale().toString());
                         cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
@@ -2842,14 +2840,13 @@ public class XWiki implements EventListener
         } catch (Exception e) {
         }
 
-        // As no language parameter was passed in the request, try to get the language to use
-        // from a cookie.
+        // As no language parameter was passed in the request, try to get the language to use from a cookie.
         try {
             // First we get the language from the cookie
             String language = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
-            if (!StringUtils.isEmpty(language)) {
+            if (StringUtils.isNotEmpty(language)) {
                 locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
-                if (locale != null) {
+                if (LocaleUtils.isAvailableLocale(locale)) {
                     return locale;
                 }
             }
@@ -2864,9 +2861,9 @@ public class XWiki implements EventListener
             if (userdoc != null) {
                 String language =
                         Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
-                if (!StringUtils.isEmpty(language)) {
+                if (StringUtils.isNotEmpty(language)) {
                     locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
-                    if (locale != null) {
+                    if (LocaleUtils.isAvailableLocale(locale)) {
                         return locale;
                     }
                 }
@@ -2886,21 +2883,14 @@ public class XWiki implements EventListener
 
         // Then from the navigator language setting
         if (context.getRequest() != null) {
-            String acceptHeader = context.getRequest().getHeader("Accept-Language");
-            // If the client didn't specify some languages, skip this phase
-            if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
-                List<Locale> acceptedLocales = getAcceptedLanguages(context.getRequest()).stream()
-                        .map(LocaleUtils::toLocale)
-                        .collect(Collectors.toList());
-                for (Locale acceptedLocale : acceptedLocales) {
-                    locale = setLocale(acceptedLocale, context, availableLocales, forceSupported);
-                    if (locale != null) {
-                        return locale;
-                    }
+            for (Locale acceptedLocale : Collections.list(context.getRequest().getLocales())) {
+                locale = setLocale(acceptedLocale, context, availableLocales, forceSupported);
+                if (LocaleUtils.isAvailableLocale(locale)) {
+                    return locale;
                 }
-                // If none of the languages requested by the client is acceptable, skip to next
-                // phase (use default language).
             }
+            // If none of the languages requested by the client is acceptable, skip to next
+            // phase (use default language).
         }
 
         // Finally, use the default language from the global preferences.

@@ -180,7 +180,7 @@
          they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-war-minimaldependencies</artifactId>
+      <artifactId>xwiki-platform-minimaldependencies</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>pom</type>

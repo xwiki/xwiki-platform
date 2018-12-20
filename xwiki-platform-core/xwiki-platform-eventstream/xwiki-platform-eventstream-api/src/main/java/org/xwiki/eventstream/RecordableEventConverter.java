@@ -22,7 +22,6 @@ package org.xwiki.eventstream;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Convert a {@link RecordableEvent} to an {@link Event} that could be stored in the event stream.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.2RC1
  */
 @Role
-@Unstable
 public interface RecordableEventConverter
 {
     /**

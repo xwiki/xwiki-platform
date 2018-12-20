@@ -22,7 +22,6 @@ package org.xwiki.notifications.filters.watch;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration for the Watched Entities feature.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8RC1
  */
 @Role
-@Unstable
 public interface WatchedEntitiesConfiguration
 {
     /**

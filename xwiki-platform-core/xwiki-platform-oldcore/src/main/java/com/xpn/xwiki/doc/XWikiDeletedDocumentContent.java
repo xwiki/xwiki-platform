@@ -21,8 +21,6 @@ package com.xpn.xwiki.doc;
 
 import java.io.IOException;
 
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -31,7 +29,6 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 9.0RC1
  */
-@Unstable
 public interface XWikiDeletedDocumentContent
 {
     /**

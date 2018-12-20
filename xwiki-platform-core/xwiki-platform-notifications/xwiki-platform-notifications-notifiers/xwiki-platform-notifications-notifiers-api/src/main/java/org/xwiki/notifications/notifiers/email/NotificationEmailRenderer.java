@@ -22,7 +22,6 @@ package org.xwiki.notifications.notifiers.email;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Render a notification for email sendings.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.5RC1
  */
 @Role
-@Unstable
 public interface NotificationEmailRenderer
 {
     /**

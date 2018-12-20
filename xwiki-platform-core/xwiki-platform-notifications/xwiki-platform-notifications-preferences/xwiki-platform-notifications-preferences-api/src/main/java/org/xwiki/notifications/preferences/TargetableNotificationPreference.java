@@ -20,7 +20,6 @@
 package org.xwiki.notifications.preferences;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A notification preference can (most of the time) be targeted to a certain user, group or wiki. A preference using
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public interface TargetableNotificationPreference extends NotificationPreference
 {
     /**

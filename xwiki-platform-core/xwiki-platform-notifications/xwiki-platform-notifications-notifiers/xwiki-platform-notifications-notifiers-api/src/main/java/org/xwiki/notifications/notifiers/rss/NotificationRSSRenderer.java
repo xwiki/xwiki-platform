@@ -22,7 +22,6 @@ package org.xwiki.notifications.notifiers.rss;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
@@ -33,7 +32,6 @@ import com.rometools.rome.feed.synd.SyndEntry;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface NotificationRSSRenderer
 {
     /**

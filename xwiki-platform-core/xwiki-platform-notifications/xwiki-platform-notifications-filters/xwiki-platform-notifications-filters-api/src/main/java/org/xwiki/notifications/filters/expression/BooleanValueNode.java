@@ -20,7 +20,6 @@
 package org.xwiki.notifications.filters.expression;
 
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define value node containing a {@link Boolean}.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.8RC1
  */
-@Unstable
 public final class BooleanValueNode extends AbstractValueNode<Boolean>
 {
     /**

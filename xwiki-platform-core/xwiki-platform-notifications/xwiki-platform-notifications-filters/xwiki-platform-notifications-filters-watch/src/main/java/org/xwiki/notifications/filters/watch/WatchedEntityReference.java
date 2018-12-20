@@ -22,7 +22,6 @@ package org.xwiki.notifications.filters.watch;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Reference to an entity (a location, a user, etc...) to watch.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.8RC1
  */
-@Unstable
 public interface WatchedEntityReference
 {
     /**

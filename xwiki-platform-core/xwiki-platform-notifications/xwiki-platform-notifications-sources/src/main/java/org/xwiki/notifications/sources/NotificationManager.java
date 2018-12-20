@@ -27,7 +27,6 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Get notifications for users.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.2RC1
  */
 @Role
-@Unstable
 public interface NotificationManager
 {
     /**

@@ -22,7 +22,6 @@ package org.xwiki.resource.events;
 import java.util.Objects;
 
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for {@link ResourceReferenceHandlerEvent} implementations.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.11RC1
  */
-@Unstable
 public abstract class AbstractResourceReferenceHandlerEvent implements ResourceReferenceHandlerEvent
 {
     /**

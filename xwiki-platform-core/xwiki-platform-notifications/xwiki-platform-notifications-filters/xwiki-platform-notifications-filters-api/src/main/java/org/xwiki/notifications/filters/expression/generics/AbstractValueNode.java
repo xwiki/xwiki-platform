@@ -33,7 +33,6 @@ import org.xwiki.notifications.filters.expression.LesserThanNode;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a node that contains a specific value accessible with {@link AbstractValueNode#getContent()}.
@@ -43,7 +42,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public abstract class AbstractValueNode<T> extends AbstractNode
 {
     private T content;

@@ -20,7 +20,6 @@
 package org.xwiki.query;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Generic interface to build a {@link Query} from some data.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8RC1
  */
 @Role
-@Unstable
 public interface QueryBuilder<T>
 {
     /**

@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -38,7 +37,6 @@ import org.xwiki.text.StringUtils;
  * @version $Id$
  * @since 9.4RC1
  */
-@Unstable
 public class CompositeEvent
 {
     private List<Event> events = new ArrayList<>();

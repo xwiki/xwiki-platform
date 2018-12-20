@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.expression.generics;
 
 import org.xwiki.notifications.filters.expression.EmptyNode;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * AbstractNode definition for a filtering expression.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public abstract class AbstractNode implements ExpressionNode
 {
     /**

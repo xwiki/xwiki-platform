@@ -21,7 +21,6 @@ package com.xpn.xwiki;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.stability.Unstable;
 
 /**
  * Initialize a {@link XWikiContext} with various properties.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.11RC1
  */
 @Role
-@Unstable
 public interface XWikiContextInitializer
 {
     /**

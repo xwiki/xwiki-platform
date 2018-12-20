@@ -22,7 +22,6 @@ package org.xwiki.eventstream;
 import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * This interface represents the descriptor of an {@link UntypedRecordableEvent}. As an {@link UntypedRecordableEvent},
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.6RC1
  */
-@Unstable
 public interface UntypedRecordableEventDescriptor extends RecordableEventDescriptor
 {
     /**

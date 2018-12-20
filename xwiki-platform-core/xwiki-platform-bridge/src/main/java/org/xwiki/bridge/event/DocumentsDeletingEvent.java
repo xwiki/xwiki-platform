@@ -20,7 +20,6 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.observation.event.AbstractCancelableEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * An event triggered before a list of documents is deleted.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public class DocumentsDeletingEvent extends AbstractCancelableEvent
 {
     /**

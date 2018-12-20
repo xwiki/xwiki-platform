@@ -28,7 +28,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Enable or disable notifications from the event stream (for customization purpose).
@@ -43,7 +42,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.5RC1
  */
 @Role
-@Unstable
 public interface NotificationFilter extends Comparable
 {
     /**

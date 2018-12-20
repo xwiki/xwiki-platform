@@ -23,7 +23,6 @@ import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiException;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Evaluate content with Velocity.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.11RC1
  */
 @Role
-@Unstable
 public interface VelocityEvaluator
 {
     /**

@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.Map;
 
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represent a preference set by a user concerning a notification.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.2RC1
  */
-@Unstable
 public interface NotificationPreference
 {
     /**

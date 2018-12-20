@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.expression;
 
 import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a AND condition in a filtering expression.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public final class AndNode extends AbstractBinaryOperatorNode
 {
     /**

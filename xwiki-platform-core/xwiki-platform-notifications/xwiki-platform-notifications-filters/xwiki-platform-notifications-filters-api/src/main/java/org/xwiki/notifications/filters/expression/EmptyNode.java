@@ -20,7 +20,6 @@
 package org.xwiki.notifications.filters.expression;
 
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Empty node definition for a filtering expression.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public final class EmptyNode extends AbstractNode
 {
     @Override

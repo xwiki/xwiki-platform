@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Resends mails.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.3RC1
  */
 @Role
-@Unstable
 public interface MailResender
 {
     /**

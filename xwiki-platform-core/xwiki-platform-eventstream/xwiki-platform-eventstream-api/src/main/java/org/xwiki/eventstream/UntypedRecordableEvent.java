@@ -19,8 +19,6 @@
  */
 package org.xwiki.eventstream;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * This interface represents an event that is not identified by a specific class, but by its component hint. The event
  * can then be retrieved through the ComponentManager.
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.6RC1
  */
-@Unstable
 public interface UntypedRecordableEvent extends RecordableEvent
 {
     /**

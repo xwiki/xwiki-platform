@@ -19,8 +19,6 @@
  */
 package org.xwiki.notifications.filters.expression.generics;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Binary operand node definition for a filtering expression. This class can be extended in order to define new
  * binary operations.
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public abstract class AbstractBinaryOperatorNode extends AbstractOperatorNode
 {
     private AbstractNode leftOperand;

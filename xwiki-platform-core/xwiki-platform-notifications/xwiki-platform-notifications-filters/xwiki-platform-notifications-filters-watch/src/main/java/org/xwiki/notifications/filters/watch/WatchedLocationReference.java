@@ -38,7 +38,6 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
-import org.xwiki.stability.Unstable;
 
 /**
  * Reference of a location to watch.
@@ -46,7 +45,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.8RC1
  */
-@Unstable
 public class WatchedLocationReference implements WatchedEntityReference
 {
     private static final Set<NotificationFormat> ALL_NOTIFICATION_FORMATS

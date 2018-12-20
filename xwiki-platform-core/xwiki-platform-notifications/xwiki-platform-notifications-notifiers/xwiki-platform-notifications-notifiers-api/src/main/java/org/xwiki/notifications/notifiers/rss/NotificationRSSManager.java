@@ -24,7 +24,6 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 
@@ -35,7 +34,6 @@ import com.rometools.rome.feed.synd.SyndFeed;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface NotificationRSSManager
 {
     /**

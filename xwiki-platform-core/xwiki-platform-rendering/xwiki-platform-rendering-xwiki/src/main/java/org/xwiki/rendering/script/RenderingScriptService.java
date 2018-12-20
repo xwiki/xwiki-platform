@@ -262,7 +262,6 @@ public class RenderingScriptService implements ScriptService
      * @throws MacroLookupException if a macro component descriptor cannot be loaded
      * @since 9.7RC1
      */
-    @Unstable
     public List<MacroDescriptor> getMacroDescriptors(Syntax syntax) throws MacroLookupException
     {
         List<MacroDescriptor> macroDescriptors = new ArrayList<>();

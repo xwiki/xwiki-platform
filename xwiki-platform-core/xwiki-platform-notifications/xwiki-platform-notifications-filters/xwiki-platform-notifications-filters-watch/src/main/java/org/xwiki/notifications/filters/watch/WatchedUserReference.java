@@ -32,7 +32,6 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
-import org.xwiki.stability.Unstable;
 
 /**
  * Reference to a user to watch.
@@ -40,7 +39,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.8RC1
  */
-@Unstable
 public class WatchedUserReference implements WatchedEntityReference
 {
     private String userId;

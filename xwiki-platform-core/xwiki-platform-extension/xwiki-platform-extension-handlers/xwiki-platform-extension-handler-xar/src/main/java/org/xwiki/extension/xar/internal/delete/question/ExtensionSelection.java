@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.refactoring.job.question.EntitySelection;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represent an extension that may be broken by a refactoring action.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public class ExtensionSelection
 {
     /**

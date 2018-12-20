@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to import existing attachments into the content of a WYSIWYG editor.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8
  */
 @Role
-@Unstable
 public interface AttachmentImporter
 {
     /**

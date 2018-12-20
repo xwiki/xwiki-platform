@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.expression;
 
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define value node containing a {@link EntityReference}.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.8RC1
  */
-@Unstable
 public final class EntityReferenceNode extends AbstractValueNode<EntityReference>
 {
     /**

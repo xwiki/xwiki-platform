@@ -24,7 +24,6 @@ import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides values for a class property.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8RC1
  */
 @Role
-@Unstable
 public interface ClassPropertyValuesProvider
 {
     /**

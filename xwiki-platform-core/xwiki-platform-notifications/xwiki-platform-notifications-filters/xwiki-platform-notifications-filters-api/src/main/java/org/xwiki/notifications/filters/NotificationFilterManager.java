@@ -29,7 +29,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide an interface for interacting with user notification filters.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  */
 @Role
-@Unstable
 public interface NotificationFilterManager
 {
     /**

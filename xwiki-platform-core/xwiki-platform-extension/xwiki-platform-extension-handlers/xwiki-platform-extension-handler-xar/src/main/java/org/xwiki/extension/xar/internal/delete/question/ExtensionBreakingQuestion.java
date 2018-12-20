@@ -29,13 +29,11 @@ import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.question.EntitySelection;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public class ExtensionBreakingQuestion
 {
     /**

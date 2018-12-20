@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.TargetableEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event triggered when a new extension version is available.
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.9RC1
  * @version $Id$
  */
-@Unstable
 public class NewExtensionVersionAvailableEvent implements RecordableEvent, TargetableEvent
 {
     @Override

@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.stability.Unstable;
 
 /**
  * Enables text filtering on the selected columns. Don't forget to bind the value of the {@code text} query parameter.
@@ -40,7 +39,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("text")
 @Singleton
-@Unstable
 public class TextQueryFilter extends AbstractWhereQueryFilter
 {
     private static final Pattern COLUMN_SEPARATOR = Pattern.compile("\\s*,\\s*");

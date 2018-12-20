@@ -22,7 +22,6 @@ package org.xwiki.refactoring.job.question;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represent an entity with an information about either or not the entity is selected to perform some refactoring.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public class EntitySelection
 {
     /**

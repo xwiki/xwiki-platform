@@ -21,7 +21,6 @@ package org.xwiki.resource.events;
 
 import org.xwiki.observation.event.Event;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Common interface for all event related to {@link org.xwiki.resource.ResourceReferenceHandler}.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.11RC1
  */
-@Unstable
 public interface ResourceReferenceHandlerEvent extends Event
 {
     /**

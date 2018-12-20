@@ -25,7 +25,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Update a boolean or static list property of the current user to its next value (for a Boolean this means set it
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  */
 @Path("/currentuser/properties/{propertyName}/next")
-@Unstable
 public interface CurrentUserPropertyResource
 {
     /**

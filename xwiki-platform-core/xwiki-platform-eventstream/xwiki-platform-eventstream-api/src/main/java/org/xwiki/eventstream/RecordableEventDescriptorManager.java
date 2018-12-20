@@ -22,7 +22,6 @@ package org.xwiki.eventstream;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Get all RecordableEventDescriptors that are present in the wiki.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.2RC1
  */
 @Role
-@Unstable
 public interface RecordableEventDescriptorManager
 {
     /**

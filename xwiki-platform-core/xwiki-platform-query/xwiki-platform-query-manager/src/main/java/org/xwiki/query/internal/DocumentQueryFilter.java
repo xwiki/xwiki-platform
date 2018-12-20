@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.stability.Unstable;
 
 /**
  * Resolve the string reference from the first column of the query results into a {@link DocumentReference} relative to
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("document")
 @Singleton
-@Unstable
 public class DocumentQueryFilter implements QueryFilter
 {
     @Inject

@@ -30,7 +30,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.question.EntitySelection;
-import org.xwiki.stability.Unstable;
 
 /**
  * Abstract job that create the list of pages to delete in order to do some checks and ask a confirmation to the user.
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S extends EntityJobStatus<? super R>>
         extends AbstractEntityJob<R, S>
 {

@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.parentchild;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration of the Parent/Child mechanism.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.4.6
  */
 @Role
-@Unstable
 public interface ParentChildConfiguration
 {
     /**

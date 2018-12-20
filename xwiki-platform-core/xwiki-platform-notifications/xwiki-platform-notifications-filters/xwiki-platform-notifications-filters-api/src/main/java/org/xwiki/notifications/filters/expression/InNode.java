@@ -24,7 +24,6 @@ import java.util.Collection;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a IN operation in a filtering expression.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.8RC1
  */
-@Unstable
 public final class InNode extends AbstractOperatorNode
 {
     private AbstractValueNode leftOperand;

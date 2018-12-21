@@ -30,6 +30,7 @@ import java.util.Map;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -145,8 +146,15 @@ public class ArtifactResolver
             }
 
             long t1 = System.currentTimeMillis();
-            DependencyNode node = this.repositoryResolver.getSystem().collectDependencies(
-                this.repositoryResolver.getSession(), collectRequest).getRoot();
+            CollectResult collectResult = this.repositoryResolver.getSystem().collectDependencies(
+                this.repositoryResolver.getSession(), collectRequest);
+
+            if (!collectResult.getExceptions().isEmpty()) {
+                sendError(artifact, collectResult.getExceptions());
+            }
+
+            DependencyNode node = collectResult.getRoot();
+
             if (this.testConfiguration.isDebug()) {
                 LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
                 node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
@@ -154,18 +162,16 @@ public class ArtifactResolver
 
             DependencyRequest request = new DependencyRequest(node, filter);
             t1 = System.currentTimeMillis();
-            DependencyResult result = this.repositoryResolver.getSystem().resolveDependencies(
+            DependencyResult dependencyResult = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
             if (this.testConfiguration.isDebug()) {
                 LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
             }
 
-            //TODO: Find how to generate an error if a dep is not found! To reproduce remove the minimaldependencies
-            // war from the local FS
-            if (!result.getCollectExceptions().isEmpty()) {
-                sendError(artifact, result.getCollectExceptions());
+            if (!dependencyResult.getCollectExceptions().isEmpty()) {
+                sendError(artifact, dependencyResult.getCollectExceptions());
             }
-            artifactResults = result.getArtifactResults();
+            artifactResults = dependencyResult.getArtifactResults();
             this.artifactResultCache.put(artifactAsString, artifactResults);
         }
 

@@ -183,7 +183,7 @@ public class ArtifactResolver
         throws Exception
     {
         Artifact rootDistributionArtifact = new DefaultArtifact(PLATFORM_GROUPID,
-            "xwiki-platform-distribution-war-minimaldependencies", "pom", xwikiVersion);
+            "xwiki-platform-minimaldependencies", "pom", xwikiVersion);
 
         List<Artifact> dependentArtifacts = new ArrayList<>();
 

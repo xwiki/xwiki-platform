@@ -31,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public class EventTypePreferences extends AbstractNotificationPreferences
 {
     private String eventType;

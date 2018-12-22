@@ -36,7 +36,6 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 9.4RC1
  */
-@Unstable
 public class NotificationsTrayPage extends ViewPage
 {
     private static final String CLASS = "class";

@@ -34,7 +34,6 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public class ApplicationPreferences extends AbstractNotificationPreferences
 {
     private static final String EVENT_TYPE_ROW = "rowEventType";

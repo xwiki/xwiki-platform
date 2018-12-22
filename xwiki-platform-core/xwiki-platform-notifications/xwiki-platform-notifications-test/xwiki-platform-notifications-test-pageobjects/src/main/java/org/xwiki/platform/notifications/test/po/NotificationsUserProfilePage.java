@@ -41,7 +41,6 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 9.4RC1
  */
-@Unstable
 public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";

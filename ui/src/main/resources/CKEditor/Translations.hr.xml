@@ -43,9 +43,9 @@
 CKEditor.ConfigClass_removePlugins.hint=Lista onemogućenih priključaka.
 CKEditor.ConfigClass_removeButtons=Onemogućene značajke alatne trake
 CKEditor.ConfigClass_removeButtons.hint=Lista onemogućenih značajki alatne trake.
-CKEditor.ConfigClass_linkShowAdvancedTab=Poveznica\: Prikaži karticu Napredno
-CKEditor.ConfigClass_linkShowAdvancedTab.hint=Omogućava postavljanje atributa poveznica poput identifikatora, imena, klase ilil stila.
-CKEditor.ConfigClass_linkShowTargetTab=Poveznica\: Prikaži karticu Odredište
+CKEditor.ConfigClass_linkShowAdvancedTab=Poveznica: Prikaži karticu Napredno
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Omogućava postavljanje atributa poveznica poput identifikatora, imena, klase ili stila.
+CKEditor.ConfigClass_linkShowTargetTab=Poveznica: Prikaži karticu Odredište
 CKEditor.ConfigClass_linkShowTargetTab.hint=Omogućava postavljanje atributa za odredište poveznice (npr. za otvaranje poveznice u novoj kartici).
 ### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Load JavaScript Skin Extensions
 ### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
@@ -63,9 +63,9 @@ ckeditor.plugin.link.queryString=Niz znakova za upit
 ckeditor.plugin.link.defaultLabel=unesite labelu poveznice
 ckeditor.plugin.link.openInNewTab=Otvori poveznicu u novoj kartici
 
-ckeditor.plugin.macro.placeholder=makro\:{0}
+ckeditor.plugin.macro.placeholder=makro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki makro
-### Missing: ckeditor.plugin.macro.editButtonHint=Edit Macro
+ckeditor.plugin.macro.editButtonHint=Uredi makro
 ckeditor.plugin.macro.refreshFailed=Osvježavanje uređenog sadržaja nije uspjelo.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Umetni makro {0}
 
@@ -107,7 +107,7 @@ resource.unc.label=UNC putanja
 resource.unc.placeholder=//poslužitelj/share/putanja/prema/datoteci
 resource.unknown.label=Nepoznato
 resource.url.label=URL
-resource.url.placeholder=http\://www.primjer.org/slika.png
+resource.url.placeholder=http://www.example.org/image.png
 resource.user.label=Korisnik
 resource.user.placeholder=alias
 

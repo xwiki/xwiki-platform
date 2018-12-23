@@ -107,7 +107,7 @@ resource.unc.label=UNC putanja
 resource.unc.placeholder=//poslužitelj/share/putanja/prema/datoteci
 resource.unknown.label=Nepoznato
 resource.url.label=URL
-resource.url.placeholder=http://www.primjer.org/slika.png
+resource.url.placeholder=http://www.example.org/image.png
 resource.user.label=Korisnik
 resource.user.placeholder=alias
 

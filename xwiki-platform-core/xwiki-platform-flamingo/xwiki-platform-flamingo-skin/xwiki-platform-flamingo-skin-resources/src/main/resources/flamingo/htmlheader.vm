@@ -32,9 +32,9 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Compute the title.
     ## ---------------------------------------------------------------------------------------------------------------
-    #if(!$title)
+    #if("$!title" == '')
       #set($title = $!xwiki.getSpacePreference('title'))
-      #if($title != '')
+      #if("$!title" != '')
         ## Evaluate the title since it can have velocity code.
         #set($title = "#evaluate($title)")
         ## Don`t forget to escape it.

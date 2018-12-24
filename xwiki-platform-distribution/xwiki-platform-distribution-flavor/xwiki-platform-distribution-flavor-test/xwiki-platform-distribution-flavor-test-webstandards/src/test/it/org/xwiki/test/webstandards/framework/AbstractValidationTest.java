@@ -83,32 +83,45 @@ public class AbstractValidationTest extends TestCase
         this.credentials = credentials;
     }
 
-    protected GetMethod createGetMethod() throws UnsupportedEncodingException
+    protected GetMethod createGetMethod()
     {
-        GetMethod getMethod = null;
+        return new GetMethod(getTargetURL(this.target));
+    }
 
-        if (this.target instanceof DocumentReferenceTarget) {
-            DocumentReferenceTarget documentReferenceTarget = (DocumentReferenceTarget) this.target;
-            StringBuilder url = new StringBuilder();
+    protected String getTargetURL(Target target)
+    {
+        StringBuilder url = new StringBuilder();
+
+        if (target instanceof DocumentReferenceTarget) {
+            DocumentReferenceTarget documentReferenceTarget = (DocumentReferenceTarget) target;
             url.append("http://127.0.0.1:8080/xwiki/bin/view/");
             for (SpaceReference spaceReference : documentReferenceTarget.getDocumentReference().getSpaceReferences()) {
-                url.append(URLEncoder.encode(spaceReference.getName(), "UTF-8"));
+                url.append(encode(spaceReference.getName()));
                 url.append("/");
             }
-            url.append(URLEncoder.encode(documentReferenceTarget.getDocumentReference().getName(), "UTF-8"));
-            
-            getMethod = new GetMethod(url.toString());
-        } else if (this.target instanceof URLPathTarget) {
-            String urlPath = ((URLPathTarget) this.target).getUrlPath();
+            url.append(encode(documentReferenceTarget.getDocumentReference().getName()));
+        } else if (target instanceof URLPathTarget) {
+            String urlPath = ((URLPathTarget) target).getUrlPath();
 
             if (urlPath.startsWith("http://")) {
-                getMethod = new GetMethod(urlPath);
+                url.append(urlPath);
             } else {
-                getMethod = new GetMethod("http://127.0.0.1:8080" + urlPath);
+                url.append("http://127.0.0.1:8080").append(urlPath);
             }
         }
 
-        return getMethod;
+        return url.toString();
+    }
+
+    protected String encode(String value)
+    {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Should not happen since UTF-8 should always be available
+            throw new RuntimeException(
+                String.format("UTF-8 encoding error for [%s]", value), e);
+        }
     }
 
     protected GetMethod getResponse() throws Exception

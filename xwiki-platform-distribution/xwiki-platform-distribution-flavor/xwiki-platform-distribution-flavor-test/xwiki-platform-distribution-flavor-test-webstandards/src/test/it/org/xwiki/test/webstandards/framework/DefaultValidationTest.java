@@ -115,8 +115,9 @@ public class DefaultValidationTest extends AbstractValidationTest
     @Override
     public String getName()
     {
-        return "Validating " + this.validator.getName() + " validity for: " + this.target.getName() + " executed "
-            + (credentials == null ? "as guest" : "with credentials " + credentials);
+        return String.format("Validating %s validity for [%s] executed %s",
+            this.validator.getName(), getTargetURL(this.target),
+            (credentials == null ? "as guest" : "with credentials " + credentials));
     }
 
     public void testDocumentValidity() throws Exception

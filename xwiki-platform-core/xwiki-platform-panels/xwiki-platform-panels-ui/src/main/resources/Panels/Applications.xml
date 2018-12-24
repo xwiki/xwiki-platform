@@ -75,7 +75,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>request.wiki=Request wiki|request.base=Base request URL|author=Author|doc.reference=Document|wiki=Wiki|request.parameters=Request parameters|request.url=Request URL|locale=Language|user=User</values>
+        <values>author=Author|doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -158,10 +158,11 @@
     </property>
     <property>
       <async_context>
-        <value>request.wiki</value>
-        <value>wiki</value>
+        <value>icon.theme</value>
         <value>locale</value>
+        <value>request.wiki</value>
         <value>user</value>
+        <value>wiki</value>
       </async_context>
     </property>
     <property>

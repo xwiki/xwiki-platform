@@ -30,6 +30,9 @@
   <artifactId>xwiki-platform-icon-default</artifactId>
   <name>XWiki Platform - Icon - Default implementation</name>
   <description>XWiki Platform - Icon - Default implementation</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.98</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls-server</artifactId>
-    <version>10.11</version>
+    <version>10.11.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls-server-api</artifactId>
   <name>XWiki Platform - Active Installs - Server - API</name>

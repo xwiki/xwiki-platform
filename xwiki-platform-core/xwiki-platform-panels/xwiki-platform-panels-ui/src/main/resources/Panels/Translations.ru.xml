@@ -45,6 +45,6 @@ panels._actions=Действия
 panels.emptyvalue=
 panels.children.title=Дочерние Страницы
 panels.siblings.title=Родственные Страницы
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.documentInformation.configureSyntaxes=Настройка синтаксиса
 </content>
 </xwikidoc>

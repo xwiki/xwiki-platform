@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=Здесь вы можете выбрать, какие приложения будут отображаться на панели приложений (слева, по умолчанию). Любое новое приложение будет отображаться там. Если вы хотите удалить некоторые из них, вам просто нужно перетащить значок из первого поля в другое. Вы также можете изменить порядок приложений, как вы хотите. Не забудьте сохранить свои изменения!
+platform.panels.applications.displayedapps=Приложения на панели
+platform.panels.applications.blacklistedapps=Приложения вне панели
+platform.panels.applications.save=Сохранить
+platform.panels.applications.revert=Сброс
+platform.panels.applications.ajax.success=Настройка сохранена.
+platform.panels.applications.ajax.csrf=Ошибка проверки CSRF. Попробуйте перезагрузить страницу.
+platform.panels.applications.ajax.noright=У вас нет полномочий для редактирования PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Ошибка сохранения изменений.
+admin.panels.applications=Панель приложений
+admin.panels.applications.description=Управляйте отображением приложений на панели приложений.
+
+admin.panels.navigation=Панель навигации
+admin.panels.navigation.description=Управляйте отображением страниц в Панели навигации.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Исключить страницы расширения верхнего уровня
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Этот динамический фильтр удаляет из дерева навигации страницы верхнего уровня, которые принадлежат установленному расширению, если они не предназначены для изменения.
+PanelsCode.NavigationConfigurationClass_exclusions=Исключения
+PanelsCode.NavigationConfigurationClass_exclusions.hint=Список страниц для исключения из дерева навигации.
+PanelsCode.NavigationConfigurationClass_inclusions=Включения
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Список страниц, включаемых в дерево навигации, даже если они были исключены предыдущим фильтром.
+platform.panels.navigation.configuration.excludedPages=Исключенные страницы
+platform.panels.navigation.configuration.excludedPages.hint=Используйте перетаскивание, чтобы переместить страницы из дерева навигации или вернуть их обратно.
+platform.panels.navigation.configuration.excludedPages.empty=Ничего
+platform.panels.navigation.configuration.topLevelExtensionPages=Страницы расширения верхнего уровня
+platform.panels.navigation.configuration.otherPages=Другие страницы
+platform.panels.navigation.configuration.saveComment=Конфигурация панели навигации обновлена администратором</content>
+</xwikidoc>

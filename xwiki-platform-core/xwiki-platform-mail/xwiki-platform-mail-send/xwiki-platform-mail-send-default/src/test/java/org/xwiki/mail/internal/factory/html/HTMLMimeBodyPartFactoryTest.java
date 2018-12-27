@@ -27,16 +27,24 @@ import java.util.Map;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.api.Attachment;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.factory.html.HTMLMimeBodyPartFactory}.
@@ -44,17 +52,19 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 6.1M2
  */
+@ComponentTest
 public class HTMLMimeBodyPartFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<MimeBodyPartFactory> mocker =
-            new MockitoComponentMockingRule<MimeBodyPartFactory>(HTMLMimeBodyPartFactory.class);
+    @InjectMockComponents
+    private HTMLMimeBodyPartFactory htmlMimeBodyPartFactory;
+
+    @InjectComponentManager
+    private ComponentManager componentManager;
 
     @Test
     public void createWhenOnlyHTMLContent() throws Exception
     {
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
-            Collections.<String, Object>emptyMap());
+        MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create("<p>some html</p>", Collections.emptyMap());
 
         assertEquals("<p>some html</p>", bodyPart.getContent());
         assertEquals("text/html; charset=UTF-8", bodyPart.getContentType());
@@ -63,8 +73,8 @@ public class HTMLMimeBodyPartFactoryTest
     @Test
     public void createWhenHTMLContentAndHeader() throws Exception
     {
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
-            Collections.<String, Object>singletonMap("headers", Collections.singletonMap("key", "value")));
+        MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create("<p>some html</p>",
+            Collections.singletonMap("headers", Collections.singletonMap("key", "value")));
 
         assertEquals("<p>some html</p>", bodyPart.getContent());
         assertArrayEquals(new String[]{ "value" }, bodyPart.getHeader("key"));
@@ -74,12 +84,12 @@ public class HTMLMimeBodyPartFactoryTest
     public void createWhenHTMLAndAlternateTextContent() throws Exception
     {
         MimeBodyPart textBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(
+        MimeBodyPartFactory defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         when(defaultBodyPartFactory.create(eq("some text"), any(Map.class))).thenReturn(textBodyPart);
 
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
-            Collections.<String, Object>singletonMap("alternate", "some text"));
+        MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create("<p>some html</p>",
+            Collections.singletonMap("alternate", "some text"));
 
         MimeMultipart multipart = ((MimeMultipart) bodyPart.getContent());
         assertEquals(2, multipart.getCount());
@@ -93,12 +103,12 @@ public class HTMLMimeBodyPartFactoryTest
         Attachment attachment = mock(Attachment.class);
 
         MimeBodyPart attachmentBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
+        MimeBodyPartFactory attachmentBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         when(attachmentBodyPartFactory.create(same(attachment), any(Map.class))).thenReturn(attachmentBodyPart);
 
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
-            Collections.<String, Object>singletonMap("attachments", Arrays.asList(attachment)));
+        MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create("<p>some html</p>",
+            Collections.singletonMap("attachments", Arrays.asList(attachment)));
 
         MimeMultipart multipart = ((MimeMultipart) bodyPart.getContent());
         assertEquals(2, multipart.getCount());
@@ -115,7 +125,7 @@ public class HTMLMimeBodyPartFactoryTest
         when(embeddedAttachment.getFilename()).thenReturn("embeddedAttachment.png");
 
         MimeBodyPart embeddedAttachmentBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
+        MimeBodyPartFactory attachmentBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         when(attachmentBodyPartFactory.create(same(embeddedAttachment), any(Map.class))).thenReturn(
             embeddedAttachmentBodyPart);
@@ -124,10 +134,9 @@ public class HTMLMimeBodyPartFactoryTest
         when(attachmentBodyPartFactory.create(same(normalAttachment), any(Map.class))).thenReturn(
             normalAttachmentBodyPart);
 
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create(
+        MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create(
             "<p>html... <img src='cid:embeddedAttachment.png'/></p>",
-            Collections.<String, Object>singletonMap("attachments",
-                Arrays.asList(normalAttachment, embeddedAttachment)));
+            Collections.singletonMap("attachments", Arrays.asList(normalAttachment, embeddedAttachment)));
 
         MimeMultipart multipart = (MimeMultipart) bodyPart.getContent();
         assertEquals(2, multipart.getCount());
@@ -150,7 +159,7 @@ public class HTMLMimeBodyPartFactoryTest
         when(embeddedAttachment.getFilename()).thenReturn("embeddedAttachment.png");
 
         MimeBodyPart embeddedAttachmentBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
+        MimeBodyPartFactory attachmentBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         when(attachmentBodyPartFactory.create(same(embeddedAttachment), any(Map.class))).thenReturn(
             embeddedAttachmentBodyPart);
@@ -160,14 +169,14 @@ public class HTMLMimeBodyPartFactoryTest
             normalAttachmentBodyPart);
 
         MimeBodyPart textBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(
+        MimeBodyPartFactory defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         when(defaultBodyPartFactory.create(eq("some text"), any(Map.class))).thenReturn(textBodyPart);
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("attachments", Arrays.asList(normalAttachment, embeddedAttachment));
         parameters.put("alternate", "some text");
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create(
+        MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create(
             "<p>html... <img src='cid:embeddedAttachment.png'/></p>", parameters);
 
         MimeMultipart multipart = (MimeMultipart) bodyPart.getContent();
@@ -185,5 +194,4 @@ public class HTMLMimeBodyPartFactoryTest
 
         assertSame(normalAttachmentBodyPart, multipart.getBodyPart(1));
     }
-
 }

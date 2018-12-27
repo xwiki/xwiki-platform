@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 public class PrepareMailQueueItemTest
 {
     @Test
-    public void verifyToString() throws Exception
+    public void verifyToString()
     {
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);

@@ -45,7 +45,7 @@ public class XWikiRequestCopierTest
     XWikiServletRequestStub originalRequest;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    public void beforeEach()
     {
         this.originalRequest = new XWikiServletRequestStub();
         this.originalRequest.setHost("host");
@@ -57,7 +57,7 @@ public class XWikiRequestCopierTest
     }
 
     @Test
-    public void copyRequest() throws Exception
+    public void copyRequest()
     {
         XWikiRequest copy = this.copier.copy(this.originalRequest);
         assertNotSame(this.originalRequest, copy);
@@ -74,7 +74,7 @@ public class XWikiRequestCopierTest
     }
 
     @Test
-    public void copyContextWhenNull() throws Exception
+    public void copyContextWhenNull()
     {
         assertNull(this.copier.copy(null));
     }

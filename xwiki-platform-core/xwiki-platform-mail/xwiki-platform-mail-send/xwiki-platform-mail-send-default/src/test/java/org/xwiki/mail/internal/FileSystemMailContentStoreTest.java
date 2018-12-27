@@ -99,7 +99,7 @@ public class FileSystemMailContentStoreTest
             new File(new File(tempDir, this.store.ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(message.getUniqueMessageId(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
-        String messageContent = IOUtils.toString(in);
+        String messageContent = IOUtils.toString(in, "UTF-8");
 
         assertTrue(messageContent.contains("Message-ID: " + messageId));
         assertTrue(messageContent.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit"));

@@ -92,7 +92,7 @@ public class SendMailRunnableTest
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
-        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onPrepareBegin(batchId, Collections.emptyMap());
         ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
 
         SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId, "xwiki");
@@ -158,12 +158,12 @@ public class SendMailRunnableTest
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
-        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onPrepareBegin(batchId, Collections.emptyMap());
         ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
 
-        listener.onPrepareMessageSuccess(message1, Collections.<String, Object>emptyMap());
+        listener.onPrepareMessageSuccess(message1, Collections.emptyMap());
         SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId, "xwiki");
-        listener.onPrepareMessageSuccess(message2, Collections.<String, Object>emptyMap());
+        listener.onPrepareMessageSuccess(message2, Collections.emptyMap());
         SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId, "xwiki");
 
         MailQueueManager mailQueueManager = this.mocker.getInstance(

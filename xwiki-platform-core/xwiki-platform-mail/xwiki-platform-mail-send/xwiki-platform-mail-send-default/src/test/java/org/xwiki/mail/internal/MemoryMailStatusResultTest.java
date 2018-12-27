@@ -49,7 +49,7 @@ public class MemoryMailStatusResultTest
     private static final String UNIQUE_MESSAGE_ID5 = "message5";
 
     @Test
-    public void getAllErrorTest() throws Exception
+    public void getAllErrorTest()
     {
         MemoryMailStatusResult statusResult = new MemoryMailStatusResult();
         ExtendedMimeMessage message1 = mock(ExtendedMimeMessage.class);

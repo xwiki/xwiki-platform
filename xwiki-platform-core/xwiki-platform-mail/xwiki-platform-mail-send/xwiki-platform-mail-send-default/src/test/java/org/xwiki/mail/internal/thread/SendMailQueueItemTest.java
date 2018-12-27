@@ -40,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 public class SendMailQueueItemTest
 {
     @Test
-    public void verifyToString() throws Exception
+    public void verifyToString()
     {
         Session session = Session.getDefaultInstance(new Properties());
         String batchId = UUID.randomUUID().toString();

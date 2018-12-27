@@ -52,20 +52,20 @@ public class MemoryMailListenerTest
     private MemoryMailListener listener;
 
     @Test
-    public void onErrorAndGetMailStatusResult() throws Exception
+    public void onErrorAndGetMailStatusResult()
     {
         String batchId = UUID.randomUUID().toString();
-        this.listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        this.listener.onPrepareBegin(batchId, Collections.emptyMap());
 
         ExtendedMimeMessage message1 = mock(ExtendedMimeMessage.class);
         when(message1.getUniqueMessageId()).thenReturn(UNIQUE_MESSAGE_ID1);
         when(message1.getType()).thenReturn("mailtype1");
-        this.listener.onPrepareMessageError(message1, new Exception("error1"), Collections.<String, Object>emptyMap());
+        this.listener.onPrepareMessageError(message1, new Exception("error1"), Collections.emptyMap());
 
         ExtendedMimeMessage message2 = mock(ExtendedMimeMessage.class);
         when(message2.getUniqueMessageId()).thenReturn(UNIQUE_MESSAGE_ID2);
         when(message2.getType()).thenReturn("mailtype2");
-        this.listener.onPrepareMessageError(message2, new Exception("error2"), Collections.<String, Object>emptyMap());
+        this.listener.onPrepareMessageError(message2, new Exception("error2"), Collections.emptyMap());
 
         Iterator<MailStatus> results = this.listener.getMailStatusResult().getByState(MailState.PREPARE_ERROR);
         assertTrue(results.hasNext(), "These should be mails in error!");

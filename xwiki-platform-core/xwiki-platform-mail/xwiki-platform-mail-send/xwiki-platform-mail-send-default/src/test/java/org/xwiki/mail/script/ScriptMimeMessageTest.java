@@ -118,7 +118,7 @@ public class ScriptMimeMessageTest
     {
         MimeBodyPart bp = new MimeBodyPart();
         bp.addHeader("randomTestHeader3", "randomTestHeader3");
-        this.scriptMessage.addPart(null, bp, Collections.<String, Object>emptyMap());
+        this.scriptMessage.addPart(null, bp, Collections.emptyMap());
         assertEquals(bp, ((Multipart)(this.scriptMessage.getContent())).getBodyPart(0));
     }
 }

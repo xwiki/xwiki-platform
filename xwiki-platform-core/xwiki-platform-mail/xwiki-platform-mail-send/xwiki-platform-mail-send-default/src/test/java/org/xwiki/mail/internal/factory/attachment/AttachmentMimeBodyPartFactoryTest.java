@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.factory.attachment;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class AttachmentMimeBodyPartFactoryTest
         when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         Attachment attachment = mock(Attachment.class);
-        when(attachment.getContent()).thenReturn("Lorem Ipsum".getBytes());
+        when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("Lorem Ipsum".getBytes()));
         when(attachment.getFilename()).thenReturn("image.png");
         when(attachment.getMimeType()).thenReturn("image/png");
 
@@ -87,7 +88,7 @@ public class AttachmentMimeBodyPartFactoryTest
         when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         Attachment attachment = mock(Attachment.class);
-        when(attachment.getContent()).thenReturn("Lorem Ipsum".getBytes());
+        when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("Lorem Ipsum".getBytes()));
         when(attachment.getFilename()).thenReturn("image.png");
         when(attachment.getMimeType()).thenReturn("image/png");
 

@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -105,7 +106,7 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
             temporaryAttachmentFile =
                 new TemporaryFile(File.createTempFile("attachment", ".tmp", this.temporaryDirectory));
             fos = new FileOutputStream(temporaryAttachmentFile);
-            fos.write(attachment.getContent());
+            IOUtils.copyLarge(attachment.getContentInputStream(), fos);
         } catch (Exception e) {
             throw new MessagingException(
                 String.format("Failed to save attachment [%s] to the file system", attachment.getFilename()), e);

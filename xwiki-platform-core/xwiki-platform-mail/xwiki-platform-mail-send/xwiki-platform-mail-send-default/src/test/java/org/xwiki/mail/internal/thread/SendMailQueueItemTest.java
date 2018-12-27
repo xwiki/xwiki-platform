@@ -24,12 +24,12 @@ import java.util.UUID;
 
 import javax.mail.Session;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.thread.SendMailQueueItem}.

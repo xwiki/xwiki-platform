@@ -66,7 +66,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4
  */
-@ComponentList({MemoryMailListener.class, PrepareMailQueueManager.class})
+@ComponentList({
+    MemoryMailListener.class,
+    PrepareMailQueueManager.class
+})
 public class PrepareMailRunnableTest
 {
     @Rule

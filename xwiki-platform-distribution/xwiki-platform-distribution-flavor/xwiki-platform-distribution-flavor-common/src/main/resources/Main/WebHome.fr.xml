@@ -62,7 +62,7 @@ Vous pouvez aussi utiliser le [[bac à sable&gt;&gt;Sandbox.WebHome]] pour plus 
 |(((
 = Etendez votre Wiki =
 
-Pour étendre les fonctionalitiés de votre Wiki avec les modules dont //vous// avez besoin, aller sur le {{velocity}}[[gestionnaire d'extensions&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')]]{{/velocity}} ou vous pouvez rechercher et installer des extensions.
+Pour étendre les fonctionalitiés de votre Wiki avec les modules dont //vous// avez besoin, aller sur le {{velocity}}[[gestionnaire d'extensions&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} ou vous pouvez rechercher et installer des extensions.
 
 Pour naviguer dans les 900+ extensions contribuées par la communauté XWiki, visitez la [[galerie d'extensions&gt;&gt;http://extensions.xwiki.org]].
 )))|(((

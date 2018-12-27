@@ -37,7 +37,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.internal.factory.AbstractMimeBodyPartFactory;
 
@@ -55,8 +54,6 @@ import com.xpn.xwiki.internal.file.TemporaryFile;
 @Singleton
 public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Attachment> implements Initializable
 {
-    private static final String HEADERS_PARAMETER_KEY = "headers";
-
     @Inject
     private Environment environment;
 
@@ -69,7 +66,7 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
     private File temporaryDirectory;
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         this.temporaryDirectory = new File(this.environment.getTemporaryDirectory(), "mail");
         this.temporaryDirectory.mkdirs();

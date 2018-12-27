@@ -54,7 +54,7 @@ public class AttachmentMimeBodyPartFactoryTest
 
     @Rule
     public MockitoComponentMockingRule<AttachmentMimeBodyPartFactory> mocker =
-            new MockitoComponentMockingRule<>(AttachmentMimeBodyPartFactory.class);
+        new MockitoComponentMockingRule<>(AttachmentMimeBodyPartFactory.class);
 
     @Test
     public void createAttachmentBodyPart() throws Exception
@@ -68,16 +68,16 @@ public class AttachmentMimeBodyPartFactoryTest
         when(attachment.getMimeType()).thenReturn("image/png");
 
         MimeBodyPart part = this.mocker.getComponentUnderTest().create(attachment,
-            Collections.<String, Object>emptyMap());
+            Collections.emptyMap());
 
         assertEquals("<image.png>", part.getContentID());
         // JavaMail adds some extra params to the content-type header
         // (e.g. image/png; name=image.png) , we just verify the content type that we passed.
         assertTrue(part.getContentType().startsWith("image/png"));
-        // We verify that the Content-Disposition has the correct file namr
+        // We verify that the Content-Disposition has the correct file name
         assertTrue(part.getFileName().matches("image\\.png"));
 
-        assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream()));
+        assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream(), "UTF-8"));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class AttachmentMimeBodyPartFactoryTest
         when(attachment.getMimeType()).thenReturn("image/png");
 
         Map<String, Object> parameters = Collections.singletonMap("headers", (Object)
-                Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
+            Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
 
         MimeBodyPart part = this.mocker.getComponentUnderTest().create(attachment, parameters);
 
@@ -100,12 +100,12 @@ public class AttachmentMimeBodyPartFactoryTest
         // JavaMail adds some extra params to the content-type header
         // (e.g. image/png; name=image.png) , we just verify the content type that we passed.
         assertTrue(part.getContentType().startsWith("image/png"));
-        // We verify that the Content-Disposition has the correct file namr
+        // We verify that the Content-Disposition has the correct file name
         assertTrue(part.getFileName().matches("image\\.png"));
 
         assertArrayEquals(new String[]{ "quoted-printable" }, part.getHeader("Content-Transfer-Encoding"));
 
-        assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream()));
+        assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream(), "UTF-8"));
     }
 
     @Test
@@ -119,7 +119,7 @@ public class AttachmentMimeBodyPartFactoryTest
         when(attachment.getContent()).thenThrow(new RuntimeException("error"));
 
         try {
-            this.mocker.getComponentUnderTest().create(attachment, Collections.<String, Object>emptyMap());
+            this.mocker.getComponentUnderTest().create(attachment, Collections.emptyMap());
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertEquals("Failed to save attachment [image.png] to the file system", expected.getMessage());

@@ -42,7 +42,6 @@ import org.xwiki.environment.Environment;
 import org.xwiki.mail.internal.factory.AbstractMimeBodyPartFactory;
 
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.internal.file.TemporaryFile;
 
 /**
  * Creates an attachment Body Part from an {@link Attachment} object. This will be added to a Multi Part message.
@@ -55,6 +54,12 @@ import com.xpn.xwiki.internal.file.TemporaryFile;
 @Singleton
 public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Attachment> implements Initializable
 {
+    /**
+     * Header name for storing temporary files used to hold attachment contents. These files are deleted in the
+     * Preparation thread, when the messages are serialized before sending.
+     */
+    public static final String TMP_ATTACHMENT_LOCATION_FILE_HEADER = "X-TmpFile";
+
     @Inject
     private Environment environment;
 
@@ -80,7 +85,9 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
         MimeBodyPart attachmentPart = new MimeBodyPart();
 
         // Save the attachment to a temporary file on the file system and wrap it in a Java Mail Data Source.
-        DataSource source = createTemporaryAttachmentDataSource(attachment);
+        // Note that we copy the attachment to a file instead of using directly the attachment data because the
+        // attachment could be removed before the mail is sent and the mail would point to some non-existing data.
+        DataSource source = createTemporaryAttachmentDataSource(attachment, attachmentPart);
         attachmentPart.setDataHandler(new DataHandler(source));
 
         attachmentPart.setHeader("Content-Type", attachment.getMimeType());
@@ -98,15 +105,19 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
         return attachmentPart;
     }
 
-    private DataSource createTemporaryAttachmentDataSource(Attachment attachment) throws MessagingException
+    private DataSource createTemporaryAttachmentDataSource(Attachment attachment, MimeBodyPart attachmentPart)
+        throws MessagingException
     {
         File temporaryAttachmentFile;
         FileOutputStream fos = null;
         try {
-            temporaryAttachmentFile =
-                new TemporaryFile(File.createTempFile("attachment", ".tmp", this.temporaryDirectory));
+            temporaryAttachmentFile = File.createTempFile("attachment", ".tmp", this.temporaryDirectory);
             fos = new FileOutputStream(temporaryAttachmentFile);
             IOUtils.copyLarge(attachment.getContentInputStream(), fos);
+
+            // Add a header with the location of the temporary file so that it can be removed when no longer needed so
+            // that it doesn't stay lying around. This is done in the Mail Preparation Thread.
+            attachmentPart.setHeader(TMP_ATTACHMENT_LOCATION_FILE_HEADER, temporaryAttachmentFile.getAbsolutePath());
         } catch (Exception e) {
             throw new MessagingException(
                 String.format("Failed to save attachment [%s] to the file system", attachment.getFilename()), e);

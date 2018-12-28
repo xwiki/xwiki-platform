@@ -25,19 +25,24 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.mail.Multipart;
+import javax.mail.Part;
 import javax.mail.Session;
 
+import org.apache.commons.io.FileUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailStoreException;
+import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
 
 /**
  * Stores mail content on the file system.
@@ -61,7 +66,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
     private Environment environment;
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         rootDirectory = new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY);
     }
@@ -69,8 +74,14 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
     @Override
     public void save(String batchId, ExtendedMimeMessage message) throws MailStoreException
     {
+        // Delete any temporary file used to hold attachments since their content will have been serialized
+        // by the call to writeTo() above. This avoids keeping temporary files on the filesystem.
+        // First, find if there are any.
+        List<File> temporaryFiles = extractTemporaryFilesFromHeaders(message);
+
         String uniqueMessageId = message.getUniqueMessageId();
         File messageFile = getMessageFile(batchId, uniqueMessageId);
+
         try {
             // Unsaved message may have their message-ID header to be modified during serialization.
             // We ensure that the message was saved, and we save it if not saved yet, getting again the identifier
@@ -79,7 +90,13 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
                 uniqueMessageId = message.getUniqueMessageId();
                 messageFile = getMessageFile(batchId, uniqueMessageId);
             }
+
             message.writeTo(new FileOutputStream(messageFile));
+
+            // Delete any found temporary attachment files
+            for (File temporaryFile : temporaryFiles) {
+                FileUtils.forceDelete(temporaryFile);
+            }
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to save message (id [%s], batch id [%s]) into file [%s]",
@@ -118,6 +135,33 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         }
     }
 
+    private List<File> extractTemporaryFilesFromHeaders(ExtendedMimeMessage message) throws MailStoreException
+    {
+        List<File> temporaryFiles = new ArrayList<>();
+        try {
+            Object content = message.getContent();
+            if (content instanceof Multipart) {
+                Multipart multipart = (Multipart) content;
+                for (int i = 0; i < multipart.getCount(); i++) {
+                    Part part = multipart.getBodyPart(i);
+                    String[] temporaryFileLocations =
+                        part.getHeader(AttachmentMimeBodyPartFactory.TMP_ATTACHMENT_LOCATION_FILE_HEADER);
+                    if (temporaryFileLocations != null && temporaryFileLocations.length > 0) {
+                        temporaryFiles.add(new File(temporaryFileLocations[0]));
+                        // Remove the special marker header so that it doesn't get sent.
+                        part.removeHeader(AttachmentMimeBodyPartFactory.TMP_ATTACHMENT_LOCATION_FILE_HEADER);
+                        // Note: for the removed header to be really removed we need to save the message.
+                        message.saveChanges();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new MailStoreException("Failed to extract temporary file refernces from headers", e);
+        }
+
+        return temporaryFiles;
+    }
+
     private File getBatchDirectory(String batchId)
     {
         File batchDirectory = new File(rootDirectory, getURLEncoded(batchId));
@@ -125,7 +169,8 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         return batchDirectory;
     }
 
-    private File getMessageFile(String batchId, String uniqueMessageId) {
+    private File getMessageFile(String batchId, String uniqueMessageId)
+    {
         return new File(getBatchDirectory(batchId), getURLEncoded(uniqueMessageId));
     }
 

@@ -119,6 +119,7 @@ public class ExtendedMimeMessage extends MimeMessage
             addHeader(XMAIL_TYPE_HEADER, mailType);
         } catch (MessagingException e) {
             // Very unlikely to happen since the default implementation does not throw anything
+            throw new RuntimeException(String.format("Failed to set Type header to [%s]", mailType), e);
         }
     }
 
@@ -133,7 +134,7 @@ public class ExtendedMimeMessage extends MimeMessage
             return getHeader(XMAIL_TYPE_HEADER, null);
         } catch (MessagingException e) {
             // Very unlikely to happen since the default implementation does not throw anything
-            return null;
+            throw new RuntimeException("Failed to get Type header", e);
         }
     }
 
@@ -149,6 +150,7 @@ public class ExtendedMimeMessage extends MimeMessage
             setHeader(MESSAGE_ID_HEADER, messageId);
         } catch (MessagingException e) {
             // Very unlikely to happen since the default implementation does not throw anything
+            throw new RuntimeException(String.format("Failed to set Message ID header to [%s]", messageId), e);
         }
     }
 

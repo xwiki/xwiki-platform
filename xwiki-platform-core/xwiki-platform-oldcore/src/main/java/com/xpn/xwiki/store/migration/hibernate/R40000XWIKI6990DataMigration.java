@@ -43,7 +43,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.Index;
@@ -1059,7 +1059,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Cache the configuration and the dialect
         this.configuration = getStore().getConfiguration();
-        this.dialect = this.configuration.buildSettings().getDialect();
+        this.dialect = getStore().getDialect();
 
         // Check configuration for safe mode
         /* True if migration should use safe but slower non-bulk native updates. */
@@ -1067,7 +1067,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             "1".equals(getXWikiContext().getWiki().Param("xwiki.store.migration." + this.getName() + ".safemode", "0"));
 
         // Use safe mode if the database has no temporary table supported by hibernate
-        useSafeUpdates = useSafeUpdates || !this.configuration.buildSettings().getDialect().supportsTemporaryTables();
+        useSafeUpdates = useSafeUpdates || !this.dialect.supportsTemporaryTables();
 
         // Proceed to document id conversion
         if (!docs.isEmpty()) {

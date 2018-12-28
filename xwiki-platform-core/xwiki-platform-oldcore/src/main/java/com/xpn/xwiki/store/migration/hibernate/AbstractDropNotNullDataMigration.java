@@ -22,7 +22,7 @@ package com.xpn.xwiki.store.migration.hibernate;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 

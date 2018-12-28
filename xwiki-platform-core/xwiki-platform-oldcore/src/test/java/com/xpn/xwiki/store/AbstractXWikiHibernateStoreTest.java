@@ -21,10 +21,10 @@ package com.xpn.xwiki.store;
 
 import javax.inject.Provider;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;

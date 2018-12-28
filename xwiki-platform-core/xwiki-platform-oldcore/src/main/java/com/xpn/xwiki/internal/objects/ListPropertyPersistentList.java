@@ -21,8 +21,8 @@ package com.xpn.xwiki.internal.objects;
 
 import java.util.ArrayList;
 
-import org.hibernate.collection.PersistentList;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.internal.PersistentList;
+import org.hibernate.engine.spi.SessionImplementor;
 
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.ListProperty.NotifyList;

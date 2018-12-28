@@ -24,14 +24,20 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Environment;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.connection.ConnectionProviderFactory;
+import org.hibernate.service.UnknownUnwrapTypeException;
+import org.hibernate.service.jdbc.connections.internal.ConnectionProviderInitiator;
+import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.service.spi.Configurable;
+import org.hibernate.service.spi.Stoppable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,10 +86,10 @@ import org.slf4j.LoggerFactory;
  * lists, issue tracking and other support facilities
  * </p>
  *
- * @see org.hibernate.connection.ConnectionProvider
+ * @see org.hibernate.service.jdbc.connections.spi.ConnectionProvider
  * @author Dirk Verbeeck
  */
-public class DBCPConnectionProvider implements ConnectionProvider
+public class DBCPConnectionProvider implements ConnectionProvider, Configurable, Stoppable
 {
     /**
      * Logger to use to log shutdown information (opposite of initialization).
@@ -107,7 +113,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
     private static final String AUTOCOMMIT = "hibernate.connection.autocommit";
 
     @Override
-    public void configure(Properties props) throws HibernateException
+    public void configure(Map props) throws HibernateException
     {
         try {
             LOGGER.debug("Configure DBCPConnectionProvider");
@@ -116,36 +122,36 @@ public class DBCPConnectionProvider implements ConnectionProvider
             Properties dbcpProperties = new Properties();
 
             // DriverClass & url
-            String jdbcDriverClass = props.getProperty(Environment.DRIVER);
+            String jdbcDriverClass = (String) props.get(Environment.DRIVER);
             dbcpProperties.put("driverClassName", jdbcDriverClass);
 
             String jdbcUrl = System.getProperty(Environment.URL);
             if (jdbcUrl == null) {
-                jdbcUrl = props.getProperty(Environment.URL);
+                jdbcUrl = (String) props.get(Environment.URL);
             }
             dbcpProperties.put("url", jdbcUrl);
 
             // Username / password. Only put username and password if they're not null. This allows
             // external authentication support (OS authenticated). It'll thus work if the hibernate
             // config does not specify a username and/or password.
-            String username = props.getProperty(Environment.USER);
+            String username = (String) props.get(Environment.USER);
             if (username != null) {
                 dbcpProperties.put("username", username);
             }
-            String password = props.getProperty(Environment.PASS);
+            String password = (String) props.get(Environment.PASS);
             if (password != null) {
                 dbcpProperties.put("password", password);
             }
 
             // Isolation level
-            String isolationLevel = props.getProperty(Environment.ISOLATION);
+            String isolationLevel = (String) props.get(Environment.ISOLATION);
             if ((isolationLevel != null) && (isolationLevel.trim().length() > 0)) {
                 dbcpProperties.put("defaultTransactionIsolation", isolationLevel);
             }
 
             // Turn off autocommit (unless autocommit property is set)
             // Note that this property will be overwritten below if the DBCP "defaultAutoCommit" property is defined.
-            String autocommit = props.getProperty(AUTOCOMMIT);
+            String autocommit = (String) props.get(AUTOCOMMIT);
             if ((autocommit != null) && (autocommit.trim().length() > 0)) {
                 dbcpProperties.put("defaultAutoCommit", autocommit);
             } else {
@@ -153,13 +159,13 @@ public class DBCPConnectionProvider implements ConnectionProvider
             }
 
             // Pool size
-            String poolSize = props.getProperty(Environment.POOL_SIZE);
+            String poolSize = (String) props.get(Environment.POOL_SIZE);
             if ((poolSize != null) && (poolSize.trim().length() > 0) && (Integer.parseInt(poolSize) > 0)) {
                 dbcpProperties.put("maxTotal", poolSize);
             }
 
             // Copy all "driver" properties into "connectionProperties"
-            Properties driverProps = ConnectionProviderFactory.getConnectionProperties(props);
+            Properties driverProps = ConnectionProviderInitiator.getConnectionProperties(props);
             if (driverProps.size() > 0) {
                 StringBuilder connectionProperties = new StringBuilder();
                 for (Iterator iter = driverProps.keySet().iterator(); iter.hasNext();) {
@@ -178,7 +184,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
                 String key = String.valueOf(element);
                 if (key.startsWith(PREFIX)) {
                     String property = key.substring(PREFIX.length());
-                    String value = props.getProperty(key);
+                    String value = (String) props.get(key);
 
                     // Handle backward compatibility
                     switch (property) {
@@ -262,7 +268,6 @@ public class DBCPConnectionProvider implements ConnectionProvider
         }
     }
 
-    @Override
     public void close() throws HibernateException
     {
         SHUTDOWN_LOGGER.debug("Stopping Database Connection Pool...");
@@ -303,5 +308,34 @@ public class DBCPConnectionProvider implements ConnectionProvider
             LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", this.ds.getNumActive(),
                 this.ds.getMaxTotal(), this.ds.getNumIdle(), this.ds.getMaxIdle());
         }
+    }
+
+    @Override
+    public boolean isUnwrappableAs(Class unwrapType)
+    {
+        return ConnectionProvider.class.equals(unwrapType) ||
+                DBCPConnectionProvider.class.isAssignableFrom(unwrapType) ||
+                DataSource.class.isAssignableFrom(unwrapType);
+    }
+
+    @Override
+    @SuppressWarnings({ "unchecked" })
+    public <T> T unwrap(Class<T> unwrapType)
+    {
+        if (ConnectionProvider.class.equals(unwrapType) ||
+                DBCPConnectionProvider.class.isAssignableFrom(unwrapType))
+        {
+            return (T) this;
+        } else if (DataSource.class.isAssignableFrom(unwrapType)) {
+            return (T) ds;
+        } else {
+            throw new UnknownUnwrapTypeException(unwrapType);
+        }
+    }
+
+    @Override
+    public void stop()
+    {
+        close();
     }
 }

@@ -20,16 +20,14 @@
 
 package com.xpn.xwiki.store.migration.hibernate;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -100,8 +98,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {
-                    Statement stmt = session.connection().createStatement();
-                    ResultSet rs;
+                    List<Object[]> rs;
                     try {
                         // We place an empty character in archives for documents that have already
                         // been migrated so that we can re-execute this data migration and not start over.
@@ -109,9 +106,9 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                         // XWD_ARCHIVE column had a not null constraint and since this column has disappeared in 1.2
                         // and after, the hibernate update script will not have modified the nullability of it...
                         // (see https://jira.xwiki.org/browse/XWIKI-2074).
-                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc"
-                            + " where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION");
-                    } catch (SQLException e) {
+                        rs = session.createSQLQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc"
+                            + " where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION").list();
+                    } catch (HibernateException e) {
                         // most likely there is no XWD_ARCHIVE column, so migration is not needed
                         // is there easier way to find what column is not exist?
                         return null;
@@ -122,15 +119,16 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                     Transaction originalTransaction = versioningStore.getTransaction(context);
                     versioningStore.setSession(null, context);
                     versioningStore.setTransaction(null, context);
-                    PreparedStatement deleteStatement =
-                        session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
+                    SQLQuery deleteStatement =
+                            session.createSQLQuery("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
-                    while (rs.next()) {
+                    for (Object[] result : rs) {
                         if (R4359XWIKI1459DataMigration.this.logger.isInfoEnabled()) {
-                            R4359XWIKI1459DataMigration.this.logger.info("Updating document [{}]...", rs.getString(3));
+                            R4359XWIKI1459DataMigration.this.logger
+                                    .info("Updating document [{}]...", result[2].toString());
                         }
-                        long docId = Long.parseLong(rs.getString(1));
-                        String sArchive = rs.getString(2);
+                        long docId = Long.parseLong(result[0].toString());
+                        String sArchive = result[1].toString();
 
                         // In some weird cases it can happen that the XWD_ARCHIVE field is empty
                         // (that shouldn't happen but we've seen it happening).
@@ -143,21 +141,20 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                                 R4359XWIKI1459DataMigration.this.logger.warn(
                                     "The RCS archive for [{}] is broken. Internal error [{}]."
                                         + " The history for this document has been reset.",
-                                    rs.getString(3), e.getMessage());
+                                    result[2].toString(), e.getMessage());
                             }
                             getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
                         } else {
                             R4359XWIKI1459DataMigration.this.logger.warn(
-                                "Empty revision found for document [{}]. Ignoring non-fatal error.", rs.getString(3));
+                                    "Empty revision found for document [{}]. Ignoring non-fatal error.",
+                                    result[2].toString());
                         }
                         deleteStatement.setLong(1, docId);
                         deleteStatement.executeUpdate();
                     }
-                    deleteStatement.close();
-                    stmt.close();
                     versioningStore.setSession(session, context);
                     versioningStore.setTransaction(originalTransaction, context);
-                } catch (SQLException e) {
+                } catch (HibernateException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
                 }

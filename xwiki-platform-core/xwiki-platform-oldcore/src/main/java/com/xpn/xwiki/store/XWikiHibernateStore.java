@@ -20,8 +20,6 @@
 package com.xpn.xwiki.store;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -37,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,7 +44,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
@@ -53,9 +51,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Settings;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
@@ -308,43 +303,44 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         boolean bTransaction = true;
         String database = context.getWikiId();
-        Statement stmt = null;
+        AtomicReference<Statement> stmt = new AtomicReference<>(null);
         try {
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
-            Connection connection = session.connection();
-            stmt = connection.createStatement();
+            session.doWork(connection -> {
+                stmt.set(connection.createStatement());
+                Statement statement = stmt.get();
 
-            String schema = getSchemaFromWikiName(wikiName, context);
-            String escapedSchema = escapeSchema(schema, context);
+                String schema = getSchemaFromWikiName(wikiName, context);
+                String escapedSchema = escapeSchema(schema, context);
 
-            DatabaseProduct databaseProduct = getDatabaseProductName();
-            if (DatabaseProduct.ORACLE == databaseProduct) {
-                stmt.execute("create user " + escapedSchema + " identified by " + escapedSchema);
-                stmt.execute("grant resource to " + escapedSchema);
-            } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
-                || DatabaseProduct.H2 == databaseProduct) {
-                stmt.execute("CREATE SCHEMA " + escapedSchema);
-            } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                stmt.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
-            } else if (DatabaseProduct.MYSQL == databaseProduct) {
-                // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
-                if (context.getWiki().getEncoding().equals("UTF-8")) {
-                    stmt.execute("create database " + escapedSchema + " CHARACTER SET utf8 COLLATE utf8_bin");
+                DatabaseProduct databaseProduct = getDatabaseProductName();
+                if (DatabaseProduct.ORACLE == databaseProduct) {
+                    statement.execute("create user " + escapedSchema + " identified by " + escapedSchema);
+                    statement.execute("grant resource to " + escapedSchema);
+                } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
+                        || DatabaseProduct.H2 == databaseProduct) {
+                    statement.execute("CREATE SCHEMA " + escapedSchema);
+                } else if (DatabaseProduct.HSQLDB == databaseProduct) {
+                    statement.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
+                } else if (DatabaseProduct.MYSQL == databaseProduct) {
+                    // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
+                    if (context.getWiki().getEncoding().equals("UTF-8")) {
+                        statement.execute("create database " + escapedSchema + " CHARACTER SET utf8 COLLATE utf8_bin");
+                    } else {
+                        statement.execute("create database " + escapedSchema);
+                    }
+                } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
+                    if (isInSchemaMode()) {
+                        statement.execute("CREATE SCHEMA " + escapedSchema);
+                    } else {
+                        this.logger.error("Creation of a new database is currently only supported in the schema mode, "
+                                + "see https://jira.xwiki.org/browse/XWIKI-8753");
+                    }
                 } else {
-                    stmt.execute("create database " + escapedSchema);
+                    statement.execute("create database " + escapedSchema);
                 }
-            } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
-                if (isInSchemaMode()) {
-                    stmt.execute("CREATE SCHEMA " + escapedSchema);
-                } else {
-                    this.logger.error("Creation of a new database is currently only supported in the schema mode, "
-                        + "see https://jira.xwiki.org/browse/XWIKI-8753");
-                }
-            } else {
-                stmt.execute("create database " + escapedSchema);
-            }
-
+            });
             endTransaction(context, true);
         } catch (Exception e) {
             Object[] args = { wikiName };
@@ -354,8 +350,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } finally {
             context.setWikiId(database);
             try {
-                if (stmt != null) {
-                    stmt.close();
+                Statement statement = stmt.get();
+                if (statement != null) {
+                    statement.close();
                 }
             } catch (Exception e) {
             }
@@ -375,17 +372,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         boolean bTransaction = true;
         String database = context.getWikiId();
-        Statement stmt = null;
+        AtomicReference<Statement> stmt = new AtomicReference<>(null);
         try {
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
-            Connection connection = session.connection();
-            stmt = connection.createStatement();
+            session.doWork(connection -> {
+                stmt.set(connection.createStatement());
 
-            String schema = getSchemaFromWikiName(wikiName, context);
-            String escapedSchema = escapeSchema(schema, context);
+                String schema = getSchemaFromWikiName(wikiName, context);
+                String escapedSchema = escapeSchema(schema, context);
 
-            executeDeleteWikiStatement(stmt, getDatabaseProductName(), escapedSchema);
+                executeDeleteWikiStatement(stmt.get(), getDatabaseProductName(), escapedSchema);
+            });
 
             endTransaction(context, true);
         } catch (Exception e) {
@@ -396,8 +394,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } finally {
             context.setWikiId(database);
             try {
-                if (stmt != null) {
-                    stmt.close();
+                Statement statement = stmt.get();
+                if (statement != null) {
+                    statement.close();
                 }
             } catch (Exception e) {
             }
@@ -1246,13 +1245,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // save object using the custom mapping
                 Map<String, Object> objmap = object.getCustomMappingMap();
                 handledProps = bclass.getCustomMappingPropertyList(context);
-                Session dynamicSession = session.getSession(EntityMode.MAP);
                 query = session.createQuery("select obj.id from " + bclass.getName() + " as obj where obj.id = :id");
                 query.setLong("id", object.getId());
                 if (query.uniqueResult() == null) {
-                    dynamicSession.save(bclass.getName(), objmap);
+                    session.save(bclass.getName(), objmap);
                 } else {
-                    dynamicSession.update(bclass.getName(), objmap);
+                    session.update(bclass.getName(), objmap);
                 }
 
                 // dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
@@ -1381,10 +1379,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 List<String> handledProps = new ArrayList<String>();
                 try {
                     if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
-                        Session dynamicSession = session.getSession(EntityMode.MAP);
                         String className = this.localEntityReferenceSerializer.serialize(bclass.getDocumentReference());
                         @SuppressWarnings("unchecked")
-                        Map<String, ?> map = (Map<String, ?>) dynamicSession.load(className, object.getId());
+                        Map<String, ?> map = (Map<String, ?>) session.load(className, object.getId());
                         // Let's make sure to look for null fields in the dynamic mapping
                         bclass.fromValueMap(map, object);
                         for (String prop : bclass.getCustomMappingPropertyList(context)) {
@@ -1510,13 +1507,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             List<String> handledProps = new ArrayList<String>();
             if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                 handledProps = bclass.getCustomMappingPropertyList(context);
-                Session dynamicSession = session.getSession(EntityMode.MAP);
-                Object map = dynamicSession.get(bclass.getName(), object.getId());
+                Object map = session.get(bclass.getName(), object.getId());
                 if (map != null) {
                     if (evict) {
-                        dynamicSession.evict(map);
+                        session.evict(map);
                     }
-                    dynamicSession.delete(map);
+                    session.delete(map);
                 }
             }
 
@@ -2845,20 +2841,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             return getSessionFactory();
         }
 
-        Configuration config = getConfiguration();
-        SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
-        Settings settings = sfactory.getSettings();
-        ConnectionProvider provider = ((SessionFactoryImpl) getSessionFactory()).getSettings().getConnectionProvider();
-        Field field = null;
-        try {
-            field = settings.getClass().getDeclaredField("connectionProvider");
-            field.setAccessible(true);
-            field.set(settings, provider);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_MAPPING_INJECTION_FAILED, "Mapping injection failed", e);
-        }
-        return sfactory;
+        return getConfiguration().buildSessionFactory();
     }
 
     @Override
@@ -2889,19 +2872,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private SessionFactory injectInSessionFactory(Configuration config) throws XWikiException
     {
-        SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
-        Settings settings = sfactory.getSettings();
-        ConnectionProvider provider = ((SessionFactoryImpl) getSessionFactory()).getSettings().getConnectionProvider();
-        Field field = null;
-        try {
-            field = settings.getClass().getDeclaredField("connectionProvider");
-            field.setAccessible(true);
-            field.set(settings, provider);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_MAPPING_INJECTION_FAILED, "Mapping injection failed", e);
-        }
-        return sfactory;
+        return config.buildSessionFactory();
     }
 
     public SessionFactory injectCustomMappingsInSessionFactory(XWikiContext inputxcontext) throws XWikiException

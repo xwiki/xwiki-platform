@@ -35,10 +35,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
+import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.service.spi.Stoppable;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -328,11 +329,13 @@ public class HibernateStore
                 } else if (DatabaseProduct.POSTGRESQL == product && isInSchemaMode()) {
                     executeSQL("SET search_path TO " + escapedSchemaName, session);
                 } else {
-                    String catalog = session.connection().getCatalog();
-                    catalog = (catalog == null) ? null : catalog.replace('_', '-');
-                    if (!schemaName.equals(catalog)) {
-                        session.connection().setCatalog(schemaName);
-                    }
+                    session.doWork(connection -> {
+                        String catalog = connection.getCatalog();
+                        catalog = (catalog == null) ? null : catalog.replace('_', '-');
+                        if (!schemaName.equals(catalog)) {
+                            connection.setCatalog(schemaName);
+                        }
+                    });
                 }
             }
 
@@ -552,7 +555,9 @@ public class HibernateStore
             // See http://bit.ly/QAJXlr
             ConnectionProvider connectionProvider =
                 ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
-            connectionProvider.close();
+            if (connectionProvider instanceof Stoppable) {
+                ((Stoppable) connectionProvider).stop();
+            }
         }
     }
 

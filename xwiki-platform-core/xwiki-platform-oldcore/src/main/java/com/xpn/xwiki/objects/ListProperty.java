@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
-import org.hibernate.collection.PersistentCollection;
+import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 
 import com.xpn.xwiki.doc.merge.MergeResult;

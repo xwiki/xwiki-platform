@@ -33,9 +33,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.util.xml.XmlDocument;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.util.xml.XmlDocument;
+import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.service.spi.Stoppable;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
@@ -82,8 +83,8 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
             // If the user has specified a Data Source we shouldn't close it. Fortunately the way Hibernate works is
             // the following: if the user has configured Hibernate to use a Data Source then Hibernate will use
             // the DatasourceConnectionProvider class which has a close() method that doesn't do anything...
-            if (provider != null) {
-                provider.close();
+            if (provider instanceof Stoppable) {
+                ((Stoppable) provider).stop();
             }
         }
     }

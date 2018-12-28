@@ -19,12 +19,11 @@
  */
 package com.xpn.xwiki.store;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Statement;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,7 +36,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.id.SequenceGenerator;
 import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
@@ -368,18 +367,15 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        String[] schemaSQL = null;
+        AtomicReference<String[]> schemaSQL = new AtomicReference<>(null);
 
         Session session;
-        Connection connection;
-        DatabaseMetadata meta;
         boolean bTransaction = true;
         String dschema = null;
 
         try {
             bTransaction = beginTransaction(false, context);
             session = this.store.getCurrentSession();
-            connection = session.connection();
             setDatabase(session, context);
 
             String contextSchema = this.store.getSchemaFromWikiName();
@@ -398,12 +394,14 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
                 }
             }
 
-            meta = new DatabaseMetadata(connection, this.store.getDialect());
-            schemaSQL = config.generateSchemaUpdateScript(this.store.getDialect(), meta);
+            session.doWork(connection -> {
+                DatabaseMetadata meta = new DatabaseMetadata(connection, this.store.getDialect());
+                schemaSQL.set(config.generateSchemaUpdateScript(this.store.getDialect(), meta));
 
-            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired for
-            // details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
-            createHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
+                // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired
+                // for details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
+                createHibernateSequenceIfRequired(schemaSQL.get(), contextSchema, session);
+            });
 
         } catch (Exception e) {
             throw new HibernateException("Failed creating schema update script", e);
@@ -423,7 +421,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
             restoreExecutionXContext();
         }
 
-        return schemaSQL;
+        return schemaSQL.get();
     }
 
     /**
@@ -494,8 +492,6 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
 
         // Updating the schema for custom mappings
         Session session;
-        Connection connection;
-        Statement stmt = null;
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         String sql = "";
@@ -503,11 +499,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
         try {
             bTransaction = beginTransaction(context);
             session = getSession(context);
-            connection = session.connection();
             setDatabase(session, context);
-            stmt = connection.createStatement();
-
-            // Start monitoring timer
             if (monitor != null) {
                 monitor.startTimer("sqlupgrade");
             }
@@ -516,18 +508,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Update Schema sql: [" + sql + "]");
                 }
-                stmt.executeUpdate(sql);
+                session.createSQLQuery(sql).executeUpdate();
             }
-            connection.commit();
+            session.getTransaction().commit();
         } catch (Exception e) {
             throw new HibernateException("Failed updating schema while executing query [" + sql + "]", e);
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (Exception e) {
-            }
             try {
                 if (bTransaction) {
                     endTransaction(context, true);

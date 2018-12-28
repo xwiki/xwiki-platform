@@ -277,32 +277,34 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             @Override
             public Object doInHibernate(Session session) throws XWikiException
             {
+                session.doWork(connection -> {
+                    Liquibase lb;
+                    try {
+                        Database lbDatabase = DatabaseFactory.getInstance()
+                                .findCorrectDatabaseImplementation(new JdbcConnection(connection));
 
-                Liquibase lb;
-                try {
-                    Database lbDatabase = DatabaseFactory.getInstance()
-                        .findCorrectDatabaseImplementation(new JdbcConnection(session.connection()));
+                        // Precise the schema name to liquibase, since it does not usually determine it
+                        // properly (See XWIKI-8813).
+                        lbDatabase.setDefaultSchemaName(store.getSchemaFromWikiName(getXWikiContext()));
 
-                    // Precise the schema name to liquibase, since it does not usually determine it
-                    // properly (See XWIKI-8813).
-                    lbDatabase.setDefaultSchemaName(store.getSchemaFromWikiName(getXWikiContext()));
+                        lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
+                                new MigrationResourceAccessor(changeLogs.toString()), lbDatabase);
+                    } catch (LiquibaseException e) {
+                        throw new HibernateException(new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                                XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                                String.format("Unable to launch liquibase for database %s, schema update failed.",
+                                        database),
+                                e));
+                    }
 
-                    lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
-                        new MigrationResourceAccessor(changeLogs.toString()), lbDatabase);
-                } catch (LiquibaseException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                        String.format("Unable to launch liquibase for database %s, schema update failed.", database),
-                        e);
-                }
-
-                try {
-                    lb.update(null);
-                } catch (LiquibaseException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                        String.format("Unable to update schema of database %s.", database), e);
-                }
+                    try {
+                        lb.update(null);
+                    } catch (LiquibaseException e) {
+                        throw new HibernateException(new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                                XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                                String.format("Unable to update schema of database %s.", database), e));
+                    }
+                });
 
                 return null;
             }

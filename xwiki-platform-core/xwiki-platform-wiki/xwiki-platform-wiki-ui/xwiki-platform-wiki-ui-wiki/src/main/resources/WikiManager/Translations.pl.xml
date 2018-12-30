@@ -48,28 +48,28 @@ core.menu.admin.wiki=Administrowanie wiki
 platform.wiki.panel.title=Informacje o wiki
 
 # MESSAGES
-platform.wiki.currentwiki.welcome=Witaj w {1}{2}{3} wiki
+platform.wiki.currentwiki.welcome=Witaj w {1}{2}{3} wiki.
 platform.wiki.currentwiki.currentUserIsOwner=Jesteś właścicielem tej wiki.
 platform.wiki.currentwiki.currentUserIsAdmin=Jesteś administratorem tej wiki.
-platform.wiki.currentwiki.joinNeedToLogin=Aby dołączyć do tej wiki musisz być zalogowany
+platform.wiki.currentwiki.joinNeedToLogin=Aby dołączyć do tej wiki musisz być zalogowany.
 platform.wiki.currentwiki.currentUserNotMember=Nie jesteś członkiem tej wiki.
-platform.wiki.currentwiki.currentuserCanJoin=Jesli chcesz, możesz {0}dołaczyć do tej wiki{1}
+platform.wiki.currentwiki.currentuserCanJoin=Jeśli chcesz, możesz {0} dołączyć do tej wiki{1}.
 platform.wiki.currentwiki.currentUserIsMember=Jesteś członkiem tej wiki.
-platform.wiki.currentwiki.currentUserCanLeave=Jeśli chcesz, możesz {0}opuścić tą wiki{1}
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Aby zobaczyć listę wszystkich członków możesz użyć strony {0}Katalog Użytkowników{1}
-platform.wiki.currentwiki.invitationPendingForCurrentWiki=Zostałeś zaproszony aby dołączyć do tej wiki
+platform.wiki.currentwiki.currentUserCanLeave=Jeśli chcesz, możesz {0}opuścić tą wiki{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Aby zobaczyć listę wszystkich członków możesz użyć strony {0}Katalog Użytkowników{1}.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Zostałeś zaproszony aby dołączyć do tej wiki.
 platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Poprosiłeś o dołączenie do tej wiki.
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Twoje zapytanie o dołączenie do wiki "{0}" zostało zaakceptowane.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Twoje zapytanie o dołaczenie do wiki "{0}" zostało odrzucone.
 platform.wiki.currentwiki.candidateHandledSaveComment=Obsłużony kandydat {0} ({1})
-platform.wiki.currentwiki.candidateHandledComment=Komentarz
+platform.wiki.currentwiki.candidateHandledComment=Komentarz:
 platform.wiki.currentwiki.candidateAcceptedSuccess=Zapytanie zaakceptowane pomyślnie.
 platform.wiki.currentwiki.candidateRejectedSuccess=Zapytanie odrzucone pomyślnie.
 platform.wiki.currentwiki.inviteUserAlreadyMember={0} jest już członkiem tej wiki.
 platform.wiki.currentwiki.inviteRequestAlreadyExists={0} wysłał prośbę o zaproszenie. Zamiast tego odpowiedz na tamto zapytanie.
 platform.wiki.currentwiki.inviteUserAlreadyInvited={0} ma aktywne zaproszenie.
 platform.wiki.currentwiki.inviteSaveComment=Użytkownik "{0}" został zaproszony aby dołaczyć do tej wiki.
-platform.wiki.currentwiki.inviteNotification=Zostałeś zaproszony aby dołączyć do wiki "{0}"
+platform.wiki.currentwiki.inviteNotification=Zostałeś zaproszony aby dołączyć do wiki "{0}".
 platform.wiki.currentwiki.inviteSuccess={0} zaproszony pomyślnie.
 platform.wiki.currentwiki.invitationCancelSaveComment=Wycofaj zaproszenie {0} ({1})
 platform.wiki.currentwiki.invitationCancelNotification=Twoje zaproszenie zostało wycofane i nie jest już prawidłowe.
@@ -115,18 +115,18 @@ WikiManager.WikiCandidateMemberClass_type_request=Zapytanie
 WikiManager.WikiCandidateMemberClass_type_invitation=Zaproszenie
 
 # HINTS
-platform.wiki.currentwiki.prop.wikiprettyname.hint=Wyświetlana nazwa tej wiki
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Wyświetlana nazwa tej wiki.
 platform.wiki.currentwiki.prop.description.hint=Krótki opis wiki i jej zastosowania.
-platform.wiki.currentwiki.prop.owner.hint=Użytkownik który ma pełne prawa do tej wiki
+platform.wiki.currentwiki.prop.owner.hint=Użytkownik który ma pełne prawa do tej wiki.
 platform.wiki.currentwiki.prop.membershipType.hint=Sposób w jaki użytkownicy mogą dołaczyć do tej wiki.
 platform.wiki.currentwiki.prop.secure.hint=Jeśli właczone, wszystkie zewnętrzne adresy wygenerowane na tej wiki będą się zaczynały od {0}https://~/~/{1}.
-platform.wiki.currentwiki.invite.username.hint=Nazwa użytkownika do dodania
+platform.wiki.currentwiki.invite.username.hint=Nazwa użytkownika do dodania.
 platform.wiki.currentwiki.invite.message.hint=Wiadomość która zostanie wysłana użytkownikowi.
 platform.wiki.currentwiki.candidates.hint=Użytkownicy którzy zapytali o zaproszenie lub zostali zaproszeni do wiki.
 platform.wiki.currentwiki.candidates.empty=Brak użytkowników, którzy poprosili o dostęp lub zostali zaproszeni do dołączenia do tej wiki.
 
 # ADMIN
-admin.xwiki.manageworkspace.description=Zarządzanie ustawieniami takimi jak nazwa wiki, opis, właściciel, typ członkostwa
+admin.xwiki.manageworkspace.description=Zarządzanie ustawieniami takimi jak nazwa wiki, opis, właściciel, typ członkostwa.
 admin.xwiki.workspaceusers.description=Zarządzanie członkami wiki: dodawanie, usuwanie, zapraszanie, akceptowanie i odrzucanie członków wiki.
 admin.xwiki.usersconfiguration.title=Konfiguracja
 admin.xwiki.members.title=Aktualni członkowie

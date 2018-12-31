@@ -37,13 +37,13 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>administration.templateProvider.description=Opis
-### Missing: administration.templateProvider.description.hint=The information to be displayed for template provider when a new page is created.
+administration.templateProvider.description.hint=Informacje wyświetlane dla dostawcy szablonu po utworzeniu nowej strony.
 administration.templateProvider.icon=Ikona
-### Missing: administration.templateProvider.icon.hint=The icon to be displayed for template provider when a new page is created. Select one from the {0}full list of icons{1}.
+administration.templateProvider.icon.hint=Ikona wyświetlana dla dostawcy szablonu po utworzeniu nowej strony. Wybierz jedną z {0} pełnej listy ikon {1}.
 administration.templateProvider.creationRestrictions=Ustaw ograniczenia
-### Missing: administration.templateProvider.creationRestrictions.hint=The list of locations (including their children) where this template is allowed to create pages
+administration.templateProvider.creationRestrictions.hint=Lista lokalizacji (w tym ich dzieci), w których ten szablon może tworzyć strony
 administration.templateProvider.creationRestrictions.none=Ten szablon można używać wszędzie
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions=Creation Restrictions as Suggestions
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions.hint=Allows the user to select any location to create the page with this template, using the first creation restriction as the prefilled default location when the template is selected from the list.
+administration.templateProvider.creationRestrictionsAreSuggestions=Ograniczenia tworzenia jako sugestie
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Pozwala użytkownikowi wybrać dowolną lokalizację, aby utworzyć stronę z tym szablonem, przy użyciu pierwszego ograniczenia tworzenia jako wstępnie wypełnionej domyślnej lokalizacji, gdy szablon zostanie wybrany z listy.
 </content>
 </xwikidoc>

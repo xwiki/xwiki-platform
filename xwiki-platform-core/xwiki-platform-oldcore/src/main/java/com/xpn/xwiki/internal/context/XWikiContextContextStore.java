@@ -45,9 +45,11 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
@@ -149,6 +151,12 @@ public class XWikiContextContextStore extends AbstractContextStore
      * Name of the entry containing the document reference.
      */
     public static final String PROP_DOCUMENT_REFERENCE = PREFIX_PROP_DOCUMENT + SUFFIX_PROP_DOCUMENT_REFERENCE;
+
+    /**
+     * The reference of the superadmin user.
+     */
+    private static final DocumentReference SUPERADMIN_REFERENCE =
+        new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
 
     protected interface SubContextStore
     {
@@ -296,6 +304,9 @@ public class XWikiContextContextStore extends AbstractContextStore
         // User
         if (contextStore.containsKey(PROP_USER)) {
             xcontext.setUserReference((DocumentReference) contextStore.get(PROP_USER));
+        } else {
+            // If the current user is not a criteria set one which will always have all the required rights
+            xcontext.setUserReference(SUPERADMIN_REFERENCE);
         }
 
         // Locale
@@ -324,9 +335,8 @@ public class XWikiContextContextStore extends AbstractContextStore
                 if (secureDocument != null) {
                     secureDocument = secureDocument.clone();
                 } else {
-                    secureDocument = new XWikiDocument(new DocumentReference(
-                        authorReference != null ? authorReference.getWikiReference().getName() : "xwiki", "SUSpace",
-                        "SUPage"));
+                    secureDocument = new XWikiDocument(new DocumentReference(authorReference != null
+                        ? authorReference.getWikiReference().getName() : xcontext.getMainXWiki(), "SUSpace", "SUPage"));
                     secureDocument.setAuthorReference(authorReference);
                     secureDocument.setCreatorReference(authorReference);
                 }

@@ -571,8 +571,6 @@ function setPanelWidth() {
 //----------------------------------------------------------------
 
 function panelEditorInit() {
-  // Indicate that we started initialize the panel editor to avoid race conditions
-  panelInitStarted = true;
   // Stop listening from inserted elements
   panelsObserver.disconnect()
 
@@ -614,34 +612,16 @@ function panelEditorInit() {
   changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().size());
 }
 
-// Listen to asynchronously panels
-panelsObserver = new MutationObserver(function(mutations)
-{
-  for (var i = 0; i < mutations.length; i++) {
-    var mutation = mutations[i];
-
-    for (var j = 0; j < mutation.addedNodes.length; j++) {
-      var element = mutation.addedNodes[j];
-
-      if (element.tagName == 'DIV') {
-        if (isPanel(element) && !isAttachedPanel(element)) {
-          maybePanelEditorInit();
-        }
-      }
-    }
-  }
-});
-panelsObserver.observe(document, { childList: true, subtree : true});
-
-function maybePanelEditorInit() {
-  // Wait until all asyncrhonous panels are loaded before initializing panels editor
-  if (!panelInitStarted && !document.getElementsByClassName('xwiki-async').length) {
-    panelEditorInit()
+// Wait for asynchronous elements
+function waitForAsync(counter) {
+  // If all asynchronous elements have been loaded init panels
+  // If we have been waiting for more than 1s give up and do with what we have
+  if (!document.getElementsByClassName('xwiki-async').length || counter > 1000) {
+    panelEditorInit();
+  } else {
+    counter += 10;
+    setTimeout(waitForAsync, 10, counter);
   }
 }
 
-// Initialize panelInitStarted variable
-panelInitStarted = false;
-
-(XWiki && XWiki.isInitialized && maybePanelEditorInit())
-|| document.observe('xwiki:dom:loading', maybePanelEditorInit);
+waitForAsync(0);

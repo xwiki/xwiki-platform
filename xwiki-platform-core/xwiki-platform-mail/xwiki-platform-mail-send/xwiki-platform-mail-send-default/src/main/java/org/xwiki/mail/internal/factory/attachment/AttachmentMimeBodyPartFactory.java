@@ -20,8 +20,6 @@
 package org.xwiki.mail.internal.factory.attachment;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -33,8 +31,7 @@ import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -109,11 +106,9 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
         throws MessagingException
     {
         File temporaryAttachmentFile;
-        FileOutputStream fos = null;
         try {
             temporaryAttachmentFile = File.createTempFile("attachment", ".tmp", this.temporaryDirectory);
-            fos = new FileOutputStream(temporaryAttachmentFile);
-            IOUtils.copyLarge(attachment.getContentInputStream(), fos);
+            FileUtils.copyInputStreamToFile(attachment.getContentInputStream(), temporaryAttachmentFile);
 
             // Add a header with the location of the temporary file so that it can be removed when no longer needed so
             // that it doesn't stay lying around. This is done in the Mail Preparation Thread.
@@ -121,16 +116,6 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
         } catch (Exception e) {
             throw new MessagingException(
                 String.format("Failed to save attachment [%s] to the file system", attachment.getFilename()), e);
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                // Only an error at closing, we continue
-                this.logger.warn("Failed to close the temporary file attachment when sending an email. "
-                    + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
-            }
         }
 
         return new FileDataSource(temporaryAttachmentFile);

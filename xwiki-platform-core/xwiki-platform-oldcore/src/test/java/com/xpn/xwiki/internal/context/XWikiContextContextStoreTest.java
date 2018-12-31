@@ -37,6 +37,8 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,6 +55,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
+@ReferenceComponentList
 public class XWikiContextContextStoreTest
 {
     private static final String WIKI = "wiki";
@@ -143,6 +146,7 @@ public class XWikiContextContextStoreTest
         assertNotEquals(WIKI, this.oldcore.getXWikiContext().getWikiId());
         assertNull(this.oldcore.getXWikiContext().getRequest());
         assertNull(this.oldcore.getXWikiContext().getDoc());
+        assertNull(this.oldcore.getXWikiContext().getUserReference());
 
         Map<String, Serializable> contextStore = new HashMap<>();
         contextStore.put(XWikiContextContextStore.PROP_WIKI, WIKI);
@@ -150,6 +154,8 @@ public class XWikiContextContextStoreTest
         this.store.restore(contextStore);
 
         assertEquals(WIKI, this.oldcore.getXWikiContext().getWikiId());
+        assertEquals(this.oldcore.getXWikiContext().getUserReference(),
+            new DocumentReference("xwiki", "XWiki", XWikiRightService.SUPERADMIN_USER));
         assertEquals(this.descriptor.getMainPageReference(),
             this.oldcore.getXWikiContext().getDoc().getDocumentReference());
         assertEquals(this.wikiURL.toString(), this.oldcore.getXWikiContext().getRequest().getRequestURL().toString());

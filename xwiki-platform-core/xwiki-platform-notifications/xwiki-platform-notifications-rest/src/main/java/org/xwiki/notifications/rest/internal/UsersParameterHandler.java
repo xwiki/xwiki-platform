@@ -20,8 +20,6 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -38,6 +36,8 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.text.StringUtils;
+
+import com.google.common.collect.Sets;
 
 /**
  *  Handle the "users" parameters of the REST API.
@@ -94,14 +94,12 @@ public class UsersParameterHandler
 
     private void addFilterPreference(NotificationParameters parameters, List<String> userList)
     {
-        Set<NotificationFormat> formats = new HashSet<>();
-        formats.add(NotificationFormat.ALERT);
         for (String userId : userList) {
             DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
             pref.setId(String.format("userRestFilters_%s", userId));
             pref.setFilterType(NotificationFilterType.INCLUSIVE);
             pref.setEnabled(true);
-            pref.setNotificationFormats(formats);
+            pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.ALERT));
             pref.setUser(userId);
             parameters.filterPreferences.add(pref);
         }

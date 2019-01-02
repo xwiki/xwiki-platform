@@ -57,9 +57,8 @@ import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.text.StringUtils;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import com.rometools.rome.io.SyndFeedOutput;
+import com.google.common.collect.Sets;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
@@ -99,12 +98,6 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     @Inject
     private UsersParameterHandler usersParameterHandler;
-
-    @Inject
-    private NotificationRSSManager notificationRSSManager;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public Response getNotifications(
@@ -209,7 +202,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         enableAllEventTypes(parameters);
         handlePagesParameter(pages, parameters);
         handleSpacesParameter(spaces, parameters);
-        handleWikisParameter(wikis, parameters, currentWiki);
+        handleWikisParameter(wikis, parameters);
         usersParameterHandler.handleUsersParameter(users, parameters);
     }
 
@@ -240,29 +233,15 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         handleLocationParameter(spaces, parameters, NotificationFilterProperty.SPACE);
     }
 
-    private void handleWikisParameter(String wikis, NotificationParameters parameters, String currentWiki)
+    private void handleWikisParameter(String wikis, NotificationParameters parameters)
     {
         handleLocationParameter(wikis, parameters, NotificationFilterProperty.WIKI);
-
-        // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
-        // other wikis (except if the "wikis" parameter is set).
-        // The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
-        // not make sense to show events from other wikis in a "timeline" such as the notifications macro.
-        // TODO: add a "handleAllWikis" parameter to disable this behaviour
-        // Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
-        // events from other wikis.
-        if (StringUtils.isBlank(wikis) && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
-            handleLocationParameter(currentWiki, parameters, NotificationFilterProperty.WIKI);
-        }
     }
 
     private void handleLocationParameter(String locations, NotificationParameters parameters,
             NotificationFilterProperty property)
     {
         if (StringUtils.isNotBlank(locations)) {
-            Set<NotificationFormat> formats = new HashSet<>();
-            formats.add(NotificationFormat.ALERT);
-
             String[] locationArray = locations.split(FIELD_SEPARATOR);
             for (int i = 0; i < locationArray.length; ++i) {
                 DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
@@ -270,8 +249,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                 pref.setEnabled(true);
                 pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
                 pref.setFilterType(NotificationFilterType.INCLUSIVE);
-                pref.setNotificationFormats(formats);
-                pref.setProviderHint("REST");
+                pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.ALERT));
                 switch (property) {
                     case WIKI:
                         pref.setWiki(locationArray[i]);

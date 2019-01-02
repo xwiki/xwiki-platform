@@ -62,10 +62,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.rometools</groupId>
-      <artifactId>rome</artifactId>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>

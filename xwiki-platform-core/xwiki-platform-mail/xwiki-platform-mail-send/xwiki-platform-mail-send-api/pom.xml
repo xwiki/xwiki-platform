@@ -43,8 +43,8 @@
     </dependency>
     <!-- Replace the version triggered by javax.mail by a more accurate one -->
     <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>javax.activation-api</artifactId>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

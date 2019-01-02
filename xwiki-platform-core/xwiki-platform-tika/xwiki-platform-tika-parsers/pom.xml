@@ -41,11 +41,6 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
     </dependency>
-    <!-- Replace the version triggered by Tika by a more accurate one -->
-    <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>javax.activation-api</artifactId>
-    </dependency>
 
     <!-- Test Dependencies -->
     <dependency>

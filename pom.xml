@@ -748,8 +748,9 @@
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>javax.activation:javax.activation-api</id>
+                <id>com.sun.activation:javax.activation</id>
                 <features>javax.activation:activation</features>
+                <features>javax.activation:javax.activation-api</features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

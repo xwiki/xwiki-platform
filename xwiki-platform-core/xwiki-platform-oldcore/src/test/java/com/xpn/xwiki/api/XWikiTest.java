@@ -138,7 +138,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testAuthorIsntChangedAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Lyre";
-        this.apiXWiki.copyDocument(this.apiDocument.getName(), copyName);
+        this.apiXWiki.copyDocument(this.apiDocument.getDocumentReference().getName(), copyName);
         Document copy = this.apiXWiki.getDocument(copyName);
 
         assertEquals("XWiki.Earth", copy.getAuthor());
@@ -147,7 +147,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testCreatorIsntChangedAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Sirius";
-        this.apiXWiki.copyDocument(this.apiDocument.getName(), copyName);
+        this.apiXWiki.copyDocument(this.apiDocument.getDocumentReference().getName(), copyName);
         Document copy = this.apiXWiki.getDocument(copyName);
 
         assertEquals("XWiki.Earth", copy.getCreator());
@@ -155,9 +155,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testCreationDateAfterDocumentCopy() throws XWikiException
     {
-        String copyName = this.apiDocument.getName() + "Copy";
+        String copyName = this.apiDocument.getDocumentReference().getName() + "Copy";
         long startTime = (Calendar.getInstance().getTimeInMillis() / 1000) * 1000;
-        this.apiXWiki.copyDocument(this.apiDocument.getName(), copyName);
+        this.apiXWiki.copyDocument(this.apiDocument.getDocumentReference().getName(), copyName);
         long endTime = (Calendar.getInstance().getTimeInMillis() / 1000) * 1000;
         long copyCreationTime = this.apiXWiki.getDocument(copyName).getCreationDate().getTime();
 

@@ -1,12 +1,11 @@
 #template('xwikivars.vm')
-$response.setContentType('application/json')
 #set ($offset = $mathtool.toInteger($request.offset))
 #set ($limit = $mathtool.toInteger($request.limit))
 #set ($order = "$!request.dir" != 'desc')
 ##
 #set ($rm = $xwiki.rightsmanager)
-#if ($request.member && !$request.member.trim().equals(''))
-  #set ($count = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, $order).size())
+#if (!$stringutils.isBlank($request.member))
+  #set ($count = $rm.countAllMatchedMembersNamesForGroup($doc.fullName, $request.member))
   #set ($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit,
     $mathtool.sub($offset, 1), $order))
 #else
@@ -23,16 +22,43 @@ $response.setContentType('application/json')
 })
 #foreach ($member in $members)
   #set ($memberReference = $services.model.resolveDocument($member))
-  #set ($grayed = $memberReference.equals($xcontext.userReference) && $doc.fullName == 'XWiki.XWikiAdminGroup')
+  #set ($showAlias = $hasAdmin || $isAdvancedUser)
+  #set ($memberDisplay = "#displayUser($memberReference {'showAlias': $showAlias, 'wrapAvatar': true})")
+  #set ($isUser = $xwiki.getDocument($memberReference).getObject('XWiki.XWikiUsers'))
+  #set ($isGroup = $xwiki.getDocument($memberReference).getObject('XWiki.XWikiGroups'))
+  #set ($type = [])
+  #if ($isUser)
+    #set ($discard = $type.add($services.localization.render('xe.admin.groups.type.user')))
+  #end
+  #if ($isGroup)
+    #set ($discard = $type.add($services.localization.render('xe.admin.groups.type.group')))
+  #end
+  #if ($memberReference.wikiReference.name == $xcontext.mainWikiName)
+    #set ($scope = $services.localization.render('xe.admin.groups.global'))
+  #elseif ($memberReference.wikiReference.name == $doc.documentReference.wikiReference.name)
+    #set ($scope = $services.localization.render('xe.admin.groups.local'))
+  #else
+    #set ($scope = $services.wiki.getById($memberReference.wikiReference.name).prettyName)
+    #if ("$!scope.trim()" == '')
+      #set ($scope = $memberReference.wikiReference.name)
+    #end
+  #end
   ## The following properties are kept for backward compatibility with XWiki versions older than 2.7.2.
+  #set ($grayed = $memberReference.equals($xcontext.userReference) && $doc.fullName == 'XWiki.XWikiAdminGroup')
   #set ($oldProperties = {
     'fullname': $member,
-    'prettyname': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
+    'prettyname': "$xwiki.getPlainUserName($member)#if ($hasAdmin || $isAdvancedUser) ($member)#end",
     'wikiname': $memberReference.wikiReference.name,
     'memberurl': $xwiki.getURL($memberReference),
     'docurl': $doc.getURL(),
     'grayed': $grayed
   })
+  ## The following properties are kept for backward compatibility with XWiki versions older than 10.9
+  #set ($discard = $oldProperties.putAll({
+    'member_url': $xwiki.getURL($memberReference),
+    '_avatar': "#largeUserAvatar($member)",
+    '_avatar_url': $xwiki.getURL($memberReference)
+  }))
   ## Live table data.
   #set ($liveTableData = {
     'doc_fullName': $member,
@@ -40,20 +66,19 @@ $response.setContentType('application/json')
     'doc_hasadmin': $xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName),
     'doc_hasedit': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
     'doc_hasdelete': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
-    'member': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
-    'member_url': $xwiki.getURL($memberReference),
+    'member': $memberDisplay.trim(),
+    'type': $stringtool.join($type, ', '),
+    'scope': $scope,
     'doc_delete_url': $doc.getURL('view', $escapetool.url({
       'xpage': 'deletegroupmember',
       'fullname': $member,
       'ajax': true,
       'form_token': $services.csrf.token
-    })),
-    '_avatar': "#largeUserAvatar($member)",
-    '_avatar_url': $xwiki.getURL($memberReference)
+    }))
   })
   #set ($data = {})
   #set ($discard = $data.putAll($oldProperties))
   #set ($discard = $data.putAll($liveTableData))
   #set ($discard = $json.rows.add($data))
 #end
-$jsontool.serialize($json)
+#jsonResponse($json)

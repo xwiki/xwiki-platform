@@ -135,7 +135,8 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
     {
         if (request.getSkippedEntities().contains(newDocumentReference)) {
             this.logger.debug("Skipping creation of document [{}], as specified in the request.", newDocumentReference);
-        } else if (this.modelBridge.exists(newDocumentReference)) {
+        } else if (this.modelBridge.exists(newDocumentReference)
+            && !this.modelBridge.canOverwriteSilently(newDocumentReference)) {
             // TODO: Ask the user if it's OK to override. For now, just log.
             this.logger.warn("Skipping creation of document [{}] because it already exists.", newDocumentReference);
         } else if (!hasAccess(Right.EDIT, newDocumentReference)) {

@@ -81,21 +81,21 @@ public class EditRightsPane extends BaseElement
 
     private LiveTableElement rightsTable;
 
-    @FindBy(id = "uorgu")
-    private WebElement showUsersField;
+    @FindBy(css = "label[for='uorgu']")
+    private WebElement switchToUsersLabel;
 
-    @FindBy(id = "uorgg")
-    private WebElement showGroupsField;
+    @FindBy(css = "label[for='uorgg']")
+    private WebElement switchToGroupsLabel;
 
     public void switchToUsers()
     {
-        this.showUsersField.click();
+        this.switchToUsersLabel.click();
         getRightsTable().waitUntilReady();
     }
 
     public void switchToGroups()
     {
-        this.showGroupsField.click();
+        this.switchToGroupsLabel.click();
         getRightsTable().waitUntilReady();
     }
 

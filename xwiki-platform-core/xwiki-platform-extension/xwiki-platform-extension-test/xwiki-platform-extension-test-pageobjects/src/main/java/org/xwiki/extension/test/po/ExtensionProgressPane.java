@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -75,6 +76,34 @@ public class ExtensionProgressPane extends BaseElement
         for (WebElement element : getDriver().findElementsWithoutWaiting(container, By.className("log-item"))) {
             log.add(new LogItemPane(element));
         }
+
+        return log;
+    }
+
+    /**
+     * @param levels the levels to get
+     * @return the lines of job log
+     * @since 10.11RC1
+     */
+    public List<LogItemPane> getJobLog(LogLevel...levels)
+    {
+        List<LogItemPane> log = new ArrayList<LogItemPane>();
+        for (WebElement element : getDriver().findElementsWithoutWaiting(container, By.className("log-item"))) {
+            LogItemPane item = new LogItemPane(element);
+
+            if (levels != null) {
+                for (LogLevel level : levels) {
+                    if (item.getLevel().equals(level.name().toLowerCase())) {
+                        log.add(item);
+
+                        break;
+                    }
+                }
+            } else {
+                log.add(item);
+            }
+        }
+
         return log;
     }
 
@@ -94,7 +123,11 @@ public class ExtensionProgressPane extends BaseElement
      */
     public UnusedPagesPane getUnusedPages()
     {
-        return new UnusedPagesPane(getDriver().findElementWithoutWaiting(container,
-            By.className("extension-question")));
+        if (getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(".extension-question .document-tree"))
+            .size() > 0) {
+            return new UnusedPagesPane(
+                getDriver().findElementWithoutWaiting(container, By.className("extension-question")));
+        }
+        return null;
     }
 }

@@ -19,12 +19,13 @@
  */
 package org.xwiki.query.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.query.QueryException}

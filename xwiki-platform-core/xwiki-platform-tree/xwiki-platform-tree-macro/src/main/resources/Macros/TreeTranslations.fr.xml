@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1424704114000</creationDate>
   <parent>Macros.Tree</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1424704928000</date>
-  <contentUpdateDate>1424704928000</contentUpdateDate>
   <version>1.1</version>
   <title>Tree Translations</title>
   <comment/>
@@ -67,7 +64,7 @@ rendering.macro.tree.parameter.finder.name=Filtre
 rendering.macro.tree.parameter.finder.description=Affiche une entrée texte qui peut être utilisée pour trouver des noeuds de l'arbre. L'entrée est affichée au-dessus de l'arbre et offre des Suggestions automatiques basées sur le contenu de l'arbre pendant que vous tapez. Quand une suggestion est sélectionnée, l'arbre est étendu jusqu'au noeud correspondant.
 rendering.macro.tree.parameter.limit.name=Limite
 rendering.macro.tree.parameter.limit.description=Le nombre maximum de nœuds fils à afficher lorsqu'un nœud père est déplié pour la première fois. Les autres nœuds sont accessibles grâce au lien "Plus...". Ce paramètre sert essentiellement à définir la pagination afin d'améliorer les performances lorsque les nœuds fils sont nombreux. L'arbre fournit ce paramètre à l'arbre d'origine c'est pourquoi ce paramètre n'est pris en compte que dans les arbres dynamiques dont l'origine implémente le nombre de nœuds fils.
-rendering.macro.tree.content.description=Vous pouvez utiliser les listes à puces HTML imbriqués pour décrire la structure de l'arbre. Voir http\://www.jstree.com/docs/html/ pour plus d'informations.
-tree.macro.editModeWarning=Cet arbre ne peut pas être affiché en mode modification
+rendering.macro.tree.content.description=Vous pouvez utiliser les listes à puces HTML imbriqués pour décrire la structure de l'arbre. Voir http://www.jstree.com/docs/html/ pour plus d'informations.
+tree.macro.editModeWarning=Cet arbre ne peut pas être affiché en mode modification.
 </content>
 </xwikidoc>

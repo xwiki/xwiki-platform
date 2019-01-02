@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+<content>### Missing: platform.flamingo.themes.home.title=Themes for Flamingo
+### Missing: platform.flamingo.themes.home.currenttheme=Current Theme
+### Missing: platform.flamingo.themes.home.otherthemes=Other available Themes
+### Missing: platform.flamingo.themes.home.warningOldColorThemeInstalled=This is the application to manage the Flamingo Themes. A Flamingo Theme is a customizable variation of any skin based on Flamingo. If you want to manage Color Themes for Colibri-based skins, you should go to {0}Colibri Color Themes Application{1}.
+### Missing: platform.flamingo.themes.home.warningCurrentOldColorTheme=The current Theme is a Colibri Color Theme which is not optimized to work with a skin based on Flamingo. We have tried our best to make it compatible, but the results might not be optimal.
+### Missing: platform.flamingo.themes.home.useThisTheme=Use this Theme
+### Missing: platform.flamingo.themes.home.newThemeName=Theme name...
+### Missing: platform.flamingo.themes.home.create=Create new Theme
+### Missing: platform.flamingo.themes.home.create.invalid=Invalid Theme name!
+### Missing: platform.flamingo.themes.home.create.csrf=For security reasons, please confirm that you want to create a Theme called "{0}".
+### Missing: platform.flamingo.themes.home.create.confirm=Confirm
+### Missing: platform.flamingo.themes.home.set.success=Theme set to "{0}".
+### Missing: platform.flamingo.themes.title.variables=Variables
+### Missing: platform.flamingo.themes.title.preview=Preview
+### Missing: platform.flamingo.themes.autorefresh=Auto refresh
+### Missing: platform.flamingo.themes.refresh=Refresh
+### Missing: platform.flamingo.themes.refreshwarning=The refresh can take several seconds.
+### Missing: platform.flamingo.themes.loading=Loading...
+### Missing: platform.flamingo.themes.category.logos=Logos
+### Missing: platform.flamingo.themes.category.base-colors=Base colors
+### Missing: platform.flamingo.themes.category.typography=Typography
+### Missing: platform.flamingo.themes.category.forms=Forms
+### Missing: platform.flamingo.themes.category.buttons=Buttons
+### Missing: platform.flamingo.themes.category.tables=Tables
+### Missing: platform.flamingo.themes.category.navbar=Navigation Bar
+### Missing: platform.flamingo.themes.category.dropdowns=Drop downs
+### Missing: platform.flamingo.themes.category.panels=Panels
+### Missing: platform.flamingo.themes.category.breadcrumb=Breadcrumb
+### Missing: platform.flamingo.themes.category.advanced=Advanced
+### Missing: platform.flamingo.themes.defaultvalue=Default
+### Missing: platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
+### Missing: platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
+### Missing: platform.flamingo.themes.local=Local
+### Missing: platform.flamingo.themes.global=Global
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+### Missing: platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
+
+#@deprecatedend</content>
+</xwikidoc>

@@ -36,8 +36,8 @@ import org.xwiki.skinx.SkinExtension;
 /**
  * Default implementation of {@link org.xwiki.icon.IconRenderer}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
 public class DefaultIconRenderer implements IconRenderer
 {
@@ -59,17 +59,50 @@ public class DefaultIconRenderer implements IconRenderer
     @Override
     public String render(String iconName, IconSet iconSet) throws IconException
     {
-        return render(iconSet, iconName, iconSet.getRenderWiki());
+        return render(iconName, iconSet, iconSet.getRenderWiki());
     }
 
     @Override
     public String renderHTML(String iconName, IconSet iconSet) throws IconException
     {
-        return render(iconSet, iconName, iconSet.getRenderHTML());
+        return render(iconName, iconSet, iconSet.getRenderHTML());
     }
 
-    private String render(IconSet iconSet, String iconName, String renderer) throws IconException
+    @Override
+    public String render(String iconName, IconSet iconSet, String renderer) throws IconException
     {
+        // The method should return an empty string in case no renderer or icon set was given
+        if (renderer == null || iconSet == null) {
+            return "";
+        }
+        // Get the icon
+        Icon icon = iconSet.getIcon(iconName);
+
+        // The icon may not exist
+        if (icon == null) {
+            // return an empty string. Idea: fallback on a different icon instead?
+            return "";
+        }
+
+        // Add the icon set resources
+        use(iconSet);
+
+        // Interpret the velocity command
+        StringWriter contentToParse = new StringWriter();
+        contentToParse.write("#set($icon = \"");
+        contentToParse.write(icon.getValue());
+        contentToParse.write("\")\n");
+        contentToParse.write(renderer);
+
+        return velocityRenderer.render(contentToParse.toString());
+    }
+
+    @Override
+    public void use(IconSet iconSet) throws IconException
+    {
+        if (iconSet == null) {
+            throw new IconException("The icon set is null", null);
+        }
         if (!StringUtils.isBlank(iconSet.getCss())) {
             activeCSS(iconSet);
         }
@@ -79,7 +112,6 @@ public class DefaultIconRenderer implements IconRenderer
         if (!StringUtils.isBlank(iconSet.getJsx())) {
             activeJSX(iconSet);
         }
-        return renderIcon(iconSet, iconName, renderer);
     }
 
     private void activeCSS(IconSet iconSet) throws IconException
@@ -98,26 +130,5 @@ public class DefaultIconRenderer implements IconRenderer
     private void activeJSX(IconSet iconSet)
     {
         jsExtension.use(iconSet.getJsx());
-    }
-
-    private String renderIcon(IconSet iconSet, String iconName, String renderer) throws IconException
-    {
-        // Get the icon
-        Icon icon = iconSet.getIcon(iconName);
-
-        // The icon may not exist
-        if (icon == null) {
-            // return an empty string. Idea: fallback on a different icon instead?
-            return "";
-        }
-
-        // Interpret the velocity command
-        StringWriter contentToParse = new StringWriter();
-        contentToParse.write("#set($icon = \"");
-        contentToParse.write(icon.getValue());
-        contentToParse.write("\")\n");
-        contentToParse.write(renderer);
-
-        return velocityRenderer.render(contentToParse.toString());
     }
 }

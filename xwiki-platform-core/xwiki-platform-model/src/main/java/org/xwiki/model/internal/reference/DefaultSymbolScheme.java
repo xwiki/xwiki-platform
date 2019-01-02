@@ -21,14 +21,16 @@ package org.xwiki.model.internal.reference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 
 /**
  * Default Symbols used for representing {@link org.xwiki.model.reference.EntityReference} as strings.
@@ -40,30 +42,79 @@ import org.xwiki.model.EntityType;
 @Singleton
 public class DefaultSymbolScheme implements SymbolScheme
 {
+    private static class ParameterConfiguration
+    {
+        /**
+         * The character used to separate the entity name from the parameters.
+         */
+        private Character separator;
+
+        /**
+         * The name of the default parameter.
+         */
+        private String defaultParameter;
+
+        /**
+         * The strings which required to be escaped in the parameters keys/values.
+         */
+        private String[] escapes;
+
+        /**
+         * The replaces for the strings to escape.
+         */
+        private String[] replacements;
+
+        ParameterConfiguration(Character separator, String defaultParameter)
+        {
+            this.separator = separator;
+            this.defaultParameter = defaultParameter;
+        }
+
+        ParameterConfiguration(Character separator)
+        {
+            this.separator = separator;
+        }
+    }
+
     /**
-     * A backslash string.
+     * A backslash character.
      */
     private static final char CESCAPE = '\\';
 
     /**
-     * A colon string. Colon is used to separate wiki name.
+     * A colon character. Colon is used to separate wiki name.
      */
     private static final char CWIKISEP = ':';
 
     /**
-     * A dot string. Dot is used to separate space names and document name.
+     * A slash character. Slash is used as separator for all pages model elements (except between page and wiki).
+     */
+    private static final char CPAGESEP = '/';
+
+    /**
+     * A semicolon character. Semicolon used as separator between the entity name and its parameters.
+     */
+    private static final char CPARAMETERSEP = ';';
+
+    /**
+     * Separator between the parameter key and value.
+     */
+    private static final char CPARAMETERVALUESEP = '=';
+
+    /**
+     * A dot character. Dot is used to separate space names and document name.
      */
     private static final char CSPACESEP = '.';
 
     /**
-     * An at-sign string. At sign is used to separate attachment name.
+     * An at-sign character. At sign is used to separate attachment name.
      */
     private static final char CATTACHMENTSEP = '@';
 
     /**
-     * An hat sign string. Hat sign is used to separate object name.
+     * An hat sign character. Hat sign is used to separate object name.
      */
-    private static final  char COBJECTSEP = '^';
+    private static final char COBJECTSEP = '^';
 
     /**
      * An dot is used to separate object property name.
@@ -75,24 +126,48 @@ public class DefaultSymbolScheme implements SymbolScheme
      */
     private static final char CCLASSPROPSEP = COBJECTSEP;
 
-    private static final Map<EntityType, Map<EntityType, Character>> SEPARATORS =
-        new HashMap<EntityType, Map<EntityType, Character>>()
-    {
-        {
-            put(EntityType.WIKI, Collections.emptyMap());
+    private static final Map<EntityType, Map<EntityType, Character>> SEPARATORS = new EnumMap<>(EntityType.class);
 
-            Map<EntityType, Character> spaceSeparators = new HashMap<>();
-            spaceSeparators.put(EntityType.WIKI, CWIKISEP);
-            spaceSeparators.put(EntityType.SPACE, CSPACESEP);
-            put(EntityType.SPACE, spaceSeparators);
+    private static final Map<EntityType, ParameterConfiguration> PARAMETER_SEPARATORS = new EnumMap<>(EntityType.class);
 
-            put(EntityType.DOCUMENT, Collections.singletonMap(EntityType.SPACE, CSPACESEP));
-            put(EntityType.ATTACHMENT, Collections.singletonMap(EntityType.DOCUMENT, CATTACHMENTSEP));
-            put(EntityType.OBJECT, Collections.singletonMap(EntityType.DOCUMENT, COBJECTSEP));
-            put(EntityType.OBJECT_PROPERTY, Collections.singletonMap(EntityType.OBJECT, CPROPERTYSEP));
-            put(EntityType.CLASS_PROPERTY, Collections.singletonMap(EntityType.DOCUMENT, CCLASSPROPSEP));
-        }
-    };
+    private static final Map<EntityType, String> KEYWORDS_CURRENT = new EnumMap<>(EntityType.class);
+
+    private static final Map<EntityType, String> KEYWORDS_PARENT = new EnumMap<>(EntityType.class);
+
+    static {
+        SEPARATORS.put(EntityType.WIKI, Collections.emptyMap());
+
+        // Pages
+        Map<EntityType, Character> pageSeparators = new EnumMap<>(EntityType.class);
+        pageSeparators.put(EntityType.WIKI, CWIKISEP);
+        pageSeparators.put(EntityType.PAGE, CPAGESEP);
+        SEPARATORS.put(EntityType.PAGE, pageSeparators);
+        PARAMETER_SEPARATORS.put(EntityType.PAGE,
+            new ParameterConfiguration(CPARAMETERSEP, AbstractLocalizedEntityReference.LOCALE));
+        KEYWORDS_CURRENT.put(EntityType.PAGE, ".");
+        KEYWORDS_PARENT.put(EntityType.PAGE, "..");
+
+        SEPARATORS.put(EntityType.PAGE_ATTACHMENT, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
+        PARAMETER_SEPARATORS.put(EntityType.PAGE_ATTACHMENT, new ParameterConfiguration(CPARAMETERSEP));
+        SEPARATORS.put(EntityType.PAGE_OBJECT, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
+        PARAMETER_SEPARATORS.put(EntityType.PAGE_OBJECT, new ParameterConfiguration(CPARAMETERSEP));
+        SEPARATORS.put(EntityType.PAGE_OBJECT_PROPERTY, Collections.singletonMap(EntityType.PAGE_OBJECT, CPAGESEP));
+        PARAMETER_SEPARATORS.put(EntityType.PAGE_OBJECT_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
+        SEPARATORS.put(EntityType.PAGE_CLASS_PROPERTY, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
+        PARAMETER_SEPARATORS.put(EntityType.PAGE_CLASS_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
+
+        // Documents
+        Map<EntityType, Character> spaceSeparators = new EnumMap<>(EntityType.class);
+        spaceSeparators.put(EntityType.WIKI, CWIKISEP);
+        spaceSeparators.put(EntityType.SPACE, CSPACESEP);
+        SEPARATORS.put(EntityType.SPACE, spaceSeparators);
+
+        SEPARATORS.put(EntityType.DOCUMENT, Collections.singletonMap(EntityType.SPACE, CSPACESEP));
+        SEPARATORS.put(EntityType.ATTACHMENT, Collections.singletonMap(EntityType.DOCUMENT, CATTACHMENTSEP));
+        SEPARATORS.put(EntityType.OBJECT, Collections.singletonMap(EntityType.DOCUMENT, COBJECTSEP));
+        SEPARATORS.put(EntityType.OBJECT_PROPERTY, Collections.singletonMap(EntityType.OBJECT, CPROPERTYSEP));
+        SEPARATORS.put(EntityType.CLASS_PROPERTY, Collections.singletonMap(EntityType.DOCUMENT, CCLASSPROPSEP));
+    }
 
     private Map<EntityType, String[]> escapes;
 
@@ -114,25 +189,51 @@ public class DefaultSymbolScheme implements SymbolScheme
         // Dynamically create the escape/replacement maps.
         // The characters to escape are all the characters that are separators between the current type and its parent
         // type + the escape symbol itself.
-        this.escapes = new HashMap<>();
-        this.replacements = new HashMap<>();
+        this.escapes = new EnumMap<>(EntityType.class);
+        this.replacements = new EnumMap<>(EntityType.class);
 
         String escape = Character.toString(getEscapeSymbol());
         for (Map.Entry<EntityType, Map<EntityType, Character>> entry : SEPARATORS.entrySet()) {
             EntityType type = entry.getKey();
+
+            // Add separators escaping
             Map<EntityType, Character> separators = entry.getValue();
             List<String> charactersToEscape = new ArrayList<>();
             List<String> replacementCharacters = new ArrayList<>();
             for (Character characterToEscape : separators.values()) {
-                charactersToEscape.add(Character.toString(characterToEscape));
-                replacementCharacters.add(escape + Character.toString(characterToEscape));
+                charactersToEscape.add(characterToEscape.toString());
+                replacementCharacters.add(escape + characterToEscape);
             }
+
+            // Add parameter escaping
+            ParameterConfiguration parameter = PARAMETER_SEPARATORS.get(type);
+            if (parameter != null  && parameter.separator != null) {
+                charactersToEscape.add(parameter.separator.toString());
+                replacementCharacters.add(escape + parameter.separator);
+            }
+
+            // Add escaping character
             charactersToEscape.add(escape);
             replacementCharacters.add(escape + escape);
+
             String[] escapesArray = new String[charactersToEscape.size()];
             this.escapes.put(type, charactersToEscape.toArray(escapesArray));
             String[] replacementsArray = new String[replacementCharacters.size()];
             this.replacements.put(type, replacementCharacters.toArray(replacementsArray));
+        }
+
+        for (Map.Entry<EntityType, ParameterConfiguration> entry : PARAMETER_SEPARATORS.entrySet()) {
+            EntityType type = entry.getKey();
+            ParameterConfiguration configuration = entry.getValue();
+
+            if (configuration.separator != null) {
+                String[] escapesArray = this.escapes.get(type);
+                configuration.escapes = ArrayUtils.addAll(escapesArray, String.valueOf(CPARAMETERVALUESEP));
+
+                String[] replacementsArray = this.replacements.get(type);
+                configuration.replacements = ArrayUtils.addAll(replacementsArray, escape + CPARAMETERVALUESEP);
+
+            }
         }
     }
 
@@ -158,5 +259,49 @@ public class DefaultSymbolScheme implements SymbolScheme
     public String[] getReplacementSymbols(EntityType type)
     {
         return this.replacements.get(type);
+    }
+
+    @Override
+    public Character getParameterSeparator(EntityType type)
+    {
+        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+
+        return configuration != null ? configuration.separator : null;
+    }
+
+    @Override
+    public String getDefaultParameter(EntityType type)
+    {
+        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+
+        return configuration != null ? configuration.defaultParameter : null;
+    }
+
+    @Override
+    public String[] getParameterSymbolsRequiringEscapes(EntityType type)
+    {
+        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+
+        return configuration != null ? configuration.escapes : null;
+    }
+
+    @Override
+    public String[] getParameterReplacementSymbols(EntityType type)
+    {
+        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+
+        return configuration != null ? configuration.replacements : null;
+    }
+
+    @Override
+    public String getCurrentReferenceKeyword(EntityType type)
+    {
+        return KEYWORDS_CURRENT.get(type);
+    }
+
+    @Override
+    public String getParentReferenceKeyword(EntityType type)
+    {
+        return KEYWORDS_PARENT.get(type);
     }
 }

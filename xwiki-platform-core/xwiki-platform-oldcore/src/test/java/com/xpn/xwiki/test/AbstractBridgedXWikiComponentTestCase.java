@@ -36,6 +36,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -149,6 +150,15 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
                 public String invoke(Invocation invocation) throws Throwable
                 {
                     return getContext().getMainXWiki();
+                }
+            });
+        this.mockWikiDescriptorManager.stubs().method("getById")
+            .will(new CustomStub("Implements WikiDescriptorManager.getById")
+            {
+                @Override
+                public String invoke(Invocation invocation) throws Throwable
+                {
+                    return null;
                 }
             });
 

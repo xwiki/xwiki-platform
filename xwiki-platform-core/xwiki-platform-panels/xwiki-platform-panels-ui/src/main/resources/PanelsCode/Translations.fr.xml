@@ -27,19 +27,16 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1413990648000</creationDate>
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1413991189000</date>
-  <contentUpdateDate>1413991189000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.panels.applications.helper=Vous pouvez définir quelles sont les applications affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toutes les nouvelles applications sont affichées dans cette barre. Si vous souhaitez en supprimer certaines, il suffit de cliquer/glisser l'icône d'un pavé à l'autre. N'oubliez pas d'enregistrer vos modifications.
+  <content>platform.panels.applications.helper=Vous pouvez définir ici les applications qui seront affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toute nouvelle application sera affichée dans cette barre. Si vous souhaitez en supprimer certaines, glissez/déposez simplement son icône d'un pavé à l'autre. Vous pouvez aussi ordonner les applications. N'oubliez pas d'enregistrer vos modifications !
 platform.panels.applications.displayedapps=Applications présentes dans la barre
 platform.panels.applications.blacklistedapps=Applications absentes de la barre
 platform.panels.applications.save=Enregistrer
@@ -48,22 +45,22 @@ platform.panels.applications.ajax.success=La configuration a été enregistrée.
 platform.panels.applications.ajax.csrf=La validation CSRF a échoué. Merci de recharger la page.
 platform.panels.applications.ajax.noright=Vous n'êtes pas autorisés à modifier PanelsCode.ApplicationsPanelConfiguration.
 platform.panels.applications.ajax.error=Enregistrement impossible.
-admin.panels.applications=Panel d'applications
+admin.panels.applications=Panneau d'applications
 admin.panels.applications.description=Gérer quelles sont les applications à afficher dans le panneau des applications.
 
 admin.panels.navigation=Panneau de navigation
 admin.panels.navigation.description=Gérer les pages à afficher dans le panneau de navigation.
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclut les pages d’Extension de haut niveau
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Ce filtre dynamique supprime de l'arbre de navigation les pages de haut niveau qui appartiennent à une extension installéee, si elles ne sont pas destinées à être modifiées.
 PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
 PanelsCode.NavigationConfigurationClass_exclusions.hint=Liste des pages à exclure de l'arbre de navigation.
 PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Liste des pages à inclure dans l'arbre de navigation même si elles ont été exclues via un filtre précédent.
+platform.panels.navigation.configuration.excludedPages=Pages exclues
+platform.panels.navigation.configuration.excludedPages.hint=Utilisez le Cliquer / Glisser pour déplacer les pages dans ou hors de l'arbre de navigation.
+platform.panels.navigation.configuration.excludedPages.empty=Aucune
+platform.panels.navigation.configuration.topLevelExtensionPages=Pages d'Extension de haut niveau
+platform.panels.navigation.configuration.otherPages=Autres pages
+platform.panels.navigation.configuration.saveComment=La configuration de l'arbre de navigation a été mise à jour depuis l'Administration
 </content>
 </xwikidoc>

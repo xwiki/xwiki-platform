@@ -12,6 +12,7 @@ org.xwiki.notifications.filters.internal.user.OwnEventFilter
 org.xwiki.notifications.filters.internal.CachedModelBridge
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterDisplayer
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterManager
+org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreferenceManager
 org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator
 org.xwiki.notifications.filters.internal.SystemUserNotificationFilter
 org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider

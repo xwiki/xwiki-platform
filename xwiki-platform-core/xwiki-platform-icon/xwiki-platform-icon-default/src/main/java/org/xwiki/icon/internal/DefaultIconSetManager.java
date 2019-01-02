@@ -37,6 +37,7 @@ import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetCache;
 import org.xwiki.icon.IconSetLoader;
 import org.xwiki.icon.IconSetManager;
+import org.xwiki.icon.internal.context.IconSetContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
@@ -76,6 +77,9 @@ public class DefaultIconSetManager implements IconSetManager
     private IconSetLoader iconSetLoader;
 
     @Inject
+    private IconSetContext iconSetContext;
+
+    @Inject
     private QueryManager queryManager;
 
     @Inject
@@ -88,11 +92,16 @@ public class DefaultIconSetManager implements IconSetManager
     @Override
     public IconSet getCurrentIconSet() throws IconException
     {
+        // Check the context
+        IconSet iconSet = this.iconSetContext.getIconSet();
+        if (iconSet != null) {
+            return iconSet;
+        }
+
         // Get the current icon theme
-        String iconTheme = configurationSource.getProperty("iconTheme");
+        String iconTheme = this.configurationSource.getProperty("iconTheme");
 
         // Get the icon set
-        IconSet iconSet = null;
         DocumentReference iconThemeDocRef = documentReferenceResolver.resolve(iconTheme);
         if (!StringUtils.isBlank(iconTheme) && documentAccessBridge.exists(iconThemeDocRef)) {
             iconSet = iconSetCache.get(iconThemeDocRef);

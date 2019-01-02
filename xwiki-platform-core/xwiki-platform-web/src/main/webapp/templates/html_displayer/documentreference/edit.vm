@@ -1,0 +1,4 @@
+#set ($parameters = {})
+#set ($discard = $parameters.putAll($displayer.parameters))
+#set ($parameters.value = $displayer.value)
+#pagePicker($parameters)

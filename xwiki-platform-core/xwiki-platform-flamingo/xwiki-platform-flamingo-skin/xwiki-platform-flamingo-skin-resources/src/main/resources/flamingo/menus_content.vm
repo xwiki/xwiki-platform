@@ -11,6 +11,8 @@
 #set ($canCopy = $canView)
 #set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
+## Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
+#set ($extraAttributes = 'rel="nofollow"')
 
 ##
 ## Display the main menus
@@ -87,18 +89,19 @@
  * @param $titleKey translation key of the link title to use
  * @param $titleAsLabel if the link title should also be used as link label
  * @param $actionUrl the link of the top menu entry. If not provided, the top menu entry will act as an activator for the dropdown
+ * @param $extraAttribute (optional) additional A element attributes to add (such as ref="nofollow" for example)
  *
  * @since 7.3M2
  *#
-#macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl)
+#macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
   <div class="btn-group" id="$id">
-    <a class="btn btn-default #if ("$!actionUrl" == '')dropdown-toggle#end" title="$services.localization.render($titleKey)"
+    <a class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
     #else
       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
     #end
-    role="button">
+    role="button"#if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
       #if ($titleAsLabel)
         <span class="btn-label">$services.localization.render($titleKey)</span>
@@ -175,7 +178,7 @@
  * Display the create button
  *#
 #macro(displayCreateButton)
-  #displayMenu('tmCreate', 'add', '', 'core.menu.create', true, $doc.getURL('create'))
+  #displayMenu('tmCreate', 'add', '', 'core.menu.create', true, $doc.getURL('create'), $extraAttributes)
 #end
 
 #**
@@ -192,7 +195,7 @@
     ## document with the WYSIWYG editor.
     #define ($editWYSIWYG)
       #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
-        #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil')
+        #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil', $extraAttributes)
       #end
     #end
     #set ($discard = $staticExtensions.add( { 'content': $editWYSIWYG, 'order': 20000, 'separator': true}))
@@ -200,14 +203,14 @@
     ## WIKI EDITOR
     ##
     #define ($wikiEditor)
-      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench')
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $wikiEditor, 'order': 30000}))
     ##
     ## INLINE EDITOR
     ##
     #define ($inlineEditor)
-      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list')
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $inlineEditor, 'order': 40000}))
     ##
@@ -219,18 +222,18 @@
     ## TODO: create a proprer 'page administration' and stop adding a right editor in this menu
     #define ($rightsEditor)
       #if ($doc.name != 'WebHome' || !$hasSpaceAdmin || !$isAdminAppInstalled)
-        #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
+        #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock', $extraAttributes)
       #end
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rightsEditor, 'order': 50000, 'separator': true}))
     ##
     ## OBJECTS EDITOR
     ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'drive')", 'order': 60000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'drive', $extraAttributes)", 'order': 60000}))
     ##
     ## CLASS EDITOR
     ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'drive')", 'order': 70000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'drive', $extraAttributes)", 'order': 70000}))
   #end
   ##
   ## Display all the extensions points, including the static ones
@@ -238,7 +241,7 @@
   #define ($menuContent)
     #displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)
   #end
-  #displayMenu('tmEdit', 'pencil', $menuContent, 'core.menu.edit', true, $defaultEditURL)
+  #displayMenu('tmEdit', 'pencil', $menuContent, 'core.menu.edit', true, $defaultEditURL, $extraAttributes)
 #end
 
 #**
@@ -251,7 +254,7 @@
   ##
   #if ($canCopy)
     #define ($copy)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'copy')
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'copy', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $copy, 'order': 20000}))
   #end
@@ -260,11 +263,11 @@
   ##
   #if ($canDelete)
     #define ($rename)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'move')
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'move', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
     #define ($delete)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove')
+      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $delete, 'order': 40000}))
   #end
@@ -294,7 +297,7 @@
     ## PRINT
     ##
     #define ($print)
-      #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print')
+      #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $print, 'order': 90000}))
     ##
@@ -304,7 +307,7 @@
       #if ("$!request.rev" != '')
         #set ($revisionParameter = "&rev=$request.rev")
       #end
-      #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search')
+      #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $viewSource, 'order': 100000}))
     ##
@@ -312,7 +315,7 @@
     ##
     #if ($canShare)
       #define ($share)
-        #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'viewer=share') $services.localization.render('core.menu.share') 'tmActionShare', '', 'envelope')
+        #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'viewer=share') $services.localization.render('core.menu.share') 'tmActionShare', '', 'envelope', $extraAttributes)
         #userPicker_import()
       #end
       #set ($discard = $staticExtensions.add( { 'content': $share, 'order': 110000}))

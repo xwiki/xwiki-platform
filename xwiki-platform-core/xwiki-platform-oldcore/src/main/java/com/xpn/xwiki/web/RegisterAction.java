@@ -21,9 +21,11 @@ package com.xpn.xwiki.web;
 
 import javax.script.ScriptContext;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.captcha.CaptchaVerifier;
+import org.xwiki.captcha.Captcha;
+import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -47,9 +49,6 @@ public class RegisterAction extends XWikiAction
     /** Space where the registration config and class are stored. */
     private static final String WIKI_SPACE = "XWiki";
 
-    /** For verifying, if needed, the captcha answer submitted. */
-    private static CaptchaVerifier verifier = Utils.getComponent(CaptchaVerifier.class, "image");
-
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -63,7 +62,7 @@ public class RegisterAction extends XWikiAction
             if (!csrfTokenCheck(context)) {
                 return false;
             }
-            // Let's verify that the user submitted the right captcha (if required).
+            // Let's verify that the user submitted the right CAPTCHA (if required).
             if (!verifyCaptcha(context, xwiki)) {
                 return false;
             }
@@ -97,11 +96,11 @@ public class RegisterAction extends XWikiAction
     }
 
     /**
-     * Verifies the user captcha answer (if required).
+     * Verifies the user CAPTCHA answer (if required).
      *
      * @param context Current context
      * @param xwiki Current wiki
-     * @return true If the user submitted the correct answer or if no captcha is required
+     * @return true If the user submitted the correct answer or if no CAPTCHA is required
      * @throws XWikiException exception
      */
     private boolean verifyCaptcha(XWikiContext context, XWiki xwiki) throws XWikiException
@@ -110,25 +109,33 @@ public class RegisterAction extends XWikiAction
         if (xwiki.getRightService().hasProgrammingRights(context)) {
             return true;
         }
-        XWikiRequest request = context.getRequest();
+
         // The document where the "requirecaptcha" parameter is stored.
         DocumentReference configRef = new DocumentReference(context.getWikiId(), WIKI_SPACE, "RegistrationConfig");
         DocumentReference classReference = new DocumentReference(context.getWikiId(), WIKI_SPACE, "Registration");
         XWikiDocument configDoc = xwiki.getDocument(configRef, context);
         // Retrieve the captcha configuration.
-        int captcha = configDoc.getIntValue(classReference, "requireCaptcha");
+        int requireCaptcha = configDoc.getIntValue(classReference, "requireCaptcha");
 
-        if (captcha == 1) {
+        if (requireCaptcha == 1) {
+            CaptchaConfiguration captchaConfiguration =
+                Utils.getComponent(org.xwiki.captcha.CaptchaConfiguration.class);
+            String defaultCaptchaName = captchaConfiguration.getDefaultName();
             try {
-                if (!verifier.isAnswerCorrect(verifier.getUserId(request), request.get("captcha_answer"))) {
-                    LOGGER.warn("Incorrect captcha answer");
+                // Use the currently configured default CAPTCHA implementation.
+                Captcha captcha = Utils.getComponent(org.xwiki.captcha.Captcha.class, defaultCaptchaName);
+
+                if (!captcha.isValid()) {
+                    LOGGER.warn("Incorrect CAPTCHA answer");
                     return false;
                 }
             } catch (Exception e) {
-                LOGGER.warn("Cannot verify captcha answer: {}", e.getMessage());
+                LOGGER.warn("Cannot verify answer for CAPTCHA of type [{}]: {}", defaultCaptchaName,
+                    ExceptionUtils.getRootCauseMessage(e));
                 return false;
             }
         }
+
         return true;
     }
 }

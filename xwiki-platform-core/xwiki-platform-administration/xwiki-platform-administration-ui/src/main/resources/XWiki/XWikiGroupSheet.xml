@@ -27,45 +27,30 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1364502206000</creationDate>
   <parent>XWiki.XWikiGroups</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1364565696000</date>
-  <contentUpdateDate>1364565664000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
-#set($groupDoc = $doc)
-#if($doc.fullName == 'Main.UserDirectory')
-  #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
-#end
-#macro(hasGroupRight $right $hasGroupRight)
-  #set($result = $xwiki.hasAccessLevel($right, $xcontext.user, $doc.fullName) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
-  #set($hasGroupRight = $NULL)
-  #setVariable("$hasGroupRight" $result)
-#end
-#hasGroupRight('edit' $hasEditGroupRight)
-{{/velocity}}
-
-{{velocity}}
+  <content>{{velocity}}
+{{html clean="false"}}
+#set ($discard = $xwiki.ssx.use('XWiki.XWikiGroupSheet'))
 ## Keep testing the inline action for backward compatibility with existing groups.
-#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
-  {{html}}
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
   #if ($request.xpage == 'plain')
     ## AJAX request.
     #set ($wrapperTag = 'form')
     &lt;form class="xform" action="$doc.getURL('preview')"&gt;
-      &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
+      &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
   #else
     #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
     ## The form is generated in the edit template.
-    &lt;div class="xform"&gt;
     #set ($wrapperTag = 'div')
+    &lt;div class="xform"&gt;
   #end
     &lt;dl&gt;
       &lt;dt&gt;&lt;label for="userInput"&gt;$services.localization.render('xe.admin.groups.addUser')&lt;/label&gt;&lt;/dt&gt;
@@ -81,32 +66,41 @@
     &lt;/dl&gt;
     &lt;div class="buttons"&gt;
       &lt;span class="buttonwrapper"&gt;
-        &lt;button type="submit" id="addMembers" name="xpage" value="adduorg"&gt;$services.localization.render('xe.admin.groups.addUser.submit')&lt;/button&gt;
+        &lt;button type="submit" id="addMembers" name="xpage" value="adduorg"&gt;
+          $services.localization.render('xe.admin.groups.addUser.submit')
+        &lt;/button&gt;
       &lt;/span&gt;
     &lt;/div&gt;
   &lt;/$wrapperTag&gt;
-  {{/html}}##
 #end
-#set($columnOptions = {
-  "member" : {'link': 'auto', 'type': 'text'},
-  '_avatar' : { 'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false },
-  "_actions" : {
+#set ($columnOptions = {
+  'member': {'type': 'text', 'html': true},
+  'type': {'filterable': false, 'sortable': false},
+  'scope': {'filterable': false, 'sortable': false},
+  '_actions': {
     'actions': ['delete'],
     'actionCallbacks': {'delete': 'table.deleteRow(i);'},
-    'ajaxActions': {'delete': true}
+    'ajaxActions': {'delete': true},
+    'filterable': false
    }
 })
-## Keep testing the inline action for backward compatibility with existing groups.
-#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
-  #set($columns = ['_avatar', 'member', '_actions'])
-#else
-  #set($columns = ['_avatar', 'member'])
+#set ($columns = ['member', 'type'])
+#if (!$xcontext.isMainWiki() &amp;&amp; $services.wiki.user.userScope != 'LOCAL_ONLY')
+  #set ($discard = $columns.add('scope'))
 #end
-#livetable('groupusers', $columns, $columnOptions, {
-  'url' : $groupDoc.getURL('view', 'xpage=getgroupmembers'),
-  'translationPrefix' : 'xe.admin.groups.',
-  'javascriptName' : 'editgrouptable'
-})
+## Keep testing the inline action for backward compatibility with existing groups.
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+  #set ($discard = $columns.add('_actions'))
+#end
+&lt;div class="medium-avatars"&gt;
+  #livetable('groupusers' $columns $columnOptions {
+    'url': $doc.getURL('view', 'xpage=getgroupmembers'),
+    'translationPrefix': 'xe.admin.groups.',
+    'javascriptName': 'editgrouptable',
+    'outputOnlyHtml': true
+  })
+&lt;/div&gt;
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>XWiki.XWikiGroupSheet</name>
@@ -190,48 +184,181 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>(function() {
-  var addMembers = function(event) {
-    event &amp;&amp; event.stop();
-    var form = event.element().form;
-    if (form.select('ul.accepted-suggestions li').length == 0 &amp;&amp; $('userInput').value.strip() == ''
-      &amp;&amp; $('groupInput').value.strip() == '') {
+      <code>require(['jquery'], function($) {
+  $(document).on('click', '#addMembers', function(event) {
+    event.preventDefault();
+    var addMembersButton = $(event.target);
+    var form = addMembersButton.closest('form');
+    var parameters = form.serializeArray();
+    // Add the data from the submit button.
+    if (addMembersButton.attr('name')) {
+      parameters.push({
+        name: addMembersButton.attr('name'),
+        value: addMembersButton.val()
+      });
+    }
+    var names = parameters.map(function(parameter) {
+      return parameter.name === 'name' ? parameter.value.trim() : '';
+    }).join('');
+    if (addMembersButton.prop('disabled') || names === '') {
       // Nothing to add.
       return;
     }
-    new Ajax.Request(form.action, {
-      parameters: form.serialize(),
-      onSuccess: function() {
-        // Clear the list of selected users and groups.
-        XWiki.widgets.UserPicker.instances.groupInput.clear();
-        XWiki.widgets.UserPicker.instances.userInput.clear();
-        // Reload the live table.
-        var end = editgrouptable.limit;
-        var start = Math.max(editgrouptable.lastOffset, 1);
-        editgrouptable.clearCache();
-        editgrouptable.getRows(start, end, start, end);
-        // Show notification message.
-        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
-      },
-      onFailure: function(response) {
-        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" + response.statusText, 'error', {timeout: 5});
-      }
+    addMembersButton.prop('disabled', true);
+    $.post(form.attr('action'), parameters).done(function() {
+      // Clear the list of selected users and groups.
+      $('#userInput')[0].selectize.clear(true);
+      $('#groupInput')[0].selectize.clear(true);
+      // Reload the live table.
+      editgrouptable.refresh();
+      // Show notification message.
+      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+    }).fail(function(response) {
+      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" +
+        response.statusText, 'error', {timeout: 5});
+    }).always(function() {
+      addMembersButton.prop('disabled', false);
     });
-  }
-  var init = function() {
-    var addMembersButton = $('addMembers');
-    if (addMembersButton &amp;&amp; !addMembersButton.__initialized) {
-      addMembersButton.observe('click', addMembers);
-      addMembersButton.__initialized = true;
-    }
-    return true;
-  };
-  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
-  document.observe('xwiki:dom:updated', init);
-})()</code>
+  });
+});</code>
     </property>
     <property>
       <name>Code</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiGroupSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>9235887d-65c7-4af4-830d-29a42cc869e5</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
+body &gt; .selectize-dropdown {
+  z-index: 1051;
+}
+
+/**
+ * Group members live table.
+ */
+
+#groupusers {
+  margin-top: 20px;
+}
+
+#groupusers td[data-title] {
+  vertical-align: middle;
+}
+
+#groupusers td.type,
+#groupusers td.scope {
+  color: $theme.textSecondaryColor;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
     </property>
     <property>
       <parse>1</parse>

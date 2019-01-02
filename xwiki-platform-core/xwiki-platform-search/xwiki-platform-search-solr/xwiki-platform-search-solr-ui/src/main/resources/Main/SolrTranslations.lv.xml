@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1385047506000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1433258948000</date>
-  <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <comment/>
@@ -41,8 +38,10 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Solr meklēšanas pārvaldība
 solr.admin.submit=Pielietot
+### Missing: solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=Jums nav atļauts izpildīt šo darbību.
 solr.admin.error.norights=Lai piekļūtu šai sadaļai, ir nepieciešamas administratora tiesības.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Statuss
 solr.admin.status.queueSize.label=Rindas izmērs
@@ -60,7 +59,9 @@ solr.admin.indexing.wiki.select_farm=Visai fermai
 solr.admin.indexing.query.label=Pielāgots pieprasījums
 solr.admin.indexing.query.hint=Neobligāts dokumentu skaita ierobežojums, kuriem indeksā tiks pielietota izvēlētā darbība.
 
-solr.sortBy=Kārtot pēc\:
+### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
+
+solr.sortBy=Kārtot pēc:
 solr.sortBy.score=Atbilstība
 solr.sortBy.title_sort=Virsraksts
 solr.sortBy.date=Pēdējo izmaiņu laiks
@@ -72,17 +73,17 @@ solr.sortBy.attauthor_display_sort=Augšuplādējis
 solr.sortOrder.asc=Augoši
 solr.sortOrder.desc=Dilstoši
 
-### Missing: solr.options=Show:
-### Missing: solr.options.highlight=Highlighting
-### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
-### Missing: solr.options.facet=Facets
-### Missing: solr.options.facet.title=Allow extra filtering of the result
+solr.options=Rādīt:
+solr.options.highlight=Izgaismošana
+solr.options.highlight.title=Parādīt iztvērumu ar atbilstošo rezultātu
+solr.options.facet=Aspekti
+solr.options.facet.title=Atļaut papildu meklēšanu rezultātos
 
 solr.result.language=Valoda
-### Missing: solr.result.locatedIn=Located in
+solr.result.locatedIn=Atrodas
 solr.result.author=Mainījis {0} {1}
 solr.result.mediaType={0} veida fails
-solr.result.uploadedBy=Augšuplādējis {0} {1} ({2}) 
+solr.result.uploadedBy=Augšuplādējis {0} {1} ({2})
 solr.result.highlightAll=Izgaismot visas atbilstības
 
 solr.facets.title=Precizēt meklējumu
@@ -145,9 +146,9 @@ solr.field.locale=Valoda
 solr.field.locale.emptyValue=Nav valodas
 solr.field.locale.emptyValue.hint=Dažiem dokumentiem nav norādīta valoda, jo tajos ir skripti (kuri nav rakstīti cilvēku valodā) vai arī lietotāja saskarnes izskats, kuru attēlo lietotāja izvēlētajā valodā (kā šo lapu).
 solr.field.wiki=Viki
-### Missing: solr.field.spaces=Location
+solr.field.spaces=Vieta
 solr.field.space_exact=Vieta
-### Missing: solr.field.space_facet=Location
+solr.field.space_facet=Vieta
 solr.field.name=Lapa
 solr.field.name_exact=Lapa
 solr.field.title=Virsraksts
@@ -173,14 +174,14 @@ solr.field.attauthor_display=Augšuplādējis
 solr.field.attdate=Augšuplādes laiks
 solr.field.attsize=Faila izmērs
 
-### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
-### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+solr.uix.docdoesnotexist.title=Varbūt jūs meklējāt sekojošas lapas?
+solr.uix.attachmentdoesnotexist.title=Varbūt jūs meklējāt kādu no sekojošiem pielikumiem?
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## until 7.2M3
-solr.result.location=Atrodas {0} » {1} » {2} 
+solr.result.location=Atrodas {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Vieta

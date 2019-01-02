@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1346768961000</creationDate>
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1416392687000</date>
-  <contentUpdateDate>1416392687000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -54,6 +51,44 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>7</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>8</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>author=Author|doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>6</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <category>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -74,8 +109,8 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
-        <number>2</number>
-        <prettyName>Content</prettyName>
+        <number>5</number>
+        <prettyName>Executed Content</prettyName>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -85,7 +120,7 @@
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>description</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Description</prettyName>
         <rows>5</rows>
         <size>40</size>
@@ -95,7 +130,7 @@
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Name</prettyName>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -107,7 +142,7 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>type</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Panel type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -118,6 +153,21 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
+    <property>
+      <async_cached>1</async_cached>
+    </property>
+    <property>
+      <async_context>
+        <value>icon.theme</value>
+        <value>locale</value>
+        <value>request.wiki</value>
+        <value>user</value>
+        <value>wiki</value>
+      </async_context>
+    </property>
+    <property>
+      <async_enabled>1</async_enabled>
+    </property>
     <property>
       <category>Information</category>
     </property>
@@ -227,6 +277,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -347,10 +398,9 @@ panels.MoreApplicationsButtonListener = Class.create({
 return XWiki;
 }(XWiki || {}));
 
-document.observe('xwiki:dom:loaded', function(e) {
-  $$('.applicationPanelMoreButton').each(function(button) {
-    new XWiki.panels.MoreApplicationsButtonListener(button);
-  });
+// Activate all buttons already in the DOM
+$$('.applicationPanelMoreButton').each(function(button) {
+  new XWiki.panels.MoreApplicationsButtonListener(button);
 });</code>
     </property>
     <property>
@@ -379,6 +429,7 @@ document.observe('xwiki:dom:loaded', function(e) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -651,6 +702,9 @@ document.observe('xwiki:dom:loaded', function(e) {
   color: $theme.textPrimaryColor; 
 }
 </code>
+    </property>
+    <property>
+      <contentType/>
     </property>
     <property>
       <name>Applications Panel</name>

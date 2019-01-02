@@ -21,7 +21,7 @@ package org.xwiki.notifications.filters.watch;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Configuration for the Watched Entities feature.
@@ -30,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8RC1
  */
 @Role
-@Unstable
 public interface WatchedEntitiesConfiguration
 {
     /**
@@ -40,7 +39,15 @@ public interface WatchedEntitiesConfiguration
 
     /**
      * @param user the user
-     * @return the automatic watch mode configured fot the given user
+     * @return the automatic watch mode configured for the given user
      */
     AutomaticWatchMode getAutomaticWatchMode(DocumentReference user);
+
+    /**
+     * @param wikiReference a reference to a wiki
+     * @return the automatic watch mode configured for the given wiki
+     * @since 9.11.8
+     * @since 10.6RC1
+     */
+    AutomaticWatchMode getDefaultAutomaticWatchMode(WikiReference wikiReference);
 }

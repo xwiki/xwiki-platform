@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor</artifactId>
   <name>XWiki Platform - Distribution - Flavor</name>
@@ -33,10 +33,20 @@
 
   <properties>
     <!-- The default UI -->
-    <xwiki.extension.distribution.ui>org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki</xwiki.extension.distribution.ui>
+    <xwiki.extension.distribution.ui.name>XWiki Standard Flavor</xwiki.extension.distribution.ui.name>
+    <xwiki.extension.distribution.ui.summary>Default set of wiki pages containing both content and default applications for XWiki Flavor Main Wiki</xwiki.extension.distribution.ui.summary>
+    <xwiki.extension.distribution.ui.groupId>org.xwiki.platform</xwiki.extension.distribution.ui.groupId>
+    <xwiki.extension.distribution.ui.artifactId>xwiki-platform-distribution-flavor-mainwiki</xwiki.extension.distribution.ui.artifactId>
+    <xwiki.extension.distribution.ui>${xwiki.extension.distribution.ui.groupId}:${xwiki.extension.distribution.ui.artifactId}</xwiki.extension.distribution.ui>
     <xwiki.extension.distribution.ui.version>${platform.version}</xwiki.extension.distribution.ui.version>
-    <xwiki.extension.distribution.wikiui>org.xwiki.platform:xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui>
-    <xwiki.extension.distribution.wikiui.version>${platform.version}</xwiki.extension.distribution.wikiui.version>
+    <xwiki.extension.distribution.ui.id>${xwiki.extension.distribution.ui.groupId}:${xwiki.extension.distribution.ui.artifactId}/${xwiki.extension.distribution.ui.version}</xwiki.extension.distribution.ui.id>
+    <xwiki.extension.distribution.wikiui.name>XWiki Standard Flavor - Sub Wiki</xwiki.extension.distribution.wikiui.name>
+    <xwiki.extension.distribution.wikiui.summary>Default set of wiki pages containing both content and default applications for XWiki Flavor Sub Wiki</xwiki.extension.distribution.wikiui.summary>
+    <xwiki.extension.distribution.wikiui.groupId>${xwiki.extension.distribution.ui.groupId}</xwiki.extension.distribution.wikiui.groupId>
+    <xwiki.extension.distribution.wikiui.artifactId>xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui.artifactId>
+    <xwiki.extension.distribution.wikiui>${xwiki.extension.distribution.wikiui.groupId}:${xwiki.extension.distribution.wikiui.artifactId}</xwiki.extension.distribution.wikiui>
+    <xwiki.extension.distribution.wikiui.version>${xwiki.extension.distribution.ui.version}</xwiki.extension.distribution.wikiui.version>
+    <xwiki.extension.distribution.wikiui.id>${xwiki.extension.distribution.wikiui.groupId}:${xwiki.extension.distribution.wikiui.artifactId}/${xwiki.extension.distribution.wikiui.version}</xwiki.extension.distribution.wikiui.id>
   </properties>
 
   <modules>

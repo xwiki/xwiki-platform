@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1264863273000</creationDate>
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1297362027000</date>
-  <contentUpdateDate>1297362027000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -43,8 +40,8 @@
 </content>
   <attachment>
     <filename>notesmall.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1286228539000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAApklEQVR4Xn3MMQrCMBTG8XfNnEBv4KKXEC/gIigiDoo4aKGgBIeCQ0UoVMRSKB1EEboUPvMloEMgw58XXn48qbSK6qSLZzrAOx/iU4wZ33bHPxopDwpAFYxGHrGBbRaMRm57A5tjMBrJtga+FsFo5LI2sB4FoxE9Uai067pRQNn3Oi8NnPXEYjQadt47XsncQMBFxJD7naY/+MdF7Mp3CulK8RoPRF+Jn0pthmUzfAAAAABJRU5ErkJggg==</content>
@@ -52,8 +49,8 @@
   </attachment>
   <attachment>
     <filename>notesmallblue.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1286228539000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAAUVBMVEX///9Bhr+qdwAuYItnnswuYIs9f7g2cKGVu9xzpdBMjMM7erBBhr84dak/hL4xZ5RYlMejxOB0ptBtoc5/rdSdwN4za5o3cqUvYo46ea+LtdgK7jyvAAAABHRSTlMAvwC/Jk9xqgAAAAFiS0dEAIgFHUgAAABDSURBVAgdLcEHEoAgDATAQ1PoYC//f6gyk1242CkE6tGhLqZCDiNI3iSU1xTobhSc87UOJyb2vA0NADMNN34s8mibPzGkBTZkbmtqAAAAAElFTkSuQmCC</content>
@@ -61,8 +58,8 @@
   </attachment>
   <attachment>
     <filename>notesmallorange.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1286228539000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAAo0lEQVR4Xn3PoQoCQRRG4R+bzSo+wTaDz+BL+BDKlglbDKJF26JYjYpZQWTRpsliFMuCbavxyL3FsDDhY4aZw3BHrHsFmz7sB3BM4TIxtvczu7NGrLrweURZI/IEyluUNWLRgdcpyhoxa8FzF2WNGDfgvoyyRu+h7FeOSROu05pvJrQNsthn8fWc1VRBCJzHhsOopkw9/PMwTxzzts9WBX+g+AES6zbKoIphxwAAAABJRU5ErkJggg==</content>
@@ -70,8 +67,8 @@
   </attachment>
   <attachment>
     <filename>notesmallred.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1286228539000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAAnUlEQVQYV2O4x8qw/xsTx/8/Sm7//3j0/P+TtAmCQWygGEgOpIbhFgPD/49fn+PFIDUMV4DE79Pv8GKQGoZzQOLPmvt4MUgNwwmQie378GKQGoYDIIXx3XgxSA3DKiAB9BUYHwFpsvTGwLvACssZwIr/rHv4H0T/UpPBwFtACv//h2CQIhD+r8qIgdchK4QpvgbFZ4AY5DaQaUDx/QA3/AflhUcmKgAAAABJRU5ErkJggg==</content>

@@ -403,6 +403,10 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 this.writer.writeElement(XARAttachmentModel.ELEMENT_MIMETYPE,
                     (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
             }
+            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_CHARSET)) {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_CHARSET,
+                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_CHARSET));
+            }
             if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR)) {
                 this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
                     (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
@@ -447,6 +451,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 this.writer.writeEndElement();
 
                 this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
+            } else {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(size));
             }
 
             this.writer.writeEndElement();

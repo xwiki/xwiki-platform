@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1446733654000</creationDate>
   <parent>Main.Search</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1446733757000</date>
-  <contentUpdateDate>1446733654000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -245,6 +242,7 @@
     #set ($discard = $xwiki.jsx.use('XWiki.QuickSearchUIX'))
     &lt;li&gt;
       &lt;form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end"&gt;
+        &lt;label class="hidden" for="headerglobalsearchinput"&gt;$services.localization.render('search')&lt;/label&gt;
         &lt;input type="text" name="text" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" /&gt;
         &lt;button type="submit" class="btn" title="$services.localization.render('search')"&gt;$services.icon.renderHTML('search')&lt;/button&gt;
       &lt;/form&gt;

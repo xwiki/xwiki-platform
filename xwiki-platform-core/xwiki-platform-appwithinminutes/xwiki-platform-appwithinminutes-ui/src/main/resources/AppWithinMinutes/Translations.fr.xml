@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1323097478000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1445422650000</date>
-  <contentUpdateDate>1445422591000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -48,19 +45,19 @@ platform.appwithinminutes.appsLiveTable.doc.space=Nom de l'application
 platform.appwithinminutes.appsLiveTable.doc.author=Dernier auteur
 platform.appwithinminutes.appsLiveTable.doc.date=Date de mise à jour
 platform.appwithinminutes.appsLiveTable._actions=Actions
-platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Donner des droits d'administration sur l'espace
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Donner des droits d'administration sur l'espace.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Créez votre propre application\!
+platform.appwithinminutes.appPanelCreateEntry=Créez votre propre application !
 
 ### Wizard step
-platform.appwithinminutes.wizardStepHeading=Étape {0} — {1} 
+platform.appwithinminutes.wizardStepHeading=Étape {0} — {1}
 appWithinMinutes.wizardStep.name.name=Nom
 appWithinMinutes.wizardStep.name.title=Donnez un nom à votre application
 appWithinMinutes.wizardStep.name.description=Choisissez un nom pour l'application
 appWithinMinutes.wizardStep.structure.name=Structure
 appWithinMinutes.wizardStep.structure.title=Définissez la structure de votre application
-appWithinMinutes.wizardStep.structure.description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
+appWithinMinutes.wizardStep.structure.description=Décrivez les données de l'application
 appWithinMinutes.wizardStep.entries.name=Eléments
 appWithinMinutes.wizardStep.entries.title=Localisez vos entrées
 appWithinMinutes.wizardStep.entries.description=Choisissez où stocker les éléments de votre application
@@ -74,7 +71,7 @@ platform.appwithinminutes.wizardStepFinishButtonTip=Accéder à la page d'accuei
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Revenir à l'étape précédente
 platform.appwithinminutes.wizardStepPreviousButtonTip=Étape précédente
 platform.appwithinminutes.wizardStepHelpTitle=Étapes
-platform.appwithinminutes.wizardStepHelpDescription=Cet assistant vous guidera pas à pas dans la création de votre application. A travers les différentes étapes vous pourrez configurer l'affichage de votre application et le type d'information qu'elle contiendra \:
+platform.appwithinminutes.wizardStepHelpDescription=Cet assistant vous guidera pas à pas dans la création de votre application. A travers les différentes étapes vous pourrez configurer l'affichage de votre application et le type d'information qu'elle contiendra :
 
 ### Wizard Step 1: Application Name
 appWithinMinutes.createApp.location.label=Emplacement
@@ -91,23 +88,23 @@ platform.appwithinminutes.appNameHint=Le nom de l'application détermine l'URL d
 platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL de la page d'accueil de l'application
 platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Espace du code de l'application
 platform.appwithinminutes.appNameIsUsedWarning=Cette application existe déjà. Si vous continuez, vous allez modifier l'application existante.
-platform.appwithinminutes.appNameEmptyError=Entrez le nom de l'application
+platform.appwithinminutes.appNameEmptyError=Saisissez le nom de l'application.
 
 ### Wizard Step 2: Application Structure
 appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Palette de champs
-platform.appwithinminutes.classEditorPaletteHint=Glissez-Déposez des champs de la palette pour créer votre formulaire
-platform.appwithinminutes.classEditorCanvasHint=Glissez-déposez les champs de la palette dans cette zone
+platform.appwithinminutes.classEditorPaletteHint=Glissez-Déposez des champs de la palette pour créer votre formulaire.
+platform.appwithinminutes.classEditorCanvasHint=Glissez-déposez les champs de la palette dans cette zone.
 
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Mettre à jour le template de la classe
-platform.appwithinminutes.classEditorUpdateTemplateHint=Sauvegarder les valeurs par défaut dans le template de la classe ({0}). 
+platform.appwithinminutes.classEditorUpdateTemplateHint=Sauvegarder les valeurs par défaut dans le template de la classe ({0}).
 platform.appwithinminutes.classEditorUpdateSheetLabel=Mettre à jour la sheet de la classe
 platform.appwithinminutes.classEditorUpdateSheetHint=Recréer le formulaire utilisé pour afficher et modifier les objets de cette classe ({0}).
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Mettre à jour le paquet de traduction de la classe
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Mettre à jour la traduction pour le nom d''affichage des champs et afficher les valeurs ({0}).
 
 platform.appwithinminutes.classEditorMultipleSheetsWarning=La classe a plusieurs sheets
-platform.appwithinminutes.classEditorDuplicateFieldNameError=La classe a deux champs qui portent le même nom\: {0} 
+platform.appwithinminutes.classEditorDuplicateFieldNameError=La classe possède deux champs ayant le même nom : {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Mettre à jour les valeurs par défaut
 platform.appwithinminutes.classEditorBindSheetSaveComment=Liaison de la sheet à la classe
 platform.appwithinminutes.classEditorSheetSaveComment=Mise à jour de la sheet de la classe
@@ -129,6 +126,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Texte long
 platform.appwithinminutes.classEditorStringFieldName=Texte court
 platform.appwithinminutes.classEditorContentFieldName=Contenu
 platform.appwithinminutes.classEditorTitleFieldName=Titre
+platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Supprimer
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configurer
@@ -185,7 +183,7 @@ platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=La dat
 platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=Une liste d'actions qui peuvent être exécutées sur une entrée de l'application, comme "Supprimer" ou "Modifier"
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Pièces jointes
-platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Une colonne qui affiche les liens vers les fichiers attachées à la page de cette entrée.
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Une colonne qui affiche les liens vers les fichiers attachés à la page
 platform.appwithinminutes.liveTableEditorImagesColumnName=Images
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Une colonne spéciale qui affiche les images attachées à la page de l'entrée
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
@@ -196,7 +194,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Mettre à jour le tableau d
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Glissez-Déposez pour modifier l'ordre
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Supprimer
 platform.appwithinminutes.liveTableEditorAddColumnHint=Ajouter
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce les champs correspondant ont été supprimés. Souhaitez-vous les effacer ? &lt;a href\=""&gt;Oui&lt;/a&gt; / &lt;a href\=""&gt;Non&lt;/a&gt; 
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ? &lt;a href=""&gt;Oui&lt;/a&gt; / &lt;a href=""&gt;Non&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Icône
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Une référence à une icône. Cele peut être n'importe quelle image dans le wiki mais également une icône affichée dans le sélecteur d'icônes lorsque celui-ci est actif.
 
@@ -207,7 +205,7 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Supprimer
 platform.appwithinminutes.appHomePageActionsHeading=Actions
 platform.appwithinminutes.appHomePageAddEntryLabel=Ajouter
 platform.appwithinminutes.appHomePageAddEntryHint=Ajouter une nouvelle entrée
-platform.appwithinminutes.appHomePageEntryNameLabel=Nom de l'entrée\:
+platform.appwithinminutes.appHomePageEntryNameLabel=Nom de l'entrée :
 platform.appwithinminutes.appHomePageDeleteEntriesLabel=Supprimer toutes les entrées
 platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
@@ -217,7 +215,7 @@ platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
 platform.appwithinminutes.deleteAppConfirmation=L''application {0} et TOUS SES DOCUMENTS vont être détruits. Etes-vous certain de vouloir continuer ?
 platform.appwithinminutes.deleteAppEntriesConfirmation=TOUS LES DOCUMENTS de l''application {0} vont être détruits. Etes-vous certain de vouloir continuer ?
 platform.appwithinminutes.deleteAppDoesNotExistError=L'application indiquée n'existe pas.
-platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas une application App Within Minutes valide
+platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas une application App Within Minutes valide.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a été indiqué.
 
 ### Deprecated keys
@@ -228,7 +226,7 @@ platform.appwithinminutes.appNamePreviewDataSpaceLabel=Espace des données de l'
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Espace
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Le nom de l'espace qui contient l'entrée de l'application
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nom complet de la page
-platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Le nom de la page qui contient l'entrée, préfixée par le nom de l'espace.
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Le nom de la page qui contient l'entrée, préfixé par le nom de l'espace
 
 #@deprecated appWithinMinutes.wizardStep.name.name
 platform.appwithinminutes.wizardStep1Name=Nom
@@ -241,7 +239,7 @@ platform.appwithinminutes.wizardStep2Name=Structure
 #@deprecated appWithinMinutes.wizardStep.structure.title
 platform.appwithinminutes.wizardStep2Title=Définissez la structure de votre application
 #@deprecated appWithinMinutes.wizardStep.structure.description
-platform.appwithinminutes.wizardStep2Description=Créez la structure de votre application en choisissant le type des champs qui devront la composer.
+platform.appwithinminutes.wizardStep2Description=Décrivez les données de l'application
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=Présentation
 #@deprecated appWithinMinutes.wizardStep.presentation.title

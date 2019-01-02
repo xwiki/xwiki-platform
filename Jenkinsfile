@@ -82,26 +82,34 @@ def builds = [
       pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml'
     )
   },
+  'Flavor Test - Upgrade' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Upgrade',
+      pom: 'xwiki-platform-distribution-flavor-test-upgrade/pom.xml'
+    )
+  },
   'Flavor Test - Webstandards' : {
     buildFunctionalTest(
       name: 'Flavor Test - Webstandards',
       pom: 'xwiki-platform-distribution-flavor-test-webstandards/pom.xml',
-      mavenOpts: '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
+      mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
   'TestRelease': {
     build(
       name: 'TestRelease',
       goals: 'clean install',
-      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
+      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true',
+      xvnc: false
     )
   },
   'Quality' : {
     build(
       name: 'Quality',
       goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy'
+      profiles: 'quality,legacy',
+      xvnc: false
     )
   }
 ]
@@ -173,6 +181,10 @@ def buildAll(builds)
           // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
           // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
           builds['Flavor Test - Webstandards'].call()
+        },
+        'flavor-test-upgrade': {
+          // Run the Flavor Upgrade tests
+          builds['Flavor Test - Upgrade'].call()
         }
       )
     },
@@ -189,20 +201,23 @@ def buildAll(builds)
 
 def build(map)
 {
-  node {
+  node(map.node ?: '') {
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2500m -Xms512m"
-      if (map.goals) {
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
+      if (map.goals != null) {
         goals = map.goals
       }
-      if (map.profiles) {
+      if (map.profiles != null) {
         profiles = map.profiles
       }
-      if (map.properties) {
+      if (map.properties != null) {
         properties = map.properties
       }
-      if (map.pom) {
+      if (map.pom != null) {
         pom = map.pom
+      }
+      if (map.mavenFlags != null) {
+        mavenFlags = map.mavenFlags
       }
     }
   }

@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1323097478000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1445422650000</date>
-  <contentUpdateDate>1445422591000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -129,6 +126,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Lange Tekst
 platform.appwithinminutes.classEditorStringFieldName=Korte Tekst
 platform.appwithinminutes.classEditorContentFieldName=Inhoud
 platform.appwithinminutes.classEditorTitleFieldName=Titel
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Verwijderen
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configureren
@@ -187,7 +185,7 @@ platform.appwithinminutes.liveTableEditorActionsColumnDescription=Een lijst met 
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Bijlagen
 platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Een speciale kolom met links naar de bijlagen van de gegevenspagina
 platform.appwithinminutes.liveTableEditorImagesColumnName=Afbeeldingen
-platform.appwithinminutes.liveTableEditorImagesColumnDescription=Een speciale kolom met afbeeldingen die bij de gegevenspagina zijn gevoegd 
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Een speciale kolom met afbeeldingen die bij de gegevenspagina zijn gevoegd
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Een speciale kolom voor het tonen van de avatar van de gebruiker. Werkt alleen voor een tabel die aan de XWiki.XWikiUsers Class is gebonden.
 platform.appwithinminutes.liveTableEditorDescriptionHint=De omschrijving geeft een korte samenvatting van wat de applicatie doet en welke gegevens ermee beheerd worden.

@@ -134,7 +134,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #classSwitcher()
 ##
 ##
-<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock">
+<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock xform">
 <div id="xwikieditcontent" class="clear">
 ##
 ##
@@ -157,7 +157,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
     </div></div>
   </div>
 </div> ## properties
-<div class="bottombuttons">#template("editactions.vm")</div>
+<div class="bottombuttons sticky-buttons">#template("editactions.vm")</div>
 </div> ## xwikieditcontent
 </form>
 #end

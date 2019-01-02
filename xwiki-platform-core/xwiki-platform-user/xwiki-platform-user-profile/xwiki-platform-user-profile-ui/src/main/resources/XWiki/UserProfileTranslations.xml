@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1469191733000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1490262427000</date>
-  <contentUpdateDate>1490262416000</contentUpdateDate>
   <version>1.1</version>
   <title>User Profile Translations</title>
   <comment/>
@@ -45,7 +42,22 @@ XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect
 XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
 XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
 XWiki.XWikiUsers_extensionConflictSetup.hint=Indicate if you want Extension Manager to ask you to confirm conflict resolution default rules (for example tell Extension Manager to ask you what to do if the document to upgrade has been removed from the wiki).
-userprofile.default=Default</content>
+userprofile.default=Default
+user.profile.groups.title=My Groups
+user.profile.groups.description=Here are listed all the groups your user belongs to.
+user.profile.groups.table.group=Group
+platform.core.profile.category.groups=My Groups
+user.profile.notifications=Notifications
+user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
+user.profile.network.unfollow.question.yes=Yes, unfollow
+user.profile.network.unfollow.question.no=No, cancel
+user.profile.network.following=Following
+user.profile.network.notfollowing=Not following
+user.profile.network.follow=Start following
+user.profile.network.unfollow=Stop following
+user.profile.network.done=Done
+user.profile.network.saving=Saving...
+user.profile.network.error=Error saving the notification setting</content>
   <object>
     <name>XWiki.UserProfileTranslations</name>
     <number>0</number>

@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1406824491000</creationDate>
   <parent>IconThemes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1406824705000</date>
-  <contentUpdateDate>1406824705000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -43,6 +40,7 @@
 xwiki.iconset.type = image
 xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")]]
 xwiki.iconset.render.html = &lt;img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="Icon" /&gt;
+xwiki.iconset.icon.url = $xwiki.getSkinFile("icons/silk/${icon}.png")
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
 home = house

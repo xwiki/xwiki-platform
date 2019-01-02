@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-menu</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-menu-ui</artifactId>
   <name>XWiki Platform - Menu - UI</name>
@@ -38,6 +38,12 @@
     </xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Menu Application</xwiki.extension.name>
+    <!-- We have to use GLOBAL visibility for the Menu Macro translations because the Menu Macro itself has GLOBAL
+      visibility in order to support global (cross-wiki) menus. The visibility of the translations needs to be
+      synchronized with the visibility of the macro, otherwise the users will see translation keys in the WYSIWYG editor
+      when inserting the macro. The WYSIWYG editor can't load the translations on demand because there's no mapping
+      between macros and their translation pages. -->
+    <xar.verify.translationVisibility.skip>true</xar.verify.translationVisibility.skip>
   </properties>
   <dependencies>
     <!-- JavaScript dependencies -->
@@ -90,6 +96,16 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-code</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    <!-- The Panels application is an optional dependency since the Menu application can work even if it's not present
+         but if it's there then it'll register in it. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>

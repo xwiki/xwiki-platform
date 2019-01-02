@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1467626480000</creationDate>
   <parent>XWiki.TemplateProviderClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1467626545000</date>
-  <contentUpdateDate>1467626545000</contentUpdateDate>
   <version>1.1</version>
   <title>TemplateProvider Translations</title>
   <comment/>
@@ -40,13 +37,13 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>administration.templateProvider.description=Description
-### Missing: administration.templateProvider.description.hint=The information to be displayed for template provider when a new page is created.
+administration.templateProvider.description.hint=Les informations à afficher pour le fournisseur de modèle lorsqu'une nouvelle page est créée.
 administration.templateProvider.icon=icône
-### Missing: administration.templateProvider.icon.hint=The icon to be displayed for template provider when a new page is created. Select one from the {0}full list of icons{1}.
+administration.templateProvider.icon.hint=L’icône à afficher pour le fournisseur de modèle lorsqu’une nouvelle page est créée. Sélectionnez-en une parmis la {0}liste complète d''icônes{1}.
 administration.templateProvider.creationRestrictions=Restrictions de création
-### Missing: administration.templateProvider.creationRestrictions.hint=The list of locations (including their children) where this template is allowed to create pages
+administration.templateProvider.creationRestrictions.hint=La liste des emplacements (y compris leurs enfants) où ce modèle est autorisé à créer des pages
 administration.templateProvider.creationRestrictions.none=Ce modèle peut créer des pages partout
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions=Creation Restrictions as Suggestions
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions.hint=Allows the user to select any location to create the page with this template, using the first creation restriction as the prefilled default location when the template is selected from the list.
+administration.templateProvider.creationRestrictionsAreSuggestions=Création de Restrictions comme Suggestions
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Autoriser l’utilisateur à sélectionner n’importe quel emplacement pour créer une page avec ce modèle, en utilisant la première restriction de création comme emplacement par défaut préremplie lorsque le modèle est sélectionné dans la liste.
 </content>
 </xwikidoc>

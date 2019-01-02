@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1252454400000</creationDate>
   <parent>Scheduler.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1252454400000</date>
-  <contentUpdateDate>1252454400000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('admin.preferences.title')</title>
   <comment/>
@@ -114,7 +111,7 @@
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAdminGroup,</groups>
+      <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
       <levels>admin,edit</levels>
@@ -197,7 +194,7 @@
       <allow>0</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAllGroup,</groups>
+      <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
       <levels>view</levels>

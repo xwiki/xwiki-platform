@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1385047506000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1433258948000</date>
-  <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <comment/>
@@ -41,8 +38,10 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Administração da Busca Solr
 solr.admin.submit=Aplicar
+### Missing: solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=Não é permitido para você executar essa ação.
 solr.admin.error.norights=Privilégios de administrador sãoo necessários para acessar essa seção.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Tamanho da Fila
@@ -59,6 +58,8 @@ solr.admin.indexing.wiki.hint=O wiki cujos documentos serão afetados pela açã
 solr.admin.indexing.wiki.select_farm=Toda a fazenda
 solr.admin.indexing.query.label=Requisição personalizada
 solr.admin.indexing.query.hint=Requisição opcional para limitar os documentos que serão afetados pela ação selecionada no índice.
+
+### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
 
 solr.sortBy=Ordenado por\:
 solr.sortBy.score=Relevância

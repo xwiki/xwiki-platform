@@ -28,7 +28,6 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionRewriter;
 import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.wrap.WrappingExtension;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script oriented helper with various ways of rewriting extensions.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.4.2
  * @since 9.0RC1
  */
-@Unstable
 public class ScriptExtensionRewriter implements ExtensionRewriter
 {
     private static final long serialVersionUID = 1L;

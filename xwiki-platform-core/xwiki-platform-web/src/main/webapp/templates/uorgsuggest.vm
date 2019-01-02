@@ -1,51 +1,102 @@
-$response.setContentType("text/xml")
-<?xml version="1.0" encoding="UTF-8"?>
-<results>
 #macro (suggestUsersOrGroups)
+  ## We make the input lower case here because XWQL doesn't support lower(:parameter).
   #set ($input = "$!request.input.toLowerCase()")
   #if ($input.length() > 0)
     ## Resolve the input as a user/group reference and use only the document name for matching.
     #set ($input = $services.model.resolveDocument($input).name)
   #end
   #if ($request.uorg == 'user')
-    #set ($statement = "from doc.object(XWiki.XWikiUsers) as user where lower(doc.name) like :input or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input order by user.first_name, user.last_name")
+    #set ($statement = "from doc.object(XWiki.XWikiUsers) as user " +
+      "where lower(doc.name) like :input or " +
+        "concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input " +
+      "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name")
   #else
-    #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups where lower(doc.name) like :input and doc.fullName <> ''XWiki.XWikiGroupTemplate'' order by doc.name')
+    #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups ' +
+      'where lower(doc.name) like :input and doc.fullName <> ''XWiki.XWikiGroupTemplate'' ' +
+      'order by lower(doc.name), doc.name')
+  #end
+  #if ($request.wiki == 'global')
+    #set ($wikiReference = $services.model.createWikiReference($xcontext.mainWikiName))
+  #else
+    #set ($wikiReference = $doc.documentReference.wikiReference)
   #end
   #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter('unique'))
-  #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
-  #foreach ($result in $query.execute())
-    #displayResult($result)
-  #end
+  ## TODO: Use the advanced query parameter API:
+  ## query.bindValue('input').anyChars().literal($input).anyChars().query()
+  ## as soon as we fix XWIKI-15362 (An XWQL query that selects from an object property fails when using the advanced
+  ## query parameter API)
+  #set ($query = $query.setLimit(10).bindValue('input', "%$input%"))
+  #set ($rawResults = $query.execute())
+  #displayResults($rawResults $wikiReference)
 #end
-
-#macro (displayResult $result)
-  #set ($reference = $services.model.resolveDocument($result, $wikiReference))
-  ## Make sure we use relative references as much as possible. See XWIKI-10046.
-  #set ($stringReference = $services.model.serialize($reference, 'compactwiki'))
-  #getUserAvatarURL($reference $avatarURL 50)
-  #if ($request.uorg == 'user')
-    ## The string returned by XWiki#getUserName() is XML encoded.
-    #set ($prettyName = $xwiki.getUserName($stringReference, false))
+##
+#macro (displayResults $rawResults $wikiReference)
+  #set ($results = [])
+  #foreach ($result in $rawResults)
+    #addResultData($result $results $wikiReference)
+  #end
+  #if ($request.media == 'json')
+    #displayResultsJSON($results)
   #else
-    #set ($prettyName = $xwiki.getDocument($reference).plainTitle)
-    #if ("$!prettyName" == '')
-      #set ($prettyName = $reference.name)
-    #end
+    #displayResultsXML($results)
   #end
-  <rs id="$escapetool.xml($reference.name)" icon="$escapetool.xml($avatarURL.url)"
-    info="$prettyName">$escapetool.xml($stringReference)</rs>
 #end
-
-#if ($request.wiki == 'global')
-  #set ($wikiReference = $services.model.createWikiReference($xcontext.mainWikiName))
-#else
-  #set ($wikiReference = $doc.documentReference.wikiReference)
+##
+#macro (addResultData $result $results $wikiReference)
+  #set ($reference = $services.model.resolveDocument($result, $wikiReference))
+  #if ($request.uorg == 'user')
+    #set ($label = $xwiki.getPlainUserName($reference))
+    #set ($defaultIcon = $services.icon.getMetaData('user'))
+  #else
+    #set ($label = $xwiki.getDocument($reference).plainTitle)
+    #set ($defaultIcon = $services.icon.getMetaData('group'))
+  #end
+  #getUserAvatarURL($reference $avatarURL 50)
+  #set ($icon = $defaultIcon)
+  #if ($avatarURL.specified)
+    #set ($icon = {
+      'iconSetType': 'IMAGE',
+      'url': $avatarURL.url
+    })
+  #end
+  #if ($request.exactMatch == 'true' && "$!request.input" != '')
+    #set ($value = $result)
+  #else
+    ## Use the local reference as value if possible (see XWIKI-10046).
+    #set ($value = $services.model.serialize($reference, 'compactwiki'))
+  #end
+  #set ($discard = $results.add({
+    'value': $value,
+    'label': $label,
+    'icon': $icon,
+    'url': $xwiki.getURL($reference)
+  }))
 #end
-#if ($request.exactMatch == 'true')
+##
+#macro (displayResultsXML $results)
+  #set ($discard = $response.setContentType('text/xml'))
+  <?xml version="1.0" encoding="UTF-8"?>
+  <results>
+    #foreach ($result in $results)
+      #set ($icon = $result.icon.url)
+      #if ("$!icon" == '')
+        #set ($icon = $result.icon.cssClass)
+      #end
+      <rs id="$escapetool.xml($result.url)" icon="$!escapetool.xml($icon)"
+        info="$escapetool.xml($result.label)">$escapetool.xml($result.value)</rs>
+    #end
+  </results>
+#end
+##
+#macro (displayResultsJSON $results)
+  #set ($discard = $response.setContentType('application/json'))
+  $jsontool.serialize($results)
+#end
+##
+#if ($request.exactMatch == 'true' && "$!request.input" != '')
   ## This is normally used for loading the initial selection.
-  #displayResult("$!request.input")
+  #set ($rawResults = [$request.input])
+  #displayResults($rawResults)
 #else
   #suggestUsersOrGroups()
 #end
-</results>

@@ -27,14 +27,11 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1300895617000</creationDate>
   <parent>XWiki.XWikiSyntax</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1454940903000</date>
-  <contentUpdateDate>1454940903000</contentUpdateDate>
   <version>1.1</version>
-  <title>XWikiSyntaxLinks</title>
+  <title>XWiki saišu sintakse</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>

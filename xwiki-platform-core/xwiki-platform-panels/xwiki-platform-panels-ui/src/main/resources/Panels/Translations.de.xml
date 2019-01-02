@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393442253000</creationDate>
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1464963428000</date>
-  <contentUpdateDate>1464963428000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -46,8 +43,8 @@ panels.type=Typ
 panels.category=Kategorie
 panels._actions=Aktionen
 panels.emptyvalue=
-### Missing: panels.children.title=Child Pages
+panels.children.title=Unterseiten
 ### Missing: panels.siblings.title=Sibling Pages
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.documentInformation.configureSyntaxes=Weitere Syntaxen konfigurieren
 </content>
 </xwikidoc>

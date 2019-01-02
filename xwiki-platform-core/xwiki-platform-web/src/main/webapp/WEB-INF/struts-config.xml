@@ -444,10 +444,6 @@
             <forward name="distribution" path="/templates/distribution.vm"/>
         </action>
 
-        <action path="/imagecaptcha/"
-                type="org.xwiki.captcha.internal.DefaultImageCaptchaAction">
-        </action>
-
 
         <action path="/unknown/"
                 type="com.xpn.xwiki.web.UnknownAction"

@@ -19,6 +19,7 @@
  */
 package org.xwiki.uiextension.internal;
 
+import org.xwiki.component.wiki.internal.AbstractBaseObjectWikiComponent;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -67,5 +68,5 @@ public interface WikiUIExtensionConstants
     /**
      * Extension scope property.
      */
-    String SCOPE_PROPERTY = "scope";
+    String SCOPE_PROPERTY = AbstractBaseObjectWikiComponent.XPROPERTY_SCOPE;
 }

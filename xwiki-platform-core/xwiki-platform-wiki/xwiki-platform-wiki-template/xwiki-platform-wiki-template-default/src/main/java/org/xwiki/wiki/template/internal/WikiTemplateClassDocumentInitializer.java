@@ -65,9 +65,16 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryClass
     public static final String FIELDPN_ISWIKITEMPLATE = "Template";
 
     /**
+     * Form type of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
+     * 
+     * @since 10.7RC1
+     */
+    public static final String FIELDFT_ISWIKITEMPLATE = "checkbox";
+
+    /**
      * Display type of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
      */
-    public static final String FIELDDT_ISWIKITEMPLATE = "checkbox";
+    public static final String FIELDDT_ISWIKITEMPLATE = "";
 
     /**
      * Default value of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
@@ -94,7 +101,7 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryClass
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE,
-            DEFAULT_ISWIKITEMPLATE);
+        xclass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDFT_ISWIKITEMPLATE,
+            FIELDDT_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
     }
 }

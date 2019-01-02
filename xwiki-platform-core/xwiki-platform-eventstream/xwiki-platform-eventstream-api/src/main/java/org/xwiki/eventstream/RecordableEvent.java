@@ -19,8 +19,6 @@
  */
 package org.xwiki.eventstream;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * An event that should be stored by the Event Stream.
  *
@@ -30,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.2RC1
  */
-@Unstable
 public interface RecordableEvent extends org.xwiki.observation.event.Event
 {
 }

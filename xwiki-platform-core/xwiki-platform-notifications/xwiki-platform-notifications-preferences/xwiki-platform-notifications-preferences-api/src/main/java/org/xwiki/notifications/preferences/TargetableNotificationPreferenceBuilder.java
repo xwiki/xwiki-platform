@@ -25,7 +25,6 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allows to build new {@link TargetableNotificationPreference}.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  */
 @Role
-@Unstable
 public interface TargetableNotificationPreferenceBuilder
 {
     /**

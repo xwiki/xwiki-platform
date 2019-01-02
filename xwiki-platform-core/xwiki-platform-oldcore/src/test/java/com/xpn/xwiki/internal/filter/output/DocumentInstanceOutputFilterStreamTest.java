@@ -25,30 +25,31 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
-import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
-import com.xpn.xwiki.internal.filter.output.DocumentInstanceOutputFilterStream;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link DocumentInstanceOutputFilterStream}.
  * 
  * @version $Id$
  */
-@AllComponents
 public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
     // Tests
@@ -63,97 +64,94 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("document1", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
-        Assert.assertEquals(Locale.ENGLISH, document.getDefaultLocale());
-        Assert.assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
-        Assert.assertEquals("customclass", document.getCustomClass());
-        Assert.assertEquals("title", document.getTitle());
-        Assert.assertEquals("defaultTemplate", document.getDefaultTemplate());
-        Assert.assertEquals("validationScript", document.getValidationScript());
-        Assert.assertEquals(new Syntax(new SyntaxType("syntax", "syntax"), "1.0"), document.getSyntax());
-        Assert.assertEquals(true, document.isHidden());
-        Assert.assertEquals("content", document.getContent());
+        assertEquals(Locale.ENGLISH, document.getDefaultLocale());
+        assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
+        assertEquals("customclass", document.getCustomClass());
+        assertEquals("title", document.getTitle());
+        assertEquals("defaultTemplate", document.getDefaultTemplate());
+        assertEquals("validationScript", document.getValidationScript());
+        assertEquals(new Syntax(new SyntaxType("syntax", "syntax"), "1.0"), document.getSyntax());
+        assertEquals(true, document.isHidden());
+        assertEquals("content", document.getContent());
 
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
-        Assert.assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
-        Assert.assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
-        Assert.assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"),
-            document.getContentAuthorReference());
-        Assert.assertEquals(true, document.isMinorEdit());
-        Assert.assertEquals("comment", document.getComment());
-        Assert.assertEquals("1.42", document.getVersion());
+        assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
+        assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
+        assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
+        assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
+        assertEquals(true, document.isMinorEdit());
+        assertEquals("comment", document.getComment());
+        assertEquals("1.42", document.getVersion());
 
         // Attachment
 
-        Assert.assertEquals(1, document.getAttachmentList().size());
+        assertEquals(1, document.getAttachmentList().size());
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(10, attachment.getLongSize());
-        Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(10, attachment.getLongSize());
+        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
             attachment.getContent(this.oldcore.getXWikiContext())));
 
-        Assert.assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
-        Assert.assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate());
-        Assert.assertEquals("15.1", attachment.getVersion());
-        Assert.assertEquals("attachment comment", attachment.getComment());
+        assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
+        assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate());
+        assertEquals("15.1", attachment.getVersion());
+        assertEquals("attachment comment", attachment.getComment());
 
         // XClass
 
         BaseClass xclass = document.getXClass();
-        Assert.assertEquals(1, xclass.getFieldList().size());
-        Assert.assertEquals("customClass", xclass.getCustomClass());
-        Assert.assertEquals("customMapping", xclass.getCustomMapping());
-        Assert.assertEquals("defaultViewSheet", xclass.getDefaultViewSheet());
-        Assert.assertEquals("defaultEditSheet", xclass.getDefaultEditSheet());
-        Assert.assertEquals("defaultWeb", xclass.getDefaultWeb());
-        Assert.assertEquals("nameField", xclass.getNameField());
-        Assert.assertEquals("validationScript", xclass.getValidationScript());
+        assertEquals(1, xclass.getFieldList().size());
+        assertEquals("customClass", xclass.getCustomClass());
+        assertEquals("customMapping", xclass.getCustomMapping());
+        assertEquals("defaultViewSheet", xclass.getDefaultViewSheet());
+        assertEquals("defaultEditSheet", xclass.getDefaultEditSheet());
+        assertEquals("defaultWeb", xclass.getDefaultWeb());
+        assertEquals("nameField", xclass.getNameField());
+        assertEquals("validationScript", xclass.getValidationScript());
 
         NumberClass numberFiled = (NumberClass) xclass.getField("prop1");
-        Assert.assertEquals("prop1", numberFiled.getName());
-        Assert.assertEquals(false, numberFiled.isDisabled());
-        Assert.assertEquals(1, numberFiled.getNumber());
-        Assert.assertEquals("long", numberFiled.getNumberType());
-        Assert.assertEquals("Prop1", numberFiled.getPrettyName());
-        Assert.assertEquals(30, numberFiled.getSize());
-        Assert.assertEquals(false, numberFiled.isUnmodifiable());
+        assertEquals("prop1", numberFiled.getName());
+        assertEquals(false, numberFiled.isDisabled());
+        assertEquals(1, numberFiled.getNumber());
+        assertEquals("long", numberFiled.getNumberType());
+        assertEquals("Prop1", numberFiled.getPrettyName());
+        assertEquals(30, numberFiled.getSize());
+        assertEquals(false, numberFiled.isUnmodifiable());
 
         // Objects
 
         Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
-        Assert.assertEquals(2, objects.size());
+        assertEquals(2, objects.size());
 
         // Object 1
 
         List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "space", "page"));
-        Assert.assertEquals(1, documentObjects.size());
+        assertEquals(1, documentObjects.size());
         BaseObject documentObject = documentObjects.get(0);
-        Assert.assertEquals(0, documentObject.getNumber());
-        Assert.assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
-        Assert.assertEquals("e2167721-2a64-430c-9520-bac1c0ee68cb", documentObject.getGuid());
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
+        assertEquals("e2167721-2a64-430c-9520-bac1c0ee68cb", documentObject.getGuid());
 
-        Assert.assertEquals(1, documentObject.getFieldList().size());
-        Assert.assertEquals(1, documentObject.getIntValue("prop1"));
+        assertEquals(1, documentObject.getFieldList().size());
+        assertEquals(1, documentObject.getIntValue("prop1"));
 
         // Object 2
 
         List<BaseObject> otherObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
-        Assert.assertEquals(1, otherObjects.size());
+        assertEquals(1, otherObjects.size());
         BaseObject otherObject = otherObjects.get(0);
-        Assert.assertEquals(0, otherObject.getNumber());
-        Assert
-            .assertEquals(new DocumentReference("wiki", "otherspace", "otherclass"), otherObject.getXClassReference());
-        Assert.assertEquals("8eaeac52-e2f2-47b2-87e1-bc6909597b39", otherObject.getGuid());
+        assertEquals(0, otherObject.getNumber());
+        assertEquals(new DocumentReference("wiki", "otherspace", "otherclass"), otherObject.getXClassReference());
+        assertEquals("8eaeac52-e2f2-47b2-87e1-bc6909597b39", otherObject.getGuid());
 
-        Assert.assertEquals(1, otherObject.getFieldList().size());
-        Assert.assertEquals(2, otherObject.getIntValue("prop2"));
+        assertEquals(1, otherObject.getFieldList().size());
+        assertEquals(2, otherObject.getIntValue("prop2"));
     }
 
     @Test
@@ -166,97 +164,94 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("document1-2", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
-        Assert.assertEquals(Locale.ENGLISH, document.getDefaultLocale());
-        Assert.assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
-        Assert.assertEquals("customclass", document.getCustomClass());
-        Assert.assertEquals("title", document.getTitle());
-        Assert.assertEquals("defaultTemplate", document.getDefaultTemplate());
-        Assert.assertEquals("validationScript", document.getValidationScript());
-        Assert.assertEquals(new Syntax(new SyntaxType("syntax", "syntax"), "1.0"), document.getSyntax());
-        Assert.assertEquals(true, document.isHidden());
-        Assert.assertEquals("content", document.getContent());
+        assertEquals(Locale.ENGLISH, document.getDefaultLocale());
+        assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
+        assertEquals("customclass", document.getCustomClass());
+        assertEquals("title", document.getTitle());
+        assertEquals("defaultTemplate", document.getDefaultTemplate());
+        assertEquals("validationScript", document.getValidationScript());
+        assertEquals(new Syntax(new SyntaxType("syntax", "syntax"), "1.0"), document.getSyntax());
+        assertEquals(true, document.isHidden());
+        assertEquals("content", document.getContent());
 
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
-        Assert.assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
-        Assert.assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
-        Assert.assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"),
-            document.getContentAuthorReference());
-        Assert.assertEquals(true, document.isMinorEdit());
-        Assert.assertEquals("comment", document.getComment());
-        Assert.assertEquals("1.1", document.getVersion());
+        assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
+        assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
+        assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
+        assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
+        assertEquals(true, document.isMinorEdit());
+        assertEquals("comment", document.getComment());
+        assertEquals("1.1", document.getVersion());
 
         // Attachment
 
-        Assert.assertEquals(1, document.getAttachmentList().size());
+        assertEquals(1, document.getAttachmentList().size());
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(10, attachment.getLongSize());
-        Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(10, attachment.getLongSize());
+        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
             attachment.getContent(this.oldcore.getXWikiContext())));
 
-        Assert.assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
-        Assert.assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate());
-        Assert.assertEquals("1.1", attachment.getVersion());
-        Assert.assertEquals("attachment comment", attachment.getComment());
+        assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
+        assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate());
+        assertEquals("1.1", attachment.getVersion());
+        assertEquals("attachment comment", attachment.getComment());
 
         // XClass
 
         BaseClass xclass = document.getXClass();
-        Assert.assertEquals("customClass", xclass.getCustomClass());
-        Assert.assertEquals("customMapping", xclass.getCustomMapping());
-        Assert.assertEquals("defaultViewSheet", xclass.getDefaultViewSheet());
-        Assert.assertEquals("defaultEditSheet", xclass.getDefaultEditSheet());
-        Assert.assertEquals("defaultWeb", xclass.getDefaultWeb());
-        Assert.assertEquals("nameField", xclass.getNameField());
-        Assert.assertEquals("validationScript", xclass.getValidationScript());
-        Assert.assertEquals(1, xclass.getFieldList().size());
+        assertEquals("customClass", xclass.getCustomClass());
+        assertEquals("customMapping", xclass.getCustomMapping());
+        assertEquals("defaultViewSheet", xclass.getDefaultViewSheet());
+        assertEquals("defaultEditSheet", xclass.getDefaultEditSheet());
+        assertEquals("defaultWeb", xclass.getDefaultWeb());
+        assertEquals("nameField", xclass.getNameField());
+        assertEquals("validationScript", xclass.getValidationScript());
+        assertEquals(1, xclass.getFieldList().size());
 
         NumberClass numberFiled = (NumberClass) xclass.getField("prop1");
-        Assert.assertEquals("prop1", numberFiled.getName());
-        Assert.assertEquals(false, numberFiled.isDisabled());
-        Assert.assertEquals(1, numberFiled.getNumber());
-        Assert.assertEquals("long", numberFiled.getNumberType());
-        Assert.assertEquals("Prop1", numberFiled.getPrettyName());
-        Assert.assertEquals(30, numberFiled.getSize());
-        Assert.assertEquals(false, numberFiled.isUnmodifiable());
+        assertEquals("prop1", numberFiled.getName());
+        assertEquals(false, numberFiled.isDisabled());
+        assertEquals(1, numberFiled.getNumber());
+        assertEquals("long", numberFiled.getNumberType());
+        assertEquals("Prop1", numberFiled.getPrettyName());
+        assertEquals(30, numberFiled.getSize());
+        assertEquals(false, numberFiled.isUnmodifiable());
 
         // Objects
 
         Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
-        Assert.assertEquals(2, objects.size());
+        assertEquals(2, objects.size());
 
         // Object 1
 
         List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "space", "page"));
-        Assert.assertEquals(1, documentObjects.size());
+        assertEquals(1, documentObjects.size());
         BaseObject documentObject = documentObjects.get(0);
-        Assert.assertEquals(0, documentObject.getNumber());
-        Assert.assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
-        Assert.assertEquals("e2167721-2a64-430c-9520-bac1c0ee68cb", documentObject.getGuid());
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
+        assertEquals("e2167721-2a64-430c-9520-bac1c0ee68cb", documentObject.getGuid());
 
-        Assert.assertEquals(1, documentObject.getFieldList().size());
-        Assert.assertEquals(1, documentObject.getIntValue("prop1"));
+        assertEquals(1, documentObject.getFieldList().size());
+        assertEquals(1, documentObject.getIntValue("prop1"));
 
         // Object 2
 
         List<BaseObject> otherObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
-        Assert.assertEquals(1, otherObjects.size());
+        assertEquals(1, otherObjects.size());
         BaseObject otherObject = otherObjects.get(0);
-        Assert.assertEquals(0, otherObject.getNumber());
-        Assert
-            .assertEquals(new DocumentReference("wiki", "otherspace", "otherclass"), otherObject.getXClassReference());
-        Assert.assertEquals("8eaeac52-e2f2-47b2-87e1-bc6909597b39", otherObject.getGuid());
+        assertEquals(0, otherObject.getNumber());
+        assertEquals(new DocumentReference("wiki", "otherspace", "otherclass"), otherObject.getXClassReference());
+        assertEquals("8eaeac52-e2f2-47b2-87e1-bc6909597b39", otherObject.getGuid());
 
-        Assert.assertEquals(1, otherObject.getFieldList().size());
-        Assert.assertEquals(2, otherObject.getIntValue("prop2"));
+        assertEquals(1, otherObject.getFieldList().size());
+        assertEquals(2, otherObject.getIntValue("prop2"));
     }
 
     @Test
@@ -268,25 +263,24 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("documentwithunexistingobjectproperty", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
         // Objects
 
         Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
-        Assert.assertEquals(1, objects.size());
+        assertEquals(1, objects.size());
 
         List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "space", "page"));
-        Assert.assertEquals(1, documentObjects.size());
+        assertEquals(1, documentObjects.size());
         BaseObject documentObject = documentObjects.get(0);
-        Assert.assertEquals(0, documentObject.getNumber());
-        Assert.assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
 
-        Assert.assertEquals(1, documentObject.getFieldList().size());
-        Assert.assertEquals(1, documentObject.getIntValue("prop1"));
+        assertEquals(1, documentObject.getFieldList().size());
+        assertEquals(1, documentObject.getIntValue("prop1"));
     }
 
     @Test
@@ -298,15 +292,14 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("documentwithnumberversion", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
         // Version
 
-        Assert.assertEquals("1.1", document.getVersion());
+        assertEquals("1.1", document.getVersion());
     }
 
     @Test
@@ -322,15 +315,14 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("documentwithnumberversion", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
-        Assert.assertEquals(contextUser, document.getCreatorReference());
-        Assert.assertEquals(contextUser, document.getAuthorReference());
-        Assert.assertEquals(contextUser, document.getContentAuthorReference());
+        assertEquals(contextUser, document.getCreatorReference());
+        assertEquals(contextUser, document.getAuthorReference());
+        assertEquals(contextUser, document.getContentAuthorReference());
     }
 
     @Test
@@ -342,24 +334,47 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("documentwithattachmentwithoutdate", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
         // Attachment
 
-        Assert.assertEquals(1, document.getAttachmentList().size());
+        assertEquals(1, document.getAttachmentList().size());
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(10, attachment.getLongSize());
-        Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(10, attachment.getLongSize());
+        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
             attachment.getContent(this.oldcore.getXWikiContext())));
 
-        Assert.assertNotNull(attachment.getDate());
-        Assert.assertEquals("1.1", attachment.getVersion());
-        Assert.assertEquals("", attachment.getComment());
+        assertNotNull(attachment.getDate());
+        assertEquals("1.1", attachment.getVersion());
+        assertEquals("", attachment.getComment());
+        assertEquals("text/plain", attachment.getMimeType());
+    }
+
+
+    @Test
+    public void testDocumentwithattachmentwithoutcontent() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithattachmentwithoutcontent", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        // Attachment
+
+        assertEquals(1, document.getAttachmentList().size());
+        XWikiAttachment attachment = document.getAttachment("attachment.txt");
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(10, attachment.getLongSize());
     }
 
     @Test
@@ -371,25 +386,24 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("documentwithunknownClassproperty", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
         // Objects
 
         Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
-        Assert.assertEquals(1, objects.size());
+        assertEquals(1, objects.size());
 
         List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "space", "page"));
-        Assert.assertEquals(1, documentObjects.size());
+        assertEquals(1, documentObjects.size());
         BaseObject documentObject = documentObjects.get(0);
-        Assert.assertEquals(0, documentObject.getNumber());
-        Assert.assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
 
-        Assert.assertEquals(1, documentObject.getFieldList().size());
-        Assert.assertEquals(1, documentObject.getIntValue("prop1"));
+        assertEquals(1, documentObject.getFieldList().size());
+        assertEquals(1, documentObject.getIntValue("prop1"));
     }
 
     @Test
@@ -401,22 +415,21 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         importFromXML("documentwithobjectwithoutnumberandclass", outputProperties);
 
-        XWikiDocument document =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(document.isNew());
+        assertFalse(document.isNew());
 
         // Objects
 
         Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
-        Assert.assertEquals(1, objects.size());
+        assertEquals(1, objects.size());
 
         List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
-        Assert.assertEquals(1, documentObjects.size());
+        assertEquals(1, documentObjects.size());
         BaseObject documentObject = documentObjects.get(0);
-        Assert.assertEquals(0, documentObject.getNumber());
-        Assert.assertEquals(1, documentObject.getFieldList().size());
-        Assert.assertEquals("propvalue", documentObject.getStringValue("prop"));
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(1, documentObject.getFieldList().size());
+        assertEquals("propvalue", documentObject.getStringValue("prop"));
     }
 }

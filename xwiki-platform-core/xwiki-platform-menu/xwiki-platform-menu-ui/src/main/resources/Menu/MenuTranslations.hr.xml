@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1372189341000</creationDate>
   <parent>MenuClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1372237284000</date>
-  <contentUpdateDate>1372229927000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -45,6 +42,7 @@ Menu.MenuClass_content1=Struktura izbornika
 # Live table generic keys
 menu.livetable.doc.title=Naslov stranice
 menu.livetable.doc.name=Ime stranice
+menu.livetable.doc.location=Lokacija
 menu.livetable.doc.space=Prostor
 menu.livetable.doc.fullname=Puno ime stranice
 menu.livetable.doc.author=Posljednji autor
@@ -62,6 +60,9 @@ menu.livetable.emptyvalue=-
 # Live table specific keys
 menu.livetable.content1=Struktura izbornika
 
+# Administration keys
+### Missing: admin.menu.name=Menu
+
 # UIX keys
 menu.uix.extensionPoint.label=Lokacija prikaza izbornika
 menu.uix.extensionPoint.hint=Naznačava gdje prikazati izbornik. Izbornik se prikazuje ili horizontalno ili vertikalno, prema odabranoj lokaciji.
@@ -73,5 +74,17 @@ menu.uix.content.label=Sadržaj UI ekstenzije
 menu.uix.content.hint=Ukoliko ovo vidite, to onda vjerojatno znači da vam je onemogućen Javascript. Trebali biste odabrati istu vrijednost kao za lokaciju prikaza izbornika.
 menu.uix.scope.label=Doseg vidljivosti izbornika
 menu.uix.scope.hint=Naznačava u kojem kontekstu je vidljiv izbornik.
+
+# Menu Macro
+### Missing: rendering.macro.menu.name=Menu
+### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+### Missing: rendering.macro.menu.parameter.id.name=Id
+### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+### Missing: rendering.macro.menu.parameter.type.name=Type
+### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
+### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+
+# Menu WebHome
+### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
 </content>
 </xwikidoc>

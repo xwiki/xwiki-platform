@@ -34,7 +34,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
+import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 
 /**
  * Update XWiki.XWikiPreferences document with all required informations.
@@ -49,28 +51,28 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
 {
     /**
      * The name of the initialized document.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final String NAME = "XWikiPreferences";
 
     /**
      * The local reference of the initialized document as String.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final String LOCAL_REFERENCE_STRING = XWiki.SYSTEM_SPACE + '.' + NAME;
 
     /**
      * The local reference of the initialized document as String.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final LocalDocumentReference LOCAL_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE, NAME);
 
     /**
      * A regex to match any object reference with initialized class.
-     * 
+     *
      * @since 9.4RC1
      */
     public static final RegexEntityReference OBJECT_REFERENCE = BaseObjectReference.any(LOCAL_REFERENCE_STRING);
@@ -110,7 +112,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
         xclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
-        xclass.addTextField("skin", "Skin", 30);
+        xclass.addPageField("skin", "Skin", 30, false, false, "", "XWiki.XWikiSkins", ListClass.DISPLAYTYPE_INPUT,
+                true, ListClass.FREE_TEXT_ALLOWED);
         xclass.addDBListField("colorTheme", "Color theme",
             "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
                 + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "
@@ -127,7 +130,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
         xclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
 
-        xclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
+        xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
 
         xclass.addTextField("webcopyright", "Copyright", 30);
         xclass.addTextField("title", "Title", 30);
@@ -149,17 +152,17 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10, ContentType.PURE_TEXT);
         xclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
 
-        xclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
-        xclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
-        xclass.addStaticListField("edit_anonymous", "Anonymous", "---|Image|Text");
-        xclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
-        xclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
-        xclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
+        xclass.addStaticListField("registration_anonymous", "Anonymous", "Image|Text");
+        xclass.addStaticListField("registration_registered", "Registered", "Image|Text");
+        xclass.addStaticListField("edit_anonymous", "Anonymous", "Image|Text");
+        xclass.addStaticListField("edit_registered", "Registered", "Image|Text");
+        xclass.addStaticListField("comment_anonymous", "Anonymous", "Image|Text");
+        xclass.addStaticListField("comment_registered", "Registered", "Image|Text");
 
         xclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
         // Captcha for guest comments
-        xclass.addBooleanField("guest_comment_requires_captcha", "Enable CAPTCHA in Comments for Unregistered Users",
+        xclass.addBooleanField("guest_comment_requires_captcha", "Enable CAPTCHA in comments for unregistered users",
             "select");
 
         // Document editing
@@ -177,10 +180,10 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         xclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         xclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        xclass.addStaticListField("leftPanelsWidth", "Width of the left panel column", "---|Small|Medium|Large");
-        xclass.addStaticListField("rightPanelsWidth", "Width of the right panel column", "---|Small|Medium|Large");
+        xclass.addStaticListField("leftPanelsWidth", "Width of the left panel column", "Small|Medium|Large");
+        xclass.addStaticListField("rightPanelsWidth", "Width of the right panel column", "Small|Medium|Large");
         xclass.addTextField("languages", "Supported languages", 30);
-        xclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
+        xclass.addPageField("documentBundles", "Internationalization Document Bundles", 60);
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
 
         // Only used by LDAP authentication service
@@ -189,7 +192,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("ldap_server", "Ldap server adress", 60);
         xclass.addTextField("ldap_port", "Ldap server port", 60);
         xclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
-        xclass.addTextField("ldap_bind_pass", "Ldap password matching", 60);
+        xclass.addPasswordField("ldap_bind_pass", "Ldap password matching", 60, PasswordMetaClass.CLEAR);
         xclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", "yesno");
         xclass.addTextField("ldap_user_group", "Ldap group filter", 60);
         xclass.addTextField("ldap_exclude_group", "Ldap group to exclude", 60);
@@ -202,7 +205,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("ldap_photo_attribute", "Ldap photo attribute name", 60);
         xclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5, ContentType.PURE_TEXT);
         xclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
-        xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "|always|create");
+        xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "always|create");
         xclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
 
         xclass.addBooleanField("showannotations", "Show document annotations", "yesno");

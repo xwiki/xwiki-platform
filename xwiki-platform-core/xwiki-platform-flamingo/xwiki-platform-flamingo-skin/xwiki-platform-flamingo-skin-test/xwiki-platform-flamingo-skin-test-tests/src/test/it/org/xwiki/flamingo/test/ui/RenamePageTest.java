@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.CopyOrRenameStatusPage;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -96,7 +96,7 @@ public class RenamePageTest extends AbstractTest
         renamePage.setAutoRedirect(true);
         // Set the new parent as "A.B"
         renamePage.getDocumentPicker().setParent("A.B");
-        CopyOrRenameStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
 
         // Check successful Rename confirmation
         assertEquals(RENAME_SUCCESSFUL, renameStatusPage.getInfoMessage());

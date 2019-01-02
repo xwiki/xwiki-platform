@@ -124,6 +124,18 @@ public class BaseObjectReference extends ObjectReference
     }
 
     /**
+     * Clone an BaseObjectReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public BaseObjectReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * @param classReference the local reference of the class (e.g. "XWiki.XWikiPreferences")
      * @return a reference used to match on object reference with the passed xclass
      * @since 9.4RC1
@@ -247,5 +259,15 @@ public class BaseObjectReference extends ObjectReference
         maybeParseName();
 
         return this.objectNumber;
+    }
+
+    @Override
+    public BaseObjectReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new BaseObjectReference(this, newParent);
     }
 }

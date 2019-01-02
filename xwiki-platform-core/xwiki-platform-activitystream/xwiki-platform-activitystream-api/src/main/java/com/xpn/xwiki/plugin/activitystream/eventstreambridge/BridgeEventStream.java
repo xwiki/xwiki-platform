@@ -31,16 +31,15 @@ import org.xwiki.context.Execution;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventGroup;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.events.EventStreamAddedEvent;
-import org.xwiki.eventstream.events.EventStreamDeletedEvent;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
+import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 
 /**
@@ -65,7 +64,10 @@ public class BridgeEventStream implements EventStream
     private EventConverter eventConverter;
 
     @Inject
-    private ObservationManager observationManager;
+    private ActivityStreamConfiguration activityStreamConfiguration;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public void addEvent(Event e)
@@ -74,7 +76,6 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().addActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.observationManager.notify(new EventStreamAddedEvent(), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
@@ -87,7 +88,6 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().deleteActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.observationManager.notify(new EventStreamDeletedEvent(), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
@@ -121,6 +121,11 @@ public class BridgeEventStream implements EventStream
         }
         q.setLimit(query.getLimit());
         q.setOffset(query.getOffset());
+
+        if (activityStreamConfiguration.useMainStore()) {
+            q.setWiki(wikiDescriptorManager.getMainWikiId());
+        }
+
         List<ActivityEvent> events = q.execute();
         return convertActivitiesToEvents(events);
     }

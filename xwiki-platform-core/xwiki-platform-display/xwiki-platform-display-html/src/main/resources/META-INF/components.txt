@@ -1,0 +1,2 @@
+500:org.xwiki.rendering.display.html.internal.DefaultTemplateHTMLDisplayer
+org.xwiki.rendering.display.html.script.HTMLDisplayerScriptService

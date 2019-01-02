@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1385551030000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1385642732000</date>
-  <contentUpdateDate>1385642732000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('activity.rss.pages.modified')</title>
   <comment/>

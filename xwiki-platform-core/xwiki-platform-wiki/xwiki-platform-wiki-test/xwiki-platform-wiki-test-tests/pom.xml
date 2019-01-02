@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-test</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-test-tests</artifactId>
   <name>XWiki Platform - Wiki - Tests - Functional Tests</name>
@@ -76,7 +76,15 @@
       <artifactId>xwiki-platform-extension-handler-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>

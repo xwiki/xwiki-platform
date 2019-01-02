@@ -19,16 +19,18 @@
  */
 package org.xwiki.mail.internal.thread.context;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,11 +41,11 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
@@ -55,13 +57,16 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentTest
 public class XWikiContextCopierTest
 {
     private static final String HIBSESSION = "hibsession";
 
-    @Rule
-    public MockitoComponentMockingRule<XWikiContextCopier> mocker = new MockitoComponentMockingRule<>(
-        XWikiContextCopier.class);
+    @InjectMockComponents
+    private XWikiContextCopier copier;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     XWikiServletResponseStub originalResponse;
 
@@ -71,54 +76,56 @@ public class XWikiContextCopierTest
 
     XWikiContext original;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception
     {
-        Utils.setComponentManager(mocker);
+        Utils.setComponentManager(this.componentManager);
 
-        originalResponse = new XWikiServletResponseStub();
+        this.originalResponse = new XWikiServletResponseStub();
 
-        original = new XWikiContext();
+        this.original = new XWikiContext();
 
         // Set some values
-        original.setWikiId("wiki");
+        this.original.setWikiId("wiki");
 
         DocumentReference userReference = new DocumentReference("wiki", "Space", "Page");
         EntityReferenceSerializer<String> serializer =
-            mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+            this.componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         when(serializer.serialize(userReference)).thenReturn("wiki:Space.Page");
 
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        this.componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
-        original.setUserReference(userReference);
+        this.original.setUserReference(userReference);
 
         // Set the mock request
         this.originalRequest = mock(XWikiRequest.class);
-        original.setRequest(this.originalRequest);
+        this.original.setRequest(this.originalRequest);
         Copier<XWikiRequest> requestCopier =
-            mocker.getInstance(new DefaultParameterizedType(null, Copier.class, XWikiRequest.class));
+            this.componentManager.getInstance(new DefaultParameterizedType(null, Copier.class, XWikiRequest.class));
         when(requestCopier.copy(this.originalRequest)).thenReturn(this.originalRequest);
 
         // Set the stubbed response
-        original.setResponse(originalResponse);
+        this.original.setResponse(this.originalResponse);
 
         // XWiki mock
         XWiki xwiki = mock(XWiki.class);
-        original.setWiki(xwiki);
+        this.original.setWiki(xwiki);
 
         // Store mock
         // Simulate the existence of a hibernate session in context
-        original.put(HIBSESSION,"opened session");
-        store = mock(XWikiStoreInterface.class);
+        this.original.put(HIBSESSION, "opened session");
+        this.store = mock(XWikiStoreInterface.class);
         // clean up will remove the session in the given context
-        doAnswer(new Answer<Void>() {
-            public Void answer(InvocationOnMock invocation) {
+        doAnswer(new Answer<Void>()
+        {
+            public Void answer(InvocationOnMock invocation)
+            {
                 XWikiContext context = (XWikiContext) invocation.getArguments()[0];
                 context.put(HIBSESSION, null);
                 return null;
             }
-        }).when(store).cleanUp(any(XWikiContext.class));
-        when(xwiki.getStore()).thenReturn(store);
+        }).when(this.store).cleanUp(any(XWikiContext.class));
+        when(xwiki.getStore()).thenReturn(this.store);
 
         // URL factory mock
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
@@ -130,33 +137,33 @@ public class XWikiContextCopierTest
     }
 
     @Test
-    public void copyContext() throws Exception
+    public void copyContext()
     {
-        XWikiContext copy = mocker.getComponentUnderTest().copy(original);
+        XWikiContext copy = this.copier.copy(this.original);
 
         // Check that the response is not the same.
-        assertNotSame(originalResponse, copy.getResponse());
+        assertNotSame(this.originalResponse, copy.getResponse());
 
         // Check that the context values are cloned.
-        assertEquals(original.getUserReference(), copy.getUserReference());
-        assertEquals(original.getWikiId(), copy.getWikiId());
+        assertEquals(this.original.getUserReference(), copy.getUserReference());
+        assertEquals(this.original.getWikiId(), copy.getWikiId());
         // No URL was present in the original context so a stub is used.
         // Note: for some reason, comparing 2 URLs takes ages (~19 seconds) on my machine. Comparing strings instead for
         // performance.
         assertEquals("http://www.mystuburl.com/", copy.getURL().toString());
         // Actually, all the context keys should be copied.
-        assertNotSame(original.entrySet(), copy.entrySet());
-        assertEquals(original.entrySet(), copy.entrySet());
+        assertNotSame(this.original.entrySet(), copy.entrySet());
+        assertEquals(this.original.entrySet(), copy.entrySet());
 
         // Some things are not cloned.
-        assertSame(original.getWiki(), copy.getWiki());
+        assertSame(this.original.getWiki(), copy.getWiki());
 
         // Verify that the store session has been cleaned for both context.
-        assertNull(original.get(HIBSESSION));
+        assertNull(this.original.get(HIBSESSION));
         assertNull(copy.get(HIBSESSION));
 
         // Check that the URLFactory is cloned.
         assertNotNull(copy.getURLFactory());
-        assertNotSame(original.getURLFactory(), copy.getURLFactory());
+        assertNotSame(this.original.getURLFactory(), copy.getURLFactory());
     }
 }

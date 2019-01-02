@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1425563685000</creationDate>
   <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1425564037000</date>
-  <contentUpdateDate>1425564037000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -41,11 +38,12 @@
   <hidden>true</hidden>
   <content>index.spacesMacro.title=空间
 index.spacesMacro.spaceIndex.title=查看空间索引
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceIndex.alt=空间索引
 index.spacesMacro.spaceAdministration.title=查看空间管理
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.alt=管理空间
 index.spacesMacro.createSpace.link=创建新空间
 index.spacesMacro.createSpace.defaultSpaceName=空间名
 index.spacesMacro.createSpace.submit=创建
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

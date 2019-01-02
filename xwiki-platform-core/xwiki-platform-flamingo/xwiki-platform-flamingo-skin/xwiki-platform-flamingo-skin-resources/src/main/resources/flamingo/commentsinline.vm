@@ -141,11 +141,16 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #if ("$!commentSelection" != "")
     #set($isAnnotation = true)
   #end
+  #set ($commentAuthor = $comment.getValue('author'))
+  ## An empty comment author means that the comment author is a guest.
+  ## This variable should be true only for an authenticate user that matches the comment author.
+  ## We don't allow guests to be edit or delete comments because we can't know if they are the comment author.
+  #set ($isUserComment = $commentAuthor != '' && $services.model.resolveDocument($commentAuthor, 'user') == $xcontext.userReference)
   <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
-    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
+    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
       <div>
-      <span class="commentauthor">$!xwiki.getUserName($doc.display('author', 'view', $comment))</span>##
+      <span class="commentauthor">$!xwiki.getUserName($commentAuthor)</span>##
       #set($date = $comment.getProperty('date').value)
 ## Don't indent, otherwise the comma will be misplaced
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
@@ -153,14 +158,28 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <div class="btn-group commenttools">
       #if($xwiki.hasAccessLevel('comment'))
         <a class="commentreply btn btn-default btn-xs" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.icon.renderHTML('comment')</a></span>
-        #if($services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference || $hasAdmin)
+        #if($hasAdmin || $isUserComment)
           <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
         #end
       #end
-      <a class="permalink btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
-      #if ($hasAdmin || (!$isGuest && $hasEdit && $comment.author == $xcontext.user))
-        <a class="delete btn btn-default btn-xs " rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')</a>
-      #end
+      <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
+        href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
+        title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
+      #if ($hasAdmin || ($hasEdit && $isUserComment))
+        ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
+        ## By providing an anchor this behavior is stoped, without altering the URL functionality.
+        #set ($queryString = $escapetool.url({
+          'form_token': $services.csrf.token,
+          'classname': $xCommentClass,
+          'classid': $comment.number,
+          'xredirect': $doc.getURL('view')
+        }))
+        #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
+        <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
+          href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
+          $services.icon.renderHTML('cross')
+        </a>
+       #end
       </div>## btn-group
     </div>## commentheader
     #if ($isAnnotation)
@@ -209,46 +228,46 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 #macro(displayCaptcha)
   <div id='commentCaptcha'>
-  ## We only want to hide the captcha if we're sure the user has javascript, if this is an ajax call then it's a safe bet.
-  #if($hideCaptcha)
-    <script type='text/javascript'>
-    $('commentCaptcha').style.display = "none";
-    var handler = function() {
-      var captchaDiv = $('commentCaptcha');
-      var image = new Element('img', {'src' : '$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()', 'alt' : '$escapetool.javascript($services.localization.render("core.captcha.image.alternateText"))'});
-      captchaDiv.insertBefore(image, captchaDiv.firstChild);
-      Event.observe(image, 'load', function() {
-        Effect.SlideDown('commentCaptcha', { duration: 0.7 });
-      });
-      Event.stopObserving($('${xCommentClass}_comment'), 'focus', handler);
-    }.bind(this);
-    Event.observe($('${xCommentClass}_comment'), 'focus', handler);
-    </script>
-  #else
-    <img src='$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()' alt='$services.localization.render("core.captcha.image.alternateText")' />
-  #end
-  <input type='hidden' name='captcha_type' value='image'/>
-  <br/>
-  <label for='captcha_answer'>$services.localization.render('core.captcha.image.instruction')</label>
-  <br/>
-  <input id='captcha_answer' name='captcha_answer' type='text'>
-  #if($captchaAnswerWrong)
-    <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$services.localization.render('core.captcha.captchaAnswerIsWrong')</span>
-  #end
-  <div class="wikimodel-emptyline"></div>
+    <div class="row">
+      <div class="col-xs-12">
+        <label>$services.localization.render('core.captcha.instruction')</label>
+      </div>
+      <div class="xform col-xs-12 col-sm-6">
+        $services.captcha.default.display()
+      </div>
+    </div>
+    ## We only want to hide the captcha if we're sure the user has javascript, if this is an ajax call then it's a safe bet.
+    #if($hideCaptcha)
+      <script type='text/javascript'>
+        $('commentCaptcha').style.display = "none";
+        var handler = function() {
+          var captchaDiv = $('commentCaptcha');
+          Effect.SlideDown('commentCaptcha', { duration: 0.7 });
+          Event.stopObserving($('${xCommentClass}_comment'), 'focus', handler);
+        }.bind(this);
+        Event.observe($('${xCommentClass}_comment'), 'focus', handler);
+      </script>
+      ## Since each CAPTCHA displayer can have its own JS+CSS, we need to make sure that, when comments are shown with AJAX, those resources are also included.
+      #skinExtensionHooks()
+    #end
+    #if($captchaAnswerWrong)
+      <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$services.localization.render('core.captcha.captchaAnswerIsWrong')</span>
+    #end
+    <div class="wikimodel-emptyline"></div>
   </div>
 #end
 ##
 ##
 ##
 #macro(displayEditCommentForm $comment)
-  #if($services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference || $hasAdmin)
+  #set ($commentAuthor = $comment.getValue('author'))
+  #if($services.model.resolveDocument($commentAuthor, 'current') == $xcontext.userReference || $hasAdmin)
   <form action="$doc.getURL('commentsave')" method="post" class="edit-xcomment reply">
-    <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
-    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($comment.author)#{else}#mediumUserAvatar($comment.author)#end</div>
+    <div id="xwikicomment_${comment.number}" class="xwikicomment#if($commentAuthor == $doc.creator) commentByCreator#end">
+    <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
       <div>
-      <span class="commentauthor">$!xwiki.getUserName($doc.display('author', 'view', $comment))</span>##
+      <span class="commentauthor">$!xwiki.getUserName($commentAuthor)</span>##
 ## Don't indent, otherwise the comma will be misplaced
 #set($date = $comment.getProperty('date').value)##
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
@@ -273,6 +292,57 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     $response.setStatus(403) ## forbidden
     #error($services.localization.render('core.viewers.comments.edit.notAllowed'))
   #end
+#end
+##
+##
+##
+#macro(showPermalinkModal)
+  <div class="modal fade" id="permalinkModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <div class="modal-title">$services.localization.render('core.viewers.comments.permalink')</div>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <div class="input-group-addon">$services.icon.renderHTML('link')</div>
+            <input type="text" class="form-control"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input type="button" class="btn btn-primary" data-dismiss="modal"
+            value="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.goto'))"/>
+          <input type="button" class="btn btn-default" data-dismiss="modal"
+            value="$escapetool.xml($services.localization.render('cancel'))"/>
+        </div>
+      </div>
+    </div>
+  </div>
+#end
+##
+##
+##
+#macro(showDeleteModal)
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <div class="modal-title">$services.localization.render('core.viewers.comments.delete')</div>
+        </div>
+        <div class="modal-body">
+          <div>$services.localization.render('core.viewers.comments.delete.confirm')</div>
+        </div>
+        <div class="modal-footer">
+          <input type="button" class="btn btn-danger"
+            value="$escapetool.xml($services.localization.render('core.viewers.comments.delete'))" data-dismiss="modal">
+          <input type="button" class="btn btn-default"
+            value="$escapetool.xml($services.localization.render('cancel'))" data-dismiss="modal">
+        </div>
+      </div>
+    </div>
+  </div>
 #end
 ##
 ##---------------------------------------------------------------------
@@ -333,5 +403,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #displayCommentForm()
 #end
   </div> ## comments
+  #showPermalinkModal
+  #showDeleteModal
 </div> ## commentscontent
 #end ## comment == ''

@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1323097478000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1445422650000</date>
-  <contentUpdateDate>1445422591000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -48,25 +45,25 @@ platform.appwithinminutes.appsLiveTable.doc.space=Lietotnes nosaukums
 platform.appwithinminutes.appsLiveTable.doc.author=Autors
 platform.appwithinminutes.appsLiveTable.doc.date=Atjaunots
 platform.appwithinminutes.appsLiveTable._actions=Darbības
-platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Pievienot vietas pārvaldības tiesības
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Pievienot vietas pārvaldības tiesības.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Izveido savu\!
+platform.appwithinminutes.appPanelCreateEntry=Izveido savu!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Solis {0} no {1}
 appWithinMinutes.wizardStep.name.name=Nosaukums
 appWithinMinutes.wizardStep.name.title=Nosauciet savu lietotni
-appWithinMinutes.wizardStep.name.description=Ievadiet lietotnes nosaukumu.
+appWithinMinutes.wizardStep.name.description=Ievadiet lietotnes nosaukumu
 appWithinMinutes.wizardStep.structure.name=Struktūra
 appWithinMinutes.wizardStep.structure.title=Norādiet lietotnes struktūru
-appWithinMinutes.wizardStep.structure.description=Izveidojiet lietotnes struktūru, norādot, kādus laukus tā saturēs.
-### Missing: appWithinMinutes.wizardStep.entries.name=Entries
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
-### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.structure.description=Aprakstiet lietotnes datus
+appWithinMinutes.wizardStep.entries.name=Ieraksti
+appWithinMinutes.wizardStep.entries.title=Norādiet datu vietu
+appWithinMinutes.wizardStep.entries.description=Izvēlieties, kur saglabāt datus
 appWithinMinutes.wizardStep.presentation.name=Izskats
 appWithinMinutes.wizardStep.presentation.title=Pielāgojiet lietotnes izskatu
-appWithinMinutes.wizardStep.presentation.description=Pielāgojiet lietotnes sākuma lapu.
+appWithinMinutes.wizardStep.presentation.description=Pielāgojiet lietotnes sākuma lapu
 platform.appwithinminutes.wizardStepNextButtonLabel=Nākamais solis
 platform.appwithinminutes.wizardStepNextButtonTip=Doties uz nākamo soli
 platform.appwithinminutes.wizardStepFinishButtonLabel=Pabeigt
@@ -74,17 +71,17 @@ platform.appwithinminutes.wizardStepFinishButtonTip=Doties uz lietotnes sākuma 
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Iepriekšējais solis
 platform.appwithinminutes.wizardStepPreviousButtonTip=Doties uz iepriekšējo soli
 platform.appwithinminutes.wizardStepHelpTitle=Soļi
-platform.appwithinminutes.wizardStepHelpDescription=Šis vednis palīdzēs jums izveidot savu lietotni. Turpmākajos soļos jūs norādīsiet, kādu informāciju lietotne apstrādās un kā tā tiks attēlota\:
+platform.appwithinminutes.wizardStepHelpDescription=Šis vednis palīdzēs jums izveidot savu lietotni. Turpmākajos soļos jūs norādīsiet, kādu informāciju lietotne apstrādās un kā tā tiks attēlota:
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
-### Missing: appWithinMinutes.codeSpace.title=Code
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+appWithinMinutes.createApp.location.label=Vieta
+appWithinMinutes.createApp.location.hint=Izveidojamās lietotnes atrašanās vieta lapu hierarhijā.
+appWithinMinutes.createApp.parent.label=Vecāks
+appWithinMinutes.createApp.parent.hint=Jaunās lietotnes vecāks. Ja vēlaties, lai tā ir augstākā līmeņa lietotne, atstājiet šo lauku tukšu.
+appWithinMinutes.createApp.parent.placeholder=Ceļš.uz.vecāku
+appWithinMinutes.codeSpace.title=Kods
+appWithinMinutes.codeSpace.description=Šī ir vieta, kurā atrodas lietotnes kods.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Lai gan jūsu profilā ir norādīts tās nerādīt, tiek rādītas arī slēptās lapas. Pretējā gadījumā lietotnes kods nebūtu redzams, jo pēc noklusēšanas visas šīs lapas  ir slēptas.
 platform.appwithinminutes.appNamePageTitle=Izveidot lietotni
 platform.appwithinminutes.appNameLabel=Lietotnes nosaukums
 platform.appwithinminutes.appNameHint=Lietotnes nosaukums nosaka tās adresi (URL), kur tiks saglabāti lietotnes dati, kā arī klases, kurā tiks saglabāta objektu datu struktūra, nosaukumu.
@@ -94,7 +91,7 @@ platform.appwithinminutes.appNameIsUsedWarning=Tāda lietotne jau pastāv. Ja tu
 platform.appwithinminutes.appNameEmptyError=Lūdzu ievadiet lietotnes nosaukumu.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
+appWithinMinutes.classEditor.title={0} struktūra
 platform.appwithinminutes.classEditorPaletteTitle=Lauku palete
 platform.appwithinminutes.classEditorPaletteHint=Velciet un nometiet laukus, lai izveidotu savu formu.
 platform.appwithinminutes.classEditorCanvasHint=Velciet laukus no paletes uz šo lauku.
@@ -106,8 +103,8 @@ platform.appwithinminutes.classEditorUpdateSheetHint=Pārizveidot šīs klases {
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Atjaunot klases tulkojumu paku
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Atjauno lauku iezīmju un sarakstu tulkojumus ({0}).
 
-platform.appwithinminutes.classEditorMultipleSheetsWarning=Šai klasei ir vairākas lapas
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasei ir divi lauki ar vienādu nosaukumu\: {0}
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Šai klasei ir vairākas izkājlapas.
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasei ir divi lauki ar vienādu nosaukumu: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Atjaunot noklusētās vērtības
 platform.appwithinminutes.classEditorBindSheetSaveComment=Klasei piesaistītā lapa
 platform.appwithinminutes.classEditorSheetSaveComment=Atjaunot klases lapu
@@ -129,6 +126,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Garš teksts
 platform.appwithinminutes.classEditorStringFieldName=Īss teksts
 platform.appwithinminutes.classEditorContentFieldName=Saturs
 platform.appwithinminutes.classEditorTitleFieldName=Virsraksts
+platform.appwithinminutes.classEditorPageFieldName=Lapa
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Dzēst
 platform.appwithinminutes.classEditorConfigureFieldLabel=Iestatīt
@@ -151,17 +149,17 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Pievienot
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Dzēst
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
-### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+appWithinMinutes.templateProviderEditor.title={0} ieraksti
+appWithinMinutes.templateProviderEditor.hint=Lietotnes ieraksti ir viki lapas, kuras satur strukturētus datus.
+appWithinMinutes.templateProviderEditor.icon.hint=Lietotnes norādes ikona.
+appWithinMinutes.templateProviderEditor.description.hint=Īss lietotnes norādes apraksts.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=No kurienes sagatavot ierakstus
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Ja vieta nav norādīta, ierakstus var izveidot no jebkuras lapas.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Kur izveidot ierakstus
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Ja vieta nav norādīta, ierakstus var izveidot jebkurā viki vietā.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Neuzspiest ierakstu atrašanās vietu
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Izmantot augšminētās vietas tikai kā ieteikumus, atļaujot lietotājam norādīt arī citu lietotnes ieraksta atrašanās vietu.
+appWithinMinutes.templateProviderEditor.terminal.hint=Vai lietotnes ierakstiem jābūt beigu lapai, vai nē.
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Klases lauki
@@ -172,8 +170,8 @@ platform.appwithinminutes.liveTableEditorDocTitleColumnName=Lapas virsraksts
 platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Lietotnes sākuma lapas virsraksts
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Lapas nosaukums
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Lietotnes sākuma lapas nosaukums
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Vieta
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Lietotnes datu saturošās lapas atrašanās vieta
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Pēdējais mainījis
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Lietotājs, kas pēdējais mainīja lietotni
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Izveidojis
@@ -189,14 +187,14 @@ platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Kolonna ie
 platform.appwithinminutes.liveTableEditorImagesColumnName=Attēli
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Īpaša kolonna, kurā attēlot ierakstam pievienoto attēlus
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Iemiesojums
-platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Kolonna ierakstu lapā, kurā parādīt lietotāja iemiesojumu. Strādā tikai XWiki.XWikiUsers klasei.
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Kolonna ierakstu lapā, kurā parādīt lietotāja iemiesojumu. Strādā tikai XWiki.XWikiUsers klasei
 platform.appwithinminutes.liveTableEditorDescriptionHint=Aprakstā norāda, ko lietotne dara un kādus datus tā apstrādā.
 platform.appwithinminutes.liveTableEditorColumnsHint=Izvēlieties kolonnas, kuras vēlaties parādīt lietotnes mājas lapas tabulā.
 platform.appwithinminutes.liveTableEditorSaveComment=Atjaunot tabulu
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Velciet kolonnas, lai mainītu to kārtību
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Dzēst
 platform.appwithinminutes.liveTableEditorAddColumnHint=Pievienot
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?\n&lt;a href\=""&gt;Jā&lt;/a&gt; / &lt;a href\=""&gt;Nē&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?\n&lt;a href=""&gt;Jā&lt;/a&gt; / &lt;a href=""&gt;Nē&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Saite uz ikonu. Jūs varat norādīt jebkuru attēlu no ikonu izvēles zem šī lauka (kad tas ir aktivizēts), vai arī norādīt saiti uz jebkuru citu viki attēlu.
 
@@ -207,7 +205,7 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Dzēst
 platform.appwithinminutes.appHomePageActionsHeading=Darbības
 platform.appwithinminutes.appHomePageAddEntryLabel=Pievienot
 platform.appwithinminutes.appHomePageAddEntryHint=Pievienot jaunu ierakstu
-platform.appwithinminutes.appHomePageEntryNameLabel=Ieraksta nosaukums
+platform.appwithinminutes.appHomePageEntryNameLabel=Ieraksta nosaukums:
 platform.appwithinminutes.appHomePageDeleteEntriesLabel=Dzēst visus ierakstus
 platform.appwithinminutes.appHomePageEditAppLabel=Mainīt lietotni
 platform.appwithinminutes.appHomePageTranslateAppLabel=Tulkot lietotni
@@ -216,9 +214,9 @@ platform.appwithinminutes.appHomePageDeleteAppLabel=Dzēst lietotni
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Lietotne {0} un VISI tās ieraksti tiks izdzēsti. Vai tiešām vēlaties turpināt?
 platform.appwithinminutes.deleteAppEntriesConfirmation=VISI lietotnes {0} ieraksti tiks izdzēsti. Vai tiešām vēlaties turpināt?
-platform.appwithinminutes.deleteAppDoesNotExistError=Izvēlētā lietotne nepastāv
+platform.appwithinminutes.deleteAppDoesNotExistError=Izvēlētā lietotne nepastāv.
 platform.appwithinminutes.deleteAppInvalidAppError=Lietotne ar norādīto nosaukumu nav pareiza "Lietotne dažās minūtēs" lietotne.
-platform.appwithinminutes.deleteAppNotSpecifiedError=Nav norādīts lietotnes nosaukums
+platform.appwithinminutes.deleteAppNotSpecifiedError=Nav norādīts lietotnes nosaukums.
 
 ### Deprecated keys
 ### Since 8.4
@@ -235,18 +233,18 @@ platform.appwithinminutes.wizardStep1Name=Nosaukums
 #@deprecated appWithinMinutes.wizardStep.name.title
 platform.appwithinminutes.wizardStep1Title=Nosauciet savu lietotni
 #@deprecated appWithinMinutes.wizardStep.name.description
-platform.appwithinminutes.wizardStep1Description=Ievadiet lietotnes nosaukumu.
+platform.appwithinminutes.wizardStep1Description=Ievadiet lietotnes nosaukumu
 #@deprecated appWithinMinutes.wizardStep.structure.name
 platform.appwithinminutes.wizardStep2Name=Struktūra
 #@deprecated appWithinMinutes.wizardStep.structure.title
 platform.appwithinminutes.wizardStep2Title=Norādiet lietotnes struktūru
 #@deprecated appWithinMinutes.wizardStep.structure.description
-platform.appwithinminutes.wizardStep2Description=Izveidojiet lietotnes struktūru, norādot, kādus laukus tā saturēs.
+platform.appwithinminutes.wizardStep2Description=Aprakstiet lietotnes datus
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=Izskats
 #@deprecated appWithinMinutes.wizardStep.presentation.title
 platform.appwithinminutes.wizardStep3Title=Pielāgojiet lietotnes izskatu
 #@deprecated appWithinMinutes.wizardStep.presentation.description
-platform.appwithinminutes.wizardStep3Description=Pielāgojiet lietotnes sākuma lapu.
+platform.appwithinminutes.wizardStep3Description=Pielāgojiet lietotnes sākuma lapu
 </content>
 </xwikidoc>

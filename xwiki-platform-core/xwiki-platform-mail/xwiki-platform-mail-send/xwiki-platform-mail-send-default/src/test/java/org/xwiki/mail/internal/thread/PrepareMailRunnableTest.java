@@ -66,7 +66,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4
  */
-@ComponentList({MemoryMailListener.class, PrepareMailQueueManager.class})
+@ComponentList({
+    MemoryMailListener.class,
+    PrepareMailQueueManager.class
+})
 public class PrepareMailRunnableTest
 {
     @Rule
@@ -121,7 +124,8 @@ public class PrepareMailRunnableTest
 
         // Make the content store save fail
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        doThrow(new MailStoreException("error")).when(contentStore).save(any(String.class), any(ExtendedMimeMessage.class));
+        doThrow(new MailStoreException("error")).when(contentStore).save(any(String.class),
+            any(ExtendedMimeMessage.class));
 
         // Prepare 2 mails. Both will fail but we want to verify that the second one is processed even though the first
         // one failed.
@@ -243,7 +247,7 @@ public class PrepareMailRunnableTest
         doAnswer(new Answer<Object>()
         {
             @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            public Object answer(InvocationOnMock invocationOnMock)
             {
                 Object[] args = invocationOnMock.getArguments();
                 SendMailQueueItem item = (SendMailQueueItem) args[0];

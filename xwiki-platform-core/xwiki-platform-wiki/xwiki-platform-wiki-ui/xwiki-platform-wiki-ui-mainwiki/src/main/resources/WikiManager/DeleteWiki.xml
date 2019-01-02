@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1304946859000</creationDate>
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1304960266000</date>
-  <contentUpdateDate>1304960266000</contentUpdateDate>
   <version>1.1</version>
   <title>#if("$!{request.wikiId}" == '')$services.localization.render('platform.wiki.users.delete.empty')#{else}$services.localization.render('platform.wiki.users.delete.title', [$request.wikiId])#end</title>
   <comment/>

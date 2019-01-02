@@ -145,6 +145,30 @@ public interface XWikiRecycleBinStoreInterface
         throws XWikiException;
 
     /**
+     * Get all the deleted documents ID or a specified number. Sorted by date.
+     * @param context - used to load the deleted documents id.
+     * @param limit - if &gt; 0 then all deleted documents id are returned. Else the specified number.
+     * @return an array of IDs of deleted documents.
+     * @throws XWikiException - if error in loading
+     * @since 10.10RC1
+     */
+    default Long[] getAllDeletedDocumentsIds(XWikiContext context, int limit) throws XWikiException
+    {
+        return new Long[0];
+    }
+
+    /**
+     * @param context - used to realize the query.
+     * @return the number of deleted documents in the recycle bin.
+     * @throws XWikiException - if error in loading.
+     * @since 10.10RC1
+     */
+    default Long getNumberOfDeletedDocuments(XWikiContext context) throws XWikiException
+    {
+        return -1L;
+    }
+
+    /**
      * @return info about all documents that were deleted in the same batch, as part of the same operation
      * @param batchId - id of the operation that deleted multiple documents at the same time; useful when trying to
      *            revert the operation

@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1444133636000</creationDate>
   <parent>Invitation.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1444133706000</date>
-  <contentUpdateDate>1444133706000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <comment/>
@@ -47,6 +44,6 @@ Invitation.WebHome_smtp_server_password.hint=Mot de passe de connexion SMTP (en 
 Invitation.WebHome_smtp_server_username.hint=Utilisateur de connexion SMTP (en cas d'authentification).
 Invitation.WebHome_smtp_port.hint=Port SMTP à utiliser.
 Invitation.WebHome_smtp_server.hint=Serveur SMTP à utiliser.
-Invitation.WebHome_javamail_extra_props.hint=Liste des propriétés JavaMail supplémentaires à utiliser
+Invitation.WebHome_javamail_extra_props.hint=Liste des propriétés JavaMail supplémentaires à utiliser.
 </content>
 </xwikidoc>

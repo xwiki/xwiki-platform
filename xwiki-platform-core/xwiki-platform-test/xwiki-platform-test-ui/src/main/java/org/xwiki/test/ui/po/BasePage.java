@@ -379,20 +379,6 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * @return {@code true} if the screen is extra small (as defined by Bootstrap), {@code false} otherwise
-     */
-    private boolean isExtraSmallScreen()
-    {
-        return getDriver().manage().window().getSize().getWidth() < 768;
-    }
-
-    private By getTopMenuToggleSelector(String menuId)
-    {
-        String side = isExtraSmallScreen() ? "left" : "right";
-        return By.xpath("//li[@id='" + menuId + "']//a[contains(@class, 'dropdown-split-" + side + "')]");
-    }
-
-    /**
      * @since 4.5M1
      */
     public CreatePagePage createPage()
@@ -599,6 +585,9 @@ public class BasePage extends BaseElement
         // JQuery and dependencies
         // JQuery dropdown plugin needed for the edit button's dropdown menu.
         getDriver().waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+
+        // Make sure all asynchronous elements have been executed
+        getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
     }
 
     /**
@@ -659,5 +648,16 @@ public class BasePage extends BaseElement
         return getDriver()
             .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
             .getText();
+    }
+
+    /**
+     * @param panelTitle the panel displayed title
+     * @return true if the panel is visible in the left panels or false otherwise
+     * @since 10.6RC1
+     */
+    public boolean hasLeftPanel(String panelTitle)
+    {
+        return getDriver().hasElementWithoutWaiting(By.xpath(
+            "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
     }
 }

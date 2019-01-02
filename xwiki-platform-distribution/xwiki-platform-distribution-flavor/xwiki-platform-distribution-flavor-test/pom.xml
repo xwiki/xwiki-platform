@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -155,6 +155,12 @@
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-mail-send-storage</artifactId>
+              <version>${project.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-notifications-filters-default</artifactId>
               <version>${project.version}</version>
               <scope>runtime</scope>
             </dependency>
@@ -528,6 +534,7 @@
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>
     <module>xwiki-platform-distribution-flavor-test-storage</module>
+    <module>xwiki-platform-distribution-flavor-test-upgrade</module>
     <module>xwiki-platform-distribution-flavor-test-jmeter</module>
   </modules>
 </project>

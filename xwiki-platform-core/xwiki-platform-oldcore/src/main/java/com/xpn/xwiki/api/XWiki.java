@@ -36,6 +36,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -46,6 +47,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -99,7 +101,7 @@ public class XWiki extends Api
 
     private DocumentRevisionProvider documentRevisionProvider;
 
-    private ContextualAuthorizationManager authorizationManager;
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     /**
      * XWiki API Constructor
@@ -163,13 +165,13 @@ public class XWiki extends Api
         return this.documentRevisionProvider;
     }
 
-    private ContextualAuthorizationManager getAuthorizationManager()
+    private ContextualAuthorizationManager getContextualAuthorizationManager()
     {
-        if (this.authorizationManager == null) {
-            this.authorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        if (this.contextualAuthorizationManager == null) {
+            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
         }
 
-        return this.authorizationManager;
+        return this.contextualAuthorizationManager;
     }
 
     /**
@@ -263,26 +265,51 @@ public class XWiki extends Api
 
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
+     * <p>
+     * This is a helper for document reference but you can use {@link #getEntityDocument(String, EntityType)} for any
+     * other kind of reference.
      *
-     * @param fullName the full name of the XWiki document to be loaded
+     * @param documentReference the reference of the document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
+     * @see #getEntityDocument(String, EntityType)
      */
-    public Document getDocument(String fullName) throws XWikiException
+    public Document getDocument(String documentReference) throws XWikiException
     {
         DocumentReference reference;
 
         // We ignore the passed full name if it's null to be backward compatible with previous behaviors.
-        if (fullName != null) {
+        if (documentReference != null) {
             // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
             // specified in the passed string, rather than use the current document's page name.
-            reference = getCurrentMixedDocumentReferenceResolver().resolve(fullName);
+            reference = getCurrentMixedDocumentReferenceResolver().resolve(documentReference);
         } else {
             reference = getDefaultDocumentReferenceResolver().resolve("");
         }
 
         return getDocument(reference);
+    }
+
+    /**
+     * Loads an Document from the database. Rights are checked before sending back the document.
+     *
+     * @param reference the reference of the document to be loaded
+     * @param type the type of the reference
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @throws XWikiException
+     * @since 10.6RC1
+     */
+    @Unstable
+    public Document getEntityDocument(String reference, EntityType type) throws XWikiException
+    {
+        XWikiDocument doc = this.xwiki.getDocument(reference, type, getXWikiContext());
+        if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
+            return null;
+        }
+
+        return doc.newDocument(getXWikiContext());
     }
 
     /**
@@ -326,7 +353,7 @@ public class XWiki extends Api
      */
     public Document getDocument(EntityReference reference) throws XWikiException
     {
-        return getDocument(getCurrentgetdocumentResolver().resolve(reference));
+        return getDocument(this.xwiki.getDocumentReference(reference, getXWikiContext()));
     }
 
     /**
@@ -367,15 +394,11 @@ public class XWiki extends Api
      */
     public Document getDocumentAsAuthor(DocumentReference reference) throws XWikiException
     {
-        String author = this.getEffectiveScriptAuthorName();
-        XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(),
-            getXWikiContext()) == false) {
+        if (!getAuthorizationManager().hasAccess(Right.VIEW, getEffectiveAuthorReference(), reference)) {
             return null;
         }
 
-        Document newdoc = doc.newDocument(getXWikiContext());
-        return newdoc;
+        return this.xwiki.getDocument(reference, getXWikiContext()).newDocument(getXWikiContext());
     }
 
     /**
@@ -608,7 +631,7 @@ public class XWiki extends Api
             return null;
         }
 
-        if (!getAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
+        if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
             // Finally we return null, otherwise showing search result is a real pain
             return null;
         }
@@ -628,7 +651,7 @@ public class XWiki extends Api
     public Document getDocument(DocumentReference reference, String revision) throws XWikiException
     {
         try {
-            if (reference != null && getAuthorizationManager().hasAccess(Right.VIEW, reference)) {
+            if (reference != null && getContextualAuthorizationManager().hasAccess(Right.VIEW, reference)) {
                 XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(reference, revision);
 
                 if (documentRevision != null) {
@@ -1866,8 +1889,8 @@ public class XWiki extends Api
 
     /**
      * API to retrieve the URL of an attached file in a Wiki Document The URL is generated differently depending on the
-     * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
+     * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
+     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
      *
      * @param fullname page name which includes the attached file
@@ -1886,8 +1909,8 @@ public class XWiki extends Api
 
     /**
      * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
-     * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
+     * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
+     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
      *
      * @param fullname the name of the document for which to return the URL for
@@ -1901,8 +1924,8 @@ public class XWiki extends Api
 
     /**
      * Retrieve the URL of an entity using the default mode/action for that entity type. The URL is generated
-     * differently depending on the environement (Servlet, Portlet, PDF, etc..). The URL generation can be modified by
-     * implementing a new XWikiURLFactory object. For compatibility with any target environement (and especially the
+     * differently depending on the environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by
+     * implementing a new XWikiURLFactory object. For compatibility with any target environment (and especially the
      * portlet environment) it is important to always use the URL functions to generate URLs and never hardcode URLs.
      *
      * @param reference the reference to the entity for which to return the URL
@@ -1920,7 +1943,7 @@ public class XWiki extends Api
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
-     * environments will not accept this (like the Portlet environement).
+     * environments will not accept this (like the Portlet environment).
      *
      * @param reference the reference to the entity for which to return the URL for
      * @param action the mode in which to access the entity (view/edit/save/..). Any valid XWiki action is possible
@@ -1937,8 +1960,8 @@ public class XWiki extends Api
 
     /**
      * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
-     * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
+     * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
+     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
      *
      * @param reference the reference to the document for which to return the URL for
@@ -1954,7 +1977,7 @@ public class XWiki extends Api
     /**
      * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment).
+     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment).
      * It is important to always use the URL functions to generate URL and never hardcode URLs.
      *
      * @param fullname the page name which includes the attached file
@@ -1972,7 +1995,7 @@ public class XWiki extends Api
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
-     * environments will not accept this (like the Portlet environement).
+     * environments will not accept this (like the Portlet environment).
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
@@ -1991,7 +2014,7 @@ public class XWiki extends Api
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
-     * environments will not accept this (like the Portlet environement).
+     * environments will not accept this (like the Portlet environment).
      *
      * @param reference the reference to the document for which to return the URL for
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
@@ -2008,10 +2031,10 @@ public class XWiki extends Api
 
     /**
      * API to retrieve the URL of an a Wiki Document in any mode, optionally adding an anchor. The URL is generated
-     * differently depending on the environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
+     * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the environment
      * needs it. It is important to not add the anchor parameter manually after a URL. Some environments will not accept
-     * this (like the Portlet environement).
+     * this (like the Portlet environment).
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible

@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.store.SignatureStore;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.reference.BlockReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0
  */
-@ComponentList({ CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class })
+@ComponentList({ CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class})
 public class DefaultSignatureStoreTest
 {
     private static final byte[] SIGNATURE = "signature".getBytes();
@@ -82,12 +83,12 @@ public class DefaultSignatureStoreTest
     @Before
     public void setUp() throws Exception
     {
-        EntityReferenceProvider valueProvider = mock(EntityReferenceProvider.class);
+        this.mocker.registerMockComponent(EntityReferenceProvider.class, "default");
+
+        EntityReferenceProvider valueProvider = this.mocker.registerMockComponent(EntityReferenceProvider.class, "current");
         when(valueProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
         when(valueProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
         when(valueProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DOCUMENT_REFERENCE);
-
-        this.mocker.registerComponent(EntityReferenceProvider.class, "current", valueProvider);
 
         Provider<XWikiContext> xcontextProvider =
             this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);

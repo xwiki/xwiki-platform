@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1385047506000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1433258948000</date>
-  <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <comment/>
@@ -41,11 +38,13 @@
   <hidden>true</hidden>
   <content>### Missing: solr.admin.title=Solr Search Administration
 ### Missing: solr.admin.submit=Apply
+### Missing: solr.admin.error.action={0} failed:
 ### Missing: solr.admin.error.notallowed=You are not allowed to perform this action.
 ### Missing: solr.admin.error.norights=Administration rights are required to access this section.
+### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Estado
-### Missing: solr.admin.status.queueSize.label=Queue Size
+### Missing: solr.admin.status.queueSize.label=Queue size
 ### Missing: solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
 
 ### Missing: solr.admin.indexing.title=Indexing
@@ -60,15 +59,17 @@ solr.admin.indexing.action.label=Acción
 ### Missing: solr.admin.indexing.query.label=Custom query
 ### Missing: solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
 
+### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
+
 solr.sortBy=Ordenar por\:
 solr.sortBy.score=Relevancia
 solr.sortBy.title_sort=Título
 solr.sortBy.date=Fecha
 solr.sortBy.author_display_sort=Último Autor
-### Missing: solr.sortBy.filename_sort=File Name
-### Missing: solr.sortBy.attsize_sort=File Size
-### Missing: solr.sortBy.attdate_sort=Upload Date
-### Missing: solr.sortBy.attauthor_display_sort=Uploaded By
+### Missing: solr.sortBy.filename_sort=File name
+### Missing: solr.sortBy.attsize_sort=File size
+### Missing: solr.sortBy.attdate_sort=Upload date
+### Missing: solr.sortBy.attauthor_display_sort=Uploaded by
 ### Missing: solr.sortOrder.asc=Ascending
 ### Missing: solr.sortOrder.desc=Descending
 
@@ -90,7 +91,7 @@ solr.sortBy.author_display_sort=Último Autor
 ### Missing: solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expandir Todo
 solr.facets.collapseAll=Contraer todo
-### Missing: solr.facets.emptyValue=Empty Value
+### Missing: solr.facets.emptyValue=Empty value
 ### Missing: solr.facets.moreValues={0} more
 
 solr.filterBy.type.document=Documento
@@ -109,14 +110,14 @@ solr.filterBy.fileType.text=Texto
 ### Missing: solr.filterBy.fileType.archive=Archive
 ### Missing: solr.filterBy.fileType.font=Font
 ### Missing: solr.filterBy.fileType.other=Other
-### Missing: solr.facet.fileType.text.plain=Plain Text
+### Missing: solr.facet.fileType.text.plain=Plain text
 ### Missing: solr.facet.fileType.text.javascript=JavaScript
-### Missing: solr.facet.fileType.text.java-source=Java Source
+### Missing: solr.facet.fileType.text.java-source=Java source
 ### Missing: solr.facet.fileType.text.sh=Shell Script
 ### Missing: solr.facet.fileType.image.icon=Icon
 ### Missing: solr.facet.fileType.archive.java-archive=JAR
 ### Missing: solr.facet.fileType.archive.xara=XAR
-### Missing: solr.facet.fileType.other.octet-stream=Binary Data
+### Missing: solr.facet.fileType.other.octet-stream=Binary data
 
 ### Missing: solr.facet.date.today=Today
 ### Missing: solr.facet.date.last7Days=Last 7 days
@@ -142,7 +143,7 @@ solr.filterBy.fileType.text=Texto
 
 ### Missing: solr.field.type=Result type
 ### Missing: solr.field.locale=Language
-### Missing: solr.field.locale.emptyValue=No Language
+### Missing: solr.field.locale.emptyValue=No language
 ### Missing: solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).
 ### Missing: solr.field.wiki=Wiki
 ### Missing: solr.field.spaces=Location
@@ -151,27 +152,27 @@ solr.filterBy.fileType.text=Texto
 ### Missing: solr.field.name=Page
 ### Missing: solr.field.name_exact=Page
 ### Missing: solr.field.title=Title
-### Missing: solr.field.author=Last Author
-### Missing: solr.field.author_display=Last Author
+### Missing: solr.field.author=Last author
+### Missing: solr.field.author_display=Last author
 ### Missing: solr.field.creator=Creator
 solr.field.creator_display=Creador
-### Missing: solr.field.date=Last Modification Date
-### Missing: solr.field.creationdate=Creation Date
-### Missing: solr.field.doccontent=Rendered Document Content
-### Missing: solr.field.doccontentraw=Raw Document Content
-### Missing: solr.field.class=Object Type
-### Missing: solr.field.class.definedBy=Defined by {0} \u00BB {1}
-### Missing: solr.field.propertyname=Property Name
-### Missing: solr.field.propertyvalue=Property Value
-### Missing: solr.field.filename=Attachment Name
-### Missing: solr.field.attcontent=Attachment Content
+### Missing: solr.field.date=Last modification date
+### Missing: solr.field.creationdate=Creation date
+### Missing: solr.field.doccontent=Rendered document content
+### Missing: solr.field.doccontentraw=Raw document content
+### Missing: solr.field.class=Object type
+### Missing: solr.field.class.definedBy=Defined by {0} » {1}
+### Missing: solr.field.propertyname=Property name
+### Missing: solr.field.propertyvalue=Property value
+### Missing: solr.field.filename=Attachment name
+### Missing: solr.field.attcontent=Attachment content
 ### Missing: solr.field.comment=Comments
 ### Missing: solr.field.objcontent=Objects
-### Missing: solr.field.mimetype=File Type
-### Missing: solr.field.attauthor=Uploaded By
-### Missing: solr.field.attauthor_display=Uploaded By
-### Missing: solr.field.attdate=Upload Date
-### Missing: solr.field.attsize=File Size
+### Missing: solr.field.mimetype=File type
+### Missing: solr.field.attauthor=Uploaded by
+### Missing: solr.field.attauthor_display=Uploaded by
+### Missing: solr.field.attdate=Upload date
+### Missing: solr.field.attsize=File size
 
 ### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
 ### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?

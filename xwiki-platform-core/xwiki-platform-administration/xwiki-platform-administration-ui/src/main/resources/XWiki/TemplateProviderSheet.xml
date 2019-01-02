@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1377515110000</creationDate>
   <parent>XWiki.TemplateProviderClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1378402239000</date>
-  <contentUpdateDate>1378401463000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -177,8 +174,12 @@
       &lt;dd&gt;
         #set ($template = $doc.getValue('template'))
         #if ($isEditing)
-          &lt;input type="text" id="XWiki.TemplateProviderClass_0_template" name="XWiki.TemplateProviderClass_0_template"
-            class="suggestDocuments" autocomplete="off" value="$!escapetool.xml($template)" /&gt;
+          #set ($pagePickerParams = {
+            'id': "XWiki.TemplateProviderClass_0_template",
+            'name': "XWiki.TemplateProviderClass_0_template",
+            'value': "$!escapetool.xml($template)"
+          })
+          #pagePicker($pagePickerParams)
         #elseif ("$!template" != '')
           #set ($templateReference = $services.model.resolveDocument($template))
           #hierarchy($templateReference {

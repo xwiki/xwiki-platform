@@ -31,9 +31,6 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1107117503000</creationDate>
-  <date>1177088879000</date>
-  <contentUpdateDate>1177088879000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -145,7 +142,7 @@
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAdminGroup,</groups>
+      <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
       <levels>edit</levels>

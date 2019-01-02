@@ -27,19 +27,16 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1364498606000</creationDate>
   <parent>XWiki.Registration</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1511976524000</date>
-  <contentUpdateDate>1511976524000</contentUpdateDate>
   <version>1.1</version>
   <title>Registration Page Documentation</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>The verified registration page is the new default registration method for XWiki Enterprise. It supports image captchas supplied by the captcha module it also supports validating the input fields both on the server side and in Javascript using [[LiveValidation&gt;&gt;http://livevalidation.com/]].
+  <content>The verified registration page is the new default registration method for XWiki Enterprise. It supports CAPTCHAs supplied by the CAPTCHA module it also supports validating the input fields both on the server side and in Javascript using [[LiveValidation&gt;&gt;http://livevalidation.com/]].
 
 {{info}}The Verified Registration page does not require programming rights to operate so you can configure it even if you are administrating a virtual wiki on a wiki farm.{{/info}}
 

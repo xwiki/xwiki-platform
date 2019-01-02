@@ -202,7 +202,9 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param member the name of the member (user or group).
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
+    @Deprecated
     public Collection<String> getAllGroupsNamesForMember(String member) throws XWikiException
     {
         Collection<String> memberList;
@@ -224,7 +226,9 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param group the name of the group.
      * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
+    @Deprecated
     public Collection<String> getAllMembersNamesForGroup(String group) throws XWikiException
     {
         return getAllMembersNamesForGroup(group, 0, 0);
@@ -238,7 +242,9 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param start the index of the first found user to return.
      * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
+    @Deprecated
     public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start) throws XWikiException
     {
         return getAllMatchedMembersNamesForGroup(group, null, nb, start, null);
@@ -275,12 +281,33 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
     }
 
     /**
+     * Filters the members of the specified group using the given text and counts the results.
+     *
+     * @param group the group whose members are going to be counted
+     * @param filter the text used to filter the group members
+     * @return the number of group members that match the given text filter
+     * @see #getAllMatchedMembersNamesForGroup(String, String, int, int, Boolean)
+     * @since 10.8RC1
+     */
+    public int countAllMatchedMembersNamesForGroup(String group, String filter)
+    {
+        try {
+            return RightsManager.getInstance().countAllMatchedMembersNamesForGroup(group, filter, this.context);
+        } catch (XWikiException e) {
+            logError("Failed to count the group members that match a given text filter.", e);
+            return 0;
+        }
+    }
+
+    /**
      * Return the number of groups containing provided member.
      *
      * @param member the name of the member (user or group).
      * @return the number of groups.
      * @throws XWikiException error when getting number of users.
+     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
+    @Deprecated
     public int countAllGroupsNamesForMember(String member) throws XWikiException
     {
         int count = 0;
@@ -300,7 +327,9 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param group the name of the group.
      * @return the number of members.
      * @throws XWikiException error when getting number of groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
+    @Deprecated
     public int countAllMembersNamesForGroup(String group) throws XWikiException
     {
         int count = 0;

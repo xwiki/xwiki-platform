@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -91,6 +92,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     @Inject
+    private EntityReferenceFactory referenceFactory;
+
+    @Inject
     private Logger logger;
 
     private String getFullReference(String userId, String wikiId)
@@ -122,15 +126,18 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             }
 
             // load properties
-            descriptor.setMainPageReference(referenceResolver.resolve(mainServerClassObject
-                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
-            descriptor.setPrettyName(mainServerClassObject
-                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
-            descriptor.setOwnerId(getFullReference(
-                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER),
-                descriptor.getId()));
-            descriptor.setDescription(mainServerClassObject
-                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
+            descriptor.setMainPageReference(this.referenceFactory.getReference(referenceResolver
+                .resolve(mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE))));
+            descriptor.setPrettyName(
+                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
+            descriptor.setOwnerId(
+                getFullReference(mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER),
+                    descriptor.getId()));
+            descriptor.setDescription(
+                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
+            int secure = mainServerClassObject.getIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, -1);
+            descriptor.setSecure(secure != -1 ? secure == 1 : null);
+            descriptor.setPort(mainServerClassObject.getIntValue(XWikiServerClassDocumentInitializer.FIELD_PORT, -1));
 
             // load the property groups
             try {
@@ -209,6 +216,10 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                 getFullReference(descriptor.getOwnerId(), descriptor.getId()), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, descriptor.getPrettyName(), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, descriptor.getDescription(), context);
+            Boolean secure = descriptor.isSecure();
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_SECURE,
+                secure != null ? (secure == Boolean.TRUE ? 1 : 0) : -1, context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_PORT, descriptor.getPort(), context);
 
             // Create the aliases
             List<String> aliases = descriptor.getAliases();

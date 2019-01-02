@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1364498611000</creationDate>
   <parent>XWiki.Mail</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1430743192000</date>
-  <contentUpdateDate>1429530627000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -120,146 +117,86 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>var XWiki = (function(XWiki) {
-  /**
-   * Extends the SuggestPicker to customize the way the selected targets (users or email addresses) are displayed.
-   */
-  var TargetSelectionManager = Class.create(XWiki.widgets.SuggestPicker, {
-    // @Override
-    initialize: function($super, element, suggest, options) {
-      $super(element, suggest, options);
-      this.list.addClassName('targets-container');
-    },
+      <code>require.config({
+  paths: {
+    'xwiki-suggestUsers': "$xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js', true)" +
+      "?v=$escapetool.url($xwiki.version)"
+  }
+});
 
-    // @Override
-    matchesSelectedValue: function(value, suggestion) {
-      // The given value can be a relative user reference. We need to parse it and match only the user alias.
-      return XWiki.Model.resolve(value, XWiki.EntityType.DOCUMENT).name == suggestion.id;
-    },
+require(['jquery', 'xwiki-suggestUsers'], function($) {
+  'use strict';
 
-    // @Override
-    displayItem: function(suggestion) {
-      var targetInfo = new Element('span').update(suggestion.info).insert(this.createDeleteTool());
-      var targetClass = 'target-item ' + (suggestion.value.indexOf('@') &gt; 0 ? 'target-email' : 'target-user');
-      return new Element('li', {'class': targetClass}).insert(targetInfo).insert(this.createItemInput(suggestion));
-    }
+  var modal = $(
+    '&lt;div class="modal" tabindex="-1" role="dialog" data-backdrop="static"&gt;' +
+      '&lt;div class="modal-dialog share-dialog" role="document"&gt;' +
+        '&lt;div class="modal-content"&gt;' +
+          '&lt;div class="modal-header"&gt;' +
+            '&lt;button type="button" class="close" data-dismiss="modal" aria-label="' +
+                  $jsontool.serialize($services.localization.render('core.viewers.share.cancel')) +
+                '"&gt;' +
+              '&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;' +
+            '&lt;/button&gt;' +
+            '&lt;div class="modal-title"&gt;' +
+              $jsontool.serialize($services.localization.render('core.viewers.share.dialogTitle')) +
+            '&lt;/div&gt;' +
+          '&lt;/div&gt;' +
+          '&lt;div class="modal-body"&gt;&lt;/div&gt;' +
+        '&lt;/div&gt;' +
+      '&lt;/div&gt;' +
+    '&lt;/div&gt;'
+  );
+
+  var initSharePage = function() {
+    modal.find('.modal-body').removeClass('loading');
+    modal.find('form').submit(onSubmit);
+    modal.find('a.secondary.button').attr('data-dismiss', 'modal');
+    modal.find('input[type="submit"]').prop('disabled', true);
+    var shareTarget = modal.find('#shareTarget').suggestUsers({
+      // Make it easier for the users to enter email addresses.
+      createOnBlur: true,
+      createFilter: /^.+@.+\..+$/
+    });
+    var selectize = shareTarget[0].selectize;
+    selectize.on('change', function(value) {
+      modal.find('input[type="submit"]').prop('disabled', !value);
+    });
+    var oldItemRenderer = selectize.settings.render.item;
+    selectize.settings.render.item = function(item) {
+      if (item &amp;&amp; !item.icon &amp;&amp; item.value &amp;&amp; item.value.indexOf('@') &gt; 0) {
+        item.icon = {
+          url: $jsontool.serialize($xwiki.getSkinFile('icons/silk/email.png'))
+        };
+      }
+      return oldItemRenderer.call(this, item);
+    };
+    selectize.focus();
+  };
+
+  var onSubmit = function(event) {
+    event.preventDefault();
+    var form = $(this);
+    var data = $(this).serialize() + '&amp;xpage=shareinline';
+    modal.find('.modal-body').addClass('loading').html('')
+      .load(XWiki.currentDocument.getURL('get'), data, initShareStatus);
+  };
+
+  var initShareStatus = function() {
+    modal.find('.modal-body').removeClass('loading');
+    modal.find('.share-backlink').attr('data-dismiss', 'modal');
+  };
+
+  // If the share page form is present then initialize it right away.
+  $('#shareTarget').length &gt; 0 &amp;&amp; initSharePage();
+
+  // Load the share page form when the corresponding menu entry is clicked.
+  $('#tmActionShare').click(function(event) {
+    event.preventDefault();
+    modal.find('.modal-body').addClass('loading').html('')
+      .load(XWiki.currentDocument.getURL('get'), {'xpage': 'shareinline'}, initSharePage);
+    modal.modal();
   });
-
-  /**
-   * Extends the UserPicker to change the selection manager.
-   */
-  var UserAndEmailPicker = Class.create(XWiki.widgets.UserPicker, {
-    // @Override
-    _createSelectionManager: function(options) {
-      return new TargetSelectionManager(this.fld, this, options);
-    },
-
-    // @Override
-    setHighlightedValue: function ($super) {
-      if (!this.iHighlighted) {
-        // Select the current input value when there is no highlighted suggestion to allow the user to enter free
-        // text (e.g. an email address).
-        this.clearSuggestions();
-        typeof this.options.callback == "function" &amp;&amp; this.options.callback({
-          'id': this.fld.value,
-          'value': this.fld.value,
-          'info': this.fld.value,
-        });
-      } else {
-        $super();
-      }
-    },
-
-    // @Override
-    clearSuggestions: function($super) {
-      $super();
-      // Keep the picker active even after clearing the list of suggestions to force it to handle the Enter key. This
-      // way the user can enter free text (e.g. an email address) without submitting the form.
-      this.isActive = true;
-    }
-  });
-
-  XWiki.SharePage = Class.create({
-    initialize : function (parentContainer) {
-      this.input = $('shareTarget');
-
-      if (!this.input) {
-        return;
-      }
-
-      var userEmailOptions = {
-        script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&amp;uorg=user&amp;'),
-        shownoresults : false
-      };
-      if (parentContainer) {
-        userEmailOptions.parentContainer = parentContainer;
-      }
-      new UserAndEmailPicker(this.input, userEmailOptions);
-      this.input.focus();
-
-      document.observe('xwiki:multisuggestpicker:selectionchanged', this._onSelectionChanged.bindAsEventListener(this));
-
-      this.form = this.input.up('form');
-      if (this.form) {
-        this.form.observe('submit', this._onSubmit.bindAsEventListener(this));
-        dialog &amp;&amp; this.form.down('.secondary').observe('click', function(event) {
-          event.stop();
-          dialog.closeDialog();
-        }.bindAsEventListener(this));
-      }
-    },
-
-    _onSubmit : function(event) {
-      event.stop();
-      if (!this.form.down('.target-item') &amp;&amp; this.input.value.strip().length == 0) {
-        this.input.addClassName('xErrorField');
-        this.input.insert({'after' : '&lt;div class="xErrorMsg"&gt;$services.localization.render('core.viewers.share.error.missingRecipient')&lt;/div&gt;'});
-        return;
-      }
-      var params = this.form.serialize();
-      this.form.up().update(loading);
-      new Ajax.Updater(loading.up(), XWiki.currentDocument.getURL('get', 'xpage=shareinline'), {
-        parameters: params,
-        onComplete : function() {
-          dialog &amp;&amp; dialog.dialog.down('.share-backlink').observe('click', dialog.closeDialog.bind(dialog));
-        }
-      });
-    },
-
-    _onSelectionChanged : function(event) {
-      if (event.memo.trigger == this.input) {
-        this.input.removeClassName('xErrorField');
-        var errorMessage = this.input.next('.xErrorMsg');
-        errorMessage &amp;&amp; errorMessage.remove();
-      }
-    }
-  });
-
-  var loading = new Element('div', {'class' : 'imgcenter'}).update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\"/&gt;");
-  var dialog;
-
-  document.observe('xwiki:dom:loaded', function() {
-    $('shareTarget') &amp;&amp; new XWiki.SharePage();
-    if ($('tmActionShare')) {
-      $('tmActionShare').observe('click', function(event) {
-        event.stop();
-        dialog = new XWiki.widgets.ModalPopup(
-          loading, {}, {
-            'verticalPosition' : 'top',
-            'title' : "$services.localization.render('core.viewers.share.dialogTitle')",
-            'removeOnClose' : true
-          }
-        );
-        dialog.showDialog();
-        loading.up().up().addClassName('share-dialog');
-        new Ajax.Updater(loading.up(), XWiki.currentDocument.getURL('get', 'xpage=shareinline'), {
-          onComplete : function() { new XWiki.SharePage(dialog.dialogBox); }
-        });
-      });
-    }
-  });
-  return XWiki;
-}(XWiki || {}));</code>
+});</code>
     </property>
     <property>
       <name/>
@@ -743,11 +680,7 @@ Ce message a été généré par XWiki depuis ${request.serverName} au nom de ${
     </property>
     <property>
       <code>#template("colorThemeInit.vm")
-.share-dialog {
-  /* this creates issues if the screen is smaller than the dialog box, the bottom of the box will not be visible.
-     But we need this in order to show the suggestions if the suggestions are longer than the dialog (same as XWIKI-11089) */
-  overflow: visible;
-}
+
 .share-dialog .mail-preview {
   background-color: $theme.backgroundSecondaryColor;
   border: 1px solid $theme.borderColor;
@@ -757,45 +690,9 @@ Ce message a été généré par XWiki depuis ${request.serverName} au nom de ${
   max-height: 20em;
   overflow: auto;
 }
-#shareTarget.withScope {
-  border-left-width: 25px;
-}
-.targets-container {
-  background: $theme.highlightColor;
-  border: 1px dotted $theme.borderColor;
-  margin: 4px 0;
-  max-height: 4em;
-  overflow: auto;
-}
-.target-item {
-  background: transparent none left center no-repeat;
-  display: inline-block;
-  margin-right: 1em;
-  padding: 0px 1px 0px 18px;
-}
-.targets-container .target-user {
-  background-image: url("$xwiki.getSkinFile('icons/silk/user.png')");
-}
-.targets-container .target-group {
-  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
-}
-.targets-container .target-email {
-  background-image: url("$xwiki.getSkinFile('icons/silk/email.png')");
-}
 
-.target-item .delete, .target-item .delete:visited {
-  color: transparent; /*$theme.pageContentBackgroundColor;*/
-  cursor: pointer;
-  font-size: 70%;
-  font-weight: bold;
-  text-decoration: none !important;
-  vertical-align: super;
-}
-.target-item:hover .delete {
-  color: $theme.textPrimaryColor;
-}
-.target-item .delete:hover {
-  color: $theme.notificationErrorColor;
+body &gt; .selectize-dropdown {
+  z-index: 1051;
 }</code>
     </property>
     <property>

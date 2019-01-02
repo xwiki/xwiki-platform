@@ -85,6 +85,10 @@ public class XWikiAttachmentEventGenerator
         if (StringUtils.isNotEmpty(attachment.getMimeType())) {
             attachmentParameters.put(WikiAttachmentFilter.PARAMETER_MIMETYPE, attachment.getMimeType());
         }
+        if (StringUtils.isNotEmpty(attachment.getCharset())) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CHARSET,
+                attachment.getCharset());
+        }
 
         if (properties.isWithJRCSRevisions()) {
             try {
@@ -105,7 +109,7 @@ public class XWikiAttachmentEventGenerator
         if (properties.isWithWikiAttachmentsContent()) {
             try {
                 content = attachment.getContentInputStream(xcontext);
-                size = Long.valueOf(attachment.getLongSize());
+                size = attachment.getLongSize();
             } catch (XWikiException e) {
                 this.logger.error("Failed to get content of attachment [{}]", attachment.getReference(), e);
 
@@ -114,7 +118,7 @@ public class XWikiAttachmentEventGenerator
             }
         } else {
             content = null;
-            size = null;
+            size = attachment.getLongSize();
         }
 
         // WikiAttachment

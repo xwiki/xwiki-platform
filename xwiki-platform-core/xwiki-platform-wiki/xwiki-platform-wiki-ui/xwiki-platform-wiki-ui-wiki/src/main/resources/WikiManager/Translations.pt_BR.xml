@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1303158348000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1307445978000</date>
-  <contentUpdateDate>1307445978000</contentUpdateDate>
   <version>1.1</version>
   <title>Wiki Manager Translations</title>
   <comment/>
@@ -54,7 +51,7 @@ platform.wiki.panel.title=Informação do Wiki
 platform.wiki.currentwiki.welcome=Bem-vindo ao Wiki {0}{1}{2}
 platform.wiki.currentwiki.currentUserIsOwner=Você é o dono dessa wiki.
 platform.wiki.currentwiki.currentUserIsAdmin=Você é um dos administradores dessa wiki.
-platform.wiki.currentwiki.joinNeedToLogin=Para se juntar a este 
+platform.wiki.currentwiki.joinNeedToLogin=Para se juntar a este
 platform.wiki.currentwiki.currentUserNotMember=Você não é um membro dessa wiki.
 platform.wiki.currentwiki.currentuserCanJoin=Se você quiser, você pode {0}se juntar a essa wiki{1}.
 platform.wiki.currentwiki.currentUserIsMember=Você é um membro dessa wiki.
@@ -126,12 +123,14 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=O nome de exibição do wiki
 platform.wiki.currentwiki.invite.username.hint=Nome do usuário para adicionar à wiki.
 platform.wiki.currentwiki.invite.message.hint=Mensagem a enviar para o usuário.
 platform.wiki.currentwiki.candidates.hint=Usuários que requisitaram ou foram convidados a se juntar à wiki.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Gerenciar configurações como nome da wiki, descrição, dono e tipos de memros.
 admin.xwiki.workspaceusers.description=Gerenciar membros da wiki\: adicionar, remover, convidar, aceitar ou rejeitar membros da wiki.
 admin.xwiki.usersconfiguration.title=Configuração
 admin.xwiki.members.title=Membros atuais
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

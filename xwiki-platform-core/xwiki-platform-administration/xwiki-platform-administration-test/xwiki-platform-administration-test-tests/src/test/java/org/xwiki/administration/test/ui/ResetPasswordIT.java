@@ -140,7 +140,7 @@ public class ResetPasswordIT extends AbstractTest
         MimeMessage receivedEmail = receivedEmails[0];
         Assert.assertEquals("Password reset request for " + userName, receivedEmail.getSubject());
         String receivedMailContent = getMessageContent(receivedEmail).get("textPart");
-        String passwordResetLink = getResetLink(receivedMailContent, userName);
+        String passwordResetLink = getResetLink(receivedMailContent, "xwiki%3AXWiki." + userName);
         Assert.assertNotNull(passwordResetLink);
 
         // Use the password reset link

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 import javax.inject.Inject;
@@ -57,7 +58,7 @@ public class ScopeNotificationFilterLocationStateComputer
     public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
             EntityReference location)
     {
-        return isLocationWatched(filterPreferences, location, null, null);
+        return isLocationWatched(filterPreferences, location, null, null).isWatched();
     }
 
     /**
@@ -67,7 +68,7 @@ public class ScopeNotificationFilterLocationStateComputer
      * @param format the notification format (could be null)
      * @return if the location is watched by the user, for the given event type and format
      */
-    public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
+    public WatchedLocationState isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
             EntityReference location, String eventType, NotificationFormat format)
     {
         // TODO: write a unit test with a complex set of preferences
@@ -77,40 +78,46 @@ public class ScopeNotificationFilterLocationStateComputer
 
         if (preferences.isEmpty()) {
             // If there is no filter preference, then the location is watched (no filter = we get everything)
-            return true;
+            return new WatchedLocationState(true);
         }
 
-        WatchedState state = handleExclusiveFilters(location, preferences);
-        if (state != WatchedState.UNKNOWN) {
-            return state == WatchedState.WATCHED;
+        WatchedLocationState state = handleExclusiveFilters(location, preferences);
+        if (state != null) {
+            return state;
         }
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
         if (!it.hasNext()) {
             // No inclusive filters ==  we get everything, so the location is watched
-            return true;
+            return new WatchedLocationState(true);
         }
 
+        boolean match = false;
+        Date startingDate = null;
         while (it.hasNext()) {
             ScopeNotificationFilterPreference pref = it.next();
 
             // If the inclusive filter match the event location...
             if (match(pref, location)) {
                 // Then it means we watch this location
-                return true;
+                match = true;
+                if (startingDate == null || startingDate.after(pref.getStartingDate())) {
+                    startingDate = pref.getStartingDate();
+                }
             }
         }
 
         // If we are here, we have filter preferences but no one is matching the current event location,
         // so we don't watch this location
-        return false;
+        return new WatchedLocationState(match, startingDate);
     }
 
-    private WatchedState handleExclusiveFilters(EntityReference location,
+    private WatchedLocationState handleExclusiveFilters(EntityReference location,
             ScopeNotificationFilterPreferencesHierarchy preferences)
     {
         WatchedState state = WatchedState.UNKNOWN;
         int deepestLevel = 0;
+        Date startingDate = null;
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
         while (it.hasNext()) {
@@ -129,12 +136,14 @@ public class ScopeNotificationFilterLocationStateComputer
                     if (match(child, location) && childDeepLevel > deepestLevel) {
                         state = WatchedState.WATCHED;
                         deepestLevel = childDeepLevel;
+                        startingDate = child.getStartingDate();
                     }
                 }
             }
         }
 
-        return state;
+        return state == WatchedState.UNKNOWN ? null
+                : new WatchedLocationState(state == WatchedState.WATCHED, startingDate);
     }
 
     private boolean match(ScopeNotificationFilterPreference pref, EntityReference location)

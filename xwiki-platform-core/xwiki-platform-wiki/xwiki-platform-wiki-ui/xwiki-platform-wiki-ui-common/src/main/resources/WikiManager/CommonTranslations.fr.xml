@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1418662042000</creationDate>
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1418727446000</date>
-  <contentUpdateDate>1418727379000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -41,8 +38,8 @@
   <hidden>true</hidden>
   <content>admin.wikis=Wikis
 admin.wikis.descriptor=Description
-### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
-admin.wiki.description=Décrivez votre wiki (pretty name et description) et définissez son propriétaire et sa page d'accueil.
+admin.wikis.descriptor.description=Configurer le descripteur de wiki
+admin.wiki.description=Décrivez votre wiki (nom et description) et définissez son propriétaire et sa page d'accueil.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Le nouvel utilisateur propriétaire n'existe pas ou peut provenir d'un autre wiki.\\nÊtes-vous certain de vouloir continue en sauvegardant cette opération ?
 platform.wiki.admin.wiki.csrfInvalidError=Clé de sécurité invalide (CSRF). Veuillez rafraîchir la page et essayer à nouveau.
 platform.wiki.admin.wiki.requiredFieldsError=Propriétaire et page d'accueil sont des champs requis.

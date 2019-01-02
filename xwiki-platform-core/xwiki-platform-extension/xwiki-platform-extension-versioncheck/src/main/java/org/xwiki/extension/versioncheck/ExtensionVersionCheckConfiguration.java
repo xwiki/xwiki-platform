@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.version.Version;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide configuration options for the extension version checker.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.9RC1
  */
 @Role
-@Unstable
 public interface ExtensionVersionCheckConfiguration
 {
     /**

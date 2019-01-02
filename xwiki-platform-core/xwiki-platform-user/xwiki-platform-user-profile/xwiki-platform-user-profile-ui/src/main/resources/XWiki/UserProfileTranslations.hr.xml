@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1469191733000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1490262427000</date>
-  <contentUpdateDate>1490262416000</contentUpdateDate>
   <version>1.1</version>
   <title>User Profile Translations</title>
   <comment/>
@@ -46,5 +43,20 @@ XWiki.XWikiUsers_editor.hint=Odaberite koji uređivač će biti zadani, poništa
 XWiki.XWikiUsers_usertype.hint=Odaberite koji će biti zadani tip korisnika. Napredni korisnici imaju pristup višestrukim mogućnostima uređivanja, izradi terminalnih stranica itd.
 XWiki.XWikiUsers_extensionConflictSetup.hint=Naznačite želite li da Upravitelj ekstenzija od vas zatraži da potvrdite zadana pravila za rješavanje konflikata (na primjer, recite Upravitelju ekstenzija da vas upita što učiniti ukoliko je dokument koji se nadograđuje uklonjen iz wikija).
 userprofile.default=Zadano
+### Missing: user.profile.groups.title=My Groups
+### Missing: user.profile.groups.description=Here are listed all the groups your user belongs to.
+### Missing: user.profile.groups.table.group=Group
+### Missing: platform.core.profile.category.groups=My Groups
+### Missing: user.profile.notifications=Notifications
+### Missing: user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
+### Missing: user.profile.network.unfollow.question.yes=Yes, unfollow
+### Missing: user.profile.network.unfollow.question.no=No, cancel
+### Missing: user.profile.network.following=Following
+### Missing: user.profile.network.notfollowing=Not following
+### Missing: user.profile.network.follow=Start following
+### Missing: user.profile.network.unfollow=Stop following
+### Missing: user.profile.network.done=Done
+### Missing: user.profile.network.saving=Saving...
+### Missing: user.profile.network.error=Error saving the notification setting
 </content>
 </xwikidoc>

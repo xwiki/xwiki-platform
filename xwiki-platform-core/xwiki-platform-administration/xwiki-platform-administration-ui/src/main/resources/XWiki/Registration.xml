@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1364502205000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1364565599000</date>
-  <contentUpdateDate>1364565599000</contentUpdateDate>
   <version>1.1</version>
   <title>Registration</title>
   <comment/>
@@ -320,57 +317,31 @@
   #end
   *********###
   ##
-  ## To disable the captcha on this page, comment out the next two entries.
-  ## The captcha image, not an input field but still defined the same way.
-  #if($captchaservice
+  ## To disable the CAPTCHA on this page, comment out the next entry.
+  ## The CAPTCHA, not really an input field but still defined the same way.
+  #if($services.captcha
       &amp;&amp; !$invited
       &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest"
       &amp;&amp; $requireCaptcha)
-    ## Empty label field used for padding.
-    ## Empty 'name' field overriddes name="captcha_image" with "" so name is not specified at all.
-    #set($field =
-      {'name' : 'captcha_image',
-        'label' : "&lt;span class='hidden'&gt;$services.localization.render('core.captcha.image.label')&lt;/span&gt;",
-        'tag' : 'img',
-        'params' : {
-          'src' : $doc.getURL('imagecaptcha'),
-          'alt' : $services.localization.render('core.captcha.image.alternateText', [$services.localization.render('core.register.submit')]),
-          'name' : ''
-        }
-      })
-    #set($discard = $fields.add($field))
-    ## The captcha field, mandatory, programmatically checked to make sure the captcha is right
-    ## Not checked by javascript because javascript can't check the captcha and the Ok message because it passes the
+    ## The CAPTCHA field, programmatically checked to make sure the CAPTCHA is right.
+    ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
     ## mandatory test is misleading.
-    ## and not filled back in if there is an error ('noReturn')
+    ## Also, not filled back in if there is an error ('noReturn').
     #set($field =
-      {'name' : 'captcha_answer',
-        'label' : $services.localization.render('core.captcha.image.instruction'),
-        'params' : {
-          'type' : 'text',
-          'size' : '60'
-        },
+      {'name' : 'captcha_placeholder',
+        'label' : $services.localization.render('core.captcha.instruction'),
+        'skipLabelFor' : true,
+        'type'  : 'html',
+        'html'  : "$!{services.captcha.default.display()}",
         'validate' : {
-          'mandatory' : {
-            'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong'),
-            'noscript' : true
-          },
           'programmaticValidation' : {
-            'code' : '#checkCaptcha($request, $request.get("captcha_answer"))',
+            'code' : '#if (!$services.captcha.default.isValid())failed#end',
             'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong')
           }
         },
         'noReturn' : true
       })
     #set($discard = $fields.add($field))
-  #end
-  ##
-  ## Checks the captcha answer; used by programmaticValidation above.
-  #macro(checkCaptcha, $request, $answer)
-    #set($cv = $captchaservice.getCaptchaVerifier('image'))
-    #if(!$cv.isAnswerCorrect($cv.getUserId($request), $answer))
-      failed
-    #end
   #end
   ##
   ## Pass the name of the template to $xwiki.createUser so any contained information will be passed in.
@@ -425,10 +396,6 @@
       $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
     #end
   #end
-  ## If this is true, then assume the registration page is being viewed inside of a lightbox
-  #if($request.get('xpage'))
-    #set($assumeLightbox = true)
-  #end
   ##
   ## Display the heading
   $heading
@@ -447,54 +414,28 @@
   #if(!$registrationDone)
     $welcomeMessage
 
-    {{html wiki=false}}
+    {{html clean="false"}}
       &lt;form id="register" action="$xwiki.relativeRequestURL" method="post" class="xform half"&gt;
-      &lt;div&gt;
-      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-      #set ($userDirectoryReference = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
-      #if ($xwiki.exists($userDirectoryReference))
-        &lt;input type="hidden" name="parent" value="$!{services.model.serialize($userDirectoryReference, 'default')}" /&gt;
-      #end
-      #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
-      &lt;div class="wikimodel-emptyline"&gt;&lt;/div&gt;
-      &lt;span class="buttonwrapper"&gt;
-      #if($assumeLightbox)
-        ## LightBox detected...
-        &lt;script type="text/javascript"&gt;
-          ## Make the X button not reload the page. (overriding LbClose)
-          window.lb.lbClose = function() {
-            this.lbHide();
-            this.lbClearData();
-            ##return false;
-          }
-          ## Post the form entry to the page and load the result. (we override lbSaveForm)
-          window.lb.lbSaveForm = function() {
-            var formParams = Form.serialize(this.form);
-            Form.disable(this.form);
-            var ajaxRequest = new Ajax.Request(this.saveUrl, {
-              parameters: formParams,
-              asynchronous: false
-            });
-            window.lb.lbFormDataLoaded(ajaxRequest.transport);
-          }
-        &lt;/script&gt;
-        ## It doesn't really matter where these are, the scripts will be relocated to the head.
-        &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin --&gt;
-        &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin --&gt;
-        ##
-        &lt;input class="button" type="submit" value="$services.localization.render('save')" onclick="window.lb.lbSaveForm();"/&gt;
-        &lt;/span&gt;#* End ButtonWrapper then start another...*#&lt;span class="buttonwrapper"&gt;
-        &lt;input class="button secondary" type="button" value="$services.localization.render("cancel")" onclick="window.lb.lbClose();"/&gt;
-      #else
-        ## Not using the LightBox
-        &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;
-      #end
-      &lt;/span&gt;## ButtonWrapper
-      &lt;/div&gt;
+        &lt;div class="hidden"&gt;
+          #if ($request.xpage == 'registerinline')
+            #skinExtensionHooks
+          #end
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          #set ($userDirectoryReference = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
+          #if ($xwiki.exists($userDirectoryReference))
+            &lt;input type="hidden" name="parent" value="$!{services.model.serialize($userDirectoryReference, 'default')}" /&gt;
+          #end
+        &lt;/div&gt;
+        #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
+        &lt;p class="buttons"&gt;
+          &lt;span class="buttonwrapper"&gt;
+            &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;
+          &lt;/span&gt;
+        &lt;/p&gt;
+        #if ($useLiveValidation)
+          #generateJavascript($fields)
+        #end
       &lt;/form&gt;
-      #if($useLiveValidation)
-        #generateJavascript($fields)
-      #end
     {{/html}}
 
     ##
@@ -503,23 +444,6 @@
       [[{{translation key="xe.admin.registration.youCanConfigureRegistrationHere"/}}&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]]
       {{html}}&lt;a href="$xwiki.getURL($documentName, 'edit', 'editor=wiki')"&gt;$services.localization.render('xe.admin.registration.youCanConfigureRegistrationFieldsHere')&lt;/a&gt;{{/html}}
     #end
-  ## If the registration is done (successful) and we detect the Lightbox simply send the user back to the original page.
-  #elseif($assumeLightbox)
-    {{html clean=false wiki=false}}
-      &lt;script type="text/javascript"&gt;
-          var url = window.lb.redirectUrl;
-          window.lb.lbClose;
-          if (url != undefined) {
-            if(window.location.pathname + window.location.search == url) {
-              ## Under certain circumstances (bug) Opera will not load a page if the location is the same as the current page.
-              ## In these cases, location.reload() doesn't work either, the only solution (I could find) was to change the URL.
-              window.location.href = url + "&amp;";
-            } else {
-              window.location.href = url;
-            }
-          }
-      &lt;/script&gt;
-    {{/html}}
   #end
 #else
   ## The registration is not allowed on the subwiki
@@ -542,7 +466,7 @@
       #set($validate = $field.get('validate'))
       #set($error = '')
       #set($value = $request.get($fieldName))
-      #if($value &amp;&amp; $value != '')
+      #if("$!value" != '' || $field.get('type') == 'html')
         ##
         ## mustMatch validation
         #if($error == '' &amp;&amp; $validate.get('mustMatch'))
@@ -696,7 +620,7 @@
           &lt;/div&gt;
         &lt;/form&gt;
         ## We don't want autoLogin if we are administrators adding users...
-        #if($autoLogin &amp;&amp; !$assumeLightbox)
+        #if ($autoLogin &amp;&amp; $request.xpage != 'registerinline')
           &lt;script type='text/javascript'&gt;
             document.observe('xwiki:dom:loaded', function() {
               document.forms['loginForm'].submit();
@@ -726,7 +650,7 @@
       #set($fieldName = $field.get('name'))
       #if($field.get('label'))
         #set($label = $field.get('label'))
-        &lt;dt&gt;&lt;label for="$fieldName"&gt;$label
+        &lt;dt&gt;&lt;label #if (!$field.get('skipLabelFor'))for="$fieldName"#end&gt;$label
         #if($field.get('validate').get('mandatory'))
           &lt;span ##
           #foreach($entry in $fieldMandatoryStar.entrySet())
@@ -737,25 +661,34 @@
           &lt;/label&gt;
         &lt;/dt&gt;
       #end
-      ## If no tag then default tag is &lt;input&gt;
-      #if($field.get('tag'))
-        #set($tag = $field.get('tag'))
-      #else
-        #set($tag = 'input')
-      #end
-      &lt;dd&gt;&lt;$tag id="$fieldName" ##
-      #set($params = $field.get('params'))
-      ## If no name parameter is spacified, then we use the field name
-      #if(!$params.get('name'))
-        #set($discard = $params.put('name', $fieldName))
-      #end
-      #foreach($entry in $params.entrySet())
-        ## If a parameter is specified as '' then we don't include it.
-        #if($entry.getValue() != '')
-          $entry.getKey()="$escapetool.xml($entry.getValue())" ##
+      &lt;dd&gt;
+      #if ($field.get('type') == 'html')
+        $field.get('html')
+      #elseif ($field.get('type') == 'tag' || "$!{field.get('type')}" == '')
+        ## If no tag then default tag is &lt;input&gt;
+        #if($field.get('tag'))
+          #set($tag = $field.get('tag'))
+        #else
+          #set($tag = 'input')
         #end
+        &lt;$tag id="$fieldName" ##
+        #set($params = $field.get('params'))
+        ## If no name parameter is spacified, then we use the field name
+        #if(!$params.get('name'))
+          #set($discard = $params.put('name', $fieldName))
+        #end
+        #foreach($entry in $params.entrySet())
+          ## If a parameter is specified as '' then we don't include it.
+          #if($entry.getValue() != '')
+            $entry.getKey()="$escapetool.xml($entry.getValue())" ##
+          #end
+        #end
+        ## Close the opened tag in a way that is valid for its type (i.e. with "/&gt;" or with "&gt;&lt;/tag&gt;").
+        #if ($tag == 'input')
+          #set ($voidTag = true)
+        #end
+        #if ($voidTag)/#end&gt;#if (!$voidTag)&lt;/$tag&gt;#end
       #end
-      &gt;&lt;/$tag&gt;
       #if($field.get('error'))
         &lt;span ##
         #foreach($entry in $failureMessageParams.entrySet())
@@ -778,7 +711,7 @@
 #macro(generateJavascript, $fields)
   &lt;script type='text/javascript'&gt;
   /* &lt;![CDATA[ */
-  document.observe('xwiki:dom:loaded', function() {
+  var initRegistrationFormValidation = function() {
   ##
   #foreach($field in $fields)
     #if($field.get('validate') &amp;&amp; $field.get('name'))
@@ -829,6 +762,13 @@
       #end##if contains js validateable fields.
     #end##if validate
   #end##loop
+    };
+    document.observe('xwiki:dom:loaded', initRegistrationFormValidation);
+    document.observe('xwiki:dom:updated', function(event) {
+      var container = (event &amp;&amp; event.memo &amp;&amp; event.memo.elements &amp;&amp; event.memo.elements[0]) || $('body');
+      if (container.down('form#register')) {
+        initRegistrationFormValidation();
+      }
     });// ]]&gt;
     &lt;/script&gt;
 #end##macro
@@ -919,7 +859,9 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </defaultRedirect>
     <heading>
+      <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>heading</name>
       <number>1</number>
       <picker>0</picker>
@@ -931,7 +873,9 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </heading>
     <liveValidation_defaultFieldOkMessage>
+      <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>liveValidation_defaultFieldOkMessage</name>
       <number>4</number>
       <picker>0</picker>
@@ -943,10 +887,12 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </liveValidation_defaultFieldOkMessage>
     <liveValidation_enabled>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>liveValidation_enabled</name>
       <number>3</number>
       <prettyName>Enable Javascript field validation</prettyName>
@@ -956,10 +902,12 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </liveValidation_enabled>
     <loginButton_autoLogin_enabled>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>loginButton_autoLogin_enabled</name>
       <number>6</number>
       <prettyName>Enable automatic login</prettyName>
@@ -969,10 +917,12 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </loginButton_autoLogin_enabled>
     <loginButton_enabled>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>loginButton_enabled</name>
       <number>5</number>
       <prettyName>Enable login button</prettyName>
@@ -982,8 +932,11 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </loginButton_enabled>
     <registrationSuccessMessage>
+      <contenttype>---</contenttype>
+      <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
+      <hint/>
       <name>registrationSuccessMessage</name>
       <number>9</number>
       <picker>0</picker>
@@ -996,21 +949,26 @@
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </registrationSuccessMessage>
     <requireCaptcha>
+      <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>requireCaptcha</name>
       <number>8</number>
-      <prettyName>Require captcha to register</prettyName>
+      <prettyName>Require CAPTCHA to register</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </requireCaptcha>
     <welcomeMessage>
+      <contenttype>---</contenttype>
+      <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
+      <hint/>
       <name>welcomeMessage</name>
       <number>2</number>
       <picker>0</picker>

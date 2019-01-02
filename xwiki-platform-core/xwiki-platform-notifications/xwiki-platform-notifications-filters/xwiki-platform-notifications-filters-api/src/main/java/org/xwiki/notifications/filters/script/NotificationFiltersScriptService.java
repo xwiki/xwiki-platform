@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.script;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,10 +31,15 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 
@@ -50,6 +56,13 @@ public class NotificationFiltersScriptService implements ScriptService
 {
     @Inject
     private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    @Inject
+    @Named("cached")
+    private ModelBridge cachedModelBridge;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -91,8 +104,9 @@ public class NotificationFiltersScriptService implements ScriptService
     public Set<NotificationFilterPreference> getFilterPreferences(NotificationFilter filter)
             throws NotificationException
     {
-        return notificationFilterManager.getFilterPreferences(
-                notificationFilterManager.getFilterPreferences(documentAccessBridge.getCurrentUserReference()),
+        return notificationFilterPreferenceManager.getFilterPreferences(
+                notificationFilterPreferenceManager.getFilterPreferences(
+                        documentAccessBridge.getCurrentUserReference()),
                 filter
         ).collect(Collectors.toSet());
     }
@@ -115,28 +129,29 @@ public class NotificationFiltersScriptService implements ScriptService
 
     /**
      * Delete a filter preference.
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId name of the filter preference
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
     {
-
-        notificationFilterManager.deleteFilterPreference(filterPreferenceName);
+        notificationFilterPreferenceManager.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(),
+                filterPreferenceId);
     }
 
     /**
      * Enable or disable a filter preference.
-     * @param filterPreferenceName name of the filter preference
+     * @param filterPreferenceId id of the filter preference
      * @param enabled either or not the filter preference should be enabled
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException
+    public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException
     {
-        notificationFilterManager.setFilterPreferenceEnabled(filterPreferenceName, enabled);
+        notificationFilterPreferenceManager.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
+                filterPreferenceId, enabled);
     }
 
     /**
@@ -151,6 +166,27 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void setStartDate(Date startDate) throws NotificationException
     {
-        notificationFilterManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
+        notificationFilterPreferenceManager.setStartDateForUser(
+                documentAccessBridge.getCurrentUserReference(), startDate
+        );
+    }
+
+    /**
+     * Create a scope notification filter preference for the current user.
+     *
+     * @param type type of the filter preference to create
+     * @param formats formats concerned by the preference
+     * @param eventTypes the event types concerned by the preference
+     * @param reference the reference of the wiki, the space or the page concerned by the preference
+     * @throws NotificationException if an error occurs
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
+            List<String> eventTypes, EntityReference reference) throws NotificationException
+    {
+        cachedModelBridge.createScopeFilterPreference(documentAccessBridge.getCurrentUserReference(),
+                type, formats, eventTypes, reference);
     }
 }

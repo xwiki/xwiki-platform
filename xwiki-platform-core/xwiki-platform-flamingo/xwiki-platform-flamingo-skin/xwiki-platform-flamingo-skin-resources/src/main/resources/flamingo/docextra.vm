@@ -19,7 +19,7 @@
       ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
       ## defined at this point, we tap into the standard annotation class, and do not load again the
       ## config document. This however should not happen.
-      #set ($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
+      #set ($annotationCount = $services.annotations.getAnnotations($doc).size())
     #end
     #set ($discard = $docextras.add(['Annotations', 'annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $services.localization.render('core.shortcuts.view.annotations')]))
   #end
@@ -39,6 +39,7 @@
   #if ($showhistory)
     ## Pagination style
     $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
+    $xwiki.jsfx.use('uicomponents/viewers/history.js', true)
     #set ($discard = $docextras.add(['History', 'history', $services.localization.render('docextra.history'), -1, 'historyinline.vm', $services.localization.render('core.shortcuts.view.history')]))
   #end
   #if ($showinformation)
@@ -62,7 +63,8 @@
       <ul class="xwikitabbar" id="docExtrasTabsUl">
         #foreach($docextra in $docextras)
           <li id="${docextra.get(0)}tab">
-            <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")">
+            ## Note: Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
+            <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")" rel="nofollow">
               $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
             </a>
           </li>

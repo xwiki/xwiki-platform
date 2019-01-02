@@ -99,6 +99,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
             .addDependency(new DefaultExtensionDependency("dependencyid2", new DefaultVersionConstraint("2.0")));
 
         this.sizeOfFile = FileUtils.sizeOf(this.baseExtension.getFile().getFile());
+
+        getRepositoryTestUtils().deleteExtension(baseExtension);
     }
 
     @Test

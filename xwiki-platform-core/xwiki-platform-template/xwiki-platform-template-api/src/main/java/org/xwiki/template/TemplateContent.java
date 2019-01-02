@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * The content of a template.
@@ -82,5 +83,16 @@ public interface TemplateContent
     default boolean isAuthorProvided()
     {
         return true;
+    }
+
+    /**
+     * @return the reference of the document to use as secure document (generally the document containing the code to
+     *         execute) or null if the template is not associated with any document (for example filesystem template)
+     * @since 10.11RC1
+     */
+    @Unstable
+    default DocumentReference getDocumentReference()
+    {
+        return null;
     }
 }

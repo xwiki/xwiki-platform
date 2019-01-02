@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1364498608000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1511976526000</date>
-  <contentUpdateDate>1511976526000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.admin.forgotUsername.title')</title>
   <comment/>
@@ -51,7 +48,12 @@
 {{/html}}
 
 #else
-  #set($results = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = ?").bindValues([$email.toLowerCase()]).execute())
+  #set($query = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = ?").bindValues([$email.toLowerCase()]))
+  #set($results = $query.execute())
+  ## If local user does not exist check global user
+  #if($results.size() == 0 &amp;&amp; ${xcontext.database} != ${xcontext.mainWikiName})
+    #set($results = $query.setWiki("${xcontext.mainWikiName}").execute())
+  #end
   #if($results.size() == 0)
     {{translation key="xe.admin.forgotUsername.error.noAccount"/}}
 

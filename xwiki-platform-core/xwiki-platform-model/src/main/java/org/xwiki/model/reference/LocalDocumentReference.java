@@ -29,7 +29,7 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 5.0M1
  */
-public class LocalDocumentReference extends EntityReference
+public class LocalDocumentReference extends AbstractLocalizedEntityReference
 {
     /**
      * Create a new Document reference in the current wiki.
@@ -65,9 +65,7 @@ public class LocalDocumentReference extends EntityReference
      */
     public LocalDocumentReference(String spaceName, String pageName, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE));
-
-        setLocale(locale);
+        super(pageName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE), locale);
     }
 
     /**
@@ -95,9 +93,7 @@ public class LocalDocumentReference extends EntityReference
      */
     public LocalDocumentReference(EntityReference entityReference, Locale locale)
     {
-        super(entityReference);
-
-        setLocale(locale);
+        super(entityReference, locale);
     }
 
     /**
@@ -110,6 +106,18 @@ public class LocalDocumentReference extends EntityReference
     public LocalDocumentReference(String pageName, EntityReference spaceReference)
     {
         super(pageName, EntityType.DOCUMENT, spaceReference);
+    }
+
+    /**
+     * Clone an LocalDocumentReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public LocalDocumentReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
     }
 
     /**
@@ -129,23 +137,21 @@ public class LocalDocumentReference extends EntityReference
         return spaceReference;
     }
 
-    /**
-     * @return the locale of this document reference
-     * @since 5.3RC1
-     */
-    public Locale getLocale()
+    @Override
+    public LocalDocumentReference replaceParent(EntityReference newParent)
     {
-        return (Locale) getParameter(DocumentReference.LOCALE);
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new LocalDocumentReference(this, newParent);
     }
 
-    /**
-     * Set the locale of this document reference.
-     * 
-     * @since 5.3RC1
-     * @param locale the locale of this document reference
-     */
-    protected void setLocale(Locale locale)
+    @Override
+    public String toString()
     {
-        setParameter(DocumentReference.LOCALE, locale);
+        // Compared to EntityReference we don't print the type since the type is already indicated by the fact that
+        // this is a LocalDocumentReference instance.
+        return TOSTRING_SERIALIZER.serialize(this);
     }
 }

@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1425563685000</creationDate>
   <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1425564037000</date>
-  <contentUpdateDate>1425564037000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -43,9 +40,10 @@
 index.spacesMacro.spaceIndex.title=Viz obsah prostoru
 index.spacesMacro.spaceIndex.alt=Index prostoru
 index.spacesMacro.spaceAdministration.title=Viz administrace prostoru
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.alt=Administrovat prostor
 index.spacesMacro.createSpace.link=Vytvořit nový prostor
 index.spacesMacro.createSpace.defaultSpaceName=Jméno prostoru
 index.spacesMacro.createSpace.submit=Vytvořit
+### Missing: index.deletedDocuments.deleteAll=Delete all
 </content>
 </xwikidoc>

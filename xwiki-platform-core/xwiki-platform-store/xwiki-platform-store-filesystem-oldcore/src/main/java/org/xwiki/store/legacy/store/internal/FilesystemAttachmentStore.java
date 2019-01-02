@@ -211,7 +211,8 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
         if (!attachFile.exists()) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
-                "The attachment could not be found in the filesystem attachment store (" + attachFile + ").\n");
+                String.format("The attachment [%s] could not be found in the filesystem attachment store.",
+                    attachFile));
         }
 
         FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
@@ -307,6 +308,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             } else {
                 new TransactionRunnable<XWikiHibernateTransaction>()
                 {
+                    @Override
                     protected void onRun() throws XWikiException
                     {
                         avs.saveArchive(archive, context, false);
@@ -320,6 +322,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 final XWikiDocument doc = attachment.getDoc();
                 new TransactionRunnable<XWikiHibernateTransaction>()
                 {
+                    @Override
                     protected void onRun() throws XWikiException
                     {
                         store.saveXWikiDoc(doc, context, false);
@@ -375,6 +378,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             } else {
                 new TransactionRunnable<HibernateTransaction>()
                 {
+                    @Override
                     protected void onRun() throws XWikiException
                     {
                         avs.deleteArchive(attachment, context, false);

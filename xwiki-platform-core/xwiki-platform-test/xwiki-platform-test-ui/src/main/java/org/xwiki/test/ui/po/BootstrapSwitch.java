@@ -21,7 +21,6 @@ package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
@@ -30,7 +29,6 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public class BootstrapSwitch
 {
     /**
@@ -122,5 +120,16 @@ public class BootstrapSwitch
             }
             click();
         }
+    }
+
+    /**
+     * @return either or not the input is enabled (meaning we can click on it)
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    public boolean isEnabled()
+    {
+        return webElement.findElement(By.tagName("input")).isEnabled();
     }
 }

@@ -19,11 +19,12 @@
  */
 package org.xwiki.model.reference;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit test for the Property reference ({@link ObjectPropertyReference}).
@@ -43,30 +44,26 @@ public class ObjectPropertyReferenceTest
             new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
                 new EntityReference("Object", EntityType.OBJECT, new EntityReference("Page", EntityType.DOCUMENT,
                     new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))))));
-        assertEquals(reference, new ObjectPropertyReference("property", new ObjectReference("Object",
-            new DocumentReference("wiki", "Space", "Page"))));
+        assertEquals(reference, new ObjectPropertyReference("property",
+            new ObjectReference("Object", new DocumentReference("wiki", "Space", "Page"))));
     }
 
     @Test
     public void testInvalidType()
     {
-        try {
-            new ObjectPropertyReference(new EntityReference("space.page", EntityType.DOCUMENT));
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid type [DOCUMENT] for an object property reference", expected.getMessage());
-        }
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new ObjectPropertyReference(new EntityReference("space.page", EntityType.DOCUMENT)));
+
+        assertEquals("Invalid type [DOCUMENT] for an object property reference", e.getMessage());
     }
 
     @Test
     public void testInvalidNullParent()
     {
-        try {
-            new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY, null));
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [null] in an object property reference", expected.getMessage());
-        }
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY)));
+
+        assertEquals("Invalid parent reference [null] in an object property reference", e.getMessage());
     }
 
     /**
@@ -75,13 +72,23 @@ public class ObjectPropertyReferenceTest
     @Test
     public void testInvalidParentType()
     {
-        try {
-            new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
-                new EntityReference("Space", EntityType.SPACE)));
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [Space Space] in an object property reference",
-                expected.getMessage());
-        }
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
+                new EntityReference("Space", EntityType.SPACE))));
+
+        assertEquals("Invalid parent reference [Space Space] in an object property reference", e.getMessage());
+    }
+
+    @Test
+    public void testReplaceParent()
+    {
+        ObjectPropertyReference reference = new ObjectPropertyReference("prop",
+            new ObjectReference("object", new DocumentReference("wiki", "space", "page")))
+                .replaceParent(new ObjectReference("object2", new DocumentReference("wiki2", "space2", "page2")));
+
+        assertEquals(new ObjectPropertyReference("prop",
+            new ObjectReference("object2", new DocumentReference("wiki2", "space2", "page2"))), reference);
+
+        assertSame(reference, reference.replaceParent(reference.getParent()));
     }
 }

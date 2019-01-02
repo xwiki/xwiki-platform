@@ -27,4 +27,9 @@ package org.xwiki.xar.internal.model;
 public class XarClassPropertyModel
 {
     public static final String ELEMENT_CLASSTYPE = "classType";
+
+    /**
+     * @since 10.11RC1
+     */
+    public static final String ELEMENT_NAME = "name";
 }

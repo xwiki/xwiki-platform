@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1293832800000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1307113397000</date>
-  <contentUpdateDate>1307113397000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.wiki.browse')</title>
   <comment/>
@@ -46,13 +43,11 @@
   &lt;p&gt;&lt;a href="$xwiki.getURL('WikiManager.CreateWiki')" class="button button-success" id="tmCreateWiki"&gt;$services.icon.renderHTML('add') $services.localization.render('platform.wiki.create.button')&lt;/a&gt;&lt;/p&gt;
 #end
 {{/html}}
-## Load the User Picker style for the wiki owner column.
-#set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #set($columns = ['wikiprettyname', 'description', 'owner', 'doc.creationDate', 'membershipType'])
 #set($columnsProperties = {
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
     'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
-    'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
+    'owner' : { 'html' : 'true' },
     'membershipType' : { 'sortable': false, 'filterable': false},
     'doc.creationDate' : { 'type' : 'date', 'size' : 10, 'html' : 'false' }
 })

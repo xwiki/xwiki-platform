@@ -1104,7 +1104,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param feature the extension id or provided feature (virtual extension)
      * @param namespace the namespace from where the extension is usable
      * @return the {@link Extension} instance
-     * @since 9.12RC1
+     * @since 10.0RC1
      */
     public Extension getAccessibleExtension(String feature, Namespace namespace)
     {
@@ -1119,7 +1119,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param query the extension query used to filter and order the result
      * @return the found extensions descriptors, empty list if nothing could be found
      * @throws SearchException error when trying to search provided pattern
-     * @since 9.12RC1
+     * @since 10.0RC1
      */
     public IterableResult<Extension> searchAccessibleExtensions(Namespace namespace, ExtensionQuery query)
         throws SearchException

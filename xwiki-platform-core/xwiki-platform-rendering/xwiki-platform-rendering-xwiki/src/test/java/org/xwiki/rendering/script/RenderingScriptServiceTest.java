@@ -33,6 +33,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
@@ -40,15 +41,18 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.test.mockito.StringReaderMatcher;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link RenderingScriptService}.
@@ -241,5 +245,49 @@ public class RenderingScriptServiceTest
         List<MacroDescriptor> descriptors = this.mocker.getComponentUnderTest().getMacroDescriptors(Syntax.XWIKI_2_1);
         assertEquals(1, descriptors.size());
         assertSame(descriptor, descriptors.get(0));
+    }
+
+    @Test
+    public void resolveMacroId() throws Exception
+    {
+        MacroId macroId = new MacroId("info", Syntax.XWIKI_2_1);
+        MacroIdFactory macroIdFactory = this.mocker.registerMockComponent(MacroIdFactory.class);
+        when(macroIdFactory.createMacroId(macroId.toString())).thenReturn(macroId);
+
+        assertSame(macroId, this.mocker.getComponentUnderTest().resolveMacroId(macroId.toString()));
+    }
+
+    @Test
+    public void resolveMacroIdInvalid() throws Exception
+    {
+        MacroIdFactory macroIdFactory = this.mocker.registerMockComponent(MacroIdFactory.class);
+        when(macroIdFactory.createMacroId("foo")).thenThrow(new ParseException("Invalid macro id"));
+
+        assertNull(this.mocker.getComponentUnderTest().resolveMacroId("foo"));
+    }
+
+    @Test
+    public void getMacroDescriptor() throws Exception
+    {
+        MacroId macroId = new MacroId("macroId");
+        Macro macro = mock(Macro.class);
+        MacroDescriptor macroDescriptor = mock(MacroDescriptor.class);
+
+        MacroManager macroManager = this.mocker.registerMockComponent(MacroManager.class);
+        when(macroManager.exists(macroId)).thenReturn(true);
+        when(macroManager.getMacro(macroId)).thenReturn(macro);
+        when(macro.getDescriptor()).thenReturn(macroDescriptor);
+
+        assertSame(macroDescriptor, this.mocker.getComponentUnderTest().getMacroDescriptor(macroId));
+    }
+
+    @Test
+    public void getMacroDescriptorNotFound() throws Exception
+    {
+        MacroId macroId = new MacroId("macroId");
+        MacroManager macroManager = this.mocker.registerMockComponent(MacroManager.class);
+        when(macroManager.exists(macroId)).thenReturn(false);
+
+        assertNull(this.mocker.getComponentUnderTest().getMacroDescriptor(macroId));
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-script</artifactId>
   <name>XWiki Platform - Localization - Script</name>
@@ -33,6 +33,7 @@
   <description>Provide script oriented APIs to manipulate translations</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>58</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

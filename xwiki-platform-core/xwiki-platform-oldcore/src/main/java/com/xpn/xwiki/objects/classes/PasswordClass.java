@@ -59,7 +59,6 @@ public class PasswordClass extends StringClass
     public PasswordClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Password", wclass);
-        setxWikiClass(wclass);
     }
 
     public PasswordClass()
@@ -126,12 +125,24 @@ public class PasswordClass extends StringClass
     {
         BaseProperty st = (BaseProperty) this.getField(PasswordMetaClass.STORAGE_TYPE);
         if (st != null) {
-            String type = st.getValue().toString().trim();
-            if (!type.equals("")) {
-                return type;
+            Object value = st.getValue();
+            if (value != null) {
+                String type = value.toString().trim();
+                if (!type.equals("")) {
+                    return type;
+                }
             }
         }
         return DEFAULT_STORAGE;
+    }
+
+    /**
+     * @param storageType One of 'Clear', 'Hash' or 'Encrypt'
+     * @since 10.7RC1
+     */
+    public void setStorageType(String storageType)
+    {
+        setStringValue(PasswordMetaClass.STORAGE_TYPE, storageType);
     }
 
     /**
@@ -200,11 +211,13 @@ public class PasswordClass extends StringClass
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
         String result = plainPassword;
-        if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-            result =
-                getPasswordHash(result, getAlgorithmFromPassword(storedPassword), getSaltFromPassword(storedPassword));
-        } else if (storedPassword.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
-            result = getPasswordCrypt(result, getAlgorithmFromPassword(storedPassword));
+        if (storedPassword != null && plainPassword != null) {
+            if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+                result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
+                        getSaltFromPassword(storedPassword));
+            } else if (storedPassword.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
+                result = getPasswordCrypt(result, getAlgorithmFromPassword(storedPassword));
+            }
         }
         return result;
     }

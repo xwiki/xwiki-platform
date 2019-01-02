@@ -91,7 +91,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     return properties;
   }
 
-  var createAnswerProperties = function(questionForm) {
+  var createAnswerProperties = function(questionForm, button) {
     // Create request parameters
     var properties = {};
 
@@ -100,7 +100,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     if (dataProperties) {
       addCustomProperties(properties, resolveAnswerProperties(dataProperties, questionForm));
     } else {
-      addFormInputs(properties, questionForm);
+      addFormInputs(properties, questionForm, button);
     }
 
     // Add extra values
@@ -118,8 +118,13 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
       });
   };
 
-  var addFormInputs = function(properties, questionForm) {
-    questionForm.serializeArray().each(function(entry) {
+  var addFormInputs = function(properties, questionForm, button) {
+    var entries = questionForm.serializeArray();
+    // Add the data from the button that submitted the answer.
+    if (button && !button.prop('disabled') && button.attr('name') !== '') {
+      entries.push({name: button.attr('name'), value: button.val()});
+    }
+    entries.each(function(entry) {
       var propertyValue = properties[entry.name];
 
       if (propertyValue) {
@@ -160,7 +165,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
           if (createAnswerRequest) {
             answerCallback(createAnswerRequest);
           } else {
-            var properties = createAnswerProperties(questionForm);
+            var properties = createAnswerProperties(questionForm, button);
 
             var answeringNotification =
               "$escapetool.javascript($services.localization.render('job.question.notification.answering'))";

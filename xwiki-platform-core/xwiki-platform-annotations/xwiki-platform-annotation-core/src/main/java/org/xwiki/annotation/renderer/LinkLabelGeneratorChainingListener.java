@@ -97,7 +97,8 @@ public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
             // link label can be changed with whichever generator, that can handle all cases
             String linkLabel = reference.getReference();
             ResourceType resourceType = reference.getType();
-            if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
+            if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)
+                || ResourceType.PAGE.equals(resourceType)) {
                 linkLabel = linkLabelGenerator.generate(reference);
             }
 

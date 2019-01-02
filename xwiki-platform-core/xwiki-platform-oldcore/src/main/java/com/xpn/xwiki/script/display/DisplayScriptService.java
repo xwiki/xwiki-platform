@@ -42,6 +42,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,10 +56,15 @@ import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
  * @since 3.2M3
  */
 @Component
-@Named("display")
+@Named(DisplayScriptService.ROLEHINT)
 @Singleton
 public class DisplayScriptService implements ScriptService
 {
+    /**
+     * The role hint of this component.
+     */
+    public static final String ROLEHINT = "display";
+
     /**
      * The key used to store the displayer parameters in the display parameter map.
      */
@@ -88,6 +94,9 @@ public class DisplayScriptService implements ScriptService
 
     @Inject
     private RenderingContext renderingContext;
+
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
 
     private Syntax getOutputSyntax(Map<String, Object> parameters)
     {
@@ -241,6 +250,20 @@ public class DisplayScriptService implements ScriptService
     public String title(Document document)
     {
         return title(document, Collections.<String, Object>emptyMap());
+    }
+
+    /**
+     * Gets a sub-service.
+     *
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
+     * @since 10.11RC1
+     */
+    @SuppressWarnings("unchecked")
+    public <S extends ScriptService> S get(String serviceName)
+    {
+        return (S) this.scriptServiceManager.get(ROLEHINT + '.' + serviceName);
     }
 
     /**

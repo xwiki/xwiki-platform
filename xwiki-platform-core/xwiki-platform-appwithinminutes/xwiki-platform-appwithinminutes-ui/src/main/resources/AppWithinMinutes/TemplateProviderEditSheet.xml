@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1478270889000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1514830441000</date>
-  <contentUpdateDate>1514830441000</contentUpdateDate>
   <version>1.1</version>
   <title>#if(!$doc.name.endsWith('Sheet'))$services.localization.render('appWithinMinutes.templateProviderEditor.title', [$stringtool.removeEnd($doc.name, 'TemplateProvider')])#{else}$doc.name#end</title>
   <comment/>

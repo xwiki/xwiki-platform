@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -71,9 +72,11 @@ public class FarmTreeNodeTest
         assertEquals(3, this.farmTreeNode.getChildCount("anyId"));
 
         this.farmTreeNode.getProperties().put("exclusions",
-            new HashSet<>(Arrays.asList("wiki:two", "document:three:Path.To.Page", "foo:bar")));
-        when(this.currentEntityReferenceResolver.resolve("three:Path.To.Page", EntityType.DOCUMENT))
-            .thenReturn(new DocumentReference("three", Arrays.asList("Path", "To"), "Page"));
+            new HashSet<>(Arrays.asList("wiki:two", "document:three:Path.To.one", "foo:bar", "space:wiki:three")));
+        when(this.currentEntityReferenceResolver.resolve("three:Path.To.one", EntityType.DOCUMENT))
+            .thenReturn(new DocumentReference("three", Arrays.asList("Path", "To"), "one"));
+        when(this.currentEntityReferenceResolver.resolve("wiki:three", EntityType.SPACE))
+            .thenReturn(new SpaceReference("wiki", "three"));
 
         assertEquals(2, this.farmTreeNode.getChildCount("anyId"));
     }

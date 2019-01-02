@@ -82,6 +82,9 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     @Inject
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
 
+    @Inject
+    private PreferenceDateNotificationFilter preferenceDateNotificationFilter;
+
     @Override
     public List<CompositeEvent> getEvents(NotificationParameters parameters)
             throws NotificationException
@@ -153,8 +156,11 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
             return true;
         }
 
-        // Don't record events that concern an event type for which we don't have a descriptor
-        if (!recordableEventDescriptorHelper.hasDescriptor(event.getType(), parameters.user)) {
+        // Don't record events that concern an event type for which we don't have a descriptor and
+        // don't record events that are before the starting date of the corresponding preference (the query do not
+        // guarantee that)
+        if (!recordableEventDescriptorHelper.hasDescriptor(event.getType(), parameters.user)
+                || preferenceDateNotificationFilter.shouldFilter(event, parameters.preferences)) {
             return true;
         }
 

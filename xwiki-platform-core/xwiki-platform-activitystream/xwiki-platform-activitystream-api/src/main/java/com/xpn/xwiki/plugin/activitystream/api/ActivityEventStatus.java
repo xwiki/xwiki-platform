@@ -19,15 +19,12 @@
  */
 package com.xpn.xwiki.plugin.activitystream.api;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Define a status for any couple of activity/entity.
  *
  * @version $Id$
  * @since 9.2RC1
  */
-@Unstable
 public interface ActivityEventStatus
 {
     /**

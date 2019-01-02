@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1293832800000</creationDate>
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1307189790000</date>
-  <contentUpdateDate>1307189790000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <comment/>
@@ -233,6 +230,7 @@ platform.wiki.create.wizard.step.create=Creează
 ### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
 ### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
 ### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
+### Missing: platform.wiki.create.wizard.step.creation.errorlog=However error(s) have been generated during that process and you might want to review them.
 ### Missing: platform.wiki.create.wizard.step.creation.error=The wiki {0} has been created but some pages have not been installed. Consequently, the wiki might behave erroneously and you should probably delete it.
 ### Missing: platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
@@ -253,6 +251,7 @@ platform.wiki.create.wizard.step.create=Creează
 ### Missing: platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
 ### Missing: platform.wiki.sheet.desc.owner=A user who will have all the rights on this wiki.
 ### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
+### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.
 ### Missing: platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
 ### Missing: platform.wiki.sheet.desc.server=The alias used to access the wiki.
 ### Missing: platform.wiki.sheet.desc.description=A brief wiki description.
@@ -260,6 +259,7 @@ platform.wiki.create.wizard.step.create=Creează
 ### Missing: platform.wiki.sheet.prop.wikiprettyname=Pretty name
 platform.wiki.sheet.prop.owner=Posesor
 ### Missing: platform.wiki.sheet.prop.secure=Secure (SSL)
+### Missing: platform.wiki.sheet.prop.port=Port
 platform.wiki.sheet.prop.description=Descriere
 ### Missing: platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Pagina de start

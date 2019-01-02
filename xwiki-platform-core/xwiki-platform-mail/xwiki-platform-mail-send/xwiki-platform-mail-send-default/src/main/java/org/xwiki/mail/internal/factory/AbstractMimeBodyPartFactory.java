@@ -35,6 +35,8 @@ import org.xwiki.mail.MimeBodyPartFactory;
  */
 public abstract class AbstractMimeBodyPartFactory<T> implements MimeBodyPartFactory<T>
 {
+    private static final String HEADERS_PARAMETER_KEY = "headers";
+
     /**
      * Add the mail headers passed as parameters into the Mime Body part also passed as parameter.
      *
@@ -44,7 +46,7 @@ public abstract class AbstractMimeBodyPartFactory<T> implements MimeBodyPartFact
      */
     protected void addHeaders(MimeBodyPart part, Map<String, Object> parameters) throws MessagingException
     {
-        Map<String, String> headers = (Map<String, String>) parameters.<String, String>get("headers");
+        Map<String, String> headers = (Map<String, String>) parameters.get(HEADERS_PARAMETER_KEY);
         if (headers != null && headers instanceof Map) {
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 part.setHeader(header.getKey(), header.getValue());

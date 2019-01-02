@@ -25,7 +25,7 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.LiveTableElement;
-import org.xwiki.test.ui.po.editor.UserPicker;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Page Object for a Group page in Edit mode.
@@ -56,15 +56,15 @@ public class GroupEditPage extends InlinePage
      */
     public GroupEditPage addMemberToGroup(String member, boolean isUser)
     {
-        UserPicker picker;
+        SuggestInputElement picker;
 
         if (isUser) {
-            picker = new UserPicker(userInput);
+            picker = new SuggestInputElement(userInput);
         } else {
-            picker = new UserPicker(groupInput);
+            picker = new SuggestInputElement(groupInput);
         }
 
-        picker.sendKeys(member).waitForSuggestions().select(member).waitForSuggestionsToDisappear();
+        picker.sendKeys(member).waitForSuggestions().selectByIndex(0).hideSuggestions();
         clickAddMemberButton();
 
         waitForNotificationSuccessMessage("Members successfully added");
@@ -74,7 +74,7 @@ public class GroupEditPage extends InlinePage
 
     public void filterMembers(String member)
     {
-        membersLiveTable.filterColumn("xwiki-livetable-groupusers-filter-2", member);
+        membersLiveTable.filterColumn("xwiki-livetable-groupusers-filter-1", member);
     }
 
     /**

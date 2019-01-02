@@ -1,8 +1,6 @@
 #template('colorThemeInit.vm')
 .meta-versionSummary label {
   font-weight: 400;
-  margin: 10px 1em 4px 0 !important; /* !important overrides Toucan rules */
-  text-align: left !important; /* !important overrides Toucan rules */
 }
 .skin-colibri .meta-versionSummary label {
   display: block;

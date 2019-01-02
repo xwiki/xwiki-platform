@@ -227,8 +227,8 @@ public class DownloadAction extends XWikiAction
             Long end = NumberUtils.createLong(endStr);
             if (start == null && end != null && end > 0) {
                 // Tail request, output the last <end> bytes
-                start = Math.max(attachment.getContentSize(context) - end, 0L);
-                end = attachment.getContentSize(context) - 1L;
+                start = Math.max(attachment.getContentLongSize(context) - end, 0L);
+                end = attachment.getContentLongSize(context) - 1L;
             }
             if (!isValidRange(start, end)) {
                 return false;
@@ -262,7 +262,7 @@ public class DownloadAction extends XWikiAction
         final XWikiContext context)
         throws XWikiException, IOException
     {
-        if (start >= 0 && start < attachment.getContentSize(context)) {
+        if (start >= 0 && start < attachment.getContentLongSize(context)) {
             InputStream data = attachment.getContentInputStream(context);
             data = new BoundedInputStream(data, end + 1);
             data.skip(start);
@@ -272,7 +272,7 @@ public class DownloadAction extends XWikiAction
                 response.setContentLength((int) (end - start + 1));
             }
             response.setHeader("Content-Range", "bytes " + start + "-" + end + SEPARATOR
-                + attachment.getContentSize(context));
+                + attachment.getContentLongSize(context));
             IOUtils.copyLarge(data, response.getOutputStream());
         } else {
             response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -442,10 +442,11 @@ public class DownloadAction extends XWikiAction
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
-        try {
-            response.setCharacterEncoding("");
-        } catch (IllegalCharsetNameException ex) {
-            response.setCharacterEncoding(XWiki.DEFAULT_ENCODING);
+
+        // Set the character encoding
+        String characterEncoding = attachment.getCharset();
+        if (characterEncoding != null) {
+            response.setCharacterEncoding(characterEncoding);
         }
 
         String ofilename =

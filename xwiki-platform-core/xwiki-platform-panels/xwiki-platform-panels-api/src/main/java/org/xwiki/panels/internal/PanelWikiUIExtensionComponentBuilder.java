@@ -31,13 +31,10 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
-import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -58,15 +55,12 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectCompo
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * Content parser used to parse the panel content.
-     */
-    @Inject
-    private ContentParser parser;
-
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     @Override
     public EntityReference getClassReference()
@@ -77,19 +71,14 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectCompo
     @Override
     public List<WikiComponent> buildComponents(BaseObject baseObject) throws WikiComponentException
     {
-        String content = baseObject.getStringValue("content");
-        Syntax syntax = baseObject.getOwnerDocument().getSyntax();
-        DocumentReference documentReference = baseObject.getOwnerDocument().getDocumentReference();
-        DocumentReference authorReference = baseObject.getOwnerDocument().getAuthorReference();
-
-        XDOM xdom = this.parser.parse(content, syntax, documentReference);
-
         try {
-            return Collections.<WikiComponent>singletonList(new PanelWikiUIExtension(baseObject.getReference(),
-                authorReference, xdom, syntax, this.componentManager));
+            String id = this.serializer.serialize(baseObject.getDocumentReference());
+
+            return Collections
+                .<WikiComponent>singletonList(new PanelWikiUIExtension(baseObject, id, this.componentManager));
         } catch (ComponentLookupException e) {
-            throw new WikiComponentException(String.format("Failed to initialize Panel UI extension [%s]", baseObject),
-                e);
+            throw new WikiComponentException(
+                String.format("Failed to initialize Panel UI extension [%s]", baseObject.getReference()), e);
         }
     }
 }

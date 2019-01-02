@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1300895617000</creationDate>
   <parent>XWiki.XWikiSyntax</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1301497989000</date>
-  <contentUpdateDate>1301497989000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxTables</title>
   <comment/>
@@ -124,7 +121,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |Parola 1|Parola 2
 )))
 |Tabella con Parametri|((({{{
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titolo 1|=(% style="background-color:yellow" %)Titolo 2
 |Parola 1|Parola 2
 }}})))|(((

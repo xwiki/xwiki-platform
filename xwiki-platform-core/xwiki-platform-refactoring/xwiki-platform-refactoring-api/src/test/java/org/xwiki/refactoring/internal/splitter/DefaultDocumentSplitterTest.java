@@ -19,10 +19,6 @@
  */
 package org.xwiki.refactoring.internal.splitter;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,6 +42,14 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link DefaultDocumentSplitter}.
@@ -98,43 +102,51 @@ public class DefaultDocumentSplitterTest
         assertSame(result.get(1), result.get(2).getParent());
 
         ClassBlockMatcher headerMatcher = new ClassBlockMatcher(HeaderBlock.class);
-        assertTrue(document.getXdom().<LinkBlock> getBlocks(headerMatcher, Axes.DESCENDANT).isEmpty());
-        assertEquals(1, result.get(1).getXdom().<LinkBlock> getBlocks(headerMatcher, Axes.DESCENDANT).size());
-        assertEquals(1, result.get(2).getXdom().<LinkBlock> getBlocks(headerMatcher, Axes.DESCENDANT).size());
+        ClassBlockMatcher linkMatcher = new ClassBlockMatcher(LinkBlock.class);
+        assertTrue(document.getXdom().getBlocks(headerMatcher, Axes.DESCENDANT).isEmpty());
+        assertEquals(1, document.getXdom().getBlocks(linkMatcher, Axes.DESCENDANT).size());
+        assertEquals(1, result.get(1).getXdom().getBlocks(headerMatcher, Axes.DESCENDANT).size());
+        assertEquals(1, result.get(1).getXdom().getBlocks(linkMatcher, Axes.DESCENDANT).size());
+        assertEquals(1, result.get(2).getXdom().getBlocks(headerMatcher, Axes.DESCENDANT).size());
+        assertTrue(result.get(2).getXdom().getBlocks(linkMatcher, Axes.DESCENDANT).isEmpty());
     }
 
     @Test
     public void updateAnchors() throws Exception
     {
         SplittingCriterion splittingCriterion = mock(SplittingCriterion.class);
-        when(splittingCriterion.shouldSplit(any(Block.class), anyInt())).thenReturn(false, true, true);
+        when(splittingCriterion.shouldSplit(any(Block.class), anyInt())).thenReturn(false, false, true, true);
         when(splittingCriterion.shouldIterate(any(SectionBlock.class), anyInt())).thenReturn(false, false, false);
 
         NamingCriterion namingCriterion = mock(NamingCriterion.class);
         when(namingCriterion.getDocumentName(any(XDOM.class))).thenReturn("Child1", "Child2");
 
         // [[link>>||anchor="chapter1"]]
-        // = {{id name="chapter1"}}Chapter 1 =
-        // = Chapter 2 ==
-        // [[link>>path:#chapter1]]
-
         ResourceReference reference = new ResourceReference("", ResourceType.DOCUMENT);
         reference.setParameter("anchor", "chapter1");
-        LinkBlock link = new LinkBlock(Arrays.<Block> asList(new WordBlock("link")), reference, false);
-        ParagraphBlock paragraph = new ParagraphBlock(Arrays.<Block> asList(link));
+        LinkBlock link = new LinkBlock(Arrays.<Block>asList(new WordBlock("link")), reference, false);
+        ParagraphBlock firstParagraph = new ParagraphBlock(Arrays.<Block>asList(link));
 
-        HeaderBlock header =
-            new HeaderBlock(Arrays.<Block> asList(new IdBlock("chapter1"), new WordBlock("Chapter 1")),
-                HeaderLevel.LEVEL1);
-        SectionBlock section1 = new SectionBlock(Arrays.<Block> asList(header));
+        // [[link>>path:||anchor="chapter1"]]
+        reference = new ResourceReference("", ResourceType.PATH);
+        reference.setParameter("anchor", "chapter1");
+        link = new LinkBlock(Arrays.<Block>asList(new WordBlock("link")), reference, false);
+        ParagraphBlock secondParagraph = new ParagraphBlock(Arrays.<Block>asList(link));
 
-        header = new HeaderBlock(Arrays.<Block> asList(new WordBlock("Chapter 2")), HeaderLevel.LEVEL1);
+        // = {{id name="chapter1"}}Chapter 1 =
+        HeaderBlock header = new HeaderBlock(Arrays.<Block>asList(new IdBlock("chapter1"), new WordBlock("Chapter 1")),
+            HeaderLevel.LEVEL1);
+        SectionBlock section1 = new SectionBlock(Arrays.<Block>asList(header));
+
+        // = Chapter 2 ==
+        // [[link>>path:#chapter1]]
+        header = new HeaderBlock(Arrays.<Block>asList(new WordBlock("Chapter 2")), HeaderLevel.LEVEL1);
         reference = new ResourceReference("#chapter1", ResourceType.PATH);
-        link = new LinkBlock(Arrays.<Block> asList(new WordBlock("link")), reference, false);
+        link = new LinkBlock(Arrays.<Block>asList(new WordBlock("link")), reference, false);
         SectionBlock section2 =
-            new SectionBlock(Arrays.<Block> asList(header, new ParagraphBlock(Arrays.<Block> asList(link))));
+            new SectionBlock(Arrays.<Block>asList(header, new ParagraphBlock(Arrays.<Block>asList(link))));
 
-        XDOM xdom = new XDOM(Arrays.<Block> asList(paragraph, section1, section2));
+        XDOM xdom = new XDOM(Arrays.<Block>asList(firstParagraph, secondParagraph, section1, section2));
         WikiDocument document = new WikiDocument("Space.Page", xdom, null);
 
         List<WikiDocument> result = mocker.getComponentUnderTest().split(document, splittingCriterion, namingCriterion);
@@ -142,12 +154,17 @@ public class DefaultDocumentSplitterTest
         ClassBlockMatcher linkMatcher = new ClassBlockMatcher(LinkBlock.class);
 
         ResourceReference updatedReference =
-            document.getXdom().<LinkBlock> getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
+            document.getXdom().<LinkBlock>getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
         assertEquals("chapter1", updatedReference.getParameter("anchor"));
         assertEquals(result.get(1).getFullName(), updatedReference.getReference());
 
+        // Verify that the path reference was not updated.
+        updatedReference = document.getXdom().<LinkBlock>getBlocks(linkMatcher, Axes.DESCENDANT).get(1).getReference();
+        assertEquals("", updatedReference.getReference());
+        assertEquals("chapter1", updatedReference.getParameter("anchor"));
+
         updatedReference =
-            result.get(2).getXdom().<LinkBlock> getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
+            result.get(2).getXdom().<LinkBlock>getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
         assertEquals(ResourceType.DOCUMENT, updatedReference.getType());
         assertEquals("chapter1", updatedReference.getParameter("anchor"));
         assertEquals(result.get(1).getFullName(), updatedReference.getReference());

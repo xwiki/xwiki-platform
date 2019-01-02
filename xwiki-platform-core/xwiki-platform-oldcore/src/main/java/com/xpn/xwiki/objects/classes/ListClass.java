@@ -87,6 +87,21 @@ public abstract class ListClass extends PropertyClass
      */
     public static final char SEPARATOR_ESCAPE = '\\';
 
+    /**
+     * @since 10.11RC1
+     */
+    public static final String FREE_TEXT_DISCOURAGED = "discouraged";
+
+    /**
+     * @since 10.11RC1
+     */
+    public static final String FREE_TEXT_FORBIDDEN = "forbidden";
+
+    /**
+     * @since 10.11RC1
+     */
+    public static final String FREE_TEXT_ALLOWED = "allowed";
+
     private static final String XCLASSNAME = "list";
 
     /**
@@ -212,9 +227,14 @@ public abstract class ListClass extends PropertyClass
         return (getIntValue("relationalStorage") == 1);
     }
 
-    public void setRelationalStorage(boolean storage)
+    /**
+     * @param relationalStorage if false, the list items will be concatenated into a VARCHAR column on a single row.
+     *            Otherwise, items are stored in their own entries in the database. In most cases, this property should
+     *            have the same value as the {@code multiSelect} property
+     */
+    public void setRelationalStorage(boolean relationalStorage)
     {
-        setIntValue("relationalStorage", storage ? 1 : 0);
+        setIntValue("relationalStorage", relationalStorage ? 1 : 0);
     }
 
     public boolean isPicker()
@@ -244,6 +264,45 @@ public abstract class ListClass extends PropertyClass
     public void setSeparator(String separator)
     {
         setStringValue("separator", separator);
+    }
+
+    /**
+     * @return the default value used in the select editor
+     * @since 10.9
+     * @since 10.8.1
+     */
+    public String getDefaultValue()
+    {
+        return getStringValue("defaultValue");
+    }
+
+    /**
+     * @param separator the default value used in the select editor
+     * @since 10.9
+     * @since 10.8.1
+     */
+    public void setDefaultValue(String separator)
+    {
+        setStringValue("defaultValue", separator);
+    }
+
+
+    /**
+     * @return the value of freeText (forbidden, discouraged or allowed)
+     * @since 10.11RC1
+     */
+    public String getFreeText()
+    {
+        return getStringValue("freeText");
+    }
+
+    /**
+     * @param type the value of freeText (forbidden, discouraged or allowed)
+     * @since 10.11RC1
+     */
+    public void setFreeText(String type)
+    {
+        setStringValue("freeText", type);
     }
 
     /**
@@ -416,6 +475,7 @@ public abstract class ListClass extends PropertyClass
             lprop = new StringProperty();
         }
 
+        lprop.setName(getName());
         return lprop;
     }
 
@@ -512,10 +572,16 @@ public abstract class ListClass extends PropertyClass
      */
     protected String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
+        return getDisplayValue(value, name, map, value, context);
+    }
+
+    private String getDisplayValue(String value, String name, Map<String, ListItem> map, String def,
+        XWikiContext context)
+    {
         ListItem item = map.get(value);
         String displayValue;
         if (item == null) {
-            displayValue = value;
+            displayValue = def;
         } else {
             displayValue = item.getValue();
         }
@@ -675,9 +741,9 @@ public abstract class ListClass extends PropertyClass
         for (Object rawvalue : list) {
             String value = getElementValue(rawvalue);
             String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
-            input radio =
-                new input((getDisplayType().equals(DISPLAYTYPE_RADIO) && !isMultiSelect()) ? input.radio
-                    : input.checkbox, prefix + name, value);
+            input radio = new input(
+                (getDisplayType().equals(DISPLAYTYPE_RADIO) && !isMultiSelect()) ? input.radio : input.checkbox,
+                prefix + name, value);
             radio.setAttributeFilter(new XMLAttributeValueFilter());
             radio.setID("xwiki-form-" + name + "-" + object.getNumber() + "-" + count);
             radio.setDisabled(isDisabled());
@@ -758,27 +824,44 @@ public abstract class ListClass extends PropertyClass
 
         List<String> selectlist = toList((BaseProperty) object.safeget(name));
 
+        String defaultValue = getDefaultValue();
+
         // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
-            if (!list.contains(item)) {
+            if (!StringUtils.isEmpty(item) && !defaultValue.equals(item) && !list.contains(item)) {
                 list.add(item);
             }
+        }
+
+        // Add default if not already part of the list
+        if (!isMultiSelect() && !list.contains(defaultValue)) {
+            String display =
+                getDisplayValue(defaultValue, name, map, defaultValue.isEmpty() ? "---" : defaultValue, context);
+
+            select.addElement(createOption("", display, selectlist));
         }
 
         // Add options from Set
         for (String rawvalue : list) {
             String value = getElementValue(rawvalue);
             String display = getDisplayValue(rawvalue, name, map, context);
-            option option = new option(display, value);
-            option.setAttributeFilter(new XMLAttributeValueFilter());
-            option.addElement(XMLUtils.escape(display));
-            if (selectlist.contains(value)) {
-                option.setSelected(true);
-            }
-            select.addElement(option);
+
+            select.addElement(createOption(value, display, selectlist));
         }
 
         buffer.append(select.toString());
+    }
+
+    private option createOption(String value, String display, List<String> selectlist)
+    {
+        option option = new option(display, value);
+        option.setAttributeFilter(new XMLAttributeValueFilter());
+        option.addElement(XMLUtils.escape(display));
+        if (selectlist.contains(value)) {
+            option.setSelected(true);
+        }
+
+        return option;
     }
 
     public abstract List<String> getList(XWikiContext context);

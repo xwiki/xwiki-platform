@@ -27,24 +27,21 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1390416042000</creationDate>
   <parent>Main.Activity</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1390416053000</date>
-  <contentUpdateDate>1390416047000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: activity.page.link.title=Located in {0}
+  <content>activity.page.link.title=Atrodas {0}
 activity.rss.pages.modified=Mainīto lapu RSS barotne
 activity.rss.feed.description=Dokumentu izmaiņu RSS barotne
 activity.rss.feed.tags.description=RSS barotne dokumentiem  ar tagu ir "{0}"
 activity.rss.feed.spaces.description=RSS barotne vietas dokumentiem ir "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS barotne ar tagu "{0}" vietā(s) "{1}" 
+activity.rss.feed.tagsAndSpaces.description=RSS barotne ar tagu "{0}" vietā(s) "{1}"
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

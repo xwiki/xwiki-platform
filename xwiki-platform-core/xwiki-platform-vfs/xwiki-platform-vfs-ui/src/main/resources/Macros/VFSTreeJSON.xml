@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1449339423000</creationDate>
   <parent>Macros.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1449485799000</date>
-  <contentUpdateDate>1449485799000</contentUpdateDate>
   <version>1.1</version>
   <title>JSON for the VFS Tree Macro</title>
   <comment/>

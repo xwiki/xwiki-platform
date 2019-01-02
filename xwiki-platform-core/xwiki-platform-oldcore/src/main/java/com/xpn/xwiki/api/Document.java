@@ -43,10 +43,12 @@ import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -128,11 +130,6 @@ public class Document extends Api
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     private DocumentRevisionProvider documentRevisionProvider;
-
-    /**
-     * Authorization manager used to check rights.
-     */
-    private ContextualAuthorizationManager authorizationManager;
 
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
@@ -255,9 +252,35 @@ public class Document extends Api
     }
 
     /**
-     * return the name of a document. for example if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
-     *
-     * @return the name of the document
+     * @return the reference of the document as {@link PageReference} without the {@link Locale}
+     * @since 10.6RC1
+     */
+    @Unstable
+    public PageReference getPageReference()
+    {
+        return this.doc.getPageReference();
+    }
+
+    /**
+     * @return the reference of the document as {@link PageReference} including the {@link Locale}
+     * @since 10.6RC1
+     */
+    @Unstable
+    public PageReference getPageReferenceWithLocale()
+    {
+        return this.doc.getPageReferenceWithLocale();
+    }
+
+    /**
+     * @return the last part of the document's reference. For example if the reference of a document is
+     *         {@code MySpace.Mydoc}, the returned name is {@code MyDoc}. For a nested document, the last part of the
+     *         reference is always {@code WebHome} and thus the returned name is {@code Webhome}. It's better to use
+     *         {@link #getPageReference()} or {@link #getDocumentReference()}, e.g. with
+     *         {@code getPageReference().getName()} or {@code getDocumentReference().getName()}. To get the space name
+     *         of the nested document you can use {@code getPageReference().getName()} or
+     *         {@code getDocumentReference().getParent().getName()}.
+     * @see #getPageReference()
+     * @see #getDocumentReference()
      */
     public String getName()
     {
@@ -919,7 +942,7 @@ public class Document extends Api
     /**
      * Get the URL of this document.
      *
-     * @return the URL to view this document, this will be a relitive URL for example: /xwiki/bin/view/Main/WebHome
+     * @return the URL to view this document, this will be a relative URL for example: /xwiki/bin/view/Main/WebHome
      * @see #getExternalURL() for an absolute URL which can used outside of the site.
      */
     public String getURL()
@@ -957,7 +980,7 @@ public class Document extends Api
      *
      * @return the full URL of the document, sutable for use at external websites for example:
      *         http://www.xwiki.org/xwiki/bin/view/Main/WebHome
-     * @see #getURL() for a reletive URL which can only be used inside of the site.
+     * @see #getURL() for a relative URL which can only be used inside of the site.
      */
     public String getExternalURL()
     {
@@ -2033,6 +2056,21 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on this
+     * document.
+     * 
+     * @param right the right to check
+     * @param userReference the user to check the right for
+     * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
+     * @since 10.6RC1
+     */
+    @Unstable
+    public boolean hasAccess(Right right, DocumentReference userReference)
+    {
+        return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());
+    }
+
     public boolean getLocked()
     {
         try {
@@ -2491,17 +2529,20 @@ public class Document extends Api
      */
     public void saveAsAuthor(String comment, boolean minorEdit) throws XWikiException
     {
-        String author = this.getEffectiveScriptAuthorName();
-        if (hasAccessLevel("edit", author)) {
-            String viewer = getXWikiContext().getUser();
+        XWikiContext xcontext = getXWikiContext();
+
+        DocumentReference author = getEffectiveAuthorReference();
+        if (hasAccess(Right.EDIT, author)) {
+            DocumentReference currentUser = xcontext.getUserReference();
             try {
-                getXWikiContext().setUser(author);
+                xcontext.setUserReference(author);
+
                 saveDocument(comment, minorEdit);
             } finally {
-                getXWikiContext().setUser(viewer);
+                xcontext.setUserReference(currentUser);
             }
         } else {
-            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.getFullName() };
+            java.lang.Object[] args = { author, xcontext.getDoc(), getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot save document {2}", null, args);
         }
@@ -2676,17 +2717,20 @@ public class Document extends Api
      */
     public void deleteAsAuthor() throws XWikiException
     {
-        String author = this.getEffectiveScriptAuthorName();
-        if (hasAccessLevel("delete", author)) {
-            String viewer = getXWikiContext().getUser();
+        XWikiContext xcontext = getXWikiContext();
+
+        DocumentReference author = getEffectiveAuthorReference();
+        if (hasAccess(Right.DELETE, author)) {
+            DocumentReference currentUser = xcontext.getUserReference();
             try {
-                getXWikiContext().setUser(author);
+                xcontext.setUserReference(author);
+
                 deleteDocument();
             } finally {
-                getXWikiContext().setUser(viewer);
+                xcontext.setUserReference(currentUser);
             }
         } else {
-            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.getFullName() };
+            java.lang.Object[] args = { author, xcontext.getDoc(), this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null,
                 args);
@@ -3090,14 +3134,5 @@ public class Document extends Api
     public boolean isTranslation()
     {
         return 1 == this.getDoc().getTranslation();
-    }
-
-    private ContextualAuthorizationManager getAuthorizationManager()
-    {
-        if (this.authorizationManager == null) {
-            this.authorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
-        }
-
-        return this.authorizationManager;
     }
 }

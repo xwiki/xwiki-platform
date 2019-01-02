@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1385047506000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1433258948000</date>
-  <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <comment/>
@@ -41,8 +38,10 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Administration de la recherche Solr
 solr.admin.submit=Appliquer
-solr.admin.error.notallowed=Vous n'êtes pas autorisé à effectuer cette action.
+solr.admin.error.action={0} a échoué :
+solr.admin.error.notallowed=Vous n'êtes pas autorisé(e) à effectuer cette action.
 solr.admin.error.norights=Les droits d'administration sont nécessaires pour accéder à cette section.
+solr.admin.success.action=Le traitement {0} a été déclenché.
 
 solr.admin.status.title=Statut
 solr.admin.status.queueSize.label=Taille de la file d'attente
@@ -55,38 +54,40 @@ solr.admin.indexing.action.select_index=Ajouter à l'index
 solr.admin.indexing.action.select_delete=Supprimer de l'index
 solr.admin.indexing.action.select_reindex=Réindexer
 solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.hint=Le wiki pour lequel tous les documents seront affectés par l'indexation.
+solr.admin.indexing.wiki.hint=Le wiki dont tous les documents seront affectés par l'indexation.
 solr.admin.indexing.wiki.select_farm=Ferme entière
 solr.admin.indexing.query.label=Recherche avancée
 solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
 
-solr.sortBy=Trier par\:
+solr.admin.info.affectedDocuments=Documents concernés dans l'index :
+
+solr.sortBy=Trier par :
 solr.sortBy.score=Pertinence
 solr.sortBy.title_sort=Titre
-solr.sortBy.date=Date
-solr.sortBy.author_display_sort=Dernier Auteur
+solr.sortBy.date=Date de dernière modification
+solr.sortBy.author_display_sort=Dernier auteur
 solr.sortBy.filename_sort=Nom de fichier
-solr.sortBy.attsize_sort=Taille du fichier
+solr.sortBy.attsize_sort=Taille de fichier
 solr.sortBy.attdate_sort=Date d'enregistrement
 solr.sortBy.attauthor_display_sort=Enregistré par
 solr.sortOrder.asc=Ascendant
 solr.sortOrder.desc=Descendant
 
-solr.options=Afficher \:
+solr.options=Afficher :
 solr.options.highlight=Surligner
 solr.options.highlight.title=Afficher un extrait dans chaque résultat
 solr.options.facet=Facettes
 solr.options.facet.title=Autoriser le fitrage dans les résultats
 
-solr.result.language=Langage
+solr.result.language=Langue
 solr.result.locatedIn=Situé dans
-solr.result.author=Mofidié par {0} le {1}
+solr.result.author=Modifié par {0} le {1}
 solr.result.mediaType=Ficher de type {0}
-solr.result.uploadedBy=Enregistré par {0} le {1} ({2}) 
+solr.result.uploadedBy=Enregistré par {0} le {1} ({2})
 solr.result.highlightAll=Afficher et surligner toutes les occurrences
 
-solr.facets.title=Affinez votre recherche
-solr.facets.hint=Selectionnez une catégorie et activez les filtres sur les résultats
+solr.facets.title=Affinez les résultats
+solr.facets.hint=Sélectionnez des éléments pour filtrer les résultats
 solr.facets.resetAll=Tout réinitialiser
 solr.facets.expandAll=Tout étendre
 solr.facets.collapseAll=Tout réduire
@@ -116,7 +117,7 @@ solr.facet.fileType.text.sh=Script  Shell
 solr.facet.fileType.image.icon=Icône
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
-solr.facet.fileType.other.octet-stream=Binaire
+solr.facet.fileType.other.octet-stream=Données binaires
 
 solr.facet.date.today=Aujourd'hui
 solr.facet.date.last7Days=Ces 7 derniers jours
@@ -126,22 +127,22 @@ solr.facet.date.customInterval=Intervalle de date et d'heure personnalisé
 solr.facet.date.start=Date et heure de début
 solr.facet.date.end=Date et heure de fin
 solr.facet.date.applyCustomInterval=Appliquer
-solr.facet.date.between=Entre le {0} et le {1} 
-solr.facet.date.after=Après le {0} 
-solr.facet.date.before=Avant le {0} 
+solr.facet.date.between=Entre le {0} et le {1}
+solr.facet.date.after=Après le {0}
+solr.facet.date.before=Avant le {0}
 solr.facet.date.any=Toutes les dates
 
 solr.facet.size.tiny=Minuscule
 solr.facet.size.small=Petit
 solr.facet.size.medium=Moyen
 solr.facet.size.large=Gros
-solr.facet.size.between=Entre {0} et {1} 
-solr.facet.size.lessThan=Moins de {0} 
-solr.facet.size.moreThan=Plus de {0} 
+solr.facet.size.between=Entre {0} et {1}
+solr.facet.size.lessThan=Inférieur à {0}
+solr.facet.size.moreThan=Plus de {0}
 solr.facet.size.any=Toutes les tailles
 
 solr.field.type=Type de résultat
-solr.field.locale=Langage
+solr.field.locale=Langue
 solr.field.locale.emptyValue=Sans langue
 solr.field.locale.emptyValue.hint=Certains documents n'ont aucune langue définie parce qu'ils contiennent des scripts (qui ne sont pas rédigés dans une langue naturelle) ou parce qu'ils sont évalués en fonction de la langue de l'utilisateur (comme cette page).
 solr.field.wiki=Wiki
@@ -152,7 +153,7 @@ solr.field.name=Page
 solr.field.name_exact=Page
 solr.field.title=Titre
 solr.field.author=Dernier auteur
-solr.field.author_display=Auteur
+solr.field.author_display=Dernier auteur
 solr.field.creator=Créateur
 solr.field.creator_display=Créateur
 solr.field.date=Date de dernière modification
@@ -160,7 +161,7 @@ solr.field.creationdate=Date de création
 solr.field.doccontent=Contenu du document
 solr.field.doccontentraw=Contenu brut du document
 solr.field.class=Type d'objet
-solr.field.class.definedBy=Défini par {0} » {1} 
+solr.field.class.definedBy=Définit par {0} » {1}
 solr.field.propertyname=Nom de la propriété
 solr.field.propertyvalue=Valeur de la propriété
 solr.field.filename=Nom du fichier joint
@@ -169,12 +170,12 @@ solr.field.comment=Commentaires
 solr.field.objcontent=Objet
 solr.field.mimetype=Type de fichier
 solr.field.attauthor=Enregistré par
-solr.field.attauthor_display=Ajouté par
+solr.field.attauthor_display=Enregistré par
 solr.field.attdate=Date d'enregistrement
 solr.field.attsize=Taille de fichier
 
-solr.uix.docdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pages ?
-solr.uix.attachmentdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pièces jointes ?
+solr.uix.docdoesnotexist.title=Recherchez-vous plutôt une de ces pages ?
+solr.uix.attachmentdoesnotexist.title=Recherchez-vous plutôt une de ces pièces jointes ?
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

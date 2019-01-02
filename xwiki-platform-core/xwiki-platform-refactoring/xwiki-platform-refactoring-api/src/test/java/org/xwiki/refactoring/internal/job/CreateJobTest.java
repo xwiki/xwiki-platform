@@ -64,6 +64,8 @@ public class CreateJobTest extends AbstractEntityJobTest
         CreateRequest request = createRequest(documentReference, templateReference);
         request.setUserReference(userReference);
         request.setCheckRights(false);
+        request.setAuthorReference(userReference);
+        request.setCheckAuthorRights(false);
         run(request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
@@ -90,6 +92,8 @@ public class CreateJobTest extends AbstractEntityJobTest
         CreateRequest request = createRequest(newSpaceReference, templateSpaceReference);
         request.setUserReference(userReference);
         request.setCheckRights(false);
+        request.setAuthorReference(userReference);
+        request.setCheckAuthorRights(false);
         run(request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
@@ -105,6 +109,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
         CreateRequest request = createRequest(documentReference, null);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         run(request);
 
         verify(this.modelBridge).create(documentReference);
@@ -121,6 +126,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
         CreateRequest request = createRequest(spaceReference, null);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         run(request);
 
         verify(this.modelBridge).create(spaceHomeReference);
@@ -147,6 +153,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
         CreateRequest request = createRequest(spaceHomeReference, templateHomeReference);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         request.setDeep(true);
         run(request);
 
@@ -164,6 +171,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
         CreateRequest request = createRequest(documentReference, templateReference);
         request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
         run(request);
 
         verifyNoCreate();
@@ -184,6 +192,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
         CreateRequest request = createRequest(documentReference, templateReference);
         request.setUserReference(userReference);
+        request.setAuthorReference(userReference);
         run(request);
 
         verifyNoCreate();
@@ -200,8 +209,38 @@ public class CreateJobTest extends AbstractEntityJobTest
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.authorization.hasAccess(Right.EDIT, userReference, documentReference)).thenReturn(false);
 
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, documentReference)).thenReturn(true);
+
         CreateRequest request = createRequest(documentReference, null);
         request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
+        run(request);
+
+        verifyNoCreate();
+        verify(this.mocker.getMockedLogger()).error("You are not allowed to create the document [{}].",
+            documentReference);
+    }
+
+    @Test
+    public void createRestrictedDocumentAuthor() throws Throwable
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.modelBridge.exists(documentReference)).thenReturn(false);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        when(this.authorization.hasAccess(Right.EDIT, userReference, documentReference)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, documentReference)).thenReturn(false);
+
+        CreateRequest request = createRequest(documentReference, null);
+        request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
         run(request);
 
         verifyNoCreate();

@@ -30,4 +30,9 @@ import org.xwiki.skin.Resource;
 public interface WikiResource<I extends InputSource> extends Resource<I>
 {
     DocumentReference getAuthorReference();
+
+    /**
+     * @since 10.11RC1
+     */
+    DocumentReference getDocumentReference();
 }

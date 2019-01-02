@@ -49,6 +49,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -146,6 +147,8 @@ public class MockitoOldcore
 
     private ScriptContext scriptContext;
 
+    private Environment environment;
+
     public MockitoOldcore(MockitoComponentManager componentManager)
     {
         this.componentManager = componentManager;
@@ -226,6 +229,12 @@ public class MockitoOldcore
             }
         }
 
+        // Make sure to provide a EntityReferenceFactory
+        if (!getMocker().hasComponent(EntityReferenceFactory.class)) {
+            EntityReferenceFactory factory = getMocker().registerMockComponent(EntityReferenceFactory.class);
+            when(factory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+        }
+
         // Make sure a default ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class)) {
             this.configurationSource = getMocker().registerMemoryConfigurationSource();
@@ -254,18 +263,19 @@ public class MockitoOldcore
         // correctly with a Servlet Context.
         if (getMocker().hasComponent(Environment.class)
             && getMocker().getInstance(Environment.class) instanceof ServletEnvironment) {
-            ServletEnvironment environment = getMocker().getInstance(Environment.class);
+            ServletEnvironment servletEnvironment = getMocker().getInstance(Environment.class);
 
             ServletContext servletContextMock = mock(ServletContext.class);
-            environment.setServletContext(servletContextMock);
+            servletEnvironment.setServletContext(servletContextMock);
             when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
                 .thenReturn(new File(System.getProperty("java.io.tmpdir")));
 
-            File testDirectory = new File("target/test-" + new Date().getTime());
-            this.temporaryDirectory = new File(testDirectory, "temporary-dir");
-            this.permanentDirectory = new File(testDirectory, "permanent-dir");
-            environment.setTemporaryDirectory(this.temporaryDirectory);
-            environment.setPermanentDirectory(this.permanentDirectory);
+            initEnvironmentDirectories();
+
+            servletEnvironment.setTemporaryDirectory(this.temporaryDirectory);
+            servletEnvironment.setPermanentDirectory(this.permanentDirectory);
+
+            this.environment = servletEnvironment;
         }
 
         // Initialize the Execution Context
@@ -853,16 +863,24 @@ public class MockitoOldcore
         return this.wikiConfigurationSource;
     }
 
+    private void initEnvironmentDirectories()
+    {
+        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
+
+        this.temporaryDirectory = new File(testDirectory, "temporary");
+        this.permanentDirectory = new File(testDirectory, "permanent-dir");
+    }
+
     /**
      * @since 7.2M2
      */
     public void registerMockEnvironment() throws Exception
     {
-        Environment environment = getMocker().registerMockComponent(Environment.class);
+        this.environment = getMocker().registerMockComponent(Environment.class);
 
-        File temp = new File(new File(System.getProperty("java.io.tmpdir")), "test-" + new Date().getTime());
+        initEnvironmentDirectories();
 
-        when(environment.getTemporaryDirectory()).thenReturn(new File(temp, "temporary"));
-        when(environment.getPermanentDirectory()).thenReturn(new File(temp, "permanent"));
+        when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
+        when(this.environment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
     }
 }

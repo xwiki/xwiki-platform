@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1402502400000</creationDate>
   <parent>FlamingoThemesCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1402503543000</date>
-  <contentUpdateDate>1402503543000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <comment/>
@@ -43,9 +40,9 @@
 platform.flamingo.themes.home.currenttheme=Thème courant
 platform.flamingo.themes.home.otherthemes=Autres thèmes disponibles
 platform.flamingo.themes.home.warningOldColorThemeInstalled=C''est l''application pour gérer les thèmes Flamingo. Un thème Flamingo est une version personnalisable de toute skin basée sur Flamingo. Si vous souhaitez gérer les thèmes de couleur basés sur Colibri, vous devez aller à {0}Colibri Color Themes Application{1}.
-platform.flamingo.themes.home.warningCurrentOldColorTheme=Le thème actuel est un thème de couleurs Colibri qui n'est pas optimisé pour fonctionner avec une skin basée sur Flamingo. Nous avons fait de notre mieux pour le rendre compatible, mais les résultats peuvent ne pas être optimaux. 
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Le thème actuel est un thème de couleurs Colibri qui n'est pas optimisé pour fonctionner avec une skin basée sur Flamingo. Nous avons fait de notre mieux pour le rendre compatible, mais les résultats peuvent ne pas être optimaux.
 platform.flamingo.themes.home.useThisTheme=Utiliser ce thème
-platform.flamingo.themes.home.newThemeName=Nom du thème... 
+platform.flamingo.themes.home.newThemeName=Nom du thème...
 platform.flamingo.themes.home.create=Créer un nouveau thème
 platform.flamingo.themes.home.create.invalid=Nom de thème invalide \!
 platform.flamingo.themes.home.create.csrf=Pour des raisons de sécurité, merci de confirmer que vous souhaitez créer un thème appelé "{0}".

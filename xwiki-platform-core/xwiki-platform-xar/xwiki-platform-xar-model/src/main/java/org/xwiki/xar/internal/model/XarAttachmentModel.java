@@ -36,6 +36,11 @@ public class XarAttachmentModel
      */
     public static final String ELEMENT_MIMETYPE = "mimetype";
 
+    /**
+     * @since 10.11RC1
+     */
+    public static final String ELEMENT_CHARSET = "charset";
+
     public static final String ELEMENT_CONTENT = "content";
 
     public static final String ELEMENT_REVISION = "version";

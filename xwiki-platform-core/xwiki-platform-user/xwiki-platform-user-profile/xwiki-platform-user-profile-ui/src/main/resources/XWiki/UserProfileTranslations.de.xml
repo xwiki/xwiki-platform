@@ -1,0 +1,61 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.UserProfileTranslations" locale="de">
+  <web>XWiki</web>
+  <name>UserProfileTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>User Profile Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Das Wiki enthält Dokumente, die standardmäßig nicht angezeigt werden. Diese verborgenen Dokumente repräsentieren technische Inhalte wie Anwendungsklassen, Konfigurationsseiten, Makros, Stile, Skripts usw.
+XWiki.XWikiUsers_accessibility.hint=Zusätzliche Barrierefreiheit aktiviert diverse visuelle Verbesserungen wie: Größere Schriften, unterstrichene Links, etc.
+XWiki.XWikiUsers_timezone.hint=Verwenden Sie eine bestimmte Zeitzone, damit die Daten Ihrem aktuellen Standort entsprechen.
+XWiki.XWikiUsers_editor.hint=Wählen Sie einen Standard-Editor, der den global definierten Standard-Editor überschreibt. Wenn nicht definiert, wird entsprechend dem Inhalt ein Editor gewählt.
+### Missing: XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
+### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=Indicate if you want Extension Manager to ask you to confirm conflict resolution default rules (for example tell Extension Manager to ask you what to do if the document to upgrade has been removed from the wiki).
+userprofile.default=Standard
+user.profile.groups.title=Meine Gruppen
+user.profile.groups.description=Hier sind alle Gruppen aufgelistet, denen Ihr Benutzer angehört.
+user.profile.groups.table.group=Gruppe
+platform.core.profile.category.groups=Meine Gruppen
+user.profile.notifications=Benachrichtigungen
+user.profile.network.unfollow.question=Sind Sie sicher, dass Sie diesem Benutzer nicht mehr folgen möchten?
+user.profile.network.unfollow.question.yes=Ja, nicht mehr folgen
+user.profile.network.unfollow.question.no=Nein, abbrechen
+user.profile.network.following=Wird verfolgt
+user.profile.network.notfollowing=Wird nicht verfolgt
+user.profile.network.follow=Ab sofort folgen
+user.profile.network.unfollow=Nicht mehr folgen
+user.profile.network.done=Erledigt
+user.profile.network.saving=Speichert…
+user.profile.network.error=Fehler beim Speichern der Benachrichtigungseinstellungen</content>
+</xwikidoc>

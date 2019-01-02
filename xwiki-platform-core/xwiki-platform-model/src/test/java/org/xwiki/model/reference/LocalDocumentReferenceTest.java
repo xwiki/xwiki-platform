@@ -19,9 +19,13 @@
  */
 package org.xwiki.model.reference;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.EntityType;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link LocalDocumentReference}.
@@ -35,8 +39,19 @@ public class LocalDocumentReferenceTest
     public void verifyLocalDocumentReferenceProperties()
     {
         LocalDocumentReference reference = new LocalDocumentReference("space", "page");
-        Assert.assertEquals("space", reference.getParent().getName());
-        Assert.assertNull(reference.getParent().getParent());
-        Assert.assertTrue(reference instanceof EntityReference);
+        assertEquals("space", reference.getParent().getName());
+        assertNull(reference.getParent().getParent());
+        assertTrue(reference instanceof EntityReference);
+    }
+
+    @Test
+    public void testReplaceParent()
+    {
+        LocalDocumentReference reference =
+            new LocalDocumentReference("space", "page").replaceParent(new EntityReference("space2", EntityType.SPACE));
+
+        assertEquals(new LocalDocumentReference("space2", "page"), reference);
+
+        assertSame(reference, reference.replaceParent(reference.getParent()));
     }
 }

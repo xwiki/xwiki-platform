@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1418662042000</creationDate>
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1418727446000</date>
-  <contentUpdateDate>1418727379000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -46,7 +43,7 @@ admin.wiki.description=Popíšte wiki (názov a popis) a zadajte vlastníka a do
 platform.wiki.admin.wiki.ownerProblemConfirmation=Nový majiteľ neexistuje. \\nNaozaj chcete uložiť?
 platform.wiki.admin.wiki.csrfInvalidError=Neplatný bezpečnostný (CSRF) kľúč. Obnovte stránku a skúste ešte raz.
 platform.wiki.admin.wiki.requiredFieldsError=Vlastník, a domovská stránka sú povinné parametre.
-platform.wiki.admin.wiki.ownerWarning=Upozornenie\: Ak zmeníte vlastníka Wiki, predošlý vlastník stratí všetky práva. 
+platform.wiki.admin.wiki.ownerWarning=Upozornenie\: Ak zmeníte vlastníka Wiki, predošlý vlastník stratí všetky práva.
 
 ###############################################################################
 ## Deprecated

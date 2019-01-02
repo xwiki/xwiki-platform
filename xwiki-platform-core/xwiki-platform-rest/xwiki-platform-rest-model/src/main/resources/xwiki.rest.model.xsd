@@ -558,6 +558,7 @@
           <element name="filename" type="string" minOccurs="0"></element>
           <element name="score" type="float" minOccurs="0"></element>
           <element name="object" type="xwiki:Object" minOccurs="0"></element>
+          <element name="hierarchy" type="xwiki:Hierarchy" minOccurs="0"></element>
         </sequence>
       </extension>
     </complexContent>
@@ -616,6 +617,21 @@
   <complexType name="JobId">
     <sequence>
       <element name="element" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="HierarchyItem">
+    <sequence>
+      <element name="label" type="string"></element>
+      <element name="name" type="string"></element>
+      <element name="type" type="string"></element>
+      <element name="url" type="string"></element>
+    </sequence>
+
+  </complexType>
+  <complexType name="Hierarchy">
+    <sequence>
+      <element name="item" type="xwiki:HierarchyItem" minOccurs="0" maxOccurs="unbounded"></element>
     </sequence>
   </complexType>
 </schema>

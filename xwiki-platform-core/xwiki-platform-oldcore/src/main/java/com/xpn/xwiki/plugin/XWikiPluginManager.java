@@ -156,10 +156,7 @@ public class XWikiPluginManager
 
     public Vector<XWikiPluginInterface> getPlugins(String functionName)
     {
-        if (this.functionList.containsKey(functionName)) {
-            return this.functionList.get(functionName);
-        }
-        return null;
+        return this.functionList.get(functionName);
     }
 
     public void virtualInit(XWikiContext context)

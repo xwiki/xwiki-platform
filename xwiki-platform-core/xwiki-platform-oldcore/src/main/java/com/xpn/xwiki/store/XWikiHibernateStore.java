@@ -1259,8 +1259,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             if (object.getXClassReference() != null) {
-                // Remove all existing properties
-                if (object.getFieldsToRemove().size() > 0) {
+                // Remove properties to remove
+                if (!object.getFieldsToRemove().isEmpty()) {
                     for (int i = 0; i < object.getFieldsToRemove().size(); i++) {
                         BaseProperty prop = (BaseProperty) object.getFieldsToRemove().get(i);
                         if (!handledProps.contains(prop.getName())) {
@@ -1270,6 +1270,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     object.setFieldsToRemove(new ArrayList<BaseProperty>());
                 }
 
+                // Add missing properties to the object
+                BaseClass xclass = object.getXClass(context);
+                if (xclass != null) {
+                    for (String key : xclass.getPropertyList()) {
+                        if (object.safeget(key) == null) {
+                            PropertyClass classProperty = (PropertyClass) xclass.getField(key);
+                            object.safeput(key, classProperty.newProperty());
+                        }
+                    }
+                }
+
+                // Save properties
                 Iterator<String> it = object.getPropertyList().iterator();
                 while (it.hasNext()) {
                     String key = it.next();
@@ -1382,8 +1394,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
                     }
                 } catch (HibernateException e) {
-                    this.logger.error("Failed loading custom mapping for doc [{}], class [{}], nb [{}]", 
-                            object.getDocumentReference(), object.getXClassReference(), object.getNumber(), e);
+                    this.logger.error("Failed loading custom mapping for doc [{}], class [{}], nb [{}]",
+                        object.getDocumentReference(), object.getXClassReference(), object.getNumber(), e);
                 }
 
                 // Load strings, integers, dates all at once

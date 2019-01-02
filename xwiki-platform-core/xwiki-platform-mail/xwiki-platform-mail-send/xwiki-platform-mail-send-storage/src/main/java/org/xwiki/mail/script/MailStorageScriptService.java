@@ -44,7 +44,6 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.DefaultMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -112,7 +111,6 @@ public class MailStorageScriptService extends AbstractMailScriptService
      *         store
      * @since 9.3RC1
      */
-    @Unstable
     public ScriptMailResult resendAsynchronously(String batchId, String uniqueMessageId)
     {
         try {
@@ -136,7 +134,6 @@ public class MailStorageScriptService extends AbstractMailScriptService
      *         from the store
      * @since 9.3RC1
      */
-    @Unstable
     public List<ScriptMailResult> resendAsynchronously(Map<String, Object> filterMap, int offset, int count)
     {
         List<Pair<MailStatus, MailStatusResult>> results;
@@ -256,7 +253,6 @@ public class MailStorageScriptService extends AbstractMailScriptService
      *
      * @since 9.4RC1
      */
-    @Unstable
     public void deleteAll()
     {
         // Note: We don't need to check permissions since the call to load() will do that anyway.

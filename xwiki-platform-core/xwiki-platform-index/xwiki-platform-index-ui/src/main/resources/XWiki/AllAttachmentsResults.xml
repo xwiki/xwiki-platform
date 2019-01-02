@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1252454400000</creationDate>
   <parent>XWiki.AllAttachments</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1297363148000</date>
-  <contentUpdateDate>1297363148000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.index.attachmentsResults')</title>
   <comment/>
@@ -238,8 +235,7 @@
     #end
     #set ($discard = $results.rows.add($row))
   #end
-  #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize($results)
+  #jsonResponse($results)
 #end
 {{/velocity}}</content>
 </xwikidoc>

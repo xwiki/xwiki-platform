@@ -21,26 +21,24 @@ package com.xpn.xwiki.internal.filter.output;
 
 import java.text.ParseException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
-import com.xpn.xwiki.internal.filter.output.UserInstanceOutputFilterStream;
-import com.xpn.xwiki.internal.filter.output.UserInstanceOutputProperties;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Validate {@link UserInstanceOutputFilterStream}.
  * 
  * @version $Id$
  */
-@AllComponents
 public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
     // Tests
@@ -57,86 +55,81 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
 
         // XWiki.user1
 
-        XWikiDocument userDocument =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user1"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument userDocument = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki1", "XWiki", "user1"), this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(userDocument.isNew());
+        assertFalse(userDocument.isNew());
 
-        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getCreatorReference());
-        Assert.assertEquals(toDate("2000-01-10 00:00:00.0 UTC"), userDocument.getCreationDate());
-        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getAuthorReference());
-        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getDate());
-        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
-        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getContentAuthorReference());
-        Assert.assertEquals(false, userDocument.isMinorEdit());
-        Assert.assertEquals("Import", userDocument.getComment());
+        assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getCreatorReference());
+        assertEquals(toDate("2000-01-10 00:00:00.0 UTC"), userDocument.getCreationDate());
+        assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getAuthorReference());
+        assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getDate());
+        assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getContentAuthorReference());
+        assertEquals(false, userDocument.isMinorEdit());
+        assertEquals("Import", userDocument.getComment());
 
         BaseObject userObject = userDocument.getXObject(MockitoOldcoreRule.USER_CLASS);
-        Assert.assertEquals(0, userObject.getNumber());
-        Assert.assertEquals("user1 first name", userObject.getStringValue("first_name"));
-        Assert.assertEquals("user1 last name", userObject.getStringValue("last_name"));
-        Assert.assertEquals("user1@email.ext", userObject.getStringValue("email"));
-        Assert.assertEquals(1, userObject.getIntValue("active"));
+        assertEquals(0, userObject.getNumber());
+        assertEquals("user1 first name", userObject.getStringValue("first_name"));
+        assertEquals("user1 last name", userObject.getStringValue("last_name"));
+        assertEquals("user1@email.ext", userObject.getStringValue("email"));
+        assertEquals(1, userObject.getIntValue("active"));
 
         // XWiki.user2
 
-        userDocument =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user2"),
-                this.oldcore.getXWikiContext());
+        userDocument = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user2"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(userDocument.isNew());
+        assertFalse(userDocument.isNew());
 
-        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getCreatorReference());
-        Assert.assertEquals(toDate("2000-01-20 00:00:00.0 UTC"), userDocument.getCreationDate());
-        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getAuthorReference());
-        Assert.assertEquals(toDate("2000-01-21 00:00:00.0 UTC"), userDocument.getDate());
-        Assert.assertEquals(toDate("2000-01-21 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
-        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getContentAuthorReference());
-        Assert.assertEquals(false, userDocument.isMinorEdit());
-        Assert.assertEquals("Import", userDocument.getComment());
+        assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getCreatorReference());
+        assertEquals(toDate("2000-01-20 00:00:00.0 UTC"), userDocument.getCreationDate());
+        assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getAuthorReference());
+        assertEquals(toDate("2000-01-21 00:00:00.0 UTC"), userDocument.getDate());
+        assertEquals(toDate("2000-01-21 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getContentAuthorReference());
+        assertEquals(false, userDocument.isMinorEdit());
+        assertEquals("Import", userDocument.getComment());
 
         userObject = userDocument.getXObject(MockitoOldcoreRule.USER_CLASS);
-        Assert.assertEquals(0, userObject.getNumber());
-        Assert.assertEquals("user2 first name", userObject.getStringValue("first_name"));
-        Assert.assertEquals("user2 last name", userObject.getStringValue("last_name"));
-        Assert.assertEquals("user2@email.ext", userObject.getStringValue("email"));
-        Assert.assertEquals(0, userObject.getIntValue("active"));
+        assertEquals(0, userObject.getNumber());
+        assertEquals("user2 first name", userObject.getStringValue("first_name"));
+        assertEquals("user2 last name", userObject.getStringValue("last_name"));
+        assertEquals("user2@email.ext", userObject.getStringValue("email"));
+        assertEquals(0, userObject.getIntValue("active"));
 
         // XWiki.group1
 
-        XWikiDocument groupDocument =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group1"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument groupDocument = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki1", "XWiki", "group1"), this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(groupDocument.isNew());
+        assertFalse(groupDocument.isNew());
 
         BaseObject groupMemberObject0 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
-        Assert.assertEquals("XWiki.user1", groupMemberObject0.getStringValue("member"));
+        assertEquals("XWiki.user1", groupMemberObject0.getStringValue("member"));
         BaseObject groupMemberObject1 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 1);
-        Assert.assertEquals("XWiki.user2", groupMemberObject1.getStringValue("member"));
+        assertEquals("XWiki.user2", groupMemberObject1.getStringValue("member"));
 
         // XWiki.group2
 
-        groupDocument =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group2"),
-                this.oldcore.getXWikiContext());
+        groupDocument = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group2"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(groupDocument.isNew());
+        assertFalse(groupDocument.isNew());
 
         groupMemberObject0 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
-        Assert.assertEquals("XWiki.group1", groupMemberObject0.getStringValue("member"));
+        assertEquals("XWiki.group1", groupMemberObject0.getStringValue("member"));
 
         // XWiki.emptygroup
 
-        groupDocument =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "emptygroup"),
-                this.oldcore.getXWikiContext());
+        groupDocument = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "emptygroup"),
+            this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(groupDocument.isNew());
+        assertFalse(groupDocument.isNew());
 
         groupMemberObject0 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
-        Assert.assertEquals("", groupMemberObject0.getStringValue("member"));
+        assertEquals("", groupMemberObject0.getStringValue("member"));
     }
 
     @Test
@@ -151,27 +144,25 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
 
         // XWiki.user
 
-        XWikiDocument userDocument =
-            this.oldcore.getSpyXWiki().getDocument(
-                new DocumentReference("wiki", "XWiki", "user"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument userDocument = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "XWiki", "user"), this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(userDocument.isNew());
+        assertFalse(userDocument.isNew());
 
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getCreatorReference());
-        Assert.assertEquals(toDate("2000-01-10 00:00:00.0 UTC"), userDocument.getCreationDate());
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getAuthorReference());
-        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getDate());
-        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getContentAuthorReference());
-        Assert.assertEquals(false, userDocument.isMinorEdit());
-        Assert.assertEquals("Import", userDocument.getComment());
+        assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getCreatorReference());
+        assertEquals(toDate("2000-01-10 00:00:00.0 UTC"), userDocument.getCreationDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getAuthorReference());
+        assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getDate());
+        assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getContentAuthorReference());
+        assertEquals(false, userDocument.isMinorEdit());
+        assertEquals("Import", userDocument.getComment());
 
         BaseObject userObject = userDocument.getXObject(MockitoOldcoreRule.USER_CLASS);
-        Assert.assertEquals(0, userObject.getNumber());
-        Assert.assertEquals("user1 first name", userObject.getStringValue("first_name"));
-        Assert.assertEquals("user1 last name", userObject.getStringValue("last_name"));
-        Assert.assertEquals("user1@email.ext", userObject.getStringValue("email"));
-        Assert.assertEquals(1, userObject.getIntValue("active"));
+        assertEquals(0, userObject.getNumber());
+        assertEquals("user1 first name", userObject.getStringValue("first_name"));
+        assertEquals("user1 last name", userObject.getStringValue("last_name"));
+        assertEquals("user1@email.ext", userObject.getStringValue("email"));
+        assertEquals(1, userObject.getIntValue("active"));
     }
 }

@@ -21,9 +21,13 @@ package org.xwiki.model.reference;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Validate {@link EntityReferenceTree}.
@@ -37,26 +41,26 @@ public class EntityReferenceTreeTest
     {
         EntityReferenceTreeNode treeNode = new EntityReferenceTree(new DocumentReference("wiki", "space", "page"));
 
-        Assert.assertEquals(null, treeNode.getReference());
-        Assert.assertEquals(1, treeNode.getChildren().size());
+        assertEquals(null, treeNode.getReference());
+        assertEquals(1, treeNode.getChildren().size());
 
         treeNode = treeNode.get("wiki");
 
-        Assert.assertNotNull(treeNode);
-        Assert.assertEquals(new WikiReference("wiki"), treeNode.getReference());
-        Assert.assertEquals(1, treeNode.getChildren().size());
+        assertNotNull(treeNode);
+        assertEquals(new WikiReference("wiki"), treeNode.getReference());
+        assertEquals(1, treeNode.getChildren().size());
 
         treeNode = treeNode.get("space");
 
-        Assert.assertNotNull(treeNode);
-        Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")), treeNode.getReference());
-        Assert.assertEquals(1, treeNode.getChildren().size());
+        assertNotNull(treeNode);
+        assertEquals(new SpaceReference("space", new WikiReference("wiki")), treeNode.getReference());
+        assertEquals(1, treeNode.getChildren().size());
 
         treeNode = treeNode.get("page");
 
-        Assert.assertNotNull(treeNode);
-        Assert.assertEquals(new DocumentReference("wiki", "space", "page"), treeNode.getReference());
-        Assert.assertEquals(0, treeNode.getChildren().size());
+        assertNotNull(treeNode);
+        assertEquals(new DocumentReference("wiki", "space", "page"), treeNode.getReference());
+        assertEquals(0, treeNode.getChildren().size());
     }
 
     @Test
@@ -66,47 +70,47 @@ public class EntityReferenceTreeTest
             new DocumentReference("wiki", "space2", "page2"), new DocumentReference("wiki", "space", "page2"),
             new DocumentReference("wiki2", "space2", "page2"));
 
-        Assert.assertEquals(null, tree.getReference());
-        Assert.assertEquals(2, tree.getChildren().size());
+        assertEquals(null, tree.getReference());
+        assertEquals(2, tree.getChildren().size());
 
         {
             EntityReferenceTreeNode treeNode = tree.get("wiki");
 
-            Assert.assertNotNull(treeNode);
-            Assert.assertEquals(new WikiReference("wiki"), treeNode.getReference());
-            Assert.assertEquals(2, treeNode.getChildren().size());
+            assertNotNull(treeNode);
+            assertEquals(new WikiReference("wiki"), treeNode.getReference());
+            assertEquals(2, treeNode.getChildren().size());
 
             treeNode = treeNode.get("space");
 
-            Assert.assertNotNull(treeNode);
-            Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")), treeNode.getReference());
-            Assert.assertEquals(2, treeNode.getChildren().size());
+            assertNotNull(treeNode);
+            assertEquals(new SpaceReference("space", new WikiReference("wiki")), treeNode.getReference());
+            assertEquals(2, treeNode.getChildren().size());
 
             treeNode = treeNode.get("page");
 
-            Assert.assertNotNull(treeNode);
-            Assert.assertEquals(new DocumentReference("wiki", "space", "page"), treeNode.getReference());
-            Assert.assertEquals(0, treeNode.getChildren().size());
+            assertNotNull(treeNode);
+            assertEquals(new DocumentReference("wiki", "space", "page"), treeNode.getReference());
+            assertEquals(0, treeNode.getChildren().size());
         }
 
         {
             EntityReferenceTreeNode treeNode = tree.get("wiki2");
 
-            Assert.assertNotNull(treeNode);
-            Assert.assertEquals(new WikiReference("wiki2"), treeNode.getReference());
-            Assert.assertEquals(1, treeNode.getChildren().size());
+            assertNotNull(treeNode);
+            assertEquals(new WikiReference("wiki2"), treeNode.getReference());
+            assertEquals(1, treeNode.getChildren().size());
 
             treeNode = treeNode.get("space2");
 
-            Assert.assertNotNull(treeNode);
-            Assert.assertEquals(new SpaceReference("space2", new WikiReference("wiki2")), treeNode.getReference());
-            Assert.assertEquals(1, treeNode.getChildren().size());
+            assertNotNull(treeNode);
+            assertEquals(new SpaceReference("space2", new WikiReference("wiki2")), treeNode.getReference());
+            assertEquals(1, treeNode.getChildren().size());
 
             treeNode = treeNode.get("page2");
 
-            Assert.assertNotNull(treeNode);
-            Assert.assertEquals(new DocumentReference("wiki2", "space2", "page2"), treeNode.getReference());
-            Assert.assertEquals(0, treeNode.getChildren().size());
+            assertNotNull(treeNode);
+            assertEquals(new DocumentReference("wiki2", "space2", "page2"), treeNode.getReference());
+            assertEquals(0, treeNode.getChildren().size());
         }
     }
 
@@ -116,22 +120,22 @@ public class EntityReferenceTreeTest
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         EntityReferenceTree tree = new EntityReferenceTree(documentReference);
 
-        Assert.assertSame(documentReference.getWikiReference(), tree.get(new WikiReference("wiki")).getReference());
+        assertSame(documentReference.getWikiReference(), tree.get(new WikiReference("wiki")).getReference());
 
-        Assert.assertSame(documentReference.getLastSpaceReference(),
+        assertSame(documentReference.getLastSpaceReference(),
             tree.get(documentReference.getLastSpaceReference()).getReference());
 
         EntityReference entityReference =
             new EntityReference(documentReference.getName(), EntityType.DOCUMENT, documentReference.getParent());
-        Assert.assertSame(documentReference, tree.get(entityReference).getReference());
+        assertSame(documentReference, tree.get(entityReference).getReference());
 
         // The entity type should be taken into account.
-        Assert.assertNull(tree
+        assertNull(tree
             .get(new EntityReference(documentReference.getName(), EntityType.SPACE, documentReference.getParent())));
 
-        Assert.assertNull(tree.get((EntityReference) null));
+        assertNull(tree.get((EntityReference) null));
 
-        Assert.assertNull(tree.get(new SpaceReference("From", documentReference.getParent().getParent())));
+        assertNull(tree.get(new SpaceReference("From", documentReference.getParent().getParent())));
     }
 
     @Test
@@ -142,38 +146,50 @@ public class EntityReferenceTreeTest
 
         EntityReferenceTreeNode tree = new EntityReferenceTree(document, space);
 
-        Assert.assertSame(document, tree.get(document).getReference());
-        Assert.assertSame(space, tree.get(space).getReference());
+        assertSame(document, tree.get(document).getReference());
+        assertSame(space, tree.get(space).getReference());
 
         EntityReferenceTreeNode treeNode = tree;
 
-        Assert.assertEquals(null, treeNode.getReference());
-        Assert.assertEquals(1, treeNode.getChildren().size());
+        assertEquals(null, treeNode.getReference());
+        assertEquals(1, treeNode.getChildren().size());
 
         treeNode = treeNode.get("wiki");
 
-        Assert.assertNotNull(treeNode);
-        Assert.assertSame(document.getWikiReference(), treeNode.getReference());
-        Assert.assertEquals(1, treeNode.getChildren().size());
+        assertNotNull(treeNode);
+        assertSame(document.getWikiReference(), treeNode.getReference());
+        assertEquals(1, treeNode.getChildren().size());
 
         treeNode = treeNode.get("space");
 
-        Assert.assertNotNull(treeNode);
-        Assert.assertSame(document.getParent(), treeNode.getReference());
-        Assert.assertEquals(2, treeNode.getChildren().size());
-        Assert.assertEquals(1, treeNode.getChildren(EntityType.DOCUMENT).size());
-        Assert.assertEquals(1, treeNode.getChildren(EntityType.SPACE).size());
+        assertNotNull(treeNode);
+        assertSame(document.getParent(), treeNode.getReference());
+        assertEquals(2, treeNode.getChildren().size());
+        assertEquals(1, treeNode.getChildren(EntityType.DOCUMENT).size());
+        assertEquals(1, treeNode.getChildren(EntityType.SPACE).size());
 
         EntityReferenceTreeNode documentNode = treeNode.getChildren(EntityType.DOCUMENT).iterator().next();
 
-        Assert.assertNotNull(documentNode);
-        Assert.assertSame(document, documentNode.getReference());
-        Assert.assertEquals(0, documentNode.getChildren().size());
+        assertNotNull(documentNode);
+        assertSame(document, documentNode.getReference());
+        assertEquals(0, documentNode.getChildren().size());
 
         EntityReferenceTreeNode spaceNode = treeNode.getChildren(EntityType.SPACE).iterator().next();
 
-        Assert.assertNotNull(spaceNode);
-        Assert.assertSame(space, spaceNode.getReference());
-        Assert.assertEquals(0, spaceNode.getChildren().size());
+        assertNotNull(spaceNode);
+        assertSame(space, spaceNode.getReference());
+        assertEquals(0, spaceNode.getChildren().size());
+    }
+
+    @Test
+    public void testToString()
+    {
+        EntityReferenceTreeNode tree = new EntityReferenceTree(new DocumentReference("wiki", "space", "page"),
+            new DocumentReference("wiki", "space2", "page2"), new DocumentReference("wiki", "space", "page2"),
+            new DocumentReference("wiki2", "space2", "page2"));
+
+        assertEquals("[Wiki wiki = [" + "Space wiki:space = [wiki:space.page, wiki:space.page2],"
+            + " Space wiki:space2 = [wiki:space2.page2]],"
+            + " Wiki wiki2 = [Space wiki2:space2 = [wiki2:space2.page2]]]", tree.toString());
     }
 }

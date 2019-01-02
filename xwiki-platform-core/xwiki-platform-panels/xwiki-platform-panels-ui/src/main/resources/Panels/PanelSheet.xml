@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,19 +20,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="Panels.PanelSheet" locale="">
   <web>Panels</web>
   <name>PanelSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1391689863000</creationDate>
   <parent>Panels.PanelClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1391691293000</date>
-  <contentUpdateDate>1391691293000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -61,6 +58,9 @@
   #displayPanelProperty($obj 'category')
   #displayPanelProperty($obj 'description')
   #displayPanelProperty($obj 'content')
+  #displayPanelProperty($obj 'async_enabled')
+  #displayPanelProperty($obj 'async_cached')
+  #displayPanelProperty($obj 'async_context')
 #end
 {{/velocity}}</content>
 </xwikidoc>

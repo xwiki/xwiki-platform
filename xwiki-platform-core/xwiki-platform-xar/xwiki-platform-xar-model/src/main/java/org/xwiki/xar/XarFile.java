@@ -125,4 +125,13 @@ public class XarFile implements Closeable
     {
         return this.file.toString();
     }
+
+    /**
+     * @return the {@link XarPackage}
+     * @since 10.9
+     */
+    public XarPackage getXarPackage()
+    {
+        return this.xarPackage;
+    }
 }

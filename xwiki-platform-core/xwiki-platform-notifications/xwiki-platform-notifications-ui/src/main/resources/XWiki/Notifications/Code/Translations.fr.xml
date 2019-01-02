@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1488298319000</creationDate>
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1488301583000</date>
-  <contentUpdateDate>1488301583000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -44,11 +41,11 @@ notifications.filters.cancel=Annuler
 notifications.filters.submit=Enregistrer
 notifications.filters.type.label=Type de filtre :
 notifications.filters.type.hint=Comment le filtre doit agir sur un évènement à l'endroit indiqué
-notifications.filters.location.label=Périmètre du filtre
+notifications.filters.location.label=Portée du filtre :
 notifications.filters.location.hint=Quelle partie du wiki doit être concernée par le filtre ?
 
 ## Advanced filters options
-notifications.settings.filters.advanced=Options avancés
+notifications.settings.filters.advanced=Options de filtrage avancées
 notifications.filters.advanced.toggles.hint=Ces filtres sont activés par défaut, mais vous pouvez les désactiver en cliquant sur le bouton à côté de chacun d'entre-eux.
 notifications.filters.advanced.toggles.table.name=Nom du filtre
 notifications.filters.advanced.toggles.table.description=Description
@@ -57,17 +54,17 @@ notifications.filters.advanced.modal.close=Fermer
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Filtre Système
-notifications.filters.description.systemUserNotificationFilter=Cacher les notifications émises par l'utilisateur Système
+notifications.filters.description.systemUserNotificationFilter=Masquer les notifications provenant de l'utilisateur Système
 notifications.filters.name.ownEventsNotificationFilter=Filtre de vos propres événements
-notifications.filters.description.ownEventsNotificationFilter=Cacher les notifications de votre propre activité
+notifications.filters.description.ownEventsNotificationFilter=Masquer les notifications de votre activité
 notifications.filters.name.eventReadAlertFilter=Filtre d'événement lu (Alerte)
-notifications.filters.description.eventReadAlertFilter=Cacher les notifications que vous avez marquées comme lu
+notifications.filters.description.eventReadAlertFilter=Masquer les notifications que vous avez marquées comme lu
 notifications.filters.name.eventReadEmailFilter=Filtre d'événement lu (Email)
-notifications.filters.description.eventReadEmailFilter=Cacher les notifications que vous avez marquées comme lu
-notifications.filters.name.minorEventAlertNotificationFilter=Evénement mineur (Alerte)
-notifications.filters.description.minorEventAlertNotificationFilter=Cacher les notifications concernant des changements mineurs de pages
+notifications.filters.description.eventReadEmailFilter=Masquer les notifications que vous avez marquées comme lu
+notifications.filters.name.minorEventAlertNotificationFilter=Événement mineur (Alerte)
+notifications.filters.description.minorEventAlertNotificationFilter=Masquer les notifications lors de modifications mineures des pages
 notifications.filters.name.minorEventEmailNotificationFilter=Evénement mineur (Email)
-notifications.filters.description.minorEventEmailNotificationFilter=Cacher les notifications concernant des changements mineurs de pages
+notifications.filters.description.minorEventEmailNotificationFilter=Masquer les notifications lors de modifications mineures des pages
 
 ## Filter Types
 notifications.filters.type.inclusive=Inclusif
@@ -86,8 +83,8 @@ notifications.filters.preferences.addPreference.filterType.exclusive=Exclusif
 notifications.filters.preferences.addPreference.notificationFormat.label=Format de la notification
 notifications.filters.preferences.addPreference.notificationFormat.hint=Sur quel format de notification le filtre doit-il s'appliquer ?
 notifications.filters.preferences.addPreference.eventType.label=Type d'évènement
-notifications.filters.preferences.addPreference.eventType.hint=Quels types d'évènements seront concenés par le filtre ?
-notifications.filters.preferences.addPreference.location.label=Périmètre du Filtre
+notifications.filters.preferences.addPreference.eventType.hint=Quels types d'évènements seront concernés par le filtre ?
+notifications.filters.preferences.addPreference.location.label=Portée du Filtre
 notifications.filters.preferences.addPreference.location.hint=Quelle page doit être concernée par le filtre ?
 notifications.filters.preferences.delete.inProgress=Suppression...
 notifications.filters.preferences.delete.done=Préférence de filtre supprimée !
@@ -113,7 +110,7 @@ notifications.settings.filters.preferences.table.name=Nom
 notifications.settings.filters.preferences.table.filterType=Type de filtre
 notifications.settings.filters.preferences.table.eventTypes=Évenements
 notifications.settings.filters.preferences.table.notificationFormats=Formats
-notifications.settings.filters.preferences.table.isEnabled=Est activé?
+notifications.settings.filters.preferences.table.isEnabled=Est activé ?
 notifications.settings.filters.preferences.table._actions=Actions
 
 notifications.menu.header=Notifications
@@ -121,29 +118,26 @@ notifications.menu.header.settings=Préférences
 notifications.menu.clear=Effacer tout
 notifications.menu.clearing=Les notifications sont en train d'être effacées
 notifications.menu.cleared=Les notifications ont été effacées
-notifications.menu.nothing=Pas de notification !
-notifications.menu.more=Charger des notifications plus anciennes
-notifications.menu.details=Détails ({0})
 notifications.settings.title=Préférences de notifications
 notifications.settings.error.notAdmin=Vous devez être administrateur pour visualiser cet élément.
 notifications.settings.menu=Menu des notifications
-notifications.settings.menu.hint=Le menu de notifications est situé en haut à droite de la page, et vous pouvez le voir en cliquant sur la cloche ({0}).
-notifications.settings.email=E-Mail
+notifications.settings.menu.hint=Le menu des notifications est situé en haut à droite de la page, vous pouvez l''ouvrir en cliquant sur la cloche ({0}).
+notifications.settings.email=Courriel
 notifications.settings.email.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
-notifications.settings.email.disabled=Les notifications par mails sont désactivées. Veuillez contacter votre administrateur.
-notifications.settings.email.hint=Un email vous est envoyé régulièrement contenant le résumé de ce qui s'est passé dans le wiki.
-notifications.settings.email.title=Préférences d'email
-notifications.settings.email.frequency=Fréquence de l'email
-notifications.settings.email.frequency.hint=Choisissez à quelle fréquence vous souhaitez recevoir un email avec le résumé de ce qui s'est passé dans le wiki.
-notifications.settings.email.diffType.hint=Sélectionnez le niveau de détail que vous souhaitez recevoir par mail lors de modifications.
+notifications.settings.email.disabled=Les notifications par courriel sont désactivées. Veuillez contacter votre administrateur.
+notifications.settings.email.hint=Un courriel vous est envoyé régulièrement avec une synthèse de l'activité du wiki.
+notifications.settings.email.title=Préférences des courriels
+notifications.settings.email.frequency=Fréquence des courriels
+notifications.settings.email.frequency.hint=Choisissez à quelle fréquence vous souhaitez recevoir un courriel avec le résumé de ce qui s'est passé dans le wiki.
+notifications.settings.email.diffType.hint=Sélectionnez le niveau de détail que vous souhaitez recevoir par courriel lors de modifications.
 notifications.settings.saving=Vos préférences sont en train d'être enregistrées...
 notifications.settings.saved=Enregistrées !
-notifications.settings.savingfailed=Echec lors de l'enregistrement de vos préférences
+notifications.settings.savingfailed=Échec lors de l'enregistrement de vos préférences
 notifications.settings.filters=Filtres ({0})
 notifications.settings.addFilter=Ajouter un filtre
 notifications.settings.errorFilterWiki=Erreur : vous devez sélectionner un wiki et non une page
 notifications.settings.preferences=Préférences
-notifications.settings.preferences.hint=Capture les évènements et les envoie dans le flux d'activité ou par mail.
+notifications.settings.preferences.hint=Capture les évènements qui se produisent et les envoie dans le flux ou par courriel.
 notifications.settings.applications.title=Applications
 notifications.settings.applications.hint=Voici la liste des applications qui peuvent envoyer des notifications. Vous pouvez les activer ou les désactiver.
 notifications.settings.applications.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
@@ -152,6 +146,8 @@ notifications.settings.events=Événements
 notifications.settings.watch.title=Pages surveillées
 notifications.settings.watch.autowatchmode=Surveillance automatique de pages
 notifications.settings.watch.autowatchmode.hint=Voulez-vous surveiller les pages sur lesquelles vous avez travaillé ?
+notifications.settings.watch.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
+notifications.settings.watch.disabled=Les entités surveillées sont désactivées. Merci de contacter l'administrateur.
 notifications.events.by=Par {0}.
 notifications.events.lastChange=Dernière modification : {0}.
 notifications.events.lastComment=Dernier commentaire : {0}.
@@ -161,14 +157,14 @@ notifications.preferences.scope.table.scopeFilterType=Type de filtre
 notifications.preferences.scope.table._actions=Actions
 notifications.email.title=Évènements sur le wiki :
 notifications.email.subject={0} événement(s) sur le wiki
-notifications.email.seeChanges=Changements : 
+notifications.email.seeChanges=Changements :
 notifications.email.linkDetails=Afficher les détails
 notifications.rss.feedLink=Flux RSS
 notifications.rss.feedLinkDescription=Flux d'évenements
-notifications.rss.feedTitle=Notifications pour le flux RSS
+notifications.rss.feedTitle=Flux RSS des notifications
 notifications.rss.feedDescription=Ce flux RSS peut être personnalisé dans votre page de profil.
 notifications.rss.seeChanges=Modifications : {0}
-notifications.globalsettings.email=Courriers de notification
+notifications.globalsettings.email=Courriels de notification
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Journalier
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Horaire
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Hebdomadaire
@@ -198,35 +194,14 @@ rendering.macro.notificationsApplicationsPreferences.description=Affiche les pr�
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cible
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cible de la macro ("user" pour l’utilisateur courant ou "wiki" pour le wiki courant)
 
-rendering.macro.notifications.name=Notifications
-rendering.macro.notifications.description=Affiche des notifications liées à l'activité du wiki.
-rendering.macro.notifications.parameter.count.name=Nombre
-rendering.macro.notifications.parameter.count.description=Nombre maximum d'évènements à afficher par défaut
-rendering.macro.notifications.parameter.useUserPreferences.name=Utiliser les paramètres de l'utilisateur
-rendering.macro.notifications.parameter.useUserPreferences.description=Si vrai, les paramètres de notifications définis par l'utilisateur sont utilisés
-rendering.macro.notifications.parameter.displayOwnEvents.name=Afficher mes propres évènements
-rendering.macro.notifications.parameter.displayOwnEvents.description=Si vrai, les évènements de l'utilisateur connecté sont affichés parmi les autres sinon ils sont masqués.
-rendering.macro.notifications.parameter.displayMinorEvents.name=Afficher les évènements mineurs
-rendering.macro.notifications.parameter.displayMinorEvents.description=Si vrai, les évènements concernant les révisions mineures sont affichés parmi les autres sinon ils sont masqués.
-rendering.macro.notifications.parameter.displaySystemEvents.name=Afficher les évènements systèmes
-rendering.macro.notifications.parameter.displaySystemEvents.description=Si vrai, les évènements déclenchés par le logiciel XWiki sont affichés parmi les autres sinon ils sont masqués.
-rendering.macro.notifications.parameter.displayReadEvents.name=Afficher les évènements lus
-rendering.macro.notifications.parameter.displayReadEvents.description=Si vrai, les évènements marqués par l'utilisateur comme lus sont affichés parmi les autres sinon ils sont masqués.
-rendering.macro.notifications.parameter.wikis.name=Wikis
-### Missing: rendering.macro.notifications.parameter.wikis.description=List of wikis (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-rendering.macro.notifications.parameter.spaces.name=Espaces
-### Missing: rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-rendering.macro.notifications.parameter.pages.name=Pages
-### Missing: rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-rendering.macro.notifications.parameter.displayReadStatus.name=Afficher l'état "lu"
-rendering.macro.notifications.parameter.displayReadStatus.description=Définit si l'état lu ou non lu doit être affiché pour les évènements
-rendering.macro.notifications.parameter.users.name=Utilisateurs
-### Missing: rendering.macro.notifications.parameter.users.description=List of users (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Afficher uniquement les utilisateurs suivis
-### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Either or not to display only the events done by the given list of users (if empty, the list of followed users of the current user is used)
+rendering.macro.notificationsAutoWatchPreferences.name=Préférences pour les notifications d'abonnement automatique
+rendering.macro.notificationsAutoWatchPreferences.description=Affiche les préférences de l'utilisateur pour les notifications d'abonnement automatique aux pages.
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cible
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Cible de la macro ("user" pour l'utilisateur courant ou "wiki" pour le wiki courant)
 
-## Notifications Macro
-notifications.macro.noWatchedUsers=Vous ne suivez personne.
-### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
+## Toggle notification filters labels
+notifications.filters.preferences.label.page=Activer/désactiver les notifications de Page uniquement
+notifications.filters.preferences.label.space=Activer/désactiver les notifications de Page et enfants
+notifications.filters.preferences.label.wiki=Activer/désactiver les notifications du Wiki
 </content>
 </xwikidoc>

@@ -59,7 +59,9 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -386,5 +388,44 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
         assertEquals(
             new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)),
             this.mocker.getComponentUnderTest().resolve(attachmentResource(ATTACHMENT, true), null));
+    }
+
+    class VoidResourceReferenceEntityReferenceResolve extends AbstractResourceReferenceEntityReferenceResolver
+    {
+        VoidResourceReferenceEntityReferenceResolve()
+        {
+            this.documentAccessBridge = DefaultResourceReferenceEntityReferenceResolverTest.this.bridge;
+        }
+
+        @Override
+        protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+        {
+            return null;
+        }
+    }
+
+    @Test
+    public void trySpaceSiblingFallback()
+    {
+        VoidResourceReferenceEntityReferenceResolve resolver = new VoidResourceReferenceEntityReferenceResolve();
+
+        String defaultDocumentName = "Foo";
+        EntityReference sourceReference = new EntityReference("Bar", EntityType.DOCUMENT);
+        DocumentReference finalReference = new DocumentReference("xwiki", "Bar",
+            "WebHome");
+        EntityReference baseReference = sourceReference;
+
+        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
+            defaultDocumentName));
+        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+            defaultDocumentName));
+
+        defaultDocumentName = "Bar";
+        assertTrue(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+            defaultDocumentName));
+
+        this.existingDocuments.add(finalReference);
+        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+            defaultDocumentName));
     }
 }

@@ -22,6 +22,7 @@ package com.xpn.xwiki.doc;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -142,6 +143,7 @@ public class XWikiDocumentMockitoTest
         this.baseObject = this.document.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext());
         this.baseObject.setStringValue("string", "string");
         this.baseObject.setLargeStringValue("area", "area");
+        this.baseObject.setLargeStringValue("puretextarea", "puretextarea");
         this.baseObject.setStringValue("passwd", "passwd");
         this.baseObject.setIntValue("boolean", 1);
         this.baseObject.setIntValue("int", 42);
@@ -603,6 +605,12 @@ public class XWikiDocumentMockitoTest
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject.getNumber()));
         Assert.assertSame(this.baseObject2,
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject2.getNumber()));
+    }
+
+    @Test
+    public void testGetXObjectsWhenClassDoesNotExist()
+    {
+        Assert.assertEquals(Collections.emptyList(), this.document.getXObjects(new DocumentReference("not", "existing", "class")));
     }
 
     @Test
@@ -1384,8 +1392,10 @@ public class XWikiDocumentMockitoTest
     public void tofromXMLDocument() throws XWikiException
     {
         // equals won't work on password fields because of https://jira.xwiki.org/browse/XWIKI-12561
+        this.baseClass.removeField("passwd");
         this.baseObject.removeField("passwd");
         this.baseObject2.removeField("passwd");
+        this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         Document document = this.document.toXMLDocument(this.oldcore.getXWikiContext());
 

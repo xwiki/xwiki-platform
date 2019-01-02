@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="ru">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+<content>## Homepage Tour (by steps order)
+tour.homepageTour.welcome.title=Добро пожаловать в XWiki
+tour.homepageTour.welcome.content=В течение следующих нескольких минут вы откроете для себя интерфейс вашей вики и основные функции.
+tour.homepageTour.panels.title=Панели
+tour.homepageTour.panels.contentA=Текущие панели позволяют вам получить доступ к приложениям и страницам вашей вики.
+tour.homepageTour.panels.contentB=Администраторы могут настроить их и решить, какие панели отображаются.
+tour.homepageTour.breadcrumbs.title=Хлебные крошки
+tour.homepageTour.breadcrumbs.contentA=Хлебные крошки позволяют вам определить, где находится ваша страница, и перемещаться по иерархии.
+tour.homepageTour.breadcrumbs.contentB=Кнопка {0} всегда приведет вас на домашнюю страницу вики.
+tour.homepageTour.pageContent.title=Содержание страницы
+tour.homepageTour.pageContent.contentA=Это место, где отображается содержимое текущей страницы.
+tour.homepageTour.pageContent.contentB=Отредактируйте эту страницу, чтобы добавить таблицы, списки, макросы и структуру, чтобы упорядочить свои знания.
+tour.homepageTour.pageMenu.title=Меню cтраницы
+tour.homepageTour.pageMenu.contentA=Это меню содержит действия, связанные со страницей. Обладая соответствующими правами, вы можете редактировать, создавать, администрировать или удалять страницы.
+tour.homepageTour.pageMenu.contentB=Кнопка {0} отображает больше действий, таких как Экспорт, Печать и Поделиться.
+tour.homepageTour.pageTabs.title=Вкладки страницы
+tour.homepageTour.pageTabs.contentA=Комментарии - отличный способ обсудить содержание страницы.
+tour.homepageTour.pageTabs.contentB=Вы также можете прикрепить файлы, сравнить версии страницы или просмотреть информацию о странице.
+tour.homepageTour.header.title=Заголовок
+tour.homepageTour.header.contentA=Вы можете искать контент, следить за изменениями страницы или получить доступ к своему профилю пользователя.
+tour.homepageTour.header.contentB=Кнопка {0} отображает действия, связанные с вики, такие как Администрирование и Индексы.
+tour.homepageTour.tourComplete.title=Тур завершен
+tour.homepageTour.tourComplete.contentA=На этом ваш тур по интерфейсу и основным функциям XWiki завершен.
+tour.homepageTour.tourComplete.contentB=Для получения более подробной информации о каждой функции, обратитесь к {0} документации {1}.</content>
+</xwikidoc>

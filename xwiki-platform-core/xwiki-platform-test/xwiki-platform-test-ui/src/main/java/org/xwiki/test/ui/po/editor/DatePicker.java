@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -53,11 +54,18 @@ public class DatePicker extends BaseElement
      * Selects the specified year.
      * 
      * @param year the year to select
+     * @return this date picker
      */
-    public void setYear(String year)
+    public DatePicker setYear(String year)
     {
-        Select yearSelector = new Select(container.findElement(By.className("year")));
-        yearSelector.selectByVisibleText(year);
+        WebElement yearElement = this.container.findElement(By.className("year"));
+        new Select(yearElement).selectByVisibleText(year);
+        // In some cases (like for instance when the browser window is not maximized) the select drop down is not
+        // closed after the value is selected. As a consequence the next click will just close the drop down instead of
+        // doing the expected behavior (e.g. selecting the day after selecting the year may have no effect). We should
+        // revisit this after we upgrade Selenium.
+        yearElement.sendKeys(Keys.ESCAPE);
+        return this;
     }
 
     /**
@@ -73,11 +81,15 @@ public class DatePicker extends BaseElement
      * Selects the specified month.
      * 
      * @param month the month to select
+     * @return this date picker
      */
-    public void setMonth(String month)
+    public DatePicker setMonth(String month)
     {
-        Select monthSelector = new Select(container.findElement(By.className("month")));
-        monthSelector.selectByVisibleText(month);
+        WebElement monthElement = this.container.findElement(By.className("month"));
+        new Select(monthElement).selectByVisibleText(month);
+        // See the comment in #setYear()
+        monthElement.sendKeys(Keys.ESCAPE);
+        return this;
     }
 
     /**
@@ -93,11 +105,13 @@ public class DatePicker extends BaseElement
      * Selects the specified day from the current month.
      * 
      * @param day the day to select
+     * @return this date picker
      */
-    public void setDay(String day)
+    public DatePicker setDay(String day)
     {
         container.findElement(By.xpath("//*[@class = 'cds_body']//tbody//div[. = '" + day + "' and not(@class)]"))
             .click();
+        return this;
     }
 
     /**
@@ -117,11 +131,13 @@ public class DatePicker extends BaseElement
      * Selects the specified hour.
      * 
      * @param hour the hour to select
+     * @return this data picker
      */
-    public void setHour(String hour)
+    public DatePicker setHour(String hour)
     {
         Select hourSelector = new Select(container.findElement(By.className("hour")));
         hourSelector.selectByVisibleText(hour);
+        return this;
     }
 
     /**
@@ -137,8 +153,9 @@ public class DatePicker extends BaseElement
      * Selects the specified minute.
      * 
      * @param minute the minute to select
+     * @return this date picker
      */
-    public void setMinute(String minute)
+    public DatePicker setMinute(String minute)
     {
         Select minuteSelector = new Select(container.findElement(By.className("minute")));
         if (minuteSelector.getFirstSelectedOption().getText().equals(minute)) {
@@ -153,6 +170,7 @@ public class DatePicker extends BaseElement
             }
         }
         minuteSelector.selectByVisibleText(minute);
+        return this;
     }
 
     /**
@@ -193,6 +211,18 @@ public class DatePicker extends BaseElement
                 }
             }
         });
+        return this;
+    }
+
+    /**
+     * Close the date picker.
+     *
+     * @return this date picker
+     * @since 10.6RC1
+     */
+    public DatePicker close()
+    {
+        this.container.findElement(By.partialLinkText("OK")).click();
         return this;
     }
 }

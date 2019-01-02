@@ -20,12 +20,12 @@
 package org.xwiki.rest.internal.resources.classes;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -36,38 +36,49 @@ import org.xwiki.query.QueryParameter;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DateClass;
-import com.xpn.xwiki.objects.classes.ListClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DBListClassPropertyValuesProvider}.
- * 
+ *
  * @version $Id$
  * @since 9.8RC1
  */
+@ComponentTest
 public class DBListClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ClassPropertyValuesProvider> mocker =
-        new MockitoComponentMockingRule<ClassPropertyValuesProvider>(DBListClassPropertyValuesProvider.class);
+    @InjectMockComponents
+    private DBListClassPropertyValuesProvider provider;
 
     private DBListClass dbListClass = new DBListClass();
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @MockComponent
     private AuthorExecutor authorExecutor;
 
-    @Before
+    @MockComponent
+    protected QueryBuilder<DBListClass> allowedValuesQueryBuilder;
+
+    @BeforeEach
     public void configure() throws Exception
     {
         super.configure();
@@ -77,17 +88,6 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
         when(this.xcontext.getWiki().getDocument(new ClassPropertyReference("status", this.classReference),
             this.xcontext)).thenReturn(this.classDocument);
-
-        this.entityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.authorExecutor = this.mocker.getInstance(AuthorExecutor.class);
-        DefaultParameterizedType listQueryBuilderType =
-            new DefaultParameterizedType(null, QueryBuilder.class, ListClass.class);
-    }
-
-    @Override
-    protected MockitoComponentManagerRule getMocker()
-    {
-        return this.mocker;
     }
 
     @Test
@@ -95,12 +95,10 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("status", this.classReference);
         when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
-        try {
-            this.mocker.getComponentUnderTest().getValues(propertyReference, 0);
-            fail();
-        } catch (XWikiRestException expected) {
-            assertEquals("Property [status reference] not found.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(XWikiRestException.class, () -> {
+            this.provider.getValues(propertyReference, 0);
+        });
+        assertEquals(exception.getMessage(), "Property [status reference] not found.");
     }
 
     @Test
@@ -108,12 +106,10 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("date", this.classReference);
         when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
-        try {
-            this.mocker.getComponentUnderTest().getValues(propertyReference, 0);
-            fail();
-        } catch (XWikiRestException expected) {
-            assertEquals("This [status reference] is not a [DBListClass] property.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(XWikiRestException.class, () -> {
+            this.provider.getValues(propertyReference, 0);
+        });
+        assertEquals(exception.getMessage(), "This [status reference] is not a [DBListClass] property.");
     }
 
     @Test
@@ -122,11 +118,12 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
         DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
         PropertyValues values = new PropertyValues();
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
+        when(this.authorExecutor.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
+            .thenReturn(values);
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 3));
+        assertSame(values, this.provider.getValues(propertyReference, 3));
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 0, "text"));
+        assertSame(values, this.provider.getValues(propertyReference, 0, "text"));
     }
 
     @Test
@@ -136,9 +133,10 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
         PropertyValues values = new PropertyValues();
         values.getPropertyValues().add(new PropertyValue());
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
+        when(this.authorExecutor.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
+            .thenReturn(values);
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 1, "foo"));
+        assertSame(values, this.provider.getValues(propertyReference, 1, "foo"));
         assertEquals(1, values.getPropertyValues().size());
 
         verify(this.usedValuesQueryBuilder, never()).build(any());
@@ -153,10 +151,11 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         PropertyValues values = new PropertyValues();
         PropertyValue red = new PropertyValue();
         red.setValue("red");
-        red.setMetaData(new HashMap<String, Object>());
+        red.setMetaData(new HashMap<>());
         red.getMetaData().put("label", "Red");
         values.getPropertyValues().add(red);
-        when(this.authorExecutor.call(any(), eq(authorReference))).thenReturn(values);
+        when(this.authorExecutor.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
+            .thenReturn(values);
 
         Query query = mock(Query.class);
         QueryParameter queryParameter = mock(QueryParameter.class);
@@ -164,12 +163,12 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         when(query.bindValue("text")).thenReturn(queryParameter);
         when(queryParameter.anyChars()).thenReturn(queryParameter);
         when(queryParameter.literal("bar")).thenReturn(queryParameter);
-        when(query.execute()).thenReturn(Arrays.asList(new Object[] {"blue", 21L}, new Object[] {"red", 17L}));
+        when(query.execute()).thenReturn(Arrays.asList(new Object[] { "blue", 21L }, new Object[] { "red", 17L }));
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 3, "bar"));
+        assertSame(values, this.provider.getValues(propertyReference, 3, "bar"));
 
         verify(query).setLimit(2);
-        verify(query).addFilter(this.mocker.getInstance(QueryFilter.class, "text"));
+        verify(query).addFilter(this.componentManager.getInstance(QueryFilter.class, "text"));
         verify(queryParameter, times(2)).anyChars();
 
         assertEquals(2, values.getPropertyValues().size());
@@ -177,5 +176,31 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
         assertEquals(17L, values.getPropertyValues().get(0).getMetaData().get("count"));
         assertEquals("blue", values.getPropertyValues().get(1).getValue());
         assertEquals(21L, values.getPropertyValues().get(1).getMetaData().get("count"));
+    }
+
+    @Test
+    public void getValue() throws Exception
+    {
+        ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
+        when(this.authorExecutor.call(any(), any(), any()))
+                .thenAnswer(answer -> ((Callable) answer.getArgument(0)).call());
+
+        PropertyValue red = new PropertyValue();
+        red.setValue("red");
+        red.setMetaData(new HashMap<>());
+        red.getMetaData().put("label", "Red");
+
+        Query query = mock(Query.class);
+        QueryParameter queryParameter = mock(QueryParameter.class);
+        when(this.allowedValuesQueryBuilder.build(dbListClass)).thenReturn(query);
+        when(query.bindValue("text")).thenReturn(queryParameter);
+        when(queryParameter.literal("red")).thenReturn(queryParameter);
+        when(query.execute()).thenReturn(Collections.singletonList(new Object[] { "red", "Red" }));
+
+        PropertyValue propertyValue = this.provider.getValue(propertyReference, "red");
+        assertEquals(red.getValue(), propertyValue.getValue());
+        assertEquals(red.getMetaData(), propertyValue.getMetaData());
+
+        verify(query).addFilter(this.componentManager.getInstance(QueryFilter.class, "text"));
     }
 }

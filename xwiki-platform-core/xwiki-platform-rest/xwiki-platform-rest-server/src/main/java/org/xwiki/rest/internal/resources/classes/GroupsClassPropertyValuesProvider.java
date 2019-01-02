@@ -19,12 +19,18 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.icon.IconException;
+import org.xwiki.icon.IconManager;
+import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.rendering.syntax.Syntax;
@@ -41,7 +47,7 @@ import com.xpn.xwiki.objects.classes.GroupsClass;
 
 /**
  * Provides values for the "List of Groups" type of properties.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
@@ -50,6 +56,8 @@ import com.xpn.xwiki.objects.classes.GroupsClass;
 @Singleton
 public class GroupsClassPropertyValuesProvider extends AbstractUsersAndGroupsClassPropertyValuesProvider<GroupsClass>
 {
+    private static final String DEFAULT_ICON_NAME = "group";
+
     @Inject
     private WikiUserManager wikiUserManager;
 
@@ -73,7 +81,8 @@ public class GroupsClassPropertyValuesProvider extends AbstractUsersAndGroupsCla
     {
         String wikiId = propertyDefinition.getOwnerDocument().getDocumentReference().getWikiReference().getName();
         if (!Objects.equal(wikiId, this.wikiDescriptorManager.getMainWikiId())
-            && this.wikiUserManager.getUserScope(wikiId) != UserScope.LOCAL_ONLY) {
+            && this.wikiUserManager.getUserScope(wikiId) != UserScope.LOCAL_ONLY)
+        {
             return getLocalAndGlobalAllowedValues(propertyDefinition, limit, filter);
         } else {
             return getLocalAllowedValues(propertyDefinition, limit, filter);
@@ -81,23 +90,33 @@ public class GroupsClassPropertyValuesProvider extends AbstractUsersAndGroupsCla
     }
 
     @Override
-    protected String getIcon(DocumentReference groupReference)
+    protected Map<String, Object> getIcon(DocumentReference groupReference)
     {
+        Map<String, Object> icon = new HashMap<>();
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument groupProfileDocument = xcontext.getWiki().getDocument(groupReference, xcontext);
             XWikiAttachment avatarAttachment = getFirstImageAttachment(groupProfileDocument, xcontext);
             if (avatarAttachment != null) {
-                return xcontext.getWiki().getURL(avatarAttachment.getReference(), "download",
-                    "width=30&height=30&keepAspectRatio=true", null, xcontext);
+                icon.put(IconManager.META_DATA_URL, xcontext.getWiki().getURL(avatarAttachment.getReference(),
+                    "download", "width=30&height=30&keepAspectRatio=true", null, xcontext));
+                icon.put(IconManager.META_DATA_ICON_SET_TYPE, IconType.IMAGE.name());
             }
         } catch (XWikiException e) {
             this.logger.warn(
                 "Failed to read the avatar of group [{}]. Root cause is [{}]. Using the default avatar instead.",
                 groupReference.getName(), ExceptionUtils.getRootCauseMessage(e));
         }
+        if (!icon.containsKey(IconManager.META_DATA_URL)) {
+            try {
+                icon = this.iconManager.getMetaData(DEFAULT_ICON_NAME);
+            } catch (IconException e) {
+                this.logger.warn("Error getting the icon [{}]. Root cause is [{}].", DEFAULT_ICON_NAME,
+                    ExceptionUtils.getRootCause(e));
+            }
+        }
 
-        return xcontext.getWiki().getSkinFile("icons/xwiki/noavatargroup.png", true, xcontext);
+        return icon;
     }
 
     private XWikiAttachment getFirstImageAttachment(XWikiDocument document, XWikiContext xcontext)

@@ -77,7 +77,7 @@
       #if ($prop.type == 'StringClass')
         #set ($titleField = $prop.name)
         #set ($foundStringProperty = true)
-      #elseif (!$foundAlternativeProperty)
+      #elseif (!$foundAlternativeProperty && $prop.type != 'PasswordClass')
         #set ($titleField = $prop.name)
         #set ($foundAlternativeProperty = true)
       #end
@@ -225,16 +225,12 @@
         ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
         ## The object editor will move these 'includes' (link/script tags) in the head of the HTML page.
         ## Note that we need to pull the JavaScript/CSS only once, for the first object of a given type.
+        <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
         #skinExtensionHooks
         #displayClass($class)
       #else
-        #foreach ($prop in $props)
-          #if ($velocityCount==1)
-            #set ($firstField = $prop.name)
-            #break
-          #end
-        #end ## foreach prop
-        #displayObject($newobj $class $props $firstField)
+        #getTitleField($props)
+        #displayObject($newobj $class $props $titleField)
       #end ## is new class
     #end ## xredirect
   #end ## class exists
@@ -314,6 +310,6 @@
   #end
     </div>## xwikiobjects
   </div>## xwikieditcontent
-  <div class="bottombuttons">#template("editactions.vm")</div>
+  <div class="bottombuttons sticky-buttons">#template("editactions.vm")</div>
   </form>
 #end ## request.xaction

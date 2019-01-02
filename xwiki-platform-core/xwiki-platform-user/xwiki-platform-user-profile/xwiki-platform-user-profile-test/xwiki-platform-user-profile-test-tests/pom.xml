@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-profile-test</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-profile-test-tests</artifactId>
   <name>XWiki Platform - User - Profile - Tests - Functional Tests</name>
@@ -37,7 +37,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- Mapping needed by the ActivityStream migrator since AS is a dependency of the User Directory -->
+    <!-- Mapping required by the Event Stream API implementation that we're using during tests (based on the old
+      ActivityStreamPlugin, see below). -->
     <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
@@ -46,6 +47,14 @@
       <artifactId>xwiki-platform-user-profile-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- We need to package an implementation of the Event Stream API and the only implementation available ATM is based
+      on the old ActivityStreamPlugin. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-activitystream-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
@@ -68,11 +77,6 @@
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
         <version>${project.version}</version>
-        <!-- Make sure that the pages are imported with the superadmin user that we use in our tests so that they have
-             programming rights. We need since since several pages require PR (Activity Stream macro, etc) -->
-        <configuration>
-          <importUser>superadmin</importUser>
-        </configuration>
         <executions>
           <execution>
             <phase>generate-test-resources</phase>
@@ -82,7 +86,8 @@
           </execution>
         </executions>
         <dependencies>
-          <!-- Need explicit dependency here so the package tool does not fail to find activitystream.hbm.xml in the classpath. -->
+          <!-- Need explicit dependency here so the package tool does not fail to find activitystream.hbm.xml in the
+               classpath (see above). -->
           <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-activitystream-api</artifactId>

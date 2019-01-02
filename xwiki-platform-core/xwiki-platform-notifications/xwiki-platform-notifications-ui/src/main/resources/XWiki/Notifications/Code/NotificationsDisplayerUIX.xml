@@ -27,11 +27,8 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1488272751000</creationDate>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1488290404000</date>
-  <contentUpdateDate>1488288100000</contentUpdateDate>
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <version>1.1</version>
   <title/>
@@ -44,6 +41,8 @@
     Get the number of unread notifications as JSON
 ********************************************************#
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
+  #set ($discard = $response.setHeader('Cache-Control', 'no-cache'))
+  #set ($discard = $response.setHeader('Content-Type', 'application/json'))
   $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(21)})
 #********************************************************
              Mark a notification as read
@@ -64,7 +63,7 @@
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'setStartDate' == $request.action)
   #set ($startDate = $datetool.date)
   #if ("$!request.date" != '')
-    #set ($startDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.date).longValue()).toDate())
+    #set ($startDate = $xwiki.jodatime.getDateTime($mathtool.toNumber($request.date).longValue()).toDate())
   #end
   #set ($discard = $services.notification.preferences.setStartDate($startDate))
   #set ($discard = $services.notification.filters.setStartDate($startDate))
@@ -194,9 +193,9 @@
   var maxCountNumber = 20;
 
   /**
-   * The current number of unread notifications
+   * The current number of unread notifications (-1 means we don't know yet how many notifications there are)
    */
-  var notificationCount = 0;
+  var notificationCount = -1;
 
   /**
    * URL to the service that return the notifications to display
@@ -284,7 +283,7 @@
    * Get the number of unread notifications.
    */
   var getUnreadNotificationsCount = function () {
-    $.getJSON(url, {action: 'getUnreadCount'}).done(function (data) {
+    $.ajax(url, {method: 'GET', cache: false, data: {action: 'getUnreadCount'}}).done(function (data) {
       updateNotificationCount(data.unread);
       // Display the "nothing!" message if there is no notification
       if (data.unread == 0) {
@@ -317,7 +316,10 @@
      */
     var notificationsMenusHasBeenOpened = false;
     $('#tmNotifications').on('show.bs.dropdown', function () {
-      if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount &gt; 0) {
+      // Don't load the notifications if the menu has already be opened before, but also if notifications count has
+      // been loaded (!= -1, which is the initial state of the notificationCount variable) but equals to 0 (so we know
+      // there is nothing to load).
+      if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount != 0) {
         macro.load(0).done(function (notifications) {
           createCleanButton(notifications[0].date);
         });
@@ -474,7 +476,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         placement: 'bottom'
       });
       var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
-      if (xm.documentReference.getName() != 'WebHome') {
+      if (xm.documentReference.name != 'WebHome') {
         // Adapt the tooltip when the current document is terminal
         watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
       }
@@ -500,6 +502,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
        * URL to the service that return the notifications to display
        */
       var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       $.post(url, {
         'action': action,
         'location': location,
@@ -512,7 +515,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         watchPageSwitch.bootstrapSwitch('state', data.document, true);
         watchSpaceSwitch.bootstrapSwitch('state', data.space, true);
         watchWikiSwitch.bootstrapSwitch('state', data.wiki, true);
+        // Display success message
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
       }).fail (function() {
+        notification.hide();
         new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('watchlist.notifications.changeStatusError'))', 'error');
         allWatchSwitches.bootstrapSwitch('disabled', false);
       });
@@ -792,12 +799,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       </scope>
     </class>
     <property>
-      <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
+      <content>{{velocity}}
+#macro (generateNotificationInput $id $reference $label)
+  &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
+  &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
+#end
+{{html clean="false"}} ## we need clean="false" because we want to display the raw content
 #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
-    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
+    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -809,12 +821,13 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         &lt;div class="col-xs-8 text-right"&gt;
           &lt;p&gt;
             &lt;span class="notifications-header-link"&gt;
-              &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')" class="notifications-header-link"&gt;
+              &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"
+                  class="notifications-header-link" rel="nofollow external"&gt;
                 $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
               &lt;/a&gt;
             &lt;/span&gt;
             &lt;span class="notifications-header-link"&gt;
-              &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;
+              &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings" rel="nofollow"&gt;
                 $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))
               &lt;/a&gt;
             &lt;/span&gt;
@@ -827,7 +840,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
-          &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
+          &lt;pre&gt;
+            #generateNotificationInput('notificationPageOnly' $doc.documentReference 'notifications.filters.preferences.label.page')
+            #generateNotificationInput('notificationPageAndChildren' $doc.documentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
+            #generateNotificationInput('notificationWiki' $doc.documentReference.wikiReference 'notifications.filters.preferences.label.wiki')
+          &lt;/pre&gt;
         &lt;/div&gt;
       #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;
@@ -837,7 +854,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     &lt;/div&gt;
   &lt;/li&gt;
 #end
-{{/html}}{{/velocity}}
+{{/html}}
+{{/velocity}}
 </content>
     </property>
     <property>

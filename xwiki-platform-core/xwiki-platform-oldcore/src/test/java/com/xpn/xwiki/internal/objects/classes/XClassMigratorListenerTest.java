@@ -21,40 +21,31 @@ package com.xpn.xwiki.internal.objects.classes;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
 import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -63,32 +54,26 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@ComponentList({
-    XClassMigratorListener.class,
-    DefaultObservationManager.class,
-    PropertyConverter.class,
-    XClassPropertyEventGeneratorListener.class,
-})
+@OldcoreTest
+@ComponentList({ DefaultObservationManager.class, PropertyConverter.class, XClassPropertyEventGeneratorListener.class })
 @ReferenceComponentList
 public class XClassMigratorListenerTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @MockComponent
+    private QueryManager mockQueryManager;
+
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @InjectMockComponents
+    private XClassMigratorListener listener;
 
     private XWikiDocument xobjectDocument;
 
     private XWikiDocument xclassDocument;
 
-    private QueryManager mockQueryManager;
-
-    @AfterComponent
-    public void afterComponent() throws Exception
-    {
-        this.mockQueryManager = this.oldcore.getMocker().registerMockComponent(QueryManager.class);
-    }
-
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         this.xclassDocument = new XWikiDocument(new DocumentReference("wiki", "Space", "Class"));
         this.xclassDocument.setSyntax(Syntax.PLAIN_1_0);
@@ -100,18 +85,31 @@ public class XClassMigratorListenerTest
         this.xobjectDocument.addXObject(xobject);
 
         Query query = mock(Query.class);
-        when(this.mockQueryManager.createQuery("from doc.object(Space.Class) as obj", Query.XWQL)).thenReturn(query);
+        when(this.mockQueryManager
+            .createQuery("select distinct obj.name from BaseObject as obj where obj.className = ?", Query.HQL))
+                .thenReturn(query);
         when(query.<String>execute()).thenReturn(Arrays.asList("Space.Page"));
 
         // We need document modification notifications
         this.oldcore.notifyDocumentUpdatedEvent(true);
+        this.oldcore.notifyDocumentCreatedEvent(true);
     }
+
+    private void saveXClassDocument() throws XWikiException
+    {
+        this.oldcore.getSpyXWiki().saveDocument(this.xclassDocument, this.oldcore.getXWikiContext());
+        this.xclassDocument = this.oldcore.getSpyXWiki().getDocument(this.xclassDocument.getDocumentReference(),
+            this.oldcore.getXWikiContext());
+    }
+
+    // Tests
 
     @Test
     public void migrateProperty() throws Exception
     {
         this.xclassDocument.getXClass().addTextField("property", "property", 30);
         saveXClassDocument();
+
         this.xobjectDocument.setStringValue(this.xclassDocument.getDocumentReference(), "property", "42");
         this.oldcore.getSpyXWiki().saveDocument(this.xobjectDocument, this.oldcore.getXWikiContext());
 
@@ -121,19 +119,29 @@ public class XClassMigratorListenerTest
         saveXClassDocument();
 
         // Verify the document has been modified
-        this.xobjectDocument =
-            this.oldcore.getSpyXWiki().getDocument(this.xobjectDocument.getDocumentReference(),
-                this.oldcore.getXWikiContext());
+        this.xobjectDocument = this.oldcore.getSpyXWiki().getDocument(this.xobjectDocument.getDocumentReference(),
+            this.oldcore.getXWikiContext());
 
-        assertEquals(42, ((BaseProperty) this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference())
-            .get("property")).getValue());
+        assertEquals(42,
+            ((BaseProperty) this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference()).get("property"))
+                .getValue());
     }
 
-    private void saveXClassDocument() throws XWikiException
+    @Test
+    public void addNewProperty() throws Exception
     {
-        this.oldcore.getSpyXWiki().saveDocument(this.xclassDocument, this.oldcore.getXWikiContext());
-        this.xclassDocument =
-            this.oldcore.getSpyXWiki().getDocument(this.xclassDocument.getDocumentReference(),
-                this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.xobjectDocument, this.oldcore.getXWikiContext());
+
+        assertNull(this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference()).get("newproperty"));
+
+        // Modify the class
+        this.xclassDocument.getXClass().addNumberField("newproperty", "newproperty", 30, "integer");
+        saveXClassDocument();
+
+        // Verify the document has been modified
+        this.xobjectDocument = this.oldcore.getSpyXWiki().getDocument(this.xobjectDocument.getDocumentReference(),
+            this.oldcore.getXWikiContext());
+
+        assertNotNull(this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference()).get("newproperty"));
     }
 }

@@ -38,11 +38,13 @@ import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetCache;
 import org.xwiki.icon.IconSetLoader;
+import org.xwiki.icon.internal.context.IconSetContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -84,6 +86,8 @@ public class DefaultIconSetManagerTest
 
     private IconSetLoader iconSetLoader;
 
+    private IconSetContext iconSetContext;
+
     private QueryManager queryManager;
 
     private WikiDescriptorManager wikiDescriptorManager;
@@ -107,6 +111,7 @@ public class DefaultIconSetManagerTest
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         iconSetCache = mocker.getInstance(IconSetCache.class);
         iconSetLoader = mocker.getInstance(IconSetLoader.class);
+        iconSetContext = mocker.getInstance(IconSetContext.class);
         queryManager = mocker.getInstance(QueryManager.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWikiId");
@@ -145,6 +150,26 @@ public class DefaultIconSetManagerTest
 
         IconSet iconSet = new IconSet(currentIconTheme);
         when(iconSetCache.get(iconThemeRef)).thenReturn(iconSet);
+
+        // Test
+        IconSet result = mocker.getComponentUnderTest().getCurrentIconSet();
+
+        // Verify
+        assertEquals(iconSet, result);
+        verify(iconSetLoader, never()).loadIconSet(any(DocumentReference.class));
+    }
+
+    @Test
+    public void getCurrentIconSetWhenInContext() throws Exception
+    {
+        String currentIconTheme = "IconThemes.SilkTheme";
+        when(configurationSource.getProperty("iconTheme")).thenReturn(currentIconTheme);
+        DocumentReference iconThemeRef = new DocumentReference("xwiki", "IconThemes", "SilkTheme");
+        when(documentReferenceResolver.resolve(currentIconTheme)).thenReturn(iconThemeRef);
+        when(documentAccessBridge.exists(iconThemeRef)).thenReturn(true);
+
+        IconSet iconSet = new IconSet(currentIconTheme);
+        when(iconSetContext.getIconSet()).thenReturn(iconSet);
 
         // Test
         IconSet result = mocker.getComponentUnderTest().getCurrentIconSet();

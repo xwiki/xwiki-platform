@@ -22,19 +22,19 @@ package org.xwiki.rest.internal.resources.classes;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
@@ -43,27 +43,33 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.UsersClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link UsersClassPropertyValuesProvider}.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
+@ComponentTest
 public class UsersClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ClassPropertyValuesProvider> mocker =
-        new MockitoComponentMockingRule<ClassPropertyValuesProvider>(UsersClassPropertyValuesProvider.class);
+    @InjectMockComponents
+    private UsersClassPropertyValuesProvider provider;
 
+    @MockComponent
     private WikiUserManager wikiUserManager;
 
     private ClassPropertyReference propertyReference = new ClassPropertyReference("owner", this.classReference);
 
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
         super.configure();
@@ -71,14 +77,6 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         addProperty(this.propertyReference.getName(), new UsersClass(), true);
         when(this.xcontext.getWiki().getSkinFile("icons/xwiki/noavatar.png", true, this.xcontext))
             .thenReturn("url/to/noavatar.png");
-
-        this.wikiUserManager = this.mocker.getInstance(WikiUserManager.class);
-    }
-
-    @Override
-    protected MockitoComponentManagerRule getMocker()
-    {
-        return this.mocker;
     }
 
     @Test
@@ -89,23 +87,25 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
 
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.allowedValuesQuery.execute())
-            .thenReturn(Collections.singletonList(new Object[] {aliceReference, " Alice One "}));
+            .thenReturn(Collections.singletonList(new Object[]{ aliceReference, " Alice One " }));
         when(this.xcontext.getWiki().getDocument(aliceReference, this.xcontext))
             .thenReturn(mock(XWikiDocument.class, "alice"));
 
-        QueryFilter documentFilter = this.mocker.getInstance(QueryFilter.class, "document");
-        QueryFilter viewableFilter = this.mocker.getInstance(QueryFilter.class, "viewable");
+        QueryFilter documentFilter = this.componentManager.getInstance(QueryFilter.class, "document");
+        QueryFilter viewableFilter = this.componentManager.getInstance(QueryFilter.class, "viewable");
         List<QueryFilter> filters = mock(List.class);
         DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
         when(this.usedValuesQuery.getFilters()).thenReturn(filters);
         when(this.usedValuesQuery.execute())
-            .thenReturn(Arrays.asList(new Object[] {bobReference, 17L}, new Object[] {aliceReference, 3L}));
+            .thenReturn(Arrays.asList(new Object[]{ bobReference, 17L }, new Object[]{ aliceReference, 3L }));
 
         EntityReferenceSerializer<String> compactSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
+            this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
         when(compactSerializer.serialize(aliceReference, this.classReference.getWikiReference()))
             .thenReturn("Users.Alice");
         when(compactSerializer.serialize(bobReference, this.classReference.getWikiReference())).thenReturn("Users.Bob");
+
+        when(this.xcontext.getWiki().getPlainUserName(bobReference, this.xcontext)).thenReturn("Bob the Great");
 
         when(this.xcontext.getWiki().getURL(aliceReference, this.xcontext)).thenReturn("url/to/alice");
         when(this.xcontext.getWiki().getURL(bobReference, this.xcontext)).thenReturn("url/to/bob");
@@ -121,20 +121,23 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         when(this.xcontext.getWiki().getURL(bobAvatarReference, "download", "width=30&height=30&keepAspectRatio=true",
             null, this.xcontext)).thenReturn("url/to/bob/avatar");
 
-        PropertyValues values = this.mocker.getComponentUnderTest().getValues(this.propertyReference, 5, "foo");
+        PropertyValues values = this.provider.getValues(this.propertyReference, 5, "foo");
 
         assertEquals(2, values.getPropertyValues().size());
 
         assertEquals("Users.Alice", values.getPropertyValues().get(0).getValue());
         assertEquals("Alice One", values.getPropertyValues().get(0).getMetaData().get("label"));
         assertEquals(3L, values.getPropertyValues().get(0).getMetaData().get("count"));
-        assertEquals("url/to/noavatar.png", values.getPropertyValues().get(0).getMetaData().get("icon"));
+        assertTrue(values.getPropertyValues().get(0).getMetaData().get("icon") instanceof Map);
         assertEquals("url/to/alice", values.getPropertyValues().get(0).getMetaData().get("url"));
 
         assertEquals("Users.Bob", values.getPropertyValues().get(1).getValue());
-        assertEquals("Bob", values.getPropertyValues().get(1).getMetaData().get("label"));
+        assertEquals("Bob the Great", values.getPropertyValues().get(1).getMetaData().get("label"));
         assertEquals(17L, values.getPropertyValues().get(1).getMetaData().get("count"));
-        assertEquals("url/to/bob/avatar", values.getPropertyValues().get(1).getMetaData().get("icon"));
+        assertTrue(values.getPropertyValues().get(1).getMetaData().get("icon") instanceof Map);
+        Map icon = (Map) values.getPropertyValues().get(1).getMetaData().get("icon");
+        assertEquals("url/to/bob/avatar", icon.get("url"));
+        assertEquals("IMAGE", icon.get("iconSetType"));
         assertEquals("url/to/bob", values.getPropertyValues().get(1).getMetaData().get("url"));
 
         verify(this.allowedValuesQuery, never()).setWiki(any(String.class));
@@ -151,10 +154,10 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.GLOBAL_ONLY);
 
-        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        WikiDescriptorManager wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("math");
 
-        this.mocker.getComponentUnderTest().getValues(this.propertyReference, 5, "foo");
+        this.provider.getValues(this.propertyReference, 5, "foo");
 
         verify(this.allowedValuesQuery).setWiki("math");
         verify(this.allowedValuesQuery, times(1)).execute();
@@ -166,7 +169,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.LOCAL_AND_GLOBAL);
 
-        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        WikiDescriptorManager wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("chess");
 
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
@@ -178,11 +181,14 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         when(this.allowedValuesQuery.execute()).thenReturn(Collections.singletonList(bobReference),
             Collections.singletonList(aliceReference));
 
-        PropertyValues values = this.mocker.getComponentUnderTest().getValues(this.propertyReference, 5, "foo");
+        when(this.xcontext.getWiki().getPlainUserName(aliceReference, this.xcontext)).thenReturn("Alice White");
+        when(this.xcontext.getWiki().getPlainUserName(bobReference, this.xcontext)).thenReturn("Bob Black");
+
+        PropertyValues values = this.provider.getValues(this.propertyReference, 5, "foo");
 
         assertEquals(2, values.getPropertyValues().size());
-        assertEquals("Alice", values.getPropertyValues().get(0).getMetaData().get("label"));
-        assertEquals("Bob", values.getPropertyValues().get(1).getMetaData().get("label"));
+        assertEquals("Alice White", values.getPropertyValues().get(0).getMetaData().get("label"));
+        assertEquals("Bob Black", values.getPropertyValues().get(1).getMetaData().get("label"));
 
         verify(this.allowedValuesQuery).setWiki("chess");
         verify(this.allowedValuesQuery, times(2)).execute();

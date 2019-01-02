@@ -24,10 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link WikiMacroDescriptor}.
@@ -42,18 +43,19 @@ public class WikiMacroDescriptorTest
      * descriptors are passed to the Wiki Macro descriptor. This is useful for example to ensure that the
      * WYSIWYG editor will display the wiki macro parameter in the same order as the Wiki Macro Object order.
      */
-    @org.junit.Test
+    @Test
     public void testGetParameterDescriptorMapInCorrectOrder()
     {
         List<WikiMacroParameterDescriptor> paramDescriptors = Arrays.asList(
             new WikiMacroParameterDescriptor("id1", "description1", true),
             new WikiMacroParameterDescriptor("id2", "description2", true));
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("name", "description", "category",
-            WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(), paramDescriptors);
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().name("name").description("description")
+            .defaultCategory("category").visibility(WikiMacroVisibility.GLOBAL)
+            .contentDescriptor(new DefaultContentDescriptor()).parameterDescriptors(paramDescriptors).build();
         Map<String, ParameterDescriptor> result = descriptor.getParameterDescriptorMap();
 
         Iterator<String> it = result.keySet().iterator();
-        Assert.assertEquals("id1", it.next());
-        Assert.assertEquals("id2", it.next());
+        assertEquals("id1", it.next());
+        assertEquals("id2", it.next());
     }
 }

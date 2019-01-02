@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1252454400000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1264723531000</date>
-  <contentUpdateDate>1264723531000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("xe.tag.tags")</title>
   <comment/>
@@ -95,8 +92,7 @@ $xwiki.ssx.use('Main.Tags')##
     (((
       (% class="xapp" %)
       === $services.localization.render('xe.tag.activity', ["//${tag}//"]) ===
-
-      {{activity tags="$tag" rss='true'/}}
+      {{notifications useUserPreferences="false" displayOwnEvents="true" tags="$tag" displayRSSLink="true" /}}
     )))
   {{/container}}
 #elseif ($do == 'prepareRename')

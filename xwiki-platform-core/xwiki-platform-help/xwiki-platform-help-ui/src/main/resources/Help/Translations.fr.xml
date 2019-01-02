@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1459330108000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1469290377000</date>
-  <contentUpdateDate>1469290377000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -40,10 +37,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>help.tipsPanel.title=Conseils
-help.tipsPanel.noTipMessage=Aucun conseil disponible\!
-help.tipsPanel.gettingStartedTip=Si vous débutez avec XWiki, consultez le [[Guide de démarrage&gt;&gt;http\://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Naviguez directement vers une page du wiki avec Ctrl+G ou Meta+G.\nVoir d'autres [[raccourcis clavier&gt;&gt;http\://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
-help.tipsPanel.improveXWikiTip=Savez-vous que vous pouvez améliorer XWiki ? Prenez 5 minutes pour [[remplir ce questionnaire&gt;&gt;http\://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] et aider ce projet open source \!
+help.tipsPanel.noTipMessage=Aucune astuce n'est disponible !
+help.tipsPanel.gettingStartedTip=Si vous débutez avec XWiki, consultez le [[Guide de démarrage&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Naviguez directement vers une page du wiki avec Ctrl+G ou Meta+G.\nVoir d'autres [[raccourcis clavier&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Savez-vous que vous pouvez améliorer XWiki ? Prenez 5 minutes pour [[remplir ce questionnaire&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] et aider ce projet open source !
 help.tipsPanel.breadcrumbsTip=Cliquez sur les flèches à côté des éléments du fil d'ariane pour naviguer vers les pages soeurs et filles de la page courante.
 help.tipsPanel.advancedHiddenShortcutTip=Tapez le combo x+x+x+a pour activer ou désactiver le [[mode Avancé&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] et x+x+x+h pour activer ou désactiver [[l'affichage des pages cachées&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.macroList.title=Macros disponibles

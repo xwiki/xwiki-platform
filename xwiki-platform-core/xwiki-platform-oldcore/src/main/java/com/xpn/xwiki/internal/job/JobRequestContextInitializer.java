@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.concurrent.ContextStore;
 import org.xwiki.job.event.JobStartedEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -41,10 +42,12 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * 
  * @version $Id$
  * @since 8.4RC1
+ * @deprecated since 10.9RC1, use {@link ContextStore} instead
  */
 @Component
 @Named("com.xpn.xwiki.internal.job.JobRequestContextInitializer")
 @Singleton
+@Deprecated
 public class JobRequestContextInitializer extends AbstractEventListener
 {
     @Inject
@@ -97,7 +100,7 @@ public class JobRequestContextInitializer extends AbstractEventListener
                 // Request
                 if (jobRequestContext.isRequestSet()) {
                     xcontext.setRequest(new XWikiServletRequestStub(jobRequestContext.getRequestURL(),
-                        jobRequestContext.getRequestParameters()));
+                        jobRequestContext.getRequestContextPath(), jobRequestContext.getRequestParameters()));
                 }
             }
         }

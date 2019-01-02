@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -36,6 +36,7 @@
    </description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>4</xwiki.pitest.mutationThreshold>
 
     <!-- It might be causing issue with this plugin build but not sure why and it's quite random -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
@@ -299,6 +300,20 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- CAPTCHA API used by oldcore in CommentsAdd and RegisterAction -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- CAPTCHA Default module used to avoid cyclic dependency on oldcore but needed to access the configuration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-captcha-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

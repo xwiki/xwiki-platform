@@ -29,13 +29,11 @@ import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.question.EntitySelection;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public class ExtensionBreakingQuestion
 {
     /**
@@ -177,12 +175,14 @@ public class ExtensionBreakingQuestion
     }
 
     /**
-     * Unselect all entities.
+     * Unselect all entities for whom no choice has been made yet.
      */
     public void unselectAll()
     {
         for (EntitySelection entitySelection : concernedEntities.values()) {
-            entitySelection.setSelected(false);
+            if (entitySelection.getState() == EntitySelection.State.UNKNOWN) {
+                entitySelection.setSelected(false);
+            }
         }
     }
 
@@ -208,7 +208,9 @@ public class ExtensionBreakingQuestion
     {
         for (DocumentReference document : documents) {
             EntitySelection entitySelection = concernedEntities.get(document);
-            entitySelection.setSelected(true);
+            if (entitySelection != null) {
+                entitySelection.setSelected(true);
+            }
         }
     }
 }

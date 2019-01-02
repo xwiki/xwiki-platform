@@ -1,0 +1,317 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Captcha.JCaptcha.Displayer" locale="">
+  <web>XWiki.Captcha.JCaptcha</web>
+  <name>Displayer</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Captcha.JCaptcha.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($discard = $xwiki.jsx.use('XWiki.Captcha.JCaptcha.Displayer'))
+#set ($discard = $xwiki.ssx.use('XWiki.Captcha.JCaptcha.Displayer'))
+#set ($type = $captchaParameters.type)
+#set ($engine = $captchaParameters.engine)
+{{html clean='false'}}
+#if ($type == 'image')
+  ## Most of the time, the caching policy is respected, but in cases like the comments section (when the tab is reloaded) we are still forced to use a "cache buster".
+  &lt;img src='$doc.getURL('jcaptcha', "type=image&amp;engine=${escapetool.url($engine)}&amp;cache-buster=${datetool.date.time}")' class='captcha captcha-challenge' alt="$services.localization.render('captcha.jcaptcha.displayer.image.alt')" /&gt;
+#elseif ($type == 'sound')
+  ## Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1129121 on Firefox is to use a "cache busting" parameter to force a GET every time.
+  &lt;audio src='$doc.getURL('jcaptcha', "type=sound&amp;engine=${escapetool.url($engine)}&amp;cache-buster=${datetool.date.time}")' class="captcha captcha-challenge"&gt;
+    #error($services.localization.render('captcha.jcaptcha.displayer.audio.error.audioElementNotSupported'))
+  &lt;/audio&gt;
+  &lt;a class='btn btn-link captcha captcha-play' href='#playCaptcha'&gt;$services.icon.renderHTML('play') $services.localization.render('captcha.jcaptcha.displayer.audio.play')&lt;/a&gt;
+#elseif ($type == 'text')
+  &lt;iframe src='$doc.getURL('jcaptcha', "type=text&amp;engine=${escapetool.url($engine)}")' class="captcha captcha-challenge" frameborder="0"&gt;&lt;/iframe&gt;
+#else
+  #set ($jCaptchaError = true)
+  #error($services.localization.render('captcha.jcaptcha.displayer.error.unsupportedType'))
+#end
+#if (!$jCaptchaError)
+  &lt;a class='btn btn-link captcha captcha-refresh' href='#refreshCaptcha'&gt;
+    $services.icon.renderHTML('refresh') $services.localization.render('captcha.jcaptcha.displayer.refresh')
+  &lt;/a&gt;
+  ## Use autocomplete="off" so that when pressing the back button, the old answer is discarded.
+  ## Use an explicit empty value="" to avoid caching.
+  &lt;input type="text" autocomplete="off" class="captcha captcha-answer" name="captchaAnswer" value="" placeholder="Answer" /&gt;
+#end
+{{/html}}
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.Captcha.JCaptcha.Displayer</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>474cbd43-63d6-43c7-9742-05951b889734</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
+  var registerListeners = function(container) {
+    // If no container is specified, using the entire document as default.
+    if (!container) {
+      container = document;
+    }
+
+    // Click listener for the audio CAPTCHA play/listen button.
+    $(container).find('.captcha-play').click(function() {
+      $(this).siblings('audio.captcha-challenge')[0].play();
+    });
+
+    // Click listener for the CAPTCHA refresh/reload button.
+    $(container).find('.captcha-refresh').click(function() {
+      // We simply reset the 'src' attribute's value to make the CAPTCHA display a new challenge.
+      var currentSrc = $(this).siblings('.captcha-challenge').prop('src');
+      // Make sure to append a cache-buster to the src, since some elements might not reload if the src is the same (e.g. image does not reload, but iframe reloads).
+      $(this).siblings('.captcha-challenge').prop('src', currentSrc.replace(/&amp;cache-buster=[0-9]+/gm, '') + '&amp;cache-buster=' + new Date().getTime());
+    });
+  }
+
+  // On load, register listeners for CAPTCHAs we can find.
+  registerListeners(document);
+  // Whenever a CAPTCHA is reloaded via AJAX, we need to re-register the listeners.
+  $(document).on('xwiki:captcha:reloaded', function(event, data) {
+    registerListeners(event.target);
+  });
+
+  // Does nothing but break Firefox's bfcache (back-forward cache) to make sure the CAPTCHA is reloaded when pressing back and not showing a stale CAPTCHA.
+  $(window).unload(function(){});
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Captcha.JCaptcha.Displayer</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>adba8dd7-1558-4593-ad83-6fd0eee2047f</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.captcha.captcha-refresh {
+  /* Align the refresh button to top. */
+  vertical-align: top;
+}
+
+iframe.captcha-challenge {
+  /* Align the iframe (text captcha) with the Refresh button. */
+  margin-top: 0.4em;
+  /* Min height needed in order for the browser to be able to show vertical scroll bars, if the content needs it. */
+  height: 4.5em;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

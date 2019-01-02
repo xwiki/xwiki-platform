@@ -21,21 +21,24 @@ package org.xwiki.component.wiki;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.query.QueryManager;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,28 +53,22 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.5RC1
  */
+@ComponentTest
+@ReferenceComponentList
 public class WikiObjectComponentManagerEventListenerProxyTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiObjectComponentManagerEventListenerProxy> mocker =
-            new MockitoComponentMockingRule<>(WikiObjectComponentManagerEventListenerProxy.class);
-
+    @MockComponent
+    @Named("context")
     private ComponentManager componentManager;
 
+    @MockComponent
     private WikiComponentManagerEventListenerHelper wikiComponentManagerEventListenerHelper;
 
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    @MockComponent
+    private QueryManager queryManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.componentManager = this.mocker.getInstance(ComponentManager.class, "context");
-
-        this.wikiComponentManagerEventListenerHelper =
-                this.mocker.registerMockComponent(WikiComponentManagerEventListenerHelper.class);
-        this.entityReferenceSerializer =
-                this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-    }
+    @InjectMockComponents
+    private WikiObjectComponentManagerEventListenerProxy listenerProxy;
 
     @Test
     public void testWikiObjectListCollection() throws Exception
@@ -79,18 +76,16 @@ public class WikiObjectComponentManagerEventListenerProxyTest
         WikiObjectComponentBuilder builder1 = mock(WikiObjectComponentBuilder.class);
         WikiObjectComponentBuilder builder2 = mock(WikiObjectComponentBuilder.class);
 
-        ObjectReference builder1Reference =
-                new ObjectReference("builder1", mock(DocumentReference.class));
-        ObjectReference builder2Reference =
-                new ObjectReference("builder2", mock(DocumentReference.class));
+        ObjectReference builder1Reference = new ObjectReference("builder1", mock(DocumentReference.class));
+        ObjectReference builder2Reference = new ObjectReference("builder2", mock(DocumentReference.class));
 
         when(builder1.getClassReference()).thenReturn(builder1Reference);
         when(builder2.getClassReference()).thenReturn(builder2Reference);
 
         when(this.componentManager.getInstanceList(WikiObjectComponentBuilder.class))
-                .thenReturn(Arrays.asList(builder1, builder2));
+            .thenReturn(Arrays.asList(builder1, builder2));
 
-        assertEquals(2, this.mocker.getComponentUnderTest().getWikiObjectsList().size());
+        assertEquals(2, this.listenerProxy.getWikiObjectsList().size());
     }
 
     @Test
@@ -121,19 +116,17 @@ public class WikiObjectComponentManagerEventListenerProxyTest
     public void testUnregisterObjectComponents() throws Exception
     {
         ObjectReference testReference = mock(ObjectReference.class);
-        this.mocker.getComponentUnderTest().unregisterObjectComponents(testReference);
+        this.listenerProxy.unregisterObjectComponents(testReference);
 
-        verify(this.wikiComponentManagerEventListenerHelper, times(1))
-                .unregisterComponents(testReference);
+        verify(this.wikiComponentManagerEventListenerHelper, times(1)).unregisterComponents(testReference);
     }
 
     private void testWithWikiObjectComponentBuilder(WikiObjectComponentBuilder buider,
-            BaseObjectReference objectReference, XWikiDocument source) throws Exception
+        BaseObjectReference objectReference, XWikiDocument source) throws Exception
     {
         BaseObject baseObject = mock(BaseObject.class);
         when(source.getXObject(any(ObjectReference.class))).thenReturn(baseObject);
 
-        this.mocker.getComponentUnderTest().registerObjectComponents(objectReference, baseObject, buider);
+        this.listenerProxy.registerObjectComponents(objectReference, baseObject, buider);
     }
-
 }

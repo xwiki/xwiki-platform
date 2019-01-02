@@ -1,0 +1,463 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Captcha.JCaptcha.Administration" locale="">
+  <web>XWiki.Captcha.JCaptcha</web>
+  <name>Administration</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Captcha.JCaptcha.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($discard = $xwiki.jsx.use('Administration'))
+#set ($discard = $xwiki.ssx.use('Administration'))
+#set ($configDoc = $xwiki.getDocument('Configuration'))
+#set ($configClass = $xwiki.getDocument('ConfigurationClass').xWikiClass)
+#set ($configObject = $configDoc.getObject($configClass.name))
+## Initialize with the default engines.
+#set ($enginesMap = {
+  'image' : [
+    'com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine',
+    'com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine',
+    'com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine',
+    'com.octo.captcha.engine.image.gimpy.HotmailEngine',
+    'com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine',
+    'com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine',
+    'com.octo.captcha.engine.image.gimpy.HotmailEngine2008'
+    ],
+  'sound' : [
+    'com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine',
+    'com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine'
+    ],
+  'text' : [
+    'org.xwiki.captcha.internal.SimpleMathCaptchaEngine'
+    ]
+})
+## Add contributed engines, through UIXs.
+#set ($engineUIXs = $services.uix.getExtensions('org.xwiki.captcha.jcaptcha.engine'))
+#foreach ($engineUIX in $engineUIXs)
+  #set ($type = $engineUIX.parameters.type)
+  #set ($engine = $engineUIX.parameters.engine)
+  #set ($registeredEngines = $enginesMap.get($type))
+  #if ($registeredEngines &amp;&amp; !$registeredEngines.contains($engine))
+    #set ($discard = $registeredEngines.add($engine))
+  #end
+#end
+{{html clean="false"}}
+&lt;form action="$configDoc.getURL('save')" class='xform jcaptcha'&gt;
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label for='XWiki.Captcha.JCaptcha.ConfigurationClass_0_type'&gt;$configClass.type.translatedPrettyName&lt;/label&gt;
+      &lt;span class='xHint'&gt;$configClass.type.hint&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;{{/html}}
+
+    $configDoc.display('type', 'edit')
+
+    {{html clean="false"}}&lt;/dd&gt;
+
+    &lt;dt&gt;
+      &lt;label&gt;$configClass.engine.translatedPrettyName&lt;/label&gt;
+      &lt;span class='xHint'&gt;$configClass.engine.hint&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      #set ($currentType = "$!configObject.getValue('type')")
+      #set ($currentEngine = "$!configObject.getValue('engine')")
+      #set ($isCustom = true)
+      #foreach ($type in $enginesMap.keySet())
+        #foreach ($engine in $enginesMap.get($type))
+          #set ($maybeChecked = '')
+          #if ($currentEngine == $engine)
+            #set ($maybeChecked = 'checked="checked"')
+            #if ($type == $currentType)
+              #set ($isCustom = false)
+            #end
+          #end
+          &lt;div class="engine $type #if ($currentType != $type)hidden#end radio"&gt;
+            &lt;label&gt;
+              &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" value="$engine" $maybeChecked /&gt;
+              $services.localization.render("captcha.jcaptcha.engine.$engine")
+            &lt;/label&gt;
+          &lt;/div&gt;
+        #end
+      #end
+      &lt;div class="jcaptcha radio"&gt;
+        &lt;div class="custom"&gt;
+          &lt;label&gt;
+            ## Note: Using the same input name for the "custom" option
+            &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" class="customActivator" #if ($isCustom)checked="checked"#end /&gt;
+            Custom:
+          &lt;/label&gt;
+          &lt;input type="text" class="customEngine" #if ($isCustom)checked="checked" value="$currentEngine"#end /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;div&gt;
+    &lt;input type="hidden" name="xredirect" value="$xwiki.requestURL" /&gt;
+    &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()" /&gt;
+    &lt;input type="submit" class="button" value="$services.localization.render('admin.save')" /&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.Captcha.JCaptcha.Administration</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f8e35660-9904-464b-aad9-182a9efc1178</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  // Handler for saving the custom engine's value in the "custom" select's option when submitting
+  // the JCaptcha settings form, since the first value is always used when multiple values are given.
+  $('form.jcaptcha').submit(function(e) {
+    var customOption = $('input.customActivator');
+    if (customOption.is(':checked')) {
+      var customInput = $('.customEngine');
+      customOption.val(customInput.val());
+    }
+  })
+
+  // Handler for changing the engine type.
+  $('#XWiki\\.Captcha\\.JCaptcha\\.ConfigurationClass_0_type').change(function(e) {
+    // Hide all engines except the ones for the new type.
+    $('.jcaptcha .engine').addClass('hidden');
+    $('.jcaptcha .engine.' + this.value).removeClass('hidden');
+
+    // Check the first option for the new type.
+    $('.jcaptcha .engine:visible:first input').prop('checked', true);
+
+    // Clear the custom value since it will not match the new type.
+    $('.customEngine').val('');
+  })
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Captcha.JCaptcha.Administration</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8eaba3c8-9933-4245-973e-8737b411e23f</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/* Extend the custom engine input to the right. */
+div.custom {
+  display: flex;
+  align-items: center;
+}
+.customEngine {
+  flex-grow: 1;
+  margin-left: .5em;
+}
+
+/* Make sure we have a margin-top for the engines, even when the first ones are hidden. */
+.jcaptcha .hidden + .radio, .jcaptcha .radio:first-of-type {
+  margin-top: 10px;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Captcha.JCaptcha.Administration</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>da1c3dc0-0446-4008-b23a-9e7196f683f4</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content>{{display reference="XWiki.Captcha.JCaptcha.Administration" /}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.captcha</extensionPointId>
+    </property>
+    <property>
+      <name>jcaptcha</name>
+    </property>
+    <property>
+      <parameters/>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

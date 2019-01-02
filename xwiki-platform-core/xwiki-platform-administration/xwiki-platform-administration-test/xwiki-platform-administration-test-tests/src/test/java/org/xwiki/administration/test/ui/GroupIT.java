@@ -20,8 +20,6 @@
 
 package org.xwiki.administration.test.ui;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.administration.test.po.GroupEditPage;
@@ -29,6 +27,8 @@ import org.xwiki.administration.test.po.GroupsPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+
+import static org.junit.Assert.assertTrue;
 
 public class GroupIT extends AbstractTest
 {
@@ -66,12 +66,10 @@ public class GroupIT extends AbstractTest
 
         // Test that SUB_GROUP is a member of BIG_GROUP
         bigGroupPage.filterMembers(SUB_GROUP);
-        assertTrue("subGroup is not part of bigGroup!",
-            bigGroupPage.getMembersTable().hasRow("Member", String.format("%s (XWiki.%s)", SUB_GROUP, SUB_GROUP)));
+        assertTrue("subGroup is not part of bigGroup!", bigGroupPage.getMembersTable().hasRow("Member", SUB_GROUP));
 
         // Test that TESTER is a member of BIG_GROUP
         bigGroupPage.filterMembers(TESTER);
-        assertTrue("tester is not part of bigGroup!",
-            bigGroupPage.getMembersTable().hasRow("Member", String.format("%s (XWiki.%s)", TESTER, TESTER)));
+        assertTrue("tester is not part of bigGroup!", bigGroupPage.getMembersTable().hasRow("Member", TESTER));
     }
 }

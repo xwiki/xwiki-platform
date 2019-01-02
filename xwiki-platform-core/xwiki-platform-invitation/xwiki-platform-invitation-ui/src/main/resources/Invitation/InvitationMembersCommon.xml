@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1273961102000</creationDate>
   <parent>Invitation.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1511976572000</date>
-  <contentUpdateDate>1511976572000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -55,7 +52,7 @@
  *
  * Macros also depend on other macros but only other macros which are contained in this script.
  *###
-#if($doc.getName() == 'InvitationMembersCommon')
+#if($doc.documentReference.name == 'InvitationMembersCommon')
   {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##
@@ -433,7 +430,7 @@
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAllGroup,</groups>
+      <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
       <levels>view</levels>

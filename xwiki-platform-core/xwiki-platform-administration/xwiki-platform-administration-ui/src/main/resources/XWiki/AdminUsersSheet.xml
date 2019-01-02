@@ -27,127 +27,560 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1364502208000</creationDate>
   <parent>XWiki.AdminSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1364565878000</date>
-  <contentUpdateDate>1364565878000</contentUpdateDate>
   <version>1.1</version>
   <title>AdminUsersSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-## We include new settings from the Wiki Manager (only if it is not the main wiki)
-#set($wikiManagerUserRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUsers'))
-#if(!$xcontext.isMainWiki() &amp;&amp; $xwiki.exists($wikiManagerUserRef))
-  {{include reference="WikiManager.WikiUsers" /}}
+  <content>{{velocity output="false"}}
+#macro (userScopeFilter)
+  &lt;select name="wiki"&gt;
+    &lt;option selected="selected" value="local"&gt;
+      $escapetool.xml($services.localization.render('rightsmanager.local'))
+    &lt;/option&gt;
+    &lt;option value="global"&gt;
+      $escapetool.xml($services.localization.render('rightsmanager.global'))
+    &lt;/option&gt;
+    &lt;option value="both"&gt;
+      $escapetool.xml($services.localization.render('rightsmanager.both'))
+    &lt;/option&gt;
+  &lt;/select&gt;
 #end
 
-##
+#macro (displayUsersLiveTable)
+  #set ($columnOptions = {
+    'name': {'type': 'text', 'sortable': false, 'html': true},
+    'first_name': {'type': 'text', 'sortable': false},
+    'last_name': {'type': 'text', 'sortable': false},
+    'scope': {'type': 'list', 'sortable': false},
+    '_actions': {
+      'actions': ['edit', 'delete'],
+      'filterable': false
+     }
+  })
+  #set ($columns = ['name', 'first_name', 'last_name', '_actions'])
+  #set ($liveTableOptions = {
+    'url': $doc.getURL('view', 'xpage=getusers'),
+    'translationPrefix': 'xe.admin.users.',
+    'outputOnlyHtml': true
+  })
+  #if (!$xcontext.isMainWiki())
+    #set ($discard = $columns.add(3, 'scope'))
+    ## We use the top filters option to show only the local users by default because the JavaScript code from the sheet
+    ## is executed after the livetable is loaded. The JavaScript code removes the top filters and updates the scope filter
+    ## afterwards.
+    #set ($liveTableOptions.topFilters = "#userScopeFilter")
+  #end
+  &lt;div class="medium-avatars"&gt;
+    #livetable('userstable' $columns $columnOptions $liveTableOptions)
+  &lt;/div&gt;
+  &lt;p&gt;
+    &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createUserModal"&gt;
+      $escapetool.xml($services.localization.render('rightsmanager.addnewuser'))
+    &lt;/button&gt;
+  &lt;/p&gt;
+#end
+
+#macro (createUserModal)
+  &lt;div class="modal" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModal-label"
+      data-backdrop="static" data-keyboard="false"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title" id="createUserModal-label"&gt;
+            $escapetool.xml($services.localization.render('rightsmanager.addnewuser'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;&lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+            $escapetool.xml($services.localization.render('create'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (editUserModal)
+  &lt;div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModal-label"
+      data-backdrop="static" data-keyboard="false" data-liveTable="#userstable" data-liveTableAction="edit"&gt;
+    &lt;div class="modal-dialog modal-lg" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title" id="editUserModal-label"&gt;
+            $escapetool.xml($services.localization.render('xe.admin.users.editUser'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;&lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+            $escapetool.xml($services.localization.render('save'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (deleteUserModal)
+  &lt;div class="modal" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModal-label"
+      data-liveTable="#userstable" data-liveTableAction="delete"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title" id="deleteUserModal-label"&gt;
+            $escapetool.xml($services.localization.render('xe.admin.users.deleteUser'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeleteuser')))
+          &lt;p&gt;$message.replace('__name__', '&lt;span class="userName"&gt;&lt;/span&gt;')&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-danger" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('delete'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+{{/velocity}}
+
+{{velocity}}
+## We include new settings from the Wiki Manager (only if it is not the main wiki).
+#set ($wikiManagerUserRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUsers'))
+#if (!$xcontext.isMainWiki() &amp;&amp; $xwiki.exists($wikiManagerUserRef))
+  {{include reference="WikiManager.WikiUsers" /}}
+#end
 ## The Users management is enabled:
 ## - on the main wiki
 ## - on a subwiki where local users are enabled
 ## - on a subwiki if there is no service "$services.wiki.user"
-#if($xcontext.isMainWiki() || "$!services.wiki.user" == '' || "$!services.wiki.user.userScope" != 'GLOBAL_ONLY')
-  ### Globally administrate the users in a wiki.
-  #set($formname = "update")
-  #set($saveaction = "save")
+#if ($xcontext.isMainWiki() || "$!services.wiki.user" == '' || "$!services.wiki.user.userScope" != 'GLOBAL_ONLY')
   ##
-  ## inject needed JS and CSS files
+  ## Inject needed JS and CSS files
   ##
-  #set($ok = $xwiki.jsfx.use("js/xwiki/lightbox/lightbox.js", true))
-  #set($ok = $xwiki.ssfx.use("js/xwiki/lightbox/lightbox.css", true))
-  #set($ok = $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true))
-  #set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
-  #set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
-  #set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
-  #set($ok = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
-  #set($ok = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
-  ##
-  ## url to get the users for displaying them in the ajax-based table
-  ##
-  #set($url = $doc.getURL('get', 'xpage=getusers'))
-  #if($xcontext.database != "xwiki")
-    #set($mainwk = false)
-  #else
-    #set($mainwk = true)
-  #end
-  {{html}}
-  &lt;div id="xwikieditcontent"&gt;
-    &lt;table id="userstable" class="xwiki-livetable"&gt;
-      &lt;tr&gt;
-        &lt;td class="xwiki-livetable-pagination"&gt;
-          &lt;span id="userstable-limits" class="xwiki-livetable-limits"&gt;&lt;/span&gt;
-          &lt;span id="userstable-ajax-loader" class="xwiki-livetable-loader"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" /&gt;$services.localization.render('platform.livetable.loading')&lt;/span&gt;
-          &lt;span class="pagination"&gt;
-            &lt;span id="userstable-pagination-text" class="xwiki-livetable-pagination-text"&gt;$services.localization.render('platform.livetable.paginationPage')&lt;/span&gt;
-            &lt;span id="userstable-pagination" class="xwiki-livetable-pagination-content" &gt;&lt;/span&gt;
-          &lt;/span&gt;
-        &lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td class="xwiki-livetable-display-container"&gt;
-          &lt;table class="xwiki-livetable-display"&gt;
-            &lt;thead class="xwiki-livetable-display-header"&gt;
-              &lt;tr&gt;
-                &lt;th class="xwiki-livetable-display-header-text" scope="col"&gt;$services.localization.render('xe.admin.users.username')&lt;/th&gt;
-                &lt;th class="xwiki-livetable-display-header-text" scope="col"&gt;$services.localization.render('xe.admin.users.firstname')&lt;/th&gt;
-                &lt;th class="xwiki-livetable-display-header-text" scope="col"&gt;$services.localization.render('xe.admin.users.lastname')&lt;/th&gt;
-                &lt;th class="xwiki-livetable-display-header-text" scope="col"&gt;$services.localization.render('xe.admin.users.manage')&lt;/th&gt;
-              &lt;/tr&gt;
-              &lt;tr id="userstable-filters" class="xwiki-livetable-display-filters"&gt;
-                &lt;td class="xwiki-livetable-display-header-filter"&gt;&lt;label for="name" class="hidden"&gt;$services.localization.render('xe.admin.users.filter.username')&lt;/label&gt;&lt;input id="name" name="name" type="text" class="filter"/&gt;&lt;/td&gt;
-                &lt;td class="xwiki-livetable-display-header-filter"&gt;&lt;label for="first_name" class="hidden"&gt;$services.localization.render('xe.admin.users.filter.username')&lt;/label&gt;&lt;input id="first_name" name="first_name" type="text" class="filter"/&gt;&lt;/td&gt;
-                &lt;td class="xwiki-livetable-display-header-filter"&gt;&lt;label for="last_name" class="hidden"&gt;$services.localization.render('xe.admin.users.filter.username')&lt;/label&gt;&lt;input id="last_name" name="last_name" type="text" class="filter"/&gt;&lt;/td&gt;
-                &lt;td class="xwiki-livetable-display-header-filter"&gt;
-                  #if(!$mainwk)
-                    &lt;select name="wiki" class="filter"&gt;
-                      &lt;option value="local" selected="selected"&gt;$services.localization.render('rightsmanager.local')&lt;/option&gt;
-                      &lt;option value="global"&gt;$services.localization.render('rightsmanager.global')&lt;/option&gt;
-                      &lt;option value="both"&gt;$services.localization.render('rightsmanager.both')&lt;/option&gt;
-                    &lt;/select&gt;
-                  #else
-                    &lt;input name="wiki" type="hidden" value="local" /&gt;
-                  #end
-                &lt;/td&gt;
-              &lt;/tr&gt;
-            &lt;/thead&gt;
-            &lt;tbody id="userstable-display" class="xwiki-livetable-display-body"&gt;
-              &lt;tr&gt;
-                &lt;td colspan="4"&gt;&amp;nbsp;&lt;/td&gt;
-              &lt;/tr&gt;
-            &lt;/tbody&gt;
-          &lt;/table&gt;
-        &lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;&lt;td id="tdAddNewUserOrGroup"&gt;
-        &lt;span class="buttonwrapper"&gt;&lt;a href="#" id="addNewUser" class="addNewUserOrGroup"&gt;$services.localization.render('rightsmanager.addnewuser')&lt;/a&gt;&lt;/span&gt;
-      &lt;/td&gt;&lt;/tr&gt;
-    &lt;/table&gt;
-    &lt;script type="text/javascript"&gt;
-      // &lt;![CDATA[
-      (function() {
-        var startup = function() {
-          var callback = function(row, i, table) { return displayUsers(row, i, table, "$!{services.csrf.getToken()}"); };
-          var ta = new XWiki.widgets.LiveTable("$url", "userstable", callback);
-          #set($registerurl = $doc.getURL('view', 'xpage=registerinline'))
-          #set($saveurl = $doc.getURL('register', 'xpage=registerinline'))
-          #set($redirectuserurl = $xwiki.getDocument('XWiki.XWikiPreferences').getURL('admin', "editor=${editor}&amp;section=Users"))
-          Event.observe($('addNewUser'), "click", makeAddHandler("$registerurl", "$saveurl", "$redirectuserurl"));
-        }
-        if ((typeof(XWiki) != 'undefined') &amp;&amp; (typeof(XWiki.widgets) != 'undefined') &amp;&amp; (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
-          startup();
-        } else {
-          document.observe('xwiki:livetable:loading', startup);
-        }
-      })();
-      // ]]&gt;
-    &lt;/script&gt;
-  &lt;/div&gt; ## end of xwikieditcontent
+  #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
+  #set ($discard = $xwiki.ssx.use("XWiki.AdminUsersSheet"))
+  #set ($discard = $xwiki.jsx.use("XWiki.AdminUsersSheet"))
+
+  {{html clean="false"}}
+  #displayUsersLiveTable
+  #createUserModal
+  #editUserModal
+  #deleteUserModal
   {{/html}}
 #end
 {{/velocity}}</content>
+  <object>
+    <name>XWiki.AdminUsersSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>df09b27d-2bed-41cf-8e10-a30b3b5b72a3</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require.config({
+  paths: {
+    'xwiki-livetable-modal': new XWiki.Document('AdminGroupsSheet', 'XWiki').getURL('jsx', 'r=1')
+  }
+});
+
+//
+// Scope Filtering
+//
+require(['jquery'], function($) {
+  var options = $('#userstable').prev('.tipfilters').remove().find('select[name="wiki"]').html();
+  var scopeFilter = $('#userstable .xwiki-livetable-display-filters select[name="scope"]')
+  scopeFilter.attr('name', 'wiki').html(options);
+});
+
+require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge'], function($, xm) {
+  //
+  // User Creation
+  //
+  var createUserModal = $('#createUserModal');
+
+  var validateCreateUserForm = function(form) {
+    return form.size() &gt; 0 &amp;&amp; (!window.LiveValidation ||
+      LiveValidation.massValidate(LiveValidationForm.getInstance(form[0]).fields));
+  };
+
+  createUserModal.on('show.bs.modal', function() {
+    var createUserButton = createUserModal.find('.btn-primary').prop('disabled', true);
+    var createUserURL = XWiki.currentDocument.getURL('view', 'xpage=registerinline');
+    var createUserModalBody = createUserModal.find('.modal-body').empty().addClass('loading');
+    $.get(createUserURL, function(html) {
+      var createUserForm = $('&lt;div/&gt;').html(html).find('form#register').removeClass('half');
+      // Use the modal button instead of the form submit button.
+      createUserForm.find('p.buttons').remove();
+      createUserModalBody.removeClass('loading').append(createUserForm);
+      $(document).trigger('xwiki:dom:updated', {'elements': createUserModalBody.toArray()});
+      createUserForm.find(':input').filter(':visible').first().focus();
+      createUserButton.prop('disabled', createUserForm.size() === 0);
+    });
+  }).on('click', '.btn-primary', function(event) {
+    var createUserForm = createUserModal.find('form#register');
+    if (!validateCreateUserForm(createUserForm)) {
+      return;
+    }
+    var createUserButton = $(this).prop('disabled', true);
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('xe.admin.users.create.inProgress')),
+      'inprogress'
+    );
+    $.post(createUserForm.attr('action'), createUserForm.serialize()).done(function(html) {
+      var errorMessage = $('&lt;div/&gt;').html(html).find('.errormessage, .LV_validation_message.LV_invalid');
+      if (errorMessage.size() &gt; 0) {
+        createUserButton.prop('disabled', false);
+        notification.replace(new XWiki.widgets.Notification(errorMessage.text(), 'error'));
+      } else {
+        createUserModal.modal('hide');
+        window.livetable_userstable.refresh();
+        $('#userstable').trigger('xwiki:user:created');
+        notification.replace(new XWiki.widgets.Notification(
+          $jsontool.serialize($services.localization.render('xe.admin.users.create.done')),
+          'done'
+        ));
+      }
+    }).fail(function (response) {
+      createUserButton.prop('disabled', false);
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.users.create.failed')),
+        'error'
+      ));
+    });
+  });
+
+  //
+  // User Editing
+  //
+  var editUserModal = $('#editUserModal');
+
+  var loadEditForm = function(forceLock) {
+    var saveButton = editUserModal.find('.btn-primary').prop('disabled', true);
+    var rowData = editUserModal.data('rowData');
+    var userReference = XWiki.Model.resolve(rowData.doc_fullName, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
+    var userDocument = new XWiki.Document(userReference);
+    var editUserURL = userDocument.getURL('edit');
+    var parameters = {xpage: 'edituser'};
+    if (forceLock === true) {
+      parameters.force = 1;
+    }
+    editUserModal.find('.modal-body').first().empty().addClass('loading').load(editUserURL, parameters, function() {
+      this.removeClass('loading');
+      this.find('.column.half').removeClass('half').addClass('full');
+      $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+      var editUserForm = editUserModal.find('form#edituser');
+      editUserForm.find(':input').filter(':visible').first().focus();
+      saveButton.prop('disabled', editUserForm.size() === 0);
+    });
+  };
+
+  editUserModal.on('show.bs.modal', function(event) {
+    // The modal body may contain nested modals..
+    event.target === this &amp;&amp; loadEditForm();
+  }).on('click', 'a.forceLock', function(event) {
+    event.preventDefault();
+    loadEditForm(true);
+  }).on('click', '.btn-primary', function(event) {
+    var editForm = editUserModal.find('form');
+    var saveButton = $(this).prop('disabled', true);
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.inprogress')),
+      'inprogress'
+    );
+    $(document).trigger('xwiki:actions:beforeSave');
+    $.post(editForm.attr('action'), editForm.serialize()).done(function() {
+      $(document).trigger('xwiki:document:saved');
+      editUserModal.modal('hide').data('liveTable').refresh();
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.done')),
+        'done'
+      ));
+    }).fail(function (response) {
+      saveButton.prop('disabled', false);
+      var message = $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.error',
+        ['__reason__']));
+      notification.replace(new XWiki.widgets.Notification(message.replace('__reason__', response.statusText), 'error'));
+    });
+  }).on('hide.bs.modal', function() {
+    if (!editUserModal.find('.btn-primary').prop('disabled')) {
+      // Prevent the leave page confirmation from CKEditor if the edit form is canceled.
+      $(document).trigger('xwiki:actions:cancel');
+    }
+  });
+
+  //
+  // User Deletion
+  //
+  var deleteUserModal = $('#deleteUserModal');
+  deleteUserModal.on('show.bs.modal', function() {
+    var rowData = deleteUserModal.data('rowData');
+    var userReference = rowData.doc_fullName;
+    if (XWiki.currentWiki !== rowData.doc_wiki) {
+      userReference = XWiki.Model.resolve(userReference, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
+      userReference = XWiki.Model.serialize(userReference);
+    }
+    deleteUserModal.find('.userName').text(userReference);
+  }).find('.btn-danger').click(function() {
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
+      'inprogress'
+    );
+    var userReference = deleteUserModal.find('.userName').text();
+    $.post('', {
+      xpage: 'deleteuorg',
+      docname: userReference,
+      form_token: xm.form_token
+    }).done(function() {
+      deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
+      deleteUserModal.data('liveTableElement').trigger('xwiki:user:deleted', {reference: userReference});
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),
+        'done'
+      ));
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('xe.admin.users.delete.failed')),
+        'error'
+      ));
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.AdminUsersSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4023eda6-fbf6-4111-9975-8d0b0883e760</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/**
+ * Users Live Table
+ */
+#userstable td[data-title] {
+  vertical-align: middle;
+}
+
+/**
+ * Delete User Modal
+ */
+
+#deleteUserModal .userName {
+  font-weight: bolder;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

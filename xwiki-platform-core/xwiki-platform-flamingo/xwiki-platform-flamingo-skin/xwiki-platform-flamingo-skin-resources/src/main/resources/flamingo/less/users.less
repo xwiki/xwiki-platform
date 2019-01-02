@@ -1,0 +1,92 @@
+// Avatars ====================================================================
+
+.avatar_30, .avatar_50 {
+  border-radius: @thumbnail-border-radius;
+}
+
+.avatar_30 {
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.avatar_50 {
+  max-width: 50px;
+  max-height: 50px;
+}
+
+// Users and Groups Displayer =================================================
+
+ul.users,
+ul.groups {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li.user,
+li.group {
+  display: inline-block;
+  margin-right: .6em;
+}
+
+.user,
+.group {
+  white-space: nowrap;
+}
+
+.user .user-avatar-wrapper,
+.group .group-avatar-wrapper {
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  margin-right: .3em;
+  text-align: center;
+  width: 18px;
+}
+
+.medium-avatars .user-avatar-wrapper,
+.medium-avatars .group-avatar-wrapper {
+  height: 32px;
+  line-height: 32px;
+  margin-right: .5em;
+  width: 32px;
+}
+
+.user .user-avatar-wrapper .user-avatar,
+.group .group-avatar-wrapper .group-avatar {
+  margin-right: 0;
+  vertical-align: middle;
+}
+
+.user .user-avatar,
+.group .group-avatar {
+  margin-right: .3em;
+}
+
+.user img.user-avatar,
+.group img.group-avatar {
+  border-radius: 3px;
+  max-height: 18px;
+  max-width: 18px;
+  vertical-align: text-top;
+}
+
+.medium-avatars img.user-avatar,
+.medium-avatars img.group-avatar {
+  max-height: 32px;
+  max-width: 32px;
+}
+
+.user .user-alias,
+.group .group-alias {
+  color: @text-muted;
+  margin-left: .3em;
+}
+.user .user-alias:before,
+.group .group-alias:before {
+  content: '(';
+}
+.user .user-alias:after,
+.group .group-alias:after {
+  content: ')';
+}

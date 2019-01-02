@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1446468725000</creationDate>
   <parent>XWiki.WatchListMacro</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1447083576000</date>
-  <contentUpdateDate>1447068415000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -172,7 +169,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, x
       placement: 'bottom'
     });
     var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
-    if (xm.documentReference.getName() != 'WebHome') {
+    if (xm.documentReference.name != 'WebHome') {
       // Adapt the tooltip when the current document is terminal
       watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
     }

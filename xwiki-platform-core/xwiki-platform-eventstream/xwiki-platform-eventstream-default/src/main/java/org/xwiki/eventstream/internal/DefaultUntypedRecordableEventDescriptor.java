@@ -22,11 +22,17 @@ package org.xwiki.eventstream.internal;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.component.namespace.Namespace;
+import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.text.StringUtils;
@@ -41,6 +47,8 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordableEventDescriptor, WikiComponent
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultUntypedRecordableEventDescriptor.class);
+
     /**
      * The event type field name in the XObject.
      */
@@ -117,22 +125,27 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
 
     private ContextualLocalizationManager contextualLocalizationManager;
 
+    private NamespaceContextExecutor namespaceContextExecutor;
+
     /**
      * Construct a DefaultUntypedRecordableEventDescriptor.
      * @param reference reference of the document holding the descriptor
      * @param authorReference reference of the author of the document
      * @param baseObject object holding the descriptor
      * @param contextualLocalizationManager an instance of the component ContextualLocalizationManager
+     * @param namespaceContextExecutor an instance of the component NamespaceContextExecutor
      * @throws EventStreamException if an error occurs
      */
     public DefaultUntypedRecordableEventDescriptor(EntityReference reference, DocumentReference authorReference,
-        BaseObject baseObject, ContextualLocalizationManager contextualLocalizationManager)
+        BaseObject baseObject, ContextualLocalizationManager contextualLocalizationManager,
+            NamespaceContextExecutor namespaceContextExecutor)
             throws EventStreamException
     {
         this.entityReference = reference;
         this.authorReference = authorReference;
         this.setProperties(baseObject);
         this.contextualLocalizationManager = contextualLocalizationManager;
+        this.namespaceContextExecutor = namespaceContextExecutor;
     }
 
     /**
@@ -232,7 +245,7 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     @Override
     public String getApplicationName()
     {
-        return this.contextualLocalizationManager.getTranslationPlain(this.applicationName);
+        return getLocalizedMessage(applicationName);
     }
 
     @Override
@@ -244,7 +257,7 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     @Override
     public String getDescription()
     {
-        return this.eventDescription;
+        return getLocalizedMessage(this.eventDescription);
     }
 
     @Override
@@ -262,5 +275,36 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     @Override
     public String getTargetExpression() {
         return this.target;
+    }
+
+    /**
+     * Render a translation key in the context of the namespace (e.g. the current wiki) where the component has been
+     * loaded.
+     *
+     * Use-case: an event descriptor coming from the sub wiki is loaded and displayed in the main wiki. If the
+     * translation resource is located in the sub wiki with the "WIKI" scope, the translation could not be rendered in
+     * the main wiki. That's why we need to execute the localization in the context of the sub wiki.
+     *
+     * @param key the key to render
+     * @return the rendered localization.
+     *
+     * @since 10.6RC1
+     * @since 10.5
+     * @since 9.11.6
+     */
+    protected String getLocalizedMessage(String key)
+    {
+        String wikiWhereTheDescriptorIs = this.entityReference.extractReference(EntityType.WIKI).getName();
+        Namespace namespaceOfTheDescriptor = new WikiNamespace(wikiWhereTheDescriptorIs);
+
+        try {
+            return namespaceContextExecutor.execute(namespaceOfTheDescriptor,
+                () -> contextualLocalizationManager.getTranslationPlain(key)
+            );
+        } catch (Exception e) {
+            LOGGER.warn("Failed to render the translation key [{}] in the namespace [{}] for the event "
+                    + "descriptor of [{}].", key, namespaceOfTheDescriptor, getEventType(), e);
+            return contextualLocalizationManager.getTranslationPlain(key);
+        }
     }
 }

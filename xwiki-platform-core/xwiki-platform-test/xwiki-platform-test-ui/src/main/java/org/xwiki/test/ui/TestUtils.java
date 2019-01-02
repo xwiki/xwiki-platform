@@ -195,6 +195,8 @@ public class TestUtils
      */
     private static Unmarshaller unmarshaller;
 
+    private static String urlPrefix = XWikiExecutor.URL;
+
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
@@ -268,7 +270,7 @@ public class TestUtils
 
     public XWikiWebDriver getDriver()
     {
-        return context.getDriver();
+        return TestUtils.context.getDriver();
     }
 
     public Session getSession()
@@ -571,7 +573,15 @@ public class TestUtils
      */
     public void gotoPage(EntityReference reference, String action, String queryString)
     {
-        gotoPage(getURL(reference, action, queryString));
+        gotoPage(reference, action, queryString, null);
+    }
+
+    /**
+     * @since 10.9
+     */
+    public void gotoPage(EntityReference reference, String action, String queryString, String fragment)
+    {
+        gotoPage(getURL(reference, action, queryString, fragment));
 
         // Update current wiki
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
@@ -878,7 +888,15 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString)
     {
-        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString);
+        return getURL(reference, action, queryString, null);
+    }
+
+    /**
+     * @since 10.9
+     */
+    public String getURL(EntityReference reference, String action, String queryString, String fragment)
+    {
+        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
     }
 
     /**
@@ -933,9 +951,31 @@ public class TestUtils
      */
     public String getBaseURL()
     {
-        return XWikiExecutor.URL + ":"
-            + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
-            + XWikiExecutor.DEFAULT_CONTEXT + "/";
+        String baseURL;
+
+        // If the URL has the port specified then consider it's a full URL and use it, otherwise add the port and the
+        // webapp context
+        if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
+            baseURL = TestUtils.urlPrefix;
+        } else {
+            baseURL = TestUtils.urlPrefix + ":"
+                + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
+                + XWikiExecutor.DEFAULT_CONTEXT;
+        }
+
+        if (!baseURL.endsWith("/")) {
+            baseURL = baseURL + "/";
+        }
+
+        return baseURL;
+    }
+
+    /**
+     * @since 10.6RC1
+     */
+    public static void setURLPrefix(String urlPrefix)
+    {
+        TestUtils.urlPrefix = urlPrefix;
     }
 
     /**
@@ -951,6 +991,14 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString)
     {
+        return getURL(action, path, queryString, null);
+    }
+
+    /**
+     * @since 10.9
+     */
+    public String getURL(String action, String[] path, String queryString, String fragment)
+    {
         StringBuilder builder = new StringBuilder(getBaseBinURL());
 
         if (!StringUtils.isEmpty(action)) {
@@ -962,7 +1010,7 @@ public class TestUtils
         }
         builder.append(StringUtils.join(escapedPath, '/'));
 
-        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
+        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download", "export").contains(action);
         if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
             builder.append('?');
         }
@@ -972,6 +1020,10 @@ public class TestUtils
         }
         if (!StringUtils.isEmpty(queryString)) {
             builder.append(queryString);
+        }
+
+        if (!StringUtils.isEmpty(fragment)) {
+            builder.append('#').append(fragment);
         }
 
         return builder.toString();
@@ -1608,7 +1660,8 @@ public class TestUtils
     public static void assertStatuses(int actualCode, int... expectedCodes)
     {
         if (!ArrayUtils.contains(expectedCodes, actualCode)) {
-            fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes) + "]");
+            fail(String.format("Unexpected code [%s], was expecting one of [%s]",
+                actualCode, Arrays.toString(expectedCodes)));
         }
     }
 
@@ -1616,6 +1669,7 @@ public class TestUtils
      * @since 7.3M1
      */
     public static <M extends HttpMethod> M assertStatusCodes(M method, boolean release, int... expectedCodes)
+        throws Exception
     {
         if (expectedCodes.length > 0) {
             int actualCode = method.getStatusCode();
@@ -1629,10 +1683,11 @@ public class TestUtils
                         message = "";
                     }
 
-                    fail("Unexpected internal server error with message: [" + message + "]");
+                    fail(String.format("Unexpected internal server error with message [%s] for [%s]",
+                        message, method.getURI()));
                 } else {
-                    fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes)
-                        + "]");
+                    fail(String.format("Unexpected code [%s], was expecting one of [%s] for [%s]",
+                        actualCode, Arrays.toString(expectedCodes), method.getURI()));
                 }
             }
         }
@@ -1838,6 +1893,8 @@ public class TestUtils
 
         public static final Map<EntityType, ResourceAPI> RESOURCES_MAP = new IdentityHashMap<>();
 
+        public static String urlPrefix;
+
         public static class ResourceAPI
         {
             public Class<?> api;
@@ -1934,7 +1991,29 @@ public class TestUtils
 
         public String getBaseURL()
         {
-            return this.testUtils.getBaseURL() + "rest";
+            String prefix;
+            if (RestTestUtils.urlPrefix != null) {
+                prefix = RestTestUtils.urlPrefix;
+            } else {
+                prefix = this.testUtils.getBaseURL();
+            }
+            if (!prefix.endsWith("/")) {
+                prefix = prefix + "/";
+            }
+            return prefix + "rest";
+        }
+
+        /**
+         * Used when running in a docker container for example and thus when we need a REST URL pointing to a host
+         * different than the TestUTils baseURL which is used inside the Selenium docker container and is thus
+         * different from a REST URL used outside of any container and that needs to call XWiki running inside a
+         * container... ;)
+         *
+         * @since 10.9
+         */
+        public void setURLPrefix(String newURLPrefix)
+        {
+            RestTestUtils.urlPrefix = newURLPrefix;
         }
 
         private String toSpaceElement(Iterable<?> spaces)

@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1303500243000</creationDate>
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1303821332000</date>
-  <contentUpdateDate>1303821332000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -55,7 +52,7 @@
   #end
   #set ($wikiNamesList = $wikiNamesList.replaceAll(',\s$',''))
   = #if ($wikiNames.size() == 1)$services.localization.render('platform.wiki.users.profile.activity.title', [$wikiNamesList])#{else}$services.localization.render('platform.wiki.users.profile.activity.multipletitle', [$wikiNamesList])#end =
-  {{activity wikis="$wikiNamesList"}}
+  {{notifications useUserPreferences="false" displayOwnEvents="true" displayRSSLink="false" wikis="$wikiNamesList"}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

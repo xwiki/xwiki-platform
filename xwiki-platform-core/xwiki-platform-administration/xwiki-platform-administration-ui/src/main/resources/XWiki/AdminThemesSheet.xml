@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1490045325000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1490045639000</date>
-  <contentUpdateDate>1490045614000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -184,7 +181,7 @@ $xwiki.jsx.use('XWiki.AdminThemesSheet')
       var inputValue = self.input.val();
       // We consider a color theme or a skin must be written with an absolute reference, so if there is no "dot", the
       // value is wrong.
-      if (inputValue.indexOf('.') &gt; 0) {
+      if (typeof inputValue === 'string' &amp;&amp; inputValue.indexOf('.') &gt; 0) {
         // TODO: verify that the page exists (?)
         var pageReference = XWiki.Model.resolve(inputValue, XWiki.EntityType.DOCUMENT);
         var url = new XWiki.Document(pageReference).getURL(self.action);
@@ -214,7 +211,7 @@ $xwiki.jsx.use('XWiki.AdminThemesSheet')
    */
   var customizeSkin = new CustomizeButton(
     $('label.skin a'),
-    $('input[name="XWiki.XWikiPreferences_0_skin"]'),
+    $('select[name="XWiki.XWikiPreferences_0_skin"]'),
     'view'
   );
 });

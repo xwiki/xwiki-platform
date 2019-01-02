@@ -25,15 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model</artifactId>
   <name>XWiki Platform - Model</name>
   <packaging>jar</packaging>
   <description>XWiki Model (Wiki, Space, Document, etc)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <xwiki.pitest.mutationThreshold>72</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -69,6 +69,7 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
     </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -89,7 +90,9 @@
             <id>default</id>
             <configuration>
               <excludes>
-                org/xwiki/model/reference/EntityReferenceSet.java
+                org/xwiki/model/internal/reference/AbstractStringEntityReferenceResolver.java,
+                org/xwiki/model/reference/EntityReferenceSet.java,
+                org/xwiki/model/script/ModelScriptService.java
               </excludes>
             </configuration>
           </execution>

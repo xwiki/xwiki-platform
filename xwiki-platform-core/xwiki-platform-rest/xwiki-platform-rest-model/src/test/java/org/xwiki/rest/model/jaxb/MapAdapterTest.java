@@ -23,11 +23,13 @@ import java.util.LinkedHashMap;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link MapAdapter}.
- * 
+ *
  * @version $Id$
  * @since 9.8RC1
  */
@@ -39,13 +41,25 @@ public class MapAdapterTest
         java.util.Map<String, java.lang.Object> input = new LinkedHashMap<>();
         input.put("label", "News");
         input.put("count", 7);
+        java.util.Map<java.lang.Object, java.lang.Object> nestedMap = new LinkedHashMap<>();
+        nestedMap.put("test", 1);
+        nestedMap.put(8, "test");
+        input.put("nested map", nestedMap);
 
         Map output = new MapAdapter().marshal(input);
-        assertEquals(2, output.getEntries().size());
+        assertEquals(3, output.getEntries().size());
         assertEquals("label", output.getEntries().get(0).getKey());
         assertEquals("News", output.getEntries().get(0).getValue());
         assertEquals("count", output.getEntries().get(1).getKey());
         assertEquals(7, output.getEntries().get(1).getValue());
+        assertEquals("nested map", output.getEntries().get(2).getKey());
+        assertTrue(output.getEntries().get(2).getValue() instanceof Map);
+        Map value = (Map) output.getEntries().get(2).getValue();
+        assertEquals(2, value.getEntries().size());
+        assertEquals("test", value.getEntries().get(0).getKey());
+        assertEquals(1, value.getEntries().get(0).getValue());
+        assertEquals("8", value.getEntries().get(1).getKey());
+        assertEquals("test", value.getEntries().get(1).getValue());
     }
 
     @Test

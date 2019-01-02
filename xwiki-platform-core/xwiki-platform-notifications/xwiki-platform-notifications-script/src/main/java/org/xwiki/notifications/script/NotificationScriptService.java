@@ -34,7 +34,6 @@ import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.script.internal.NotificationScriptEventHelper;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script services for the notifications.
@@ -45,7 +44,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named(NotificationScriptService.ROLE_HINT)
-@Unstable
 public class NotificationScriptService implements ScriptService
 {
     /**

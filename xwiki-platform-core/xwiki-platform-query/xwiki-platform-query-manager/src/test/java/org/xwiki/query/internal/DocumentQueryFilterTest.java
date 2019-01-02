@@ -23,86 +23,84 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentQueryFilter}.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
+@ComponentTest
 public class DocumentQueryFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryFilter> mocker =
-        new MockitoComponentMockingRule<QueryFilter>(DocumentQueryFilter.class);
+    @InjectMockComponents
+    private DocumentQueryFilter filter;
 
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @Before
-    public void configure() throws Exception
-    {
-        this.currentDocumentReferenceResolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-    }
+    @MockComponent
+    @Named("current")
+    private DocumentReferenceResolver<String> resolver;
 
     @Test
-    public void filterStatement() throws Exception
+    public void filterStatement()
     {
         String statement = "select doc.fullName from XWikiDocument doc";
-        assertSame(statement, this.mocker.getComponentUnderTest().filterStatement(statement, Query.HQL));
+        assertSame(statement, this.filter.filterStatement(statement, Query.HQL));
     }
 
     @Test
-    public void filterResultsWithOneColumn() throws Exception
+    public void filterResultsWithOneColumn()
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
-        when(this.currentDocumentReferenceResolver.resolve("Path.To.Page")).thenReturn(documentReference);
+        when(this.resolver.resolve("Path.To.Page")).thenReturn(documentReference);
 
         List<Object> results = Arrays.asList("Path.To.Page");
-        assertEquals(Arrays.asList(documentReference), this.mocker.getComponentUnderTest().filterResults(results));
+        assertEquals(Arrays.asList(documentReference), this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsWithTwoColumns() throws Exception
+    public void filterResultsWithTwoColumns()
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
-        when(this.currentDocumentReferenceResolver.resolve("Path.To.Page")).thenReturn(documentReference);
+        when(this.resolver.resolve("Path.To.Page")).thenReturn(documentReference);
 
-        List<Object> results = Arrays.asList((Object) new Object[] {"Path.To.Page", "red"});
-        List<Object> filteredResults = this.mocker.getComponentUnderTest().filterResults(results);
+        List<Object> results = Arrays.asList((Object) new Object[]{ "Path.To.Page", "red" });
+        List<Object> filteredResults = this.filter.filterResults(results);
         assertEquals(1, filteredResults.size());
-        assertArrayEquals(new Object[] {documentReference, "red"}, (Object[]) filteredResults.get(0));
+        assertArrayEquals(new Object[]{ documentReference, "red" }, (Object[]) filteredResults.get(0));
     }
 
     @Test
-    public void filterResultsWithOneColumnButNotString() throws Exception
+    public void filterResultsWithOneColumnButNotString()
     {
         List<Object> results = Collections.singletonList(23);
-        assertSame(results, this.mocker.getComponentUnderTest().filterResults(results));
+        assertSame(results, this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsWithTwoColumnsButNotString() throws Exception
+    public void filterResultsWithTwoColumnsButNotString()
     {
-        List<Object> results = Collections.singletonList(new Object[] {23, "Path.To.Page"});
-        assertSame(results, this.mocker.getComponentUnderTest().filterResults(results));
+        List<Object> results = Collections.singletonList(new Object[]{ 23, "Path.To.Page" });
+        assertSame(results, this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsEmpty() throws Exception
+    public void filterResultsEmpty()
     {
         List<Object> results = Collections.emptyList();
-        assertSame(results, this.mocker.getComponentUnderTest().filterResults(results));
+        assertSame(results, this.filter.filterResults(results));
     }
 }

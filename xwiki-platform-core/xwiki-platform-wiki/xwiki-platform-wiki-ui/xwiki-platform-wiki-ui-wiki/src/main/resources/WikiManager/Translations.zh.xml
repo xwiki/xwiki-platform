@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1303158348000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1307445978000</date>
-  <contentUpdateDate>1307445978000</contentUpdateDate>
   <version>1.1</version>
   <title>Wiki Manager Translations</title>
   <comment/>
@@ -42,33 +39,33 @@
   <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 ## MENU
-### Missing: core.menu.type.wiki=Wiki
-### Missing: core.menu.watchlist.add.wiki=Watch Wiki
+core.menu.type.wiki=Wiki
+core.menu.watchlist.add.wiki=查看Wiki
 ### Missing: core.menu.watchlist.remove.wiki=Unwatch Wiki
 core.menu.admin.wiki=管理Wiki
 
 # WIKI INFORMATION PANEL
-### Missing: platform.wiki.panel.title=Wiki information
+platform.wiki.panel.title=Wiki信息
 
 # MESSAGES
-### Missing: platform.wiki.currentwiki.welcome=Welcome to the {0}{1}{2} wiki.
-### Missing: platform.wiki.currentwiki.currentUserIsOwner=You are the owner of this wiki.
-### Missing: platform.wiki.currentwiki.currentUserIsAdmin=You are an administrator of this wiki.
-### Missing: platform.wiki.currentwiki.joinNeedToLogin=To join this wiki, you need to be logged in.
-### Missing: platform.wiki.currentwiki.currentUserNotMember=You are not a member of this wiki.
-### Missing: platform.wiki.currentwiki.currentuserCanJoin=If you like, you can {0}join this wiki{1}.
-### Missing: platform.wiki.currentwiki.currentUserIsMember=You are a member of this wiki.
+platform.wiki.currentwiki.welcome=欢迎来到{0}{1}{2} Wiki.
+platform.wiki.currentwiki.currentUserIsOwner=你是这个wiki的所有者。
+platform.wiki.currentwiki.currentUserIsAdmin=你是这个Wiki的管理员。
+platform.wiki.currentwiki.joinNeedToLogin=你需要先登录，才能加入这个Wiki。
+platform.wiki.currentwiki.currentUserNotMember=你不是这个Wiki的成员。
+platform.wiki.currentwiki.currentuserCanJoin=如果你喜欢这个Wiki {1}，你可以{0}加入它。
+platform.wiki.currentwiki.currentUserIsMember=你是这个Wiki的成员。
 ### Missing: platform.wiki.currentwiki.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
-### Missing: platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, see {0}User Directory{1}.
-### Missing: platform.wiki.currentwiki.invitationPendingForCurrentWiki=You have been invited to join this wiki.
-### Missing: platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=You have requested to join this wiki.
-### Missing: platform.wiki.currentwiki.joinRequestAcceptedNotification=Your request to join the wiki ''{0}'' has been accepted.
-### Missing: platform.wiki.currentwiki.joinRequestRejectedNotification=Your request to join the wiki ''{0}'' has been rejected.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=通过{0}用户列表{1}，你可以看到所有的Wiki成员。
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=你已经被邀请加入这个Wiki。
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=你已经请求了加入这个Wiki。
+platform.wiki.currentwiki.joinRequestAcceptedNotification=你加入Wiki''{0}''的请求已经通过。
+platform.wiki.currentwiki.joinRequestRejectedNotification=你请求加入Wiki ''{0}'' 的请求已经被拒绝。
 ### Missing: platform.wiki.currentwiki.candidateHandledSaveComment=Handled candidate {0} ({1})
-### Missing: platform.wiki.currentwiki.candidateHandledComment=Comment:
-### Missing: platform.wiki.currentwiki.candidateAcceptedSuccess=Request accepted.
-### Missing: platform.wiki.currentwiki.candidateRejectedSuccess=Request rejected.
-### Missing: platform.wiki.currentwiki.inviteUserAlreadyMember={0} is already a member of the wiki.
+platform.wiki.currentwiki.candidateHandledComment=评论：
+platform.wiki.currentwiki.candidateAcceptedSuccess=请求被接受。
+platform.wiki.currentwiki.candidateRejectedSuccess=请求被拒绝。
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} 现在是Wiki的成员。
 ### Missing: platform.wiki.currentwiki.inviteRequestAlreadyExists={0} already has a pending request. Please respond to that request instead.
 ### Missing: platform.wiki.currentwiki.inviteUserAlreadyInvited={0} already has a pending invitation.
 ### Missing: platform.wiki.currentwiki.inviteSaveComment=User ''{0}'' has been invited to join the wiki.
@@ -126,12 +123,14 @@ core.menu.admin.wiki=管理Wiki
 ### Missing: platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.
 ### Missing: platform.wiki.currentwiki.invite.message.hint=The message to send to the user.
 ### Missing: platform.wiki.currentwiki.candidates.hint=Users who have requested or been invited to join the wiki.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 ### Missing: admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
 ### Missing: admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
 ### Missing: admin.xwiki.usersconfiguration.title=Configuration
 ### Missing: admin.xwiki.members.title=Current Members
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

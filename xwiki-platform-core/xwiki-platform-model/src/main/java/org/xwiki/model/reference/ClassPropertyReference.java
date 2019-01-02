@@ -66,7 +66,20 @@ public class ClassPropertyReference extends EntityReference
     }
 
     /**
+     * Clone an ClassPropertyReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public ClassPropertyReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * Deprecated constructor.
+     * 
      * @param wiki the wiki of the document where the parent class of this property is
      * @param space the space of the document where the parent class of this property is
      * @param page the document where the parent class of this property is
@@ -89,7 +102,7 @@ public class ClassPropertyReference extends EntityReference
     protected void setType(EntityType type)
     {
         if (type != EntityType.CLASS_PROPERTY) {
-            throw new IllegalArgumentException("Invalid type [" + type + "] for an class property reference");
+            throw new IllegalArgumentException("Invalid type [" + type + "] for a class property reference");
         }
 
         super.setType(EntityType.CLASS_PROPERTY);
@@ -112,8 +125,8 @@ public class ClassPropertyReference extends EntityReference
         }
 
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
-            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an class property "
-                + "reference");
+            throw new IllegalArgumentException(
+                "Invalid parent reference [" + parent + "] in a class property reference");
         }
 
         super.setParent(new DocumentReference(parent));
@@ -122,6 +135,20 @@ public class ClassPropertyReference extends EntityReference
     @Override
     public ClassPropertyReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new ClassPropertyReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public ClassPropertyReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new ClassPropertyReference(this, newParent);
     }
 }

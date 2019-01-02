@@ -28,8 +28,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Represents the actions possible for the different registration pages (standard registration page, lightbox
- * registration page).
+ * Represents the actions possible for the different registration pages (standard registration page and the registration
+ * modal).
  *
  * @version $Id$
  * @since 3.2M3
@@ -113,6 +113,6 @@ public abstract class AbstractRegistrationPage extends BasePage
 
     public boolean isLiveValidationEnabled()
     {
-        return !getDriver().findElementsWithoutWaiting(By.xpath("//div[@id='mainContentArea']/script")).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(this.registerFormElement, By.xpath("./script")).isEmpty();
     }
 }

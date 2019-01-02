@@ -21,9 +21,10 @@ package org.xwiki.display.internal;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -133,10 +134,10 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         // the current document from the title field or from a script within the first content heading.
         Map<Object, Object> xwikiContext = getXWikiContextMap();
         @SuppressWarnings("unchecked")
-        Stack<DocumentReference> documentReferenceStack =
-            (Stack<DocumentReference>) xwikiContext.get(DOCUMENT_REFERENCE_STACK_KEY);
+        Deque<DocumentReference> documentReferenceStack =
+            (Deque<DocumentReference>) xwikiContext.get(DOCUMENT_REFERENCE_STACK_KEY);
         if (documentReferenceStack == null) {
-            documentReferenceStack = new Stack<DocumentReference>();
+            documentReferenceStack = new LinkedList<>();
             xwikiContext.put(DOCUMENT_REFERENCE_STACK_KEY, documentReferenceStack);
         } else if (documentReferenceStack.contains(document.getDocumentReference())) {
             logger.warn("Infinite recursion detected while displaying the title of [{}]. "
@@ -234,7 +235,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
             if (parameters.isExecutionContextIsolated()) {
-                backupObjects = new HashMap<String, Object>();
+                backupObjects = new HashMap<>();
                 // The following method call also clones the execution context.
                 documentAccessBridge.pushDocumentInContext(backupObjects, documentReference);
                 // Pop the document from the context only if the push was successful!

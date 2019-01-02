@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1372189341000</creationDate>
   <parent>MenuClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1372237284000</date>
-  <contentUpdateDate>1372229927000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -45,6 +42,7 @@ Menu.MenuClass_content1=Structure du menu
 # Live table generic keys
 menu.livetable.doc.title=Titre de la page
 menu.livetable.doc.name=Nom de la page
+menu.livetable.doc.location=Emplacement
 menu.livetable.doc.space=Espace
 menu.livetable.doc.fullname=Nom complet de la page
 menu.livetable.doc.author=Dernier auteur
@@ -62,16 +60,31 @@ menu.livetable.emptyvalue=-
 # Live table specific keys
 menu.livetable.content1=Structure du menu
 
+# Administration keys
+admin.menu.name=Menu
+
 # UIX keys
 menu.uix.extensionPoint.label=Emplacement du menu
 menu.uix.extensionPoint.hint=Choix de l'emplacement du menu. Selon votre choix, il sera affiché soit horizontalement, soit verticalement.
 menu.uix.extensionPoint.value.nowhere=Ne pas afficher le menu
 menu.uix.extensionPoint.value.template.header.after=Après l'en-tête du wiki
-menu.uix.extensionPoint.value.panels.rightPanels=Dans un panel droit
-menu.uix.extensionPoint.value.panels.leftPanels=Dans un panel gauche
+menu.uix.extensionPoint.value.panels.rightPanels=Dans un panneau de droite
+menu.uix.extensionPoint.value.panels.leftPanels=Dans un panneau de gauche
 menu.uix.content.label=Emplacement de l'interface utilisateur
-menu.uix.content.hint=Si vous lisez ceci, le JavaScript de votre navigateur est probablement désactivé.\nVous devriez donc choisir la même valeur que celle renseignée dans le champ ci-dessus \:  Emplacement du menu
+menu.uix.content.hint=Si vous lisez ceci, le JavaScript de votre navigateur est probablement désactivé.\nVous devriez donc choisir la même valeur que celle renseignée dans le champ ci-dessus :  Emplacement du menu
 menu.uix.scope.label=Contexte de visibilité du menu
 menu.uix.scope.hint=Choix du contexte d'affichage du menu.
+
+# Menu Macro
+rendering.macro.menu.name=Menu
+rendering.macro.menu.description=Affiche un menu créé en utilisant une syntaxe wiki simple (listes imbriquées et liens).
+rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.description=Identifiant de menu optionnel qui sera lié à l'élément html qui englobe le menu. Vous pouvez utiliser cet identifiant dans du code JavaScript pour accéder au menu DOM, ou dans des tests fonctionnels pour vérifier les éléments du menu.
+rendering.macro.menu.parameter.type.name=Type
+rendering.macro.menu.parameter.type.description=Le type de menu (optionnel) détermine l'apparence et le comportement du menu. Valeurs possibles : horizontal (valeur par défaut) et vertical.
+rendering.macro.menu.content.description=Définit la structure du menu en utilisant la syntaxe wiki. Chaque élément du menu devrait être un élément de liste, et devrait contenir l'étiquette du menu ou un lien. Vous pouvez utiliser des listes imbriquées pour les sous-menus.
+
+# Menu WebHome
+menu.description=Ceci est une application simple qui vous permet de créer des menus de navigation à afficher soit horizontalement comme une barre supérieure après l'en-tête de page, soit verticalement dans un panneau latéral.
 </content>
 </xwikidoc>

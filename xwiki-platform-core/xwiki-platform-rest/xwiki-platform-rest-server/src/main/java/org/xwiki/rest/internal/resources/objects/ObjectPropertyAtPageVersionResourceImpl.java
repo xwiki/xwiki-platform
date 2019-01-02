@@ -74,8 +74,8 @@ public class ObjectPropertyAtPageVersionResourceImpl extends XWikiResource imple
             for (Property property : object.getProperties()) {
                 if (property.getName().equals(propertyName)) {
                     String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectAtPageVersionResource.class,
-                        doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), version,
-                            object.getClassName(), object.getNumber()).toString();
+                        doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                        version, object.getClassName(), object.getNumber()).toString();
                     Link objectLink = objectFactory.createLink();
                     objectLink.setHref(objectUri);
                     objectLink.setRel(Relations.OBJECT);

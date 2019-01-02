@@ -89,10 +89,10 @@ public class RenamePage extends ViewPage
         return this.documentPicker;
     }
 
-    public CopyOrRenameStatusPage clickRenameButton()
+    public CopyOrRenameOrDeleteStatusPage clickRenameButton()
     {
         this.renameButton.click();
-        return new CopyOrRenameStatusPage();
+        return new CopyOrRenameOrDeleteStatusPage();
     }
 
     public boolean isTerminal()

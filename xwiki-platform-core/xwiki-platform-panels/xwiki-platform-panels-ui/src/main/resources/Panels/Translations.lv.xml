@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393442253000</creationDate>
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1464963428000</date>
-  <contentUpdateDate>1464963428000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -46,8 +43,8 @@ panels.type=Veids
 panels.category=Kategorija
 panels._actions=Darbības
 panels.emptyvalue=
-### Missing: panels.children.title=Child Pages
-### Missing: panels.siblings.title=Sibling Pages
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.children.title=Bērnu lapas
+panels.siblings.title=Brāļu lapas
+panels.documentInformation.configureSyntaxes=Iestatīt papildu sintakses
 </content>
 </xwikidoc>

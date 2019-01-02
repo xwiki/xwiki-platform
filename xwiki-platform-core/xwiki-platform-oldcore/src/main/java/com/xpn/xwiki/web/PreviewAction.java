@@ -113,8 +113,6 @@ public class PreviewAction extends EditAction
         // requiring programming rights is executed in preview mode if the current user has programming rights.
         editedDocument.setContentAuthorReference(context.getUserReference());
 
-        // Reconfirm edit (captcha) when jcaptcha is not correct.
-        Boolean reCheckCaptcha = (Boolean) context.get("recheckcaptcha");
-        return reCheckCaptcha != null && reCheckCaptcha ? "captcha" : "preview";
+        return "preview";
     }
 }

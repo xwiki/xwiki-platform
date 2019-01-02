@@ -42,5 +42,15 @@
       <module name="org.slf4j" />
       <module name="org.slf4j.impl" />
     </exclusions>
+    <!-- By default WildFly doesn't expose some class from the JDK and XWiki uses RESTlet which uses those classes.
+         Thus we need to tell WildFly to allow using them. See https://access.redhat.com/solutions/1234573 -->
+    <dependencies>
+      <module name="sun.jdk"/>
+      <system>
+        <paths>
+          <path name="com/sun/net/httpserver"/>
+        </paths>
+      </system>
+    </dependencies>
   </deployment>
 </jboss-deployment-structure>

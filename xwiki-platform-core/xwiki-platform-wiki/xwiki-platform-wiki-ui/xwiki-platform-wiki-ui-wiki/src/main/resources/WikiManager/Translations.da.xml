@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1303158348000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1307445978000</date>
-  <contentUpdateDate>1307445978000</contentUpdateDate>
   <version>1.1</version>
   <title>Wiki Manager Translations</title>
   <comment/>
@@ -126,12 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Hvis aktiv vil alle wikiens eksterne 
 platform.wiki.currentwiki.invite.username.hint=Navn på bruger, der skal inviteres til wikien.
 platform.wiki.currentwiki.invite.message.hint=Besked til brugeren.
 platform.wiki.currentwiki.candidates.hint=Brugere som har anmodet om eller er inviteret til medlemskab i wikien.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Håndter indstillinger, såsom wiki navn, beskrivelse og medlemsskaber.
 admin.xwiki.workspaceusers.description=Håndter medlemskaber\: tilføj, fjern, invitér, godkend eller afvis wiki-medlemmer.
 admin.xwiki.usersconfiguration.title=Konfiguration
 admin.xwiki.members.title=Nuværende medlemmer
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

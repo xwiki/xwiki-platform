@@ -166,7 +166,8 @@
           </div>
         </form>
       #else
-        #set ($copyAsRequest = $services.refactoring.createCopyAsRequest($sourceDocReference, $targetDocReference))
+        #set ($copyAsRequest = $services.refactoring.requestFactory.createCopyAsRequest($sourceDocReference,
+          $targetDocReference))
         #set ($discard = $copyAsRequest.setDeep($deep))
         #maybeUpdateTitleAfterCopy($copyAsRequest $sourceDocReference 'targetPageTitle')
         #set ($copyAsJob = $services.refactoring.copyAs($copyAsRequest))

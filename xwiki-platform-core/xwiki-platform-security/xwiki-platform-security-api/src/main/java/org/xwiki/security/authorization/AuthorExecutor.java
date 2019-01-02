@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Allow executing some code with the right of a provided user.
@@ -36,13 +37,34 @@ public interface AuthorExecutor
     /**
      * Execute the passed {@link Callable} with the rights of the passed user.
      *
-     * @param callable the the task to execute
+     * @param callable the task to execute
      * @param authorReference the user to check rights on
      * @return computed result
      * @throws Exception if unable to compute a result
      * @param <V> the result type of method <tt>call</tt>
+     * @deprecated since 10.11RC1, use {@link #call(Callable, DocumentReference, DocumentReference)} instead
      */
+    @Deprecated
     <V> V call(Callable<V> callable, DocumentReference authorReference) throws Exception;
+
+    /**
+     * Execute the passed {@link Callable} with the rights of the passed user.
+     *
+     * @param callable the task to execute
+     * @param authorReference the user to check rights on
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return computed result
+     * @throws Exception if unable to compute a result
+     * @param <V> the result type of method <tt>call</tt>
+     * @since 10.11RC1
+     */
+    @Unstable
+    default <V> V call(Callable<V> callable, DocumentReference authorReference, DocumentReference sourceReference)
+        throws Exception
+    {
+        return call(callable, authorReference);
+    }
 
     /**
      * Setup the context so that following code is executed with provided user rights.
@@ -58,8 +80,34 @@ public interface AuthorExecutor
      * @param authorReference the user to check rights on
      * @return the context to restore
      * @see #after(AutoCloseable)
+     * @deprecated since 10.11RC1, use {@link #before(DocumentReference, DocumentReference)} instead
      */
+    @Deprecated
     AutoCloseable before(DocumentReference authorReference);
+
+    /**
+     * Setup the context so that following code is executed with provided user rights.
+     * 
+     * <pre>
+     * {@code
+     * try (AutoCloseable context = this.executor.before(author, sourceDocument)) {
+     *   ...
+     * }
+     * }
+     * </pre>
+     *
+     * @param authorReference the user to check rights on
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return the context to restore
+     * @see #after(AutoCloseable)
+     * @since 10.11RC1
+     */
+    @Unstable
+    default AutoCloseable before(DocumentReference authorReference, DocumentReference sourceReference)
+    {
+        return before(authorReference);
+    }
 
     /**
      * Restore the context to it's previous state as defined by the provided {@link AutoCloseable}.

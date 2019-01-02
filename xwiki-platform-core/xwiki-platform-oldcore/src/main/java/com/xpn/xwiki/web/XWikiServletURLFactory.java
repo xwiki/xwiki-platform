@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -97,19 +98,37 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         this.contextPath = context.getWiki().getWebAppPath(context);
 
+        URL homepageConfigration = getXWikiHomeParameter(context);
+
         // Set the configured home URL for the main wiki
-        setDefaultURL(null, getXWikiHomeParameter(context));
+        setDefaultURL(null, homepageConfigration);
 
         // Remember initial request base URL for path for last resort
-        try {
-            this.originalURL = new URL(getProtocol(context) + "://" + getHostPort(context));
-        } catch (MalformedURLException e1) {
-            // This cannot really happen.
+        if (homepageConfigration != null && context.isMainWiki()) {
+            // If the main wiki base URL is forced in the configuration use it
+            this.originalURL = homepageConfigration;
+        } else {
+            // Remember the request base URL for last resort
+            this.originalURL = HttpServletUtils.getSourceBaseURL(context.getRequest());
+
+            // If protocol is forced in the configuration witch to it
+            String protocolConfiguration = context.getWiki().Param("xwiki.url.protocol");
+            if (StringUtils.isNoneEmpty(protocolConfiguration)) {
+                try {
+                    this.defaultURL =
+                        new URL(protocolConfiguration, this.originalURL.getHost(), this.originalURL.getPort(), "")
+                            .toString();
+                } catch (MalformedURLException e) {
+                    LOGGER.warn("The configured protocol [{}] produce an invalid URL: {}", protocolConfiguration,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
         }
 
-        // Only take into account initial request if it's a "real" one
+        // Only take into account initial request if it's meant to be
         XWikiRequest request = context.getRequest();
-        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)
+            || !((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon()) {
             this.defaultURL = this.originalURL.toString();
             setDefaultURL(context.getOriginalWikiId(), this.originalURL);
         }
@@ -160,68 +179,25 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * @param context the XWiki context used to access the request object
-     * @return the value of the {@code xwiki.url.protocol} configuration parameter, if defined, otherwise the protocol
-     *         used to make the request to the proxy server if we are behind one, otherwise the protocol of the URL used
-     *         to make the current request
+     * @return a URL made from the xwiki.cfg parameter xwiki.home or null if undefined or unparsable.
      */
-    private String getProtocol(XWikiContext context)
-    {
-        // Tests usually set the context URL but don't set the request object.
-        String protocol = context.getURL().getProtocol();
-        if (context.getRequest() != null) {
-            protocol = context.getRequest().getScheme();
-            if ("http".equalsIgnoreCase(protocol) && context.getRequest().isSecure()) {
-                // This can happen in reverse proxy mode, if the proxy server receives HTTPS requests and forwards them
-                // as HTTP to the internal web server running XWiki.
-                protocol = "https";
-            }
-        }
-
-        // Detected protocol can be overwritten by configuration.
-        protocol = context.getWiki().Param("xwiki.url.protocol", protocol);
-
-        return protocol != null ? protocol : "http";
-    }
-
-    /**
-     * @param context the XWiki context used to access the request object
-     * @return the proxy host, if we are behind one, otherwise the host of the URL used to make the current request
-     */
-    private String getHostPort(XWikiContext context)
-    {
-        URL url = context.getURL();
-
-        // Check reverse-proxy mode (e.g. Apache's mod_proxy_http).
-        String proxyHost = StringUtils.substringBefore(context.getRequest().getHeader("x-forwarded-host"), ",");
-        if (!StringUtils.isEmpty(proxyHost)) {
-            return proxyHost;
-        }
-        // If the reverse proxy does not support the x-forwarded-host parameter
-        // we allow the user to force the the host name by using the xwiki.home param.
-        final URL homeParam = getXWikiHomeParameter(context);
-        if (homeParam != null && context.isMainWiki()) {
-            url = homeParam;
-        }
-
-        return url.getHost() + (url.getPort() < 0 ? "" : (":" + url.getPort()));
-    }
-
-    /** @return a URL made from the xwiki.cfg parameter xwiki.home or null if undefined or unparsable. */
     private static URL getXWikiHomeParameter(final XWikiContext context)
     {
         final String surl = getXWikiHomeParameterAsString(context);
-        if (!StringUtils.isEmpty(surl)) {
+        if (StringUtils.isNotEmpty(surl)) {
             try {
                 return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
                 LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: {}. Ignoring parameter.", surl);
             }
         }
+
         return null;
     }
 
-    /** @return the xwiki.home parameter or null if undefined. */
+    /**
+     * @return the xwiki.home parameter or null if undefined.
+     */
     private static String getXWikiHomeParameterAsString(final XWikiContext context)
     {
         return context.getWiki().Param("xwiki.home", null);

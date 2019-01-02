@@ -49,5 +49,4 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     {
         super(wikiId, wikiAlias);
     }
-
 }

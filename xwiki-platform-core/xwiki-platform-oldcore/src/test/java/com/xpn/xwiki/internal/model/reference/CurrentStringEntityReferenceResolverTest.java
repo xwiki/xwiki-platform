@@ -19,55 +19,61 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitReferencePageReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.PageReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link CurrentStringEntityReferenceResolver}.
  * 
  * @version $Id$
  */
-@ComponentList(value = {
-    CurrentEntityReferenceProvider.class,
-    CurrentStringEntityReferenceResolver.class,
-    DefaultModelConfiguration.class,
-    DefaultSymbolScheme.class
-})
+@OldcoreTest
+@ComponentList(value = { CurrentEntityReferenceProvider.class, CurrentStringEntityReferenceResolver.class,
+DefaultModelConfiguration.class, DefaultSymbolScheme.class, ExplicitReferencePageReferenceResolver.class,
+ExplicitReferenceEntityReferenceResolver.class })
 public class CurrentStringEntityReferenceResolverTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private static final String CURRENT_WIKI = "currentwiki";
 
     private static final String CURRENT_SPACE = "currentspace";
 
+    private static final String CURRENT_DOCUMENT = "currentdocument";
+
     private static final String CURRENT_PAGE = "currentpage";
 
     private static final String CURRENTDOC_SPACE = "currentdocspace";
 
-    private static final String CURRENTDOC_PAGE = "currentdocpage";
+    private static final String CURRENTDOC_DOCUMENT = "currentdocdocument";
 
-    private EntityReferenceResolver<String> resolver;
+    @InjectMockComponents
+    private CurrentStringEntityReferenceResolver resolver;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
-
-        this.resolver = this.oldcore.getMocker().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
     }
 
     @Test
@@ -77,9 +83,9 @@ public class CurrentStringEntityReferenceResolverTest
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
 
-        Assert.assertEquals("xwiki", reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals("Main", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals("WebHome", reference.getName());
+        assertEquals("xwiki", reference.extractReference(EntityType.WIKI).getName());
+        assertEquals("Main", reference.extractReference(EntityType.SPACE).getName());
+        assertEquals("WebHome", reference.getName());
     }
 
     @Test
@@ -90,36 +96,36 @@ public class CurrentStringEntityReferenceResolverTest
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
 
-        Assert.assertEquals("xwiki", reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals("Main", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals("WebHome", reference.getName());
+        assertEquals("xwiki", reference.extractReference(EntityType.WIKI).getName());
+        assertEquals("Main", reference.extractReference(EntityType.SPACE).getName());
+        assertEquals("WebHome", reference.getName());
     }
 
     @Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
-        this.oldcore.getXWikiContext().setDoc(
-            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
+        this.oldcore.getXWikiContext()
+            .setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_DOCUMENT)));
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
 
-        Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals(CURRENTDOC_SPACE, reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals(CURRENTDOC_PAGE, reference.getName());
+        assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
+        assertEquals(CURRENTDOC_SPACE, reference.extractReference(EntityType.SPACE).getName());
+        assertEquals(CURRENTDOC_DOCUMENT, reference.getName());
     }
 
     @Test
     public void testResolveAttachmentReference() throws Exception
     {
-        this.oldcore.getXWikiContext().setDoc(
-            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
+        this.oldcore.getXWikiContext()
+            .setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_DOCUMENT)));
 
         EntityReference reference = resolver.resolve("", EntityType.ATTACHMENT);
 
-        Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals(CURRENTDOC_SPACE, reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals(CURRENTDOC_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
-        Assert.assertEquals("filename", reference.getName());
+        assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
+        assertEquals(CURRENTDOC_SPACE, reference.extractReference(EntityType.SPACE).getName());
+        assertEquals(CURRENTDOC_DOCUMENT, reference.extractReference(EntityType.DOCUMENT).getName());
+        assertEquals("filename", reference.getName());
     }
 
     @Test
@@ -127,28 +133,54 @@ public class CurrentStringEntityReferenceResolverTest
     {
         EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);
 
-        Assert.assertEquals("WebHome", reference.getParent().getName());
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
-        Assert.assertEquals("Main", reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
-        Assert.assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
+        assertEquals("WebHome", reference.getParent().getName());
+        assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
+        assertEquals("Main", reference.getParent().getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
+        assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
     }
 
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
-        this.oldcore.getXWikiContext().setDoc(
-            new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
+        this.oldcore.getXWikiContext()
+            .setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_DOCUMENT)));
 
         EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);
 
-        Assert.assertEquals(CURRENT_PAGE, reference.getParent().getName());
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
-        Assert.assertEquals(CURRENT_SPACE, reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
-        Assert.assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
+        assertEquals(CURRENT_DOCUMENT, reference.getParent().getName());
+        assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
+        assertEquals(CURRENT_SPACE, reference.getParent().getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
+        assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
+    }
+
+    @Test
+    public void testResolvePageReferenceKeywords() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE));
+        FieldUtils.writeDeclaredField(document, "pageReferenceCache",
+            new PageReference("docwiki", CURRENT_SPACE, CURRENT_PAGE), true);
+        this.oldcore.getXWikiContext().setDoc(document);
+
+        EntityReference reference = this.resolver.resolve(".", EntityType.PAGE);
+        assertEquals(new PageReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE), reference);
+
+        reference = this.resolver.resolve("page/.", EntityType.PAGE);
+        assertEquals(new PageReference(CURRENT_WIKI, "page"), reference);
+
+        reference = this.resolver.resolve("page/./.", EntityType.PAGE);
+        assertEquals(new PageReference(CURRENT_WIKI, "page"), reference);
+
+        reference = this.resolver.resolve("..", EntityType.PAGE);
+        assertEquals(new PageReference(CURRENT_WIKI, CURRENT_SPACE), reference);
+
+        reference = this.resolver.resolve("page/..", EntityType.PAGE);
+        assertEquals(new WikiReference(CURRENT_WIKI), reference);
+
+        reference = this.resolver.resolve("page1/page2/..", EntityType.PAGE);
+        assertEquals(new PageReference(CURRENT_WIKI, "page1"), reference);
     }
 }

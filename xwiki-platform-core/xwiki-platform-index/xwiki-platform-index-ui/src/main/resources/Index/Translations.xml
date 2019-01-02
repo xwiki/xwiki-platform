@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1425563685000</creationDate>
   <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1425564037000</date>
-  <contentUpdateDate>1425564037000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -47,6 +44,7 @@ index.spacesMacro.spaceAdministration.alt=Administer Space
 index.spacesMacro.createSpace.link=Create a new space
 index.spacesMacro.createSpace.defaultSpaceName=Space name
 index.spacesMacro.createSpace.submit=Create
+index.deletedDocuments.deleteAll=Delete all
 </content>
   <object>
     <name>Index.Translations</name>

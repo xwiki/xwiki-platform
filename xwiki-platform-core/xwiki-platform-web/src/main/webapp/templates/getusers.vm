@@ -1,92 +1,121 @@
-$response.setContentType("application/json")
-#set ($offset = $mathtool.toInteger($request.get('offset')))
-## offset starts from 0 in velocity and 1 in javascript
-#set ($off = $offset - 1)
-#set ($limit = $mathtool.toInteger($request.get('limit')))
+#macro (displayUserAliasWithAvatar $userReference)
+  <div class="user" data-reference="$escapetool.xml($userReference)">
+    <span class="user-avatar-wrapper">
+      #getUserAvatarURL($userReference $avatarURL 120)
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+    </span>
+    <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
+  </div>
+#end
 
 #### get all the request parameters which are filters
-#set( $params = $request.getParameterMap() )
-#set( $keys = $params.keySet() )
-#set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo", "sort", "dir"] )
-#set( $docProps = ["fullName", "name"] )
+#set ($params = $request.getParameterMap())
+#set ($keys = $params.keySet())
+#set ($defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo", "sort", "dir"])
+#set ($docProps = ["fullName", "name"])
 #set ($filterMap = {})
 #set ($orderList = [])
 
-#foreach( $key in $keys )
-  #if(! $defaultKeys.contains( $key ) )
-     ## build the filters map
-     #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
-     #if( $docProps.contains( $key ))
-        #set ($arr = [])
-        #set( $discard = $arr.add( $NULL ) ) ## this may be variable...
-        #set( $discard = $arr.add( "$value" ) )
-        #set( $discard = $filterMap.put("$key", $arr))
-        #set( $discard = $orderList.add( "$key" ))
-     #else
-        #set ($arr = [])
-        #set( $discard = $arr.add( "StringProperty" ) ) ## this may be variable...
-        #set( $discard = $arr.add( "$value" ) )
-        #set( $discard = $filterMap.put("$key", $arr ))
-        #set ($arr2 = [])
-        #set( $discard = $arr2.add( "$key" ) )
-        #set( $discard = $arr2.add( "StringProperty" ) )
-        #set( $discard = $orderList.add( $arr2 ))
-     #end
+#foreach ($key in $keys)
+  #if (! $defaultKeys.contains( $key ) )
+    ## build the filters map
+    #foreach ($i in $params.get($key)) #set ($value = $i) #end
+    #if ($docProps.contains($key))
+      #set ($arr = [])
+      #set ($discard = $arr.add($NULL)) ## this may be variable...
+      #set ($discard = $arr.add("$value"))
+      #set ($discard = $filterMap.put("$key", $arr))
+      #set ($discard = $orderList.add("$key"))
+    #else
+      #set ($arr = [])
+      #set ($discard = $arr.add("StringProperty")) ## this may be variable...
+      #set ($discard = $arr.add("$value"))
+      #set ($discard = $filterMap.put("$key", $arr))
+      #set ($arr2 = [])
+      #set ($discard = $arr2.add("$key"))
+      #set ($discard = $arr2.add("StringProperty"))
+      #set ($discard = $orderList.add($arr2))
+    #end
   #end
 #end
 
-#if($orderList.size() == 0)
-#set($disc = $orderList.add("name")) ## initially fiter by "name" !!!
+#if ($orderList.isEmpty())
+  #set ($discard = $orderList.add('name'))
 #end
 
-#foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
-## If the Rights Manager Plugin is not enabled, then return an empty JSON result
-#set( $rm = $xwiki.rightsmanager.usersApi )
-#if ("$!rm" != '')
-  #if( $value == "local" )
-    #set( $users = $rm.getAllMatchedLocalUsers( $filterMap, $limit, $off, $orderList ) )
-    #set( $countUsers = $rm.countAllMatchedLocalUsers( $filterMap ) )
-  #elseif( $value == "global" )
-    #set( $users = $rm.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
-    #set( $countUsers = $rm.countAllMatchedGlobalUsers( $filterMap ) )
+#set ($usersService = $xwiki.rightsmanager.usersApi)
+#set ($offset = $mathtool.toInteger($request.get('offset')))
+#set ($limit = $mathtool.toInteger($request.get('limit')))
+
+## If the Rights Manager Plugin is not enabled, then return an empty JSON result.
+#if ("$!usersService" != '')
+  ## The live table offset starts from 1 so we need to subtract 1.
+  #if ($request.wiki == 'local')
+    #set ($users = $usersService.getAllMatchedLocalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
+    #set ($countUsers = $usersService.countAllMatchedLocalUsers($filterMap))
+  #elseif ($request.wiki == 'global')
+    #set ($users = $usersService.getAllMatchedGlobalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
+    #set ($countUsers = $usersService.countAllMatchedGlobalUsers($filterMap))
   #else
-    ## get both local and global users
-    #set( $users = $rm.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
-    #set( $countUsers = $rm.countAllMatchedUsers( $filterMap ) )
+    ## Get both local and global users.
+    #set ($users = $usersService.getAllMatchedUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
+    #set ($countUsers = $usersService.countAllMatchedUsers($filterMap))
   #end
 #else
   #set ($users = [])
   #set ($countUsers = 0)
 #end
-### json starts
-{
-"totalrows": $countUsers,
-"returnedrows": #if($countUsers < $limit) $countUsers #else $limit #end,
-"offset": $offset,
-"reqNo": $mathtool.toInteger($request.reqNo),
-"rows": [
-#foreach( $user in $users )
-   #if($xcontext.user == $user.fullName)
-    #set($grayed = true)
-   #else
-    #set($grayed = false)
+
+#set ($data = {
+  'totalrows': $countUsers,
+  'returnedrows': $mathtool.min($countUsers, $limit),
+  'offset': $offset,
+  'reqNo': $mathtool.toInteger($request.reqNo),
+  'rows': []
+})
+#foreach ($user in $users)
+  #set ($grayed = $xcontext.user == $user.fullName)
+  #set ($wikiName = $user.wiki)
+  #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
+    #set ($wikiName = 'local')
   #end
-   #set($wikiname = $user.getWiki())
-   #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
-   #if( $velocityCount > 1 ) , #end
-   {"username"      : "$!{escapetool.javascript($user.name)}",
-    "fullname"      : "$!{escapetool.javascript($user.fullName)}",
-    "wikiname"      : "$!{escapetool.javascript($wikiname)}",
-    "firstname"     : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').getValue('first_name'))}",
-    "lastname"      : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').getValue('last_name'))}",
-    "userurl"       : "$xwiki.getURL($user.fullName)",
-    "usersaveurl"   : "$user.getURL("save")",
-    "userinlineurl" : "$user.getURL("edit", "xpage=edituser")",
-    "docurl"        : "$xwiki.getURL("XWiki.XWikiPreferences", "admin", "section=Users")",
-    "grayed"        : "$grayed"
-  }
+  #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
+  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
+  #set ($row = {
+    'username': $user.name,
+    'fullname': $user.fullName,
+    'wikiname': $wikiName,
+    'firstname': $userObject.getValue('first_name'),
+    'lastname': $userObject.getValue('last_name'),
+    'userurl': $user.getURL(),
+    'usersaveurl': $user.getURL('save'),
+    'userinlineurl': $user.getURL('edit', 'xpage=edituser'),
+    'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Users'),
+    'grayed': $grayed
+  })
+  #if ($user.wiki == $xcontext.mainWikiName)
+    #set ($scope = 'global')
+  #else
+    #set ($scope = 'local')
+  #end
+  ## Prevent users from deleting themselves.
+  #set ($hasDelete = $xcontext.userReference != $user.documentReference
+    && $services.security.authorization.hasAccess('delete', $user.documentReference))
+  #set ($discard = $row.putAll({
+    'doc_fullName': $user.fullName,
+    'doc_wiki': $user.wiki,
+    'doc_url': $user.getURL(),
+    'doc_viewable': $services.security.authorization.hasAccess('view', $user.documentReference),
+    'doc_hasadmin': $xwiki.hasAdminRights(),
+    'doc_hasedit': $services.security.authorization.hasAccess('edit', $user.documentReference),
+    'doc_edit_url': $user.getURL('edit'),
+    'doc_hasdelete': $hasDelete,
+    'doc_delete_url': $user.getURL('delete'),
+    'name': "#displayUserAliasWithAvatar($user.documentReference)",
+    'first_name': $userObject.getValue('first_name'),
+    'last_name': $userObject.getValue('last_name'),
+    'scope': $services.localization.render("xe.admin.groups.$scope")
+  }))
+  #set ($discard = $data.rows.add($row))
 #end
-]}
-
-### end of json
-
+#jsonResponse($data)

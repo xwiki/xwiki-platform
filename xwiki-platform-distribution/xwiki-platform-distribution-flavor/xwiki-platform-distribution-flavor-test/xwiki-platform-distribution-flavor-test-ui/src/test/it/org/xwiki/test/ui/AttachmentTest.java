@@ -119,6 +119,8 @@ public class AttachmentTest extends AbstractTest
 
         Assert.assertEquals("This is a small attachment.", getDriver().findElement(By.tagName("html")).getText());
         getDriver().navigate().back();
+        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
+        getDriver().navigate().refresh();
         vp.waitForDocExtraPaneActive("attachments");
         ap.getAttachmentLink(this.testAttachment2).click();
         Assert.assertEquals("This is another small attachment.", getDriver().findElement(By.tagName("html")).getText());

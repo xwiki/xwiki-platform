@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -152,6 +152,7 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
+<<<<<<< HEAD
                   {
                     "code": "java.method.exception.checkedAdded",
                     "old": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionExtension",
@@ -297,7 +298,7 @@
                   },
                   {
                     "code": "java.method.parameterTypeChanged",
-                    "old": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, ===org.apache.commons.collections.ExtendedProperties===) @ org.xwiki.velocity.XWikiWebappResourceLoader",
+                    "old": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, 
                     "new": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, ===org.apache.velocity.util.ExtProperties===) @ org.xwiki.velocity.XWikiWebappResourceLoader",
                     "oldType": "org.apache.commons.collections.ExtendedProperties",
                     "newType": "org.apache.velocity.util.ExtProperties",
@@ -403,6 +404,7 @@
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
+    <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-notifications</module>
     <module>xwiki-platform-observation</module>

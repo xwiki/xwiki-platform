@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1402556245000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1460113981000</date>
-  <contentUpdateDate>1460113981000</contentUpdateDate>
   <version>1.1</version>
   <title>Documents Macro</title>
   <comment/>
@@ -171,7 +168,7 @@ Generates:
   #set($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
 #end
 #set($colprops = {
-  'doc.title' : { 'size' : 30, 'link' : 'view', 'filterable': false, 'sortable': false },
+  'doc.title' : { 'size' : 30, 'link' : 'view' },
   'doc.location' : { 'html': true },
   'doc.fullName' : { 'size' : 30, 'link' : 'view' },
   'doc.name' : { 'size' : 30, 'link' : 'view' },
@@ -202,6 +199,9 @@ Generates:
     'filterable': false,
     'sortable': false
   }))
+#end
+#if ($collist.contains('doc.location'))
+  #set ($discard = $options.put('selectedColumn','doc.location'))
 #end
 #if ("$!xcontext.macro.params.id" != "")
   #set ($livetableId = $xcontext.macro.params.id)

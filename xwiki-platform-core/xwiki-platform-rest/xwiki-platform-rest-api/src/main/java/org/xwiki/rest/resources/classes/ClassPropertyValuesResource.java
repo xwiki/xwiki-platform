@@ -29,7 +29,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.stability.Unstable;
 
 /**
  * Returns the class property values.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8RC1
  */
 @Path("/wikis/{wikiName}/classes/{className}/properties/{propertyName}/values")
-@Unstable
 public interface ClassPropertyValuesResource
 {
     @GET
@@ -47,6 +45,7 @@ public interface ClassPropertyValuesResource
         @PathParam("className") String className,
         @PathParam("propertyName") String propertyName,
         @QueryParam("limit") @DefaultValue("100") Integer limit,
-        @QueryParam("fp") List<String> filterParameters
+        @QueryParam("fp") List<String> filterParameters,
+        @QueryParam("exactMatch") @DefaultValue("false") Boolean isExactMatch
     ) throws XWikiRestException;
 }

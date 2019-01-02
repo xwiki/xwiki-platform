@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1252450800000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1274890282000</date>
-  <contentUpdateDate>1274890282000</contentUpdateDate>
   <version>1.1</version>
   <title>#if("$!{request.text}" == '')$services.localization.render('search.page.database.title.noquery')#else$services.localization.render('search.page.database.title.query', [$request.text])#end</title>
   <comment/>

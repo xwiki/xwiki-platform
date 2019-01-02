@@ -214,95 +214,106 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 
-###
-###    displayUser
-###
-### Display the profile of a user (or a list of users) with an image
-###
-### @param arg Could be either a string, a reference or a list of them
-###
-#macro(displayUser $arg)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
-  #if ($arg.iterator())
+#**
+ * Displays the user avatar and name, linked to the user profile page.
+ *
+ * @param arg could be either a string, a reference or a list of them
+ * @param options various configuration options; default values are {
+ *   showAlias: false, // whether to show the user alias or not
+ *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
+ *   wrapAvatar: false // whether to wrap the avatar image with a span or not
+ * }
+ *#
+#macro (displayUser $arg $options)
+  #set ($isList = $arg.iterator())
+  #if ($isList)
     #set ($usersList = $arg)
   #else
     #set ($usersList = [$arg])
   #end
-  <ul class="users">
-    #foreach($user in $usersList)
-      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
-      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
-      #set ($userReference = $user.extractReference('DOCUMENT'))
-      #if (!$userReference)
-        #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
-      #end
-      #set($userReferenceString = $services.model.serialize($userReference, 'default'))
-      #getUserAvatarURL($userReference $avatarURL 30)
-      <li class="user">
-        <div class="user-avatar-wrapper">
-          ## The string returned by XWiki#getUserName() is XML encoded.
-          <img src="${escapetool.xml($avatarURL.url)}" class="icon"
-            alt="${xwiki.getUserName($userReferenceString, false)}" />
-        </div>
-        <div class="user-name">${xwiki.getUserName($userReferenceString)}</div>
-        <div>
-          <span class="user-alias">${escapetool.xml($userReference.name)}</span>
-          ## Display the wiki only for local users.
-          #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
-            <span class="user-wiki">${escapetool.xml($userReference.wikiReference.name)}</span>
-          #end
-        </div>
-      </li>
+  #set ($macro.options = {
+    'showAlias': false,
+    'useInlineHTML': false,
+    'wrapAvatar': false
+  })
+  #if ($options.entrySet())
+    #set ($discard = $macro.options.putAll($options))
+  #end
+  #set ($usersTag = 'ul')
+  #set ($userTag = 'li')
+  #if ($macro.options.useInlineHTML)
+    #set ($usersTag = 'span')
+    #set ($userTag = 'span')
+  #elseif (!$isList)
+    #set ($userTag = 'div')
+  #end
+  #set ($types = $collectionstool.set)
+  #set ($output = [])
+  #foreach ($user in $usersList)
+    ## Since we accept both a String or an EntityReference as input, we first check if we have an Entity Reference
+    ## to a Document and if not then we resolve the String to convert it to a Document Reference.
+    #set ($userReference = $user.extractReference('DOCUMENT'))
+    #if (!$userReference)
+      #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
     #end
-  </ul>
+    #set ($userAlias = $userReference.name)
+    #if ($userAlias == $services.model.getEntityReference('DOCUMENT', 'default'))
+      #set ($userAlias = $userReference.lastSpaceReference.name)
+    #end
+    #set ($userDocument = $xwiki.getDocument($userReference))
+    #if ($userDocument.getObject('XWiki.XWikiGroups'))
+      #set ($type = 'group')
+      #set ($userName = $userDocument.plainTitle)
+      #if ("$!userName" == '')
+        #set ($userName = $userAlias)
+      #end
+    #else
+      #set ($type = 'user')
+      #set ($userName = $xwiki.getPlainUserName($userReference))
+    #end
+    #set ($discard = $types.add("${type}s"))
+    #set ($userAliasDisplay = '')
+    #if ($macro.options.showAlias && $userAlias != $userName)
+      #set ($userAliasDisplay = "<span class=""${type}-alias"">" + $escapetool.xml($userAlias) + '</span>')
+    #end
+    #set ($escapedUserName = $escapetool.xml($userName))
+    #getUserAvatarURL($userReference $avatarURL 120)
+    #set ($avatarWrapperStart = '')
+    #set ($avatarWrapperEnd = '')
+    #if ($macro.options.wrapAvatar)
+      #set ($avatarWrapperStart = "<span class=""${type}-avatar-wrapper"">")
+      #set ($avatarWrapperEnd = '</span>')
+    #end
+    ## We avoid the whitespace because the users are displayed as inline blocks.
+    #set ($discard = $output.addAll([
+      "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
+        $avatarWrapperStart,
+          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
+        $avatarWrapperEnd,
+        "<a class=""${type}-name"" href=""$escapetool.xml($xwiki.getURL($userReference))"">$escapedUserName</a>",
+        $userAliasDisplay,
+      "</$userTag>"
+    ]))
+  #end
+  #if ($isList && $output.size() > 0)
+    #set ($discard = $output.add(0, "<$usersTag class=""$stringtool.join($types, ' ')"">"))
+    #set ($discard = $output.add("</$usersTag>"))
+  #end
+  $stringtool.join($output, '')
 #end
 
-
-###
-###    displayGroup
-###
-### Display the profile of a group (or a list of groups) with an image
-###
-### @param arg Could be either a string, a reference or a list of them
-###
-#macro(displayGroup $arg)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-  #if ($arg.iterator())
-    #set ($groupsList = $arg)
-  #else
-    #set ($groupsList = [$arg])
-  #end
-  <ul class="users">
-    #foreach ($group in $groupsList)
-      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
-      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
-      #set ($groupReference = $group.extractReference('DOCUMENT'))
-      #if (!$groupReference)
-        #set ($groupReference = $services.model.resolveDocument($group, 'group/current'))
-      #end
-      #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
-      #if ("$!groupTitle" == '')
-        #set ($groupTitle = $groupReference.name)
-      #end
-      <li class="user">
-        <div class="user-avatar-wrapper">
-          #getUserAvatarURL($groupReference $avatarURL 30)
-          <img src="${escapetool.xml($avatarURL.url)}" class="icon"
-            alt="${escapetool.xml($groupTitle)}" />
-        </div>
-        <div class="user-name">
-          <a href="${escapetool.xml($xwiki.getURL($groupReference))}">${escapetool.xml($groupTitle)}</a>
-        </div>
-        <div>
-          <span class="user-alias">${escapetool.xml($groupReference.name)}</span>
-          ## Display the wiki only for local groups.
-          #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
-            <span class="user-wiki">${escapetool.xml($groupReference.wikiReference.name)}</span>
-          #end
-        </div>
-      </li>
-    #end
-  </ul>
+#**
+ * Displays the group avatar and name, linked to the group profile page.
+ *
+ * @param arg could be either a string, a reference or a list of them
+ * @param options various configuration options; default values are {
+ *   showAlias: false, // whether to show the group alias or not
+ *   useInlineHTML: false, // whether to use in-line HTML elements to display the group or not
+ *   wrapAvatar: false // whether to wrap the avatar image with a span or not
+ * }
+ *#
+#macro (displayGroup $arg $options)
+  #displayUser($arg $options)
 #end
 
 
@@ -420,8 +431,8 @@ $xwiki.getUserName("xwiki:${username}")
     #set($discard = $mimetypeMap.put('image/svg+xml',                      ['vector', 'svg']))
     #set($discard = $mimetypeMap.put('image/',                             ['image', 'image']))
     ## text
-    #set($discard = $mimetypeMap.put('text/html',                          ['html', 'html']))
-    #set($discard = $mimetypeMap.put('text/css',                           ['css', 'css']))
+    #set($discard = $mimetypeMap.put('text/html',                          ['file-code', 'html']))
+    #set($discard = $mimetypeMap.put('text/css',                           ['file-code', 'css']))
     #set($discard = $mimetypeMap.put('text/',                              ['file-text', 'text']))
     ## documents
     #set($discard = $mimetypeMap.put('application/xml',                    ['file-code', 'xml']))
@@ -764,59 +775,44 @@ $fn
 ### Generate the starting html code for a panel
 ###
 ### @param title The panel caption title
+### @param isLarge True if the panel should be larger (default: false)
+### @param isHeaderHidden True if the header should be hidden (default: false)
 ###
-#macro(panelheader $title)
-## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
-## the Panels selectively using CSS.
-#set ($specialClassAttribute = '')
-#if ($paneldoc)
-  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
+#macro(panelheader $title $isLarge $isHeaderHidden)
+## Note: We pass the Panel name as an HTML class attribute so that it's possible to style the Panels selectively using
+## CSS.
+## We want to avoid showing the "WebHome" suffix in the generated class since we're working to remove it from the UI
+## and from the APIs. In addition it generates class names longer than they are needed. Thus for nested pages we strip
+## it. We also strip the wiki prefix to have a shorter generated class name and because they're not needed to provide
+## per-wiki styling of Panels.
+#set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+#if ($paneldoc.documentReference.name == $defaultDocumentName)
+  #set ($serializedDocument = $services.model.serialize($paneldoc.documentReference.parent, 'compactwiki'))
+#else
+  #set ($serializedDocument = $services.model.serialize($paneldoc.documentReference, 'compactwiki'))
 #end
+## We keep only alphanumeric characters so it can be used as a CSS class.
+## For instance: "xwiki:A.B.WebHome" will become "AB"
+#set ($specialClassAttribute = $stringtool.toAlphaNumeric("$!serializedDocument"))
+## We keep this class for compatibility purpose but the previous one should be used instead.
+#set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="panel expanded $!specialClassAttribute">
-<h1 class="xwikipaneltitle">$title</h1>
+<div class="#if ($isLarge) large #end panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
+<h1 class="xwikipaneltitle #if ($isHeaderHidden) hidden #end">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="panel expanded $specialClassAttribute" %)(((
-{{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
+(% class="#if ($isLarge) large #end panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
+{{html}}<h1 class="xwikipaneltitle #if ($isHeaderHidden) hidden #end">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
 
 #macro(panelhiddenheader $title)
-## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
-## the Panels selectively using CSS.
-#set ($specialClassAttribute = '')
-#if ($paneldoc && $paneldoc != '')
-  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
-#end
-#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="panel expanded $!specialClassAttribute">
-<h1 class="xwikipaneltitle hidden">$title</h1>
-<div class="xwikipanelcontents">
-#else
-(% class="panel expanded $specialClassAttribute" %)(((
-{{html}}<h1 class="xwikipaneltitle hidden">$title</h1>{{/html}}
-(% class="xwikipanelcontents" %)(((
-#end
+#panelheader($title, false, true)
 #end
 
 #macro(largepanelheader $title)
-## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
-## the Panels selectively using CSS.
-#set ($specialClassAttribute = '')
-#if ($paneldoc && $paneldoc != '')
-  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
-#end
-#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="large panel $expanded $!specialClassAttribute">
-<h1 class="xwikipaneltitle">$title</h1>
-<div class="xwikipanelcontents">
-#else
-(% class="large panel expanded $!specialClassAttribute" %)(((
-{{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
-(% class="xwikipanelcontents" %)(((
-#end
+#panelheader($title, true, false)
 #end
 
 ###
@@ -1261,7 +1257,6 @@ $Msz MB##
   ## Options / defaults
   ##
   #if("$!options.translationPrefix" != '') #set($transprefix = $options.translationPrefix) #else #set($transprefix = '') #end
-  #if("$!options.selectedColumn" != '')  #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.defaultOrder" == 'desc') #set($defaultOrder = 'desc') #else #set($defaultOrder = 'asc') #end
   #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
   #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
@@ -1274,7 +1269,7 @@ $Msz MB##
     #set ($selectedTags = [])
   #end
   #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
-  #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
+  #set ($topfilters = $options.topFilters)
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
   #set ($queryFilters = $options.queryFilters)
@@ -1390,32 +1385,15 @@ $Msz MB##
             #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
-                #set($isFilterable = true)
-              #else
-                #set($isFilterable = false)
-              #end
-              #if(("$!colprop.sortable" == '' || $colprop.sortable != false) && "$!colname" != '_actions')
-                #set($isSortable = true)
-              #else
-                #set($isSortable = false)
-              #end
-              ## Determine the name to be displayed in the column header. Strategy is as following :
-              ## - If defined the displayName passed as a column option wins
-              ## - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name
-              ## - Finally, we fall back on the column name
-              #if("$!colprop.displayName" != '')
-                #set($displayName = $colprop.displayName)
-              #elseif($transprefix != '')
-                #set($displayName = $services.localization.render("${transprefix}${colname}"))
-              #else
-                #set($displayName = $colname)
-              #end
+              #set($isFilterable = $colprop.filterable != false && "$!colname" != '_actions')
+              #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
+              ## Get the column's display name to use in the header.
+              #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
                 #if($isSortable)<a rel="${colname}">#end
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
+                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 $displayName
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
+                #if($isFilterable)</label>#end
                 #if($isSortable)</a>#end
                 #set($columnCount = $mathtool.add($columnCount, 1))
               </th>
@@ -1449,13 +1427,20 @@ $Msz MB##
   <div id="${htmlLiveTableId}-inaccessible-docs" class="hidden">
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
   </div>
+  <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
+    #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
+  </div>
   <script type="text/javascript">
   //<![CDATA[
 (function() {
-  function startup() {
-    // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
-    if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
-      #set ($jsLiveTableId = $escapetool.javascript($divid))
+  var startup = function(container) {
+    // Make sure the LiveTable code is loaded (the WYSIWYG editor doesn't load the JavaScript code for instance).
+    var liveTableCodeLoaded = XWiki && XWiki.widgets && XWiki.widgets.LiveTable;
+    // Also make sure the live table is not already initialized.
+    #set ($jsLiveTableId = $escapetool.javascript($divid))
+    var liveTableElement = $('$jsLiveTableId');
+    if (liveTableCodeLoaded && liveTableElement && !liveTableElement.__liveTable &&
+        (liveTableElement == container || liveTableElement.descendantOf(container))) {
       #set ($liveTableParams = {
         'maxPages': $maxPages,
         'limit': $count,
@@ -1475,8 +1460,8 @@ $Msz MB##
       #if ($!callback != '')
         #set ($callbackParam = "$callback, ")
       #end
-      window[$jsontool.serialize($jsName)] = new XWiki.widgets.LiveTable("$dataurl", "$jsLiveTableId",
-        $callbackParam$jsontool.serialize($liveTableParams));
+      window[$jsontool.serialize($jsName)] = liveTableElement.__liveTable = new XWiki.widgets.LiveTable("$dataurl",
+        "$jsLiveTableId", $callbackParam$jsontool.serialize($liveTableParams));
       #if ($hasPageSize)
         document.observe("xwiki:livetable:${jsLiveTableId}:loadingEntries", function() {
           $('${jsLiveTableId}-pagesize').addClassName("hidden");
@@ -1488,9 +1473,15 @@ $Msz MB##
       return true;
     }
     return false;
-  }
-  // Initialize liveTable
-  (XWiki && XWiki.isInitialized && startup()) || document.observe('xwiki:livetable:loading', startup);
+  };
+  var init = function(event) {
+    var elements = (event && event.memo.elements) || [$('body')];
+    return elements.length > 0 && elements.some(startup);
+  };
+  // Initialize the live table on page load or after the live table code has been loaded.
+  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:livetable:loading', init);
+  // Initialize the live table when it is added after the page is loaded.
+  document.observe('xwiki:dom:updated', init);
 })();
    //]]>
   </script>
@@ -1541,7 +1532,7 @@ $Msz MB##
       'Email': 'text',
       'Groups': 'suggest',
       'Number': 'number',
-      'Page': 'text',
+      'Page': 'suggest',
       'StaticList': 'list',
       'String': 'text',
       'TextArea': 'text',
@@ -1595,6 +1586,30 @@ $Msz MB##
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
     </select>
   #end
+#end
+
+#**
+ * Internal macro - Determine the name to be displayed in a livetable's column header. Strategy is as follows :
+ * - If defined, the 'displayName' passed as a column option wins.
+ * - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name.
+ * - Finally, we fall back on the column name.
+ *
+ * @param colname the column name
+ * @param colprop the column properties map
+ * @param transprefix the translations prefix to use
+ *
+ * @internal
+ *#
+##
+#macro(getLivetableColumnDisplayName $colname $colprop $transprefix)
+  #if("$!colprop.displayName" != '')
+    #set($displayName = $colprop.displayName)##
+  #elseif($transprefix != '')
+    #set($displayName = $services.localization.render("${transprefix}${colname}"))##
+  #else
+    #set($displayName = $colname)##
+  #end
+$displayName##
 #end
 
 #**
@@ -1652,9 +1667,21 @@ function (row, i, table) {
   var columns = $jsontool.serialize($collist);
   var columnDescriptors = $jsontool.serialize($colprops);
   var className = $jsontool.serialize($classname);
+  var showFilterNote = false;
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
+  #if ($collist.indexOf('doc.title') != -1)
+    #set($titleOpts = $colprops['doc.title'])
+    #if ("$!{titleOpts}" == ""
+        || ($titleOpts['filterable'] == $NULL || $titleOpts['filterable'] == true)
+        || ($titleOpts['sortable'] == $NULL   || $titleOpts['sortable'] == true))
+  showFilterNote = true;
+  if (row['doc_title_raw'] !== undefined) {
+    $($jsontool.serialize("${divid}-computed-title-docs")).removeClassName('hidden');
+  }
+    #end
+  #end
   ## NOTE: Don't use Velocity code below this line!
   var tr = new Element('tr');
   columns.forEach(function(column) {
@@ -1739,6 +1766,9 @@ function (row, i, table) {
         var text = row[fieldName] + '';
         if (fieldName === 'doc_name' && !row['doc_viewable']) {
           text += '*';
+        }
+        if (showFilterNote && fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
+          container.addClassName('docTitleComputed');
         }
         container.update(text.escapeHTML());
       }
@@ -2288,62 +2318,60 @@ $string##
 #end
 
 #**
- * Pulls all the JavaScript and CSS resources needed by the UserPicker.
- *
- * @param $sortable whether the list of selected users should be sortable or not
+ * Pulls all the JavaScript and CSS resources needed by pickers.
  *#
-#macro (userPicker_import $sortable)
-  #if ($sortable)
-    ## Needed for sorting the selected values.
-    #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
-  #end
-  ## Needed for displaying a list of suggestions based on the user input (included by default).
-  ##set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
-  ##set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
-  ## Needed for managing the selected values. In single selection mode the value selected from the list of suggestions
-  ## overwrites the previously selected value.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js', true))
-  ## The actual user picker. Provides a custom display for the user suggestions and selected users.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
+#macro (picker_import)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the user and group picker.
+ *#
+#macro (userPicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
 #end
 
 #macro (userPicker_input $multiSelect $parameters)
-  #set ($parameters.type = 'text')
   #if ($multiSelect)
-    #set ($discard = $parameters.put('class', "$!parameters.get('class') multipleSelection"))
+    #set ($discard = $parameters.put('multiple', 'multiple'))
   #end
-  #set ($attributes = [])
-  #foreach ($entry in $parameters.entrySet())
-    #set ($discard = $attributes.add("$escapetool.xml($entry.key)='$!escapetool.xml($entry.value)'"))
-  #end
-  <input $stringtool.join($attributes, ' ') />
+  #set ($discard = $parameters.putIfAbsent('data-userScope', $services.wiki.user.userScope))
+  #suggestInput($parameters)
 #end
 
 #macro (userPicker $multiSelect $parameters)
-  #userPicker_import($multiSelect)
-  #set ($class = 'suggestUsers')
-  #set ($userScope = "$!services.wiki.user.userScope")
-  #if ($userScope == 'LOCAL_AND_GLOBAL')
-    #set ($class = "$class withScope")
-  #elseif ($userScope == 'GLOBAL_ONLY')
-    #set ($class = "$class global")
-  #end
-  #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
+  #userPicker_import
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-users"))
   #userPicker_input($multiSelect $parameters)
 #end
 
 #macro (groupPicker $multiSelect $parameters)
-  #userPicker_import($multiSelect)
-  #set ($class = 'suggestGroups')
-  #if (!$xcontext.isMainWiki() && "$!services.wiki.user.userScope" != 'LOCAL_ONLY')
-    ## We can have both local and global groups in a subwiki that accepts global users. In case the wiki accepts only
-    ## global users, local groups can be used to setup various rights for the global users.
-    #set ($class = "$class withScope")
-  #end
-  #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
+  #userPicker_import
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-groups"))
   #userPicker_input($multiSelect $parameters)
+#end
+
+
+#**
+* Pulls all the JavaScript and CSS resources needed by the page picker.
+*#
+#macro (pagePicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPages.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+#end
+
+#macro (pagePicker $parameters)
+  #pagePicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-pages"))
+  #suggestInput($parameters)
 #end
 
 #**
@@ -2524,37 +2552,93 @@ Recursive title display detected!##
  * Used by custom property displayers that need a generic suggest input.
  *#
 #macro (xpropertySuggestInputDisplayer $field $prefix $name $value)
-  #set ($id = $escapetool.xml("${prefix}${name}"))
-  #set ($disabled = $field.getProperty('disabled').value == 1)
-  #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-  ## We don't use $isMultiSelect to determine if there is one or multiple values selected because you can have multiple
-  ## values selected on a single selection property if the property had multiple selection active in the past.
-  #if ("$!value.size()" != '')
-    #set ($values = $value)
-  #elseif ($isMultiSelect)
-    ## Multiple selection without relational storage.
-    #set ($separators = $field.getProperty('separators').value)
-    #if ("$!separators" == '')
-      #set ($separators = '|,')
-    #end
-    #set ($values = $stringtool.split($value, $separators))
-  #else
-    #set ($values = [$value])
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($id = "${prefix}${name}")
+  #set ($freeText = $!field.getValue('freeText'))
+  #set ($parameters = {
+    'id': $id,
+    'name': $id,
+    'value': $value,
+    'class': 'suggest-propertyValues',
+    'data-className': $field.className,
+    'data-propertyName': $name
+  })
+  #if ("$!freeText" != '')
+    #set ($discard = $parameters.put('data-freeText', $freeText))
   #end
+
+  #if ($field.getProperty('disabled').value == 1)
+    #set ($parameters.disabled = 'disabled')
+  #end
+  #if ($field.getProperty('multiSelect').value == 1)
+    #set ($parameters.multiple = 'multiple')
+    #set ($separators = $field.getProperty('separators').value)
+    #if ("$!separators" != '')
+      #set ($parameters.separators = $separators)
+    #end
+  #end
+  #suggestInput($parameters)
+#end
+
+#**
+ * Utility macro to output a generic suggest input.
+ *
+ * @param $parameters the parameters (most of them are treated as HTML attributes)
+ *#
+#macro (suggestInput $parameters)
   #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
     {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-    {'forceSkinAction' : true, 'language' : $xcontext.locale}))
-  <select id="$!id" name="$!id" class="suggest-propertyValues"#if ($isMultiSelect) multiple="multiple"#end
-      #if ($disabled)disabled="disabled" #{end}data-className="$!escapetool.xml($field.className)"
-      data-propertyName="$!escapetool.xml($name)" size="1">
+  #set ($discard = $parameters.put('size', 1))
+  #set ($attributes = [])
+  #set ($nonAttributes = ['value', 'separators'])
+  #foreach ($entry in $parameters.entrySet())
+    #if (!$nonAttributes.contains($entry.key))
+      #set ($discard = $attributes.add("$escapetool.xml($entry.key)='$!escapetool.xml($entry.value)'"))
+    #end
+  #end
+  #if ("$!parameters.value.size()" != '')
+    #set ($values = $parameters.value)
+  #elseif ($parameters.multiple)
+    #set ($values = $stringtool.split($parameters.value, $parameters.getOrDefault('separators', '|,')))
+  #elseif ("$!parameters.value" != '')
+    #set ($values = [$parameters.value])
+  #else
+    #set ($values = [])
+  #end
+  <select $stringtool.join($attributes, ' ')>
     #foreach ($selectedValue in $values)
       <option value="$!escapetool.xml($selectedValue)" selected="selected">$!escapetool.xml($selectedValue)</option>
     #end
   </select>
-  #if ($isMultiSelect)
+  #if ($parameters.multiple)
     ## We need a hidden input with an empty value to be able to clear the selected values when no value is selected.
-    <input type="hidden" name="$!id" />
+    <input type="hidden" name="$!escapetool.xml($parameters.name)" />
   #end
+#end
+
+#**
+ * Serializes the given data as JSON and writes the result on the HTTP response, setting the proper content type and
+ * length.
+ *
+ * @param $data the data to be written as JSON on the HTTP response
+ *#
+#macro (jsonResponse $data)
+  #set ($json = $jsontool.serialize($data))
+  ## We write the output directly to the HTTP response in order to avoid going through the Rendering which executes
+  ## transformations that could break the JSON (e.g. the icon transformation). Another option would be to specify which
+  ## Rendering Transformations to execute in the query string (XWIKI-13167).
+  #set ($discard = $response.setContentType('application/json'))
+  ## Make sure the Character Encoding response header matches the character encoding used to write the response and
+  ## compute its length.
+  #set ($characterEncoding = 'utf-8')
+  #set ($discard = $response.setCharacterEncoding($characterEncoding))
+  #set ($discard = $response.writer.write($json))
+  ## The content length is measured in bytes and one character can use more than one byte.
+  #set ($discard = $response.setContentLength($json.getBytes($characterEncoding).size()))
+  ## Make sure the entire content is send back to the client.
+  #set ($discard = $response.flushBuffer())
+  ## Make sure XWiki doesn't write any more content to the response.
+  #set ($discard = $xcontext.setFinished(true))
 #end

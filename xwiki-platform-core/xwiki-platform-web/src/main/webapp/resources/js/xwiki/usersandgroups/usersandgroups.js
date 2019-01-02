@@ -468,14 +468,6 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
 
 ////////////////////////////////////////////////////////////////
 
-function editUserOrGroup(userinlineurl, usersaveurl, userredirecturl)
-{
-  return function() {
-    window.lb = new Lightbox(userinlineurl, usersaveurl, userredirecturl);
-  }
-}
-
-
 //function to delete a user with ajax
 function deleteUserOrGroup(i, table, docname, uorg, form_token)
 {
@@ -516,13 +508,6 @@ function deleteMember(i, table, docname, docurl, form_token)
         }
       });
     }
-  }
-}
-
-function makeAddHandler(url, saveurl, redirecturl)
-{
-  return function() {
-    window.lb = new Lightbox(url, saveurl, redirecturl);
   }
 }
 
@@ -570,6 +555,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     paramMap["parameters"] = {};
     paramMap["parameters"][config + "_" + objNum + "_" + self.id] = setValue;
     paramMap["parameters"]["ajax"] = "1";
+    paramMap["parameters"]["comment"] = "$services.localization.render('authenticate_viewedit_savecomment')";
     paramMap["onSuccess"] = function() {
       pivot.alt = newAlt;
       pivot.src = newSrc;

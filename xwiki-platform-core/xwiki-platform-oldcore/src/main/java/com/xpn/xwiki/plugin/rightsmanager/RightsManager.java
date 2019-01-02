@@ -452,7 +452,9 @@ public final class RightsManager
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -468,7 +470,9 @@ public final class RightsManager
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing user name.
      * @throws XWikiException error when browsing groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -496,13 +500,33 @@ public final class RightsManager
     }
 
     /**
+     * Filters the members of the specified group using the given text and counts the results.
+     *
+     * @param group the group whose members are going to be counted
+     * @param filter the text used to filter the group members
+     * @param xcontext the XWiki context
+     * @return the number of group members that match the given text filter
+     * @throws XWikiException if counting the group members fails
+     * @see #getAllMatchedMembersNamesForGroup(String, String, int, int, Boolean, XWikiContext)
+     * @since 10.8RC1
+     */
+    public int countAllMatchedMembersNamesForGroup(String group, String filter, XWikiContext xcontext)
+        throws XWikiException
+    {
+        return xcontext.getWiki().getGroupService(xcontext).countAllMatchedMembersNamesForGroup(group, filter,
+            xcontext);
+    }
+
+    /**
      * Return the number of groups containing provided member.
      *
      * @param member the name of the member (user or group).
      * @param context the XWiki context.
      * @return the number of groups.
      * @throws XWikiException error when getting number of users.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public int countAllGroupsNamesForMember(String member, XWikiContext context) throws XWikiException
     {
         return context.getWiki().getGroupService(context).countAllGroupsNamesForMember(member, context);
@@ -515,7 +539,9 @@ public final class RightsManager
      * @param context the XWiki context.
      * @return the number of members.
      * @throws XWikiException error when getting number of groups.
+     * @deprecated since 10.8RC1, use org.xwiki.user.group.GroupManager component instead
      */
+    @Deprecated
     public int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException
     {
         return context.getWiki().getGroupService(context).countAllMembersNamesForGroup(group, context);

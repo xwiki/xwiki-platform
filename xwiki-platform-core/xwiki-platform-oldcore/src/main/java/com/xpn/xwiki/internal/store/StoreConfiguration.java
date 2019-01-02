@@ -64,7 +64,17 @@ public class StoreConfiguration
 
     private <S> S getStore(Class<S> storeClass, String property, String defaultHint) throws ComponentLookupException
     {
+        return getStore(storeClass, property, defaultHint, false);
+    }
+
+    private <S> S getStore(Class<S> storeClass, String property, String defaultHint, boolean returnNullForHibernate)
+        throws ComponentLookupException
+    {
         String hint = this.configuration.getProperty(property, defaultHint);
+
+        if (returnNullForHibernate && hint.equals(XWikiHibernateBaseStore.HINT)) {
+            return null;
+        }
 
         if (this.componentManager.hasComponent(storeClass, hint)) {
             return this.componentManager.getInstance(storeClass, hint);
@@ -154,7 +164,7 @@ public class StoreConfiguration
      */
     public XWikiRecycleBinContentStoreInterface getXWikiRecycleBinContentStore() throws ComponentLookupException
     {
-        return getStore(XWikiRecycleBinContentStoreInterface.class, "xwiki.store.recyclebin.content.hint", FILE);
+        return getStore(XWikiRecycleBinContentStoreInterface.class, "xwiki.store.recyclebin.content.hint", FILE, true);
     }
 
     /**
@@ -163,7 +173,8 @@ public class StoreConfiguration
      */
     public AttachmentRecycleBinContentStore getAttachmentRecycleBinContentStore() throws ComponentLookupException
     {
-        return getStore(AttachmentRecycleBinContentStore.class, "xwiki.store.attachment.recyclebin.content.hint", FILE);
+        return getStore(AttachmentRecycleBinContentStore.class, "xwiki.store.attachment.recyclebin.content.hint", FILE,
+            true);
     }
 
     /**

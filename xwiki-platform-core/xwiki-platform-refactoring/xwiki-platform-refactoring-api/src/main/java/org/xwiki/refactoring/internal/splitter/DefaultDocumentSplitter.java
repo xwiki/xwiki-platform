@@ -169,6 +169,12 @@ public class DefaultDocumentSplitter implements DocumentSplitter
         }
     }
 
+    private boolean isDocument(ResourceType resourceType)
+    {
+        return ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)
+            || ResourceType.PAGE.equals(resourceType);
+    }
+
     /**
      * @param document the document whose anchors to update
      * @param fragments see {@link #collectDocumentFragments(List)}
@@ -180,8 +186,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
             ResourceReference reference = linkBlock.getReference();
             ResourceType resoureceType = reference.getType();
             String fragment = null;
-            if ((ResourceType.DOCUMENT.equals(resoureceType) || ResourceType.SPACE.equals(resoureceType))
-                && StringUtils.isEmpty(reference.getReference())) {
+            if (isDocument(resoureceType) && StringUtils.isEmpty(reference.getReference())) {
                 fragment = reference.getParameter(ANCHOR_PARAMETER);
             } else if (StringUtils.startsWith(reference.getReference(), "#")
                 && (ResourceType.PATH.equals(resoureceType) || ResourceType.URL.equals(resoureceType))) {

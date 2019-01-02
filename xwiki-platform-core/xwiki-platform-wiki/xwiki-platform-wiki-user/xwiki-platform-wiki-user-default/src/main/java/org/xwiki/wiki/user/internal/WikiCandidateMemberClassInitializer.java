@@ -166,12 +166,12 @@ public class WikiCandidateMemberClassInitializer extends AbstractMandatoryClassI
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField(FIELD_USER, FIELDPN_USERNAME, 30);
+        xclass.addUsersField(FIELD_USER, FIELDPN_USERNAME, 30, false);
         xclass.addDateField(FIELD_DATE_OF_CREATION, FIELDPN_DATE);
         xclass.addTextAreaField(FIELD_USER_COMMENT, FIELDPN_USERCOMMENT, 40, 3);
         xclass.addStaticListField(FIELD_STATUS, FIELDPN_STATUS, FIELDL_STATUS);
         xclass.addDateField(FIELD_DATE_OF_CLOSURE, FIELDPN_RESOLUTIONDATE);
-        xclass.addTextField(FIELD_ADMIN, FIELDPN_REVIEWER, 30);
+        xclass.addUsersField(FIELD_ADMIN, FIELDPN_REVIEWER, 30, false);
         xclass.addTextAreaField(FIELD_ADMIN_COMMENT, FIELDPN_REVIEWERCOMMENT, 40, 3);
         xclass.addTextAreaField(FIELD_ADMIN_PRIVATE_COMMENT, FIELDPN_REVIEWERPRIVATECOMMENT, 40, 3);
         xclass.addStaticListField(FIELD_TYPE, FIELDPN_TYPE, FIELDL_TYPE);

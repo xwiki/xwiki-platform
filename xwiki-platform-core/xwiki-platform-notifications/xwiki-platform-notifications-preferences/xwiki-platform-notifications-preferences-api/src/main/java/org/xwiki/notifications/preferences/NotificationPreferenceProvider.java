@@ -25,7 +25,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides notifications preferences from multiple sources.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  */
 @Role
-@Unstable
 public interface NotificationPreferenceProvider
 {
     /**

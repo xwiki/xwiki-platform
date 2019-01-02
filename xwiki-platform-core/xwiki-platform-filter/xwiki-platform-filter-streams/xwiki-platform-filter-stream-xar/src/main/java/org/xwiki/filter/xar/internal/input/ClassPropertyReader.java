@@ -79,6 +79,11 @@ public class ClassPropertyReader extends AbstractReader implements XARXMLReader<
                 wikiClassProperty.type = value;
             } else {
                 wikiClassProperty.fields.put(elementName, value);
+
+                // If a <name> is defined it has priority over parent element local name
+                if (elementName.equals(XARClassPropertyModel.ELEMENT_NAME)) {
+                    wikiClassProperty.name = value;
+                }
             }
         }
 

@@ -22,14 +22,13 @@ package org.xwiki.query.internal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,22 +39,14 @@ import static org.mockito.Mockito.when;
  * @since 8.4.5
  * @since 9.3RC1
  */
+@ComponentTest
 public class EscapeLikeParametersFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EscapeLikeParametersFilter> mocker =
-        new MockitoComponentMockingRule<>(EscapeLikeParametersFilter.class);
-
-    private QueryFilter filter;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.filter = this.mocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private EscapeLikeParametersFilter filter;
 
     @Test
-    public void filterWithNamedParameterAndNoEscape() throws Exception
+    public void filterWithNamedParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -75,7 +66,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNamedParameterAndLikeAtEnd() throws Exception
+    public void filterWithNamedParameterAndLikeAtEnd()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -91,7 +82,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNamedParameterAndEscape() throws Exception
+    public void filterWithNamedParameterAndEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -107,7 +98,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithPositionalParameterAndNoEscape() throws Exception
+    public void filterWithPositionalParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -130,7 +121,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNumberedPositionalParameterAndNoEscape() throws Exception
+    public void filterWithNumberedPositionalParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -149,7 +140,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithPositionalParameterAndFunction() throws Exception
+    public void filterWithPositionalParameterAndFunction()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -163,5 +154,128 @@ public class EscapeLikeParametersFilterTest
         Query filteredQuery = this.filter.filterQuery(query);
         assertEquals("SELECT a FROM b WHERE ref LIKE LOWER(?) ESCAPE '!'", filteredQuery.getStatement());
         assertEquals("wiki:space1.space\\.2.space!!3.WebHome", filteredQuery.getPositionalParameters().get(0));
+    }
+
+    @Test
+    public void filterWhenUsingBangInLike()
+    {
+        Query query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn("select a from b where ref like :likeValue");
+
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        parameters.put("likeValue", new DefaultQueryParameter(query).like("%some!thing%"));
+        when(query.getNamedParameters()).thenReturn(parameters);
+
+        Query filteredQuery = this.filter.filterQuery(query);
+        assertEquals("SELECT a FROM b WHERE ref LIKE :likeValue ESCAPE '!'", filteredQuery.getStatement());
+        // The test is here, we verify that the bang character has been escaped from the like value since it's an
+        // escape character
+        assertEquals("%some!!thing%", filteredQuery.getNamedParameters().get("likeValue"));
+    }
+
+    @Test
+    public void namedParametersLikeAPICustomEscape()
+    {
+        String statement = "select doc.fullName from XWikiDocument doc where "
+            + "doc.fullName like :fullName escape '/' and doc.author like :author escape '!'";
+        Query query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn(statement);
+
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        parameters.put("fullName", new DefaultQueryParameter(null).literal("Foo//Bar"));
+        parameters.put("author", new DefaultQueryParameter(null).like("Bar!").anychar());
+
+        when(query.getNamedParameters()).thenReturn(parameters);
+
+        Query filteredQuery = this.filter.filterQuery(query);
+        String modifiedStatement = "SELECT doc.fullName FROM XWikiDocument doc WHERE "
+            + "doc.fullName LIKE :fullName ESCAPE '/' AND doc.author LIKE :author ESCAPE '!'";
+        assertEquals(modifiedStatement, filteredQuery.getStatement());
+
+        assertTrue(filteredQuery.getPositionalParameters().isEmpty());
+
+        Map<String, Object> expectedMap = new LinkedHashMap<>();
+        expectedMap.put("author", "Bar!!_");
+
+        // Limitation, only standard '!' is currently escaped automatically
+        expectedMap.put("fullName", "Foo//Bar");
+
+        assertEquals(expectedMap, filteredQuery.getNamedParameters());
+    }
+
+    @Test
+    public void positionalParametersLikeAPICustomEscape()
+    {
+        String statement = "select doc.fullName from XWikiDocument doc where "
+            + "doc.fullName like ? and doc.author like ? escape '!'";
+        Query query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn(statement);
+
+        Map<Integer, Object> parameters = new LinkedHashMap<>();
+        parameters.put(0, new DefaultQueryParameter(null).literal("Foo!"));
+        parameters.put(1, new DefaultQueryParameter(null).like("Bar!").anychar());
+
+        when(query.getPositionalParameters()).thenReturn(parameters);
+
+        Query filteredQuery = this.filter.filterQuery(query);
+        String modifiedStatement = "SELECT doc.fullName FROM XWikiDocument doc WHERE "
+            + "doc.fullName LIKE ? ESCAPE '!' AND doc.author LIKE ? ESCAPE '!'";
+        assertEquals(modifiedStatement, filteredQuery.getStatement());
+
+        assertTrue(filteredQuery.getNamedParameters().isEmpty());
+
+        Map<Integer, Object> expectedMap = new LinkedHashMap<>();
+        expectedMap.put(0, "Foo!!");
+        expectedMap.put(1, "Bar!!_");
+
+        assertEquals(expectedMap, filteredQuery.getPositionalParameters());
+    }
+
+    @Test
+    public void positionalAndNamedParameters()
+    {
+        String statement = "select doc.fullName from XWikiDocument doc where "
+            + "doc.fullName like :fullName escape '/' and "
+            + "doc.author like ? or "
+            + "doc.version = :version and "
+            + "doc.space like ? escape '!'";
+
+        Query query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn(statement);
+
+        Map<String, Object> namedParameters = new LinkedHashMap<>();
+        namedParameters.put("fullName", new DefaultQueryParameter(null).literal("Space//Content").anyChars());
+        namedParameters.put("version", "1.1");
+        when(query.getNamedParameters()).thenReturn(namedParameters);
+
+        Map<Integer, Object> positionalParameters = new LinkedHashMap<>();
+        positionalParameters.put(0, new DefaultQueryParameter(null).like("Bar!"));
+        positionalParameters.put(1, new DefaultQueryParameter(null).like("%Foo!%"));
+        when(query.getPositionalParameters()).thenReturn(positionalParameters);
+
+        Query filteredQuery = this.filter.filterQuery(query);
+        String modifiedStatement = "SELECT doc.fullName FROM XWikiDocument doc WHERE "
+            + "doc.fullName LIKE :fullName ESCAPE '/' AND "
+            + "doc.author LIKE ? ESCAPE '!' OR "
+            + "doc.version = :version AND "
+            + "doc.space LIKE ? ESCAPE '!'";
+
+        assertEquals(modifiedStatement, filteredQuery.getStatement());
+
+        Map<String, Object> expectedNamedMap = new LinkedHashMap<>();
+        expectedNamedMap.put("fullName", "Space//Content%");
+        expectedNamedMap.put("version", "1.1");
+
+        assertEquals(expectedNamedMap, filteredQuery.getNamedParameters());
+
+        Map<Integer, Object> expectedPositionalMap = new LinkedHashMap<>();
+        expectedPositionalMap.put(0, "Bar!!");
+        expectedPositionalMap.put(1, "%Foo!!%");
+
+        assertEquals(expectedPositionalMap, filteredQuery.getPositionalParameters());
     }
 }

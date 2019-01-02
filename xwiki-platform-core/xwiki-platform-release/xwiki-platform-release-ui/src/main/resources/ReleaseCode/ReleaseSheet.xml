@@ -31,9 +31,6 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1342183810000</creationDate>
-  <date>1361390507000</date>
-  <contentUpdateDate>1361390507000</contentUpdateDate>
   <version>1.1</version>
   <title>#set($version=$doc.getObject("ReleaseCode.ReleaseClass").getProperty("version").getValue())#if("$!version" != "")Release for version $version#{else}New Release for version $request.version#end</title>
   <template/>

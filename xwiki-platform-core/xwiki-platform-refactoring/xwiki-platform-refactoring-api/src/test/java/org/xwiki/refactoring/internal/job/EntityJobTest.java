@@ -109,7 +109,7 @@ public class EntityJobTest
         EntityReferenceProvider defaultEntityReferenceProvider = mock(EntityReferenceProvider.class);
         ReflectionUtils.setFieldValue(job, "defaultEntityReferenceProvider", defaultEntityReferenceProvider);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
-            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT, null));
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
 
         job.initialize(request);
     }
@@ -203,6 +203,7 @@ public class EntityJobTest
 
         DocumentReference userReference = new DocumentReference("foo", "Users", "Alice");
         when(request.getUserReference()).thenReturn(userReference);
+        when(request.getAuthorReference()).thenReturn(userReference);
 
         DocumentReference documentReference = new DocumentReference("math", "Space", "Page");
         when(this.authorization.hasAccess(Right.EDIT, userReference, documentReference.getLastSpaceReference()))

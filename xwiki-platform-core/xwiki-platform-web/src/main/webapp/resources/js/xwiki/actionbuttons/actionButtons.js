@@ -147,13 +147,22 @@ actionButtons.EditActions = Class.create({
       }
     }
   },
-  notify : function(event, action, params) {
-    document.fire("xwiki:actions:" + action, Object.extend({originalEvent : event, form: event.element().form}, params || { }));
-    // In IE, events can't be stopped from another event's handler, so we must call stop() again here
-    if (event.stopped) {
-      event.stop();
+  notify : function(originalEvent, action, params) {
+    var event = document.fire('xwiki:actions:' + action, Object.extend({
+      originalEvent: originalEvent,
+      form: originalEvent.element().form
+    }, params || {}));
+    // We check both the current event and the original event in order to preserve backwards compatibility with older
+    // code that may stop only the original event. We recommend stopping only the current event becase most of the
+    // listeners shouldn't be aware of the original event.
+    var stopped = event.stopped || originalEvent.stopped;
+    // Stop the original event if the current event has been stopped. Also, in Internet Explorer the original event
+    // can't be stopped from the current event's handlers, so in case some old code has tried to stop the original event
+    // we must call stop() again here.
+    if (stopped) {
+      originalEvent.stop();
     }
-    return !event.stopped;
+    return !stopped;
   }
 });
 
@@ -217,10 +226,8 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     // - S&C from template async in edit/preview mode,
     // - S&V from template async.
 
-    // Stop the original submit event.
-    if (typeof (event.memo.originalEvent) != 'undefined') {
-      event.memo.originalEvent.stop();
-    }
+    // Stop the submit event.
+    event.stop();
 
     // Show the right notification message.
     if (isCreateFromTemplate) {
@@ -373,21 +380,31 @@ return XWiki;
 
 // Make sure the action buttons are visible at the bottom of the window.
 require(['jquery'], function ($) {
-  var $container = $('.bottombuttons');
-  // Use the placeholder to get the initial container position.
-  var $placeholder = $('<span></span>');
+  var $container = $('.sticky-buttons');
+  if ($container.length == 0) return;
+  // Use the placeholder to save the initial container position and make a gap to place
+  // the sticky save bar once it reaches its initial position.
+  var $placeholder = $('<div></div>');
+  // Hide the element while keeping its offset.
+  $placeholder.height(0);
   $placeholder.insertBefore($container);
 
-  $(window).on("scroll resize load click", function() {
+  $(window).on("scroll resize load click xwiki:dom:refresh", function() {
     var isFullScreen = $('.fullScreenWrapper').length > 0
-    var position = $placeholder.offset().top;
+    var isVisible = $container.is(':visible');
+    // Show the element and make the gap where the save bar should fit.
+    $placeholder.height($container.height());
+    var position = $placeholder.offset().top + $placeholder.height();
 
-    if (!isFullScreen && $(window).height() + $(window).scrollTop() < position) {
-      $container.addClass('bottombuttons-fixed');
+    if (isVisible && !isFullScreen && $(window).height() + $(window).scrollTop() < position) {
+      $container.addClass('sticky-buttons-fixed');
+      // The width of the parent element is not inherited when the position is fixed
       $container.innerWidth($container.parent().width());
     } else {
-      $container.removeClass('bottombuttons-fixed');
+      $container.removeClass('sticky-buttons-fixed');
       $container.innerWidth('');
+      // Hide the element while keeping its offset.
+      $placeholder.height(0);
     }
   });
 });

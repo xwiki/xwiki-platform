@@ -70,9 +70,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 {
     private static final LocalDocumentReference USERCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
-    /** Needed for accessing the XWikiContext. */
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    @Named("readonly")
+    private Provider<XWikiContext> readonlyContextProvider;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -108,6 +111,17 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    public DocumentReference getDocumentReference(EntityReference entityReference)
+    {
+        XWikiContext context = getContext();
+        if (context != null) {
+            return context.getWiki().getDocumentReference(entityReference, context);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     @Deprecated
     public DocumentModelBridge getDocument(String documentReference) throws Exception
     {
@@ -130,10 +144,24 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    public DocumentModelBridge getDocumentInstance(EntityReference reference) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        return xcontext.getWiki().getDocument(reference, xcontext);
+    }
+
+    @Override
     public DocumentModelBridge getTranslatedDocumentInstance(DocumentReference documentReference) throws Exception
     {
         XWikiContext xcontext = getContext();
         return xcontext.getWiki().getDocument(documentReference, xcontext).getTranslatedDocument(xcontext);
+    }
+
+    @Override
+    public DocumentModelBridge getTranslatedDocumentInstance(EntityReference entityReference) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        return xcontext.getWiki().getDocument(entityReference, xcontext).getTranslatedDocument(xcontext);
     }
 
     @Override
@@ -649,6 +677,22 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    public String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor)
+    {
+        return getDocumentURL(entityReference, action, queryString, anchor, false);
+    }
+
+    @Override
+    public String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor,
+        boolean isFullURL)
+    {
+        XWikiContext xcontext = getContext();
+        DocumentReference documentReference = xcontext.getWiki().getDocumentReference(entityReference, xcontext);
+
+        return getDocumentURL(documentReference, action, queryString, anchor, isFullURL);
+    }
+
+    @Override
     @Deprecated
     public String getURL(String documentReference, String action, String queryString, String anchor)
     {
@@ -872,6 +916,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         return xcontext.getWikiId();
+    }
+
+    @Override
+    public DocumentReference getCurrentAuthorReference()
+    {
+        return getContext().getAuthorReference();
     }
 
     /**

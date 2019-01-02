@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1372193154000</creationDate>
   <parent>Menu.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1395771452000</date>
-  <contentUpdateDate>1395771452000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -51,7 +48,6 @@
 #end
 ##
 ##
-#set ($discard = $services.localization.use('document', 'Menu.MenuTranslations'))
 #set ($discard = $doc.use('XWiki.UIExtensionClass'))
 #set ($uixObject = $doc.getObject('XWiki.UIExtensionClass'))
 #set ($selectedExtensionPointId = $uixObject.getProperty('extensionPointId').value)
@@ -60,12 +56,12 @@
   ## Prepare the extension point map.
   #set ($menuPanel = "{{velocity}}
     ${escapetool.h}panelheader(""$doc.plainTitle"")
-    {{menu type=""vertical collapsible open""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}
+    {{menu type=""vertical collapsible open""}}{{include reference=""${escapetool.d}xcontext.uix.doc.documentReference"" /}}{{/menu}}
     ${escapetool.h}panelfooter()
     {{/velocity}}")
   #set ($menuBar = "{{velocity}}
-    ${escapetool.h}if (${escapetool.d}xwiki.hasAccessLevel('view', ${escapetool.d}xcontext.user, '$doc.prefixedFullName'))
-      {{menu type=""horizontal fixedWidth"" id=""menu-horizontal-$doc.prefixedFullName.replaceAll('[\s|,|.|:|\[|\]|\[\/\]|\[\\\]|=|@|#]', '-')""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}
+    ${escapetool.h}if (${escapetool.d}xwiki.hasAccessLevel('view', ${escapetool.d}xcontext.user, ${escapetool.d}xcontext.uix.doc.documentReference))
+      {{menu type=""horizontal fixedWidth"" id=""menu-horizontal-$doc.fullName.replaceAll('[\s|,|.|:|\[|\]|\[\/\]|\[\\\]|=|@|#]', '-')""}}{{include reference=""${escapetool.d}xcontext.uix.doc.documentReference"" /}}{{/menu}}
     ${escapetool.h}end
     {{/velocity}}")
   #set ($extensionPoints = {
@@ -120,7 +116,7 @@
   : $doc.display('scope')
 )))
 
-#set ($discard = $doc.set('name', $doc.prefixedFullName))
+#set ($discard = $doc.set('name', $doc.fullName))
 #if ($xcontext.action == 'edit')
   (% class="hidden" %)(((
     $doc.display('name', 'hidden')

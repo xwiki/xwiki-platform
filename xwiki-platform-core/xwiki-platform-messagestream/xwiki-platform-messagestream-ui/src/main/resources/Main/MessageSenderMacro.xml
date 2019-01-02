@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1367516430000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1476804064000</date>
-  <contentUpdateDate>1476522551000</contentUpdateDate>
   <version>1.1</version>
   <title>Message Sender Macro</title>
   <comment/>
@@ -122,44 +119,9 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#set ($userSuggestScope = 'local')
-#if ($services.wiki.user &amp;&amp; $services.wiki.user.userScope != "LOCAL_ONLY")
-  #set ($userSuggestScope = 'global')
-#end
-var XWiki = (function (XWiki) {
+      <code>var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
-/**
- * Extends the UserPicker in order to display the selected user/group inline after the target text input.
- */
-var CustomUserPicker = Class.create(XWiki.widgets.UserPicker, {
-  // @Override
-  _createSelectionManager: function($super, options) {
-    var selectionManager = $super(Object.extend(options, {
-      listInsertionPosition : 'after',
-      acceptFreeText : false
-    }));
-    // Overwrite the way the selected item is displayed.
-    selectionManager.displayItem = function(suggestion) {
-      var targetInfo = new Element('span').update(suggestion.info).insert(this.createDeleteTool());
-      var targetClass = this.suggest.sources[0].script.indexOf('uorg=group') &gt; 0 ? 'target-group' : 'target-user';
-      return new Element('li', {'class': targetClass}).insert(targetInfo).insert(this.createItemInput(suggestion));
-    }.bind(selectionManager);
-    return selectionManager;
-  }
-});
-
 XWiki.MessageStream = Class.create({
-  targetsWithName : ['user', 'group'],
-  suggestParameters : {
-    user : {
-      script: '$doc.getURL("get", "xpage=uorgsuggest&amp;uorg=user&amp;wiki=${userSuggestScope}")&amp;',
-      noresults: "$escapetool.javascript($services.localization.render('core.widgets.userPicker.noResults'))"
-    },
-    group : {
-      script: "$doc.getURL('get', 'xpage=uorgsuggest&amp;uorg=group')&amp;",
-      noresults: "$escapetool.javascript($services.localization.render('core.widgets.groupPicker.noResults'))"
-    }
-  },
   initialize : function() {
     this.prepareForms();
     this.enhanceSelect();
@@ -167,30 +129,30 @@ XWiki.MessageStream = Class.create({
   prepareTargetInput : function(event, element) {
     var targetType = element.options[element.selectedIndex].value;
     element.className = targetType;
-    if (!element.__targetNameInput) {return;}
-    if (this.targetsWithName.indexOf(targetType) &lt; 0) {
-      element.__targetNameInput.addClassName('hidden');
-      if (element.__targetNameInput.__x_suggest) {
-        element.__targetNameInput.__x_suggest.detach();
-      }
-    } else {
-      // Focus the text input so that the place-holder value is cleared if present. Otherwise the user picker will treat
-      // the place-holder value as if it was typed by the user and will automatically select the corresponding suggestion.
-      element.__targetNameInput.removeClassName('hidden').activate();
-      // Defer the creation of the user picker to allow the focus listeners to be called first (in order to clear the
-      // place-holder value).
-      this.suggestParameters[targetType] &amp;&amp; function() {
-        new CustomUserPicker(element.__targetNameInput, this.suggestParameters[targetType]);
-      }.bind(this).defer();
+    var messageStream = element.up('.messagestream');
+    var targetInputContainer = messageStream.down('.message-target-' + targetType);
+    if (!targetInputContainer) {
+      targetInputContainer = messageStream.down('.message-target-default');
     }
+    messageStream.select('.message-target').forEach(function(messageTargetContainer) {
+      var fields = messageTargetContainer.select('input, select, textarea');
+      if (messageTargetContainer === targetInputContainer) {
+        messageTargetContainer.removeClassName('hidden');
+        fields.forEach(function(field) {
+          field.enable();
+          field.hasClassName('selectized') &amp;&amp; field.selectize.enable();
+        });
+      } else {
+        messageTargetContainer.addClassName('hidden');
+        fields.forEach(function(field) {
+          field.disable();
+          field.hasClassName('selectized') &amp;&amp; field.selectize.disable();
+        });
+      }
+    });
   },
   enhanceSelect: function () {
     $$('.messagestream select[name="visibilityLevel"]').each(function(element) {
-      element.addClassName(element.options[element.selectedIndex].value);
-      element.__targetNameInput = element.up('.messagestream').down('input[name="targetName"]');
-      if (element.__targetNameInput &amp;&amp; this.targetsWithName.indexOf(element.options[element.selectedIndex].value) &lt; 0) {
-        element.__targetNameInput.addClassName('hidden');
-      }
       element.observe('change', this.prepareTargetInput.bindAsEventListener(this, element));
       this.prepareTargetInput(null, element);
     }.bind(this));
@@ -369,34 +331,17 @@ return XWiki;
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
-.messagestream-tools {
+      <code>.messagestream-tools {
+  display: flex;
   position: relative;
   margin: .5em 0 1em;
-}
-.messagestream-tools .accepted-suggestions {
-  display: inline;
-}
-.messagestream-tools .accepted-suggestions .target-user,
-.messagestream-tools .accepted-suggestions .target-group {
-  background: none no-repeat scroll left center transparent;
-  display: inline-block;
-  margin-right: 1em;
-  padding: 0 1px 0 18px;
-}
-.messagestream-tools .accepted-suggestions .target-user {
-  background-image: url("$xwiki.getSkinFile('icons/silk/user.png')");
-}
-.messagestream-tools .accepted-suggestions .target-group {
-  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 .messagestream select {
   width: auto;
 }
-.messagestream input.targetName {
-  margin-right: .3em;
-  width: auto;
+.messagestream .message-target {
+  flex-grow: 1;
+  margin-left: .3em;
 }</code>
     </property>
     <property>
@@ -406,7 +351,7 @@ return XWiki;
       <name>Message stream form styling</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -541,8 +486,6 @@ return XWiki;
 #set ($configClass = $xwiki.getDocument($config).getxWikiClass())
 #set ($isMessageStreamActive = $services.messageStream.isActive())
 
-#set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
-
 #set ($activityActionsMap = {
   'publicMessage':    'icons/silk/user_comment.png',
   'personalMessage':  'icons/silk/user_comment.png',
@@ -568,8 +511,6 @@ return XWiki;
 ##
 ## Skin Extensions
 ##--------------------------------------------------------------
-#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js'))
-#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js'))
 #set ($discard = $xwiki.ssx.use('Main.Activity'))
 #set ($discard = $xwiki.ssx.use('Main.MessageSenderMacro'))
 #set ($discard = $xwiki.jsx.use('Main.MessageSenderMacro'))
@@ -675,13 +616,13 @@ return XWiki;
           #if (!$defaultTarget)
             #if ($doc.getObject('XWiki.XWikiGroups'))
               #set ($defaultTarget = 'group')
-              #set ($targetName = $doc.prefixedFullName)
+              #set ($targetName = $doc.fullName)
             #elseif ($doc.getObject('XWiki.XWikiUsers'))
-              #if ($doc.prefixedFullName == $currentUser)
+              #if ($doc.documentReference == $xcontext.userReference)
                 #set ($defaultTarget = 'followers')
               #else
                 #set ($defaultTarget = 'user')
-                #set ($targetName = $doc.prefixedFullName)
+                #set ($targetName = $doc.fullName)
               #end
             #else
               #set ($defaultTarget = 'everyone')
@@ -694,16 +635,31 @@ return XWiki;
             #end
             &lt;/select&gt;
           &lt;/label&gt;
-          &lt;label for="targetName$!{targetNameCounter}"&gt;
-            &lt;span class='hidden'&gt;Name:&lt;/span&gt;
-            &lt;input type="text" name="targetName" id="targetName$!targetNameCounter" class="targetName withTip useTitleAsTip" value="$!targetName" size="15"
-              title="$services.localization.render('xe.activity.messages.visibility.targetName.tip')" #if ($inEditMode) disabled="disabled"#end/&gt;
-          &lt;/label&gt;
-          #if (!$targetNameCounter)
-            #set ($targetNameCounter = 1)
-          #else
-            #set ($targetNameCounter = $targetNameCounter + 1)
+          #set ($suggestPickerParams = {
+            'name': 'targetName',
+            'title': $services.localization.render('xe.activity.messages.visibility.targetName.tip')
+          })
+          #foreach ($target in ['user', 'group'])
+            #if ($possibleTargets.contains($target))
+              #set ($notDefaultTarget = $target != $defaultTarget)
+              &lt;div class="message-target message-target-$target#if ($notDefaultTarget) hidden#end"&gt;
+                #set ($discard = $suggestPickerParams.put('class', 'targetName'))
+                #set ($suggestPickerParams.disabled = $inEditMode || $notDefaultTarget)
+                #set ($suggestPickerParams.value = $targetName)
+                #if ($notDefaultTarget)
+                  #set ($suggestPickerParams.value = '')
+                #end
+                #if ($target == 'user')
+                  #userPicker(false, $suggestPickerParams)
+                #else
+                  #groupPicker(false, $suggestPickerParams)
+                #end
+              &lt;/div&gt;
+            #end
           #end
+          &lt;div class="message-target message-target-default"&gt;
+            &lt;input type="hidden" name="targetName" value="$!escapetool.xml($targetName)" class="targetName" /&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class='messagestream-buttons'&gt;
           &lt;span class='butonwrapper'&gt;&lt;input type='submit' value="$services.localization.render('xe.activity.messages.submit')" class='button'#if($inEditMode) disabled='disabled'#end/&gt;&lt;/span&gt;

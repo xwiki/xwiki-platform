@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,10 +34,14 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Define a notification filter based on a scope in the wiki.
@@ -71,9 +76,20 @@ public class ScopeNotificationFilter implements NotificationFilter
             return FilterPolicy.NO_EFFECT;
         }
 
-        // We dismiss the event if the location is not watched
-        return !stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format)
-                ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
+        // We dismiss the event if the location is not watched or if the starting date of the location is after
+        // the date of the event.
+        // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long and
+        // used to generate stack overflows. So we won't make it worse by adding a date condition on each different
+        // scope preference.
+        WatchedLocationState state
+                = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format);
+        if (!state.isWatched()
+                || (state.getStartingDate() != null && state.getStartingDate().after(event.getDate()))) {
+            return FilterPolicy.FILTER;
+        }
+
+        // Otherwise, we have nothing to say
+        return FilterPolicy.NO_EFFECT;
     }
 
     @Override
@@ -90,7 +106,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     {
         return expressionGenerator.filterExpression(filterPreferences,
                 (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE),
-                preference.getFormat());
+                preference.getFormat(), user);
     }
 
     @Override
@@ -98,8 +114,52 @@ public class ScopeNotificationFilter implements NotificationFilter
             Collection<NotificationFilterPreference> filterPreferences,
             NotificationFilterType type, NotificationFormat format)
     {
-        // We don't handle this use-case anymore
+        return filterExpression(user, filterPreferences, type, format, Collections.emptyList());
+    }
+
+    @Override
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
+            NotificationFormat format, Collection<NotificationPreference> preferences)
+    {
+        // Generate the node that we may (or not) return afterwards
+        AbstractOperatorNode node = expressionGenerator.filterExpression(filterPreferences, format, type, user);
+        if (node == null) {
+            return null;
+        }
+
+        if (type == NotificationFilterType.INCLUSIVE) {
+            // In order not to include all watched pages without consideration to the event types, we first collect
+            // the enabled even types.
+            AbstractOperatorNode enabledEventTypes = getEnabledEventTypes(preferences);
+            if (enabledEventTypes != null) {
+                return enabledEventTypes.and(node);
+            }
+        } else {
+            return node;
+        }
+
         return null;
+    }
+
+    private AbstractOperatorNode getEnabledEventTypes(Collection<NotificationPreference> preferences)
+    {
+        AbstractOperatorNode topNode = null;
+
+        for (NotificationPreference preference : preferences) {
+            Object eventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
+            if (preference.isNotificationEnabled() && eventType != null && eventType instanceof String) {
+                AbstractOperatorNode node = value(EventProperty.TYPE).eq(value((String) eventType))
+                        .and(value(EventProperty.DATE).greaterThan(value(preference.getStartDate())));
+                if (topNode == null) {
+                    topNode = node;
+                } else {
+                    topNode = topNode.or(node);
+                }
+            }
+        }
+
+        return topNode;
     }
 
     @Override

@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1404731556000</creationDate>
   <parent>Main.AllDocs</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1504187165000</date>
-  <contentUpdateDate>1504187165000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.index.documentsTrash')</title>
   <comment/>
@@ -56,13 +53,40 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 #set($options = {
     'url'               : "$xwiki.getURL('XWiki.DeletedDocumentsJSON', 'view', 'list=1&amp;xpage=plain&amp;outputSyntax=plain')",
     'callback'          : 'XWiki.index.trash.documents.displayEntry',
-    'translationPrefix' : 'platform.index.trashDocuments.'
+    'translationPrefix' : 'platform.index.trashDocuments.',
+    'javascriptName'    : 'trashDocumentsLivetable'
   })##
 ##
 ##
 ##
 {{html wiki="true" clean="false"}}
 &lt;div class="hidden"&gt;
+    &lt;div class="modal" id="deleteDocumentConfirmModal" tabindex="-1" role="dialog"
+    aria-labelledby="deleteDocumentConfirmModal-label"&gt;
+      &lt;div class="modal-dialog" role="document"&gt;
+        &lt;div class="modal-content"&gt;
+          &lt;div class="modal-header"&gt;
+            &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;div class="modal-title" id="deleteDocumentConfirmModal-label"&gt;
+              $services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-body"&gt;
+            &lt;p&gt;$escapetool.xml($services.localization.render('core.recyclebin.completelyDeleteConfirm'))&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-footer"&gt;
+            &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+              $escapetool.xml($services.localization.render('cancel'))
+            &lt;/button&gt;
+            &lt;button type="button" class="btn btn-danger" data-dismiss="modal"&gt;
+              $escapetool.xml($services.localization.render('delete'))
+            &lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
 #livetable('documentsTrash' $columns $columnsProperties $options)
 &lt;/div&gt;
 {{/html}}
@@ -344,15 +368,65 @@ XWiki.index.trash.documents.confirmDelete = function(event, table, rowIdx) {
       );
   }
 }
-/*
- * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
- * Re-display it when the document loads and Javascript is available.
- */
-document.observe('xwiki:dom:loaded', function() {
-  if ($('documentsTrash')) {
-    $('documentsTrash').up('.hidden').removeClassName('hidden');
-  }
-});</code>
+
+require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
+  //
+  // Delete All
+  //
+  var deleteDocumentConfirmModal = $('#deleteDocumentConfirmModal');
+  deleteDocumentConfirmModal.find('.btn-danger').on('click', function() {
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteInProgress')),
+      'inprogress'
+    );
+    $.post(XWiki.currentDocument.getURL('delete'), {
+        'confirm': 1,
+        'emptybin': true,
+        'form_token': xm.form_token,
+        'ajax': 1
+    }).done(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteDone')),
+        'done'
+      ));
+      trashDocumentsLivetable.refresh();
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteFailed')),
+        'error'
+      ));
+    });
+  });
+  var createTrashAllButton = function() {
+    if ($('#trashAllDeleted').length == 0) {
+      var actionAllContainer = $('#documentsTrash td.xwiki-livetable-display-header-filter:last-child');
+      var trashAll = $('&lt;a&gt;').attr({
+        'id': 'trashAllDeleted',
+        'class': 'btn btn-danger',
+        'href':'#',
+        'data-toggle': 'modal',
+        'data-target': '#deleteDocumentConfirmModal'
+      }).text("$services.localization.render('index.deletedDocuments.deleteAll')");
+      trashAll.appendTo(actionAllContainer);
+    }
+    $('#trashAllDeleted').toggleClass('disabled', trashDocumentsLivetable.totalRows &lt;= 0);
+  };
+
+  var displayLivetable = function () {
+    $('#documentsTrash').parents('.hidden').removeClass('hidden');
+  };
+
+  $(document).on('xwiki:livetable:documentsTrash:displayComplete', createTrashAllButton);
+  // we call the method in case the livetable has already been loaded and the event triggered.
+  createTrashAllButton();
+
+  /*
+  * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
+  * Re-display it when the document loads and Javascript is available.
+  */
+  displayLivetable();
+});
+      </code>
     </property>
     <property>
       <name/>

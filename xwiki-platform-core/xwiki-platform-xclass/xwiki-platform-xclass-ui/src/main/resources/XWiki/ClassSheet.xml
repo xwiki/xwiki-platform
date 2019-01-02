@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1375380137000</creationDate>
   <parent>XWiki.XWikiClasses</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1445594256000</date>
-  <contentUpdateDate>1445594204000</contentUpdateDate>
   <version>1.1</version>
   <title>#sheetTitle('Default Class Sheet')</title>
   <comment/>
@@ -233,7 +230,7 @@
           ## FIXME: Use a dedicated escape tool method when XCOMMONS-405 is implemented.
           #set ($sheetContent = $escapetool.xml($sheetContent).replaceAll("\n", '&amp;#10;'))
           &lt;input type="hidden" name="content" value="$sheetContent"/&gt;
-          &lt;input type="hidden" name="title" value="${escapetool.h}if(${escapetool.d}doc.name == '$escapetool.xml($defaultClassSheetReference.name)')$escapetool.xml($className) Sheet${escapetool.h}{else}${escapetool.d}services.display.title(${escapetool.d}doc, {'displayerHint': 'default'})${escapetool.h}end"/&gt;
+          &lt;input type="hidden" name="title" value="${escapetool.h}if(${escapetool.d}doc.name == '$escapetool.xml($defaultClassSheetReference.name)')$escapetool.xml($className) Sheet${escapetool.h}{else}${escapetool.d}services.display.title(${escapetool.d}doc, {'displayerHint': 'default', 'outputSyntaxId': 'plain/1.0'})${escapetool.h}end"/&gt;
           &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Create the sheet" class="button"/&gt;&lt;/span&gt;
         &lt;/div&gt;
       &lt;/form&gt;

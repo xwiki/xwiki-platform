@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1303158348000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1307445978000</date>
-  <contentUpdateDate>1307445978000</contentUpdateDate>
   <version>1.1</version>
   <title>Wiki Manager Translations</title>
   <comment/>
@@ -44,7 +41,7 @@
 ## MENU
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=Sledovať wiki
-core.menu.watchlist.remove.wiki=Nesledovať 
+core.menu.watchlist.remove.wiki=Nesledovať
 core.menu.admin.wiki=Spravovať wiki
 
 # WIKI INFORMATION PANEL
@@ -126,12 +123,14 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Zobrazovaný názov Wiki.
 ### Missing: platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.
 ### Missing: platform.wiki.currentwiki.invite.message.hint=The message to send to the user.
 ### Missing: platform.wiki.currentwiki.candidates.hint=Users who have requested or been invited to join the wiki.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 ### Missing: admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
 ### Missing: admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
 admin.xwiki.usersconfiguration.title=Konfigurácia
 ### Missing: admin.xwiki.members.title=Current Members
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

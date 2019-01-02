@@ -39,10 +39,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.exec.environment.EnvironmentUtils;
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +53,8 @@ import org.slf4j.LoggerFactory;
 public class XWikiExecutor
 {
     /**
-     * Only start XWiki if the System property {@code xwiki.test.startXWiki} is undefined or has a value of true.
-     * This allows the build to start XWiki (this is the case for example when running functional tests with Docker).
+     * Only start XWiki if the System property {@code xwiki.test.startXWiki} is undefined or has a value of true. This
+     * allows the build to start XWiki (this is the case for example when running functional tests with Docker).
      */
     private static final boolean SHOULD_START_XWIKI =
         Boolean.valueOf(System.getProperty("xwiki.test.startXWiki", "true"));
@@ -100,9 +97,10 @@ public class XWikiExecutor
 
     private static final String XWIKIPROPERTIES_PATH = WEBINF_PATH + "/xwiki.properties";
 
-    private static final int TIMEOUT_SECONDS = 120;
-
     private static final long PROCESS_FINISH_TIMEOUT = 5 * 60L * 1000L;
+
+    private static final int VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT =
+        Integer.valueOf(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
 
     private int port;
 
@@ -112,7 +110,7 @@ public class XWikiExecutor
 
     private String executionDirectory;
 
-    private Map<String, String> environment = new HashMap<String, String>();
+    private Map<String, String> environment = new HashMap<>();
 
     private DefaultExecuteResultHandler startedProcessHandler;
 
@@ -128,14 +126,9 @@ public class XWikiExecutor
      */
     private boolean managed;
 
-    public class Response
-    {
-        public boolean timedOut;
+    private XWikiWatchdog watchdog = new XWikiWatchdog();
 
-        public byte[] responseBody;
-
-        public int responseCode;
-    }
+    private long startTimeout = 120;
 
     public XWikiExecutor(int index)
     {
@@ -165,6 +158,12 @@ public class XWikiExecutor
             if (index > 0) {
                 this.executionDirectory += "-" + index;
             }
+        }
+        // Make sure the execution directory exists
+        try {
+            FileUtils.forceMkdir(new File(this.executionDirectory));
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Failed to create directory [%s]", this.executionDirectory), e);
         }
     }
 
@@ -197,6 +196,16 @@ public class XWikiExecutor
         addEnvironmentVariable("XWIKI_OPTS", opts);
     }
 
+    /**
+     * Change the timeout checked when starting and initializing XWiki.
+     * 
+     * @since 10.11RC1
+     */
+    public void setTimeoutSeconds(long timeoutSeconds)
+    {
+        this.startTimeout = timeoutSeconds;
+    }
+
     public void addEnvironmentVariable(String key, String value)
     {
         this.environment.put(key, value);
@@ -215,11 +224,11 @@ public class XWikiExecutor
     /**
      * Start XWiki using the following strategy:
      * <ul>
-     *   <li>If the {@code xwiki.test.startXWiki} system property is set to "false" then don't start/stop XWiki</li>
-     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
-     *       running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
-     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance
-     *       is already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
+     * <li>If the {@code xwiki.test.startXWiki} system property is set to "false" then don't start/stop XWiki</li>
+     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
+     * running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
+     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance is
+     * already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
      * </ul>
      * 
      * @throws Exception when failing to start XWiki
@@ -234,7 +243,7 @@ public class XWikiExecutor
         if (VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
             LOGGER.info("Checking if an XWiki server is already started at [{}]", getURL());
             // First, verify if XWiki is started. If it is then don't start it again.
-            this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
+            this.wasStarted = !this.watchdog.isXWikiStarted(getURL(), VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT).timedOut;
         }
 
         if (!this.wasStarted) {
@@ -280,7 +289,11 @@ public class XWikiExecutor
         Map<String, String> newEnvironment = EnvironmentUtils.getProcEnvironment();
         newEnvironment.putAll(this.environment);
 
-        executor.execute(command, newEnvironment, resultHandler);
+        try {
+            executor.execute(command, newEnvironment, resultHandler);
+        } catch (Exception e) {
+            throw new Exception(String.format("Failed to execute command [%s]", commandLine), e);
+        }
 
         return resultHandler;
     }
@@ -312,67 +325,16 @@ public class XWikiExecutor
         // Wait till the main page becomes available which means the server is started fine
         LOGGER.info("Checking that XWiki is up and running...");
 
-        Response response = isXWikiStarted(getURL(), TIMEOUT_SECONDS);
+        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), this.startTimeout);
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
-                TIMEOUT_SECONDS, response.responseCode, new String(response.responseBody));
+                this.startTimeout, response.responseCode, new String(response.responseBody));
             LOGGER.info(message);
             stop();
             throw new RuntimeException(message);
         } else {
             LOGGER.info("Server is answering to [{}]... cool", getURL());
         }
-    }
-
-    public Response isXWikiStarted(String url, int timeout) throws Exception
-    {
-        HttpClient client = new HttpClient();
-
-        boolean connected = false;
-        long startTime = System.currentTimeMillis();
-        Response response = new Response();
-        response.timedOut = false;
-        response.responseCode = -1;
-        response.responseBody = new byte[0];
-        while (!connected && !response.timedOut) {
-            GetMethod method = new GetMethod(url);
-
-            // Don't retry automatically since we're doing that in the algorithm below
-            method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-                new DefaultHttpMethodRetryHandler(0, false));
-            // Set a socket timeout to ensure the server has no chance of not answering to our request...
-            method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 10000);
-
-            try {
-                // Execute the method.
-                response.responseCode = client.executeMethod(method);
-
-                // We must always read the response body.
-                response.responseBody = method.getResponseBody();
-
-                if (DEBUG) {
-                    LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url, response.responseCode,
-                        new String(response.responseBody));
-                }
-
-                // check the http response code is either not an error, either "unauthorized"
-                // (which is the case for products that deny view for guest, for example).
-                connected = (response.responseCode < 400 || response.responseCode == 401);
-            } catch (Exception e) {
-                // Do nothing as it simply means the server is not ready yet...
-            } finally {
-                // Release the connection.
-                method.releaseConnection();
-            }
-            Thread.sleep(500L);
-            response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
-        }
-
-        if (response.timedOut) {
-            LOGGER.info("No server is responding on [{}] after [{}] seconds", url, timeout);
-        }
-
-        return response;
     }
 
     public void stop() throws Exception
@@ -548,10 +510,11 @@ public class XWikiExecutor
     {
         String startCommand = START_COMMAND;
         if (startCommand == null) {
+            String scriptNamePrefix = DEBUG ? "start_xwiki_debug" : "start_xwiki";
             if (SystemUtils.IS_OS_WINDOWS) {
-                startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
+                startCommand = String.format("cmd /c %s.bat %s %s", scriptNamePrefix, port, stopPort);
             } else {
-                startCommand = String.format("bash start_xwiki.sh -p %s -sp %s", port, stopPort);
+                startCommand = String.format("bash %s.sh -p %s -sp %s", scriptNamePrefix, port, stopPort);
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));

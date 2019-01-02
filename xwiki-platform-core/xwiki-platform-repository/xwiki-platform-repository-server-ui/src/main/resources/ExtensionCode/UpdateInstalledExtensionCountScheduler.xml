@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1359103531000</creationDate>
   <parent>Scheduler.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1468938072000</date>
-  <contentUpdateDate>1413895253000</contentUpdateDate>
   <version>1.1</version>
   <title>UpdateInstalledExtensionCountScheduler</title>
   <comment/>
@@ -119,6 +116,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </jobName>
       <script>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>script</name>
@@ -186,12 +184,23 @@ def updateCount(extensionId, documentName) {
   if (result) {
     count = result.getAsJsonObject('aggregations').getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong()
 
-    document = xwiki.getDocument(documentName)
+    // Get XWikiDocument
+    pxwiki = xwiki.getXWiki()
+    pxcontext = xcontext
+    document = pxwiki.getDocument(documentName, pxcontext)
 
-    if (document.getValue('installedCount') != count) {
-      document.set('installedCount', count)
+    extensionObject = document.getObject('ExtensionCode.ExtensionClass')
+    if (extensionObject.getLongValue('installedCount') != count &amp;&amp; extensionObject.getIntValue('showInstalledCount') != 0) {
+      extensionObject.set('installedCount', count, pxcontext)
 
-      document.save('Update install count')
+      if (document.comment == 'Update install count') {
+        // Don't increment version (otherwise we could end up with a lot of those)
+        document.setMetaDataDirty(false)
+        document.setContentDirty(false)
+      }
+
+      // Save
+      pxwiki.saveDocument(document, 'Update install count', true, pxcontext)
     }
   } else if (services.activeinstalls.lastError) {
     throw services.activeinstalls.lastError
@@ -202,7 +211,7 @@ def logger = org.slf4j.LoggerFactory.getLogger('ExtensionCode.UpdateInstalledExt
 
 logger.info('Starting updating installed extensions count')
 
-def extensions = services.query.xwql("select doc.fullName, extension.id from Document doc, doc.object(ExtensionCode.ExtensionProxyClass) as proxy, doc.object(ExtensionCode.ExtensionClass) as extension").execute()
+def extensions = services.query.xwql("select doc.fullName, extension.id from Document doc, doc.object(ExtensionCode.ExtensionClass) as extension").execute()
 for (extension in extensions)
 {
   logger.info('Updating installed extension [{}] count', extension[0])

@@ -25,7 +25,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Display a notification.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.2RC1
  */
 @Role
-@Unstable
 public interface NotificationDisplayer
 {
     /**

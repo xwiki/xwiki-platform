@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1264862667000</creationDate>
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1271949711000</date>
-  <contentUpdateDate>1271949711000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -41,7 +38,7 @@
   <hidden>true</hidden>
   <content>annotations.title=Anmerkungen
 annotations.menu.loading=Lade Anmerkungen Einstellungen
-annotations.menu.loaderror=Fehlgeschlagen\:
+annotations.menu.loaderror=Fehlgeschlagen:
 annotations.tab.info.noannotations=Dieses Dokument enthält keine Anmerkungen
 
 annotations.settings.display=Zeige Anmerkungen
@@ -49,7 +46,7 @@ annotations.settings.error.wrongsyntax=Anmerkungen sind nicht verfügbar in Doku
 annotations.settings.error.notarget=Kein Dokument, für das die Anmerkungseinstellungen abgerufen werden sollen, spezifiziert.
 
 annotations.annotated.loading=Lade Dokument mit Anmerkungen
-annotations.annotated.loaderror=Fehlgeschlagen\:
+annotations.annotated.loaderror=Fehlgeschlagen:
 annotations.annotated.loaderror.wrongresponse=Falsch formatierte Serverantwort
 annotations.annotated.error.noannotatedelement=Anmerkungen konnten nicht geladen werden, da der Inhalt nicht verfügbar ist.
 annotations.annotated.error.wrongsyntax=Anmerkungen werden in Dokumenten in XWiki/1.0 Syntax nicht unterstützt.
@@ -59,7 +56,7 @@ annotations.action.edit.tooltip=Diese Anmerkung bearbeiten
 annotations.action.edit.submit.text=Aktualisieren
 annotations.action.edit.cancel.text=Abbrechen
 annotations.action.edit.success=Anmerkung wurde erfolgreich aktualisiert.
-annotations.action.edit.loaderror=Fehlgeschlagen\:
+annotations.action.edit.loaderror=Fehlgeschlagen:
 annotations.action.edit.error.notfound=Diese Anmerkung existiert nicht mehr. Bitte laden Sie die Seite erneut, um die Ansicht zu aktualisieren.
 
 annotations.action.delete.text=[Löschen]
@@ -67,14 +64,14 @@ annotations.action.delete.tooltip=Diese Anmerkung löschen
 annotations.action.delete.confirm=Sind Sie sicher, dass Sie diese Anmerkung löschen möchten?
 annotations.action.delete.inProgress=Lösche Anmerkung...
 annotations.action.delete.done=Anmerkung gelöscht
-annotations.action.delete.failed=Löschen von Anmerkung fehlgeschlagen\:
+annotations.action.delete.failed=Löschen von Anmerkung fehlgeschlagen:
 
 annotations.action.create.submit.text=Anmerkung hinzufügen
 annotations.action.create.cancel.text=Abbrechen
 annotations.action.create.selection.invalid=Bitte wählen Sie einen nicht-leeren Text im Dokument aus.
-annotations.action.create.form.loaderror=Fehlgeschlagen\:
+annotations.action.create.form.loaderror=Fehlgeschlagen:
 annotations.action.create.success=Anmerkung wurde erfolgreich hinzufügt
-annotations.action.create.loaderror=Fehlgeschlagen\:
+annotations.action.create.loaderror=Fehlgeschlagen:
 annotations.action.create.error.unauthorized=Sie sind nicht berechtigt, Anmerkungen in diesem Dokument zu erstellen.
 annotations.action.create.error.unauthorizedguest=Sie sind nicht berechtigt Anmerkungen in diesem Dokument zu erstellen. Bitte melden Sie sich an.
 annotations.action.create.helpmessage=Um eine Anmerkung einem Teil des Textes hinzuzufügen, markieren Sie ihn und drücken Sie {0}.
@@ -82,16 +79,16 @@ annotations.action.create.error.wrongsyntax=Anmerkungen werden in Dokumenten mit
 annotations.action.create.error.notarget=Nicht spezifiziertes Ziel (Dokument) für das Erstellen von Anmerkungen.
 
 annotations.action.view.hide.text=verbergen
-annotations.action.view.form.loaderror=Fehlgeschlagen\:
+annotations.action.view.form.loaderror=Fehlgeschlagen:
 annotations.action.view.error.notfound=Diese Anmerkung existiert nicht mehr. Bitte laden Sie die Seite erneut, um die Ansicht zu aktualisieren.
 annotations.action.view.thread=Diskussion lesen
 
-annotations.altered.text=Diese Anmerkung konnte nicht angezeigt werden, da der Text mit der Anmerkung nicht gefunden wurde im Dokument\:
-annotations.updated.text=Die Anmerkung wurde nach einem Update des Dokuments automatisch neu positioniert. Ursprünglich\:
+annotations.altered.text=Diese Anmerkung konnte nicht angezeigt werden, da der Text mit der Anmerkung nicht gefunden wurde im Dokument:
+annotations.updated.text=Die Anmerkung wurde nach einem Update des Dokuments automatisch neu positioniert. Ursprünglich:
 annotations.action.validate.text=[Überprüfen]
 annotations.action.validate.tooltip=Überprüfe das automatische Aktualisieren des markierten Textes für dieser Anmerkung
 annotations.action.validate.success=Anmerkung wurde erfolgreich überprüft.
-annotations.action.validate.loaderror=Fehlgeschlagen\:
+annotations.action.validate.loaderror=Fehlgeschlagen:
 
 annotations.filters.show=Verfeinere die Anzeigekriterien
 annotations.filters.nooption=Es sind keine Werte für das Filtern von "{0}" vorhanden
@@ -105,7 +102,7 @@ annotations.config.activate.title=Anmerkungen Aktivierungseinstellungen
 annotations.config.activate.explanation=Die folgenden zwei Einstellungen erlauben es einzustellen, für welche Bereiche die Anmerkungen aktiviert werden. Die erste Einstellung legt die grundlegende Regel fest, während die zweite Liste festlegt in welchen Bereichen diese Regel nicht angewendet werden soll. Als Beispiel, wurde "ja" ausgewählt und Ausnahme-Bereiche sind "XWiki" und "Main" eingetragen. Dies, bedeutet, dass die Anmerkungen in allen Bereichen außer "XWiki" und "Main" eingeschaltet sind, während bei Auswahl von "nein" und Ausnahme-Bereiche "Dokumente" Anmerkungen nur in "Dokumente" eingeschaltet sein würden.
 annotations.config.type.explanation=Füge Eigenschaft zu dieser Klasse hinzu wenn zusätzliche Eigenschaften für die Anmerkungen festgelegt werden sollen.
 admin.annotations=Anmerkungen
-### Missing: admin.annotations.description=Configure the page annotations
+admin.annotations.description=Seite-Anmerkungen konfigurieren
 
 AnnotationCode.AnnotationConfig_activated=Anmerkungen sind aktiviert
 ### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki

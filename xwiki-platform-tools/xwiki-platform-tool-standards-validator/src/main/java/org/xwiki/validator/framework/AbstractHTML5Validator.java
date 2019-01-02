@@ -293,6 +293,20 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
         return this.html5Document;
     }
 
+    @Override
+    public List<ValidationError> validate()
+    {
+        if (this.html5Document == null) {
+            return this.errorHandler.getErrors();
+        }
+
+        this.errorHandler.clear();
+
+        validate(this.document);
+
+        return this.errorHandler.getErrors();
+    }
+
     /**
      * Asserts that a condition is false. If it isn't it puts an error message in the validation results.
      *
@@ -431,8 +445,8 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
         return attributeNames;
     }
 
-    /**AbstractDOMValidator
-     * Get the value of an element attribute.
+    /**
+     * AbstractDOMValidator Get the value of an element attribute.
      *
      * @param element element to analyze
      * @param attributeName name of the attribute to search

@@ -132,7 +132,7 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
                 searchResult.setTitle(title);
                 searchResult.setWiki(wikiName);
                 searchResult.setSpace(doc.getSpace());
-                searchResult.setPageName(doc.getName());
+                searchResult.setPageName(doc.getDocumentReference().getName());
                 searchResult.setVersion(doc.getVersion());
                 searchResult.setAuthor(doc.getAuthor());
                 Calendar calendar = Calendar.getInstance();

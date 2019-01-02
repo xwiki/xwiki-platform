@@ -19,35 +19,34 @@
  */
 package org.xwiki.mail.internal.thread.context;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 
 /**
  * Unit tests for {@link XWikiRequestCopier}.
  *
  * @version $Id$
  */
+@ComponentTest
 public class XWikiRequestCopierTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XWikiRequestCopier> mocker = new MockitoComponentMockingRule<>(
-        XWikiRequestCopier.class);
+    @InjectMockComponents
+    private XWikiRequestCopier copier;
 
     XWikiServletRequestStub originalRequest;
 
-    @Before
-    public void setup() throws Exception
+    @BeforeEach
+    public void beforeEach()
     {
-        Utils.setComponentManager(mocker);
-
         this.originalRequest = new XWikiServletRequestStub();
         this.originalRequest.setHost("host");
         this.originalRequest.setContextPath("contextPath");
@@ -58,9 +57,9 @@ public class XWikiRequestCopierTest
     }
 
     @Test
-    public void copyRequest() throws Exception
+    public void copyRequest()
     {
-        XWikiRequest copy = this.mocker.getComponentUnderTest().copy(this.originalRequest);
+        XWikiRequest copy = this.copier.copy(this.originalRequest);
         assertNotSame(this.originalRequest, copy);
 
         // Check that each value on the cloned request are equal.
@@ -70,12 +69,13 @@ public class XWikiRequestCopierTest
         assertEquals(this.originalRequest.getAttributeNames(), copy.getAttributeNames());
         assertEquals(this.originalRequest.getAttribute("attribute"), copy.getAttribute("attribute"));
         assertEquals(this.originalRequest.getServerName(), copy.getServerName());
-        assertEquals(this.originalRequest.getRequestURL(), copy.getRequestURL());
+        assertNotSame(this.originalRequest.getRequestURL(), copy.getRequestURL());
+        assertEquals(this.originalRequest.getRequestURL().toString(), copy.getRequestURL().toString());
     }
 
     @Test
-    public void copyContextWhenNull() throws Exception
+    public void copyContextWhenNull()
     {
-        assertNull(this.mocker.getComponentUnderTest().copy(null));
+        assertNull(this.copier.copy(null));
     }
 }

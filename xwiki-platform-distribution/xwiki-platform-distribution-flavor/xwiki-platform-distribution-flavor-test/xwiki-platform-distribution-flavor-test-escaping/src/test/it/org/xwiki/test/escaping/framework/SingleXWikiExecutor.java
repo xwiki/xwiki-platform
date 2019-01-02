@@ -21,6 +21,7 @@ package org.xwiki.test.escaping.framework;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.XWikiWatchdog;
 
 /**
  * Starts and stops exactly one XWiki instance. The methods {@link #start()} and {@link #stop()}
@@ -37,6 +38,8 @@ public final class SingleXWikiExecutor extends XWikiExecutor
 
     /** Call counter. */
     private static int counter = 0;
+
+    private XWikiWatchdog watchdog = new XWikiWatchdog();
 
     /**
      * Create new SingleXWikiExecutor.
@@ -68,7 +71,7 @@ public final class SingleXWikiExecutor extends XWikiExecutor
     public synchronized void start() throws Exception
     {
         if (counter == 0) {
-            if (!VERIFY_RUNNING_XWIKI_AT_START.equals("true") || isXWikiStarted(getURL(), 15).timedOut) {
+            if (!VERIFY_RUNNING_XWIKI_AT_START.equals("true") || this.watchdog.isXWikiStarted(getURL(), 15).timedOut) {
                 // Disable extensions manager external repositories
                 PropertiesConfiguration properties = loadXWikiPropertiesConfiguration();
                 if (!properties.containsKey("extension.repositories")) {

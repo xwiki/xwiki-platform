@@ -30,7 +30,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.GroupSecurityReference;
@@ -54,6 +57,7 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -63,7 +67,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@ComponentList({DefaultSecurityCacheLoader.class, DefaultSecurityReferenceFactory.class})
+@ComponentList({ DefaultSecurityCacheLoader.class, DefaultSecurityReferenceFactory.class })
 public class DefaultSecurityCacheLoaderTest
 {
     @Rule
@@ -81,6 +85,14 @@ public class DefaultSecurityCacheLoaderTest
     {
         XWikiBridge bridge = mocker.registerMockComponent(XWikiBridge.class);
         when(bridge.getMainWikiReference()).thenReturn(new WikiReference("wiki"));
+        when(bridge.toCompatibleEntityReference(any(EntityReference.class))).thenAnswer(new Answer<EntityReference>()
+        {
+            @Override
+            public EntityReference answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.getArgument(0);
+            }
+        });
         securityReferenceFactory = mocker.getInstance(SecurityReferenceFactory.class);
 
         mocker.registerMockComponent(SecurityCache.class);

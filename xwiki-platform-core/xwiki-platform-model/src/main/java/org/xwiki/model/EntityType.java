@@ -19,7 +19,12 @@
  */
 package org.xwiki.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a type of entity (ie a Model Object such as a Wiki, a Space, a Document, an Attachment, etc).
@@ -29,59 +34,127 @@ import java.util.Locale;
  */
 public enum EntityType
 {
-    // Note that order below is important since it creates an order.
-    // For example: EntityType.WIKI.ordinal() < EntityType.SPACE.ordinal()
-
     /**
      * Represents a Wiki Entity.
      */
     WIKI,
 
+    // Documents
+
     /**
      * Represents a Space Entity.
      */
-    SPACE,
+    SPACE(WIKI, null),
 
     /**
      * Represents a Document Entity.
      */
-    DOCUMENT,
+    DOCUMENT(SPACE),
 
     /**
      * Represents an Attachment Entity.
      */
-    ATTACHMENT,
+    ATTACHMENT(DOCUMENT),
 
     /**
      * Represents an Object Entity.
      */
-    OBJECT,
+    OBJECT(DOCUMENT),
 
     /**
      * Represents an Object Property Entity.
      */
-    OBJECT_PROPERTY,
+    OBJECT_PROPERTY(OBJECT),
 
     /**
      * Represents a class property entity.
+     * 
      * @since 3.2M1
      */
-    CLASS_PROPERTY,
+    CLASS_PROPERTY(DOCUMENT),
 
     /**
      * Represents a structured part of the content of a document or an object property.
+     * 
      * @since 6.0M1
      */
-    BLOCK;
+    BLOCK(DOCUMENT, OBJECT_PROPERTY),
+
+    // Pages
+
+    /**
+     * Represents a Page Entity.
+     * 
+     * @since 10.6RC1
+     */
+    @Unstable
+    PAGE(WIKI, null),
+
+    /**
+     * Represents an Attachment Entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    @Unstable
+    PAGE_ATTACHMENT(PAGE),
+
+    /**
+     * Represents an Object Entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    @Unstable
+    PAGE_OBJECT(PAGE),
+
+    /**
+     * Represents an Object Property Entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    @Unstable
+    PAGE_OBJECT_PROPERTY(PAGE_OBJECT),
+
+    /**
+     * Represents a class property entity in a page.
+     * 
+     * @since 10.6RC1
+     */
+    @Unstable
+    PAGE_CLASS_PROPERTY(PAGE);
+
+    // TODO: should probably introduce a PAGE_BLOCK when we decide how we want it (we might want to move a two types or
+    // decide to have BLOCK being parent of BLOCK, etc.)
 
     /**
      * The lower case String version of the enum.
      */
-    private String lowerCase;
+    private final String lowerCase;
 
-    EntityType()
+    private final List<EntityType> allowedParents;
+
+    private final boolean[] allowedAncestors = new boolean[13];
+
+    EntityType(EntityType... allowedParents)
     {
         this.lowerCase = name().toLowerCase(Locale.US);
+
+        List<EntityType> list = new ArrayList<>(allowedParents.length);
+        for (EntityType parent : allowedParents) {
+            list.add(parent != null ? parent : this);
+        }
+        this.allowedParents = Collections.unmodifiableList(list);
+        setParentTypes(this.allowedParents);
+    }
+
+    private void setParentTypes(List<EntityType> parents)
+    {
+        for (EntityType parent : parents) {
+            if (!this.allowedAncestors[parent.ordinal()]) {
+                this.allowedAncestors[parent.ordinal()] = true;
+
+                setParentTypes(parent.getAllowedParents());
+            }
+        }
     }
 
     /**
@@ -91,5 +164,26 @@ public enum EntityType
     public String getLowerCase()
     {
         return this.lowerCase;
+    }
+
+    /**
+     * @return the list of allowed parent for this entity type
+     * @since 10.6RC1
+     */
+    @Unstable
+    public List<EntityType> getAllowedParents()
+    {
+        return this.allowedParents;
+    }
+
+    /**
+     * @param type the type
+     * @return true of the passed type is a possible ancestor of the passed type
+     * @since 10.6RC1
+     */
+    @Unstable
+    public boolean isAllowedAncestor(EntityType type)
+    {
+        return this.allowedAncestors[type.ordinal()];
     }
 }

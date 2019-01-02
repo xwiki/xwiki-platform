@@ -27,13 +27,13 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Page Object for Comments Tab.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
 public class CommentsTab extends BaseElement
 {
-    @FindBy(xpath = "//fieldset[@id='commentform']/label/span")
+    @FindBy(css = "fieldset#commentform > label > span")
     private WebElement commentAuthor;
 
     @FindBy(id = "XWiki.XWikiComments_author")
@@ -50,8 +50,8 @@ public class CommentsTab extends BaseElement
 
     public boolean isCommentFormShown()
     {
-        WebElement commentForm = getDriver().findElement(
-            By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
+        WebElement commentForm =
+            getDriver().findElement(By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
         return commentForm.isDisplayed();
     }
 
@@ -99,31 +99,40 @@ public class CommentsTab extends BaseElement
         return this.getCommentID(content);
     }
 
+    /**
+     * Deletes a comment.
+     *
+     * @param id the comment id
+     */
     public void deleteCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id
-            + "']//a[contains(@class, 'delete')]")).click();
-        this.confirmDelete = new ConfirmationModal();
-        this.confirmDelete.clickOk();
-        getDriver().waitUntilElementIsVisible(
-            By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"));
-        getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"))
+        // We initialize before so we can remove the animation before the modal is shown
+        this.confirmDelete = new ConfirmationModal(By.id("deleteModal"));
+        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'delete')]"))
             .click();
+        this.confirmDelete.clickOk();
+        waitForNotificationSuccessMessage("Comment deleted");
     }
 
     /**
      * Clicks on the reply icon near the specified comment.
-     * 
+     *
      * @param id identifies the comment to reply to
      * @return the form used to reply
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
-            + id + "']//a[contains(@class, 'commentreply')]")).click();
+        getDriver().findElementWithoutWaiting(
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'commentreply')]")).click();
         return getAddCommentForm();
     }
 
+    /**
+     * Replies to a comment with the specified content.
+     *
+     * @param id the comment id
+     * @param replyContent the comment content of the reply
+     */
     public void replyToCommentByID(int id, String replyContent)
     {
         CommentForm replyCommentForm = replyToCommentByID(id);
@@ -133,18 +142,25 @@ public class CommentsTab extends BaseElement
 
     /**
      * Clicks on the edit icon near the specified comment.
-     * 
+     *
      * @param id identifies the comment to be edited
      * @return the form used to edit the comment
      */
     public CommentForm editCommentByID(int id)
     {
-        getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
-            + id + "']//a[contains(@class, 'edit')]")).click();
+        getDriver()
+            .findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'edit')]"))
+            .click();
         getDriver().waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
         return new CommentForm(By.className("edit-xcomment"));
     }
 
+    /**
+     * Edits a comment with the specified content.
+     *
+     * @param id the comment id
+     * @param content the new comment content
+     */
     public void editCommentByID(int id, String content)
     {
         CommentForm editCommentForm = editCommentByID(id);
@@ -153,24 +169,44 @@ public class CommentsTab extends BaseElement
         editCommentForm.clickSubmit();
     }
 
+    /**
+     * @param id the comment id
+     * @return the comment author
+     */
     public String getCommentAuthorByID(int id)
     {
-        return getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
-            + id + "']//span[@class='commentauthor']")).getText();
-    }
-
-    public String getCommentContentByID(int id)
-    {
-        return getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
-            + id + "']//div[@class='commentcontent']")).getText();
+        return getDriver().findElementWithoutWaiting(By.cssSelector("#xwikicomment_" + id + " span.commentauthor"))
+            .getText();
     }
 
     /**
+     * @param id the comment id
+     * @return the comment content
+     */
+    public String getCommentContentByID(int id)
+    {
+        return getDriver().findElementWithoutWaiting(By.cssSelector("#xwikicomment_" + id + " .commentcontent"))
+            .getText();
+    }
+
+    /**
+     * @param id the comment id
+     * @return true if the comment has the edit button
      * @since 3.2M3
      */
-    public boolean hasEditButtonForCommentByID(int commentId)
+    public boolean hasEditButtonForCommentByID(int id)
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
-            + commentId + "']//a[contains(@class, 'edit')]")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector("#xwikicomment_" + id + " a.edit")).isEmpty();
+    }
+
+    /**
+     * @param id the comment id
+     * @return true if the comment has the delete button
+     * @since 10.6RC1
+     * @since 9.11.9
+     */
+    public boolean hasDeleteButtonForCommentByID(int id)
+    {
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector("#xwikicomment_" + id + " a.delete")).isEmpty();
     }
 }

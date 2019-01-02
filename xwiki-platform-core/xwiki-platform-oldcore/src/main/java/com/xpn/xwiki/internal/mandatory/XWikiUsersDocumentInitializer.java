@@ -83,16 +83,16 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("blog", "Blog", 60);
         xclass.addTextField("blogfeed", "Blog Feed", 60);
         xclass.addTextAreaField("comment", "Comment", 40, 5);
-        xclass.addStaticListField("imtype", "IM Type", "---|AIM|Yahoo|Jabber|MSN|Skype|ICQ");
+        xclass.addStaticListField("imtype", "IM Type", "AIM|Yahoo|Jabber|MSN|Skype|ICQ");
         xclass.addTextField("imaccount", "imaccount", 30);
-        xclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
-        xclass.addStaticListField("usertype", "User type", "Simple|Advanced");
+        xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
+        xclass.addStaticListField("usertype", "User type", "Simple|Advanced", "Simple");
         xclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
         xclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
 
         // New fields for the XWiki 1.0 skin
-        xclass.addTextField("skin", "skin", 30);
+        xclass.addPageField("skin", "skin", 30);
         xclass.addTextField("avatar", "Avatar", 30);
         xclass.addTextField("phone", "Phone", 30);
         xclass.addTextAreaField("address", "Address", 40, 3);

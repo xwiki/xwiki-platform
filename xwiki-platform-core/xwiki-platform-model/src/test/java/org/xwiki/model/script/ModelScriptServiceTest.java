@@ -22,9 +22,8 @@ package org.xwiki.model.script;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -36,10 +35,16 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.PageReference;
+import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.model.script.ModelScriptService}.
@@ -53,7 +58,11 @@ public class ModelScriptServiceTest
 
     private ComponentManager componentManager;
 
-    private DocumentReferenceResolver<EntityReference> resolver;
+    private EntityReferenceResolver<EntityReference> entityResolver;
+
+    private DocumentReferenceResolver<EntityReference> documentResolver;
+
+    private PageReferenceResolver<EntityReference> pageResolver;
 
     private EntityReferenceResolver<String> stringEntityReferenceResolver;
 
@@ -62,16 +71,30 @@ public class ModelScriptServiceTest
     private Logger logger;
 
     @SuppressWarnings("unchecked")
-    @Before
-    public void setUp()
+    @BeforeEach
+    public void beforeEach() throws ComponentLookupException
     {
         this.service = new ModelScriptService();
+
         this.componentManager = mock(ComponentManager.class);
         ReflectionUtils.setFieldValue(this.service, "componentManager", this.componentManager);
+
         this.logger = mock(Logger.class);
         ReflectionUtils.setFieldValue(this.service, "logger", this.logger);
-        this.resolver = mock(DocumentReferenceResolver.class);
+
+        this.entityResolver = mock(EntityReferenceResolver.class);
+        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_REFERENCE, "current"))
+            .thenReturn(this.entityResolver);
+        this.documentResolver = mock(DocumentReferenceResolver.class);
+        when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "current"))
+            .thenReturn(this.documentResolver);
+        this.pageResolver = mock(PageReferenceResolver.class);
+        when(this.componentManager.getInstance(PageReferenceResolver.TYPE_REFERENCE, "current"))
+            .thenReturn(this.pageResolver);
         this.stringEntityReferenceResolver = mock(EntityReferenceResolver.class);
+        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "current"))
+            .thenReturn(this.stringEntityReferenceResolver);
+
         this.valueProvider = mock(EntityReferenceValueProvider.class);
     }
 
@@ -79,84 +102,94 @@ public class ModelScriptServiceTest
     public void createDocumentReferenceWithSpecifiedHint() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
-            .thenReturn(this.resolver);
+            .thenReturn(this.documentResolver);
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        when(this.resolver.resolve(reference)).thenReturn(reference);
+        when(this.documentResolver.resolve(reference)).thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", "space", "page", "default"));
+        assertEquals(reference, this.service.createDocumentReference("wiki", "space", "page", "default"));
     }
 
     @Test
     public void createDocumentReferenceWithDefaultHint() throws Exception
     {
-        when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "current"))
-            .thenReturn(this.resolver);
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        when(this.resolver.resolve(reference)).thenReturn(reference);
+        when(this.documentResolver.resolve(reference)).thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", "space", "page"));
+        assertEquals(reference, this.service.createDocumentReference("wiki", "space", "page"));
     }
 
     @Test
     public void createDocumentReferenceWhenEmptyParameters() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
-            .thenReturn(this.resolver);
+            .thenReturn(this.documentResolver);
         DocumentReference reference = new DocumentReference("defaultwiki", "defaultspace", "defaultpage");
-        when(this.resolver.resolve(null)).thenReturn(reference);
+        when(this.documentResolver.resolve(null)).thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.createDocumentReference("", "", "", "default"));
+        assertEquals(reference, this.service.createDocumentReference("", "", "", "default"));
+    }
+
+    @Test
+    public void createPageReferenceWhenEmptyParameters() throws Exception
+    {
+        PageReference reference = new PageReference("defaultwiki", "defaultpage");
+        when(this.entityResolver.resolve(null, EntityType.PAGE)).thenReturn(reference);
+
+        assertEquals(reference, this.service.createPageReference(""));
     }
 
     @Test
     public void createDocumentReferenceWhenWikiParameterEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
-            .thenReturn(this.resolver);
+            .thenReturn(this.documentResolver);
         DocumentReference reference = new DocumentReference("defaultwiki", "space", "page");
-        when(this.resolver.resolve(new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("space", EntityType.SPACE)))).thenReturn(reference);
+        when(this.documentResolver
+            .resolve(new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE))))
+                .thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.createDocumentReference("", "space", "page", "default"));
+        assertEquals(reference, this.service.createDocumentReference("", "space", "page", "default"));
     }
 
     @Test
     public void createDocumentReferenceWhenSpaceParameterEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
-            .thenReturn(this.resolver);
+            .thenReturn(this.documentResolver);
         DocumentReference reference = new DocumentReference("wiki", "defaultspace", "page");
-        when(this.resolver.resolve(new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("wiki", EntityType.WIKI)))).thenReturn(reference);
+        when(this.documentResolver
+            .resolve(new EntityReference("page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI))))
+                .thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", "", "page", "default"));
-        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", Collections.<String>emptyList(),
-                "page", "default"));
+        assertEquals(reference, this.service.createDocumentReference("wiki", "", "page", "default"));
+        assertEquals(reference,
+            this.service.createDocumentReference("wiki", Collections.<String>emptyList(), "page", "default"));
     }
 
     @Test
     public void createDocumentReferenceWhenPageParameterEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
-            .thenReturn(this.resolver);
+            .thenReturn(this.documentResolver);
         DocumentReference reference = new DocumentReference("wiki", "space", "defaultpage");
-        when(this.resolver.resolve(new EntityReference("space", EntityType.SPACE,
-            new EntityReference("wiki", EntityType.WIKI)))).thenReturn(reference);
+        when(this.documentResolver
+            .resolve(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))))
+                .thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", "space", "", "default"));
+        assertEquals(reference, this.service.createDocumentReference("wiki", "space", "", "default"));
     }
 
     @Test
     public void createDocumentReferenceWhenWikiAndSpaceParametersEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
-            .thenReturn(this.resolver);
+            .thenReturn(this.documentResolver);
         DocumentReference reference = new DocumentReference("wiki", "defaultspace", "defaultpage");
-        when(this.resolver.resolve(new EntityReference("wiki", EntityType.WIKI))).thenReturn(reference);
+        when(this.documentResolver.resolve(new EntityReference("wiki", EntityType.WIKI))).thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", "", "", "default"));
-        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", Collections.<String>emptyList(),
-            "", "default"));
+        assertEquals(reference, this.service.createDocumentReference("wiki", "", "", "default"));
+        assertEquals(reference,
+            this.service.createDocumentReference("wiki", Collections.<String>emptyList(), "", "default"));
     }
 
     @Test
@@ -168,7 +201,7 @@ public class ModelScriptServiceTest
         when(this.componentManager.getInstance(DocumentReferenceResolver.class, "invalid"))
             .thenThrow(new ComponentLookupException("error"));
 
-        Assert.assertNull(this.service.createDocumentReference("wiki", "space", "page", "invalid"));
+        assertNull(this.service.createDocumentReference("wiki", "space", "page", "invalid"));
     }
 
     @Test
@@ -179,15 +212,15 @@ public class ModelScriptServiceTest
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         // Make sure backward compatibility is preserved.
         when(this.componentManager.getInstance(DocumentReferenceResolver.class, "current/reference"))
-            .thenReturn(this.resolver);
-        when(this.resolver.resolve(reference)).thenReturn(reference);
+            .thenReturn(this.documentResolver);
+        when(this.documentResolver.resolve(reference)).thenReturn(reference);
 
-        Assert.assertEquals(reference,
-            this.service.createDocumentReference("wiki", "space", "page", "current/reference"));
+        assertEquals(reference, this.service.createDocumentReference("wiki", "space", "page", "current/reference"));
 
         // Verify that we log a warning!
-        verify(this.logger).warn("Deprecated usage of DocumentReferenceResolver with hint [{}]. "
-            + "Please consider using a DocumentReferenceResolver that takes into account generic types.",
+        verify(this.logger).warn(
+            "Deprecated usage of DocumentReferenceResolver with hint [{}]. "
+                + "Please consider using a DocumentReferenceResolver that takes into account generic types.",
             "current/reference");
     }
 
@@ -195,7 +228,7 @@ public class ModelScriptServiceTest
     public void createDocumentReferenceFromPageNameAndSpaceReference()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
-        Assert.assertEquals(documentReference, this.service.createDocumentReference(documentReference.getName(),
+        assertEquals(documentReference, this.service.createDocumentReference(documentReference.getName(),
             documentReference.getLastSpaceReference()));
     }
 
@@ -206,7 +239,7 @@ public class ModelScriptServiceTest
             .thenReturn(this.valueProvider);
         when(this.valueProvider.getDefaultValue(EntityType.WIKI)).thenReturn("somewiki");
 
-        Assert.assertEquals("somewiki", this.service.getEntityReferenceValue(EntityType.WIKI));
+        assertEquals("somewiki", this.service.getEntityReferenceValue(EntityType.WIKI));
     }
 
     @Test
@@ -215,48 +248,47 @@ public class ModelScriptServiceTest
         when(this.componentManager.getInstance(EntityReferenceValueProvider.class, "invalid"))
             .thenThrow(new ComponentLookupException("error"));
 
-        Assert.assertNull(this.service.getEntityReferenceValue(EntityType.WIKI, "invalid"));
+        assertNull(this.service.getEntityReferenceValue(EntityType.WIKI, "invalid"));
     }
 
     @Test
     public void getEntityReferenceValueWithNullType() throws Exception
     {
-        Assert.assertNull(this.service.getEntityReferenceValue(null));
+        assertNull(this.service.getEntityReferenceValue(null));
     }
 
     @Test
     public void createWikiReference()
     {
-        Assert.assertEquals(new WikiReference("wiki"), this.service.createWikiReference("wiki"));
+        assertEquals(new WikiReference("wiki"), this.service.createWikiReference("wiki"));
     }
 
     @Test
     public void createSpaceReference()
     {
-        Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")),
+        assertEquals(new SpaceReference("space", new WikiReference("wiki")),
             this.service.createSpaceReference("space", this.service.createWikiReference("wiki")));
 
         SpaceReference spaceReference =
             new SpaceReference("C", new SpaceReference("B", new SpaceReference("A", new WikiReference("wiki"))));
-        Assert.assertEquals(spaceReference,
+        assertEquals(spaceReference,
             this.service.createSpaceReference(Arrays.asList("A", "B", "C"), this.service.createWikiReference("wiki")));
 
-        Assert.assertEquals(spaceReference,
+        assertEquals(spaceReference,
             this.service.createSpaceReference(spaceReference.getName(), (SpaceReference) spaceReference.getParent()));
     }
 
     @Test
     public void createEntityReferenceWithoutParent()
     {
-        Assert.assertEquals(new EntityReference("page", EntityType.DOCUMENT),
+        assertEquals(new EntityReference("page", EntityType.DOCUMENT),
             this.service.createEntityReference("page", EntityType.DOCUMENT));
     }
 
     @Test
     public void createEntityReferenceWithParent()
     {
-        Assert.assertEquals(new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("space", EntityType.SPACE)),
+        assertEquals(new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE)),
             this.service.createEntityReference("page", EntityType.DOCUMENT,
                 this.service.createEntityReference("space", EntityType.SPACE)));
     }
@@ -264,39 +296,37 @@ public class ModelScriptServiceTest
     @Test
     public void resolveSpace() throws Exception
     {
-        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "current")).thenReturn(
-            this.stringEntityReferenceResolver);
         SpaceReference reference = new SpaceReference("Space", new WikiReference("wiki"));
         when(this.stringEntityReferenceResolver.resolve("x", EntityType.SPACE, new Object[] {})).thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.resolveSpace("x"));
+        assertEquals(reference, this.service.resolveSpace("x"));
     }
 
     @Test
     public void resolveSpaceWithHintAndParameters() throws Exception
     {
-        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom")).thenReturn(
-            this.stringEntityReferenceResolver);
+        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom"))
+            .thenReturn(this.stringEntityReferenceResolver);
         SpaceReference reference = new SpaceReference("Foo", new WikiReference("bar"));
-        Object[] parameters = new Object[] {new DocumentReference("wiki", "Space", "Page"), "extra"};
-        when(this.stringEntityReferenceResolver.resolve("reference", EntityType.SPACE, parameters)).thenReturn(
-            reference);
+        Object[] parameters = new Object[] { new DocumentReference("wiki", "Space", "Page"), "extra" };
+        when(this.stringEntityReferenceResolver.resolve("reference", EntityType.SPACE, parameters))
+            .thenReturn(reference);
 
-        Assert.assertEquals(reference, this.service.resolveSpace("reference", "custom", parameters[0], parameters[1]));
+        assertEquals(reference, this.service.resolveSpace("reference", "custom", parameters[0], parameters[1]));
     }
 
     @Test
     public void resolveClassPropertyWithHintAndParameters() throws Exception
     {
-        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom")).thenReturn(
-            this.stringEntityReferenceResolver);
+        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom"))
+            .thenReturn(this.stringEntityReferenceResolver);
         ClassPropertyReference reference =
             new ClassPropertyReference("property", new DocumentReference("wiki", "Space", "Class"));
-        Object[] parameters = new Object[] {new DocumentReference("wiki", "Space", "Page"), "extra"};
+        Object[] parameters = new Object[] { new DocumentReference("wiki", "Space", "Page"), "extra" };
         when(this.stringEntityReferenceResolver.resolve("Class^property", EntityType.CLASS_PROPERTY, parameters))
             .thenReturn(reference);
 
-        Assert.assertEquals(reference,
+        assertEquals(reference,
             this.service.resolveClassProperty("Class^property", "custom", parameters[0], parameters[1]));
     }
 }

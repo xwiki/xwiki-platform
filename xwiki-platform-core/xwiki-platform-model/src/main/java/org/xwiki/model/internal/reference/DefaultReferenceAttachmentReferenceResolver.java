@@ -50,13 +50,13 @@ public class DefaultReferenceAttachmentReferenceResolver implements AttachmentRe
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     @Override
-    public AttachmentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
+    public AttachmentReference resolve(EntityReference attachmentReferenceRepresentation, Object... parameters)
     {
-        if (documentReferenceRepresentation instanceof AttachmentReference) {
-            return (AttachmentReference) documentReferenceRepresentation;
+        if (attachmentReferenceRepresentation instanceof AttachmentReference) {
+            return (AttachmentReference) attachmentReferenceRepresentation;
         }
 
-        return new AttachmentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
+        return new AttachmentReference(this.entityReferenceResolver.resolve(attachmentReferenceRepresentation,
             EntityType.ATTACHMENT, parameters));
     }
 }

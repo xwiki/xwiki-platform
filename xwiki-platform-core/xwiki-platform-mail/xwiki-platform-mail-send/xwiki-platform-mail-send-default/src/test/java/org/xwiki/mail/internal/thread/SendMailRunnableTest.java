@@ -28,9 +28,8 @@ import javax.inject.Provider;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.ExtendedMimeMessage;
@@ -42,12 +41,15 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,20 +58,24 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4
  */
+@ComponentTest
 @ComponentList({
     MemoryMailListener.class,
     SendMailQueueManager.class
 })
 public class SendMailRunnableTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SendMailRunnable> mocker =
-        new MockitoComponentMockingRule<>(SendMailRunnable.class);
+    @InjectMockComponents
+    private SendMailRunnable sendMailRunnable;
 
-    @Before
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @BeforeEach
     public void setUp() throws Exception
     {
-        Provider<XWikiContext> xwikiContextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xwikiContextProvider =
+            this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
     }
 
@@ -90,19 +96,19 @@ public class SendMailRunnableTest
         ExtendedMimeMessage message2 = new ExtendedMimeMessage(msg2);
         String id2 = message2.getUniqueMessageId();
 
-        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
+        MemoryMailListener listener = this.componentManager.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
-        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onPrepareBegin(batchId, Collections.emptyMap());
         ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
 
         SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId, "xwiki");
         SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId, "xwiki");
 
-        MailQueueManager mailQueueManager = this.mocker.getInstance(
+        MailQueueManager mailQueueManager = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
 
         // Simulate loading the message from the content store
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
         when(contentStore.load(session, batchId, id1)).thenReturn(message1);
         when(contentStore.load(session, batchId, id2)).thenReturn(message2);
 
@@ -111,15 +117,14 @@ public class SendMailRunnableTest
         mailQueueManager.addToQueue(item1);
         mailQueueManager.addToQueue(item2);
 
-        MailRunnable runnable = this.mocker.getComponentUnderTest();
-        Thread thread = new Thread(runnable);
+        Thread thread = new Thread(this.sendMailRunnable);
         thread.start();
 
         // Wait for the mails to have been processed.
         try {
             listener.getMailStatusResult().waitTillProcessed(10000L);
         } finally {
-            runnable.stopProcessing();
+            this.sendMailRunnable.stopProcessing();
             thread.interrupt();
             thread.join();
         }
@@ -156,21 +161,21 @@ public class SendMailRunnableTest
         ExtendedMimeMessage message2 = new ExtendedMimeMessage(msg2);
         String id2 = message2.getUniqueMessageId();
 
-        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
+        MemoryMailListener listener = this.componentManager.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
-        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onPrepareBegin(batchId, Collections.emptyMap());
         ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
 
-        listener.onPrepareMessageSuccess(message1, Collections.<String, Object>emptyMap());
+        listener.onPrepareMessageSuccess(message1, Collections.emptyMap());
         SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId, "xwiki");
-        listener.onPrepareMessageSuccess(message2, Collections.<String, Object>emptyMap());
+        listener.onPrepareMessageSuccess(message2, Collections.emptyMap());
         SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId, "xwiki");
 
-        MailQueueManager mailQueueManager = this.mocker.getInstance(
+        MailQueueManager mailQueueManager = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
 
         // Simulate loading the message from the content store
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
         when(contentStore.load(session, batchId, id1)).thenThrow(new MailStoreException("Store failure on message 1"));
         when(contentStore.load(session, batchId, id2)).thenThrow(new MailStoreException("Store failure on message 2"));
 
@@ -179,15 +184,14 @@ public class SendMailRunnableTest
         mailQueueManager.addToQueue(item1);
         mailQueueManager.addToQueue(item2);
 
-        MailRunnable runnable = this.mocker.getComponentUnderTest();
-        Thread thread = new Thread(runnable);
+        Thread thread = new Thread(this.sendMailRunnable);
         thread.start();
 
         // Wait for the mails to have been processed.
         try {
             listener.getMailStatusResult().waitTillProcessed(10000L);
         } finally {
-            runnable.stopProcessing();
+            this.sendMailRunnable.stopProcessing();
             thread.interrupt();
             thread.join();
         }

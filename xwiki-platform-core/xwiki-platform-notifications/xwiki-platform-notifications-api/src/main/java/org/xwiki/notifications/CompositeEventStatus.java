@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.stability.Unstable;
 
 /**
  * Combine all event statuses of a composite event.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.4RC1
  */
-@Unstable
 public class CompositeEventStatus
 {
     private CompositeEvent compositeEvent;

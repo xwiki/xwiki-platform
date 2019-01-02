@@ -123,15 +123,13 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
     @Override
     public void validateRpd9s1()
     {
-        String exprString = "//*[@style]";
-
-        if (!getMeta(SPACE_META).equals("ColorThemes") && !isPage("XWiki", "XWikiSyntax")
-            && !isPage("XWiki", "XWikiSyntaxHorizontalLine") && !isPage("XWiki", "XWikiSyntaxTables")
-            && !isPage("XWiki", "XWikiSyntaxLinks") && !isPage("XWiki", "XWikiSyntaxParagraphs")
-            && !isPage("XWiki", "XWikiSyntaxMacros") && !isPage("XWiki", "XWikiSyntaxDefinitionLists")
-            && !isPage("XWiki", "XWikiSyntaxHeadings") && !isPage("XWiki", "XWikiSyntaxLists")
-            && !isPage("XWiki", "XWikiSyntaxParameters") && !isPage("Panels", "PanelWizard")
-            && !isPage("XWiki", "Treeview") && !isPage("Invitation", "WebHome")) {
+        if (!isPage("XWiki", "XWikiSyntax") && !isPage("XWiki", "XWikiSyntaxHorizontalLine")
+            && !isPage("XWiki", "XWikiSyntaxTables") && !isPage("XWiki", "XWikiSyntaxLinks")
+            && !isPage("XWiki", "XWikiSyntaxParagraphs") && !isPage("XWiki", "XWikiSyntaxMacros")
+            && !isPage("XWiki", "XWikiSyntaxDefinitionLists") && !isPage("XWiki", "XWikiSyntaxHeadings")
+            && !isPage("XWiki", "XWikiSyntaxLists") && !isPage("XWiki", "XWikiSyntaxParameters")
+            && !isPage("XWiki", "XWikiSyntaxGroups") && !isPage("XWiki", "Treeview")
+            && !isPage("Panels", "PanelWizard") && !isPage("Invitation", "WebHome")) {
             // Usage of the style attribute is strictly forbidden in the other spaces.
 
             assertTrue(Type.ERROR, "rpd9s1.attr", getElement(ELEM_BODY).getElementsByAttribute(STYLE).isEmpty());

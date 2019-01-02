@@ -37,6 +37,7 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
@@ -67,7 +68,7 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
 
     @Override
     public PropertyValues getClassPropertyValues(String wikiName, String className, String propertyName, Integer limit,
-        List<String> filterParameters) throws XWikiRestException
+        List<String> filterParameters, Boolean isExactMatch) throws XWikiRestException
     {
         DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
         ClassPropertyReference classPropertyReference = new ClassPropertyReference(propertyName, classReference);
@@ -84,8 +85,18 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
         propertyLink.setHref(propertyURI.toString());
         propertyLink.setRel(Relations.PROPERTY);
 
-        PropertyValues propertyValues =
-            this.propertyValuesProvider.getValues(classPropertyReference, limit, filterParameters.toArray());
+        PropertyValues propertyValues = new PropertyValues();
+        if (isExactMatch) {
+            for (String filterParameter : filterParameters) {
+                PropertyValue value =  this.propertyValuesProvider.getValue(classPropertyReference, filterParameter);
+                if (value != null) {
+                    propertyValues.getPropertyValues().add(value);
+                }
+            }
+        } else {
+            propertyValues = this.propertyValuesProvider
+                .getValues(classPropertyReference, limit, filterParameters.toArray());
+        }
         propertyValues.getLinks().add(propertyLink);
 
         return propertyValues;

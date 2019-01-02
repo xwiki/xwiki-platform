@@ -27,7 +27,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide an interface for interacting with user notification preferences.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  */
 @Role
-@Unstable
 public interface NotificationPreferenceManager
 {
     /**

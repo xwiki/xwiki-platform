@@ -99,13 +99,13 @@ public class PrepareMailRunnable extends AbstractMailRunnable
      * @param item the queue item containing all the data for sending the mail
      * @throws org.xwiki.context.ExecutionContextException when the XWiki Context fails to be set up
      */
-    protected void prepareMail(PrepareMailQueueItem item) throws ExecutionContextException
+    protected void prepareMail(PrepareMailQueueItem item)
     {
         Iterator<? extends MimeMessage> messageIterator = item.getMessages().iterator();
         MailListener listener = item.getListener();
 
         if (listener != null) {
-            listener.onPrepareBegin(item.getBatchId(), Collections.<String, Object>emptyMap());
+            listener.onPrepareBegin(item.getBatchId(), Collections.emptyMap());
         }
 
         // Count the total number of messages to process
@@ -131,7 +131,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
             }
         } catch (Exception e) {
             if (listener != null) {
-                listener.onPrepareFatalError(e, Collections.<String, Object>emptyMap());
+                listener.onPrepareFatalError(e, Collections.emptyMap());
             }
         } finally {
             if (listener != null) {
@@ -142,7 +142,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
                 if (result instanceof UpdateableMailStatusResult) {
                     ((UpdateableMailStatusResult) result).setTotalSize(messageCounter);
                 }
-                listener.onPrepareEnd(Collections.<String, Object>emptyMap());
+                listener.onPrepareEnd(Collections.emptyMap());
             }
         }
     }
@@ -182,7 +182,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
 
         // Step 3: Notify the user that the MimeMessage is prepared
         if (listener != null) {
-            listener.onPrepareMessageSuccess(message, Collections.<String, Object>emptyMap());
+            listener.onPrepareMessageSuccess(message, Collections.emptyMap());
         }
 
         // Step 4: Put the MimeMessage id on the Mail Send Queue for sending

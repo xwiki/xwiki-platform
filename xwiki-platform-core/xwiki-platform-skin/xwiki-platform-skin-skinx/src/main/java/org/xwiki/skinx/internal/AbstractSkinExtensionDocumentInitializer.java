@@ -49,6 +49,6 @@ public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractM
         xclass.addTextAreaField("code", "Code", 50, 20, ContentType.PURE_TEXT);
         xclass.addStaticListField("use", "Use this extension", "currentPage|onDemand|always");
         xclass.addBooleanField("parse", "Parse content", "yesno");
-        xclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
+        xclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid", "long");
     }
 }

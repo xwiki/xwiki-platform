@@ -19,21 +19,26 @@
  */
 package org.xwiki.uiextension.internal;
 
-import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.component.wiki.WikiComponent;
+import javax.inject.Provider;
+
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.internal.AsyncRenderer;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.uiextension.UIExtension;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Represents a dynamic component instance of a UI Extension (ie a UI Extension defined in a Wiki page) that we register
@@ -42,7 +47,7 @@ import org.xwiki.uiextension.UIExtension;
  * @version $Id$
  * @since 4.2M3
  */
-public class WikiUIExtension implements UIExtension, WikiComponent
+public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsyncRendererDecorator
 {
     /**
      * The key used for the UIX context in the script context.
@@ -54,15 +59,6 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      */
     public static final String CONTEXT_UIX_DOC_KEY = "doc";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WikiUIExtension.class);
-
-    private final ObjectReference objectReference;
-
-    /**
-     * @see #WikiUIExtension
-     */
-    private final DocumentReference authorReference;
-
     /**
      * @see #WikiUIExtension
      */
@@ -73,12 +69,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      */
     private final String extensionPointId;
 
-    /**
-     * @see #WikiUIExtension
-     */
-    private final String roleHint;
-
-    private final AuthorExecutor authorExecutor;
+    private final Provider<XWikiContext> xcontextProvider;
 
     /**
      * Parameter manager for this extension.
@@ -86,35 +77,25 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     private WikiUIExtensionParameters parameters;
 
     /**
-     * The renderer for this extensions.
-     */
-    private WikiUIExtensionRenderer renderer;
-
-    /**
-     * @see #setScope(org.xwiki.component.wiki.WikiComponentScope)
-     */
-    private WikiComponentScope scope = WikiComponentScope.WIKI;
-
-    /**
      * Default constructor.
      *
+     * @param baseObject the object containing panel setup
      * @param roleHint the role hint of the component to create
      * @param id the id of the extension
      * @param extensionPointId ID of the extension point this extension is designed for
-     * @param objectReference the reference of the object holding this extension
-     * @param authorReference the reference of the author of the document holding this extension
-     * @param authorExecutor the executor used to execute the extension with the proper user rights
+     * @param componentManager The XWiki content manager
+     * @throws ComponentLookupException If module dependencies are missing
+     * @throws WikiComponentException When failing to parse content
      */
-    public WikiUIExtension(String roleHint, String id, String extensionPointId, ObjectReference objectReference,
-        DocumentReference authorReference, AuthorExecutor authorExecutor)
+    public WikiUIExtension(BaseObject baseObject, String roleHint, String id, String extensionPointId,
+        ComponentManager componentManager) throws ComponentLookupException, WikiComponentException
     {
-        this.roleHint = roleHint;
+        super(baseObject, UIExtension.class, roleHint, componentManager);
+
         this.id = id;
         this.extensionPointId = extensionPointId;
-        this.authorReference = authorReference;
-        this.objectReference = objectReference;
 
-        this.authorExecutor = authorExecutor;
+        this.xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
     }
 
     /**
@@ -125,16 +106,6 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     public void setParameters(WikiUIExtensionParameters parameters)
     {
         this.parameters = parameters;
-    }
-
-    /**
-     * Set the extension renderer.
-     *
-     * @param renderer the extension renderer
-     */
-    public void setRenderer(WikiUIExtensionRenderer renderer)
-    {
-        this.renderer = renderer;
     }
 
     /**
@@ -169,54 +140,45 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         }
     }
 
-    @Override
-    public Block execute()
+    private Object before() throws RenderingException
     {
-        if (this.renderer != null) {
-            try {
-                return this.authorExecutor.call(this.renderer::execute, getAuthorReference());
-            } catch (Exception e) {
-                LOGGER.error("Error while executing transformation for extension [{}]",
-                    this.objectReference.toString());
-            }
+        // Get the document holding the UIX and put it in the UIX context
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiDocument document;
+        try {
+            document = xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
+        } catch (XWikiException e) {
+            throw new RenderingException("Failed to get ui extension document", e);
         }
+        Map<String, Object> uixContext = new HashMap<>();
+        uixContext.put(WikiUIExtension.CONTEXT_UIX_DOC_KEY, document.newDocument(xcontext));
 
-        return new WordBlock("");
+        // Remember the previous uix context to restore it
+        Map<String, Object> previousUIXContext = (Map<String, Object>) xcontext.get(WikiUIExtension.CONTEXT_UIX_KEY);
+        // Put the UIX context in the XWiki context
+        xcontext.put(WikiUIExtension.CONTEXT_UIX_KEY, uixContext);
+
+        return previousUIXContext;
+    }
+
+    private void after(Object uixContext)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        // Restore previous uid context
+        xcontext.put(WikiUIExtension.CONTEXT_UIX_KEY, uixContext);
     }
 
     @Override
-    public DocumentReference getDocumentReference()
+    public BlockAsyncRendererResult render(AsyncRenderer renderer, boolean async, boolean cached)
+        throws RenderingException
     {
-        return this.objectReference.getDocumentReference();
-    }
+        Object obj = before();
 
-    @Override
-    public EntityReference getEntityReference()
-    {
-        return this.objectReference;
-    }
-
-    @Override
-    public DocumentReference getAuthorReference()
-    {
-        return authorReference;
-    }
-
-    @Override
-    public Type getRoleType()
-    {
-        return UIExtension.class;
-    }
-
-    @Override
-    public String getRoleHint()
-    {
-        return roleHint;
-    }
-
-    @Override
-    public WikiComponentScope getScope()
-    {
-        return scope;
+        try {
+            return (BlockAsyncRendererResult) renderer.render(async, cached);
+        } finally {
+            after(obj);
+        }
     }
 }

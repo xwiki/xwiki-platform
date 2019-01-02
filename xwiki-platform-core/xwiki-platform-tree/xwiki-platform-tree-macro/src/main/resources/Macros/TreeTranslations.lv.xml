@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1424704114000</creationDate>
   <parent>Macros.Tree</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1424704928000</date>
-  <contentUpdateDate>1424704928000</contentUpdateDate>
   <version>1.1</version>
   <title>Tree Translations</title>
   <comment/>
@@ -40,19 +37,19 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.tree.name=Koks
-rendering.macro.tree.description=Parāda koka hierarhiju saskaņā ar makrosa saturu un parametriem
+rendering.macro.tree.description=Parāda koka hierarhiju saskaņā ar makrosa saturu un parametriem.
 rendering.macro.tree.parameter.reference.name=Norāde
 rendering.macro.tree.parameter.reference.description=Norāde uz resursu, sākot ar kuru tiks parādīts koks ar visiem tajā esošajiem bērniem. Resursu var norādīt dinamiski atverot koku, piemēram ar labo peles klikšķi konteksta izvēlnē. Statiskiem kokiem jums būtu jāizmanto makrosa saturs. Norāde var būt dokumenta nosaukums vai URL/ceļš.
 rendering.macro.tree.parameter.root.name=Sakne
 rendering.macro.tree.parameter.root.description=Saknes mezgla identifikators. Tas noder, ja vēlaties parādīt koku, sākot ar norādīto sakni. Koks tiek parādīts, sākot ar norādītās saknes bērniem, tātad pati sakne patiesībā nav redzama. Ja sakne nav norādīta, tiek parādīts viss koks.
-### Missing: rendering.macro.tree.parameter.showRoot.name=Show Root
-### Missing: rendering.macro.tree.parameter.showRoot.description=Whether to show the root node or not. The root node is not shown by default because it is usually implied from the context where the tree is displayed (e.g. a label before the tree). There are some cases though when you may want to display the root node: to be able to create a new node under the root.
+rendering.macro.tree.parameter.showRoot.name=Rādīt sakni
+rendering.macro.tree.parameter.showRoot.description=Rādīt vai nerādīt sakni. Pēc noklusēšanas sakne tiek rādīta, jo tā parasti parāda kopējo (piemēram, koka sākuma birka). Tomēr var gadīties, ka jūs nevēlaties rādīt sakni, jo vēlaties no parādīt zem cita mezgla.
 rendering.macro.tree.parameter.dragAndDrop.name=Vilkt un ievietot
 rendering.macro.tree.parameter.dragAndDrop.description=Vai ļaut lietotājam ar vilkšanu un ievietošanu pārvaldīt koka mezglus.
 rendering.macro.tree.parameter.contextMenu.name=Izvēlne
-rendering.macro.tree.parameter.contextMenu.description=Vai rādīt uz koka mezgliem lietotājam ar labo peles klikšķi atveramu izvēlni
+rendering.macro.tree.parameter.contextMenu.description=Vai rādīt uz koka mezgliem lietotājam ar labo peles klikšķi atveramu izvēlni.
 rendering.macro.tree.parameter.class.name=Klase
-rendering.macro.tree.parameter.class.description=Papildu CSS klase ar kurām var pielāgot koka HTML elementus
+rendering.macro.tree.parameter.class.description=Papildu CSS klase ar kurām var pielāgot koka HTML elementus.
 rendering.macro.tree.parameter.icons.name=Ikonas
 rendering.macro.tree.parameter.icons.description=Vai rādīt koka mezglu ikonas. Ja visi koka mezgli ir ar to pašu veidu, ikonas var nerādīt, lai ietaupītu vietu.
 rendering.macro.tree.parameter.edges.name=Līnijas
@@ -65,9 +62,9 @@ rendering.macro.tree.parameter.openTo.name=Atvērt līdz
 rendering.macro.tree.parameter.openTo.description=Mezgla identifikators, sākot ar kuru atvērt koka saturu. Tiks atvērti arī visi izvēlētā mezgla bērni līdz izvēlētajam vecākam.
 rendering.macro.tree.parameter.finder.name=Meklēšanas lauks
 rendering.macro.tree.parameter.finder.description=Rādīt teksta lauku, kurā var ievadīt kokā meklējamās vērtības. Lauks ir attēlots virs koka un tajā darbojas priekšāteicējs, kas piedāvā vērtības saskaņā ar koka saturu.
-### Missing: rendering.macro.tree.parameter.limit.name=Limit
-### Missing: rendering.macro.tree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large. The tree passes this parameter to the tree source so it works only with dynamic trees whose source implements child count limit.
-rendering.macro.tree.content.description=Lai aprakstītu koka struktūru, jūs varat izmantot iegultu HTML. Papildu informācijai skatiet http\://www.jstree.com/docs/html/
-### Missing: tree.macro.editModeWarning=This tree can't be displayed in edit mode.
+rendering.macro.tree.parameter.limit.name=Robeža
+rendering.macro.tree.parameter.limit.description=Parādīto bērnu mezglu skaits, pirmo reizi izvēršot vecāka mezglu. Pārējie bērnu mezgli ir apskatāmi, klikšinot uz "vairāk..." saites. Šo parametru parasti izmanto, lai lapotu bērnu mezglus gadījumā, kad to ir daudz. Šis parametrs strādā tikai tajos kokos, kuru saturs tiek noteikts dinamiski, un kuri nodrošina bērnu mezglu skaita ierobežošanu.
+rendering.macro.tree.content.description=Lai aprakstītu koka struktūru, jūs varat izmantot iegultu HTML. Skatiet http://www.jstree.com/docs/html/ papildu informācijai.
+tree.macro.editModeWarning=Šo koku nevar parādīt mainīšanas režīmā.
 </content>
 </xwikidoc>

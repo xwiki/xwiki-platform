@@ -195,10 +195,10 @@ public class TransactionRunnable<T>
 
     /**
      * This will run if the transaction fails.
-     * This function is guaranteed to be run nomatter what happens before in this transaction.
+     * This function is guaranteed to be run no matter what happens before in this transaction.
      * onRollback() will NOT run for a given TransactionRunnable unless onRun() has been called.
-     * onRollback() will be called for each transaction in thr reverse order as they are run, children
-     * first, siblings in oposite order as registered.
+     * onRollback() will be called for each transaction in the reverse order as they are run, children
+     * first, siblings in opposite order as registered.
      *
      * This MUST roll the storage engine back to it's prior state even after onCommit has been invoked.
      * TransactionRunnables which cannot rollback after a successful onCommit must extend
@@ -214,11 +214,11 @@ public class TransactionRunnable<T>
 
     /**
      * This will be run when after onCommit or onRollback no matter the outcome.
-     * This function is guaranteed to be run nomatter what happens before in this transaction.
+     * This function is guaranteed to be run no matter what happens before in this transaction.
      * This is intended to do post commit cleanup and it MUST NOT be used to finalize a commit.
      * onComplete() will NOT run for a given TransactionRunnable unless onPreRun() has been called.
-     * onComplete() will be called for each transaction in thr reverse order as they are run, children
-     * first, siblings in oposite order as registered.
+     * onComplete() will be called for each transaction in the reverse order as they are run, children
+     * first, siblings in opposite order as registered.
      *
      * @throws Exception which will be reported as a failure which cannot cause database corruption.
      */

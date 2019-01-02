@@ -19,8 +19,9 @@
  */
 package org.xwiki.refactoring.job.question;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represent an entity with an information about either or not the entity is selected to perform some refactoring.
@@ -28,9 +29,29 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public class EntitySelection
 {
+    /**
+     * Define the inner state of the EntitySelection.
+     */
+    public enum State {
+
+        /**
+         * If a user selected it.
+         */
+        SELECTED,
+
+        /**
+         * If a user deselected it.
+         */
+        DESELECTED,
+
+        /**
+         * Default state. By default, UNKNOWN is considered as selected: see {@link #isSelected()}.
+         */
+        UNKNOWN
+    };
+
     /**
      * Reference to the entity to select for the refactoring.
      */
@@ -39,7 +60,7 @@ public class EntitySelection
     /**
      * Indicate if the entity is selected or not by the user.
      */
-    private boolean isSelected = true;
+    private State isSelected = State.UNKNOWN;
 
     /**
      * Construct an EntitySelection.
@@ -59,9 +80,17 @@ public class EntitySelection
     }
 
     /**
-     * @return if the user has selected the entity
+     * @return true if the user has selected the entity or no choice has been made
      */
     public boolean isSelected()
+    {
+        return isSelected == State.UNKNOWN || isSelected == State.SELECTED;
+    }
+
+    /**
+     * @return current state of the entity selection.
+     */
+    public State getState()
     {
         return isSelected;
     }
@@ -72,6 +101,33 @@ public class EntitySelection
      */
     public void setSelected(boolean selected)
     {
-        isSelected = selected;
+        if (selected) {
+            isSelected = State.SELECTED;
+        } else {
+            isSelected = State.DESELECTED;
+        }
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(3, 13).append(getEntityReference()).append(isSelected).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        EntitySelection entitySelection = (EntitySelection) object;
+        return new EqualsBuilder().append(getEntityReference(), entitySelection.getEntityReference())
+            .append(isSelected(), entitySelection.isSelected()).isEquals();
     }
 }

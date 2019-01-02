@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1402502400000</creationDate>
   <parent>FlamingoThemesCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1402503543000</date>
-  <contentUpdateDate>1402503543000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <comment/>
@@ -42,12 +39,12 @@
   <content>platform.flamingo.themes.home.title=Flamingo tēmas
 platform.flamingo.themes.home.currenttheme=Pašreizējā tēma
 platform.flamingo.themes.home.otherthemes=Citas pieejamās tēmas
-platform.flamingo.themes.home.warningOldColorThemeInstalled=Ar šo lietotni varat pārvalīdīt Flamingo tēmas. Flamingo tēma ir pielāgojama Flamingo apdare. Ja vēlaties mainīt krāsas Colibri-bāzētai apdarei, jums ir jāizmanto {0}Colibri krāsu tēmu lietotne{1}. 
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Ar šo lietotni varat pārvalīdīt Flamingo tēmas. Flamingo tēma ir pielāgojama Flamingo apdare. Ja vēlaties mainīt krāsas Colibri-bāzētai apdarei, jums ir jāizmanto {0}Colibri krāsu tēmu lietotne{1}.
 platform.flamingo.themes.home.warningCurrentOldColorTheme=Pašreiz tiek izmantota Colibri krāsu tēma, kura nav piemērota izmantošanai ar Flamingo apdari. Mēs esam darījuši visu iespējamo, lai tā nebūtu, tomēr rezultāts var nebūt pietiekami labs.
 platform.flamingo.themes.home.useThisTheme=Lietot šo tēmu
 platform.flamingo.themes.home.newThemeName=Tēmas nosaukums...
 platform.flamingo.themes.home.create=Izveidot jaunu tēmu
-platform.flamingo.themes.home.create.invalid=Nepareizs tēmas nosaukums\!
+platform.flamingo.themes.home.create.invalid=Nepareizs tēmas nosaukums!
 platform.flamingo.themes.home.create.csrf=Drošības nolūkos lūdzam apstiprināt, ka vēlaties izveidot tēmu ar nosaukumu  "{0}".
 platform.flamingo.themes.home.create.confirm=Apstiprināt
 platform.flamingo.themes.home.set.success=Tēma iestatīta uz  "{0}".
@@ -62,7 +59,7 @@ platform.flamingo.themes.category.base-colors=Pamatkrāsas
 platform.flamingo.themes.category.typography=Burtu izskats
 platform.flamingo.themes.category.forms=Formas
 platform.flamingo.themes.category.buttons=Pogas
-### Missing: platform.flamingo.themes.category.tables=Tables
+platform.flamingo.themes.category.tables=Tabulas
 platform.flamingo.themes.category.navbar=Navigācijas josla
 platform.flamingo.themes.category.dropdowns=Izvēlnes
 platform.flamingo.themes.category.panels=Paneļi
@@ -71,8 +68,8 @@ platform.flamingo.themes.category.advanced=Padziļināti
 platform.flamingo.themes.defaultvalue=Noklusētais
 platform.flamingo.themes.lessCode.description=Šajā laukā varat tieši ierakstīt LESS kodu, kurš tiks pievienots apdarei.
 platform.flamingo.themes.incompatiblebrowser=Piedodiet, bet tēmas priešskatīšana nedarbojas ar šo Internet Explorer versiju. Jums ir jāizmanto pārlūkprogrammas modernāka versija.
-### Missing: platform.flamingo.themes.local=Local
-### Missing: platform.flamingo.themes.global=Global
+platform.flamingo.themes.local=Lokāla
+platform.flamingo.themes.global=Globāla
 
 ###############################################################################
 ## Deprecated

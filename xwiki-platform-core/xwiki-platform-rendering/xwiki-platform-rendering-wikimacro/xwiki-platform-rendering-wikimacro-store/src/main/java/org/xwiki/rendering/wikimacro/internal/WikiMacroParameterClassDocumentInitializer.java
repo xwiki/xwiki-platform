@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Update XWiki.XWikiComments document with all required informations.
+ * Update XWiki.WikiMacroParameterClass document with all required informations.
  * 
  * @version $Id$
  * @since 4.3M1
@@ -55,5 +55,6 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
         xclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
         xclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
         xclass.addTextField(PARAMETER_DEFAULT_VALUE_PROPERTY, "Parameter default value", 30);
+        xclass.addTextField(PARAMETER_TYPE_PROPERTY, "Parameter type", 60);
     }
 }

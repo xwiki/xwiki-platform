@@ -46,6 +46,9 @@ public class DefaultSpaceReferenceProvider implements Provider<SpaceReference>
     @Inject
     private Provider<WikiReference> wikiReferenceProvider;
 
+    @Inject
+    private EntityReferenceFactory factory;
+
     /**
      * We can cache the default document since it's configurable only at xwiki.properties level which require a restart
      * to be modified.
@@ -61,7 +64,7 @@ public class DefaultSpaceReferenceProvider implements Provider<SpaceReference>
             // Add wikis
             reference = reference.appendParent(this.wikiReferenceProvider.get());
 
-            this.cachedReference = new SpaceReference(reference);
+            this.cachedReference = this.factory.getReference(new SpaceReference(reference));
         }
 
         return this.cachedReference;

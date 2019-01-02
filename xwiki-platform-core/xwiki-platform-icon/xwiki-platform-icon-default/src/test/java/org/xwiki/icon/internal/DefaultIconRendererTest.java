@@ -22,17 +22,20 @@ package org.xwiki.icon.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.icon.Icon;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -42,31 +45,29 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link org.xwiki.icon.internal.DefaultIconRenderer}.
  *
- * @since 6.2M1
  * @version $Id$
+ * @since 6.2M1
  */
+@ComponentTest
 public class DefaultIconRendererTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultIconRenderer> mocker =
-            new MockitoComponentMockingRule<>(DefaultIconRenderer.class);
+    @InjectMockComponents
+    private DefaultIconRenderer iconRenderer;
 
+    @MockComponent
+    @Named("ssx")
     private SkinExtension skinExtension;
 
+    @MockComponent
+    @Named("linkx")
     private SkinExtension linkExtension;
 
+    @MockComponent
+    @Named("jsx")
     private SkinExtension jsExtension;
 
+    @MockComponent
     private VelocityRenderer velocityRenderer;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        skinExtension = mocker.getInstance(SkinExtension.class, "ssx");
-        linkExtension = mocker.getInstance(SkinExtension.class, "linkx");
-        jsExtension = mocker.getInstance(SkinExtension.class, "jsx");
-        velocityRenderer = mocker.getInstance(VelocityRenderer.class);
-    }
 
     @Test
     public void render() throws Exception
@@ -77,7 +78,7 @@ public class DefaultIconRendererTest
         when(velocityRenderer.render("#set($icon = \"blabla\")\nimage:$icon.png")).thenReturn("image:blabla.png");
 
         // Test
-        String result = mocker.getComponentUnderTest().render("test", iconSet);
+        String result = iconRenderer.render("test", iconSet);
 
         // Verify
         assertEquals("image:blabla.png", result);
@@ -90,12 +91,13 @@ public class DefaultIconRendererTest
     public void renderWithCSS() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderWiki("image:$icon.png");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
         when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
 
         // Test
-        mocker.getComponentUnderTest().render("test", iconSet);
+        iconRenderer.render("test", iconSet);
 
         // Verify
         Map<String, Object> parameters = new HashMap<>();
@@ -109,11 +111,12 @@ public class DefaultIconRendererTest
     public void renderWithSSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderWiki("image:$icon.png");
         iconSet.setSsx("ssx");
         iconSet.addIcon("test", new Icon("blabla"));
 
         // Test
-        mocker.getComponentUnderTest().render("test", iconSet);
+        iconRenderer.render("test", iconSet);
 
         // Verify
         verify(skinExtension).use("ssx");
@@ -125,11 +128,12 @@ public class DefaultIconRendererTest
     public void renderWithJSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderWiki("image:$icon.png");
         iconSet.setJsx("jsx");
         iconSet.addIcon("test", new Icon("blabla"));
 
         // Test
-        mocker.getComponentUnderTest().render("test", iconSet);
+        iconRenderer.render("test", iconSet);
 
         // Verify
         verify(jsExtension).use("jsx");
@@ -145,10 +149,10 @@ public class DefaultIconRendererTest
         iconSet.addIcon("test", new Icon("blabla"));
 
         when(velocityRenderer.render("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />"))
-                .thenReturn("<img src=\"blabla.png\" />");
+            .thenReturn("<img src=\"blabla.png\" />");
 
         // Test
-        String result = mocker.getComponentUnderTest().renderHTML("test", iconSet);
+        String result = iconRenderer.renderHTML("test", iconSet);
 
         // Verify
         assertEquals("<img src=\"blabla.png\" />", result);
@@ -158,12 +162,13 @@ public class DefaultIconRendererTest
     public void renderHTMLWithCSS() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
         when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
 
         // Test
-        mocker.getComponentUnderTest().renderHTML("test", iconSet);
+        iconRenderer.renderHTML("test", iconSet);
 
         // Verify
         Map<String, Object> parameters = new HashMap<>();
@@ -177,11 +182,12 @@ public class DefaultIconRendererTest
     public void renderHTMLWithSSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.setSsx("ssx");
         iconSet.addIcon("test", new Icon("blabla"));
 
         // Test
-        mocker.getComponentUnderTest().renderHTML("test", iconSet);
+        iconRenderer.renderHTML("test", iconSet);
 
         // Verify
         verify(skinExtension).use("ssx");
@@ -193,11 +199,12 @@ public class DefaultIconRendererTest
     public void renderHTMLWithJSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
+        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.setJsx("jsx");
         iconSet.addIcon("test", new Icon("blabla"));
 
         // Test
-        mocker.getComponentUnderTest().renderHTML("test", iconSet);
+        iconRenderer.renderHTML("test", iconSet);
 
         // Verify
         verify(jsExtension).use("jsx");
@@ -211,7 +218,7 @@ public class DefaultIconRendererTest
         IconSet iconSet = new IconSet("default");
 
         // Test
-        String result = mocker.getComponentUnderTest().render("non-existent-icon", iconSet);
+        String result = iconRenderer.render("non-existent-icon", iconSet);
 
         // Verify
         assertEquals("", result);
@@ -229,7 +236,7 @@ public class DefaultIconRendererTest
         // Test
         IconException caughtException = null;
         try {
-            mocker.getComponentUnderTest().render("test", iconSet);
+            iconRenderer.render("test", iconSet);
         } catch (IconException e) {
             caughtException = e;
         }
@@ -239,4 +246,29 @@ public class DefaultIconRendererTest
         assertEquals(exception, caughtException);
     }
 
+    @Test
+    public void renderIcon() throws Exception
+    {
+        IconSet iconSet = new IconSet("iconSet");
+        iconSet.addIcon("test", new Icon("hello"));
+        when(velocityRenderer.render("#set($icon = \"hello\")\nfa fa-$icon")).thenReturn("fa fa-hello");
+
+        // Test
+        String renderedIcon1 = iconRenderer.render("test", iconSet, "fa fa-$icon");
+        String renderedIcon2 = iconRenderer.render("none", iconSet, "fa fa-$icon");
+        String renderedIcon3 = iconRenderer.render("none", null, "fa fa-$icon");
+        String renderedIcon4 = iconRenderer.render("none", iconSet, null);
+
+        // Verify
+        assertEquals("fa fa-hello", renderedIcon1);
+        assertEquals("", renderedIcon2);
+        assertEquals("", renderedIcon3);
+        assertEquals("", renderedIcon4);
+    }
+
+    @Test
+    public void useWithIconSetNull() throws Exception
+    {
+        assertThrows(IconException.class, () -> iconRenderer.use(null));
+    }
 }

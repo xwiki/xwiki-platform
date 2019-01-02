@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1384447292000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1384452769000</date>
-  <contentUpdateDate>1384452769000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("help.syntaxpage.title")</title>
   <comment/>
@@ -153,7 +150,7 @@
     #end
 
     ## Add new sections to category children map
-    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxId").value, 'maxSyntax' : $obj.getProperty("maxSyntaxId").value, 'name' : $sectionTitle})
+    #set($child = {'id' : $sectionDoc.documentReference.name.substring(11), 'minSyntax' : $obj.getProperty("minSyntaxId").value, 'maxSyntax' : $obj.getProperty("maxSyntaxId").value, 'name' : $sectionTitle})
     $catChildren.add($child)
   #end
 #end

@@ -19,9 +19,12 @@
  */
 package org.xwiki.test.ui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
@@ -82,7 +85,26 @@ public class XWikiWebDriver extends RemoteWebDriver
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         try {
-            return this.wrappedDriver.findElement(by);
+            return findElement(by);
+        } finally {
+            setDriverImplicitWait();
+        }
+    }
+
+    /**
+     * Same as {@link #findElementWithoutWaiting(By)} but don't scroll to make the element visible. Useful for example
+     * whenverifying that the page has finished loading (and thus there's no element visible and we cannot scroll to
+     * it).
+     *
+     * @since 10.8.1
+     * @since 10.9
+     */
+    public WebElement findElementWithoutWaitingWithoutScrolling(By by)
+    {
+        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
+        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        try {
+            return findElementWithoutScrolling(by);
         } finally {
             setDriverImplicitWait();
         }
@@ -93,7 +115,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         try {
-            return this.wrappedDriver.findElements(by);
+            return findElements(by);
         } finally {
             setDriverImplicitWait();
         }
@@ -145,6 +167,24 @@ public class XWikiWebDriver extends RemoteWebDriver
         }
     }
 
+    /**
+     * Same as {@link #hasElementWithoutWaiting(By)} but don't scroll to make the element visible. Useful for example
+     * whenverifying that the page has finished loading (and thus there's no element visible and we cannot scroll to
+     * it).
+     *
+     * @since 10.8.1
+     * @since 10.9
+     */
+    public boolean hasElementWithoutWaitingWithoutScrolling(By by)
+    {
+        try {
+            findElementWithoutWaitingWithoutScrolling(by);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
     public boolean hasElementWithoutWaiting(WebElement element, By by)
     {
         try {
@@ -174,7 +214,31 @@ public class XWikiWebDriver extends RemoteWebDriver
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         Wait<WebDriver> wait = new WebDriverWait(this, getTimeout());
         try {
-            wait.until(condition);
+            // Handle both Selenium 2 and Selenium 3
+            try {
+                Method method = WebDriverWait.class.getMethod("until", Function.class);
+                // We're in Selenium3, it requires a java Function passed to the wait
+                try {
+                    method.invoke(wait, new Function<WebDriver, T>()
+                    {
+                        @Override public T apply(WebDriver webDriver)
+                        {
+                            return condition.apply(webDriver);
+                        }
+                    });
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Error converting to selenium3", e);
+                } catch (InvocationTargetException e) {
+                    if (e.getCause() instanceof RuntimeException) {
+                        throw (RuntimeException) e.getCause();
+                    } else {
+                        throw new RuntimeException("Failed to invoke 'until' method for Selenium3", e);
+                    }
+                }
+            } catch (NoSuchMethodException e) {
+                // We're in Selenium 2!
+                wait.until(condition);
+            }
         } finally {
             // Reset timeout
             setDriverImplicitWait();
@@ -575,10 +639,19 @@ public class XWikiWebDriver extends RemoteWebDriver
         return this.wrappedDriver.findElements(by);
     }
 
+    // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
+    // visible floating save bar would hide the element.
+    private WebElement scrollTo(WebElement element)
+    {
+        executeScript("arguments[0].scrollIntoView();", element);
+        return element;
+    }
+
     @Override
     public WebElement findElement(By by)
     {
-        return this.wrappedDriver.findElement(by);
+        WebElement element = this.wrappedDriver.findElement(by);
+        return this.scrollTo(element);
     }
 
     @Override
@@ -682,7 +755,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementById(String using)
     {
-        return this.wrappedDriver.findElementById(using);
+        return this.scrollTo(this.wrappedDriver.findElementById(using));
     }
 
     @Override
@@ -694,7 +767,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByLinkText(String using)
     {
-        return this.wrappedDriver.findElementByLinkText(using);
+        return this.scrollTo(this.wrappedDriver.findElementByLinkText(using));
     }
 
     @Override
@@ -706,7 +779,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByPartialLinkText(String using)
     {
-        return this.wrappedDriver.findElementByPartialLinkText(using);
+        return this.scrollTo(this.wrappedDriver.findElementByPartialLinkText(using));
     }
 
     @Override
@@ -718,7 +791,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByTagName(String using)
     {
-        return this.wrappedDriver.findElementByTagName(using);
+        return this.scrollTo(this.wrappedDriver.findElementByTagName(using));
     }
 
     @Override
@@ -730,7 +803,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByName(String using)
     {
-        return this.wrappedDriver.findElementByName(using);
+        return this.scrollTo(this.wrappedDriver.findElementByName(using));
     }
 
     @Override
@@ -742,7 +815,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByClassName(String using)
     {
-        return this.wrappedDriver.findElementByClassName(using);
+        return this.scrollTo(this.wrappedDriver.findElementByClassName(using));
     }
 
     @Override
@@ -754,7 +827,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByCssSelector(String using)
     {
-        return this.wrappedDriver.findElementByCssSelector(using);
+        return this.scrollTo(this.wrappedDriver.findElementByCssSelector(using));
     }
 
     @Override
@@ -766,7 +839,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementByXPath(String using)
     {
-        return this.wrappedDriver.findElementByXPath(using);
+        return this.scrollTo(this.wrappedDriver.findElementByXPath(using));
     }
 
     @Override
@@ -881,8 +954,22 @@ public class XWikiWebDriver extends RemoteWebDriver
             @Override
             public Boolean apply(WebDriver input)
             {
-                return !hasElementWithoutWaiting(By.id("pageNotYetReloadedMarker"));
+                // Note: make sure we don't scroll since we're looking for an element that's not here anymore and
+                // thus it would produce a StaleElementException!
+                return !hasElementWithoutWaitingWithoutScrolling(By.id("pageNotYetReloadedMarker"));
             }
         });
+    }
+
+    /**
+     * Same as {@link #findElement(By)} but don't scroll to make the element visible. Useful for example when
+     * verifying that the page has finished loading (and thus there's no element visible and we cannot scroll to it).
+     *
+     * @since 10.8.1
+     * @since 10.9
+     */
+    public WebElement findElementWithoutScrolling(By by)
+    {
+        return this.wrappedDriver.findElement(by);
     }
 }

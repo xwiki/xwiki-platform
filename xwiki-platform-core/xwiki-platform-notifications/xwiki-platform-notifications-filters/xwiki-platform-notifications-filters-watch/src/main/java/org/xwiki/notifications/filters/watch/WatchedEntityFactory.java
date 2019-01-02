@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.watch;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Helper to create watched entity references.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8RC1
  */
 @Role
-@Unstable
 public interface WatchedEntityFactory
 {
     /**

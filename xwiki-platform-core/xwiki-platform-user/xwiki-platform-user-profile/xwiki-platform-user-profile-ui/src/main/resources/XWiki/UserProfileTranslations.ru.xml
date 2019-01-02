@@ -1,0 +1,61 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.UserProfileTranslations" locale="ru">
+  <web>XWiki</web>
+  <name>UserProfileTranslations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>User Profile Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Вики содержит документы, которые не отображаются по умолчанию. Эти скрытые документы представляют технический контент, такой как классы приложений, страницы конфигурации, макросы, стили, сценарии и т. Д.
+XWiki.XWikiUsers_accessibility.hint=Дополнительная доступность обеспечит различные визуальные улучшения, такие как: большие шрифты, подчеркнутые ссылки и т. Д.
+XWiki.XWikiUsers_timezone.hint=Используйте определенный часовой пояс, чтобы даты отражали ваше текущее местоположение.
+XWiki.XWikiUsers_editor.hint=Выберите, какой редактор будет редактором по умолчанию, переопределяя редактор по умолчанию, установленный глобально. Если не определено, выбирается редактор по умолчанию, в зависимости от того, что редактируется.
+XWiki.XWikiUsers_usertype.hint=Выберите, какой тип пользователя будет по умолчанию. Опытные пользователи получат доступ к нескольким функциям редактирования, созданию терминальных страниц и т. Д.
+XWiki.XWikiUsers_extensionConflictSetup.hint=Укажите, хотите ли вы, чтобы Менеджер Расширений требовал подтвердить правила по умолчанию для разрешения конфликтов (например, попросите Extension Manager спросить вас, что делать, если документ для обновления был удален из вики).
+userprofile.default=По-умолчанию
+user.profile.groups.title=Мои группы
+user.profile.groups.description=Здесь перечислены все группы, в которых вы состоите.
+user.profile.groups.table.group=Группа
+platform.core.profile.category.groups=Мои группы
+user.profile.notifications=Уведомления
+user.profile.network.unfollow.question=Вы уверены, что хотите отписаться от этого пользователя?
+user.profile.network.unfollow.question.yes=Да, отписаться
+user.profile.network.unfollow.question.no=Нет, отмена
+### Missing: user.profile.network.following=Following
+### Missing: user.profile.network.notfollowing=Not following
+user.profile.network.follow=Подписаться
+user.profile.network.unfollow=Отписаться
+user.profile.network.done=Готово
+user.profile.network.saving=Сохранение...
+user.profile.network.error=Ошибка сохранения настроек уведомления</content>
+</xwikidoc>

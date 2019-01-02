@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1497361206000</creationDate>
   <parent>xwiki:XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1497361206000</date>
-  <contentUpdateDate>1497361206000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -73,7 +70,7 @@
 #elseif ("$!request.action" == 'deleteFilterPreference')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      $services.notification.filters.deleteFilterPreference($request.filterPreferenceName)
+      $services.notification.filters.deleteFilterPreference($request.filterPreferenceId)
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end
@@ -84,7 +81,7 @@
 #elseif ("$!request.action" == 'setFilterPreferenceEnabled')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      $services.notification.filters.setFilterPreferenceEnabled($request.filterPreferenceName, $stringtool.equals("$!request.enabled", 'true'))
+      $services.notification.filters.setFilterPreferenceEnabled($request.filterPreferenceId, $stringtool.equals("$!request.enabled", 'true'))
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end
@@ -92,13 +89,38 @@
   #if ("$!exception" != '')
     $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
   #end
-#elseif ("$!request.action" == 'setAutoWatchMode')
+#elseif ("$!request.action" == 'createScopeFilterPreference')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
-      #set ($obj = $userDoc.getObject('XWiki.Notifications.Code.AutomaticWatchModeClass', true))
+      #set ($reference = '')
+      #if ("$!request.wiki" != '')
+        #set ($reference = $services.model.createWikiReference($request.wiki))
+      #elseif ("$!request.space" != '')
+        #set ($reference = $services.model.resolveSpace($request.space))
+      #elseif ("$!request.page" != '')
+        #set ($reference = $services.model.resolveDocument($request.page))
+      #end
+      $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference)
+    #else
+      $response.sendError(401, 'Bad CSRF Token')
+    #end
+  #end
+  #if ("$!exception" != '')
+    $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
+  #end
+#elseif ("$!request.action" == 'setAutoWatchMode' || "$!request.action" == 'setDefaultAutoWatchMode')
+  #try()
+    #if ($services.csrf.isTokenValid($request.csrf))
+      #if ($request.action == 'setAutoWatchMode')
+        #set ($targetDoc = $xwiki.getDocument($xcontext.userReference))
+      #elseif (!$hasAdmin)
+        $response.sendError(401, 'Unauthorized')
+      #else
+        #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
+      #end
+      #set ($obj = $targetDoc.getObject('XWiki.Notifications.Code.AutomaticWatchModeClass', true))
       #set ($discard = $obj.set('automaticWatchMode', $request.mode))
-      #set ($discard = $userDoc.save('Update the automaticWatchMode.'))
+      #set ($discard = $targetDoc.save('Update the automaticWatchMode.'))
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end

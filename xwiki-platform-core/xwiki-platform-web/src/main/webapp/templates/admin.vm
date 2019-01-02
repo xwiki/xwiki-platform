@@ -82,19 +82,8 @@
     ## notifiers) and we want to exclude them also.
     #if ($documentCount < 6)
       ## Less than 6 pages in the wiki, probably a fresh install.
-      #set ($URLhost = 'http://maven.xwiki.org')
-      #set ($URLgroup = 'org/xwiki/enterprise')
-      #set ($URLartifact = 'xwiki-enterprise-ui-mainwiki-all')
-      #if ("$!services.wiki" != '' && $services.wiki.currentWikiId != $services.wiki.mainWikiId)
-        #set ($URLartifact = 'xwiki-enterprise-ui-wiki-all')
-      #end
-      #set ($URLversion = $xwiki.getVersion())
-      #if ($URLversion.endsWith('-SNAPSHOT'))
-        #set ($URL = "${URLhost}/snapshots/${URLgroup}/${URLartifact}/$URLversion/")
-      #else
-        #set ($URL = "${URLhost}/releases/${URLgroup}/${URLartifact}/$URLversion/${URLartifact}-${URLversion}.xar")
-      #end
-      #warning($services.localization.render('admin.defaultwikinotinstalled', ["<a href='$URL'>$URL</a>"]))
+      #set ($URL = "https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/EmptyWiki")
+      #warning($services.localization.render('admin.defaultwikinotinstalled_useflavor', ["<a href='$URL'>", '</a>']))
     #else
       ## More than 6 pages in the wiki and Admin app not installed, probably an upgrade.
       #warning($services.localization.render('admin.adminappnotinstalled', ['<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application">http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application</a>']))

@@ -53,6 +53,7 @@ public class OfficeImporterPage extends ViewPage
     public OfficeImporterPage()
     {
         super();
+        getDriver().waitUntilCondition(webDriver -> webDriver.findElement(By.id("officeImportForm")) != null);
     }
     
     public void setFile(File file)

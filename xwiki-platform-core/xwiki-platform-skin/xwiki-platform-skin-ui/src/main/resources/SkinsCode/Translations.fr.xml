@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1426000188000</creationDate>
   <parent>SkinsCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1426004665000</date>
-  <contentUpdateDate>1426004665000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -53,7 +50,7 @@ skin.sheet.js.deleting=Suppression...
 skin.sheet.js.deletingDone=Le modèle a été supprimé
 skin.sheet.js.error.csrf=La validation CSRF a échoué lors de l'enregistrement de la skin. Rafraîchissez la page avant de réessayer.
 skin.sheet.js.error.rights=Impossible d'enregistrer le thème, vous ne disposez pas de droits suffisants.
-skin.sheet.js.deleteConfirmationText=Êtes-vous certain de vouloir supprimer ce modèle ? 
+skin.sheet.js.deleteConfirmationText=Êtes-vous certain de vouloir supprimer ce modèle ?
 skin.sheet.js.deleteConfirmationYes=Oui, le supprimer
 skin.sheet.js.deleteConfirmationNo=Non, annuler
 skin.sheet.js.adding=Ajout...
@@ -70,7 +67,7 @@ skin.sheet.js.addingDone=Le modèle a été ajouté
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=Overridden templates
+skin.sheet.overridedTemplates=Modèles écrasés
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

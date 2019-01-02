@@ -19,7 +19,14 @@
     <label for="author">$services.localization.render('export_author')</label>
     <span class="xHint">$services.localization.render('administration.section.export.author.hint')</span>
   </dt>
-  <dd><input type="text" name="author" id="author" value="$xcontext.user"/></dd>
+  <dd>
+    #set ($userPickerParams = {
+      'id': 'author',
+      'name': 'author',
+      'value': $xcontext.user
+    })
+    #userPicker(false $userPickerParams)
+  </dd>
   <dt>
     <label for="version">$services.localization.render('export_version')</label>
     <span class="xHint">$services.localization.render('administration.section.export.version.hint')</span>

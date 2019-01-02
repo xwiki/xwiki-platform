@@ -26,7 +26,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
@@ -64,6 +66,12 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
     @Inject
     private ContextualLocalizationManager contextualLocalizationManager;
 
+    @Inject
+    private NamespaceContextExecutor namespaceContextExecutor;
+
+    @Inject
+    private Logger logger;
+
     @Override
     public EntityReference getClassReference()
     {
@@ -80,7 +88,7 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
             return Arrays.asList(
                     new DefaultUntypedRecordableEventDescriptor(
                             baseObject.getReference(), parentDocument.getAuthorReference(), baseObject,
-                            contextualLocalizationManager));
+                            contextualLocalizationManager, namespaceContextExecutor));
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
                     "Unable to build the UntypedRecordableEvent wiki component "

@@ -24,54 +24,61 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AttachmentQueryFilter}.
- * 
+ *
  * @version $Id$
  * @since 9.7RC1
  */
+@ComponentTest
 public class AttachmentQueryFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryFilter> mocker =
-        new MockitoComponentMockingRule<QueryFilter>(AttachmentQueryFilter.class);
+    @InjectMockComponents
+    private AttachmentQueryFilter queryFilter;
+
+    @MockComponent
+    @Named("current")
+    private DocumentReferenceResolver<String> resolver;
 
     @Test
-    public void filterStatementWithoutFromAndWhere() throws Exception
+    public void filterStatementWithoutFromAndWhere()
     {
-        String result = this.mocker.getComponentUnderTest()
-            .filterStatement("select doc.fullName from XWikiDocument doc order by attachment.date", Query.HQL);
+        String result = this.queryFilter.filterStatement(
+            "select doc.fullName from XWikiDocument doc order by attachment.date", Query.HQL);
         assertEquals("select doc.fullName, attachment.filename " + "from XWikiDocument doc, XWikiAttachment attachment "
             + "where doc.id = attachment.docId " + "order by attachment.date", result);
     }
 
     @Test
-    public void filterStatementWithWhere() throws Exception
+    public void filterStatementWithWhere()
     {
-        String result = this.mocker.getComponentUnderTest().filterStatement(
+        String result = this.queryFilter.filterStatement(
             "select doc.fullName from XWikiDocument doc where attachment.mimeType like 'image/%'", Query.HQL);
         assertEquals("select doc.fullName, attachment.filename " + "from XWikiDocument doc, XWikiAttachment attachment "
             + "where doc.id = attachment.docId and (attachment.mimeType like 'image/%')", result);
     }
 
     @Test
-    public void filterStatementWithFromAndWhere() throws Exception
+    public void filterStatementWithFromAndWhere()
     {
-        String result = this.mocker.getComponentUnderTest()
-            .filterStatement("select doc.fullName from XWikiDocument doc, BaseObject as obj "
-                + "where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'", Query.HQL);
+        String result = this.queryFilter.filterStatement(
+            "select doc.fullName from XWikiDocument doc, BaseObject as obj where doc.fullName = obj.name and "
+                + "obj.className = 'XWiki.XWikiUsers'", Query.HQL);
         assertEquals("select doc.fullName, attachment.filename "
             + "from XWikiDocument doc, XWikiAttachment attachment, BaseObject as obj "
             + "where doc.id = attachment.docId and "
@@ -79,42 +86,40 @@ public class AttachmentQueryFilterTest
     }
 
     @Test
-    public void filterStatementNonHQL() throws Exception
+    public void filterStatementNonHQL()
     {
         String statement = "select doc.fullName from XWikiDocument doc ...";
-        assertSame(statement, this.mocker.getComponentUnderTest().filterStatement(statement, Query.XWQL));
+        assertSame(statement, this.queryFilter.filterStatement(statement, Query.XWQL));
     }
 
     @Test
-    public void filterStatementThatDoesNotMatch() throws Exception
+    public void filterStatementThatDoesNotMatch()
     {
         String statement = "one two three";
-        assertSame(statement, this.mocker.getComponentUnderTest().filterStatement(statement, Query.HQL));
+        assertSame(statement, this.queryFilter.filterStatement(statement, Query.HQL));
 
         statement = "select space.reference from XWikiSpace space ...";
-        assertSame(statement, this.mocker.getComponentUnderTest().filterStatement(statement, Query.HQL));
+        assertSame(statement, this.queryFilter.filterStatement(statement, Query.HQL));
     }
 
     @Test
-    public void filterResults() throws Exception
+    public void filterResults()
     {
         List<Object[]> results = new ArrayList<>();
-        results.add(new Object[] {"A.B", "image.png"});
+        results.add(new Object[]{ "A.B", "image.png" });
 
-        DocumentReferenceResolver<String> currentDocumentReferenceResolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         DocumentReference documentReference = new DocumentReference("wiki", "A", "B");
-        when(currentDocumentReferenceResolver.resolve("A.B")).thenReturn(documentReference);
+        when(this.resolver.resolve("A.B")).thenReturn(documentReference);
 
-        List<AttachmentReference> attachmentReferences = this.mocker.getComponentUnderTest().filterResults(results);
+        List<AttachmentReference> attachmentReferences = this.queryFilter.filterResults(results);
         AttachmentReference expectedAttachmentReference = new AttachmentReference("image.png", documentReference);
         assertEquals(Collections.singletonList(expectedAttachmentReference), attachmentReferences);
     }
 
     @Test
-    public void filterResultsWithOneColumn() throws Exception
+    public void filterResultsWithOneColumn()
     {
         List<Object> results = Arrays.asList(13, 27);
-        assertSame(results, this.mocker.getComponentUnderTest().filterResults(results));
+        assertSame(results, this.queryFilter.filterResults(results));
     }
 }

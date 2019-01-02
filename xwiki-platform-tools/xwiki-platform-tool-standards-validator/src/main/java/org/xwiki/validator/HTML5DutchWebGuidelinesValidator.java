@@ -57,18 +57,13 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     private static final String QUERY_STRING_SEPARATOR = "?";
 
+    private static final String SUBMIT_BUTTONS = StringUtils.join(Arrays.asList("button[type='submit']",
+        "button:not([type])", "input[type='submit']", "input[type='image'][alt]:not([alt=''])"), ", ");
+
     /**
      * Message resources.
      */
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
-
-    /**
-     * Constructor.
-     */
-    public HTML5DutchWebGuidelinesValidator()
-    {
-        super();
-    }
 
     @Override
     public String getName()
@@ -310,22 +305,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
         for (Element formElement : formElements) {
             // Look for either a submit input or an image input with the 'alt' attribute specified.
             // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
-            boolean hasSubmit = false;
-            boolean hasButtonSubmit = false;
-            for (Element input : formElement.getElementsByTag(ELEM_INPUT)) {
-                String type = input.attr(ATTR_TYPE);
-                if (SUBMIT.equals(type) || (IMAGE.equals(type) && !StringUtils.isEmpty(input.attr(ATTR_ALT)))) {
-                    hasSubmit = true;
-                    break;
-                }
-            }
-            for (Element button : formElement.getElementsByTag("button")) {
-                if (!button.hasAttr(ATTR_TYPE) || SUBMIT.equals(button.attr(ATTR_TYPE))) {
-                    hasButtonSubmit = true;
-                    break;
-                }
-            }
-            assertTrue(Type.ERROR, "rpd1s3.formSubmit", hasSubmit || hasButtonSubmit);
+            assertFalse(Type.ERROR, "rpd1s3.formSubmit", formElement.select(SUBMIT_BUTTONS).isEmpty());
         }
     }
 
@@ -692,12 +672,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
         for (Element link : getElements(ELEM_LINK)) {
 
             // Look for images in the link.
-            boolean hasNonEmptyAlt = false;
-            for (Element child : getChildren(link, ELEM_IMG)) {
-                if (StringUtils.isNotEmpty(getAttributeValue(child, ATTR_ALT))) {
-                    hasNonEmptyAlt = true;
-                }
-            }
+            boolean hasImages = link.select("img").size() > 0;
+            boolean hasImagesWithoutAlt = link.select("img[alt=''], img:not([alt])").size() > 0;
 
             // Look for text in the link.
             boolean hasText = false;
@@ -708,7 +684,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
             }
 
             // Images in links must have a not empty alt attribute if there's no text in the link.
-            assertTrue(Type.ERROR, "rpd7s4.links", hasNonEmptyAlt || hasText);
+            assertTrue(Type.ERROR, "rpd7s4.links", !hasImages || !hasImagesWithoutAlt || hasText);
         }
     }
 
@@ -986,8 +962,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd9s1()
     {
-        assertFalse(Type.ERROR, "rpd9s1.attr", getElement(ELEM_BODY).getElementsByAttribute(STYLE).isEmpty());
-        assertFalse(Type.ERROR, "rpd9s1.tag", getElement(ELEM_BODY).getElementsByTag(STYLE).isEmpty());
+        assertTrue(Type.ERROR, "rpd9s1.attr", getElement(ELEM_BODY).getElementsByAttribute(STYLE).isEmpty());
+        assertTrue(Type.ERROR, "rpd9s1.tag", getElement(ELEM_BODY).getElementsByTag(STYLE).isEmpty());
     }
 
     /**
@@ -1220,29 +1196,10 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     public void validateRpd13s4()
     {
         for (Element form : getElements(ELEM_FORM)) {
-            boolean hasSubmit = false;
-            boolean hasDynamicSelect = false;
-
-            for (Element input : form.getElementsByTag(ELEM_INPUT)) {
-                String type = input.attr(ATTR_TYPE);
-                if ("submit".equals(type) || "image".equals(type)) {
-                    hasSubmit = true;
-                    break;
-                }
-            }
-            assertTrue(Type.ERROR, "rpd13s4.submit", hasSubmit);
-
-            for (Element select : form.getElementsByTag("select")) {
-                if (select.hasAttr("onchange")) {
-                    hasDynamicSelect = true;
-                    break;
-                }
-            }
-
-            if (hasDynamicSelect) {
-                addError(Type.WARNING, -1, -1, "rpd13s4.select");
-            }
+            assertFalse(Type.ERROR, "rpd13s4.submit", form.select(SUBMIT_BUTTONS).isEmpty());
         }
+
+        assertTrue(Type.WARNING, "rpd13s4.select", this.html5Document.select("form select[onchange]").isEmpty());
     }
 
     /**
@@ -1368,7 +1325,6 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd13s18()
     {
-        String exprString = "//input[@type='reset']";
         boolean hasResetForm = false;
         for (Element input : getElement(ELEM_BODY).getElementsByTag(ELEM_INPUT)) {
             if ("reset".equals(input.attr(ATTR_TYPE))) {

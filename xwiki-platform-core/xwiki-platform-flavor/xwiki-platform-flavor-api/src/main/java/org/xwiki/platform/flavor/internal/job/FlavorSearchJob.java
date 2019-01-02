@@ -19,14 +19,14 @@
  */
 package org.xwiki.platform.flavor.internal.job;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
@@ -149,8 +149,8 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
      */
     @Override
     protected void installMandatoryExtensionDependency(ExtensionDependency extensionDependency, String namespace,
-        List<ModifableExtensionPlanNode> parentBranch, Map<String, ExtensionDependency> managedDependencies)
-        throws InstallException, IncompatibleVersionConstraintException, ResolveException
+        List<ModifableExtensionPlanNode> parentBranch, Map<String, ExtensionDependency> managedDependencies,
+        Set<String> parents) throws InstallException, IncompatibleVersionConstraintException, ResolveException
     {
         // Cheating a bit to speed up resolution:
         // Skip it when we already know it's valid
@@ -160,7 +160,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
             if (this.validatedExtensions.get(extensionDependency) == Boolean.TRUE
                 && this.configuration.getRecomendedVersionConstraint(extensionDependency.getId()) == null) {
                 super.installMandatoryExtensionDependency(extensionDependency, namespace, parentBranch,
-                    managedDependencies);
+                    managedDependencies, parents);
             }
 
             valid = Boolean.TRUE;
@@ -232,10 +232,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
                 // Filter allowed flavors on namespace
                 if (this.namespaceResolver.isAllowed(flavor.getAllowedNamespaces(), namespace)) {
                     // Directly add the flavor without trying to validate it first (99% of the time it's
-                    // valid
-                    // or it
-                    // mean
-                    // the distribution was broken and you probably want to know about it)
+                    // valid or it means the distribution was broken and you probably want to know about it)
                     this.foundFlavors.add(flavor);
                 }
             } catch (ResolveException e) {
@@ -251,40 +248,55 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
         }
     }
 
-    private Extension findValidVersion(String flavorId, String namespace)
+    private NavigableSet<Version> getVersions(String flavorId)
     {
-        IterableResult<Version> versions;
+        NavigableSet<Version> versionList = new TreeSet<>();
+
+        // Search local versions
         try {
-            versions = this.repositoryManager.resolveVersions(flavorId, 0, -1);
-
-            if (versions.getSize() == 0) {
-                this.logger.debug("Could not find any version for the flavor extension [{}]", flavorId);
-
-                return null;
-            }
-
-            List<Version> versionList = new ArrayList<Version>(versions.getSize());
-            for (Version version : versions) {
+            IterableResult<Version> localVersions = this.localExtensionRepository.resolveVersions(flavorId, 0, -1);
+            for (Version version : localVersions) {
                 versionList.add(version);
             }
-
-            return findValidVersion(flavorId, namespace, versionList);
         } catch (ResolveException e) {
-            this.logger.debug("Failed to resolve versions for extension id [{}]", flavorId, e);
+            this.logger.debug("Failed to resolve local versions for extension id [{}]", flavorId, e);
         }
 
-        return null;
+        // Search remote versions
+        try {
+            IterableResult<Version> remoteVersions = this.repositoryManager.resolveVersions(flavorId, 0, -1);
+
+            for (Version version : remoteVersions) {
+                versionList.add(version);
+            }
+        } catch (ResolveException e) {
+            this.logger.debug("Failed to resolve remote versions for extension id [{}]", flavorId, e);
+        }
+
+        return versionList;
     }
 
-    private Extension findValidVersion(String flavorId, String namespace, List<Version> versionList)
+    private Extension findValidVersion(String flavorId, String namespace)
     {
-        this.progressManager.pushLevelProgress(versionList.size(), flavorId);
+        NavigableSet<Version> versions = getVersions(flavorId);
+
+        if (versions.isEmpty()) {
+            this.logger.debug("Could not find any version for the flavor extension [{}]", flavorId);
+
+            return null;
+        }
+
+        return findValidVersion(flavorId, namespace, versions);
+    }
+
+    private Extension findValidVersion(String flavorId, String namespace, NavigableSet<Version> versions)
+    {
+        this.progressManager.pushLevelProgress(versions.size(), flavorId);
 
         try {
-            for (ListIterator<Version> it = versionList.listIterator(versionList.size()); it.hasPrevious();) {
+            // Try more recent first
+            for (Version version : versions.descendingSet()) {
                 this.progressManager.startStep(flavorId);
-
-                Version version = it.previous();
 
                 Extension extension = tryInstallExtension(new ExtensionId(flavorId, version), namespace);
 

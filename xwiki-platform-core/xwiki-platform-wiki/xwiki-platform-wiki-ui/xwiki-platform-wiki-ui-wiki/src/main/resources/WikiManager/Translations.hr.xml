@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1303158348000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1307445978000</date>
-  <contentUpdateDate>1307445978000</contentUpdateDate>
   <version>1.1</version>
   <title>Wiki Manager Translations</title>
   <comment/>
@@ -126,12 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Ukoliko je omogućeno, svi generirani
 platform.wiki.currentwiki.invite.username.hint=Ime korisnika za dodati wikiju.
 platform.wiki.currentwiki.invite.message.hint=Poruka za poslati korisniku.
 platform.wiki.currentwiki.candidates.hint=Korisnici koji su zatražili ili koji su pozvani da se pridruže wikiju.
+### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Upravljajte postavkama kao što su ime wikija, opis, vlasnik i tip članstva.
 admin.xwiki.workspaceusers.description=Upravljajte članovima wikija\: dodajte, uklonite, pozovite, prihvatite ili odbijte članove wikija.
 admin.xwiki.usersconfiguration.title=Konfiguracija
 admin.xwiki.members.title=Trenutni članovi
+### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
 platform.wiki.drawer.homeWiki=Početni wiki

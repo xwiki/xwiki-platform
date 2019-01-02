@@ -19,7 +19,7 @@
  */
 package org.xwiki.model.internal;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -37,9 +37,9 @@ import org.xwiki.model.ModelConfiguration;
  * Get configuration data from the XWiki configuration using a {@link ConfigurationSource}. If no
  * {@link ConfigurationSource} component is found in the system then default to default values:
  * <ul>
- *   <li>"xwiki" for the default wiki value</li>
- *   <li>"Main" for the default space value</li>
- *   <li>"WebHome" for the default page value</li>
+ * <li>"xwiki" for the default wiki value</li>
+ * <li>"Main" for the default space value</li>
+ * <li>"WebHome" for the default page value</li>
  * </ul>
  *
  * @version $Id$
@@ -57,7 +57,7 @@ public class DefaultModelConfiguration implements ModelConfiguration
     /**
      * Default values for all the Entity types, see {@link #getDefaultReferenceValue(org.xwiki.model.EntityType)}.
      */
-    private static final Map<EntityType, String> DEFAULT_VALUES = new HashMap<EntityType, String>()
+    private static final Map<EntityType, String> DEFAULT_VALUES = new EnumMap<EntityType, String>(EntityType.class)
     {
         {
             put(EntityType.WIKI, "xwiki");
@@ -67,12 +67,17 @@ public class DefaultModelConfiguration implements ModelConfiguration
             put(EntityType.OBJECT, "object");
             put(EntityType.OBJECT_PROPERTY, "property");
             put(EntityType.CLASS_PROPERTY, get(EntityType.OBJECT_PROPERTY));
+            put(EntityType.PAGE, get(EntityType.SPACE));
+            put(EntityType.PAGE_ATTACHMENT, get(EntityType.ATTACHMENT));
+            put(EntityType.PAGE_OBJECT, get(EntityType.OBJECT));
+            put(EntityType.PAGE_OBJECT_PROPERTY, get(EntityType.OBJECT_PROPERTY));
+            put(EntityType.PAGE_CLASS_PROPERTY, get(EntityType.CLASS_PROPERTY));
         }
     };
 
     /**
-     * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available
-     * in the system. This is why we lazy load the ConfigurationSource component.
+     * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available in
+     * the system. This is why we lazy load the ConfigurationSource component.
      */
     @Inject
     private ComponentManager componentManager;
@@ -97,8 +102,8 @@ public class DefaultModelConfiguration implements ModelConfiguration
                 DEFAULT_VALUES.get(type));
         } catch (ComponentLookupException e) {
             // Failed to load the component, use default values
-            this.logger.debug("Failed to load [" + ConfigurationSource.class.getName()
-                + "]. Using default Model values", e);
+            this.logger
+                .debug("Failed to load [" + ConfigurationSource.class.getName() + "]. Using default Model values", e);
             name = DEFAULT_VALUES.get(type);
         }
 

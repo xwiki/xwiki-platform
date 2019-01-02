@@ -39,6 +39,7 @@ public class XARAttachmentModel extends XarAttachmentModel
     {
         {
             put(ELEMENT_MIMETYPE, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
+            put(ELEMENT_CHARSET, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_CHARSET));
             put(ELEMENT_REVISION, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
             put(ELEMENT_REVISION_AUTHOR, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
             put(ELEMENT_REVISION_DATE,

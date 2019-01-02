@@ -375,7 +375,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         List<String> namespaces =
             (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
         Integer namespacesEmpty =
-            (Integer) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY);
+            getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, 0);
         if (namespaces != null && (!namespaces.isEmpty() || namespacesEmpty == 1)) {
             Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
             restNamespaces.withNamespaces(namespaces);
@@ -821,7 +821,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     {
         BaseProperty<?> property = (BaseProperty<?>) object.safeget(field);
 
-        return property != null ? (T) property.getValue() : def;
+        T value = def;
+        if (property != null) {
+            value = (T) property.getValue();
+            if (value == null) {
+                value = def;
+            }
+        }
+
+        return value;
     }
 
     protected boolean getBooleanValue(BaseObject object, String field, boolean def)
@@ -829,7 +837,10 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         BaseProperty<?> property = (BaseProperty<?>) object.safeget(field);
 
         if (property instanceof NumberProperty) {
-            return ((Number) property.getValue()).intValue() == 1;
+            Number number = (Number) property.getValue();
+            if (number != null) {
+                return number.intValue() == 1;
+            }
         }
 
         return def;

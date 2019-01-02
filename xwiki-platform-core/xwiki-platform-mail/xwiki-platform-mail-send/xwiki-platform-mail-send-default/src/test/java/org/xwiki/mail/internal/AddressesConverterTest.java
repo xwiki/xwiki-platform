@@ -50,7 +50,7 @@ public class AddressesConverterTest
         InternetAddress[] addresses = new InternetAddress[2];
         addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
         addresses[1] = new InternetAddress("john2@doe.com");
-        assertArrayEquals(addresses, (InternetAddress[]) this.addressesConverter.convert(Address[].class,
+        assertArrayEquals(addresses, this.addressesConverter.convert(Address[].class,
             "John Doe(comment) <john1@doe.com>,john2@doe.com"));
     }
 

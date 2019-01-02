@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.integration;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +38,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -47,6 +50,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.EnvironmentConfiguration;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailListener;
@@ -75,9 +79,12 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Attachment;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API.
@@ -101,6 +108,12 @@ import static org.mockito.Mockito.*;
 })
 public class JavaIntegrationTest extends AbstractMailIntegrationTest
 {
+    private static final String PERMDIR = "target/" + JavaIntegrationTest.class.getSimpleName();
+
+    private static final String TMPDIR = String.format("%s/tmp", PERMDIR);
+
+    private static final String MAILTMPDIR = String.format("%s/mail", TMPDIR);
+
     @Rule
     public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTP));
 
@@ -109,9 +122,11 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
 
     private TestMailSenderConfiguration configuration;
 
-    private MimeBodyPartFactory<String> defaultBodyPartFactory;
+    private TextMimeBodyPartFactory defaultBodyPartFactory;
 
-    private MimeBodyPartFactory<String> htmlBodyPartFactory;
+    private HTMLMimeBodyPartFactory htmlBodyPartFactory;
+
+    private AttachmentMimeBodyPartFactory attachmentBodyPartFactory;
 
     private MailSender sender;
 
@@ -141,16 +156,22 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
-        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
+        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(PERMDIR);
     }
 
     @Before
     public void initialize() throws Exception
     {
+        // Make sure files for temporary attachments are saved in the target directory
+        StandardEnvironment environment = this.componentManager.getInstance(Environment.class);
+        environment.setTemporaryDirectory(new File(TMPDIR));
+
         this.defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         this.htmlBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
+        this.attachmentBodyPartFactory = this.componentManager.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         this.sender = this.componentManager.getInstance(MailSender.class);
 
         // Set the EC
@@ -197,7 +218,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         Multipart multipart = new MimeMultipart("mixed");
         // Add text in the body
         multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
-            Collections.<String, Object>singletonMap("mimetype", "text/plain")));
+            Collections.singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
         // We also test using some default BCC addresses from configuration in this test
@@ -251,7 +272,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         Multipart multipart = new MimeMultipart("alternative");
         // Add an HTML body part
         multipart.addBodyPart(this.htmlBodyPartFactory.create(
-            "<font size=\"\\\"2\\\"\">simple meeting invitation</font>", Collections.<String, Object>emptyMap()));
+            "<font size=\"\\\"2\\\"\">simple meeting invitation</font>", Collections.emptyMap()));
         // Add the Calendar invitation body part
         String calendarContent = "BEGIN:VCALENDAR\r\n"
             + "METHOD:REQUEST\r\n"
@@ -309,10 +330,59 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
+    public void sendMailWithAttachment() throws Exception
+    {
+        // Remove any tmp file to start with a clean slate
+        FileUtils.cleanDirectory(new File(MAILTMPDIR));
+
+        // Step 1: Create a JavaMail Session
+        Session session = Session.getInstance(this.configuration.getAllProperties());
+
+        // Step 2: Create the Message to send
+        MimeMessage message = new MimeMessage(session);
+        message.setSubject("subject");
+        message.setRecipient(RecipientType.TO, new InternetAddress("john@doe.com"));
+
+        // Step 3: Add the attachment
+        Multipart multipart = new MimeMultipart("mixed");
+        Attachment attachment = mock(Attachment.class);
+        when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("attachment content".getBytes()));
+        when(attachment.getFilename()).thenReturn("attachment.txt");
+        when(attachment.getMimeType()).thenReturn("text/plain");
+        multipart.addBodyPart(this.attachmentBodyPartFactory.create(attachment, Collections.emptyMap()));
+        message.setContent(multipart);
+
+        // Verify that a temporary file was saved in the TMP dir
+        assertEquals(1, new File(MAILTMPDIR).listFiles().length);
+
+        // Step 4: Send the mail and wait for it to be sent
+        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
+
+        // Verify that the mail has been received (wait maximum 30 seconds).
+        this.mail.waitForIncomingEmail(30000L, 1);
+        MimeMessage[] messages = this.mail.getReceivedMessages();
+
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
+
+        assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
+
+        BodyPart attachmentPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
+        assertEquals("attachment content", attachmentPart.getContent());
+
+        // Make sure that our special tmp file location header is not sent in the mail
+        assertNull(attachmentPart.getHeader(AttachmentMimeBodyPartFactory.TMP_ATTACHMENT_LOCATION_FILE_HEADER));
+
+        // Verify that the mail sent removed the temporary file
+        assertEquals(0, new File(MAILTMPDIR).listFiles().length);
+    }
+
+    @Test
     public void sendMailWithCustomMessageId() throws Exception
     {
         Session session = Session.getInstance(this.configuration.getAllProperties());
-        MimeMessage message = new MimeMessage(session) {
+        MimeMessage message = new MimeMessage(session)
+        {
             @Override
             protected void updateMessageID() throws MessagingException
             {

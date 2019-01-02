@@ -14,7 +14,7 @@
 #macro(xwikimessageboxstart $title $message)
     <div class="centered panel panel-default xwikimessage">
      <div class="panel-heading">
-      <h3 class="panel-title">$title</h3>
+      <div class="panel-title">$title</div>
      </div>
      <div class="panel-body">
       <p class="xwikimessage">$message</p>
@@ -105,7 +105,6 @@
   ## Options / defaults
   ##
   #if("$!options.translationPrefix" != '') #set($transprefix = $options.translationPrefix) #else #set($transprefix = '') #end
-  #if("$!options.selectedColumn" != '')  #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.defaultOrder" == 'desc') #set($defaultOrder = 'desc') #else #set($defaultOrder = 'asc') #end
   #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
   #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
@@ -118,7 +117,7 @@
     #set ($selectedTags = [])
   #end
   #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
-  #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
+  #set ($topfilters = $options.topFilters)
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
   #set ($queryFilters = $options.queryFilters)
@@ -237,24 +236,16 @@
             #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
-                #set($isFilterable = true)
-              #else
-                #set($isFilterable = false)
-              #end
-              #if(("$!colprop.sortable" == '' || $colprop.sortable != false) && "$!colname" != '_actions')
-                #set($isSortable = true)
-              #else
-                #set($isSortable = false)
-              #end
+              #set($isFilterable = $colprop.filterable != false && "$!colname" != '_actions')
+              #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
+                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 #if($isSortable)<a data-rel="${colname}">#end
                 $displayName
                 #if($isSortable)</a>#end
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
+                #if($isFilterable)</label>#end
                 #set($columnCount = $mathtool.add($columnCount, 1))
               </th>
             #end
@@ -287,13 +278,20 @@
   <div id="${htmlLiveTableId}-inaccessible-docs" class="hidden">
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
   </div>
+  <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
+    #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
+  </div>
   <script type="text/javascript">
   //<![CDATA[
 (function() {
-  function startup() {
-    // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
-    if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
-      #set ($jsLiveTableId = $escapetool.javascript($divid))
+  var startup = function(container) {
+    // Make sure the LiveTable code is loaded (the WYSIWYG editor doesn't load the JavaScript code for instance).
+    var liveTableCodeLoaded = XWiki && XWiki.widgets && XWiki.widgets.LiveTable;
+    // Also make sure the live table is not already initialized.
+    #set ($jsLiveTableId = $escapetool.javascript($divid))
+    var liveTableElement = $('$jsLiveTableId');
+    if (liveTableCodeLoaded && liveTableElement && !liveTableElement.__liveTable &&
+        (liveTableElement == container || liveTableElement.descendantOf(container))) {
       #set ($liveTableParams = {
         'maxPages': $maxPages,
         'limit': $count,
@@ -313,8 +311,8 @@
       #if ($!callback != '')
         #set ($callbackParam = "$callback, ")
       #end
-      window[$jsontool.serialize($jsName)] = new XWiki.widgets.LiveTable("$dataurl", "$jsLiveTableId",
-        $callbackParam$jsontool.serialize($liveTableParams));
+      window[$jsontool.serialize($jsName)] = liveTableElement.__liveTable = new XWiki.widgets.LiveTable("$dataurl",
+        "$jsLiveTableId", $callbackParam$jsontool.serialize($liveTableParams));
       #if ($hasPageSize)
         document.observe("xwiki:livetable:${jsLiveTableId}:loadingEntries", function() {
           $('${jsLiveTableId}-pagesize').addClassName("hidden");
@@ -326,9 +324,15 @@
       return true;
     }
     return false;
-  }
-  // Initialize liveTable
-  (XWiki && XWiki.isInitialized && startup()) || document.observe('xwiki:livetable:loading', startup);
+  };
+  var init = function(event) {
+    var elements = (event && event.memo.elements) || [$('body')];
+    return elements.length > 0 && elements.some(startup);
+  };
+  // Initialize the live table on page load or after the live table code has been loaded.
+  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:livetable:loading', init);
+  // Initialize the live table when it is added after the page is loaded.
+  document.observe('xwiki:dom:updated', init);
 })();
    //]]>
   </script>
@@ -339,33 +343,6 @@
 #else{/pre}#end##
 #end## end-wrappers
 #end## end-livetable-macro
-
-#macro (livetable_filters $columns $columnsProperties $xclassName)
-  <tr class="xwiki-livetable-display-filters">
-    #foreach ($column in $columns)
-      #set ($columnProperties = $columnsProperties.get($column))
-      #if ($columnProperties.type != 'hidden')
-        <td class="xwiki-livetable-display-header-filter">
-          #if ($columnProperties.filterable != false)
-            #set ($columnXClassName = $columnProperties.get('class'))
-            #set ($columnXPropertyName = $column)
-            #if (!$columnXClassName)
-              #if ($column.startsWith('doc.'))
-                #set ($columnXClassName = 'XWiki.DocumentClass')
-                #set ($columnXPropertyName = $column.substring(4))
-              #else
-                #set ($columnXClassName = $xclassName)
-              #end
-            #end
-            #set ($xclass = $xwiki.getDocument($columnXClassName).getxWikiClass())
-            #set ($xproperty = $xclass.get($columnXPropertyName))
-            #livetable_filter($column $columnProperties $xproperty)
-          #end
-        </td>
-      #end
-    #end
-  </tr>
-#end
 
 #macro (livetable_filter $column $columnProperties $xproperty)
   #set ($filterType = $columnProperties.type)
@@ -379,7 +356,7 @@
       'Email': 'text',
       'Groups': 'suggest',
       'Number': 'number',
-      'Page': 'text',
+      'Page': 'suggest',
       'StaticList': 'list',
       'String': 'text',
       'TextArea': 'text',
@@ -430,12 +407,13 @@
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker',
       'css/bootstrap-daterangepicker.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
     ## Hidden input for date fields allows us to send timestamps to the server while displaying pretty dates.
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="hidden" />
+    <input name="$column" type="hidden" />
     #set ($dateFormat = $xproperty.getValue('dateFormat'))
     #if ("$!dateFormat" == '')
       #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
     #end
-    <input type="text" data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" type="text"
+      data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
       [$services.localization.render("${transprefix}$column")]))" />
@@ -452,181 +430,6 @@
   #end
 #end
 
-#**
- * Internal macro - Determine the name to be displayed in a livetable's column header. Strategy is as follows :
- * - If defined, the 'displayName' passed as a column option wins.
- * - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name.
- * - Finally, we fall back on the column name.
- *
- * @param colname the column name
- * @param colprop the column properties map
- * @param transprefix the translations prefix to use
- *
- * @internal
- *#
-##
-#macro(getLivetableColumnDisplayName $colname $colprop $transprefix)
-  #if("$!colprop.displayName" != '')
-    #set($displayName = $colprop.displayName)##
-  #elseif($transprefix != '')
-    #set($displayName = $services.localization.render("${transprefix}${colname}"))##
-  #else
-    #set($displayName = $colname)##
-  #end
-$displayName##
-#end
-
-#**
- * Internal macro - Used by the livetable macro to generate a JavaScript anonymous function
- * that is passed to the LiveTable object constructor. This is function is dynamically written
- * according to columns properties passed to the livetable macro.
- *
- * @param collist the list of columns
- * @param colprops the columns properties
- * @param transprefix the translation prefix
- *
- * @internal
- *#
-#macro(livetablecallback $divid $collist $colprops $transprefix)
-function (row, i, table) {
-   ## Make sure the columns containing HTML are formatted in HTML indeed
-   #set ($htmlColumnKeys = ['doc.location'])
-   #foreach($htmlColumnKey in $htmlColumnKeys)
-     #if ($collist.contains($htmlColumnKey))
-       #set ($htmlColumnProps = $colprops[$htmlColumnKey])
-       #if (!$htmlColumnProps)
-         #set ($htmlColumnProps = {})
-         #set ($colprops[$htmlColumnKey] = $htmlColumnProps)
-       #end
-       #if ($htmlColumnProps.html == $NULL)
-         #set ($htmlColumnProps.html = true)
-       #end
-     #end
-   #end
-
-  // This callback method has been generated from Velocity.
-  ## Translate the column descriptor.
-  #foreach ($entry in $colprops.entrySet())
-    #if ("$!entry.value.displayName" == '' && "$!transprefix" != '')
-      #set ($entry.value.displayName = $services.localization.render("${transprefix}$entry.key"))
-    #end
-  #end
-  #set ($actionsDescriptor = $colprops.get('_actions'))
-  #if ($actionsDescriptor)
-    #if (!$actionsDescriptor.labels)
-      #set ($actionsDescriptor.labels = {})
-    #end
-    #foreach ($action in $actionsDescriptor.actions)
-      #if (!$actionsDescriptor.labels.get($action))
-        #if ("$!transprefix" != '' && $services.localization.get("${transprefix}_actions.$action"))
-          #set ($discard = $actionsDescriptor.labels.put($action,
-            $services.localization.render("${transprefix}_actions.$action")))
-        #elseif ($services.localization.get("platform.livetable._actions.$action"))
-          #set ($discard = $actionsDescriptor.labels.put($action,
-            $services.localization.render("platform.livetable._actions.$action")))
-        #end
-      #end
-    #end
-  #end
-  var columns = $jsontool.serialize($collist);
-  var columnDescriptors = $jsontool.serialize($colprops);
-  var className = $jsontool.serialize($classname);
-  if (!row['doc_viewable']) {
-    $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
-  }
-  ## NOTE: Don't use Velocity code below this line!
-  var tr = new Element('tr');
-  columns.forEach(function(column) {
-    var descriptor = columnDescriptors[column] || {};
-    if (descriptor.type === 'hidden') {
-      return;
-    }
-    // The column's display name to be used when displaying the reponsive version.
-    var displayName = descriptor.displayName || column;
-    var fieldName = column.replace(/^doc\./, 'doc_');
-    if (column === '_actions') {
-      var adminActions = ['admin', 'rename', 'rights'];
-      var td = new Element('td', {
-        'class': 'actions',
-        'data-title': displayName
-      });
-      (descriptor.actions || []).forEach(function(action, index) {
-        if (row['doc_has' + action] || action === 'view' || (row['doc_has' + action] === undefined &&
-            (row['doc_hasadmin'] || adminActions.indexOf(action) < 0))) {
-          if (index > 0) {
-            td.insert(' ');
-          }
-          var link = new Element('a', {
-            'href': row['doc_' + action + '_url'],
-            'class': 'action action' + action
-          }).update((descriptor.labels || {})[action] || action);
-          if (descriptor.ajaxActions && descriptor.ajaxActions[action]) {
-            link.observe('click', function(event) {
-              event.stop();
-              new Ajax.Request(this.href, {
-                onSuccess: function() {
-                  eval((descriptor.actionCallbacks || {})[action]);
-                }
-              });
-            }.bindAsEventListener(link));
-          }
-          td.insert(link);
-        }
-      });
-      tr.appendChild(td);
-    } else {
-      var td = new Element('td', {
-        'class': [
-          fieldName,
-          'link' + (descriptor.link || ''),
-          'type' + (descriptor.type || '')
-        ].join(' '),
-        'data-title': displayName
-      });
-      var container = td;
-      if (descriptor.link && row['doc_viewable']) {
-        var link = new Element(descriptor.link === 'editor' ? 'span' : 'a');
-        // Automatic: the link URL is in JSON results, with the '_url' sufix.
-        if (descriptor.link === 'auto') {
-          link.href = row[fieldName + '_url'] || row['doc_url'];
-        } else if (descriptor.link === 'field') {
-          if (row[fieldName + '_url']) {
-            link.href = row[fieldName + '_url'];
-          }
-        // Property editor
-        } else if (descriptor.link === 'editor') {
-          var propertyClassName = descriptor['class'] || className;
-          td.observe('click', function(event) {
-            var tag = event.element().down('span') || event.element();
-            editProperty(row['doc_fullName'], propertyClassName, column, function(value) {
-              tag.innerHTML = value;
-            });
-          });
-        // Author, space or wiki link.
-        } else if (row['doc_' + descriptor.link + '_url']) {
-          link.href = row['doc_' + descriptor.link + '_url'];
-        } else {
-          link.href = row['doc_url'];
-        }
-        td.appendChild(link);
-        container = link;
-      }
-      // The value can be passed as a string..
-      if (descriptor.html + '' === 'true') {
-        container.innerHTML = row[fieldName] || '';
-      } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
-        var text = row[fieldName] + '';
-        if (fieldName === 'doc_name' && !row['doc_viewable']) {
-          text += '*';
-        }
-        container.update(text.escapeHTML());
-      }
-      tr.appendChild(td);
-    }
-  });
-  return tr;
-}
-#end
 ##
 ##
 #**

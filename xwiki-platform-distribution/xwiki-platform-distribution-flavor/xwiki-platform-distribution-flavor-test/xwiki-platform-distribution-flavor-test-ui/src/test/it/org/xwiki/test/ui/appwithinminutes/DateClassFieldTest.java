@@ -57,7 +57,8 @@ public class DateClassFieldTest extends AbstractClassEditorTest
         datePicker.setMinute("15");
         String selectedDate = dateField.getDefaultValue();
         // Ignore the number of seconds.
-        Assert.assertTrue(selectedDate.startsWith("13/10/2011 08:15:"));
+        Assert.assertTrue(String.format("The selected date [%s] doesn't start with [13/10/2011 08:15:].", selectedDate),
+            selectedDate.startsWith("13/10/2011 08:15:"));
 
         // Set the value of the date input and assert the date selected by the picker.
         dateField.setDefaultValue("17/03/2020 19:43:34");

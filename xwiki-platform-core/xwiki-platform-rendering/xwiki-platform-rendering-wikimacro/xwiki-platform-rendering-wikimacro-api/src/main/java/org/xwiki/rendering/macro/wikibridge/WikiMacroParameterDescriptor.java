@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro.wikibridge;
 
 import java.lang.reflect.Type;
 
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 
 /**
@@ -61,6 +62,11 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     private Object defaultValue;
 
     /**
+     * Type of the parameter.
+     */
+    private Type parameterType;
+
+    /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
      * 
      * @param id parameter identifier.
@@ -69,14 +75,12 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      */
     public WikiMacroParameterDescriptor(String id, String description, boolean mandatory)
     {
-        this.id = id;
-        this.description = description;
-        this.mandatory = mandatory;
+        this(id, description, mandatory, null);
     }
 
     /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
-     * 
+     *
      * @param id parameter identifier.
      * @param description parameter description.
      * @param mandatory if the parameter is mandatory.
@@ -85,10 +89,27 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      */
     public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue)
     {
+        this(id, description, mandatory, defaultValue, null);
+    }
+
+    /**
+     * Creates a new {@link WikiMacroParameterDescriptor} instance.
+     *
+     * @param id parameter identifier.
+     * @param description parameter description.
+     * @param mandatory if the parameter is mandatory.
+     * @param defaultValue parameter default value.
+     * @param parameterType parameter type.
+     * @since 10.10RC1
+     */
+    public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue,
+            Type parameterType)
+    {
         this.id = id;
         this.description = description;
         this.mandatory = mandatory;
         this.defaultValue = defaultValue;
+        this.parameterType = parameterType;
     }
 
     @Override
@@ -111,14 +132,23 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
 
     @Override
     @Deprecated
-    public Class< ? > getType()
+    public Class<?> getType()
     {
-        return String.class;
+        Class<?> type = ReflectionUtils.getTypeClass(this.parameterType);
+        if (type == null) {
+            type = String.class;
+        }
+
+        return type;
     }
 
     @Override
     public Type getParameterType()
     {
+        if (this.parameterType != null) {
+            return this.parameterType;
+        }
+
         return getType();
     }
 

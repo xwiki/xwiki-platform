@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1418633909000</creationDate>
   <parent>Mail.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1422375914000</date>
-  <contentUpdateDate>1422375914000</contentUpdateDate>
   <version>1.1</version>
   <title>Mail Translations</title>
   <comment/>
@@ -47,13 +44,13 @@ admin.emailsend=Sūta e-pastu
 admin.emailsend.description=Iestatīt e-pasta sūtīšanas iestatījumus.
 admin.emailstatus=E-pasta sūtīšanas statuss
 admin.emailstatus.description=Skatīt nosūtīto e-pastu statusu.
-### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
+admin.emailstatus.hint=Ja nevarat atrast vēstules statusu, iespējams tāpēc, ka nosūtīšanas iespējās nebija norādīts, ka vēstules statuss ir jāsaglabā.
 Mail.GeneralMailConfigClass_obfuscate=Slēpt e-pasta adresi
-Mail.GeneralMailConfigClass_obfuscate.hint=Šis iestatījums darbojas tikai uz e-pasta adresēm, kuras ir saglabātas Email veidā, un ja nav mainīta noklusētā attēlošana. Izskata piemērs\: a...@domain.org
+Mail.GeneralMailConfigClass_obfuscate.hint=Šis iestatījums darbojas tikai uz e-pasta adresēm, kuras ir saglabātas Email veidā, un ja nav mainīta noklusētā attēlošana. Izskata piemērs: a...@domain.org
 Mail.SendMailConfigClass_from=Nosūtīto e-pastu sūtītāja adrese
-Mail.SendMailConfigClass_from.hint=Noklusētā e-pasta adrese, kuru norādīs kā nosūtīto pastu sūtītāja adresi.
+Mail.SendMailConfigClass_from.hint=Noklusētā e-pasta adrese, kuru norādīs kā nosūtīto pastu sūtītāja adresi
 Mail.SendMailConfigClass_bcc=BCC e-pasta adreses
-Mail.SendMailConfigClass_bcc.hint=Noklusētais, ar komatu atdalītas e-pasta adrešu saraksts, uz kurām neredzami nosūtīt visu e-pastu kopijas.
+Mail.SendMailConfigClass_bcc.hint=Noklusētais, ar komatu atdalītas e-pasta adrešu saraksts, uz kurām neredzami nosūtīt visu e-pastu kopijas
 Mail.SendMailConfigClass_host=E-pasta serveris
 Mail.SendMailConfigClass_host.hint=Izmantotais SMTP serveris. Noklusētais serveris ir "localhost"
 Mail.SendMailConfigClass_port=E-pasta servera ports
@@ -63,11 +60,11 @@ Mail.SendMailConfigClass_username.hint=Ja SMTP serveris pieprasa autentifikācij
 Mail.SendMailConfigClass_password=E-pasta servera parole
 Mail.SendMailConfigClass_password.hint=Ja SMTP serveris pieprasa autentifikāciju, šeit norādiet lietotāja paroli
 Mail.SendMailConfigClass_properties=Papildu īpašības
-Mail.SendMailConfigClass_properties.hint=Saraksts ar papildu JavaMail īpašībām (piem.,  "mail.smtp.starttls.enable\=true", lai lietotu TLS)
+Mail.SendMailConfigClass_properties.hint=Saraksts ar papildu JavaMail īpašībām (piem.,  "mail.smtp.starttls.enable=true", lai lietotu TLS)
 Mail.SendMailConfigClass_sendWaitTime=Izsūtīšanas pauzes ilgums
 Mail.SendMailConfigClass_sendWaitTime.hint=Pauze milisekundēs, kuru nogaidīt pēc katra e-pasta izsūtīšanas (pēc noklusēšanas 8 sekundes)
 Mail.SendMailConfigClass_discardSuccessStatuses=Dzēst veiksmes ziņojumus?
-Mail.SendMailConfigClass_discardSuccessStatuses.hint=Vai saglabāt, vai izmest ziņojumus par veiksmīgi nosūtītajiem e-pastiem.
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Vai saglabāt, vai izmest ziņojumus par veiksmīgi nosūtītajiem e-pastiem
 Mail.SendMailStatus_livetable.date=Datums
 Mail.SendMailStatus_livetable.batchId=Partijas IID
 Mail.SendMailStatus_livetable.type=Veids

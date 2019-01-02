@@ -79,7 +79,7 @@ public abstract class AbstractTest
     /** Used so that AllTests can set the persistent test context. */
     public static void initializeSystem(PersistentTestContext context) throws Exception
     {
-        AbstractTest.context = context;
+        AbstractTest.setContext(context);
         BaseElement.setContext(context);
         TestUtils.setContext(context);
         AbstractTest.componentManager = new EmbeddableComponentManager();
@@ -97,6 +97,16 @@ public abstract class AbstractTest
         loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
 
         TestUtils.initializeComponent(AbstractTest.componentManager);
+    }
+
+    public static void setContext(PersistentTestContext testContext)
+    {
+        context = testContext;
+    }
+
+    public static PersistentTestContext getContext()
+    {
+        return context;
     }
 
     @BeforeClass

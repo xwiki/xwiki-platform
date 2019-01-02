@@ -185,30 +185,45 @@ public class XWikiWikiModel implements WikiModel
         return getLinkURL(imageReference);
     }
 
+    private EntityReference getDocumentEntityReference(ResourceReference resourceReference)
+    {
+        EntityReference documentReference;
+
+        if (resourceReference.getType().equals(ResourceType.PAGE)) {
+            documentReference =
+                this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.PAGE);
+        } else {
+            documentReference =
+                this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+        }
+
+        return documentReference;
+    }
+
     @Override
     public boolean isDocumentAvailable(ResourceReference resourceReference)
     {
-        EntityReference documentReference =
-            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+        EntityReference documentEntityReference = getDocumentEntityReference(resourceReference);
 
-        if (documentReference == null) {
+        if (documentEntityReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
-        return this.documentAccessBridge.exists(new DocumentReference(documentReference));
+        DocumentReference documentReference = this.documentAccessBridge.getDocumentReference(documentEntityReference);
+
+        return this.documentAccessBridge.exists(documentReference);
     }
 
     @Override
     public String getDocumentViewURL(ResourceReference resourceReference)
     {
-        EntityReference documentReference =
-            this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+        EntityReference documentReference = getDocumentEntityReference(resourceReference);
 
         if (documentReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
-        return this.documentAccessBridge.getDocumentURL(new DocumentReference(documentReference), "view",
+        return this.documentAccessBridge.getDocumentURL(documentReference, "view",
             resourceReference.getParameter(DocumentResourceReference.QUERY_STRING),
             resourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
@@ -234,8 +249,8 @@ public class XWikiWikiModel implements WikiModel
                     // TODO: Once the xwiki-url module is usable, refactor this code to use it and remove the need to
                     // perform explicit encoding here.
 
-                    modifiedQueryString = "parent=" + URLEncoder.encode(
-                        this.compactEntityReferenceSerializer.serialize(reference), UTF8.name());
+                    modifiedQueryString = "parent="
+                        + URLEncoder.encode(this.compactEntityReferenceSerializer.serialize(reference), UTF8.name());
                 } catch (UnsupportedEncodingException e) {
                     // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
                     // without that encoding.
@@ -244,31 +259,28 @@ public class XWikiWikiModel implements WikiModel
             }
         }
 
-        EntityReference documentReference =
-            this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+        EntityReference documentReference = getDocumentEntityReference(resourceReference);
 
         if (documentReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
-        return this.documentAccessBridge.getDocumentURL(new DocumentReference(documentReference), "create",
-            modifiedQueryString, resourceReference.getParameter(DocumentResourceReference.ANCHOR));
+        return this.documentAccessBridge.getDocumentURL(documentReference, "create", modifiedQueryString,
+            resourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     @Override
     public XDOM getXDOM(ResourceReference resourceReference) throws WikiModelException
     {
         // Currently we only support getting the XDOM for a document
-        EntityReference entityReference =
-            this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+        EntityReference entityReference = getDocumentEntityReference(resourceReference);
 
         if (entityReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
         try {
-            return this.documentAccessBridge.getTranslatedDocumentInstance(new DocumentReference(entityReference))
-                .getXDOM();
+            return this.documentAccessBridge.getTranslatedDocumentInstance(entityReference).getXDOM();
         } catch (Exception e) {
             throw new WikiModelException(String.format("Failed to get XDOM for [%s]", resourceReference), e);
         }

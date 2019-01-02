@@ -51,7 +51,7 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
 public class DefaultMailSenderConfigurationTest
 {
     @RegisterExtension
-    static LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private DefaultMailSenderConfiguration configuration;

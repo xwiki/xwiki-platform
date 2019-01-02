@@ -36,8 +36,8 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
 {
     @Override
     public SearchResults search(String wikiName, String spaceName, String keywords, List<String> searchScopeStrings,
-            Integer number, Integer start, String orderField, String order, Boolean withPrettyNames)
-            throws XWikiRestException
+            Integer number, Integer start, String orderField, String order, Boolean withPrettyNames,
+            Boolean isLocaleAware) throws XWikiRestException
     {
         List<String> spaces = parseSpaceSegments(spaceName);
         
@@ -52,7 +52,7 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
                     search(searchScopes, keywords, wikiName, Utils.getLocalSpaceId(spaces),
                             Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(
                                     Utils.getXWikiContext(componentManager)), number, start, true, orderField, order,
-                            withPrettyNames));
+                            withPrettyNames, isLocaleAware));
 
             return searchResults;
         } catch (Exception e) {

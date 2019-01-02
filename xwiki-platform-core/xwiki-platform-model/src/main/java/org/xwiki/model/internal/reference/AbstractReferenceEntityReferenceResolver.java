@@ -34,23 +34,29 @@ import org.xwiki.model.reference.InvalidEntityReferenceException;
  * @version $Id$
  * @since 2.2.3
  */
-public abstract class AbstractReferenceEntityReferenceResolver extends AbstractEntityReferenceResolver implements
-    EntityReferenceResolver<EntityReference>
+public abstract class AbstractReferenceEntityReferenceResolver extends AbstractEntityReferenceResolver
+    implements EntityReferenceResolver<EntityReference>
 {
     @Override
     public EntityReference resolve(EntityReference referenceToResolve, EntityType type, Object... parameters)
     {
-        EntityReference normalizedReference;
+        EntityReference normalizedReference = referenceToResolve;
 
-        if (referenceToResolve == null) {
+        if (normalizedReference == null) {
             normalizedReference = resolveDefaultReference(type, parameters);
-        } else {
-            // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
-            // reference.
-            if (type.ordinal() > referenceToResolve.getType().ordinal()) {
-                normalizedReference = resolveDefaultReference(type, parameters).appendParent(referenceToResolve);
-            } else {
-                normalizedReference = referenceToResolve;
+        } else if (normalizedReference.getType() != type) {
+            // If the passed type is not compatible with the reference to resolve's type then we need to convert it
+            if (!type.isAllowedAncestor(normalizedReference.getType())
+                && !normalizedReference.getType().isAllowedAncestor(type)) {
+                normalizedReference = normalizeReference(normalizedReference, parameters);
+
+                normalizedReference = toCompatibleEntityReference(normalizedReference, type);
+            }
+
+            // If the passed type is a supertype of the reference to resolve's type then we need to insert a top
+            // level reference.
+            if (type != normalizedReference.getType() && type.isAllowedAncestor(normalizedReference.getType())) {
+                normalizedReference = resolveDefaultReference(type, parameters).appendParent(normalizedReference);
             }
         }
 
@@ -62,11 +68,9 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
             throw new InvalidEntityReferenceException("Invalid reference [" + referenceToResolve + "]");
         }
 
-        if (referenceToResolve != null) {
+        if (type != normalizedReference.getType()) {
             // If the passed type is a subtype of the reference to resolve's type then we extract the reference.
-            if (type.ordinal() < referenceToResolve.getType().ordinal()) {
-                normalizedReference = normalizedReference.extractReference(type);
-            }
+            normalizedReference = normalizedReference.extractReference(type);
         }
 
         return normalizedReference;
@@ -85,7 +89,7 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
         EntityReference normalizedReference = referenceToResolve;
         EntityReference reference = normalizedReference;
         while (reference != null) {
-            List<EntityType> types = EntityReferenceConstants.PARENT_TYPES.get(reference.getType());
+            List<EntityType> types = reference.getType().getAllowedParents();
             if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
                 // The parent reference isn't the allowed parent: insert an allowed reference
                 EntityReference newReference =

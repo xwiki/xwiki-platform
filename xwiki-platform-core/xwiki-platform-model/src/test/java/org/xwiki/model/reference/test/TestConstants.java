@@ -34,6 +34,8 @@ public interface TestConstants
 
     String DEFAULT_SPACE = "defspace";
 
+    String DEFAULT_DOCUMENT = "defdocument";
+
     String DEFAULT_PAGE = "defpage";
 
     String DEFAULT_ATTACHMENT = "deffilename";
@@ -48,7 +50,7 @@ public interface TestConstants
 
     EntityReference DEFAULT_SPACE_REFERENCE = new EntityReference(DEFAULT_SPACE, EntityType.SPACE);
 
-    EntityReference DEFAULT_PAGE_REFERENCE = new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT);
+    EntityReference DEFAULT_DOCUMENT_REFERENCE = new EntityReference(DEFAULT_DOCUMENT, EntityType.DOCUMENT);
 
     EntityReference DEFAULT_ATTACHMENT_REFERENCE = new EntityReference(DEFAULT_ATTACHMENT, EntityType.ATTACHMENT);
 
@@ -60,4 +62,15 @@ public interface TestConstants
     EntityReference DEFAULT_CLASS_PROPERTY_REFERENCE = new EntityReference(DEFAULT_CLASS_PROPERTY,
         EntityType.CLASS_PROPERTY);
 
+    EntityReference DEFAULT_PAGE_REFERENCE = new EntityReference(DEFAULT_PAGE, EntityType.PAGE);
+
+    EntityReference DEFAULT_PAGE_ATTACHMENT_REFERENCE = new EntityReference(DEFAULT_ATTACHMENT, EntityType.PAGE_ATTACHMENT);
+
+    EntityReference DEFAULT_PAGE_OBJECT_REFERENCE = new EntityReference(DEFAULT_OBJECT, EntityType.PAGE_OBJECT);
+
+    EntityReference DEFAULT_PAGE_OBJECT_PROPERTY_REFERENCE = new EntityReference(DEFAULT_OBJECT_PROPERTY,
+        EntityType.PAGE_OBJECT_PROPERTY);
+
+    EntityReference DEFAULT_PAGE_CLASS_PROPERTY_REFERENCE = new EntityReference(DEFAULT_CLASS_PROPERTY,
+        EntityType.PAGE_CLASS_PROPERTY);
 }

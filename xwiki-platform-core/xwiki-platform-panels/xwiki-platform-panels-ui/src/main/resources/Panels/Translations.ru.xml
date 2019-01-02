@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393442253000</creationDate>
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1464963428000</date>
-  <contentUpdateDate>1464963428000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -48,6 +45,6 @@ panels._actions=Действия
 panels.emptyvalue=
 panels.children.title=Дочерние Страницы
 panels.siblings.title=Родственные Страницы
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.documentInformation.configureSyntaxes=Настройка синтаксиса
 </content>
 </xwikidoc>

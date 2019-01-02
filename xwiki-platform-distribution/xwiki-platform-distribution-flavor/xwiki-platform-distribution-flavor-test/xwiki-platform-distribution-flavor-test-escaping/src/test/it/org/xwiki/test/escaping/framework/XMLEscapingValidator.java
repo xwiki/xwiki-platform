@@ -48,6 +48,8 @@ public class XMLEscapingValidator implements Validator
     /** Test for unescaped quote. */
     private static final String TEST_QUOT = "aaa\"bbb";
 
+    private static final String TEST_QUOT_ESCAPED = "aaa&quot;bbb";
+
     /** Test for unescaped tag start. */
     private static final String TEST_LT = "ddd<eee";
 
@@ -161,35 +163,57 @@ public class XMLEscapingValidator implements Validator
     }
 
     /**
-     * Check whether quote and apostrophe are properly escaped. Attempts to avoid false positives caused by XML escaping
-     * inside tags (where only <, > and & are escaped). Found problems are added to the internal list of escaping
-     * errors.
+     * Check whether double quotes and singe quotes are properly escaped. The rule we apply is:
+     * <ul>
+     *   <li>Double quotes must always be escaped inside an attribute that has double quotes around the value</li>
+     *   <li>Single quotes must always be escaped inside an attribute that has single quotes around the value</li>
+     *   <li>Single and double quotes don't need to be escaped into element text</li>
+     * </ul>
      * 
      * @param line the line to check
      * @param lineNr line number reported on failures
      */
-    private void checkStringDelimiters(String line, int lineNr)
+    protected void checkStringDelimiters(String line, int lineNr)
     {
-        // NOTE this method produces false NEGATIVES if XML-tag escaping method is used inside tag attributes (unlikely)
-        final int offset = INPUT_STRING.indexOf(TEST_APOS) - INPUT_STRING.indexOf(TEST_QUOT);
-        int idx = 0;
-        while ((idx = line.indexOf(TEST_APOS, idx)) >= 0) {
-            // ignore if quote was not escaped either
-            int expected_idx = idx - offset;
-            if (expected_idx < 0 || line.indexOf(TEST_QUOT, expected_idx) != expected_idx) {
+        // Check for unescaped single quotes that must be escaped
+        int idx = -1;
+        while ((idx = line.indexOf(TEST_APOS, idx + 1)) >= 0) {
+            char c = isInAttribute(line, idx);
+            // If we're in an attribute and the attribute delimiter is a single quote then the single quote should
+            // have been escaped
+            if (c == '\'') {
                 this.errors.add(new ValidationError(Type.WARNING, lineNr, idx, "Unescaped ' character"));
             }
-            idx++;
         }
-        idx = 0;
-        while ((idx = line.indexOf(TEST_QUOT, idx)) >= 0) {
-            // ignore if apostrophe was not escaped either
-            int expected_idx = idx + offset;
-            if (expected_idx < 0 || line.indexOf(TEST_APOS, expected_idx) != expected_idx) {
+
+        // Check for unescaped double quotes that must be escaped
+        idx = -1;
+        while ((idx = line.indexOf(TEST_QUOT, idx + 1)) >= 0) {
+            char c = isInAttribute(line, idx);
+            // If we're in an attribute and the attribute delimiter is a double quote then the double quote should
+            // have been escaped
+            if (c == '\"') {
                 this.errors.add(new ValidationError(Type.WARNING, lineNr, idx, "Unescaped \" character"));
             }
-            idx++;
         }
+    }
+
+    private char isInAttribute(String line, int startPosition)
+    {
+        int position = startPosition;
+        for (; position > -1; position--) {
+            char c = line.charAt(position);
+            if (c == '<' || c == '>') {
+                return 0;
+            }
+            if (c == '\"' || c == '\'') {
+                // TODO: Improve to handle spaces/tabs between "=" and quotes
+                if (position > 0 && line.charAt(position - 1) == '=') {
+                    return c;
+                }
+            }
+        }
+        return 0;
     }
 
     /**

@@ -59,6 +59,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.ExportURLFactory;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 /**
  * Create a ZIP package containing a range of HTML pages with skin and attachment dependencies.
@@ -351,6 +352,12 @@ public class HtmlPackager
         // Use the filesystem URL format for all code using the url module to generate URLs (webjars, etc).
         Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
 
+        // We don't want rendering of pages to output anything in the current servlet response
+        // since we'll send the zip in that response.
+        // for example, if the page does a redirect, it would write to the servlet output stream and ruin it
+        // since we can't write to a stream in which a redirect has been done (it's committed) and thus
+        // we won't be able to return our zip in this case.
+        renderContext.setResponse(new XWikiServletResponseStub());
         return renderContext;
     }
 

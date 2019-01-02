@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1413881092000</creationDate>
   <parent>Panels.Applications</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1413991041000</date>
-  <contentUpdateDate>1413991041000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -94,6 +91,34 @@
     </class>
     <property>
       <applicationId>platform.panels.panelApplication</applicationId>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>5</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>6722e567-fbdf-4ebf-a85d-116ab12f158e</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.menu.MenuApplication</applicationId>
     </property>
   </object>
   <object>

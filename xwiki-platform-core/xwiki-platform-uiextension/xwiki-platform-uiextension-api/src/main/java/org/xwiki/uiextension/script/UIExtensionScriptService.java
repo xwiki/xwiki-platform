@@ -67,7 +67,7 @@ public class UIExtensionScriptService implements ScriptService
      */
     @Inject
     private UIExtensionManager uiExtensionManager;
-
+    
     /**
      * Utility method to split a list of extension names, for example {code}"Panels.Apps,Panels.QuickLinks"{code} to get
      * a List containing those names.

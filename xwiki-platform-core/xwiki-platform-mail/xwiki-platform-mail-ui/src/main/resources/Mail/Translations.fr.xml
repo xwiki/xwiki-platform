@@ -27,57 +27,54 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1418633909000</creationDate>
   <parent>Mail.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1422375914000</date>
-  <contentUpdateDate>1422375914000</contentUpdateDate>
   <version>1.1</version>
   <title>Mail Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.email=Email
-admin.email.description=Configurer l'email (général, envoi d'email) et voir  les statuts d'emails.
+  <content>admin.email=Courriel (email)
+admin.email.description=Configurer l'envoi de courriel et voir les statuts des courriels.
 admin.emailgeneral=Général
-admin.emailgeneral.description=Configuration des paramètres généraux relatifs aux mails
-admin.emailsend=Envoi de mails
-admin.emailsend.description=Configurer les paramètres d'envoi d'emails
-admin.emailstatus=Status des mails
-admin.emailstatus.description=Voir le status des mails envoyés.
-### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
-Mail.GeneralMailConfigClass_obfuscate=Obscurcir l'adresse email
-Mail.GeneralMailConfigClass_obfuscate.hint=Cela affecte seulement les adresses email enregistrées dans les propriétés de l'objet de type E-mail, aussi longtemps que le displayer par défaut pour le type de propriété Email n'est pas écrasé.
-Mail.SendMailConfigClass_from=Adresse email à envoyer depuis
-Mail.SendMailConfigClass_from.hint=L'adresse email par défaut utilisée pour envoyer des emails de notifications depuis
-Mail.SendMailConfigClass_bcc=CCI
-Mail.SendMailConfigClass_bcc.hint=Une liste d'adresses emails CCI séparée par des virgules à utiliser lors de l'envoi.
+admin.emailgeneral.description=Configurez les paramètres avancés de messagerie comme le masquage des adresses email.
+admin.emailsend=Envoi de courriels
+admin.emailsend.description=Configurer les paramètres d'envoi des courriels.
+admin.emailstatus=Statut d'envoi des courriels
+admin.emailstatus.description=Voir le statut des courriels envoyés et ré-envoyer les courriels qui sont revenus en échec.
+admin.emailstatus.hint=Si vous ne pouvez pas trouver le statut d'un courriel c'est probablement parce que la propriété qui a expédié ce courriel n'a pas spécifié que son statut devait persister.
+Mail.GeneralMailConfigClass_obfuscate=Masquer l'adresse email
+Mail.GeneralMailConfigClass_obfuscate.hint=Cela affecte seulement les adresses email enregistrées dans les propriétés de l'objet de type Email, aussi longtemps que le displayer par défaut pour le type de propriété Email n'est pas écrasé. Exemple: a...@domain.org
+Mail.SendMailConfigClass_from=Adresse email de l'expéditeur
+Mail.SendMailConfigClass_from.hint=L'adresse email utilisée par défaut pour envoyer les courriels de notifications
+Mail.SendMailConfigClass_bcc=Adresses email en CCI (copie conforme invisible)
+Mail.SendMailConfigClass_bcc.hint=Une liste d'adresses email CCI (copie conforme invisible) séparée par des virgules à utiliser lors de l'envoi
 Mail.SendMailConfigClass_host=Serveur email
 Mail.SendMailConfigClass_host.hint=Le serveur SMTP vers lequel envoyer.\n"localhost" par défaut
 Mail.SendMailConfigClass_port=Port du serveur d'email
-Mail.SendMailConfigClass_port.hint=Le port du serveur SMTP à utiliser. Par défaut \: 25
+Mail.SendMailConfigClass_port.hint=Le port du serveur SMTP à utiliser. Par défaut : 25
 Mail.SendMailConfigClass_username=Nom d'utilisateur du serveur email (optionnel)
-Mail.SendMailConfigClass_username.hint=Le nom d'utilisateur pour se connecter au serveur SMTP, pour authentifier les serveurs
+Mail.SendMailConfigClass_username.hint=Le nom d'utilisateur pour se connecter au serveur SMTP, seulement quand l'authentification est requise
 Mail.SendMailConfigClass_password=Mot de passe du serveur d'email (optionnel)
-Mail.SendMailConfigClass_password.hint=Le mot de passe pour se connecter au serveur SMTP, pour authentifier les serveurs
+Mail.SendMailConfigClass_password.hint=Le mot de passe pour se connecter au serveur SMTP, seulement quand l'authentification est requise
 Mail.SendMailConfigClass_properties=Propriétés additionnelles
-Mail.SendMailConfigClass_properties.hint=La liste des propriétés JavaMail additionnelles à utiliser (par exemple "mail.smtp.starttls.enable\=true" pour TLS
-Mail.SendMailConfigClass_sendWaitTime=Envoyer temps d'attente
+Mail.SendMailConfigClass_properties.hint=La liste des propriétés JavaMail additionnelles à utiliser (par exemple "mail.smtp.starttls.enable=true" pour TLS)
+Mail.SendMailConfigClass_sendWaitTime=Fréquence d'envoi
 Mail.SendMailConfigClass_sendWaitTime.hint=Le délai d'attente entre chaque email envoyé, en milli-secondes (par défaut 8 secondes)
 Mail.SendMailConfigClass_discardSuccessStatuses=Effacer les statuts succès ?
-Mail.SendMailConfigClass_discardSuccessStatuses.hint=Ne pas stocker les statuts des mails envoyés avec succès. 
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Ne pas stocker les statuts des courriels envoyés avec succès (par défaut, oui)
 Mail.SendMailStatus_livetable.date=Date
 Mail.SendMailStatus_livetable.batchId=ID du lot
 Mail.SendMailStatus_livetable.type=Type
 Mail.SendMailStatus_livetable.recipients=Destinataires
-Mail.SendMailStatus_livetable.state=Statuts
+Mail.SendMailStatus_livetable.state=Statut
 Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Erreur
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Renvoyer
-mailSender.admin.resendSuccess=Le mail a été envoyé avec succès
-mailSender.admin.resendFailure=Le mail n'a pas pu être envoyé de nouveau. Cliquez pour avoir plus d'information.
+mailSender.admin.resendSuccess=Le courriel a été envoyé avec succès
+mailSender.admin.resendFailure=Le courriel n'a pas pu être envoyé de nouveau. Cliquez pour avoir plus d'information.
 </content>
 </xwikidoc>

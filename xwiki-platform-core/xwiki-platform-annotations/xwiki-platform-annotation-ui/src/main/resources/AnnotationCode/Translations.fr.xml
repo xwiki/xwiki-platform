@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1264862667000</creationDate>
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1271949711000</date>
-  <contentUpdateDate>1271949711000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -41,7 +38,7 @@
   <hidden>true</hidden>
   <content>annotations.title=Annotations
 annotations.menu.loading=Chargement des paramètres pour les annotations
-annotations.menu.loaderror=Erreur :
+annotations.menu.loaderror=Échec :
 annotations.tab.info.noannotations=Aucune annotation trouvée pour cette page
 
 annotations.settings.display=Afficher les annotations
@@ -51,20 +48,20 @@ annotations.settings.error.notarget=Aucun document de paramétrage pour les anno
 annotations.annotated.loading=Chargement des annotations
 annotations.annotated.loaderror=Erreur :
 annotations.annotated.loaderror.wrongresponse=Réponse serveur mal formatée
-annotations.annotated.error.noannotatedelement=Impossible de charger les annotations : leur contenu n'est pas disponible.
-annotations.annotated.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents rédigés en syntaxe XWiki 1.0.
+annotations.annotated.error.noannotatedelement=Impossible de charger les annotations : le contenu n'est pas disponible.
+annotations.annotated.error.wrongsyntax=Les annotations ne sont pas disponibles pour les pages rédigées en syntaxe XWiki 1.0.
 
 annotations.action.edit.text=[Modifier]
-annotations.action.edit.tooltip=Modifier cette annotation
-annotations.action.edit.submit.text=Enregistrer
+annotations.action.edit.tooltip=Modifier l'annotation
+annotations.action.edit.submit.text=Mettre à jour
 annotations.action.edit.cancel.text=Annuler
-annotations.action.edit.success=L'annotation a été mise à jour
-annotations.action.edit.loaderror=Erreur :
-annotations.action.edit.error.notfound=Cette annotation n'existe plus. Merci de recharger la page.
+annotations.action.edit.success=Annotation mise à jour.
+annotations.action.edit.loaderror=Échec :
+annotations.action.edit.error.notfound=Cette annotation n'existe plus. Merci d'actualiser la page.
 
 annotations.action.delete.text=[Supprimer]
 annotations.action.delete.tooltip=Supprimer l'annotation
-annotations.action.delete.confirm=Etes-vous certain de vouloir supprimer cette annotation ?
+annotations.action.delete.confirm=Êtes-vous certain de vouloir supprimer cette annotation ?
 annotations.action.delete.inProgress=Suppression de l'annotation...
 annotations.action.delete.done=Annotation supprimée
 annotations.action.delete.failed=Impossible de supprimer l'annotation :
@@ -72,31 +69,31 @@ annotations.action.delete.failed=Impossible de supprimer l'annotation :
 annotations.action.create.submit.text=Ajouter l'annotation
 annotations.action.create.cancel.text=Annuler
 annotations.action.create.selection.invalid=Merci de sélectionner du texte dans le corps du document.
-annotations.action.create.form.loaderror=Erreur :
-annotations.action.create.success=L'annotation a été ajoutée avec succès
-annotations.action.create.loaderror=Erreur :
-annotations.action.create.error.unauthorized=Vous n'êtes pas autorisés à annoter ce document.
-annotations.action.create.error.unauthorizedguest=Vous n'êtes pas autorisés à annoter ce document. Commencez par vous identifier.
-annotations.action.create.helpmessage=Pour annoter une portion de texte, sélectionnez-la puis appuyez sur {0}.
+annotations.action.create.form.loaderror=Échec :
+annotations.action.create.success=Annotation ajoutée.
+annotations.action.create.loaderror=Échec :
+annotations.action.create.error.unauthorized=Vous n'êtes pas autorisé à annoter cette page.
+annotations.action.create.error.unauthorizedguest=Vous n'êtes pas autorisé à annoter ce document. Commencez par vous identifier.
+annotations.action.create.helpmessage=Pour annoter un texte, sélectionnez-le puis appuyez sur {0}.
 annotations.action.create.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents rédigés en syntaxe XWiki 1.0.
-annotations.action.create.error.notarget=L'annotation n'est associée à aucun document.
+annotations.action.create.error.notarget=Pas de cible (page) spécifiée pour créer une annotation.
 
-annotations.action.view.hide.text=Masquer
-annotations.action.view.form.loaderror=Erreur :
-annotations.action.view.error.notfound=Cette annotation n'existe plus. Merci de recharger la page.
+annotations.action.view.hide.text=masquer
+annotations.action.view.form.loaderror=Échec :
+annotations.action.view.error.notfound=Cette annotation n'existe plus. Merci d'actualiser la page.
 annotations.action.view.thread=Afficher la discussion
 
-annotations.altered.text=Cette annotation ne peut être affichée car le texte annoté n'existe plus dans le document.
-annotations.updated.text=Cette annotation a été déplacée automatiquement en raison d'une mise à jour du document. Initialement :
-annotations.action.validate.text=[Enregistrer]
+annotations.altered.text=Cette annotation ne peut être affichée car le texte annoté n'existe plus dans la page :
+annotations.updated.text=Cette annotation a été déplacée automatiquement en raison d'une mise à jour de la page. Initialement :
+annotations.action.validate.text=[Valider]
 annotations.action.validate.tooltip=Valider la mise à jour automatique du texte sélectionné pour cette annotation
-annotations.action.validate.success=L'annotation a été enregistrée
-annotations.action.validate.loaderror=Erreur :
+annotations.action.validate.success=Annotation enregistrée.
+annotations.action.validate.loaderror=Échec :
 
 annotations.filters.show=Affiner le critère d'affichage
-annotations.filters.nooption=Il n''y a aucun résultat pour le filtre "{0}"
-annotations.filters.anyvalue=Toutes les valeurs
-annotations.filters.clearvalue=Effacer
+annotations.filters.nooption=Il n''y a aucune valeur à filtrer pour "{0}"
+annotations.filters.anyvalue=n'importe quelle valeur
+annotations.filters.clearvalue=effacer
 
 annotations.config.title=Panneau de configuration des Annotations
 annotations.config.display.title=Paramètres d'affichage des annotations
@@ -114,7 +111,7 @@ AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Désactiver les annotations
 AnnotationCode.AnnotationConfig_displayed=Par défaut, afficher les annotations
 AnnotationCode.AnnotationConfig_displayed.hint=Indique si les annotations sont affichées par défaut ou seulement en utilisant l'option "Afficher les annotations" de la page
 AnnotationCode.AnnotationConfig_displayHighlight=Par défaut, surligner le texte annoté
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Indique si le surlignement des annotations doit toujours être actif ou uniquement au survol
 AnnotationCode.AnnotationConfig_annotationClass=Classe XWiki définissant la structure des annotations
 </content>
 </xwikidoc>

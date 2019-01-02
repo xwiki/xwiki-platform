@@ -21,11 +21,9 @@ package org.xwiki.notifications.filters.watchlistbridge.internal;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -130,43 +128,53 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         List<String> values = obj.getListValue(fieldName);
         if (values != null && !values.isEmpty()) {
             for (String value : values) {
-                DefaultNotificationFilterPreference pref = createDefaultNotificationFilterPreference(
-                    String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
-                Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
-                preferenceProperties.put(property, Collections.singletonList(value));
-                pref.setPreferenceProperties(preferenceProperties);
+                DefaultNotificationFilterPreference pref = createNotificationFilterPreference(
+                        String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
+                switch (property) {
+                    case PAGE:
+                        pref.setPageOnly(value);
+                        break;
+                    case SPACE:
+                        pref.setPage(value);
+                        break;
+                    case WIKI:
+                        pref.setWiki(value);
+                        break;
+                    default:
+                        break;
+                }
                 results.add(pref);
             }
         }
     }
 
-    private DefaultNotificationFilterPreference createDefaultNotificationFilterPreference(String name)
+    private DefaultNotificationFilterPreference createNotificationFilterPreference(String id)
     {
-        DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(name);
+        DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
+        pref.setId(id);
         pref.setEnabled(true);
         pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         pref.setProviderHint(PROVIDER_HINT);
         pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
-        pref.setPreferenceProperties(new HashMap<>());
         return pref;
     }
 
     @Override
-    public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
+    public void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> filterPreferences)
     {
         // We do not want to create any new preference for the watchlist application, since we want to migrate
         // smoothly to the new notification mechanism
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceName)
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceId)
     {
         if (!configuration.isEnabled()) {
             return;
         }
 
-        String[] parts = filterPreferenceName.split("_");
+        String[] parts = filterPreferenceId.split("_");
         if (parts.length != 3 || !"watchlist".equals(parts[0])) {
             return;
         }
@@ -175,12 +183,11 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
 
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
-        DocumentReference user = context.getUserReference();
 
         try {
             XWikiDocument document = xwiki.getDocument(user, context);
             List<BaseObject> objects = document.getXObjects(
-                CLASS_REFERENCE.appendParent(context.getUserReference().getWikiReference()));
+                CLASS_REFERENCE.appendParent(user.getWikiReference()));
             if (objects == null) {
                 return;
             }
@@ -190,7 +197,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
                 if (obj == null) {
                     continue;
                 }
-                found |= removeValueFromObject(filterPreferenceName, type, fieldName, obj);
+                found |= removeValueFromObject(filterPreferenceId, type, fieldName, obj);
             }
 
             if (found) {
@@ -232,7 +239,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     }
 
     @Override
-    public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled)
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
     {
         // Watchlist preferences are always enabled
     }

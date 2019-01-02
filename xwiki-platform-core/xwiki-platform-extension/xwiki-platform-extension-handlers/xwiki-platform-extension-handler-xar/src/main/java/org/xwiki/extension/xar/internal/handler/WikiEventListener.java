@@ -37,6 +37,7 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.extension.event.ExtensionInstallingEvent;
 import org.xwiki.extension.handler.ExtensionHandler;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.job.InstallRequest;
@@ -127,6 +128,10 @@ public class WikiEventListener extends AbstractEventListener
 
             // Copy extension
             try {
+                // Notify about the install
+                this.observation.notify(new ExtensionInstallingEvent(installedExtension.getId(), targetNamespace),
+                    installedExtension);
+
                 // Installed extension
                 this.extensionHandlerManager.initialize(installedExtension, targetNamespace);
 

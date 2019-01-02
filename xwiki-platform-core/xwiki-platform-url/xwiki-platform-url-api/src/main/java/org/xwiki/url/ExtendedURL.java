@@ -179,7 +179,7 @@ public class ExtendedURL implements Cloneable
         return this.parameters;
     }
 
-    private Map<String, List<String>> extractParameters(URI uri)
+    protected Map<String, List<String>> extractParameters(URI uri)
     {
         Map<String, List<String>> uriParameters;
         if (uri.getQuery() != null) {

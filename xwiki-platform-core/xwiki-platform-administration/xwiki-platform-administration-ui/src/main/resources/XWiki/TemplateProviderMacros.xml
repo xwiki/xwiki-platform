@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1481031971000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1511976524000</date>
-  <contentUpdateDate>1511976524000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -98,7 +95,7 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title"&gt;$services.localization.render('core.documentPicker.title')&lt;/h4&gt;
+          &lt;div class="modal-title"&gt;$services.localization.render('core.documentPicker.title')&lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           #documentTree({

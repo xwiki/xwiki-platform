@@ -28,7 +28,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Enable or disable notifications from the event stream (for customization purpose).
@@ -43,7 +42,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.5RC1
  */
 @Role
-@Unstable
 public interface NotificationFilter extends Comparable
 {
     /**
@@ -121,6 +119,26 @@ public interface NotificationFilter extends Comparable
      */
     ExpressionNode filterExpression(DocumentReference user, Collection<NotificationFilterPreference> filterPreferences,
             NotificationFilterType type, NotificationFormat format);
+
+    /**
+     * Filtering expression to use when retrieving notifications.
+     * Note that this filtering expression will not be bound to any notification preference.
+     * @param user the user interested in the notifications
+     * @param filterPreferences the collection of all preferences to take into account
+     * @param type of the expected notification filter
+     * @param format format of the notification
+     * @param preferences list of preferences
+     * @return a filtering expression or null
+     *
+     * @since 10.8RC1
+     * @since 9.11.8
+     */
+    default ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
+            NotificationFormat format, Collection<NotificationPreference> preferences)
+    {
+        return filterExpression(user, filterPreferences, type, format);
+    }
 
     /**
      * Get the name of the filter. This is useful as {@link NotificationFilterPreference} will be able to be linked to

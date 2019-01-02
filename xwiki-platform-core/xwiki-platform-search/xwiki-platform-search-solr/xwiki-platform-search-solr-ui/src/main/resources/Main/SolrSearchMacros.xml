@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1427878175000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1477063002000</date>
-  <contentUpdateDate>1477063002000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Macros</title>
   <comment/>
@@ -820,11 +817,11 @@ $value##
   #end
   ##
   ## Pagination
-  #set ($rows = $numbertool.integer($request.rows))
+  #set ($rows = $mathtool.toInteger($request.rows))
   #if ("$!rows" == '')
     #set ($rows = 10)
   #end
-  #set ($start = $numbertool.integer($request.firstIndex))
+  #set ($start = $mathtool.toInteger($request.firstIndex))
   #if ("$!start" == '')
     #set ($start = 0)
   #end

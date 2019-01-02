@@ -715,6 +715,13 @@ public class PackageMojo extends AbstractOldCoreMojo
         // Also add the skins artifacts, that may have JAR dependencies
         mandatoryTopLevelArtifacts.addAll(getSkinArtifacts());
 
+        // CAPTCHA API used by oldcore in CommentsAdd and RegisterAction.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-captcha-api", getXWikiPlatformVersion(), null, "jar"));
+        // CAPTCHA Default module used to avoid cyclic dependency on oldcore but needed to access the configuration.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-captcha-default", getXWikiPlatformVersion(), null, "jar"));
+
         return mandatoryTopLevelArtifacts;
     }
 

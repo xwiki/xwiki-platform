@@ -109,6 +109,8 @@ import static org.mockito.Mockito.when;
 // @formatter:on
 public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
 {
+    private static final String PERMDIR = "target/" + ScriptingIntegrationTest.class.getSimpleName();
+
     @Rule
     public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTP));
 
@@ -142,7 +144,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
-        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
+        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(PERMDIR);
 
         this.componentManager.registerMockComponent(ConverterManager.class);
     }

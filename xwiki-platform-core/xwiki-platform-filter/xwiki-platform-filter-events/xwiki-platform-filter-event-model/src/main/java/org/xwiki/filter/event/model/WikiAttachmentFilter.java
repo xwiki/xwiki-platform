@@ -46,6 +46,12 @@ public interface WikiAttachmentFilter
 
     /**
      * @type {@link String}
+     * @since 10.11RC1
+     */
+    String PARAMETER_CHARSET = "charset";
+
+    /**
+     * @type {@link String}
      */
     String PARAMETER_CONTENT_TYPE = "content_type";
 

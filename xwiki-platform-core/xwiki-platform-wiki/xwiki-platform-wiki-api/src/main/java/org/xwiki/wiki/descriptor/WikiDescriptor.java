@@ -52,7 +52,7 @@ public class WikiDescriptor implements Cloneable
     /**
      * Alias are names that can be used to designate this wiki in several places, like the URL.
      */
-    private List<String> aliases = new ArrayList<String>();
+    private List<String> aliases = new ArrayList<>();
 
     /**
      * Pretty name.
@@ -78,6 +78,16 @@ public class WikiDescriptor implements Cloneable
      * Description.
      */
     private String description;
+
+    /**
+     * @see #isSecure()
+     */
+    private Boolean secure;
+
+    /**
+     * @see #getPort()
+     */
+    private int port = -1;
 
     /**
      * Properties groups that new modules can use to store their own value in the wiki descriptor.
@@ -237,6 +247,42 @@ public class WikiDescriptor implements Cloneable
     }
 
     /**
+     * @return true if the wiki should be accessed trough a secure connection (HTTPS), null means default
+     * @since 10.7RC1
+     */
+    public Boolean isSecure()
+    {
+        return this.secure;
+    }
+
+    /**
+     * @param secure true if the wiki should be accessed trough a secure connection (HTTPS), null means default
+     * @since 10.7RC1
+     */
+    public void setSecure(Boolean secure)
+    {
+        this.secure = secure;
+    }
+
+    /**
+     * @return the port to use when generating external URL for the wiki, -1 means default
+     * @since 10.7RC1
+     */
+    public int getPort()
+    {
+        return this.port;
+    }
+
+    /**
+     * @param port the port to use when generating external URL for the wiki, -1 means default
+     * @since 10.7RC1
+     */
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
+
+    /**
      * @param propertyGroupId the id of the property group to retrieve
      * @return the property group corresponding to the id, or null if no property group correspond to that Id.
      */
@@ -258,10 +304,7 @@ public class WikiDescriptor implements Cloneable
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(3, 3)
-                .append(getDefaultAlias())
-                .append(getId())
-                .toHashCode();
+        return new HashCodeBuilder(3, 3).append(getDefaultAlias()).append(getId()).toHashCode();
     }
 
     @Override
@@ -277,10 +320,8 @@ public class WikiDescriptor implements Cloneable
             return false;
         }
         WikiDescriptor rhs = (WikiDescriptor) object;
-        return new EqualsBuilder()
-                .append(getDefaultAlias(), rhs.getDefaultAlias())
-                .append(getId(), rhs.getId())
-                .isEquals();
+        return new EqualsBuilder().append(getDefaultAlias(), rhs.getDefaultAlias()).append(getId(), rhs.getId())
+            .isEquals();
     }
 
     @Override

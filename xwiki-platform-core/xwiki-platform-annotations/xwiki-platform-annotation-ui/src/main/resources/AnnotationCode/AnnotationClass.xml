@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1264979019000</creationDate>
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1264979528000</date>
-  <contentUpdateDate>1264979528000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -166,16 +163,25 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </state>
     <target>
+      <cache>0</cache>
+      <classname/>
+      <customDisplay/>
       <disabled>0</disabled>
       <name>target</name>
       <number>7</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>Target</prettyName>
       <size>30</size>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </target>
   </class>
 </xwikidoc>

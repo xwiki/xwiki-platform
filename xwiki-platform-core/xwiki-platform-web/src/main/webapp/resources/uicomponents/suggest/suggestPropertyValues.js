@@ -24,7 +24,7 @@ require.config({
   }
 });
 
-require(['jquery', 'xwiki-selectize'], function($) {
+define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($) {
   'use strict';
 
   var getSelectizeOptions = function(select) {
@@ -35,21 +35,40 @@ require(['jquery', 'xwiki-selectize'], function($) {
       'properties', encodeURIComponent(select.attr('data-propertyName')),
       'values'
     ].join('/');
-    return {
-      create: true,
-      load: function(text, callback) {
-        $.getJSON(loadURL, {
-          'fp': text,
-          'limit': 10
-        }).then(function(response) {
+
+    var getLoad = function(getOptions) {
+      return function(text, callback) {
+        $.getJSON(loadURL, getOptions(text)).then(function(response) {
           if (response && $.isArray(response.propertyValues)) {
             return response.propertyValues.map(getSuggestion);
           } else {
             return [];
           }
         }).done(callback).fail(callback);
-      }
+      };
+    }
+
+    var options = {
+      create: true,
+      load: getLoad(function(text) {
+        return { 'fp': text, 'limit': 10 }
+      }),
+      loadSelected: getLoad(function(text) {
+        return { 'fp': text, 'exactMatch': true }
+      })
     };
+
+    var freeText = select.attr('data-freeText');
+    if (freeText) {
+      freeText = freeText.toLowerCase();
+      if (freeText === 'allowed') {
+        options.createOnBlur = true;
+      } else if (freeText === 'forbidden') {
+        options.create = false;
+      }
+    }
+
+    return options;
   };
 
   var getSuggestion = function(propertyValue) {
@@ -58,7 +77,8 @@ require(['jquery', 'xwiki-selectize'], function($) {
       value: propertyValue.value,
       label: metaData.label,
       icon: metaData.icon,
-      url: metaData.url
+      url: metaData.url,
+      hint: metaData.hint
     };
   };
 
@@ -67,6 +87,14 @@ require(['jquery', 'xwiki-selectize'], function($) {
       $(this).xwikiSelectize(getSelectizeOptions($(this)));
     });
   };
+});
 
-  $('.suggest-propertyValues').suggestPropertyValues();
+require(['jquery', 'xwiki-suggestPropertyValues', 'xwiki-events-bridge'], function($) {
+  var init = function(event, data) {
+    var container = $((data && data.elements) || document);
+    container.find('.suggest-propertyValues').suggestPropertyValues();
+  };
+
+  $(document).on('xwiki:dom:updated', init);
+  init();
 });

@@ -42,6 +42,9 @@ public class DefaultWikiReferenceProvider implements Provider<WikiReference>
     @Inject
     private EntityReferenceProvider provider;
 
+    @Inject
+    private EntityReferenceFactory factory;
+
     /**
      * We can cache the default document since it's configurable only at xwiki.properties level which require a restart
      * to be modified.
@@ -54,8 +57,8 @@ public class DefaultWikiReferenceProvider implements Provider<WikiReference>
         if (this.cachedReference == null) {
             EntityReference reference = this.provider.getDefaultReference(EntityType.WIKI);
 
-            this.cachedReference =
-                reference instanceof WikiReference ? (WikiReference) reference : new WikiReference(reference);
+            this.cachedReference = this.factory.getReference(
+                reference instanceof WikiReference ? (WikiReference) reference : new WikiReference(reference));
         }
 
         return this.cachedReference;

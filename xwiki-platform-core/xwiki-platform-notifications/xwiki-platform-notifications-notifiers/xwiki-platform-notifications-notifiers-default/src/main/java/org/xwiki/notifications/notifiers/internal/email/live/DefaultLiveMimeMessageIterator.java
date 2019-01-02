@@ -40,6 +40,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -61,6 +62,9 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
 
     @Inject
     private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
@@ -85,6 +89,8 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
     {
         CompositeEvent resultCompositeEvent = new CompositeEvent(this.compositeEvent);
 
+        // TODO: handle followed user for who we don't cate about the notification preference, we just want to receive
+        // all actions the person is doing
         if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)) {
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
@@ -112,7 +118,7 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
             throws NotificationException
     {
         Collection<NotificationFilterPreference> filterPreferences
-                = notificationFilterManager.getFilterPreferences(user);
+                = notificationFilterPreferenceManager.getFilterPreferences(user);
         for (NotificationFilter filter : filters) {
             NotificationFilter.FilterPolicy policy = filter.filterEvent(event, user, filterPreferences,
                     NotificationFormat.EMAIL);

@@ -27,11 +27,8 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1252454400000</creationDate>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1321284472000</date>
-  <contentUpdateDate>1321284472000</contentUpdateDate>
   <version>1.1</version>
   <title>Benvinguda</title>
   <comment/>
@@ -64,7 +61,7 @@ També podeu utilitzar el [[Sandbox&gt;&gt;Sandbox.WebHome]] per a mes exemples 
 |(((
 = Expandiu el vostre wiki =
 
-Per ampliar la potencia i funcionalitats del vostre wiki amb mòduls que //vostè// necessiti, adreceu-vos al {{velocity}}[[Gestor d'Extensions &gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')]]{{/velocity}} on podreu cercar i instal·lar extensions.
+Per ampliar la potencia i funcionalitats del vostre wiki amb mòduls que //vostè// necessiti, adreceu-vos al {{velocity}}[[Gestor d'Extensions &gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} on podreu cercar i instal·lar extensions.
 
 Per fullejar entre les més de 900 extensions de la comunitat XWiki, adreceu-vos al [[Repositori d'Extensions&gt;&gt;http://extensions.xwiki.org]].
 )))|(((

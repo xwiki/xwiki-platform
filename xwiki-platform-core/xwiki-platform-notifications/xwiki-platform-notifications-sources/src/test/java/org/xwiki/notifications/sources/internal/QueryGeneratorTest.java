@@ -27,7 +27,6 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
@@ -48,6 +47,8 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +84,10 @@ public class QueryGeneratorTest
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
     private Date startDate;
+    private String startDateParamName;
     private Date pref1StartDate;
+    private String pref1StartDateParamName;
+
     private NotificationFilterPreference fakeFilterPreference;
     private NotificationPreference pref1;
 
@@ -98,11 +102,13 @@ public class QueryGeneratorTest
         recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
 
         startDate = new Date(10);
+        this.startDateParamName = String.format("date_%s", DigestUtils.sha256Hex(this.startDate.toString()));
 
         query = mock(Query.class);
         when(queryManager.createQuery(anyString(), anyString())).thenReturn(query);
 
         pref1StartDate = new Date(100000000);
+        this.pref1StartDateParamName = String.format("date_%s", DigestUtils.sha256Hex(this.pref1StartDate.toString()));
 
         pref1 = mock(NotificationPreference.class);
         when(pref1.getProperties()).thenReturn(Collections.singletonMap(
@@ -113,8 +119,6 @@ public class QueryGeneratorTest
 
         fakeFilterPreference = mock(NotificationFilterPreference.class);
         when(fakeFilterPreference.isActive()).thenReturn(true);
-        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class)))
-                .thenReturn(Sets.newSet(fakeFilterPreference));
 
         when(documentAccessBridge.getProperty(userReference,
                 new DocumentReference("xwiki", "XWiki", "XWikiUsers"),
@@ -138,26 +142,26 @@ public class QueryGeneratorTest
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
-                "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) AND HIDDEN <> true) " +
-                        "ORDER BY DATE DESC",
-                node.toString());
+        assertEquals("((DATE >= \"" + this.startDate.toString() + "\" " +
+            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) " +
+            "ORDER BY DATE DESC",
+            node.toString());
 
         // Test 2
         mocker.getComponentUnderTest().generateQuery(parameters);
 
-
-        verify(queryManager).createQuery(
-                "where ((" +
-                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
-                        "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                        "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a))) " +
-                        "AND (event.hidden <> true) " +
-                        "ORDER BY event.date DESC", Query.HQL);
-        verify(query).bindValue("date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357", startDate);
-        verify(query).bindValue("date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a", pref1StartDate);
-        verify(query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
-                eq("create"));
+        verify(this.queryManager).createQuery(
+            "where ((" +
+                "event.date >= :" + this.startDateParamName + ") " +
+                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
+                "AND (event.date >= :" + this.pref1StartDateParamName + "))) " +
+                "AND (event.hidden <> true) " +
+                "ORDER BY event.date DESC",
+            Query.HQL);
+        verify(this.query).bindValue(this.startDateParamName, this.startDate);
+        verify(this.query).bindValue(this.pref1StartDateParamName, this.pref1StartDate);
+        verify(this.query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
+            eq("create"));
 
     }
 
@@ -179,25 +183,24 @@ public class QueryGeneratorTest
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("(DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
-                "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +
-                "ORDER BY DATE DESC", node.toString());
+        assertEquals("(DATE >= \"" + this.startDate.toString() + "\" " +
+            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) " +
+            "ORDER BY DATE DESC", node.toString());
 
         // Test 2
         mocker.getComponentUnderTest().generateQuery(parameters);
 
-
-        verify(queryManager).createQuery(
-                "where (" +
-                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
-                        "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                        "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a)) " +
-                        "ORDER BY event.date DESC", Query.HQL);
-        verify(query).bindValue(eq("date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357"),
-                eq(startDate));
-        verify(query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
-                eq("create"));
-        verify(query).bindValue("date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a", pref1StartDate);
+        verify(this.queryManager).createQuery(
+            "where (" +
+                "event.date >= :" + this.startDateParamName + ") " +
+                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
+                "AND (event.date >= :" + this.pref1StartDateParamName + ")) " +
+                "ORDER BY event.date DESC",
+            Query.HQL);
+        verify(this.query).bindValue(eq(this.startDateParamName), eq(this.startDate));
+        verify(this.query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
+            eq("create"));
+        verify(this.query).bindValue(this.pref1StartDateParamName, this.pref1StartDate);
     }
 
     @Test
@@ -213,27 +216,28 @@ public class QueryGeneratorTest
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
-                "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) AND HIDDEN <> true) " +
-                "ORDER BY DATE DESC", node.toString());
+        assertEquals("((DATE >= \"" + this.startDate.toString() + "\" " +
+            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) " +
+            "ORDER BY DATE DESC", node.toString());
 
         // Test 2
         mocker.getComponentUnderTest().generateQuery(parameters);
 
-        verify(queryManager).createQuery(
-                "where ((" +
-                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
-                        "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                        "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a))) " +
-                        "AND (event.hidden <> true) " +
-                        "ORDER BY event.date DESC",
-                Query.HQL);
+        verify(this.queryManager).createQuery(
+            "where ((" +
+                "event.date >= :" + this.startDateParamName + ") " +
+                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
+                "AND (event.date >= :" + this.pref1StartDateParamName + "))) " +
+                "AND (event.hidden <> true) " +
+                "ORDER BY event.date DESC",
+            Query.HQL);
     }
 
     @Test
     public void generateQueryWithUntilDate() throws Exception
     {
         Date untilDate = new Date(1000000000000L);
+        String untilDateParamName = String.format("date_%s", DigestUtils.sha256Hex(untilDate.toString()));
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
@@ -246,27 +250,26 @@ public class QueryGeneratorTest
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
-                "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +
-                "AND DATE <= \"Sun Sep 09 03:46:40 CEST 2001\") AND HIDDEN <> true) " +
-                "ORDER BY DATE DESC", node.toString());
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " +
+            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) " +
+            "AND DATE <= \"" + untilDate.toString() + "\") AND HIDDEN <> true) " +
+            "ORDER BY DATE DESC", node.toString());
 
         // Test 2
         mocker.getComponentUnderTest().generateQuery(parameters);
 
-
-        verify(queryManager).createQuery(
-                "where (((" +
-                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
-                        "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                        "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a))) " +
-                        "AND (event.date <= :date_582ce8e50c9ad1782bdd021604912ed119e6ab2ff58a094f23b3be0ce6105306)) " +
-                        "AND (event.hidden <> true) " +
-                        "ORDER BY event.date DESC",
-                Query.HQL);
-        verify(query).bindValue("date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357", startDate);
-        verify(query).bindValue("date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a", pref1StartDate);
-        verify(query).bindValue("date_582ce8e50c9ad1782bdd021604912ed119e6ab2ff58a094f23b3be0ce6105306", untilDate);
+        verify(this.queryManager).createQuery(
+            "where (((" +
+                "event.date >= :" + this.startDateParamName + ") " +
+                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
+                "AND (event.date >= :" + this.pref1StartDateParamName + "))) " +
+                "AND (event.date <= :" + untilDateParamName + ")) " +
+                "AND (event.hidden <> true) " +
+                "ORDER BY event.date DESC",
+            Query.HQL);
+        verify(this.query).bindValue(this.startDateParamName, this.startDate);
+        verify(this.query).bindValue(this.pref1StartDateParamName, this.pref1StartDate);
+        verify(this.query).bindValue(untilDateParamName, untilDate);
 
     }
 
@@ -287,13 +290,12 @@ public class QueryGeneratorTest
 
         // Verify
         assertEquals("((((TYPE = \"create\" " +
-                "AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\") " +
-                "AND NOT (ID IN (\"event1\", \"event2\"))) " +
-                "AND DATE <= \"Sun Sep 09 03:46:40 CEST 2001\") " +
-                "AND HIDDEN <> true) " +
-                "ORDER BY DATE DESC",
-                node.toString()
-        );
+            "AND DATE >= \"" + this.pref1StartDate.toString() + "\") " +
+            "AND NOT (ID IN (\"event1\", \"event2\"))) " +
+            "AND DATE <= \"" + untilDate.toString() + "\") " +
+            "AND HIDDEN <> true) " +
+            "ORDER BY DATE DESC",
+            node.toString());
     }
 
     @Test
@@ -310,12 +312,11 @@ public class QueryGeneratorTest
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" "
-                + "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) AND HIDDEN <> true) "
-                + "AND WIKI = \"Wiki xwiki\") "
-                + "ORDER BY DATE DESC",
-                node.toString()
-        );
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" "
+            + "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) "
+            + "AND WIKI = \"Wiki xwiki\") "
+            + "ORDER BY DATE DESC",
+            node.toString());
     }
 
     @Test
@@ -350,13 +351,13 @@ public class QueryGeneratorTest
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
-        assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
-                "AND (((TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\") " +
-                "AND (PAGE = \"someValue1\" AND \"1\" = \"1\")) " +
-                "AND (TYPE = \"someValue2\" AND \"2\" = \"2\"))) " +
-                "AND NOT (ID IN (\"event1\", \"event2\"))) " +
-                "AND HIDDEN <> true) " +
-                "ORDER BY DATE DESC", node.toString());
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " +
+            "AND (((TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\") " +
+            "AND (PAGE = \"someValue1\" AND \"1\" = \"1\")) " +
+            "AND (TYPE = \"someValue2\" AND \"2\" = \"2\"))) " +
+            "AND NOT (ID IN (\"event1\", \"event2\"))) " +
+            "AND HIDDEN <> true) " +
+            "ORDER BY DATE DESC", node.toString());
     }
 
     @Test
@@ -383,13 +384,12 @@ public class QueryGeneratorTest
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
-        assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
-                "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +
-                "AND NOT (ID IN (\"event1\", \"event2\"))) " +
-                "AND HIDDEN <> true) " +
-                "ORDER BY DATE DESC",
-                node.toString()
-        );
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " +
+            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) " +
+            "AND NOT (ID IN (\"event1\", \"event2\"))) " +
+            "AND HIDDEN <> true) " +
+            "ORDER BY DATE DESC",
+            node.toString());
     }
 
     @Test
@@ -421,8 +421,8 @@ public class QueryGeneratorTest
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Expectation: no filters on "create" event type because it has no descriptor
-        assertEquals("(DATE >= \"Thu Jan 01 01:00:00 CET 1970\" AND HIDDEN <> true) ORDER BY DATE DESC",
-                node.toString());
+        assertEquals("(DATE >= \"" + this.startDate.toString() + "\" AND HIDDEN <> true) ORDER BY DATE DESC",
+            node.toString());
     }
 
 }

@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
@@ -37,7 +36,6 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
  */
 @Component(roles = ActivityStreamConfiguration.class)
 @Singleton
-@Unstable
 public class ActivityStreamConfiguration
 {
     @Inject

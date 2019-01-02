@@ -31,7 +31,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Removes from the query results the rows that correspond to entities that the current user doesn't have the right to
@@ -44,7 +43,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("viewable")
 @Singleton
-@Unstable
 public class ViewableQueryFilter implements QueryFilter
 {
     @Inject

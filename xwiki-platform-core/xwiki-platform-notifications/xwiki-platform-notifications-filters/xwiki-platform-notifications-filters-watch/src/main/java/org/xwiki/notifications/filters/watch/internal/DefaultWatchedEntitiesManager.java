@@ -33,9 +33,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
@@ -53,7 +52,7 @@ import org.xwiki.notifications.preferences.internal.XWikiEventTypesEnabler;
 public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
 {
     @Inject
-    private NotificationFilterManager notificationFilterManager;
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     private XWikiEventTypesEnabler xwikiEventTypesEnabler;
@@ -75,7 +74,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     public Collection<String> getWatchedUsers(DocumentReference user) throws NotificationException
     {
         Collection<NotificationFilterPreference> filterPreferences
-            = notificationFilterManager.getFilterPreferences(user);
+            = notificationFilterPreferenceManager.getFilterPreferences(user);
 
         Set<String> results = new HashSet<>();
         Iterator<NotificationFilterPreference> iterator =
@@ -85,7 +84,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             ).iterator();
         while (iterator.hasNext()) {
             NotificationFilterPreference preference = iterator.next();
-            results.addAll(preference.getProperties(NotificationFilterProperty.USER));
+            results.add(preference.getUser());
         }
         return results;
     }
@@ -118,17 +117,17 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
 
                 if (notificationFilterPreference.getFilterType() == NotificationFilterType.INCLUSIVE
                         && notificationFilterPreference.isEnabled() != shouldBeWatched) {
-                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference);
+                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference, user);
                 } else if (notificationFilterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE
                         && notificationFilterPreference.isEnabled() == shouldBeWatched) {
-                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference);
+                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference, user);
                 }
             }
         }
 
         // But it might been still unwatched because of an other filter!
         if (!thereIsAMatch || entity.isWatched(user) != shouldBeWatched) {
-            notificationFilterManager.saveFilterPreferences(
+            notificationFilterPreferenceManager.saveFilterPreferences(user,
                     Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
         }
     }
@@ -140,18 +139,18 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         return !xwikiEventTypesEnabler.isNotificationDisabled(user) && entity.isWatched(user) == desiredState;
     }
 
-    private void enableOrDeleteFilter(boolean enable,
-            NotificationFilterPreference notificationFilterPreference) throws NotificationException
+    private void enableOrDeleteFilter(boolean enable, NotificationFilterPreference notificationFilterPreference,
+        DocumentReference user) throws NotificationException
     {
         if (enable) {
-            notificationFilterManager.setFilterPreferenceEnabled(
-                    notificationFilterPreference.getFilterPreferenceName(),
+            notificationFilterPreferenceManager.setFilterPreferenceEnabled(user,
+                    notificationFilterPreference.getId(),
                     true);
         } else  {
             // Delete this filter instead of just disabling it, because we don't want to let remaining
             // filters
-            notificationFilterManager.deleteFilterPreference(
-                    notificationFilterPreference.getFilterPreferenceName());
+            notificationFilterPreferenceManager.deleteFilterPreference(user,
+                    notificationFilterPreference.getId());
         }
     }
 
@@ -160,9 +159,9 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     {
         // A filter preferences object concerning all event is a filter that has no even set and that concern
         // concerns all notification formats.
-        return notificationFilterManager.getFilterPreferences(user).stream().filter(
-            filterPreference -> filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
-            && filterPreference.getFilterFormats().size() == NotificationFormat.values().length
+        return notificationFilterPreferenceManager.getFilterPreferences(user).stream().filter(
+            filterPreference -> filterPreference.getEventTypes().isEmpty()
+            && filterPreference.getNotificationFormats().size() == NotificationFormat.values().length
         );
     }
 

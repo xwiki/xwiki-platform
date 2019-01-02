@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1473755036000</creationDate>
   <parent>Extension.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1473755036000</date>
-  <contentUpdateDate>1473755036000</contentUpdateDate>
   <version>1.1</version>
   <title>Search box for the Home Page</title>
   <comment/>

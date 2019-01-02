@@ -27,17 +27,14 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1264959390000</creationDate>
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1441121723000</date>
-  <contentUpdateDate>1441121723000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity filter="none" output="false"}}
 ## Not used here but kept for retro-compatibility
@@ -216,10 +213,11 @@
  * @param $ann the annotation object
  *#
 #macro(displayAnnotationTitle $ann)
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy'))
   &lt;div class="annotationTitle"&gt;
     &lt;span class="annotationAuthor"&gt;$!xwiki.getUserName($ann.author)&lt;/span&gt;##
 ## Do not indent this, or the comma will be misplaced
-#if("$!{ann.date}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, "dd/MM/yyyy")&lt;/span&gt;#end
+#if("$!{ann.date}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/span&gt;#end
   &lt;/div&gt;
 #end
 ##
@@ -252,6 +250,7 @@
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
   &lt;span class="annotationTools"&gt;
     #if($mode != 'create' &amp;&amp; $services.annotations.canEditAnnotation($ann.id, $docRef))
+      #set($isUserComment = $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
       #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
       #if ("$!{ann.state}" == 'UPDATED')
         &lt;span class="tool accept"&gt;&lt;a class="validate" href="${editURL}" title="$services.localization.render('annotations.action.validate.tooltip')"&gt;$services.localization.render('annotations.action.validate.text')&lt;/a&gt;&lt;/span&gt;
@@ -266,11 +265,15 @@
           ## add "comment reply" button
           &lt;span class="tool annotationReply"&gt;&lt;a class="reply" href="${xredirect}#xwikicomment_${ann.id}" title="$services.localization.render('core.viewers.comments.reply')"&gt;$services.localization.render('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;
         #end
-        ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
-        &lt;span class="tool annotationEdit"&gt;&lt;a class="edit" href="${editURL}" title="$services.localization.render('annotations.action.edit.tooltip')"&gt;$services.localization.render('annotations.action.edit.text')&lt;/a&gt;&lt;/span&gt;
+        #if($hasAdmin || $isUserComment)
+          ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
+          &lt;span class="tool annotationEdit"&gt;&lt;a class="edit" href="${editURL}" title="$services.localization.render('annotations.action.edit.tooltip')"&gt;$services.localization.render('annotations.action.edit.text')&lt;/a&gt;&lt;/span&gt;
+        #end
       #end
-      #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
-      &lt;span class="tool delete"&gt;&lt;a class="delete" href="${deleteURL}" title="$services.localization.render('annotations.action.delete.tooltip')"&gt;$services.localization.render('annotations.action.delete.text')&lt;/a&gt;&lt;/span&gt;
+      #if($hasAdmin || $isUserComment)
+        #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
+        &lt;span class="tool delete"&gt;&lt;a class="delete" href="${deleteURL}" title="$services.localization.render('annotations.action.delete.tooltip')"&gt;$services.localization.render('annotations.action.delete.text')&lt;/a&gt;&lt;/span&gt;
+      #end
     #end
   &lt;/span&gt;
 #end

@@ -24,12 +24,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -55,29 +57,36 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 public class XWikiServletRequestStub implements XWikiRequest
 {
-    /**
-     * The scheme used by the runtime instance. This is required for creating URLs from daemon thread.
-     */
+    private boolean secure;
+
     private String scheme;
 
-    private String host;
+    private String protocol;
 
-    /**
-     * The context path used by the runtime instance. This is required for creating URLs from daemon thread.
-     */
+    private String queryString;
+
     private String contextPath;
 
-    private StringBuffer requestURL;
-
-    private String requestURI;
+    private String servletPath;
 
     private String serverName;
 
+    private int serverPort;
+
+    private Vector<String> headerNames;
+
+    private Map<String, Vector<String>> headers;
+
     private Map<String, String[]> parameters;
+
+    private String requestURI;
+
+    private StringBuffer requestURL;
+
+    private boolean daemon = true;
 
     public XWikiServletRequestStub()
     {
-        setHost("");
     }
 
     /**
@@ -85,17 +94,69 @@ public class XWikiServletRequestStub implements XWikiRequest
      */
     public XWikiServletRequestStub(URL requestURL, Map<String, String[]> requestParameters)
     {
-        if (requestURL != null) {
-            setScheme(requestURL.getProtocol());
-            setHost(requestURL.getHost());
+        this(requestURL, null, requestParameters);
+    }
 
-            setRequestURI(requestURL.toString());
-            setrequestURL(new StringBuffer(requestURL.toString()));
-        } else {
-            setHost("");
+    /**
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public XWikiServletRequestStub(URL requestURL, String contextPath, Map<String, String[]> requestParameters)
+    {
+        if (requestURL != null) {
+            this.protocol = requestURL.getProtocol();
+            this.scheme = requestURL.getProtocol();
+
+            this.serverName = requestURL.getHost();
+            this.serverPort = requestURL.getPort();
+
+            this.secure = this.protocol.equalsIgnoreCase("https");
+
+            this.requestURI = requestURL.getPath();
+            this.requestURL = new StringBuffer(requestURL.toString());
+
+            setHost(requestURL.getHost());
         }
 
+        this.contextPath = contextPath;
+
         this.parameters = clone(requestParameters);
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 10.7RC1
+     */
+    public XWikiServletRequestStub(XWikiRequest request)
+    {
+        this.secure = request.isSecure();
+        this.protocol = request.getProtocol();
+        this.scheme = request.getScheme();
+        this.serverName = request.getServerName();
+        this.serverPort = request.getServerPort();
+
+        this.contextPath = request.getContextPath();
+        this.servletPath = request.getServletPath();
+
+        this.queryString = request.getQueryString();
+
+        this.requestURI = request.getRequestURI();
+        this.requestURL = new StringBuffer(request.getRequestURL());
+
+        this.headerNames = new Vector<>();
+        this.headers = new LinkedHashMap<>();
+        for (Enumeration<String> enumeration = request.getHeaderNames(); enumeration.hasMoreElements();) {
+            String headerName = enumeration.nextElement();
+
+            this.headerNames.addElement(headerName);
+            Vector<String> values = new Vector<>();
+            for (Enumeration<String> e2 = request.getHeaders(headerName); e2.hasMoreElements();) {
+                values.addElement(e2.nextElement());
+            }
+            this.headers.put(headerName.toLowerCase(), values);
+        }
+
+        this.parameters = clone(request.getParameterMap());
     }
 
     private Map<String, String[]> clone(Map<String, String[]> map)
@@ -120,7 +181,11 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     public void setHost(String host)
     {
-        this.host = host;
+        if (this.headers == null) {
+            this.headers = new LinkedHashMap<>();
+        }
+
+        this.headers.put("x-forwarded-host", new Vector<String>(Arrays.asList(host)));
     }
 
     public void setScheme(String scheme)
@@ -157,10 +222,15 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getHeader(String s)
     {
-        if (s.equals("x-forwarded-host")) {
-            return this.host;
+        if (this.headers != null) {
+            Vector<String> values = this.headers.get(s.toLowerCase());
+
+            if (values != null) {
+                values.get(0);
+            }
         }
-        return "";
+
+        return null;
     }
 
     /**
@@ -190,7 +260,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public HttpServletRequest getHttpServletRequest()
     {
-        return null;
+        return this;
     }
 
     @Override
@@ -202,7 +272,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getAuthType()
     {
-        return "";
+        return null;
     }
 
     @Override
@@ -220,19 +290,29 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public Enumeration<String> getHeaders(String s)
     {
-        return null;
+        if (this.headers != null) {
+            Vector<String> values = this.headers.get(s.toLowerCase());
+
+            if (values != null) {
+                return values.elements();
+            }
+        }
+
+        return Collections.emptyEnumeration();
     }
 
     @Override
     public Enumeration<String> getHeaderNames()
     {
-        return null;
+        return this.headerNames != null ? this.headerNames.elements() : Collections.emptyEnumeration();
     }
 
     @Override
     public int getIntHeader(String s)
     {
-        return 0;
+        String header = getHeader(s);
+
+        return header != null ? Integer.parseInt(header) : -1;
     }
 
     @Override
@@ -262,7 +342,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getQueryString()
     {
-        return "";
+        return this.queryString;
     }
 
     @Override
@@ -304,7 +384,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getServletPath()
     {
-        return null;
+        return this.servletPath;
     }
 
     @Override
@@ -356,7 +436,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public Enumeration<String> getAttributeNames()
     {
-        return null;
+        return Collections.emptyEnumeration();
     }
 
     @Override
@@ -394,7 +474,10 @@ public class XWikiServletRequestStub implements XWikiRequest
     {
         if (this.parameters != null) {
             String[] values = this.parameters.get(s);
-            return values != null && values.length > 0 ? values[0] : null;
+
+            if (ArrayUtils.isNotEmpty(values)) {
+                return values[0];
+            }
         }
 
         return null;
@@ -415,7 +498,7 @@ public class XWikiServletRequestStub implements XWikiRequest
             return values != null ? values.clone() : null;
         }
 
-        return null;
+        return ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
     @Override
@@ -427,7 +510,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getProtocol()
     {
-        return null;
+        return this.protocol;
     }
 
     @Override
@@ -445,7 +528,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public int getServerPort()
     {
-        return 0;
+        return this.serverPort;
     }
 
     @Override
@@ -493,7 +576,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public boolean isSecure()
     {
-        return false;
+        return this.secure;
     }
 
     @Override
@@ -606,5 +689,24 @@ public class XWikiServletRequestStub implements XWikiRequest
     public DispatcherType getDispatcherType()
     {
         return null;
+    }
+
+    /**
+     * @return true if the request is intended to be used in a long standing daemon thread (mails, etc.) and should not
+     *         be taken into account when generating a URL
+     * @since 10.11RC1
+     */
+    public boolean isDaemon()
+    {
+        return this.daemon;
+    }
+
+    /**
+     * @param daemon the daemon to set
+     * @since 10.11RC1
+     */
+    public void setDaemon(boolean daemon)
+    {
+        this.daemon = daemon;
     }
 }

@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1323097478000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1445422650000</date>
-  <contentUpdateDate>1445422591000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -46,12 +43,12 @@ platform.appwithinminutes.createAppButtonLabel=Crear Aplicación
 platform.appwithinminutes.appsLiveTableHeading=Aplicaciones
 platform.appwithinminutes.appsLiveTable.doc.space=Nombre de aplicación
 platform.appwithinminutes.appsLiveTable.doc.author=Ultimo autor
-### Missing: platform.appwithinminutes.appsLiveTable.doc.date=Update date
+platform.appwithinminutes.appsLiveTable.doc.date=Fecha de actualización
 platform.appwithinminutes.appsLiveTable._actions=Acciones
 ### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Crea tu propio\!
+platform.appwithinminutes.appPanelCreateEntry=Crea tu propio!
 
 ### Wizard step
 ### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
@@ -129,9 +126,10 @@ platform.appwithinminutes.classEditorNumberFieldName=Número
 ### Missing: platform.appwithinminutes.classEditorStringFieldName=Short Text
 platform.appwithinminutes.classEditorContentFieldName=Contenido
 platform.appwithinminutes.classEditorTitleFieldName=Título
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Borrar
-platform.appwithinminutes.classEditorConfigureFieldLabel=Configurar 
+platform.appwithinminutes.classEditorConfigureFieldLabel=Configurar
 platform.appwithinminutes.classEditorPreviewFieldLabel=Vista previa
 ### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=Hide configuration panel and apply changes
 platform.appwithinminutes.classEditorMoveFieldLabel=Mover
@@ -141,7 +139,7 @@ platform.appwithinminutes.classEditorMoveFieldLabel=Mover
 
 ### Date Picker
 ### Missing: platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Limpiar 
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Limpiar
 platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Ahora
 platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Hoy
 
@@ -207,7 +205,7 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Borrar
 platform.appwithinminutes.appHomePageActionsHeading=Acciones
 platform.appwithinminutes.appHomePageAddEntryLabel=Añadir
 platform.appwithinminutes.appHomePageAddEntryHint=Añadir nueva entrada
-platform.appwithinminutes.appHomePageEntryNameLabel=Nombre de entrada\:
+platform.appwithinminutes.appHomePageEntryNameLabel=Nombre de entrada:
 ### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
 platform.appwithinminutes.appHomePageEditAppLabel=Editar aplicación
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traducir aplicación

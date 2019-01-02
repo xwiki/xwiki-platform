@@ -20,7 +20,6 @@
 package org.xwiki.eventstream;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide a description for a specific implementation of RecordableEvent so that users can knows what the event is
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.2RC1
  */
 @Role
-@Unstable
 public interface RecordableEventDescriptor
 {
     /**

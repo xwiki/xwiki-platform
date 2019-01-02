@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1293832800000</creationDate>
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1498504128000</date>
-  <contentUpdateDate>1498504128000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.wiki.create.title')</title>
   <comment/>
@@ -320,7 +317,6 @@
         &lt;input type="hidden" name="flavor" value="$!escapetool.xml($request.flavor)" /&gt;
         &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
         &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-        #userPicker_import(true)
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
           ### OWNER ###
@@ -336,7 +332,12 @@
                 #if("$!value" == "")
                   #set($value = $escapetool.xml($xcontext.user))
                 #end
-                &lt;input type="text" id="owner" name="ownerId" value="$!value" class="suggestUsers"/&gt;
+                #set ($userPickerParams = {
+                  'id': 'owner',
+                  'name': 'ownerId',
+                  'value': $value
+                })
+                #userPicker(false $userPickerParams)
               &lt;/dd&gt;
             &lt;/dl&gt;
           #else
@@ -408,13 +409,12 @@
               &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.members')&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
-              #set($listMembers = '')
-              #set($sep = '')
-              #foreach($m in $request.getParameterValues('members'))
-                #set($listMembers = "${listMembers}${sep}$!escapetool.xml($m)")
-                #set($sep = ',')
-              #end
-              &lt;input type="text" id="members" name="members" value="$listMembers" class="suggestUsers multipleSelection"/&gt;
+              #set ($userPickerParams = {
+                'id': 'members',
+                'name': 'members',
+                'value': $request.getParameterValues('members')
+              })
+              #userPicker(true $userPickerParams)
             &lt;/dd&gt;
           &lt;/dl&gt;
         ### END OF WIZARD SECOND HALF
@@ -582,10 +582,14 @@
         &lt;/div&gt;
       &lt;/div&gt;
       #end
+      #set($errorlogs = $status.log.getLogs('ERROR'))
       &lt;p class="successmessage box #if($status.error || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
-      &lt;p class="errormessage box #if(!$$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
+      &lt;p class="warningmessage box #if($errorlogs.isEmpty() || $state != 'FINISHED')hidden#end" id="errorlogMessage"&gt;
+        $services.localization.render('platform.wiki.create.wizard.step.creation.errorlog', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
+      &lt;/p&gt;
+      &lt;p class="errormessage box #if(!$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
     &lt;/div&gt;
@@ -606,7 +610,7 @@
         #set($cleanUpHidden = false)
       #else
         #set($finalizeHidden = false)
-        #set($cleanUpHidden = true)
+        #set($cleanUpHidden = $errorlogs.isEmpty())
       #end
     #else
       #set($finalizeHidden = true)
@@ -1127,6 +1131,9 @@ XWiki.WikiCreationStatusBar = Class.create({
       } else {
         // Success
         $('successMessage').removeClassName('hidden');
+        if (response.hasErrorLog) {
+          $('errorlogMessage').removeClassName('hidden');
+        }
         $('finalize').removeClassName('hidden');
       }
     }

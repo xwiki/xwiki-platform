@@ -24,18 +24,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.job.event.status.JobProgress;
 import org.xwiki.script.service.ScriptService;
 
+import com.xpn.xwiki.internal.debug.DebugConfiguration;
 import com.xpn.xwiki.web.XWikiAction;
 
 /**
  * Various internal debug tools.
- * 
+ *
  * @version $Id$
  * @since 7.1M2
  */
@@ -48,11 +47,7 @@ public class DebugInternalScriptService implements ScriptService
     private Execution execution;
 
     @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource properties;
-
-    @Inject
-    private Container container;
+    private DebugConfiguration debugConfiguration;
 
     /**
      * @return is debug enabled in the current execution context
@@ -82,11 +77,6 @@ public class DebugInternalScriptService implements ScriptService
      */
     public boolean isMinify()
     {
-        String minifyString = (String) this.container.getRequest().getProperty("minify");
-        if (minifyString != null) {
-            return Boolean.valueOf(minifyString);
-        }
-
-        return this.properties.getProperty("debug.minify", true);
+        return this.debugConfiguration.isMinify();
     }
 }

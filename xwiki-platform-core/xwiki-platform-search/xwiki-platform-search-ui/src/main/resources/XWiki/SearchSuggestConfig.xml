@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1392139202000</creationDate>
   <parent>XWiki.SearchCode</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1392295857000</date>
-  <contentUpdateDate>1392295857000</contentUpdateDate>
   <version>1.1</version>
   <title>Search Suggest Configuration</title>
   <comment/>
@@ -42,8 +39,8 @@
   <content/>
   <attachment>
     <filename>search-suggest.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1299802511000</date>
     <version>1.1</version>
     <comment/>
     <content>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</content>
@@ -88,17 +85,29 @@
       <nameField/>
       <validationScript/>
       <sheet>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>sheet</name>
         <number>1</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Sheet</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
     <property>
@@ -148,17 +157,29 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </codeToExecute>
       <configurationClass>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>configurationClass</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
       <configureGlobally>
         <customDisplay/>
@@ -492,17 +513,29 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -641,17 +674,29 @@ qf=title^2 name</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -790,17 +835,29 @@ qf=doccontent^2 doccontentraw</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -939,17 +996,29 @@ qf=filename</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -1088,17 +1157,29 @@ qf=attcontent</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -1238,17 +1319,29 @@ qf=object.Blog.BlogPostClass</query>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>
@@ -1388,17 +1481,29 @@ qf=property.XWiki.XWikiUsers.last_name^10 property.XWiki.XWikiUsers.first_name^5
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </resultsNumber>
       <url>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>url</name>
         <number>3</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Service</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
         <size>30</size>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </url>
     </class>
     <property>

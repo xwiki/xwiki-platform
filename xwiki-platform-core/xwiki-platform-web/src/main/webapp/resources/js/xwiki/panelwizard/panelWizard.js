@@ -12,7 +12,7 @@ function debugwrite(sometext) {
 }
 
 function isPanel(node) {
-  return node && node.nodeType === 1 && $(node).hasClassName('panel') &&
+  return node && node.nodeType === 1 && node.classList.contains('panel') &&
     $(node).up('#leftPanels, #rightPanels, #allviewpanels');
 }
 
@@ -344,6 +344,14 @@ function attachDragHandler(el) {
   };
 }
 
+function isAttachedPanel(element) {
+  if (element.ondblclick) {
+    return true;
+  }
+
+  return false;
+}
+
 function getBlocNameList(el) {
   var list = "";
   var nb = el.childNodes.length;
@@ -563,6 +571,9 @@ function setPanelWidth() {
 //----------------------------------------------------------------
 
 function panelEditorInit() {
+  // Stop listening from inserted elements
+  panelsObserver.disconnect()
+
   tipobj = $("dhtmltooltip");
 
   parentNode = null;
@@ -601,5 +612,16 @@ function panelEditorInit() {
   changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().size());
 }
 
-(XWiki && XWiki.isInitialized && panelEditorInit())
-|| document.observe('xwiki:dom:loading', panelEditorInit);
+// Wait for asynchronous elements
+function waitForAsync(counter) {
+  // If all asynchronous elements have been loaded init panels
+  // If we have been waiting for more than 1s give up and do with what we have
+  if (!document.getElementsByClassName('xwiki-async').length || counter > 1000) {
+    panelEditorInit();
+  } else {
+    counter += 10;
+    setTimeout(waitForAsync, 10, counter);
+  }
+}
+
+waitForAsync(0);

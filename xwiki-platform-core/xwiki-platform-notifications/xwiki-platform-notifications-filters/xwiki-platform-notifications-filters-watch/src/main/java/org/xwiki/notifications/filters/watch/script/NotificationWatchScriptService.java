@@ -34,7 +34,6 @@ import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script Service to handle the watched entities. We call `Watched Entities` the locations or the users for that we
@@ -46,7 +45,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named(NotificationWatchScriptService.ROLE_HINT)
-@Unstable
 public class NotificationWatchScriptService implements ScriptService
 {
     /**
@@ -161,6 +159,17 @@ public class NotificationWatchScriptService implements ScriptService
     public AutomaticWatchMode getAutomaticWatchMode()
     {
         return configuration.getAutomaticWatchMode(documentAccessBridge.getCurrentUserReference());
+    }
+
+    /**
+     * @return the default automatic watch mode configured for the current wiki
+     * @since 9.11.8
+     * @since 10.6RC1
+     */
+    public AutomaticWatchMode getDefaultAutomaticWatchMode()
+    {
+        return configuration.getDefaultAutomaticWatchMode(
+                documentAccessBridge.getCurrentDocumentReference().getWikiReference());
     }
 
     /**

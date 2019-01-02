@@ -22,6 +22,7 @@ package org.xwiki.sharepage.test.po;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents actions that can be done on the Share Page by Email dialog box.
@@ -42,8 +43,7 @@ public class ShareDialog extends BaseElement
 
     public void setEmailField(String email)
     {
-        this.emailField.clear();
-        this.emailField.sendKeys(email);
+        new SuggestInputElement(this.emailField).sendKeys(email).waitForSuggestions().selectTypedText();
     }
 
     public void setMessage(String message)

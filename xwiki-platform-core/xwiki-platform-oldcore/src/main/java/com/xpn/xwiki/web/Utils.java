@@ -106,13 +106,12 @@ public class Utils
     {
         XWikiResponse response = context.getResponse();
 
-        // If a Redirect has already been sent then don't process the template since it means and we shouldn't write
-        // anymore to the servlet output stream!
+        // If a Redirect has already been sent then don't process the template since it means the output has been
+        // committed and we shouldn't write anymore to the servlet output stream!
         // See: http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#sendRedirect(String)
         // "After using this method, the response should be considered to be committed and should not be written
         // to."
-        if ((response instanceof XWikiServletResponse)
-            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND) {
+        if (response.getStatus() == HttpServletResponse.SC_FOUND) {
             return;
         }
 
@@ -208,8 +207,8 @@ public class Utils
             // We only write if the caller has asked.
             // We also make sure to verify that there hasn't been a call to sendRedirect before since it would mean the
             // response has already been written to and we shouldn't try to write in it.
-            if (write
-                && ((response instanceof XWikiServletResponse) && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND)) {
+            if (write && response.getStatus() != HttpServletResponse.SC_FOUND)
+            {
                 try {
                     try {
                         response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));

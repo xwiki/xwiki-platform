@@ -890,7 +890,7 @@ public class Package
                 // Reset to initial (1.1) version when we don't want to conserve existing history and either we don't
                 // want the package history or this latter one is empty
                 boolean shouldResetToInitialVersion =
-                    !conserveExistingHistory && (!this.withVersions || !packageHasHistory);
+                    !isNewDocument && !conserveExistingHistory && (!this.withVersions || !packageHasHistory);
 
                 if (conserveExistingHistory) {
                     // Insert the archive from the existing document

@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1392888654000</creationDate>
   <parent>XWiki.XWikiUserSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1393434253000</date>
-  <contentUpdateDate>1393434253000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -42,8 +39,6 @@
   <content>{{velocity}}
 #set ($obj = $doc.getObject('XWiki.XWikiUsers'))
 #if (!$obj)
-= {{translation key="xe.admin.users.sheet"/}} =
-
 {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
 #else
   #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
@@ -62,13 +57,14 @@
       #set ($joinedWikis = [])
       #set ($wikis = $services.wiki.getAll())
       #foreach ($wiki in $wikis)
-        #if($services.wiki.user.isMember($currentUser, $wiki.id))
+        #if($services.wiki.user.isMember($documentUser, $wiki.id))
           #set($temp = $joinedWikis.add($wiki))
         #end
       #end
       #if ($joinedWikis.size() == 0)
         &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
       #else
+        #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
         &lt;ul id='wikis'&gt;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
@@ -205,6 +201,10 @@ XWiki.UserWikiTab = Class.create({
 
       onSuccess : function(response) {
         $('wikiActivityColumn').innerHTML = response.responseText;
+        require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMacro) {
+          var macro = new XWikiNotificationsMacro($('#wikiActivityColumn .notifications-macro'));
+          macro.load(0);
+        });
       }.bind(this),
 
       onFailure: function(response) {

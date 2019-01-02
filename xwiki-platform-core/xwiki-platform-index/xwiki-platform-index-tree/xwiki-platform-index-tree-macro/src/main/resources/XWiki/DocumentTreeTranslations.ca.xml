@@ -27,72 +27,69 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1424709160000</creationDate>
   <parent>XWiki.DocumentTree</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1424709200000</date>
-  <contentUpdateDate>1424709198000</contentUpdateDate>
   <version>1.1</version>
   <title>Document Tree Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: rendering.macro.documentTree.name=Page Tree
-### Missing: rendering.macro.documentTree.description=Displays the tree of XWiki pages.
-### Missing: rendering.macro.documentTree.parameter.readOnly.name=Read Only
-### Missing: rendering.macro.documentTree.parameter.readOnly.description=Should the user be able to modify the tree structure, provided that they have the necessary rights?
-### Missing: rendering.macro.documentTree.parameter.showWikis.name=Show Wikis
-### Missing: rendering.macro.documentTree.parameter.showWikis.description=Whether to show the wiki nodes or not. This can be used only on the main wiki and if the tree source has been saved with programming rights.
-### Missing: rendering.macro.documentTree.parameter.showWikiPrettyName.name=Show Wiki Pretty Name
-### Missing: rendering.macro.documentTree.parameter.showWikiPrettyName.description=Show the wiki pretty name instead of the wiki id when displaying a wiki node.
-### Missing: rendering.macro.documentTree.parameter.showSpaces.name=Show Spaces
-### Missing: rendering.macro.documentTree.parameter.showSpaces.description=Whether to show the space nodes or not. The pages are grouped by space if the space nodes are displayed.
-### Missing: rendering.macro.documentTree.parameter.showDocumentTitle.name=Show Page Title
-### Missing: rendering.macro.documentTree.parameter.showDocumentTitle.description=Whether to show the page title instead of the page name when displaying a page node.
-### Missing: rendering.macro.documentTree.parameter.showTranslations.name=Show Translations
-### Missing: rendering.macro.documentTree.parameter.showTranslations.description=Whether to show the page's translations or not.
-### Missing: rendering.macro.documentTree.parameter.showAttachments.name=Show Attachments
-### Missing: rendering.macro.documentTree.parameter.showAttachments.description=Whether to show the page's attachments or not.
-### Missing: rendering.macro.documentTree.parameter.showObjects.name=Show Objects
-### Missing: rendering.macro.documentTree.parameter.showObjects.description=Whether to show the page's objects or not.
-### Missing: rendering.macro.documentTree.parameter.showClassProperties.name=Show Class Properties
-### Missing: rendering.macro.documentTree.parameter.showClassProperties.description=Whether to show the class properties for pages that define classes.
-### Missing: rendering.macro.documentTree.parameter.root.name=Root
+  <content>rendering.macro.documentTree.name=Arbre de Documents
+rendering.macro.documentTree.description=Mostra l'arbre de documents Xwiki.
+rendering.macro.documentTree.parameter.readOnly.name=Només Lectura
+rendering.macro.documentTree.parameter.readOnly.description=L'usuari pot modificar l'estructura d'arbre, sempre que disposi dels drets necessaris?
+rendering.macro.documentTree.parameter.showWikis.name=Mostra Wikis
+rendering.macro.documentTree.parameter.showWikis.description=Si s'ha de mostrar els nodes wiki o no. Això només es pot utilitzar al wiki principal i si la font de l'arbre s'ha desat amb drets de programació.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Mostra el nom bonic del Wiki
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Mostra el nom bonic del wiki en lloc de l'identificador wiki quan es mostra un node wiki.
+rendering.macro.documentTree.parameter.showSpaces.name=Mostra els Espais
+rendering.macro.documentTree.parameter.showSpaces.description=Si s'ha de mostrar els nodes de l'espai o no. Els documents s'agrupen per espai si es mostren els nodes de l'espai.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Mostre el títol del document
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Indica si es mostrarà el títol del document en comptes del nom del document quan es mostri un node de document.
+rendering.macro.documentTree.parameter.showTranslations.name=Mostra Traduccions
+rendering.macro.documentTree.parameter.showTranslations.description=Si s'ha de mostrar les traduccions del document o no.
+rendering.macro.documentTree.parameter.showAttachments.name=Mostra arxius adjunts
+rendering.macro.documentTree.parameter.showAttachments.description=Si mostrar els arxius adjunts del document o no.
+rendering.macro.documentTree.parameter.showObjects.name=Mostra Objectes
+rendering.macro.documentTree.parameter.showObjects.description=Si mostrar arxius adjunts del document o no.
+rendering.macro.documentTree.parameter.showClassProperties.name=Mostra les propietats de la Classe
+rendering.macro.documentTree.parameter.showClassProperties.description=Si mostrar les propietats de la classe als documents que defineixen classes.
+rendering.macro.documentTree.parameter.root.name=Arrel
 ### Missing: rendering.macro.documentTree.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
-### Missing: rendering.macro.documentTree.parameter.showRoot.name=Show Root
+rendering.macro.documentTree.parameter.showRoot.name=Mostra l'arrel
 ### Missing: rendering.macro.documentTree.parameter.showRoot.description=Whether to show the root node or not. The root node is not shown by default because it is usually implied from the context where the tree is displayed (e.g. a label before the tree). There are some cases though when you may want to display the root node: to be able to create a new node under the root.
-### Missing: rendering.macro.documentTree.parameter.compact.name=Compact
+rendering.macro.documentTree.parameter.compact.name=Compacte
 ### Missing: rendering.macro.documentTree.parameter.compact.description=If you have limited horizontal space available then you should probably set this to true. The effect is that the node icons and the edges that connect them will be hidden. Some special styles will also be applied to ensure the tree takes less horizontal space while keeping the node labels fully visible.
-### Missing: rendering.macro.documentTree.parameter.links.name=Links
+rendering.macro.documentTree.parameter.links.name=Enllaços
 ### Missing: rendering.macro.documentTree.parameter.links.description=Specifies whether the node labels should look and behave as links (anchors).
 ### Missing: rendering.macro.documentTree.parameter.checkboxes.name=Checkboxes
 ### Missing: rendering.macro.documentTree.parameter.checkboxes.description=Whether to display a checkbox in front of each tree node to allow the user to select multiple tree nodes.
 ### Missing: rendering.macro.documentTree.parameter.openTo.name=Open to
 ### Missing: rendering.macro.documentTree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also. The format of the node id is the one used for the root parameter.
-### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.name=Show only Viewable
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Mostra només el que és visible
 ### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.description=Show only the wiki, space and page nodes for which the current user has view right. If this is set to false then the wiki, space and page nodes that are not viewable by the current user are listed in the tree using their names. The user won't be able to see their content by following their links though (the user will just be aware of their existence).
-### Missing: rendering.macro.documentTree.parameter.filterByClass.name=Filter by Class
+rendering.macro.documentTree.parameter.filterByClass.name=Filtra per Classe
 ### Missing: rendering.macro.documentTree.parameter.filterByClass.description=Show only the pages that have an object of the specified type. The value of this parameter is the full name of an XWiki page that holds a class definition. For example, 'Blog.CategoryClass' can be used to show only the pages that represent blog categories. Leave this parameter empty if you don't want to restrict the type of pages shown in the tree.
-### Missing: rendering.macro.documentTree.parameter.finder.name=Finder
+rendering.macro.documentTree.parameter.finder.name=Cercador
 ### Missing: rendering.macro.documentTree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
-### Missing: rendering.macro.documentTree.parameter.hierarchyMode.name=Page Hierarchy Mode
+rendering.macro.documentTree.parameter.hierarchyMode.name=Mode de jerarquia de la pàgina
 ### Missing: rendering.macro.documentTree.parameter.hierarchyMode.description=Specifies which hierarchy to use between pages. Possible values are "reference" (default) and "parentchild". If "reference" is used then the page hierarchy is defined using only the page reference, especially the nested spaces component of the page reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" page field from the database.
-### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden Documents
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filtra documents ocults
 ### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
-### Missing: rendering.macro.documentTree.parameter.limit.name=Limit
+rendering.macro.documentTree.parameter.limit.name=Límit
 ### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
-### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
+rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
 
 index.documentTree.empty=No s'han trobat pàgines
-### Missing: index.documentTree.more={0} more ...
+index.documentTree.more={0} més ...
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
-### Missing: rendering.macro.documentTree.parameter.showChildDocuments.name=Show Child Documents
+rendering.macro.documentTree.parameter.showChildDocuments.name=Mostra els documents fills
 ### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
 </content>
 </xwikidoc>

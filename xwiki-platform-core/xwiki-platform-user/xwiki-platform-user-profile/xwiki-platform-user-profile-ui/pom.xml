@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-profile</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-profile-ui</artifactId>
   <name>XWiki Platform - User - Profile - UI</name>
@@ -34,8 +34,13 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>User Profile Application</xwiki.extension.name>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-user-ui</xwiki.extension.features>
+    <xwiki.extension.features>
+      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+      org.xwiki.platform:xwiki-platform-user-ui,
+
+      <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
+      org.xwiki.contrib.membership:application-membership-profile
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
@@ -71,20 +76,25 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Need for the user's activity stream -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activitystream-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Need for the user's message stream -->
+    <!-- Needed for the user's message stream -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-messagestream-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed for membership tab -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

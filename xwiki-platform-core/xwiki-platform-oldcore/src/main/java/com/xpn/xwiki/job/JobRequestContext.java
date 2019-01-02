@@ -20,12 +20,13 @@
 package com.xpn.xwiki.job;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.xwiki.container.servlet.HttpServletUtils;
+import org.xwiki.context.concurrent.ContextStore;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,7 +40,9 @@ import com.xpn.xwiki.web.XWikiRequest;
  * 
  * @version $Id$
  * @since 8.3RC1
+ * @deprecated since 10.9RC1, use {@link ContextStore} instead
  */
+@Deprecated
 public class JobRequestContext implements Serializable
 {
     /**
@@ -73,6 +76,8 @@ public class JobRequestContext implements Serializable
 
     private URL requestURL;
 
+    private String requestContextPath;
+
     private Map<String, String[]> requestParameters;
 
     /**
@@ -96,12 +101,8 @@ public class JobRequestContext implements Serializable
             XWikiRequest request = xcontext.getRequest();
             if (request != null) {
                 if (request.getRequestURL() != null) {
-                    try {
-                        setRequestUrl(new URL(request.getRequestURL().toString()));
-                    } catch (MalformedURLException e) {
-                        // Log something ? I guess I should never happen (it returns a StringBuffer so that it can be
-                        // modified).
-                    }
+                    setRequestUrl(HttpServletUtils.getSourceURL(request));
+                    setRequestContextPath(request.getContextPath());
                 }
                 if (request.getParameterMap() != null) {
                     setRequestParameters(request.getParameterMap());
@@ -300,6 +301,26 @@ public class JobRequestContext implements Serializable
     public URL getRequestURL()
     {
         return this.requestURL;
+    }
+
+    /**
+     * @return the requestContextPath
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public String getRequestContextPath()
+    {
+        return this.requestContextPath;
+    }
+
+    /**
+     * @param requestContextPath the requestContextPath to set
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public void setRequestContextPath(String requestContextPath)
+    {
+        this.requestContextPath = requestContextPath;
     }
 
     /**

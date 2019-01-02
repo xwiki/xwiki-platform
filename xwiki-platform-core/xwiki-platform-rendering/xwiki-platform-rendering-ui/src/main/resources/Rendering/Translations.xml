@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1463329763000</creationDate>
   <parent>Rendering.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1463329782000</date>
-  <contentUpdateDate>1463329763000</contentUpdateDate>
   <version>1.1</version>
   <title>Rendering Translations</title>
   <comment/>

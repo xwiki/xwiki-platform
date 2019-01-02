@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1384924669000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1433258989000</date>
-  <contentUpdateDate>1432915830000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search</title>
   <comment/>
@@ -48,8 +45,8 @@
 {{/velocity}}</content>
   <attachment>
     <filename>dark-grey-disclosure-arrow-down.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJUlEQVQIW2OIjIz8jwszAAkGbBJAwACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==</content>
@@ -57,8 +54,8 @@
   </attachment>
   <attachment>
     <filename>dark-grey-disclosure-arrow-left.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJ0lEQVQI1y3GMQEAIAwDsGy4RCCiMDOOciU1Nsy6MHSgA33qh7RJH1DfCDMFeFsmAAAAAElFTkSuQmCC</content>
@@ -66,8 +63,8 @@
   </attachment>
   <attachment>
     <filename>light-grey-disclosure-arrow-down.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzYJEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC</content>
@@ -75,8 +72,8 @@
   </attachment>
   <attachment>
     <filename>light-grey-disclosure-arrow-left.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJUlEQVQI1zXKsQ0AIADDMLf//8ZJMFRMzpAc4HbQQQeVH5abwwPlkgTcUkPn+AAAAABJRU5ErkJggg==</content>
@@ -748,7 +745,6 @@ a.search-result-highlightAll:after {
   cursor: pointer;
   line-height: 1.4em;
   margin: 0 .2em;
-  text-transform: capitalize;
 }
 
 .search-facet-header:after {

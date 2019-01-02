@@ -22,7 +22,9 @@ package com.xpn.xwiki.internal.file;
 import java.io.File;
 
 /**
- * Helper to create file that are automatically deleted when not needed anymore.
+ * Helper to create file that are automatically deleted when not needed anymore (but done as best effort since
+ * the files will be deleted when they're not used anymore and the GC is called or when the JVM is stopped. Thus if
+ * the JVM crashes before the finalizers are called this will leave undeleted files on the filesystem).
  * 
  * @version $Id$
  * @since 9.0RC1

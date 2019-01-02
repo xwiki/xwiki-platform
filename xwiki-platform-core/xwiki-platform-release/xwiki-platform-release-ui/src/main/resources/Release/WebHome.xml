@@ -31,9 +31,6 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1342185615000</creationDate>
-  <date>1360753036000</date>
-  <contentUpdateDate>1360753036000</contentUpdateDate>
   <version>1.1</version>
   <title>Releases</title>
   <template/>
@@ -69,7 +66,7 @@
 #set($columns = ["version", "releaseManagers", "releaseDate", "releaseNotes"])
 #set($columnsProperties = {
     "version" : { "type" : "text" , "link" : "view"},
-    "releaseManagers" : { "type" : "text" },
+    "releaseManagers" : { "html" : true },
     "releaseDate" : { "type" : "text" }
 })
 #set($options = { 

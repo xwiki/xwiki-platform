@@ -32,6 +32,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -161,17 +162,45 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      *
      * @param name name for the newly created entity, could not be null.
      * @param type type for the newly created entity, could not be null.
+     * @param parameters parameters for this reference, may be null
+     * @since 10.6RC1
+     */
+    @Unstable
+    public EntityReference(String name, EntityType type, Map<String, Serializable> parameters)
+    {
+        setName(name);
+        setType(type);
+        setParameters(parameters);
+    }
+
+    /**
+     * Create a new EntityReference. Note: Entity reference are immutable since 3.3M2.
+     *
+     * @param name name for the newly created entity, could not be null.
+     * @param type type for the newly created entity, could not be null.
      * @param parent parent reference for the newly created entity reference, may be null.
      * @param parameters parameters for this reference, may be null
      * @since 3.3M2
      */
-    protected EntityReference(String name, EntityType type, EntityReference parent,
-        Map<String, Serializable> parameters)
+    public EntityReference(String name, EntityType type, EntityReference parent, Map<String, Serializable> parameters)
     {
         setName(name);
         setType(type);
         setParent(parent);
         setParameters(parameters);
+    }
+
+    /**
+     * Clone an EntityReference, but use the specified paramaters.
+     *
+     * @param reference the reference to clone
+     * @param parameters parameters for this reference, may be null
+     * @since 10.6RC1
+     */
+    @Unstable
+    public EntityReference(EntityReference reference, Map<String, Serializable> parameters)
+    {
+        this(reference.getName(), reference.getType(), reference.getParent(), parameters);
     }
 
     /**
@@ -267,14 +296,14 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     protected void setParameter(String name, Serializable value)
     {
         if (value != null) {
-            if (parameters == null) {
-                parameters = new TreeMap<String, Serializable>();
+            if (this.parameters == null) {
+                this.parameters = new TreeMap<>();
             }
-            parameters.put(name, value);
+            this.parameters.put(name, value);
         } else if (parameters != null) {
-            parameters.remove(name);
-            if (parameters.size() == 0) {
-                parameters = null;
+            this.parameters.remove(name);
+            if (this.parameters.size() == 0) {
+                this.parameters = null;
             }
         }
     }
@@ -301,7 +330,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @return the value of the parameter
      * @since 5.3RC1
      */
-    final Map<String, Serializable> getParameters()
+    public final Map<String, Serializable> getParameters()
     {
         return this.parameters == null ? Collections.<String, Serializable>emptyMap() : this.parameters;
     }
@@ -382,8 +411,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * Extract the first entity of the given type from this one by traversing the current entity to the root.
      *
      * @param type the type of the entity to be extracted
-     * @return the first entity of the given type in the current entity when traversing to the root or null if no
-     *         entity of the passed type exist
+     * @return the first entity of the given type in the current entity when traversing to the root or null if no entity
+     *         of the passed type exist
      * @since 7.4M1
      */
     public EntityReference extractFirstReference(EntityType type)
@@ -411,7 +440,24 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (oldParent == newParent) {
             return this;
         }
+
         return new EntityReference(this, oldParent, newParent);
+    }
+
+    /**
+     * Return a clone of this reference, but with its parent replaced by the passed one.
+     *
+     * @param newParent the new parent that will replace the parent
+     * @return a new reference with a amended parent chain
+     * @since 10.8RC1
+     */
+    public EntityReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new EntityReference(this, newParent);
     }
 
     /**
@@ -426,6 +472,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (newParent == null) {
             return this;
         }
+
         return new EntityReference(this, null, newParent);
     }
 
@@ -442,6 +489,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (oldParent == null) {
             return this;
         }
+
         return new EntityReference(this, oldParent, null);
     }
 
@@ -523,7 +571,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         EntityReference currentReference1 = this;
         EntityReference currentReference2 = otherReference;
 
-        while (currentReference1 != null && currentReference1.getType().ordinal() >= to.ordinal()) {
+        while (currentReference1 != null
+            && (currentReference1.getType() == to || currentReference1.getType().isAllowedAncestor(to))) {
             if (!currentReference1.equalsNonRecursive(currentReference2)) {
                 return false;
             }
@@ -532,7 +581,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             currentReference2 = currentReference2.getParent();
         }
 
-        if (currentReference2 == null || currentReference2.getType().ordinal() < to.ordinal()) {
+        if (currentReference2 == null || to.isAllowedAncestor(currentReference2.getType())) {
             return true;
         }
 
@@ -641,14 +690,20 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
                 Object obj = reference.parameters.get(entry.getKey());
                 Object myobj = entry.getValue();
-                if (myobj != null && myobj instanceof Comparable) {
+                if (myobj instanceof Comparable) {
                     if (obj == null) {
                         return 1;
                     }
-                    return ((Comparable) myobj).compareTo(obj);
+
+                    int number = ((Comparable) myobj).compareTo(obj);
+
+                    if (number != 0) {
+                        return number;
+                    }
                 }
             }
         }
+
         return (reference.parameters == null) ? 0 : -1;
     }
 }

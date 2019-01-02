@@ -23,11 +23,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.internal.model.XarModel;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class XarPackageTest
 {
@@ -56,6 +57,16 @@ public class XarPackageTest
 
     private static final LocalDocumentReference SPACE_MERGEDTRANSLATIONS_FR =
         new LocalDocumentReference(SPACE_MERGEDTRANSLATIONS, Locale.FRENCH);
+
+    public static void assertEqualsEntry(XarEntry expected, XarEntry actual)
+    {
+        assertEquals(expected, actual);
+        assertEquals(expected.getEntryName(), actual.getEntryName());
+        assertEquals(expected.getDefaultAction(), actual.getDefaultAction());
+        assertEquals(expected.getEntryType(), actual.getEntryType());
+    }
+
+    // Tests
 
     @Test
     public void readDescriptor() throws Exception
@@ -96,13 +107,5 @@ public class XarPackageTest
         xarPackage.readDescriptor(getClass().getResourceAsStream("/packagewithemptyid.xml"));
 
         assertEquals(null, xarPackage.getPackageExtensionId());
-    }
-
-    private void assertEqualsEntry(XarEntry expected, XarEntry actual)
-    {
-        assertEquals(expected, actual);
-        assertEquals(expected.getEntryName(), actual.getEntryName());
-        assertEquals(expected.getDefaultAction(), actual.getDefaultAction());
-        assertEquals(expected.getEntryType(), actual.getEntryType());
     }
 }

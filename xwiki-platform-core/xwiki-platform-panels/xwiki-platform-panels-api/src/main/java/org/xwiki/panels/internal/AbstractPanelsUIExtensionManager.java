@@ -20,7 +20,10 @@
 package org.xwiki.panels.internal;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,15 +33,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionManager;
 
 /**
  * Abstract panels UI extension manager. Implementations must provide a list of panel IDs to be displayed, this class
- * handles the retrieval of the UI extensions corresponding to the configured list.
+ * handles the retrieval of the UI extensions corresponding to the configured panel list.
  *
  * @version $Id$
  * @since 4.3.1
@@ -65,19 +70,15 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
     private DocumentReferenceResolver<String> resolver;
 
     /**
-     * Serializer allowing to serialize references into their absolute representation.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    /**
-     * We use the Context Component Manager to lookup UI Extensions registered as components.
-     * The Context Component Manager allows Extensions to be registered for a specific user, for a specific wiki or for
-     * a whole farm.
+     * We use the Context Component Manager to lookup UI Extensions registered as components. The Context Component
+     * Manager allows Extensions to be registered for a specific user, for a specific wiki or for a whole farm.
      */
     @Inject
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
+
+    @Inject
+    private AsyncContext asyncContext;
 
     /**
      * Method returning the list of configured panels.
@@ -89,29 +90,57 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
     @Override
     public List<UIExtension> get(String extensionPointId)
     {
-        List<UIExtension> panels = new ArrayList<UIExtension>();
+        List<UIExtension> panels = new ArrayList<>();
 
         String panelConfigurationString = getConfiguration();
 
         // Verify that there's a panel configuration property defined, and if not don't return any panel extension.
         if (!StringUtils.isEmpty(panelConfigurationString)) {
-            List<String> panelSerializedReferences = new ArrayList<String>();
-            for (String serializedReference : getConfiguration().split(",")) {
-                panelSerializedReferences.add(serializer.serialize(resolver.resolve(serializedReference.trim())));
+            // we store the document reference along with their position in the list,
+            // as we want to build a list ordered the same way than in the original panelConfigurationString
+            Map<DocumentReference, Integer> panelReferenceWithPosition = new HashMap<>();
+
+            String[] panelStringReferences = panelConfigurationString.split(",");
+            for (int i = 0; i < panelStringReferences.length; i++) {
+                panelReferenceWithPosition.put(resolver.resolve(panelStringReferences[i].trim()), i);
             }
 
             try {
                 List<UIExtension> allExtensions =
                     contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
-                for (String panelSerializedReference : panelSerializedReferences) {
-                    for (UIExtension extension : allExtensions) {
-                        if (extension.getId().equals(panelSerializedReference)) {
-                            panels.add(extension);
-                        }
+                Map<UIExtension, Integer> panelsPositions = new HashMap<>();
+                // TODO: This is not performant and will not scale well when the number of UIExtension instances
+                // increase in the wiki
+                for (UIExtension extension : allExtensions) {
+                    DocumentReference extensionId;
+
+                    // We differentiate UIExtension implementations:
+                    //
+                    // - PanelWikiUIExtension and WikiUIExtension (i.e. WikiComponent): They point to a wiki page and we
+                    // can use that page's reference.
+                    //
+                    // - For other implementations, we only support instance that have their id containing a document
+                    // reference.
+                    if (extension instanceof WikiComponent) {
+                        WikiComponent wikiComponent = (WikiComponent) extension;
+                        extensionId = wikiComponent.getDocumentReference();
+                    } else {
+                        extensionId = resolver.resolve(extension.getId());
+                    }
+
+                    if (panelReferenceWithPosition.containsKey(extensionId)) {
+                        panelsPositions.put(extension, panelReferenceWithPosition.get(extensionId));
                     }
                 }
+
+                panels.addAll(panelsPositions.keySet());
+                panels.sort(Comparator.comparing(panelsPositions::get));
+
+                // Indicate that any currently running asynchronous execution result should be removed from the cache as
+                // soon as a UIExtension component is modified
+                this.asyncContext.useComponent(UIExtension.class);
             } catch (ComponentLookupException e) {
-                logger.error("Failed to lookup Panels instances, error: [{}]", e);
+                this.logger.error("Failed to lookup Panels instances, error: [{}]", e);
             }
         }
 

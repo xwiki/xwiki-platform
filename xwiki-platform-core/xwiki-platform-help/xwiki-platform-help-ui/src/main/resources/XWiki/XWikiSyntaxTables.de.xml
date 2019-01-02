@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1300895617000</creationDate>
   <parent>XWiki.XWikiSyntax</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1301497989000</date>
-  <contentUpdateDate>1301497989000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxTables</title>
   <comment/>
@@ -72,7 +69,7 @@ Wort 1 | Wort 2
   &lt;/tbody&gt;
 &lt;/table&gt;
 )))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Wort 1|Wort 2
 )))
@@ -125,11 +122,11 @@ Erlaubt es auf einfache Weise Inhalte im Tabellenformat zu erstellen. Parameter 
 |Wort 1|Wort 2
 )))
 |Parametrisierte Tabelle|((({{{
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Wort 1|Wort 2
 }}})))|(((
-(% style="background-color:red;align=center" %)
+(% style="background-color:red;align:center" %)
 |=Titel 1|=(% style="background-color:yellow" %)Titel 2
 |Wort 1|Wort 2
 )))

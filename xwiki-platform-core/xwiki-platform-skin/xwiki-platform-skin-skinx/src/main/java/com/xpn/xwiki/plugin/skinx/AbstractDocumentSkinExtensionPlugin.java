@@ -254,19 +254,16 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public void use(String resource, XWikiContext context)
     {
         String canonicalResource = getCanonicalDocumentName(resource);
-        LOGGER.debug("Using [{}] as [{}] extension", canonicalResource, this.getName());
-        getPulledResources(context).add(canonicalResource);
-        // In case a previous call added some parameters, remove them, since the last call for a resource always
-        // discards previous ones.
-        getParametersMap(context).remove(canonicalResource);
+
+        super.use(canonicalResource, context);
     }
 
     @Override
     public void use(String resource, Map<String, Object> parameters, XWikiContext context)
     {
         String canonicalResource = getCanonicalDocumentName(resource);
-        getPulledResources(context).add(canonicalResource);
-        getParametersMap(context).put(canonicalResource, parameters);
+
+        super.use(canonicalResource, parameters, context);
     }
 
     /**

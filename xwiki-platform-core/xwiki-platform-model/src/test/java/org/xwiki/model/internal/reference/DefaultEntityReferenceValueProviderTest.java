@@ -19,15 +19,17 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.component.util.ReflectionUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.test.TestConstants;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the deprecated {@link org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider}.
@@ -35,40 +37,34 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @version $Id$
  * @since 2.3M1
  */
-public class DefaultEntityReferenceValueProviderTest
+@ComponentTest
+public class DefaultEntityReferenceValueProviderTest implements TestConstants
 {
-    private Mockery mockery = new Mockery();
+    @MockComponent
+    private ModelConfiguration configuration;
 
-    private EntityReferenceValueProvider provider;
+    @InjectMockComponents
+    private DefaultEntityReferenceValueProvider provider;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    public void beforeEach()
     {
-        this.provider = new DefaultEntityReferenceValueProvider();
-        final ModelConfiguration mockConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.provider, "configuration", mockConfiguration);
-
-        this.mockery.checking(new Expectations()
-        {
-            {
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.SPACE);
-                will(returnValue("defspace"));
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("defwiki"));
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.DOCUMENT);
-                will(returnValue("defpage"));
-                allowing(mockConfiguration).getDefaultReferenceValue(EntityType.ATTACHMENT);
-                will(returnValue("deffilename"));
-            }
-        });
+        when(this.configuration.getDefaultReferenceValue(EntityType.SPACE)).thenReturn(DEFAULT_SPACE);
+        when(this.configuration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn(DEFAULT_WIKI);
+        when(this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT);
+        when(this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT);
+        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE)).thenReturn(DEFAULT_PAGE);
+        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE_ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT);
     }
 
     @Test
     public void testGetDefaultValue()
     {
-        Assert.assertEquals("defpage", this.provider.getDefaultValue(EntityType.DOCUMENT));
-        Assert.assertEquals("defspace", this.provider.getDefaultValue(EntityType.SPACE));
-        Assert.assertEquals("deffilename", this.provider.getDefaultValue(EntityType.ATTACHMENT));
-        Assert.assertEquals("defwiki", this.provider.getDefaultValue(EntityType.WIKI));
+        assertEquals(DEFAULT_WIKI, this.provider.getDefaultValue(EntityType.WIKI));
+        assertEquals(DEFAULT_SPACE, this.provider.getDefaultValue(EntityType.SPACE));
+        assertEquals(DEFAULT_DOCUMENT, this.provider.getDefaultValue(EntityType.DOCUMENT));
+        assertEquals(DEFAULT_ATTACHMENT, this.provider.getDefaultValue(EntityType.ATTACHMENT));
+        assertEquals(DEFAULT_PAGE, this.provider.getDefaultValue(EntityType.PAGE));
+        assertEquals(DEFAULT_ATTACHMENT, this.provider.getDefaultValue(EntityType.PAGE_ATTACHMENT));
     }
 }

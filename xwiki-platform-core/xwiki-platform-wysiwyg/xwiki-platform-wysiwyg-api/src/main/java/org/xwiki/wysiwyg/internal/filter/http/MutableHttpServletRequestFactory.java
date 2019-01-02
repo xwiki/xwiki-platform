@@ -32,7 +32,7 @@ import org.xwiki.wysiwyg.filter.MutableServletRequestFactory;
  * 
  * @version $Id$
  */
-@Component(hints = {"HTTP/1.1", "HTTP/1.0" })
+@Component
 @Singleton
 public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
 {
@@ -42,7 +42,7 @@ public class MutableHttpServletRequestFactory implements MutableServletRequestFa
         if (request instanceof HttpServletRequest) {
             return new MutableHttpServletRequest((HttpServletRequest) request);
         } else {
-            throw new IllegalArgumentException("Expecting HttpServletRequest!");
+            throw new IllegalArgumentException(String.format("Expecting HttpServletRequest, got [%s]!", request));
         }
     }
 }

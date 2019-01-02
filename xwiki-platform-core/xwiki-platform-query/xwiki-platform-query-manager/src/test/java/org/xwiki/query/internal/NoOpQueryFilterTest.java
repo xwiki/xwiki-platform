@@ -22,8 +22,9 @@ package org.xwiki.query.internal;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests for {@link NoOpQueryFilter}
@@ -39,9 +40,9 @@ public class NoOpQueryFilterTest
         NoOpQueryFilter filter = new NoOpQueryFilter();
 
         String statement = "statement";
-        Assert.assertSame(statement, filter.filterStatement(statement, "language"));
+        assertSame(statement, filter.filterStatement(statement, "language"));
 
         List results = Arrays.asList("result1", "result2");
-        Assert.assertSame(results, filter.filterResults(results));
+        assertSame(results, filter.filterResults(results));
     }
 }

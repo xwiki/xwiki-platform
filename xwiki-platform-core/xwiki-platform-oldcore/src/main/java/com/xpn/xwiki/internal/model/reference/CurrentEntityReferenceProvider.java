@@ -29,6 +29,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -81,6 +82,13 @@ public class CurrentEntityReferenceProvider extends DefaultEntityReferenceProvid
                     DocumentReference documentReference = currentDoc.getDocumentReference();
                     // Keep only the document part
                     result = documentReference.removeParent(documentReference.getLastSpaceReference());
+                }
+            } else if (type == EntityType.PAGE) {
+                XWikiDocument currentDoc = xcontext.getDoc();
+                if (currentDoc != null) {
+                    PageReference pageReference = currentDoc.getPageReference();
+                    // Keep only the page part
+                    result = pageReference.removeParent(pageReference.getWikiReference());
                 }
             }
         }

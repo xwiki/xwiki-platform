@@ -24,17 +24,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
 /**
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.doReturn;
  *
  * @version $Id$
  */
+@OldcoreTest
 @ReferenceComponentList
 public class StaticListClassTest
 {
@@ -50,8 +52,8 @@ public class StaticListClassTest
      */
     private static final List<String> VALUES_WITH_HTML_SPECIAL_CHARS = Arrays.asList("a<b>c", "1\"2'3", "x{y&z");
 
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     /** Tests that {@link StaticListClass#getList} returns values sorted according to the property's sort option. */
     @Test
@@ -60,17 +62,17 @@ public class StaticListClassTest
         StaticListClass listClass = new StaticListClass();
         listClass.setValues("a=A|c=D|d=C|b");
 
-        assertEquals("Default order was not preserved.", "[a, c, d, b]",
-            listClass.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, c, d, b]", listClass.getList(this.oldcore.getXWikiContext()).toString(),
+            "Default order was not preserved.");
         listClass.setSort("none");
-        assertEquals("Default order was not preserved.", "[a, c, d, b]",
-            listClass.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, c, d, b]", listClass.getList(this.oldcore.getXWikiContext()).toString(),
+            "Default order was not preserved.");
         listClass.setSort("id");
-        assertEquals("Items were not ordered by ID.", "[a, b, c, d]",
-            listClass.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, b, c, d]", listClass.getList(this.oldcore.getXWikiContext()).toString(),
+            "Items were not ordered by ID.");
         listClass.setSort("value");
-        assertEquals("Items were not ordered by value.", "[a, b, d, c]",
-            listClass.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, b, d, c]", listClass.getList(this.oldcore.getXWikiContext()).toString(),
+            "Items were not ordered by value.");
     }
 
     /**
@@ -90,11 +92,11 @@ public class StaticListClassTest
         listClass.setValues("a|b=B and B|c=<=C=>|d=d\\|D|e");
 
         Map<String, ListItem> result = listClass.getMap(this.oldcore.getXWikiContext());
-        assertEquals("Proper splitting not supported", 5, result.size());
-        assertEquals("key syntax not supported", "a", result.get("a").getValue());
-        assertEquals("key=label syntax not supported", "B and B", result.get("b").getValue());
-        assertEquals("= in labels not supported", "<=C=>", result.get("c").getValue());
-        assertEquals("Escaped \\| in labels not supported", "d|D", result.get("d").getValue());
+        assertEquals(5, result.size(), "Proper splitting not supported");
+        assertEquals("a", result.get("a").getValue(), "key syntax not supported");
+        assertEquals("B and B", result.get("b").getValue(), "key=label syntax not supported");
+        assertEquals("<=C=>", result.get("c").getValue(), "= in labels not supported");
+        assertEquals("d|D", result.get("d").getValue(), "Escaped \\| in labels not supported");
     }
 
     /**
@@ -170,6 +172,7 @@ public class StaticListClassTest
     public void testDisplayEditSelect()
     {
         String expectedHTML = "<select id='w&#62;vb&#38;a&#60;r' name='w&#62;vb&#38;a&#60;r' size='7'>"
+            + "<option value='' label='---'>---</option>"
             + "<option value='a&#60;b&#62;c' label='c&#62;b&#60;a'>c&#62;b&#60;a</option>"
             + "<option selected='selected' value='1&#34;2&#39;3' label='3&#39;2&#34;1'>3&#39;2&#34;1</option>"
             + "<option value='x&#123;y&#38;z' label='z&#38;y&#123;x'>z&#38;y&#123;x</option>"

@@ -129,6 +129,18 @@ public class SpaceReference extends EntityReference
     }
 
     /**
+     * Clone an SpaceReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public SpaceReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Overridden in order to verify the validity of the passed parent.
@@ -179,7 +191,21 @@ public class SpaceReference extends EntityReference
     @Override
     public SpaceReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new SpaceReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public SpaceReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new SpaceReference(this, newParent);
     }
 
     /**

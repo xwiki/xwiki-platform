@@ -25,63 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha</artifactId>
-  <name>XWiki Platform - Captcha</name>
-  <packaging>jar</packaging>
-  <description>Offers API to generate Captchas</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Captcha Module</xwiki.extension.name>
-  </properties>
-  <dependencies>
-    <!-- CaptchaActions are components -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- CaptchaVelocityContextInitializer needs ConfigurationSource to tell whether captchas should be enabled -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- CaptchaVelocityContextInitializer needs access to VelocityContextInitializer -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- Jcaptcha Api -->
-    <dependency>
-      <groupId>com.octo.captcha</groupId>
-      <artifactId>jcaptcha-api</artifactId>
-      <version>2.0-alpha-1-SNAPSHOT-500</version>
-    </dependency>
-    <!-- Jcaptcha -->
-    <dependency>
-      <groupId>com.octo.captcha</groupId>
-      <artifactId>jcaptcha</artifactId>
-      <version>2.0-alpha-1-SNAPSHOT-500</version>
-    </dependency>
-    <!-- For sound captcha integration -->
-    <dependency>
-      <groupId>com.octo.captcha</groupId>
-      <artifactId>jcaptcha-extension-sound-freetts</artifactId>
-      <version>2.0-alpha-1-SNAPSHOT-500</version>
-    </dependency>
-    <!-- Need servlet api for getting HttpSession id and flushing captcha to HttpResponse -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <!-- AbstractCaptchaAction extends org.apache.struts.action.Action -->
-    <dependency>
-      <groupId>org.apache.struts</groupId>
-      <artifactId>struts-core</artifactId>
-    </dependency>
-  </dependencies>
+  <name>XWiki Platform - CAPTCHA - Parent POM</name>
+  <packaging>pom</packaging>
+  <modules>
+    <module>xwiki-platform-captcha-api</module>
+    <module>xwiki-platform-captcha-ui</module>
+    <module>xwiki-platform-captcha-default</module>
+    <module>xwiki-platform-captcha-jcaptcha</module>
+  </modules>
+  <description>Offers API and configuration to generate and validate CAPTCHAs.</description>
 </project>

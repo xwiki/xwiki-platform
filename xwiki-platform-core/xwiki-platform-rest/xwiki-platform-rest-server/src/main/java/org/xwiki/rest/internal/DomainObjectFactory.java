@@ -246,8 +246,8 @@ public class DomainObjectFactory
             comment.setReplyTo((Integer) property.getValue());
         }
 
-        String pageUri =
-            uri(baseUri, PageResource.class, doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName());
+        String pageUri = uri(baseUri, PageResource.class, doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()),
+            doc.getDocumentReference().getName());
         Link pageLink = objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);

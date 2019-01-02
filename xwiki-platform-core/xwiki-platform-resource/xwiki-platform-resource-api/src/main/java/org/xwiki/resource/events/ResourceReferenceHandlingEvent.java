@@ -21,7 +21,6 @@ package org.xwiki.resource.events;
 
 import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event sent before starting the execution of a {@link org.xwiki.resource.ResourceReferenceHandler}.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.11RC1
  */
-@Unstable
 public class ResourceReferenceHandlingEvent extends AbstractResourceReferenceHandlerEvent implements BeginEvent
 {
     /**

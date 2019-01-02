@@ -27,19 +27,16 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1413990648000</creationDate>
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1413991189000</date>
-  <contentUpdateDate>1413991189000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.panels.applications.helper=Šeit jūs varat izvēlēties, kuras lietotnes rādīt Lietotņu joslā (pēc noklusēšanas, pa kreisi). Šeit tiks parādītas visas jaunās lietotnes. Ja vēlaties kādu no tām noņemt, pārvelciet ikonu no vienas joslas uz otru. Neaizmirstiet saglabāt izmaiņas\!
+  <content>platform.panels.applications.helper=Šeit jūs varat izvēlēties, kuras lietotnes rādīt Lietotņu joslā (pēc noklusēšanas, pa kreisi). Šeit tiks parādītas visas jaunās lietotnes. Ja vēlaties kādu no tām noņemt, pārvelciet ikonu no vienas joslas uz otru. Neaizmirstiet saglabāt izmaiņas!
 platform.panels.applications.displayedapps=Lietotnes, kuras ir joslā
 platform.panels.applications.blacklistedapps=Lietotnes, kuras nav joslā
 platform.panels.applications.save=Saglabāt
@@ -49,21 +46,21 @@ platform.panels.applications.ajax.csrf=Neizdevās CSRF validācija. Mēģiniet p
 platform.panels.applications.ajax.noright=Jums nav tiesību mainīt PanelsCode.ApplicationsPanelConfiguration.
 platform.panels.applications.ajax.error=Neizdevās saglabāt izmaiņas.
 admin.panels.applications=Lietotņu panelis
-### Missing: admin.panels.applications.description=Manage what applications are displayed in the Applications Panel.
+admin.panels.applications.description=Pārvaldīt, kuras lietotnes ir parādītas Lietotņu panelī.
 
-### Missing: admin.panels.navigation=Navigation Panel
-### Missing: admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
+admin.panels.navigation=Pārvietošanās panelis
+admin.panels.navigation.description=Pārvaldīt, kuras lietotnes ir parādītas Pārvietošanās panelī.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Izslēgt augšējā līmeņa lapas
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Ja šīs lapas nav paredzēts mainīt, ar šo dinamisko filtru var izlaist uzstādītā paplašinājuma koka augšējā līmeņa lapas.
+PanelsCode.NavigationConfigurationClass_exclusions=Izņēmumi
+PanelsCode.NavigationConfigurationClass_exclusions.hint=Saraksts ar lapām, kuras izlaist no pārvietošanās koka.
+PanelsCode.NavigationConfigurationClass_inclusions=Iekļaut
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Saraksts ar lapām, kuras iekļaut sarakstā, pat ja tās bija izlaistas ar iepriekšējo filtru.
+platform.panels.navigation.configuration.excludedPages=Izlaistās lapas
+platform.panels.navigation.configuration.excludedPages.hint=Velciet un nometiet lapas, lai iekļautu vai izņemu tās no koka.
+platform.panels.navigation.configuration.excludedPages.empty=Nevienu
+platform.panels.navigation.configuration.topLevelExtensionPages=Paplašinājumu augšējā līmeņa lapas
+platform.panels.navigation.configuration.otherPages=Citas lapas
+platform.panels.navigation.configuration.saveComment=Pārvietošanās paneļa iestatījumi ir saglabāti
 </content>
 </xwikidoc>

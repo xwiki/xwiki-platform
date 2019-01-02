@@ -101,6 +101,8 @@ import static org.mockito.Mockito.when;
 // @formatter:on
 public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
 {
+    private static final String PERMDIR = "target/" + AuthenticatingIntegrationTest.class.getSimpleName();
+
     // Required by GreenMail.
     static {
         Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
@@ -147,7 +149,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
-        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
+        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(PERMDIR);
     }
 
     @Before

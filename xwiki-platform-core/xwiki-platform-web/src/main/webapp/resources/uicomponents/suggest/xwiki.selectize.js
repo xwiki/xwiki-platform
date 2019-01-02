@@ -36,19 +36,26 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     '</div>'
   ].join('');
 
-  var renderOption = function(option) {
+  var renderCommon = function(option) {
     var output = $(optionTemplate);
     var value = (option && typeof option === 'object') ? option.value : option;
     output.attr('data-value', value);
     var icon = option && option.icon;
-    if (typeof icon === 'string') {
-      if (icon.indexOf('/') >= 0 || icon.indexOf('.') >= 0) {
-        // The icon is specified by its path.
-        var image = $('<img class="xwiki-selectize-option-icon" alt="" />').attr('src', icon);
+    if (typeof icon === 'object') {
+      // Set the icon set type in case it was missing.
+      if (!icon.iconSetType && icon.url) {
+        icon.iconSetType = 'IMAGE';
+      } else if (!icon.iconSetType && icon.cssClass) {
+          icon.iconSetType = 'FONT';
+      }
+      // Render the icon depending on the icon set type.
+      if (icon.iconSetType === 'IMAGE') {
+        var image = $('<img class="xwiki-selectize-option-icon" alt="" />').attr('src', icon.url);
         output.find('.xwiki-selectize-option-icon').replaceWith(image);
+      } else if (icon.iconSetType === 'FONT') {
+        output.find('.xwiki-selectize-option-icon').addClass(icon.cssClass);
       } else {
-        // The icon is specified by its CSS class.
-        output.find('.xwiki-selectize-option-icon').addClass(icon);
+        output.find('.xwiki-selectize-option-icon').remove();
       }
     } else {
       output.find('.xwiki-selectize-option-icon').remove();
@@ -66,6 +73,30 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     return output;
   };
 
+  var renderOption = function(option) {
+    var output = renderCommon(option);
+    // This class is needed starting with v0.12.5 in order to have proper styling.
+    output.addClass('option');
+    // We need a wrapper around the icon in order to center it because it looks better if the labels are aligned when
+    // the suggestions are displayed on separate lines in the drop down list. We don't need to center the icon for the
+    // selected suggestions because they are displayed in-line so the labels don't have to be aligned.
+    output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"/>');
+    var hint = option && option.hint;
+    if (typeof hint === 'string' && hint !== '') {
+      output.append($('<div class="xwiki-selectize-option-hint"/>').text(hint));
+    }
+    return output;
+  }
+
+  var renderItem = function(option) {
+    var output = renderCommon(option);
+    var hint = option && option.hint;
+    if (typeof hint === 'string' && hint !== '') {
+      output.attr('title', hint);
+    }
+    return output;
+  }
+
   var defaultSettings = {
     // Copying the CSS classes from the form field to the dropdown can have unexpected side effects if those classes are
     // not meant to be applied on the dropdown (e.g. live table active filter).
@@ -78,20 +109,33 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     highlight: false,
     labelField: 'label',
     loadThrottle: 500,
+    onDropdownClose: function(dropdown) {
+      dropdown.removeClass('active');
+    },
+    onDropdownOpen: function(dropdown) {
+      dropdown.addClass('active');
+    },
     persist: false,
     preload: 'focus',
     render: {
-      item: renderOption,
+      item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
         // TODO: Use translation key here.
         var text = 'Select {0} ...';
-        var output = $('<div class="create"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
+        // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
+        var output = $('<div class="create option"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
         output.find('em').text(data.input);
         return output;
       }
     },
-    searchField: ['value', 'label']
+    searchField: ['value', 'label'],
+    onType: function(value) {
+      if (!this.loadedSearches.hasOwnProperty(value)) {
+        var wrapper = this.$wrapper;
+        wrapper.addClass(this.settings.loadingClass);
+      }
+    }
   };
 
   var loadSelectedValues = function() {
@@ -117,8 +161,14 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   var loadSelectedValue = function(selectize, value) {
     var deferred = $.Deferred();
-    if (value && typeof selectize.settings.load === 'function') {
-      selectize.settings.load(value, function(options) {
+    var load;
+    if (typeof selectize.settings.loadSelected === 'function') {
+      load = selectize.settings.loadSelected;
+    } else {
+      load = selectize.settings.load;
+    }
+    if (value && typeof load === 'function') {
+      load(value, function(options) {
         $.isArray(options) && options.forEach(function(option) {
           var value = option[selectize.settings.valueField];
           if (selectize.options.hasOwnProperty(value)) {
@@ -163,7 +213,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   $.fn.xwikiSelectize = function(settings) {
-    return this.selectize($.extend({}, defaultSettings, settings))
+    return this.not('.selectized, .selectize-control')
+      .selectize($.extend({}, defaultSettings, settings))
       .each(loadSelectedValues).each(handleDropdownWidth)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.

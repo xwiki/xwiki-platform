@@ -1,7 +1,7 @@
 ###
 ### Rename document template
 ###
-#if (!$xwiki.checkAccess($doc.fullName, 'delete'))
+#if (!$xwiki.checkAccess($doc.fullName, 'delete') && "$!request.renameId" == '')
   #template("accessdenied.vm")
 #elseif ($xcontext.action == 'get' && "$!request.renameId" != '')
   ## AJAX request for rename status update.
@@ -53,7 +53,8 @@
             [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')
         #else
-          #set ($renameRequest = $services.refactoring.createRenameRequest($doc.documentReference, $newDocReference))
+          #set ($renameRequest = $services.refactoring.requestFactory.createRenameRequest($doc.documentReference,
+            $newDocReference))
           ## We can't rename the children if the new page is terminal.
           #set ($deep = $request.deep == 'true' && !$terminal)
           #set ($discard = $renameRequest.setDeep($deep))

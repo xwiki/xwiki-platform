@@ -535,7 +535,7 @@ public class XWikiContext extends Hashtable<Object, Object>
             remove(USER_KEY);
             remove(USERREFERENCE_KEY);
         } else {
-            this.userReference = new DocumentReference(userReference);
+            this.userReference = userReference;
             boolean ismain = isMainWiki(this.userReference.getWikiReference().getName());
             put(USER_KEY, new XWikiUser(getUser(), ismain));
             put(USERREFERENCE_KEY, this.userReference);
@@ -970,7 +970,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
         final Object dropped = getExecution().getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
 
-        if (dropped == null || !(dropped instanceof Integer)) {
+        if (!(dropped instanceof Integer)) {
             return false;
         }
 

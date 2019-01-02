@@ -21,15 +21,12 @@ package org.xwiki.eventstream;
 
 import java.util.Set;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * An event that specify which entities are concerned or interested by it.
  *
  * @version $Id$
  * @since 9.2RC1
  */
-@Unstable
 public interface TargetableEvent extends org.xwiki.observation.event.Event
 {
     /**

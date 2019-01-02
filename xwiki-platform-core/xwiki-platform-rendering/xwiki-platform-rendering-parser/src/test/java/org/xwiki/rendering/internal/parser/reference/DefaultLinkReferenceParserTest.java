@@ -130,6 +130,13 @@ public class DefaultLinkReferenceParserTest
         assertEquals("Typed = [true] Type = [space] Reference = [wiki:space]", reference.toString());
         assertTrue(reference.isTyped());
 
+        // Verify page links work
+        reference = this.parser.parse("page:wiki:page");
+        assertEquals(ResourceType.PAGE, reference.getType());
+        assertEquals("wiki:page", reference.getReference());
+        assertEquals("Typed = [true] Type = [page] Reference = [wiki:page]", reference.toString());
+        assertTrue(reference.isTyped());
+
         // Verify InterWiki links work
         reference = this.parser.parse("interwiki:alias:content");
         assertEquals(ResourceType.INTERWIKI, reference.getType());

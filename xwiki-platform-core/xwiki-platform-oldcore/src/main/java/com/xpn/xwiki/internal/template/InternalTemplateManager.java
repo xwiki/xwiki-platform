@@ -264,7 +264,9 @@ public class InternalTemplateManager
         protected DefaultTemplateContent getContentInternal(String content)
         {
             if (this.resource instanceof WikiResource) {
-                return new DefaultTemplateContent(content, ((WikiResource<?>) this.resource).getAuthorReference());
+                WikiResource<?> wikiResource = ((WikiResource<?>) this.resource);
+                return new DefaultTemplateContent(content, wikiResource.getAuthorReference(),
+                    wikiResource.getDocumentReference());
             } else {
                 return new DefaultTemplateContent(content);
             }
@@ -291,6 +293,8 @@ public class InternalTemplateManager
 
         protected DocumentReference authorReference;
 
+        protected DocumentReference documentReference;
+
         @PropertyId("source.syntax")
         public Syntax sourceSyntax;
 
@@ -311,6 +315,13 @@ public class InternalTemplateManager
             this(content);
 
             setAuthorReference(authorReference);
+        }
+
+        DefaultTemplateContent(String content, DocumentReference authorReference, DocumentReference sourceReference)
+        {
+            this(content, authorReference);
+
+            setDocumentReference(sourceReference);
         }
 
         @Override
@@ -392,6 +403,17 @@ public class InternalTemplateManager
         {
             this.authorReference = authorReference;
             this.authorProvided = true;
+        }
+
+        @Override
+        public DocumentReference getDocumentReference()
+        {
+            return this.documentReference;
+        }
+
+        protected void setDocumentReference(DocumentReference documentReference)
+        {
+            this.documentReference = documentReference;
         }
 
         // RawProperties
@@ -676,7 +698,7 @@ public class InternalTemplateManager
                         render(template, template.getContent(), writer);
 
                         return null;
-                    }, template.getContent().getAuthorReference());
+                    }, template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
                 } else {
                     render(template, template.getContent(), writer);
                 }
@@ -766,7 +788,7 @@ public class InternalTemplateManager
         if (template != null) {
             if (template.getContent().isAuthorProvided()) {
                 return this.authorExecutor.call(() -> execute(template, template.getContent()),
-                    template.getContent().getAuthorReference());
+                    template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
             } else {
                 return execute(template, template.getContent());
             }
@@ -780,7 +802,7 @@ public class InternalTemplateManager
         if (template != null) {
             if (template.getContent().isAuthorProvided()) {
                 return this.authorExecutor.call(() -> execute(template, template.getContent()),
-                    template.getContent().getAuthorReference());
+                    template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
             } else {
                 return execute(template, template.getContent());
             }

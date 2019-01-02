@@ -25,7 +25,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.Right;
 
@@ -43,8 +45,8 @@ public class DefaultXWikiBridge implements XWikiBridge
 {
     /** Document reference resolver for user and group. */
     @Inject
-    @Named("user")
-    private DocumentReferenceResolver<String> resolver;
+    @Named("current")
+    private EntityReferenceResolver<EntityReference> currentResolver;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -103,5 +105,26 @@ public class DefaultXWikiBridge implements XWikiBridge
             }
         }
         return null;
+    }
+
+    @Override
+    public EntityReference toCompatibleEntityReference(EntityReference reference)
+    {
+        if (reference == null) {
+            return reference;
+        }
+
+        // Make sure the reference is complete
+        EntityReference compatibleReference = this.currentResolver.resolve(reference, reference.getType());
+
+        // Convert to PAGE reference to DOCUMENT reference since the security system design does not work well with PAGE
+        // one (which have different kinds of right at the same level)
+        if (compatibleReference.getType() == EntityType.PAGE
+            || compatibleReference.getType().isAllowedAncestor(EntityType.PAGE)) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            compatibleReference = xcontext.getWiki().getDocumentReference(reference, xcontext);
+        }
+
+        return compatibleReference;
     }
 }

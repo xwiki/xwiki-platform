@@ -141,7 +141,7 @@
         </natural-id>
         <property name="docName" column="XDA_DOC_NAME" type="string" length="255" index="XDA_DOC_NAME" />
         <property name="deleter" type="string" column="XDA_DELETER" index="XDA_DELETER" />
-        <property name="conentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
+        <property name="contentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
         <property name="xml" type="materialized_clob" column="XDA_XML" length="1000000000" />
     </class>
 
@@ -182,6 +182,7 @@
         <property name="comment" type="string" column="XWA_COMMENT" length="1023" />
         <property name="contentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
         <property name="archiveStore" type="string" column="XDD_ARCHIVESTORE" length="50" />
+        <property name="charset" type="string" column="XDD_CHARSET" length="40" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachmentContent" table="xwikiattachment_content">

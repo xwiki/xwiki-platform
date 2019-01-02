@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1375383729000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1454083420000</date>
-  <contentUpdateDate>1453746013000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki Preferences</title>
   <comment/>
@@ -54,9 +51,9 @@
       <defaultValue>0</defaultValue>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>accessibility</name>
-      <number>70</number>
+      <number>12</number>
       <prettyName>Enable extra accessibility features</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -67,7 +64,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>admin_email</name>
-      <number>10</number>
+      <number>20</number>
       <picker>0</picker>
       <prettyName>Admin eMail</prettyName>
       <size>30</size>
@@ -84,7 +81,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>auth_active_check</name>
-      <number>20</number>
+      <number>6</number>
       <prettyName>Authentication Active Check</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -99,8 +96,8 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>authenticate_edit</name>
-      <number>5</number>
-      <prettyName>Authenticate On Edit</prettyName>
+      <number>4</number>
+      <prettyName>Authenticated Edit</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -114,7 +111,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>authenticate_view</name>
-      <number>2</number>
+      <number>5</number>
       <prettyName>Authenticated View</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -129,8 +126,8 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>backlinks</name>
-      <number>19</number>
-      <prettyName>Backlinks</prettyName>
+      <number>41</number>
+      <prettyName>Activate the backlinks</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -146,7 +143,7 @@
       <idField/>
       <multiSelect>0</multiSelect>
       <name>colorTheme</name>
-      <number>67</number>
+      <number>8</number>
       <picker>0</picker>
       <prettyName>Color theme</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -168,19 +165,19 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>comment_anonymous</name>
-      <number>26</number>
+      <number>34</number>
       <picker>1</picker>
       <prettyName>Anonymous</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </comment_anonymous>
     <comment_registered>
@@ -190,28 +187,28 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>comment_registered</name>
-      <number>27</number>
+      <number>35</number>
       <picker>1</picker>
       <prettyName>Registered</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </comment_registered>
     <confirmation_email_content>
-      <contenttype>FullyRenderedText</contenttype>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>confirmation_email_content</name>
-      <number>12</number>
+      <number>27</number>
       <picker>0</picker>
       <prettyName>Confirmation eMail Content</prettyName>
       <rows>10</rows>
@@ -238,7 +235,7 @@
 {{/velocity}}</customDisplay>
       <disabled>0</disabled>
       <name>core.defaultDocumentSyntax</name>
-      <number>42</number>
+      <number>38</number>
       <picker>0</picker>
       <prettyName>Default document syntax</prettyName>
       <size>60</size>
@@ -251,7 +248,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>dateformat</name>
-      <number>37</number>
+      <number>18</number>
       <picker>0</picker>
       <prettyName>Date Format</prettyName>
       <size>30</size>
@@ -264,7 +261,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>default_language</name>
-      <number>16</number>
+      <number>3</number>
       <picker>0</picker>
       <prettyName>Default Language</prettyName>
       <size>5</size>
@@ -275,18 +272,29 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </default_language>
     <documentBundles>
+      <cache>0</cache>
+      <classname/>
       <customDisplay/>
       <disabled>0</disabled>
+      <displayType>input</displayType>
+      <hint/>
+      <idField/>
+      <multiSelect>0</multiSelect>
       <name>documentBundles</name>
-      <number>35</number>
-      <picker>0</picker>
+      <number>49</number>
+      <picker>1</picker>
       <prettyName>Internationalization Document Bundles</prettyName>
       <size>60</size>
-      <tooltip/>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </documentBundles>
     <edit_anonymous>
       <cache>0</cache>
@@ -295,19 +303,19 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>edit_anonymous</name>
-      <number>24</number>
+      <number>32</number>
       <picker>1</picker>
       <prettyName>Anonymous</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </edit_anonymous>
     <edit_registered>
@@ -317,19 +325,19 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>edit_registered</name>
-      <number>25</number>
+      <number>33</number>
       <picker>1</picker>
       <prettyName>Registered</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </edit_registered>
     <editcomment>
@@ -337,9 +345,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>editcomment</name>
-      <number>76</number>
+      <number>75</number>
       <prettyName>Enable version summary</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -351,9 +359,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>editcomment_mandatory</name>
-      <number>77</number>
+      <number>76</number>
       <prettyName>Make version summary mandatory</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -367,12 +375,12 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>editor</name>
-      <number>17</number>
+      <number>13</number>
       <picker>1</picker>
       <prettyName>Default Editor</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <tooltip/>
@@ -387,9 +395,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>select</displayType>
       <name>guest_comment_requires_captcha</name>
-      <number>68</number>
+      <number>37</number>
       <prettyName>Enable CAPTCHA in Comments for Unregistered Users</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -402,7 +410,7 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>iconTheme</name>
-      <number>60</number>
+      <number>9</number>
       <prettyName>Icon theme</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
@@ -412,12 +420,12 @@
       <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
     </iconTheme>
     <invitation_email_content>
-      <contenttype>FullyRenderedText</contenttype>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>invitation_email_content</name>
-      <number>21</number>
+      <number>28</number>
       <picker>0</picker>
       <prettyName>Invitation eMail Content</prettyName>
       <rows>10</rows>
@@ -429,11 +437,12 @@
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </invitation_email_content>
     <javamail_extra_props>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>javamail_extra_props</name>
-      <number>41</number>
+      <number>25</number>
       <picker>0</picker>
       <prettyName>Additional JavaMail properties</prettyName>
       <rows>6</rows>
@@ -447,7 +456,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>languages</name>
-      <number>32</number>
+      <number>48</number>
       <picker>0</picker>
       <prettyName>Supported languages</prettyName>
       <size>30</size>
@@ -464,7 +473,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap</name>
-      <number>43</number>
+      <number>51</number>
       <prettyName>Ldap</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -475,7 +484,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_UID_attr</name>
-      <number>52</number>
+      <number>60</number>
       <picker>0</picker>
       <prettyName>Ldap UID attribute name</prettyName>
       <size>60</size>
@@ -488,7 +497,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_base_DN</name>
-      <number>51</number>
+      <number>59</number>
       <picker>0</picker>
       <prettyName>Ldap base DN</prettyName>
       <size>60</size>
@@ -501,7 +510,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_bind_DN</name>
-      <number>46</number>
+      <number>54</number>
       <picker>0</picker>
       <prettyName>Ldap login matching</prettyName>
       <size>60</size>
@@ -514,7 +523,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_bind_pass</name>
-      <number>47</number>
+      <number>55</number>
       <picker>0</picker>
       <prettyName>Ldap password matching</prettyName>
       <size>60</size>
@@ -527,7 +536,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_exclude_group</name>
-      <number>50</number>
+      <number>58</number>
       <picker>0</picker>
       <prettyName>Ldap group to exclude</prettyName>
       <size>60</size>
@@ -537,11 +546,12 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </ldap_exclude_group>
     <ldap_fields_mapping>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>ldap_fields_mapping</name>
-      <number>53</number>
+      <number>61</number>
       <picker>0</picker>
       <prettyName>Ldap user fields mapping</prettyName>
       <rows>1</rows>
@@ -552,11 +562,12 @@
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </ldap_fields_mapping>
     <ldap_group_mapping>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>ldap_group_mapping</name>
-      <number>58</number>
+      <number>66</number>
       <picker>0</picker>
       <prettyName>Ldap groups mapping</prettyName>
       <rows>5</rows>
@@ -570,7 +581,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_groupcache_expiration</name>
-      <number>61</number>
+      <number>67</number>
       <picker>0</picker>
       <prettyName>LDAP groups members cache</prettyName>
       <size>60</size>
@@ -586,25 +597,25 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>ldap_mode_group_sync</name>
-      <number>62</number>
+      <number>68</number>
       <picker>0</picker>
       <prettyName>LDAP groups sync mode</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>|always|create</values>
+      <values>always|create</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </ldap_mode_group_sync>
     <ldap_photo_attachment_name>
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_photo_attachment_name</name>
-      <number>56</number>
+      <number>64</number>
       <picker>0</picker>
       <prettyName>Attachment name to save LDAP photo</prettyName>
       <size>30</size>
@@ -617,7 +628,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_photo_attribute</name>
-      <number>57</number>
+      <number>65</number>
       <picker>0</picker>
       <prettyName>Ldap photo attribute name</prettyName>
       <size>60</size>
@@ -630,7 +641,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_port</name>
-      <number>45</number>
+      <number>53</number>
       <picker>0</picker>
       <prettyName>Ldap server port</prettyName>
       <size>60</size>
@@ -643,9 +654,9 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_server</name>
-      <number>44</number>
+      <number>52</number>
       <picker>0</picker>
-      <prettyName>Ldap server address</prettyName>
+      <prettyName>Ldap server adress</prettyName>
       <size>60</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -659,7 +670,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_trylocal</name>
-      <number>66</number>
+      <number>69</number>
       <prettyName>Try local login</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -673,7 +684,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_update_photo</name>
-      <number>55</number>
+      <number>63</number>
       <prettyName>Update user photo from LDAP</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -687,7 +698,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_update_user</name>
-      <number>54</number>
+      <number>62</number>
       <prettyName>Update user from LDAP</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -698,7 +709,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_user_group</name>
-      <number>49</number>
+      <number>57</number>
       <picker>0</picker>
       <prettyName>Ldap group filter</prettyName>
       <size>60</size>
@@ -714,7 +725,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_validate_password</name>
-      <number>48</number>
+      <number>56</number>
       <prettyName>Validate Ldap user/password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -725,7 +736,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>leftPanels</name>
-      <number>28</number>
+      <number>42</number>
       <picker>0</picker>
       <prettyName>Panels displayed on the left</prettyName>
       <size>60</size>
@@ -741,23 +752,23 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>leftPanelsWidth</name>
-      <number>63</number>
+      <number>46</number>
       <prettyName>Width of the left panel column</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <unmodifiable>0</unmodifiable>
-      <values>---|Small|Medium|Large</values>
+      <values>Small|Medium|Large</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </leftPanelsWidth>
     <meta>
-      <contenttype>FullyRenderedText</contenttype>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>meta</name>
-      <number>6</number>
+      <number>17</number>
       <picker>0</picker>
       <prettyName>HTTP Meta Info</prettyName>
       <rows>8</rows>
@@ -773,9 +784,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>minoredit</name>
-      <number>78</number>
+      <number>77</number>
       <prettyName>Enable minor edits</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -789,7 +800,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>multilingual</name>
-      <number>15</number>
+      <number>2</number>
       <prettyName>Multi-Lingual</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -802,9 +813,9 @@
       <defaultValue>0</defaultValue>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>obfuscateEmailAddresses</name>
-      <number>59</number>
+      <number>29</number>
       <prettyName>Obfuscate Email Addresses</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -815,7 +826,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>parent</name>
-      <number>34</number>
+      <number>1</number>
       <picker>0</picker>
       <prettyName>Parent Space</prettyName>
       <size>30</size>
@@ -845,19 +856,19 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>registration_anonymous</name>
-      <number>22</number>
+      <number>30</number>
       <picker>1</picker>
       <prettyName>Anonymous</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </registration_anonymous>
     <registration_registered>
@@ -867,26 +878,26 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>registration_registered</name>
-      <number>23</number>
+      <number>31</number>
       <picker>1</picker>
       <prettyName>Registered</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <sort>none</sort>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>---|Image|Text</values>
+      <values>Image|Text</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </registration_registered>
     <rightPanels>
       <customDisplay/>
       <disabled>0</disabled>
       <name>rightPanels</name>
-      <number>29</number>
+      <number>43</number>
       <picker>0</picker>
       <prettyName>Panels displayed on the right</prettyName>
       <size>60</size>
@@ -902,14 +913,14 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>rightPanelsWidth</name>
-      <number>65</number>
+      <number>47</number>
       <prettyName>Width of the right panel column</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
-      <separators> ,|</separators>
+      <separators>|, </separators>
       <size>1</size>
       <unmodifiable>0</unmodifiable>
-      <values>---|Small|Medium|Large</values>
+      <values>Small|Medium|Large</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </rightPanelsWidth>
     <showLeftPanels>
@@ -919,7 +930,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showLeftPanels</name>
-      <number>30</number>
+      <number>44</number>
       <prettyName>Display the left panel column</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -934,7 +945,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showRightPanels</name>
-      <number>31</number>
+      <number>45</number>
       <prettyName>Display the right panel column</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -947,9 +958,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>showannotations</name>
-      <number>71</number>
+      <number>70</number>
       <prettyName>Show document annotations</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -961,9 +972,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>showattachments</name>
-      <number>73</number>
+      <number>72</number>
       <prettyName>Show document attachments</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -975,9 +986,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>showcomments</name>
-      <number>72</number>
+      <number>71</number>
       <prettyName>Show document comments</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -989,9 +1000,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>showhistory</name>
-      <number>74</number>
+      <number>73</number>
       <prettyName>Show document history</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1003,9 +1014,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>showinformation</name>
-      <number>75</number>
+      <number>74</number>
       <prettyName>Show document information</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1013,24 +1024,36 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </showinformation>
     <skin>
+      <cache>0</cache>
+      <classname>XWiki.XWikiSkins</classname>
       <customDisplay/>
       <disabled>0</disabled>
+      <displayType>input</displayType>
+      <freeText>allowed</freeText>
+      <hint/>
+      <idField/>
+      <multiSelect>0</multiSelect>
       <name>skin</name>
-      <number>1</number>
-      <picker>0</picker>
+      <number>7</number>
+      <picker>1</picker>
       <prettyName>Skin</prettyName>
-      <size>20</size>
-      <tooltip/>
+      <size>30</size>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </skin>
     <smtp_port>
       <customDisplay/>
       <disabled>0</disabled>
       <name>smtp_port</name>
-      <number>38</number>
+      <number>22</number>
       <picker>0</picker>
       <prettyName>SMTP Port</prettyName>
       <size>5</size>
@@ -1043,7 +1066,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>smtp_server</name>
-      <number>9</number>
+      <number>21</number>
       <picker>0</picker>
       <prettyName>SMTP Server</prettyName>
       <size>30</size>
@@ -1057,7 +1080,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>smtp_server_password</name>
-      <number>40</number>
+      <number>24</number>
       <picker>0</picker>
       <prettyName>Server password (optional)</prettyName>
       <size>30</size>
@@ -1070,7 +1093,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>smtp_server_username</name>
-      <number>39</number>
+      <number>23</number>
       <picker>0</picker>
       <prettyName>Server username (optional)</prettyName>
       <size>30</size>
@@ -1083,9 +1106,9 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>stylesheet</name>
-      <number>13</number>
+      <number>10</number>
       <picker>0</picker>
-      <prettyName>Stylesheet</prettyName>
+      <prettyName>Default Stylesheet</prettyName>
       <size>30</size>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -1097,10 +1120,10 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>stylesheets</name>
-      <number>14</number>
+      <number>11</number>
       <picker>0</picker>
-      <prettyName>Stylesheets</prettyName>
-      <size>30</size>
+      <prettyName>Alternative Stylesheet</prettyName>
+      <size>60</size>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1114,7 +1137,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>tags</name>
-      <number>33</number>
+      <number>40</number>
       <prettyName>Activate the tagging</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -1125,7 +1148,7 @@
     <timezone>
       <disabled>0</disabled>
       <name>timezone</name>
-      <number>64</number>
+      <number>50</number>
       <prettyName>Time Zone</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
@@ -1135,7 +1158,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>title</name>
-      <number>7</number>
+      <number>15</number>
       <picker>0</picker>
       <prettyName>Title</prettyName>
       <size>30</size>
@@ -1165,7 +1188,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>use_email_verification</name>
-      <number>18</number>
+      <number>19</number>
       <prettyName>Use eMail Verification</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -1174,12 +1197,12 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </use_email_verification>
     <validation_email_content>
-      <contenttype>FullyRenderedText</contenttype>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>validation_email_content</name>
-      <number>11</number>
+      <number>26</number>
       <picker>0</picker>
       <prettyName>Validation eMail Content</prettyName>
       <rows>10</rows>
@@ -1194,7 +1217,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>version</name>
-      <number>8</number>
+      <number>16</number>
       <picker>0</picker>
       <prettyName>Version</prettyName>
       <size>30</size>
@@ -1208,10 +1231,10 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>webcopyright</name>
-      <number>3</number>
+      <number>14</number>
       <picker>0</picker>
-      <prettyName>Web Copyright</prettyName>
-      <size>60</size>
+      <prettyName>Copyright</prettyName>
+      <size>30</size>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1223,9 +1246,9 @@
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
-      <displayType/>
+      <displayType>yesno</displayType>
       <name>xwiki.title.mandatory</name>
-      <number>69</number>
+      <number>39</number>
       <prettyName>Make document title field mandatory</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1237,7 +1260,7 @@
     <name>XWiki.XWikiPreferences</name>
     <number>0</number>
     <className>XWiki.ClassSheetBinding</className>
-    <guid>a31af27a-2ed7-4a6a-9b53-afe212bd8e2b</guid>
+    <guid>ee7379ec-4b2e-4a8d-a0b7-ba21a9670330</guid>
     <class>
       <name>XWiki.ClassSheetBinding</name>
       <customClass/>
@@ -1248,21 +1271,77 @@
       <nameField/>
       <validationScript/>
       <sheet>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>sheet</name>
         <number>1</number>
-        <picker>0</picker>
+        <picker>1</picker>
         <prettyName>Sheet</prettyName>
         <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
     <property>
       <sheet>AdminSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiPreferences</name>
+    <number>1</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>a0ffc317-c845-49b2-b246-ea6ee83e5e53</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>XWiki.AdminSheet</sheet>
     </property>
   </object>
   <object>
@@ -1422,7 +1501,7 @@
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAllGroup,</groups>
+      <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
       <levels>edit,comment,undelete,script</levels>
@@ -1450,9 +1529,9 @@
         <defaultValue>0</defaultValue>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>accessibility</name>
-        <number>70</number>
+        <number>12</number>
         <prettyName>Enable extra accessibility features</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -1463,7 +1542,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>admin_email</name>
-        <number>10</number>
+        <number>20</number>
         <picker>0</picker>
         <prettyName>Admin eMail</prettyName>
         <size>30</size>
@@ -1480,7 +1559,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>auth_active_check</name>
-        <number>20</number>
+        <number>6</number>
         <prettyName>Authentication Active Check</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -1495,8 +1574,8 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>authenticate_edit</name>
-        <number>5</number>
-        <prettyName>Authenticate On Edit</prettyName>
+        <number>4</number>
+        <prettyName>Authenticated Edit</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -1510,7 +1589,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>authenticate_view</name>
-        <number>2</number>
+        <number>5</number>
         <prettyName>Authenticated View</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -1525,8 +1604,8 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>backlinks</name>
-        <number>19</number>
-        <prettyName>Backlinks</prettyName>
+        <number>41</number>
+        <prettyName>Activate the backlinks</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -1542,7 +1621,7 @@
         <idField/>
         <multiSelect>0</multiSelect>
         <name>colorTheme</name>
-        <number>67</number>
+        <number>8</number>
         <picker>0</picker>
         <prettyName>Color theme</prettyName>
         <relationalStorage>0</relationalStorage>
@@ -1564,19 +1643,19 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>comment_anonymous</name>
-        <number>26</number>
+        <number>34</number>
         <picker>1</picker>
         <prettyName>Anonymous</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </comment_anonymous>
       <comment_registered>
@@ -1586,28 +1665,28 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>comment_registered</name>
-        <number>27</number>
+        <number>35</number>
         <picker>1</picker>
         <prettyName>Registered</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </comment_registered>
       <confirmation_email_content>
-        <contenttype>FullyRenderedText</contenttype>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>confirmation_email_content</name>
-        <number>12</number>
+        <number>27</number>
         <picker>0</picker>
         <prettyName>Confirmation eMail Content</prettyName>
         <rows>10</rows>
@@ -1634,7 +1713,7 @@
 {{/velocity}}</customDisplay>
         <disabled>0</disabled>
         <name>core.defaultDocumentSyntax</name>
-        <number>42</number>
+        <number>38</number>
         <picker>0</picker>
         <prettyName>Default document syntax</prettyName>
         <size>60</size>
@@ -1647,7 +1726,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>dateformat</name>
-        <number>37</number>
+        <number>18</number>
         <picker>0</picker>
         <prettyName>Date Format</prettyName>
         <size>30</size>
@@ -1660,7 +1739,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>default_language</name>
-        <number>16</number>
+        <number>3</number>
         <picker>0</picker>
         <prettyName>Default Language</prettyName>
         <size>5</size>
@@ -1671,18 +1750,29 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </default_language>
       <documentBundles>
+        <cache>0</cache>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>documentBundles</name>
-        <number>35</number>
-        <picker>0</picker>
+        <number>49</number>
+        <picker>1</picker>
         <prettyName>Internationalization Document Bundles</prettyName>
         <size>60</size>
-        <tooltip/>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </documentBundles>
       <edit_anonymous>
         <cache>0</cache>
@@ -1691,19 +1781,19 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>edit_anonymous</name>
-        <number>24</number>
+        <number>32</number>
         <picker>1</picker>
         <prettyName>Anonymous</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </edit_anonymous>
       <edit_registered>
@@ -1713,19 +1803,19 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>edit_registered</name>
-        <number>25</number>
+        <number>33</number>
         <picker>1</picker>
         <prettyName>Registered</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </edit_registered>
       <editcomment>
@@ -1733,9 +1823,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>editcomment</name>
-        <number>76</number>
+        <number>75</number>
         <prettyName>Enable version summary</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -1747,9 +1837,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>editcomment_mandatory</name>
-        <number>77</number>
+        <number>76</number>
         <prettyName>Make version summary mandatory</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -1763,12 +1853,12 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>editor</name>
-        <number>17</number>
+        <number>13</number>
         <picker>1</picker>
         <prettyName>Default Editor</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <tooltip/>
@@ -1783,9 +1873,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>select</displayType>
         <name>guest_comment_requires_captcha</name>
-        <number>68</number>
+        <number>37</number>
         <prettyName>Enable CAPTCHA in Comments for Unregistered Users</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -1798,7 +1888,7 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>iconTheme</name>
-        <number>60</number>
+        <number>9</number>
         <prettyName>Icon theme</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -1808,12 +1898,12 @@
         <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
       </iconTheme>
       <invitation_email_content>
-        <contenttype>FullyRenderedText</contenttype>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>invitation_email_content</name>
-        <number>21</number>
+        <number>28</number>
         <picker>0</picker>
         <prettyName>Invitation eMail Content</prettyName>
         <rows>10</rows>
@@ -1825,11 +1915,12 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </invitation_email_content>
       <javamail_extra_props>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>javamail_extra_props</name>
-        <number>41</number>
+        <number>25</number>
         <picker>0</picker>
         <prettyName>Additional JavaMail properties</prettyName>
         <rows>6</rows>
@@ -1843,7 +1934,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>languages</name>
-        <number>32</number>
+        <number>48</number>
         <picker>0</picker>
         <prettyName>Supported languages</prettyName>
         <size>30</size>
@@ -1860,7 +1951,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>ldap</name>
-        <number>43</number>
+        <number>51</number>
         <prettyName>Ldap</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -1871,7 +1962,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_UID_attr</name>
-        <number>52</number>
+        <number>60</number>
         <picker>0</picker>
         <prettyName>Ldap UID attribute name</prettyName>
         <size>60</size>
@@ -1884,7 +1975,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_base_DN</name>
-        <number>51</number>
+        <number>59</number>
         <picker>0</picker>
         <prettyName>Ldap base DN</prettyName>
         <size>60</size>
@@ -1897,7 +1988,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_bind_DN</name>
-        <number>46</number>
+        <number>54</number>
         <picker>0</picker>
         <prettyName>Ldap login matching</prettyName>
         <size>60</size>
@@ -1910,7 +2001,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_bind_pass</name>
-        <number>47</number>
+        <number>55</number>
         <picker>0</picker>
         <prettyName>Ldap password matching</prettyName>
         <size>60</size>
@@ -1923,7 +2014,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_exclude_group</name>
-        <number>50</number>
+        <number>58</number>
         <picker>0</picker>
         <prettyName>Ldap group to exclude</prettyName>
         <size>60</size>
@@ -1933,11 +2024,12 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </ldap_exclude_group>
       <ldap_fields_mapping>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>ldap_fields_mapping</name>
-        <number>53</number>
+        <number>61</number>
         <picker>0</picker>
         <prettyName>Ldap user fields mapping</prettyName>
         <rows>1</rows>
@@ -1948,11 +2040,12 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </ldap_fields_mapping>
       <ldap_group_mapping>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>ldap_group_mapping</name>
-        <number>58</number>
+        <number>66</number>
         <picker>0</picker>
         <prettyName>Ldap groups mapping</prettyName>
         <rows>5</rows>
@@ -1966,7 +2059,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_groupcache_expiration</name>
-        <number>61</number>
+        <number>67</number>
         <picker>0</picker>
         <prettyName>LDAP groups members cache</prettyName>
         <size>60</size>
@@ -1982,12 +2075,12 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>ldap_mode_group_sync</name>
-        <number>62</number>
+        <number>68</number>
         <picker>0</picker>
         <prettyName>LDAP groups sync mode</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <unmodifiable>0</unmodifiable>
@@ -2000,7 +2093,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_photo_attachment_name</name>
-        <number>56</number>
+        <number>64</number>
         <picker>0</picker>
         <prettyName>Attachment name to save LDAP photo</prettyName>
         <size>30</size>
@@ -2013,7 +2106,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_photo_attribute</name>
-        <number>57</number>
+        <number>65</number>
         <picker>0</picker>
         <prettyName>Ldap photo attribute name</prettyName>
         <size>60</size>
@@ -2026,7 +2119,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_port</name>
-        <number>45</number>
+        <number>53</number>
         <picker>0</picker>
         <prettyName>Ldap server port</prettyName>
         <size>60</size>
@@ -2039,9 +2132,9 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_server</name>
-        <number>44</number>
+        <number>52</number>
         <picker>0</picker>
-        <prettyName>Ldap server address</prettyName>
+        <prettyName>Ldap server adress</prettyName>
         <size>60</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2055,7 +2148,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>ldap_trylocal</name>
-        <number>66</number>
+        <number>69</number>
         <prettyName>Try local login</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2069,7 +2162,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>ldap_update_photo</name>
-        <number>55</number>
+        <number>63</number>
         <prettyName>Update user photo from LDAP</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2083,7 +2176,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>ldap_update_user</name>
-        <number>54</number>
+        <number>62</number>
         <prettyName>Update user from LDAP</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2094,7 +2187,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>ldap_user_group</name>
-        <number>49</number>
+        <number>57</number>
         <picker>0</picker>
         <prettyName>Ldap group filter</prettyName>
         <size>60</size>
@@ -2110,7 +2203,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>ldap_validate_password</name>
-        <number>48</number>
+        <number>56</number>
         <prettyName>Validate Ldap user/password</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2121,7 +2214,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>leftPanels</name>
-        <number>28</number>
+        <number>42</number>
         <picker>0</picker>
         <prettyName>Panels displayed on the left</prettyName>
         <size>60</size>
@@ -2137,27 +2230,27 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>leftPanelsWidth</name>
-        <number>63</number>
+        <number>46</number>
         <prettyName>Width of the left panel column</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>---|Small|Medium|Large</values>
+        <values>Small|Medium|Large</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </leftPanelsWidth>
       <meta>
-        <contenttype>FullyRenderedText</contenttype>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>meta</name>
-        <number>6</number>
+        <number>17</number>
         <picker>0</picker>
         <prettyName>HTTP Meta Info</prettyName>
-        <rows>5</rows>
-        <size>40</size>
+        <rows>8</rows>
+        <size>60</size>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2169,9 +2262,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>minoredit</name>
-        <number>78</number>
+        <number>77</number>
         <prettyName>Enable minor edits</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2185,7 +2278,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>multilingual</name>
-        <number>15</number>
+        <number>2</number>
         <prettyName>Multi-Lingual</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -2198,9 +2291,9 @@
         <defaultValue>0</defaultValue>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>obfuscateEmailAddresses</name>
-        <number>59</number>
+        <number>29</number>
         <prettyName>Obfuscate Email Addresses</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2211,7 +2304,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>parent</name>
-        <number>34</number>
+        <number>1</number>
         <picker>0</picker>
         <prettyName>Parent Space</prettyName>
         <size>30</size>
@@ -2241,19 +2334,19 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>registration_anonymous</name>
-        <number>22</number>
+        <number>30</number>
         <picker>1</picker>
         <prettyName>Anonymous</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </registration_anonymous>
       <registration_registered>
@@ -2263,26 +2356,26 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>registration_registered</name>
-        <number>23</number>
+        <number>31</number>
         <picker>1</picker>
         <prettyName>Registered</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <sort>none</sort>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>---|Image|Text</values>
+        <values>Image|Text</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </registration_registered>
       <rightPanels>
         <customDisplay/>
         <disabled>0</disabled>
         <name>rightPanels</name>
-        <number>29</number>
+        <number>43</number>
         <picker>0</picker>
         <prettyName>Panels displayed on the right</prettyName>
         <size>60</size>
@@ -2298,14 +2391,14 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>rightPanelsWidth</name>
-        <number>65</number>
+        <number>47</number>
         <prettyName>Width of the right panel column</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>---|Small|Medium|Large</values>
+        <values>Small|Medium|Large</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </rightPanelsWidth>
       <showLeftPanels>
@@ -2315,7 +2408,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>showLeftPanels</name>
-        <number>30</number>
+        <number>44</number>
         <prettyName>Display the left panel column</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -2330,7 +2423,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>showRightPanels</name>
-        <number>31</number>
+        <number>45</number>
         <prettyName>Display the right panel column</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -2343,9 +2436,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>showannotations</name>
-        <number>71</number>
+        <number>70</number>
         <prettyName>Show document annotations</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2357,9 +2450,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>showattachments</name>
-        <number>73</number>
+        <number>72</number>
         <prettyName>Show document attachments</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2371,9 +2464,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>showcomments</name>
-        <number>72</number>
+        <number>71</number>
         <prettyName>Show document comments</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2385,9 +2478,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>showhistory</name>
-        <number>74</number>
+        <number>73</number>
         <prettyName>Show document history</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2399,9 +2492,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>showinformation</name>
-        <number>75</number>
+        <number>74</number>
         <prettyName>Show document information</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2409,24 +2502,36 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </showinformation>
       <skin>
+        <cache>0</cache>
+        <classname>XWiki.XWikiSkins</classname>
         <customDisplay/>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
         <name>skin</name>
-        <number>1</number>
-        <picker>0</picker>
+        <number>7</number>
+        <picker>1</picker>
         <prettyName>Skin</prettyName>
-        <size>20</size>
-        <tooltip/>
+        <size>30</size>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <sort>none</sort>
+        <sql/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </skin>
       <smtp_port>
         <customDisplay/>
         <disabled>0</disabled>
         <name>smtp_port</name>
-        <number>38</number>
+        <number>22</number>
         <picker>0</picker>
         <prettyName>SMTP Port</prettyName>
         <size>5</size>
@@ -2439,7 +2544,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>smtp_server</name>
-        <number>9</number>
+        <number>21</number>
         <picker>0</picker>
         <prettyName>SMTP Server</prettyName>
         <size>30</size>
@@ -2453,7 +2558,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>smtp_server_password</name>
-        <number>40</number>
+        <number>24</number>
         <picker>0</picker>
         <prettyName>Server password (optional)</prettyName>
         <size>30</size>
@@ -2466,7 +2571,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>smtp_server_username</name>
-        <number>39</number>
+        <number>23</number>
         <picker>0</picker>
         <prettyName>Server username (optional)</prettyName>
         <size>30</size>
@@ -2479,9 +2584,9 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>stylesheet</name>
-        <number>13</number>
+        <number>10</number>
         <picker>0</picker>
-        <prettyName>Stylesheet</prettyName>
+        <prettyName>Default Stylesheet</prettyName>
         <size>30</size>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -2493,10 +2598,10 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>stylesheets</name>
-        <number>14</number>
+        <number>11</number>
         <picker>0</picker>
-        <prettyName>Stylesheets</prettyName>
-        <size>30</size>
+        <prettyName>Alternative Stylesheet</prettyName>
+        <size>60</size>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2510,7 +2615,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>tags</name>
-        <number>33</number>
+        <number>40</number>
         <prettyName>Activate the tagging</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -2521,7 +2626,7 @@
       <timezone>
         <disabled>0</disabled>
         <name>timezone</name>
-        <number>64</number>
+        <number>50</number>
         <prettyName>Time Zone</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -2531,7 +2636,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>title</name>
-        <number>7</number>
+        <number>15</number>
         <picker>0</picker>
         <prettyName>Title</prettyName>
         <size>30</size>
@@ -2561,7 +2666,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>use_email_verification</name>
-        <number>18</number>
+        <number>19</number>
         <prettyName>Use eMail Verification</prettyName>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
@@ -2570,12 +2675,12 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </use_email_verification>
       <validation_email_content>
-        <contenttype>FullyRenderedText</contenttype>
+        <contenttype>PureText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>validation_email_content</name>
-        <number>11</number>
+        <number>26</number>
         <picker>0</picker>
         <prettyName>Validation eMail Content</prettyName>
         <rows>10</rows>
@@ -2590,7 +2695,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>version</name>
-        <number>8</number>
+        <number>16</number>
         <picker>0</picker>
         <prettyName>Version</prettyName>
         <size>30</size>
@@ -2604,10 +2709,10 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>webcopyright</name>
-        <number>3</number>
+        <number>14</number>
         <picker>0</picker>
-        <prettyName>Web Copyright</prettyName>
-        <size>60</size>
+        <prettyName>Copyright</prettyName>
+        <size>30</size>
         <tooltip/>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2619,9 +2724,9 @@
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
-        <displayType/>
+        <displayType>yesno</displayType>
         <name>xwiki.title.mandatory</name>
-        <number>69</number>
+        <number>39</number>
         <prettyName>Make document title field mandatory</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -2659,7 +2764,7 @@ Subject: Your account on ${wikiname} has been activated
 
 Hello ${xwiki.getUserName("$xwikiname", false)},
 
-Your account on ${wikiname} has been successfully activated. You can now login at ${host}${xwiki.getURL('XWiki.XWikiLogin', 'login')} using your username (${xwiki.getDocument($xwikiname).getName()}).</confirmation_email_content>
+Your account on ${wikiname} has been successfully activated. You can now login at ${host}${xwiki.getURL('XWiki.XWikiLogin', 'login')} using your username (${xwiki.getDocument($xwikiname).documentReference.name}).</confirmation_email_content>
     </property>
     <property>
       <core.defaultDocumentSyntax/>
@@ -2787,7 +2892,7 @@ Your account on ${wikiname} has been successfully activated. You can now login a
       <title>$tdoc.getRenderedTitle('plain/1.0') - XWiki</title>
     </property>
     <property>
-      <upload_maxsize>33554432</upload_maxsize>
+      <upload_maxsize>107374182400</upload_maxsize>
     </property>
     <property>
       <validation_email_content>#set ($wikiname = $request.serverName)
@@ -2887,7 +2992,7 @@ ${host}${xwiki.getURL('XWiki.AccountValidation', 'view', "validkey=${validkey}&a
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAdminGroup,</groups>
+      <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
       <levels>view</levels>

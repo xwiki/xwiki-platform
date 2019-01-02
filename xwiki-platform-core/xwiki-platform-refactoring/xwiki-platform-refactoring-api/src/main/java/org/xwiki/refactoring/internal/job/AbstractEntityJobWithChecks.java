@@ -30,7 +30,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.question.EntitySelection;
-import org.xwiki.stability.Unstable;
 
 /**
  * Abstract job that create the list of pages to delete in order to do some checks and ask a confirmation to the user.
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.1RC1
  */
-@Unstable
 public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S extends EntityJobStatus<? super R>>
         extends AbstractEntityJob<R, S>
 {
@@ -49,6 +47,15 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
      * Map that will contain all entities that are concerned by the refactoring.
      */
     protected Map<EntityReference, EntitySelection> concernedEntities = new HashMap<>();
+
+    /**
+     * @return true means that this job will delete sources.
+     * @since 10.11RC1
+     */
+    protected boolean isDeleteSources()
+    {
+        return true;
+    }
 
     @Override
     protected void runInternal() throws Exception
@@ -61,13 +68,17 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
                 progressManager.startStep(this);
                 getEntities(entityReferences);
 
-                // Send the event
-                DocumentsDeletingEvent event = new DocumentsDeletingEvent();
-                observationManager.notify(event, this, concernedEntities);
+                if (isDeleteSources()) {
+                    // Send the event
+                    DocumentsDeletingEvent event = new DocumentsDeletingEvent();
+                    observationManager.notify(event, this, concernedEntities);
 
-                // Stop the job if some listener has canceled the action
-                if (event.isCanceled()) {
-                    return;
+                    // Stop the job if some listener has canceled the action
+                    if (event.isCanceled()) {
+                        getStatus().cancel();
+
+                        return;
+                    }
                 }
 
                 // Process

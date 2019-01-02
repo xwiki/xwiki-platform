@@ -183,7 +183,7 @@ Object.extend(XWiki, {
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
-     // Use Ajax.Updater to display the requested pane (extraID) : comments, attachments, etc.
+     // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
      // On complete :
      //   1. Call dhtmlSwitch()
      //   2. If the function call has been triggered by an event : reset location.href to #extraID
@@ -193,13 +193,58 @@ Object.extend(XWiki, {
             window.activeDocExtraPane.className="invisible";
         }
         $("docextrapanes").className="loading";
-        new Ajax.Updater(
-                extraID + "pane",
-                window.docgeturl + '?xpage=xpart&vm=' + extraTemplate,
+
+        // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
+        var maybeMinifyRequestParameter = '';
+        var requestMinify = window.location.search.toQueryParams().minify;
+        if (requestMinify && requestMinify == 'false') {
+          maybeMinifyRequestParameter = '&minify=false';
+        }
+
+        new Ajax.Request(
+          window.docgeturl + '?xpage=xpart&vm=' + extraTemplate + maybeMinifyRequestParameter,
                 {
-                    method: 'post',
-                    evalScripts: true,
-                    onComplete: function(transport){
+                    method: 'get',
+                    onSuccess: function(response) {
+                      // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
+                      // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.
+
+                      var head = document.body.previous('head');
+                      var html = response.responseText;
+
+                      // Use a temporary "container" to parse and process the HTML response.
+                      var container = new Element('div');
+                      container.innerHTML = html;
+
+                      // Insert link elements in head, if not already there.
+                      container.select('link').each(function(link) {
+                        var existingElements = head.select('link[href="' + link.readAttribute('href') + '"][type="' + link.readAttribute('type') + '"]');
+                        if (existingElements.length == 0) {
+                          head.insert(new Element('link', {rel: "stylesheet", type: link.type, href: link.readAttribute('href')}));
+                        }
+                        // Strip links from the result, since they are now in head.
+                        link.remove();
+                      });
+
+                      container.select('script').each(function(script) {
+                        // Insert external scripts in head, if not already there.
+                        if (script.src) {
+                          var existingElements = head.select('script[src="' + script.readAttribute('src') + '"][type="' + script.readAttribute('type') + '"]');
+                          if (existingElements.length == 0) {
+                            head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
+                          }
+                        }
+                      });
+
+                      // Replace the element's content with the temporary container's content, while also evaluating any inline scripts.
+                      // Note: This also does stripScripts internally, but it's OK now, since we have already added the necessary external scripts to head.
+                      $(extraID + "pane").update(container.innerHTML);
+                    },
+                    onComplete: function(response){
+                      if (response.status == 401) {
+                        document.location.reload();
+                      }
+
                       $("docextrapanes").className="";
 
                       // Let other know new content has been loaded
@@ -1120,11 +1165,12 @@ shortcut = new Object({
             var newListener = new keypress.Listener(target);
 
             if (group === this._listeners.disabled_in_inputs) {
-                // Disable the created listener when focus goes on an input or textarea field
+                // Disable the created listener when focus goes on an input, a textarea field or on the
+                // CodeMirror div (syntax highlighting).
                 jQuery(document)
-                    .on('focus', 'input, textarea',
+                    .on('focus', 'input, textarea, .CodeMirror-code',
                         function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea',
+                    .on('blur', 'input, textarea, .CodeMirror-code',
                         function() { newListener.listen(); });
             }
 

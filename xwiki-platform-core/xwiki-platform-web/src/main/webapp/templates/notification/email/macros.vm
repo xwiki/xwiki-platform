@@ -158,16 +158,6 @@
         #end
       #end
     </table>
-  #else
-    #set ($lastVersion = $event.events[0].documentVersion)
-    #set ($lastIndex = $event.events.size() - 1)
-    #set ($firstVersion = $event.events[$lastIndex].documentVersion)
-    #if ($firstVersion != $lastVersion)
-      #set ($url = $xwiki.getURL($event.document, 'view', "viewer=changes&rev1=${firstVersion}&rev2=${lastVersion}"))
-    #else
-      #set ($url = $xwiki.getURL($event.document, 'view', "viewer=changes&rev2=${lastVersion}"))
-    #end
-    #link($url, $escapetool.xml($services.localization.render('notifications.email.linkDetails')))
   #end
 #end
 
@@ -217,6 +207,16 @@
       #end
       #displayhtmldiff($diffContent.toString())
     </div>
+  #else
+    #set ($lastVersion = $event.events[0].documentVersion)
+    #set ($lastIndex = $event.events.size() - 1)
+    #set ($firstVersion = $event.events[$lastIndex].documentVersion)
+    #if ($firstVersion != $lastVersion)
+      #set ($url = $xwiki.getURL($event.document, 'view', "viewer=changes&rev1=${firstVersion}&rev2=${lastVersion}"))
+    #else
+      #set ($url = $xwiki.getURL($event.document, 'view', "viewer=changes&rev2=${lastVersion}"))
+    #end
+    #link($url, $escapetool.xml($services.localization.render('notifications.email.linkDetails')))
   #end
 #end
 

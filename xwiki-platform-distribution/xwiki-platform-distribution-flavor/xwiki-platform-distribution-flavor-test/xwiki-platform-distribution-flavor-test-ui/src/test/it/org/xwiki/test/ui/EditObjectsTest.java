@@ -29,8 +29,10 @@ import org.openqa.selenium.By;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.DatePicker;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
@@ -338,13 +340,16 @@ public class EditObjectsTest extends AbstractTest
         String className = getTestClassName() + "." + getTestMethodName();
         ObjectEditPage objectEditor = ObjectEditPage.gotoPage(getTestClassName(), getTestMethodName());
         ObjectEditPane object = objectEditor.addObject(className);
-        object.openDatePicker("date").setDay("15");
-        object.getUserPicker("author").sendKeys("ad").waitForSuggestions().select("Admin");
+        object.openDatePicker("date").setDay("15").close();
+        object.getSuggestInput("author").sendKeys("ad").waitForSuggestions().selectByVisibleText("Administrator");
 
         // Save, edit again and check the values.
         object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(className).get(0);
-        Assert.assertEquals("15", object.openDatePicker("date").getDay());
-        Assert.assertEquals("Administrator", object.getUserPicker("author").waitToLoad().getAcceptedSuggestions()
-            .get(0).getName());
+        DatePicker datePicker = object.openDatePicker("date");
+        Assert.assertEquals("15", datePicker.getDay());
+        datePicker.close();
+        SuggestionElement author = object.getSuggestInput("author").getSelectedSuggestions().get(0);
+        Assert.assertEquals("Administrator", author.getLabel());
+        Assert.assertEquals("XWiki.Admin", author.getValue());
     }
 }

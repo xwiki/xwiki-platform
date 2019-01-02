@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1262178920000</creationDate>
   <parent>Main.AllDocs</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1504192142000</date>
-  <contentUpdateDate>1504192142000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.index.attachmentsTrash')</title>
   <comment/>
@@ -160,8 +157,8 @@ $response.setContentType('application/json')
   #if($dates.size() == 2)
     ## Date range matching
     #set($sql = "${sql} and datt.date between ? and ? ")
-    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[0]))))
-    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[1]))))
+    #set($discard = $params.add($datetool.toDate($mathtool.toNumber($dates[0]))))
+    #set($discard = $params.add($datetool.toDate($mathtool.toNumber($dates[1]))))
   #else
     ## Single value matching
     #set($sql = "${sql} and upper(str(datt.date)) like upper(str(?)) ")

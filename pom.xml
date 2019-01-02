@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>10.6-SNAPSHOT</version>
+  <version>11.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -52,12 +52,12 @@
     <hsqldb.version>2.4.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.21</ckeditor.version>
+    <ckeditor.version>1.29</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.10</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>1.18</tika.version>
-    <pdfbox.version>2.0.9</pdfbox.version>
+    <tika.version>1.20</tika.version>
+    <pdfbox.version>2.0.13</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
@@ -76,12 +76,14 @@
 
     <!-- Disable release staging and directly deploy on the configured distributionManagement -->
     <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
+
+    <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
     <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>HEAD</tag>
+    <tag>stable-10.7.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -96,9 +98,9 @@
     <dependencies>
       <!-- Standard dependencies used in several modules -->
       <dependency>
-        <groupId>c3p0</groupId>
+        <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.9.1.2</version>
+        <version>0.9.5.2</version>
       </dependency>
       <!-- Jython engine -->
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
@@ -111,7 +113,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>4.0.11.Final</version>
+        <version>4.0.15.Final</version>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
@@ -124,28 +126,20 @@
         <artifactId>tika-parsers</artifactId>
         <version>${tika.version}</version>
         <exclusions>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-          <!-- Tika depends on junrar for handling RAR files and junrar itself depends on Commons VFS2 which depends on
-               org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.4. AFAIK we shouldn't require this dependency and
-               we can safely exclude it. The other reason for excluding it is that it itself depends on
-               regexp:regexp:jar:1.3 and this causes some duplicate class conflicts with Xalan, and we already depend
-               on jakarta-regexp:jakarta-regexp. -->
-          <exclusion>
-            <artifactId>regexp</artifactId>
-            <groupId>regexp</groupId>
-          </exclusion>
           <!-- We don't need it the way we use Tika and it causes various conflicts -->
           <exclusion>
             <artifactId>cxf-rt-rs-client</artifactId>
             <groupId>org.apache.cxf</groupId>
+          </exclusion>
+          <!-- Now merged with jaxb-runtime -->
+          <exclusion>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-core</artifactId>
+          </exclusion>
+          <!-- Artifact id changed -->
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -187,6 +181,16 @@
             <artifactId>commons-logging-api</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.rometools</groupId>
+        <artifactId>rome</artifactId>
+        <version>1.12.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.rometools</groupId>
+        <artifactId>rome-utils</artifactId>
+        <version>1.12.0</version>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
@@ -240,7 +244,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10</version>
+        <version>2.10.1</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -334,13 +338,13 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>4.5.1</version>
+        <version>5.2.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
-        <version>2.2.3</version>
+        <version>2.3.0</version>
       </dependency>
 
       <dependency>
@@ -405,24 +409,24 @@
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>1.2</version>
+        <version>1.3</version>
       </dependency>
 
       <!-- JNR -->
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.2.17</version>
+        <version>1.2.18</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-constants</artifactId>
-        <version>0.9.9</version>
+        <version>0.9.12</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.1.8</version>
+        <version>2.1.9</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -432,7 +436,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.0.45</version>
+        <version>3.0.47</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -650,12 +654,11 @@
               <extensionOverride>
                 <!-- Right id of the JAXB reference implementation -->
                 <id>org.glassfish.jaxb:jaxb-runtime</id>
-                <features>com.sun.xml.bind:jaxb-impl</features>
-              </extensionOverride>
-              <extensionOverride>
-                <!-- Right id of the JAXB reference implementation -->
-                <id>org.glassfish.jaxb:jaxb-core</id>
-                <features>com.sun.xml.bind:jaxb-core</features>
+                <features>
+                  com.sun.xml.bind:jaxb-impl,
+                  org.glassfish.jaxb:jaxb-core,
+                  com.sun.xml.bind:jaxb-core
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <!-- Open Java is the same as JSON-Java but with a different license -->
@@ -672,47 +675,82 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcprov-jdk15on</id>
                 <features>
-                  bouncycastle:bcprov-jdk16
-                  bouncycastle:bcprov-jdk15
-                  bouncycastle:bcprov-jdk14
-                  bouncycastle:bcprov-jdk13
-                  bouncycastle:bcprov-jdk12
-                  org.bouncycastle:bcprov-jdk16
-                  org.bouncycastle:bcprov-jdk15
-                  org.bouncycastle:bcprov-jdk14
-                  org.bouncycastle:bcprov-jdk13
+                  bouncycastle:bcprov-jdk16,
+                  bouncycastle:bcprov-jdk15,
+                  bouncycastle:bcprov-jdk14,
+                  bouncycastle:bcprov-jdk13,
+                  bouncycastle:bcprov-jdk12,
+                  org.bouncycastle:bcprov-jdk16,
+                  org.bouncycastle:bcprov-jdk15,
+                  org.bouncycastle:bcprov-jdk14,
+                  org.bouncycastle:bcprov-jdk13,
                   org.bouncycastle:bcprov-jdk12
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>org.bouncycastle:bcpkix-jdk15on</id>
                 <features>
-                  bouncycastle:bcpkix-jdk16
-                  bouncycastle:bcpkix-jdk15
-                  bouncycastle:bcpkix-jdk14
-                  bouncycastle:bcpkix-jdk13
-                  bouncycastle:bcpkix-jdk12
-                  org.bouncycastle:bcpkix-jdk16
-                  org.bouncycastle:bcpkix-jdk15
-                  org.bouncycastle:bcpkix-jdk14
-                  org.bouncycastle:bcpkix-jdk13
+                  bouncycastle:bcpkix-jdk16,
+                  bouncycastle:bcpkix-jdk15,
+                  bouncycastle:bcpkix-jdk14,
+                  bouncycastle:bcpkix-jdk13,
+                  bouncycastle:bcpkix-jdk12,
+                  org.bouncycastle:bcpkix-jdk16,
+                  org.bouncycastle:bcpkix-jdk15,
+                  org.bouncycastle:bcpkix-jdk14,
+                  org.bouncycastle:bcpkix-jdk13,
                   org.bouncycastle:bcpkix-jdk12
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk15on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16
-                  bouncycastle:bcmail-jdk15
-                  bouncycastle:bcmail-jdk14
-                  bouncycastle:bcmail-jdk13
-                  bouncycastle:bcmail-jdk12
-                  org.bouncycastle:bcmail-jdk16
-                  org.bouncycastle:bcmail-jdk15
-                  org.bouncycastle:bcmail-jdk14
-                  org.bouncycastle:bcmail-jdk13
+                  bouncycastle:bcmail-jdk16,
+                  bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk14,
+                  bouncycastle:bcmail-jdk13,
+                  bouncycastle:bcmail-jdk12,
+                  org.bouncycastle:bcmail-jdk16,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk14,
+                  org.bouncycastle:bcmail-jdk13,
                   org.bouncycastle:bcmail-jdk12
                 </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>commons-beanutils:commons-beanutils</id>
+                <features>commons-beanutils:commons-beanutils-core</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.jdom:jdom</id>
+                <features>jdom:jdom</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>com.sun.mail:javax.mail</id>
+                <features>
+                  javax.mail:mail,
+                  javax.mail:mailapi
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>xml-apis:xml-apis</id>
+                <features>xerces:xmlParserAPIs/2.6.2</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>com.google.inject:guice:no_aop</id>
+                <features>com.google.inject:guice</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>net.sf.json-lib:json-lib:jdk15</id>
+                <features>
+                  net.sf.json-lib:json-lib,
+                  net.sf.json-lib:json-lib:jdk13
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>com.sun.activation:javax.activation</id>
+                <features>javax.activation:activation</features>
+                <features>javax.activation:javax.activation-api</features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>
@@ -734,15 +772,14 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
-          <!-- Verify that all org.xwiki.commons dependencies have a version specified either as:
+          <!-- Verify that all org.xwiki.commons dependencies have a version specified as:
                - ${commons.version}
-               - a value not starting with $ (we want to allow supporting ranges)
-               Also verifies that all org.xwiki.rendering dependencies have a version specified either as:
+               Also verifies that all org.xwiki.rendering dependencies have a version specified as:
                - ${rendering.version}
-               - a value not starting with $ (we want to allow supporting ranges)
                Also verifies that all org.xwiki.platform dependencies have a version specified either as:
                - ${project.version}
-               - a value not starting with $ (we want to allow supporting ranges)
+               - [${project.version}] (single version specified as a version range)
+               - ${platform.version}
           -->
           <execution>
             <id>check-dependency-version</id>
@@ -766,6 +803,7 @@
                   </versionCheck>
                 </validateDependencyVersion>
               </rules>
+              <skip>${xwiki.enforcer.check-dependency-version.skip}</skip>
             </configuration>
           </execution>
         </executions>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,19 +20,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.LiveTableResultsMacros" locale="">
+<xwikidoc version="1.3" reference="XWiki.LiveTableResultsMacros" locale="">
   <web>XWiki</web>
   <name>LiveTableResultsMacros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393531742000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1465980426000</date>
-  <contentUpdateDate>1465980426000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.livetable.resultsMacros')</title>
   <comment/>
@@ -343,6 +340,10 @@
     #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
     #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+    #set($rawTitle = $translatedDoc.title)
+    #if($rawTitle != $row['doc_title'])
+	  #set($discard = $row.put('doc_title_raw', $rawTitle))
+    #end
     #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))
     #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
     #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
@@ -435,11 +436,10 @@
  *#
 #macro(gridresultwithfilter $className $collist $filterfrom $filterwhere $filterParams)
   #if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
-    $response.setContentType('application/json')
     ## Build the JSON in memory (using basic Java data types) so that it can be adjusted before serialization.
     #set($map = {})
     #gridresultwithfilter_buildJSON($className $collist $filterfrom $filterwhere $filterParams $map)
-    $jsontool.serialize($map)
+    #jsonResponse($map)
   #end
 #end
 
@@ -692,8 +692,8 @@
   #set ($timestamps = $filterValue.split('-'))
   #if ($timestamps.size() == 2)
     #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
-    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
-    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
+    #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[0]))))
+    #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[1]))))
   #else
     ## Fall back to the older string matching
     #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(?)")
@@ -812,6 +812,5 @@
   ## Remove non-word characters.
   #set ($safe_tableAlias = "$prefix$suffix.replaceAll('\W', '')")
 #end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=Почта
+admin.email.description=Настройте параметры отправки почты и просмотрите статусы почты.
+admin.emailgeneral=Расширенные
+admin.emailgeneral.description=Настройте дополнительные параметры почты, такие как обфускация почтового адреса.
+admin.emailsend=Отправка почты
+admin.emailsend.description=Настройте параметры отправки почты.
+admin.emailstatus=Состояние отправки почты
+admin.emailstatus.description=Просмотр состояния отправленных писем и повторная отправка сбойных сообщений.
+admin.emailstatus.hint=Если вы не можете найти статус письма, возможно, это связано с тем, что свойство, которое отправило письмо, не указывало, что статус почты должен сохраняться.
+Mail.GeneralMailConfigClass_obfuscate=Обфусцировать адреса электронной почты
+Mail.GeneralMailConfigClass_obfuscate.hint=Это влияет только на адреса электронной почты, хранящиеся в свойствах объекта типа Email, если пользовательское средство отображения по умолчанию для типа свойства Email не перезаписывается. Пример: a ... @ domain.org
+Mail.SendMailConfigClass_from=Адрес электронной почты для отправки с
+Mail.SendMailConfigClass_from.hint=Адрес электронной почты по умолчанию, используемый для отправки уведомлений по электронной почте с
+Mail.SendMailConfigClass_bcc=Адреса электронной почты BCC
+Mail.SendMailConfigClass_bcc.hint=Разделенный запятыми список адресов электронной почты BCC, используемый при отправке почты
+Mail.SendMailConfigClass_host=Почтовый сервер
+Mail.SendMailConfigClass_host.hint=SMTP сервер. По-умолчанию "localhost"
+Mail.SendMailConfigClass_port=Порт
+Mail.SendMailConfigClass_port.hint=Используемый порт SMTP сервера. По-умолчанию 25
+Mail.SendMailConfigClass_username=Пользователь почтового сервера
+Mail.SendMailConfigClass_username.hint=Имя пользователя для подключения к SMTP-серверу, только когда требуется аутентификация
+Mail.SendMailConfigClass_password=Пароль почтового сервера
+Mail.SendMailConfigClass_password.hint=Пароль для подключения к SMTP-серверу, только когда требуется аутентификация
+Mail.SendMailConfigClass_properties=Дополнительные свойства
+Mail.SendMailConfigClass_properties.hint=Список дополнительных свойств JavaMail для использования (например, «mail.smtp.starttls.enable = true» для TLS)
+Mail.SendMailConfigClass_sendWaitTime=Время ожидания отправки
+Mail.SendMailConfigClass_sendWaitTime.hint=Задержка между каждым отправляемым письмом, в миллисекундах (по умолчанию 8 секунд)
+Mail.SendMailConfigClass_discardSuccessStatuses=Отменить статусы успешной доставки?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Независимо от того, сохраняются ли почтовые статусы или нет для почты, которая была успешно отправлена (по умолчанию true)
+Mail.SendMailStatus_livetable.date=Дата
+Mail.SendMailStatus_livetable.batchId=ID пакета
+Mail.SendMailStatus_livetable.type=Тип
+Mail.SendMailStatus_livetable.recipients=Получатели
+Mail.SendMailStatus_livetable.state=Состояние
+Mail.SendMailStatus_livetable.wiki=Вики
+Mail.SendMailStatus_livetable.error=Ошибка
+Mail.SendMailStatus_livetable.actions=Действия
+Mail.SendMailStatus_livetable.resend=Отправить повторно
+mailSender.admin.resendSuccess=Письмо было повторно отправлено
+mailSender.admin.resendFailure=Ошибка повторной отправки. Нажмите для просмотра сведений.</content>
+</xwikidoc>

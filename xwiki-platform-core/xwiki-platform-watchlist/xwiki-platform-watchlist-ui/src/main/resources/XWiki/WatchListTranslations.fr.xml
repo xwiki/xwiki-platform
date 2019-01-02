@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1397735293000</creationDate>
   <parent>XWiki.WatchListClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1397735757000</date>
-  <contentUpdateDate>1397735757000</contentUpdateDate>
   <version>1.1</version>
   <title>WatchListTranslations</title>
   <comment/>
@@ -41,7 +38,7 @@
   <hidden>true</hidden>
   <content>### Macro "watchlist"
 rendering.macro.watchlist.name=Liste de suivi
-rendering.macro.watchlist.description=Affiche la liste des pages suivies
+rendering.macro.watchlist.description=Affiche la liste des pages suivies.
 
 ### XWiki.WatchListClass
 XWiki.WatchListClass_interval_realtime=Temps réel
@@ -50,13 +47,13 @@ XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Quotidien
 XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Hebdomadaire
 
 ### Notification Icons    
-watchlist.notifications.icons.on=OFF
-### Missing: watchlist.notifications.icons.off=OFF
+watchlist.notifications.icons.on=ACTIF
+watchlist.notifications.icons.off=INACTIF
 watchlist.notifications.icons.tooltip.page=Suivre cette page
 watchlist.notifications.icons.tooltip.pageAndChildren=Suivre cette page et les pages filles
 watchlist.notifications.icons.tooltip.space=Suivre la page parente et ses filles
 watchlist.notifications.icons.tooltip.wiki=Suivre ce wiki
-watchlist.notifications.changeStatusError=Impossible de modifier le status de suivi
+watchlist.notifications.changeStatusError=Impossible de modifier le statut de suivi.
 watchlist.settings=Paramètres
 
 ### Watchlist livetable (in the macro)

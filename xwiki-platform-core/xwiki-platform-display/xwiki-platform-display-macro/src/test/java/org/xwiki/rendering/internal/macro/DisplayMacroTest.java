@@ -37,8 +37,10 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -56,6 +58,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
@@ -77,9 +81,9 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     /**
      * Mocks the component that is used to resolve the 'reference' parameter.
      */
-    private DocumentReferenceResolver<String> mockDocumentReferenceResolver;
+    private EntityReferenceResolver<String> mockEntityReferenceResolver;
 
-    private AuthorizationManager mockAuthorization;
+    private ContextualAuthorizationManager mockContextualAuthorization;
 
     private DocumentModelBridge mockDocument;
 
@@ -100,10 +104,12 @@ public class DisplayMacroTest extends AbstractComponentTestCase
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
 
-        this.mockDocumentReferenceResolver =
-            registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
-        this.mockAuthorization = registerMockComponent(AuthorizationManager.class);
+        this.mockEntityReferenceResolver =
+            registerMockComponent(EntityReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
+        // Make sure to not load the standard AuthorizationManager which trigger too many things
+        registerMockComponent(AuthorizationManager.class);
 
+        this.mockContextualAuthorization = getComponentManager().getInstance(ContextualAuthorizationManager.class);
         this.displayMacro = (DisplayMacro) getComponentManager().getInstance(Macro.class, "display");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
@@ -111,13 +117,21 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     @Test
     public void testDisplayMacroShowsVelocityMacrosAreIsolated() throws Exception
     {
+        // @formatter:off
         String expected =
-            "beginDocument\n" + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n" + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-                + "beginParagraph\n" + "onSpecialSymbol [#]\n" + "onWord [testmacro]\n" + "endParagraph\n"
+            "beginDocument\n"
+                + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
+                + "[syntax]=[XWiki 2.0]]\n"
+                + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
+                + "beginParagraph\n"
+                + "onSpecialSymbol [#]\n"
+                + "onWord [testmacro]\n"
+                + "endParagraph\n"
                 + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
                 + "endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n" + "endDocument";
+                + "[syntax]=[XWiki 2.0]]\n"
+                + "endDocument";
+        // @formatter:on
 
         // We verify that a Velocity macro set in the including page is not seen in the displayed page.
         List<Block> blocks =
@@ -146,15 +160,23 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     @Test
     public void testDisplayMacroWhenDisplayingDocumentWithRelativeReferences() throws Exception
     {
-        String expected = "beginDocument\n" + "beginMetaData [[base]=[displayedWiki:displayedSpace.displayedPage]"
-            + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n" + "beginParagraph\n"
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[displayedWiki:displayedSpace.displayedPage]"
+            + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
             + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
-            + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n" + "onSpace\n"
+            + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
+            + "onSpace\n"
             + "beginLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
-            + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n" + "onSpace\n"
-            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n" + "endParagraph\n"
+            + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
+            + "onSpace\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
+            + "endParagraph\n"
             + "endMetaData [[base]=[displayedWiki:displayedSpace.displayedPage]"
-            + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n" + "endDocument";
+            + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
 
         final DocumentReference displayedDocumentReference =
             new DocumentReference("displayedWiki", "displayedSpace", "displayedPage");
@@ -163,7 +185,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(DocumentReference.class)));
                 will(returnValue(true));
                 oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)),
                     with(any(DocumentModelBridge.class)));
@@ -199,18 +221,15 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         final DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("wiki:space.page");
 
+        final DocumentReference includedDocumentReference = new DocumentReference("wiki", "space", "page");
+        setUpDocumentMock("wiki:space.page", includedDocumentReference, "");
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentReferenceResolver).resolve("wiki:space.page", macroContext.getCurrentMacroBlock());
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
-
-                allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
+                allowing(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(DocumentReference.class)));
                 will(returnValue(true));
-                allowing(mockSetup.bridge).getDocumentInstance(with(any(DocumentReference.class)));
-                will(returnValue(null));
 
-                allowing(mockDocumentDisplayer).display(with(same((DocumentModelBridge) null)),
+                allowing(mockDocumentDisplayer).display(with(same(mockDocument)),
                     with(any(DocumentDisplayerParameters.class)));
                 will(new CustomAction("recursively call the include macro again")
                 {
@@ -243,11 +262,15 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     @Test
     public void testDisplayMacroInsideBaseMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
+        // @formatter:off
         String expected = "beginDocument\n"
             + "beginMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n" + "onWord [content]\n" + "endParagraph\n"
+            + "beginParagraph\n"
+            + "onWord [content]\n"
+            + "endParagraph\n"
             + "endMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
             + "endDocument";
+        // @formatter:on
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("relativePage");
@@ -264,13 +287,13 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentReferenceResolver).resolve(with("wiki:space.page"),
+                allowing(mockEntityReferenceResolver).resolve(with("wiki:space.page"), with(EntityType.DOCUMENT),
                     with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(sourceReference));
-                allowing(mockDocumentReferenceResolver).resolve(with("relativePage"),
+                allowing(mockEntityReferenceResolver).resolve(with("relativePage"), with(EntityType.DOCUMENT),
                     with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(resolvedReference));
-                oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
+                allowing(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
                 will(returnValue(true));
                 oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(mockDocument)));
                 oneOf(mockSetup.bridge).getCurrentDocumentReference();
@@ -287,12 +310,21 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     @Test
     public void testDisplayMacroWhenSectionSpecified() throws Exception
     {
+        // @formatter:off
         String expected =
-            "beginDocument\n" + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n" + "beginHeader [1, Hsection]\n" + "onWord [section]\n"
-                + "endHeader [1, Hsection]\n" + "beginParagraph\n" + "onWord [content2]\n" + "endParagraph\n"
+            "beginDocument\n"
+                + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
+                + "[syntax]=[XWiki 2.0]]\n"
+                + "beginHeader [1, Hsection]\n"
+                + "onWord [section]\n"
+                + "endHeader [1, Hsection]\n"
+                + "beginParagraph\n"
+                + "onWord [content2]\n"
+                + "endParagraph\n"
                 + "endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n" + "endDocument";
+                + "[syntax]=[XWiki 2.0]]\n"
+                + "endDocument";
+        // @formatter:on
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setSection("Hsection");
@@ -333,10 +365,10 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentReferenceResolver).resolve(with(resolve),
+                allowing(mockEntityReferenceResolver).resolve(with(resolve), with(EntityType.DOCUMENT),
                     with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(reference));
-                allowing(mockSetup.bridge).getDocumentInstance(reference);
+                allowing(mockSetup.bridge).getDocumentInstance((EntityReference) reference);
                 will(returnValue(mockDocument));
                 allowing(mockSetup.bridge).getTranslatedDocumentInstance(reference);
                 will(returnValue(mockDocument));
@@ -381,7 +413,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockSetup.bridge).isDocumentViewable(with(same(displayedDocumentReference)));
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(same(displayedDocumentReference)));
                 will(returnValue(true));
                 oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(mockDocument)));
                 atMost(1).of(mockSetup.bridge).getCurrentDocumentReference();

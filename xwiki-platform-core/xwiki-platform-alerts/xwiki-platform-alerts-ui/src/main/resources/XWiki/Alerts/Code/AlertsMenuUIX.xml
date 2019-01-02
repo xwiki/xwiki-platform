@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1509625319000</creationDate>
   <parent>xwiki:XWiki.Alerts.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1509625319000</date>
-  <contentUpdateDate>1509625319000</contentUpdateDate>
   <version>1.1</version>
   <title>AlertsMenuUIX</title>
   <comment/>
@@ -137,11 +134,18 @@
   ##
   ## Display the menu only if the content is not blank
   ##
-  #if ($stringtool.isNotBlank($menuContent.toString()))
+  #set ($cachedMenuContent = $menuContent.toString())
+  #if ($stringtool.isNotBlank($cachedMenuContent))
     &lt;li class="dropdown" id="tmNotifications"&gt;
-      &lt;a class="icon-navbar dropdown-toggle" data-toggle="dropdown" role="button" title="$services.localization.render('watchlist')"&gt;&lt;span class="sr-only"&gt;$services.localization.render('core.menu.toggleNavigation')&lt;/span&gt;$services.icon.renderHTML('bell')&lt;/a&gt;
+      &lt;a class="icon-navbar dropdown-toggle" data-toggle="dropdown" role="button"
+      title="$services.localization.render('watchlist.notification.tooltip')"&gt;
+        &lt;span class="sr-only"&gt;
+          $services.localization.render('core.menu.toggleNavigation')
+        &lt;/span&gt;
+        $services.icon.renderHTML('bell')
+      &lt;/a&gt;
       &lt;ul class="dropdown-menu"&gt;
-        $menuContent
+        $cachedMenuContent
       &lt;/ul&gt;
     &lt;/li&gt;
   #end

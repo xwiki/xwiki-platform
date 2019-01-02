@@ -62,6 +62,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.WrappedThreadEventListener;
+import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -131,7 +132,7 @@ public abstract class XWikiAction extends Action
         Arrays.asList("skin", "ssx", "jsx", "download");
 
     /**
-     * Indicate if the action is blocked until XWiki is initialized.
+     * Indicate if the action allow asynchronous display (among which the XWiki initialization).
      */
     protected boolean waitForXWikiInitialization = true;
 
@@ -227,6 +228,8 @@ public abstract class XWikiAction extends Action
 
         boolean debug = StringUtils.equals(context.getRequest().get("debug"), "true");
 
+        String sasync = context.getRequest().get("async");
+
         try {
             String action = context.getAction();
 
@@ -251,7 +254,8 @@ public abstract class XWikiAction extends Action
 
             // Verify that the requested wiki exists
             try {
-                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization, context);
+                // Don't show init screen if async is forced to false
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || StringUtils.equals(sasync, "false"), context);
 
                 // If XWiki is still initializing display initialization template
                 if (xwiki == null) {
@@ -342,6 +346,16 @@ public abstract class XWikiAction extends Action
             }
             context.put("ajax", ajax);
 
+            boolean async = false;
+            if (StringUtils.isNotEmpty(sasync)) {
+                async = sasync.equals("true");
+            } else {
+                // By default allow asynchronous rendering for "human oriented" actions which are not executing an ajax
+                // request
+                async = !ajax && !this.waitForXWikiInitialization;
+            }
+            Utils.getComponent(AsyncContext.class).setEnabled(async);
+
             // Any error before this will be treated using a redirection to an error page
 
             if (monitor != null) {
@@ -418,7 +432,7 @@ public abstract class XWikiAction extends Action
 
                 // We save the current action set since:
                 // - by default the action is set to "view" for Extensions not installed as root and contributing some
-                //   new Entity Action (see https://jira.xwiki.org/browse/XWIKI-15182).
+                // new Entity Action (see https://jira.xwiki.org/browse/XWIKI-15182).
                 // - we want to set back the action in case no ResourceReferenceHandler was found to handle the URL
                 // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-15182 is fixed
                 String originalAction = context.getAction();

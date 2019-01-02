@@ -25,39 +25,52 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
   <packaging>pom</packaging>
   <description>Parent pom of the default XWiki distribution. Can also be used as parent for custom distributions.</description>
   <modules>
-    <module>xwiki-platform-distribution-ui</module>
-    <module>xwiki-platform-distribution-war-dependencies</module>
-    <module>xwiki-platform-distribution-war-legacydependencies</module>
-    <module>xwiki-platform-distribution-war</module>
-    <module>xwiki-platform-distribution-jetty-hsqldb</module>
-    <module>xwiki-platform-distribution-flavor</module>
+    <!-- Sorted alphabetically -->
     <module>xwiki-platform-distribution-debian</module>
     <module>xwiki-platform-distribution-fedora</module>
+    <module>xwiki-platform-distribution-flavor</module>
+    <module>xwiki-platform-distribution-jetty-hsqldb</module>
+    <module>xwiki-platform-distribution-resources</module>
+    <module>xwiki-platform-distribution-war</module>
+    <module>xwiki-platform-distribution-war-dependencies</module>
+    <module>xwiki-platform-distribution-war-legacydependencies</module>
+    <module>xwiki-platform-distribution-ui</module>
   </modules>
   <properties>
+    <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
+    <maven.version>3.6.0</maven.version>
+    <maven.resolver.version>1.3.1</maven.resolver.version>
+
     <!-- Flavors known to be valid with the current distribution -->
     <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
     <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
-        org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
+      org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
+      org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
     </xwiki.extension.knownFlavors>
 
     <!-- Flavors known to be incompatible with the current distribution -->
     <xwiki.extension.knownInvalidFlavors>
-        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
-        org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
-        org.xwiki.platform:xwiki-platform-distribution-flavor
+      org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
+      org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
+      org.xwiki.platform:xwiki-platform-distribution-flavor,
+      org.xwiki.manager:xwiki-manager-ui,
+      org.xwiki.manager:xwiki-manager-wiki-administrator,
+      org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
+      com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
+      com.xpn.xwiki.products:xwiki-enterprise-wiki
     </xwiki.extension.knownInvalidFlavors>
 
     <!-- Hibernate configuration -->
-    <xwiki.db.common.extraMappings>activitystream.hbm.xml,instance.hbm.xml</xwiki.db.common.extraMappings>
+    <xwiki.db.common.extraMappings>
+      activitystream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
+    </xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
     <xwiki.db.mysql.extraMappings>mailsender.hbm.xml</xwiki.db.mysql.extraMappings>
@@ -115,10 +128,11 @@
       <!-- Old extensions that we consider now as flavors -->
       org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
       org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
-      org.xwiki.manager:xwiki-enterprise-ui,
+      org.xwiki.manager:xwiki-manager-ui,
       org.xwiki.manager:xwiki-manager-wiki-administrator,
       org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
-      com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator
+      com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
+      com.xpn.xwiki.products:xwiki-enterprise-wiki
     </xwiki.properties.extensions.oldflavors>
     <xwiki.properties.defaultWysiwygEditor />
     <xwiki.properties.additionalproperties />
@@ -153,9 +167,6 @@
     <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
       backward compatibility breakages. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't cloverify distribution code since there should be no code and we don't want to include any test or
-         tools used to build the distributions in the global TPC we computed. We want only runtime code -->
-    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not
@@ -166,28 +177,28 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -198,29 +209,29 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -232,13 +243,13 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>10.6-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -408,23 +419,6 @@
                     <packages>
                       <package>org.w3c.css.sac</package>
                     </packages>
-                  </exception>
-                  <!-- Logging shouldn't be configured by libraries! In any case since we route everything through
-                       SLF4J, logging is configured by the SLF4J implementation used (e.g. Logback). -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>org.apache.axis</groupId>
-                        <artifactId>axis</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>radeox</groupId>
-                        <artifactId>radeox</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <resources>
-                      <resource>simplelog.properties</resource>
-                    </resources>
                   </exception>
                   <!-- The files are different but removing them would mean repackaging the JARs which is PITA.
                        Since the versions are the same for bc (1.52) there's a good chance the files are compatible. -->

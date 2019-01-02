@@ -114,12 +114,14 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
     }
 
     @Override
-    public void afterAll(ExtensionContext extensionContext) throws Exception
+    public void afterEach(ExtensionContext extensionContext) throws Exception
     {
         MockitoOldcore moc = loadMockitoOldcore(extensionContext);
         if (moc != null) {
             moc.after();
         }
+
+        super.afterEach(extensionContext);
     }
 
     @Override

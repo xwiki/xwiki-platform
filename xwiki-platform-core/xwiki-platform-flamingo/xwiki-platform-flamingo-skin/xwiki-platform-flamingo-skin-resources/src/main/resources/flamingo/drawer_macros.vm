@@ -5,10 +5,11 @@
  * @param $icon the name of the icon of the element
  * @param $text the text to display in the element
  * @param $id (optional) the HTML id of the element
+ * @param $extraAttribute (optional) additional A element attributes to add (such as ref="nofollow" for example)
  *#
-#macro(drawerItem $url $icon $text $id)
+#macro(drawerItem $url $icon $text $id $extraAttribute)
   <li class="drawer-menu-item">
-    <a href="$url" #if($id)id="$id"#end>
+    <a href="$url"#if($id) id="$id"#{end}#if ("$!extraAttribute" != '') $extraAttribute#end>
       <div class="drawer-menu-item-icon">
         $services.icon.renderHTML($icon)
       </div>

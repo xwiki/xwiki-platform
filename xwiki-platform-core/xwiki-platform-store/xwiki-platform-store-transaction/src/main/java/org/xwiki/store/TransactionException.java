@@ -115,6 +115,12 @@ public class TransactionException extends Exception
         this.isNonRecoverable = nonRecoverable;
     }
 
+    @Override
+    public synchronized Throwable getCause()
+    {
+        return this.causes.isEmpty() ? super.getCause() : this.causes.get(0);
+    }
+
     /**
      * @return all of the exceptions which caused this exception to be thrown.
      */

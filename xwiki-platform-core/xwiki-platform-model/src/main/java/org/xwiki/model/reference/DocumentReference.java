@@ -20,24 +20,27 @@
 package org.xwiki.model.reference;
 
 import java.beans.Transient;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Provider;
 
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 /**
- * Represents a reference to a document (wiki, space and page names).
+ * Represents a reference to a document (wiki, space and document names).
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class DocumentReference extends EntityReference
+public class DocumentReference extends AbstractLocalizedEntityReference
 {
     /**
      * The {@link Type} for a {@code Provider<DocumentReference>}.
@@ -50,7 +53,7 @@ public class DocumentReference extends EntityReference
     /**
      * Parameter key for the locale.
      */
-    static final String LOCALE = "LOCALE";
+    static final String LOCALE = AbstractLocalizedEntityReference.LOCALE;
 
     /**
      * Cache the {@link LocalDocumentReference} corresponding to this {@link DocumentReference}.
@@ -91,8 +94,7 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(EntityReference reference, Locale locale)
     {
-        super(reference);
-        setLocale(locale);
+        super(reference, locale);
     }
 
     /**
@@ -159,8 +161,7 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(String wikiName, List<String> spaceNames, String pageName, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames));
-        setLocale(locale);
+        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames), locale);
     }
 
     /**
@@ -195,8 +196,31 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(String pageName, SpaceReference parent, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, parent);
-        setLocale(locale);
+        super(pageName, EntityType.DOCUMENT, parent, locale);
+    }
+
+    /**
+     * @param pageName the name of the document
+     * @param parent the parent space for the document
+     * @param parameters parameters for this reference, may be null
+     * @since 10.6RC1
+     */
+    @Unstable
+    public DocumentReference(String pageName, EntityReference parent, Map<String, Serializable> parameters)
+    {
+        super(pageName, EntityType.DOCUMENT, parent, parameters);
+    }
+
+    /**
+     * Clone an DocumentReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public DocumentReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
     }
 
     /**
@@ -241,24 +265,6 @@ public class DocumentReference extends EntityReference
         }
 
         super.setType(EntityType.DOCUMENT);
-    }
-
-    /**
-     * Set the locale of this document reference.
-     *
-     * @param locale the locale of this document reference
-     */
-    protected void setLocale(Locale locale)
-    {
-        setParameter(LOCALE, locale);
-    }
-
-    /**
-     * @return the locale of this document reference
-     */
-    public Locale getLocale()
-    {
-        return (Locale) getParameter(LOCALE);
     }
 
     /**
@@ -322,7 +328,21 @@ public class DocumentReference extends EntityReference
     @Override
     public DocumentReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new DocumentReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public DocumentReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new DocumentReference(this, newParent);
     }
 
     /**

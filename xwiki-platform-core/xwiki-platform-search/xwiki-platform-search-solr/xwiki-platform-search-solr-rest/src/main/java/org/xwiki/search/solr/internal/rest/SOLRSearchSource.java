@@ -127,6 +127,8 @@ public class SOLRSearchSource extends AbstractSearchSource
                 }
                 fq.add("{!tag=wiki}wiki:(" + builder + ")");
             }
+        } else {
+            query.setWiki(defaultWikiName);
         }
 
         // TODO: current locale filtering ?
@@ -194,9 +196,8 @@ public class SOLRSearchSource extends AbstractSearchSource
                                 spaces, searchResult.getPageName()).toString();
                 } else {
                     searchResult.setLanguage(docLocale.toString());
-                    pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, spaces,
-                                searchResult.getPageName(), docLocale).toString();
+                    pageUri = Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class,
+                        searchResult.getWiki(), spaces, searchResult.getPageName(), docLocale).toString();
                 }
 
                 Link pageLink = new Link();

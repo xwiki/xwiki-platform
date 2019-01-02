@@ -20,30 +20,34 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 /**
+ * Basic confirmation actions performed on a bootstrap modal.
+ * 
  * @version $Id$
  * @since 3.2M3
  */
-public class ConfirmationModal extends ViewPage
+public class ConfirmationModal extends BaseModal
 {
-    @FindBy(xpath = "//div[@class='buttons']//input[@value='Yes']")
-    private WebElement buttonOk;
+    public ConfirmationModal(By selector)
+    {
+        super(selector);
+    }
 
-    @FindBy(xpath = "//div[@class='buttons']//input[@value='No']")
-    private WebElement buttonCancel;
+    public String getMessage()
+    {
+        return getDriver().findElementWithoutWaiting(this.container, By.className("modal-body")).getText();
+    }
 
     public void clickOk()
     {
-        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
-        this.buttonOk.click();
+        getDriver().findElementWithoutWaiting(this.container,
+            By.cssSelector(".modal-footer .btn-primary, .modal-footer .btn-danger")).click();
+        this.waitForClosed();
     }
 
     public void clickCancel()
     {
-        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
-        this.buttonCancel.click();
+        this.close();
     }
 }

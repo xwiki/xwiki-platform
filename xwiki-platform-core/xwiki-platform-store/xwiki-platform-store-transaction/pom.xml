@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-transaction</artifactId>
   <name>XWiki Platform - Store - Transaction</name>
@@ -105,7 +105,8 @@
     and has no dependence on any type of underlying transactional storage engine.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>75</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <!-- Test Dependencies -->

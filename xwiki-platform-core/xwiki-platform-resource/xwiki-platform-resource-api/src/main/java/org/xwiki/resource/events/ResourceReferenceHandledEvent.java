@@ -22,7 +22,6 @@ package org.xwiki.resource.events;
 import org.xwiki.observation.event.EndEvent;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event sent after the execution of a {@link org.xwiki.resource.ResourceReferenceHandler}.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.11RC1
  */
-@Unstable
 public class ResourceReferenceHandledEvent extends AbstractResourceReferenceHandlerEvent implements EndEvent
 {
     /**

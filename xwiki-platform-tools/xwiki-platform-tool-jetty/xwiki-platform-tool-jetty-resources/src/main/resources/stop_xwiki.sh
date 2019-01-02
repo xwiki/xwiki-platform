@@ -36,15 +36,17 @@ usage() {
   echo "-sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079."
   echo "-ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance"
   echo "    is started. Defaults to /var/tmp."
+  echo "-wt, --waittime: Number of seconds to wait for the XWiki lock file to be removed before exiting."
   echo ""
   echo "Example: stop_xwiki.sh -p 8080 -sp 8079"
 }
 
 waitForLockDeletion() {
   # Wait till the XWiki lock file is removed by the start script
-  # Wait 20 seconds at most and exits if the lock file hasn't been removed after that.
+  # Wait 30 seconds (or the time defined by the user) at most and exits if the lock file hasn't been removed after
+  # that.
   local ctr=0;
-  while [ $ctr -lt 200 ]; do
+  while [ $ctr -lt $(($XWIKI_WAIT_TIME*10)) ]; do
     ctr=$((ctr+1));
     [ ! -e $1 ] && return 0;
     sleep .1;
@@ -80,6 +82,9 @@ fi
 # The location where to store the process id
 XWIKI_LOCK_DIR="/var/tmp"
 
+# The number of seconds to wait for the XWiki lock file to be removed before exiting.
+XWIKI_WAIT_TIME=30
+
 # Parse script parameters
 while [[ $# > 0 ]]; do
   key="$1"
@@ -95,6 +100,10 @@ while [[ $# > 0 ]]; do
       ;;
     -ld|--lockdir)
       XWIKI_LOCK_DIR="$1"
+      shift
+      ;;
+    -wt|--waittime)
+      XWIKI_WAIT_TIME="$1"
       shift
       ;;
     -h|--help)

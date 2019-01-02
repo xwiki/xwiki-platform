@@ -19,47 +19,26 @@
  */
 package org.xwiki.validator;
 
-import javax.xml.xpath.XPathConstants;
+import java.util.Arrays;
+import java.util.List;
 
+import org.jsoup.nodes.Element;
 import org.w3c.dom.Document;
 import org.xwiki.validator.ValidationError.Type;
-import org.xwiki.validator.framework.AbstractDOMValidator;
-import org.xwiki.validator.framework.XMLResourcesEntityResolver;
-
-import nu.validator.htmlparser.common.XmlViolationPolicy;
-import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
+import org.xwiki.validator.framework.AbstractHTML5Validator;
 
 /**
  * Validator allowing to validate (X)HTML content against some XWiki rules.
  * 
  * @version $Id$
  */
-public class XWikiValidator extends AbstractDOMValidator
+public class XWikiValidator extends AbstractHTML5Validator
 {
-    /**
-     * Constructor.
-     */
-    public XWikiValidator()
-    {
-        setValidateXML(false);
-
-        this.errorHandler = createXMLErrorHandler();
-
-        try {
-            // Use the HTML5 Document builder (from the 'nu' project) instead of the default DOM builder that fails
-            // with HTML 5
-            this.documentBuilder = new HtmlDocumentBuilder(XmlViolationPolicy.ALTER_INFOSET);
-            this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
-            this.documentBuilder.setErrorHandler(this.errorHandler);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     protected void validate(Document document)
     {
         validateFailingMacros();
+        validateNotEmptyHeadingId();
     }
 
     /**
@@ -67,9 +46,24 @@ public class XWikiValidator extends AbstractDOMValidator
      */
     public void validateFailingMacros()
     {
-        String exprString = "//*[@class='xwikirenderingerror']";
-        assertFalse(Type.ERROR, "Found rendering error", (Boolean) evaluate(this.document, exprString,
-            XPathConstants.BOOLEAN));
+        assertTrue(Type.ERROR, "Found rendering error",
+            this.html5Document.getElementsByClass("xwikirenderingerror").isEmpty());
+    }
+
+    /**
+     * Check if there is any heading with empty (generally generated) id value.
+     */
+    public void validateNotEmptyHeadingId()
+    {
+        List<String> headings = Arrays.asList("h1", "h2", "h3", "h4", "h5", "h6");
+
+        for (Element element : getElements(headings)) {
+            String id = element.attr("id");
+
+            // Verify that no heading contains an empty id.
+            assertTrue(Type.ERROR, "A " + element.tagName() + " heading with empty id (\"H\") has been found",
+                id == null || !id.equals("H"));
+        }
     }
 
     @Override

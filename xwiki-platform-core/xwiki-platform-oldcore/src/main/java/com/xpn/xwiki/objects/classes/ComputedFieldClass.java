@@ -120,7 +120,7 @@ public class ComputedFieldClass extends PropertyClass
             XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
 
             String result = renderContentInContext(script, classDocument.getSyntax().toIdString(),
-                classDocument.getAuthorReference(), context);
+                classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
 
             buffer.append(result);
         } catch (Exception e) {

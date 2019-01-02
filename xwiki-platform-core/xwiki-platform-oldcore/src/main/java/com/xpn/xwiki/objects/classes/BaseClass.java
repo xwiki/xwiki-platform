@@ -537,13 +537,21 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addPasswordField(String fieldName, String fieldPrettyName, int size)
     {
+        return addPasswordField(fieldName, fieldPrettyName, size, null);
+    }
+
+    public boolean addPasswordField(String fieldName, String fieldPrettyName, int size, String storageType)
+    {
         if (get(fieldName) == null) {
-            PasswordClass text_class = new PasswordClass();
-            text_class.setName(fieldName);
-            text_class.setPrettyName(fieldPrettyName);
-            text_class.setSize(size);
-            text_class.setObject(this);
-            put(fieldName, text_class);
+            PasswordClass passwordClass = new PasswordClass();
+            passwordClass.setName(fieldName);
+            passwordClass.setPrettyName(fieldPrettyName);
+            passwordClass.setSize(size);
+            if (storageType != null) {
+                passwordClass.setStorageType(storageType);
+            }
+            passwordClass.setObject(this);
+            put(fieldName, passwordClass);
 
             return true;
         }
@@ -583,6 +591,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    /**
+     * @since 10.10RC1
+     */
+    public boolean addBooleanField(String fieldName, String fieldPrettyName)
+    {
+        return addBooleanField(fieldName, fieldPrettyName, null);
+    }
+
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
     {
         return addBooleanField(fieldName, fieldPrettyName, displayType, null);
@@ -590,10 +606,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType, Boolean def)
     {
+        return addBooleanField(fieldName, fieldPrettyName, null, displayType, def);
+    }
+
+    /**
+     * @since 10.7RC1
+     */
+    public boolean addBooleanField(String fieldName, String fieldPrettyName, String formType, String displayType,
+        Boolean def)
+    {
         if (get(fieldName) == null) {
             BooleanClass booleanClass = new BooleanClass();
             booleanClass.setName(fieldName);
             booleanClass.setPrettyName(fieldPrettyName);
+            if (formType != null) {
+                booleanClass.setDisplayFormType(formType);
+            }
             booleanClass.setDisplayType(displayType);
             booleanClass.setObject(this);
             if (def != null) {
@@ -803,6 +831,15 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return addStaticListField(fieldName, fieldPrettyName, 1, false, values);
     }
 
+    /**
+     * @since 10.9
+     * @since 10.8.1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, String values, String defaultValue)
+    {
+        return addStaticListField(fieldName, fieldPrettyName, 1, false, false, values, null, null, defaultValue);
+    }
+
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         String values)
     {
@@ -832,6 +869,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String values, String displayType, String separators)
     {
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, values, displayType,
+            separators, null);
+    }
+
+    /**
+     * @since 10.9
+     * @since 10.8.1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String values, String displayType, String separators, String defaultValue)
+    {
         if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
@@ -846,6 +894,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (separators != null) {
                 list_class.setSeparators(separators);
                 list_class.setSeparator(separators.substring(0, 1));
+            }
+            if (defaultValue != null) {
+                list_class.setDefaultValue(defaultValue);
             }
             list_class.setObject(this);
             put(fieldName, list_class);
@@ -962,6 +1013,104 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             list_class.setSql(sql);
             list_class.setObject(this);
             put(fieldName, list_class);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds a page field to the class.
+     * <p>
+     * The input has no multiselect by default.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, false);
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, multiSelect, "");
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @param relationalStorage sets the {@link PageClass} {@code relationalStorage} property metadata with the
+     *            specified value. See {@link PageClass#setRelationalStorage} for more details
+     * @param hqlQuery the optional HQL query to execute to return allowed document references. If null or empty, the
+     *            {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass)
+     *            implicit page query builder} is used
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String hqlQuery)
+    {
+        return addPageField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, hqlQuery, "",
+            ListClass.DISPLAYTYPE_INPUT, true, ListClass.FREE_TEXT_DISCOURAGED);
+    }
+
+    /**
+     * Adds a page field to the class.
+     *
+     * @param fieldName the field name
+     * @param fieldPrettyName the shown name
+     * @param size size of the input
+     * @param multiSelect specifies if there can be several values
+     * @param relationalStorage sets the {@link PageClass} {@code relationalStorage} property metadata with the
+     *            specified value. See {@link PageClass#setRelationalStorage} for more details
+     * @param hqlQuery the optional HQL query to execute to return allowed document references. If null or empty, the
+     *            {@link com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder#build(PageClass)
+     *            implicit page query builder} is used
+     * @param className optional class name used to filter suggested documents containing an object of this class
+     * @param displayType either {@link ListClass#DISPLAYTYPE_CHECKBOX}, {@link ListClass#DISPLAYTYPE_INPUT},
+     *            {@link ListClass#DISPLAYTYPE_RADIO} or {@link ListClass#DISPLAYTYPE_SELECT}
+     * @param hasPicker enables auto suggestion display
+     * @param freeText indicate how non document reference values are handled (forbidden, discouraged or allowed)
+     * @return true if the field has been added
+     * @since 10.8RC1
+     */
+    public boolean addPageField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+            boolean relationalStorage, String hqlQuery, String className, String displayType, boolean hasPicker,
+            String freeText)
+    {
+        if (getField(fieldName) == null) {
+            PageClass pageClass = new PageClass();
+            pageClass.setName(fieldName);
+            pageClass.setPrettyName(fieldPrettyName);
+            pageClass.setSize(size);
+            pageClass.setMultiSelect(multiSelect);
+            pageClass.setSql(hqlQuery);
+            pageClass.setRelationalStorage(relationalStorage);
+            pageClass.setDisplayType(displayType);
+            pageClass.setPicker(hasPicker);
+            pageClass.setObject(this);
+            pageClass.setClassname(className);
+            pageClass.setFreeText(freeText);
+            put(fieldName, pageClass);
 
             return true;
         }

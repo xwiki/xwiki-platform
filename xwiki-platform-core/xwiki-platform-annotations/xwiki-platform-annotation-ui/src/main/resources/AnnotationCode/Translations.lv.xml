@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1264862667000</creationDate>
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1271949711000</date>
-  <contentUpdateDate>1271949711000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -41,7 +38,7 @@
   <hidden>true</hidden>
   <content>annotations.title=Anotācijas
 annotations.menu.loading=Ielādē anotāciju iestatījums
-annotations.menu.loaderror=Neizdevās\:
+annotations.menu.loaderror=Neizdevās:
 annotations.tab.info.noannotations=Šim dokumentam nav anotāciju
 
 annotations.settings.display=Rādīt anotācijas
@@ -49,52 +46,52 @@ annotations.settings.error.wrongsyntax=Dokumentam ar XWiki/1.0 sintaksi anotāci
 annotations.settings.error.notarget=Nav norādīts dokuments, kuram rādīt anotācijas.
 
 annotations.annotated.loading=Ielādē anotēto dokumentu
-annotations.annotated.loaderror=Neizdevās\:
+annotations.annotated.loaderror=Neizdevās:
 annotations.annotated.loaderror.wrongresponse=Nepareizi noformēta servera atbilde
-annotations.annotated.error.noannotatedelement=Anotācijas nevarēja ielādēt, jo vairs nav pieejams saturs.
+annotations.annotated.error.noannotatedelement=Anotāciju neizdevās ielādēt, jo nav pieejams dokumenta saturs.
 annotations.annotated.error.wrongsyntax=Anotācijas nevar izmantot dokumentā ar XWiki/1.0 sintaksi.
 
 annotations.action.edit.text=[Mainīt]
 annotations.action.edit.tooltip=Mainīt šo anotāciju
 annotations.action.edit.submit.text=Atjaunot
 annotations.action.edit.cancel.text=Atcelt
-annotations.action.edit.success=Anotācija ir veiksmīgi atjaunota
-annotations.action.edit.loaderror=Neizdevās\:
-annotations.action.edit.error.notfound=Šī anotācija vairs nepastāv. Mēģiniet pārlādēt lapu, lai redzētu tās aktuālo saturu.
+annotations.action.edit.success=Anotācija ir veiksmīgi atjaunota.
+annotations.action.edit.loaderror=Neizdevās:
+annotations.action.edit.error.notfound=Šī anotācija vairs nepastāv. Lūdzu atjaunojiet lapas saturu pārlūkprogrammā.
 
 annotations.action.delete.text=[Dzēst]
 annotations.action.delete.tooltip=Dzēst šo anotāciju
 annotations.action.delete.confirm=Vai tiešām vēlaties dzēst šo anotāciju?
 annotations.action.delete.inProgress=Dzēšu anotāciju...
 annotations.action.delete.done=Anotācija ir izdzēsta
-annotations.action.delete.failed=Neizdevās izdzēst anotāciju\:
+annotations.action.delete.failed=Neizdevās izdzēst anotāciju:
 
 annotations.action.create.submit.text=Pievienot anotāciju
 annotations.action.create.cancel.text=Atcelt
 annotations.action.create.selection.invalid=Lūdzu iezīmējiet netukšu tekstu dokumenta saturā.
-annotations.action.create.form.loaderror=Neizdevās\:
-annotations.action.create.success=Anotācija ir veiksmīgi pievienota
-annotations.action.create.loaderror=Neizdevās\:
+annotations.action.create.form.loaderror=Neizdevās:
+annotations.action.create.success=Anotācija ir veiksmīgi pievienota.
+annotations.action.create.loaderror=Neizdevās:
 annotations.action.create.error.unauthorized=Jums nav tiesību pievienot šim dokumentam anotāciju.
 annotations.action.create.error.unauthorizedguest=Jums nav tiesību pievienot šim dokumentam anotāciju. Mēģiniet vispirms pieteikties.
-annotations.action.create.helpmessage=Lai anotētu kādu tekstu, iezīmējiet to un spiediet {0}.
+annotations.action.create.helpmessage=Lai anotētu teksta daļu, iezīmējiet to un spiediet {0}.
 annotations.action.create.error.wrongsyntax=Dokumentā ar XWiki/1.0 sintaksi anotācijas nevar izmantot.
-annotations.action.create.error.notarget=Nav norādīts mērķa dokuments, kuram pievienot anotāciju.
+annotations.action.create.error.notarget=Nav norādīta mērķa lapa, kurai pievienot anotāciju.
 
 annotations.action.view.hide.text=slēpt
-annotations.action.view.form.loaderror=Neizdevās\:
-annotations.action.view.error.notfound=Šī anotācija vairs nepastāv. Lūdzu atjaunojiet lapas saturu.
+annotations.action.view.form.loaderror=Neizdevās:
+annotations.action.view.error.notfound=Šī anotācija vairs nepastāv. Lūdzu atjaunojiet lapas saturu pārlūkprogrammā.
 annotations.action.view.thread=Skatīt pavedienu
 
-annotations.altered.text=Šo anotāciju nevar parādīt, jo teksts, kuram tā bija pievienota dokumentā vairs nav atrasts.
-annotations.updated.text=Šī anotācija tika automātiski pārvietota pēc dokumenta izmaiņām. Sākotnēji bija\:
-annotations.action.validate.text=[Validēt]
-annotations.action.validate.tooltip=Validēt izvēlētā teksta anotācijas automātisko atjaunošanu.
-annotations.action.validate.success=Anotācija ir veismīgi validēta.
-annotations.action.validate.loaderror=Neizdevās\:
+annotations.altered.text=Šo anotāciju nevar parādīt, jo anotētais teksts lapa vairs nav atrodams:
+annotations.updated.text=Šī anotācija tika automātiski pārvietota pēc lapas izmaiņām. Sākotnēji bija:
+annotations.action.validate.text=[Pārbaudīt]
+annotations.action.validate.tooltip=Pārbaudīt iezīmētā teksta anotācijas automātisko atjaunošanu
+annotations.action.validate.success=Anotācija ir veiksmīgi pārbaudīta.
+annotations.action.validate.loaderror=Neizdevās:
 
 annotations.filters.show=Detalizēt attēlošanas nosacījumus
-annotations.filters.nooption=Nav vērtību pēc kurām filtrēt "{0}"
+annotations.filters.nooption=Nav ievadīta "{0}" filtrējamā vērtība
 annotations.filters.anyvalue=jebkura vērtība
 annotations.filters.clearvalue=attīrīt
 
@@ -103,18 +100,18 @@ annotations.config.display.title=Anotāciju attēlošanas iestatījumi
 annotations.config.type.title=Anotāciju veida iestatījumi
 annotations.config.activate.title=Anotāciju izmantošanas iestatījumi
 annotations.config.activate.explanation=Sekojošie divi iestatījumi ļauj noteikt, kur anotācijas ir aktīvas. Pirmajā iestatījumā norāda vispārīgo likumu, bet otrajā norāda izņēmumus, kur pirmo likumu nevajag pielietot. Piemēram, izmantot "jā" un izņēmumu vieta  "XWiki" un "Main" norāda, ka anotācijas varēs izmantot visur, izņemot "XWiki" un "Main" vietas. Ja izmantot ir norādīts kā "nē", un izņēmumi ir "Documents" vieta, tas nozīmē, ka anotācijas varēs izmantot tikai dokumentiem "Documents" vietā.
-annotations.config.type.explanation=Pievienojiet šai klasei papildu īpašības, ja vēlaties papildināt anotāciju īpašības.
+annotations.config.type.explanation=Ja anotācijai vēlaties papildu īpašības, pievienojiet šai klasei papildu īpašības.
 admin.annotations=Anotācijas
-### Missing: admin.annotations.description=Configure the page annotations
+admin.annotations.description=Iestatīt lapas anotācijas
 
 AnnotationCode.AnnotationConfig_activated=Anotācijas ir ieslēgtas
-### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
+AnnotationCode.AnnotationConfig_activated.hint=Izvēlieties, vai iespējot viki anotācijas
 AnnotationCode.AnnotationConfig_exceptionSpaces=Izņemot sekojošās vietās
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
+AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Atspējot anotācijas sekojošām vietām:
 AnnotationCode.AnnotationConfig_displayed=Parādīt anotācijas pēc noklusēšanas
-### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
+AnnotationCode.AnnotationConfig_displayed.hint=Izvēlieties, vai anotācijas tiks attēlotas pēc noklusēšanas, vai tikai tad, ja lapā ir tieši norādīts "Rādīt anotācijas"
 AnnotationCode.AnnotationConfig_displayHighlight=Izgaismot anotāciju pēc noklusēšanas
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Izvēlieties, vai anotācijas tiks parādītas vienmēr, vai tikai tad, kad anotētajam tekstam uzbīda kursoru
 AnnotationCode.AnnotationConfig_annotationClass=XWiki klase, kas nosaka anotācijas struktūru
 </content>
 </xwikidoc>

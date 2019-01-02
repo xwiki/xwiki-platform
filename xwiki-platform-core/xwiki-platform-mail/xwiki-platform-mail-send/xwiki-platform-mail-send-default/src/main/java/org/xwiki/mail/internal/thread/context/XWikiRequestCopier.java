@@ -46,12 +46,7 @@ public class XWikiRequestCopier implements Copier<XWikiRequest>
             return null;
         }
 
-        XWikiServletRequestStub dummyRequest = new XWikiServletRequestStub();
-        dummyRequest.setHost(originalRequest.getHeader("x-forwarded-host"));
-        dummyRequest.setScheme(originalRequest.getScheme());
-        dummyRequest.setContextPath(originalRequest.getContextPath());
-        dummyRequest.setrequestURL(originalRequest.getRequestURL());
-        dummyRequest.setServerName(originalRequest.getServerName());
+        XWikiServletRequestStub dummyRequest = new XWikiServletRequestStub(originalRequest);
 
         return new XWikiServletRequest(dummyRequest);
     }

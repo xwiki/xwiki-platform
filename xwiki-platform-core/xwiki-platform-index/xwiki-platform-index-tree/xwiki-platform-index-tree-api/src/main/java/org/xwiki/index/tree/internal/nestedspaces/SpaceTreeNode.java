@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
@@ -58,7 +59,7 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
 
     @Inject
     @Named("hidden/document")
-    private QueryFilter hiddenDocumentQueryFilter;
+    private Provider<QueryFilter> hiddenDocumentQueryFilterProvider;
 
     @Inject
     @Named("count")
@@ -178,7 +179,7 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
         Query query = this.queryManager.createQuery(whereClause(constraints), Query.HQL);
         query.addFilter(this.countQueryFilter);
         if (Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"))) {
-            query.addFilter(this.hiddenDocumentQueryFilter);
+            query.addFilter(this.hiddenDocumentQueryFilterProvider.get());
         }
         query.setWiki(spaceReference.getWikiReference().getName());
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {

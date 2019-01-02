@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1323097478000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1445422650000</date>
-  <contentUpdateDate>1445422591000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -129,6 +126,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Long Text
 platform.appwithinminutes.classEditorStringFieldName=Short Text
 platform.appwithinminutes.classEditorContentFieldName=Content
 platform.appwithinminutes.classEditorTitleFieldName=Title
+platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Delete
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configure

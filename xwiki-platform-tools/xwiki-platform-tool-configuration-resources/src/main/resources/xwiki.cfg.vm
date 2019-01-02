@@ -241,8 +241,10 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #-# The name of the default URL factory that should be used.
 # xwiki.urlfactory.serviceclass=com.xpn.xwiki.web.XWikiURLFactoryServiceImpl
 
-#-# Force the protocol to use in the generated URLs. The right value is taken from the request URL, so setting this
-#-# is not recommended in most cases.
+#-# The default protocol to use when generating an external URL. Can be overwritten in the wiki descriptor ("secure" property).
+#-# If not set, the following is used:
+#-#   * during client request for the current wiki: the protocol from the URL used by the client
+#-#   * for a different wiki or during background tasks (mails, etc.): information come from the wiki descriptor (also fallback on main wiki)
 #-# For example:
 #-# xwiki.url.protocol=https
 # xwiki.url.protocol=
@@ -363,9 +365,6 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 #-# page. Enable this to simply display an "unauthorized" message instead, to hide the login form.
 # xwiki.hidelogin=false
 
-#-# HTTP status code to sent when the authentication failed.
-xwiki.authentication.unauthorized_code=200
-
 #-# Used by some authenticators (like com.xpn.xwiki.user.impl.xwiki.AppServerTrustedAuthServiceImpl)
 #-# to indicate that the users should be created. In this kind of authenticator the user are not created by default.
 #-# Must be set to "empty".
@@ -471,6 +470,8 @@ xwiki.plugin.image.cache.capacity=30
 #-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
 #-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
 #-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
+#-# Moreover, disabling the main store makes impossible for global users to watch pages from subwikis. It is not
+#-# recommended.
 #-#
 #-# Default: 1
 # xwiki.plugin.activitystream.uselocalstore=1

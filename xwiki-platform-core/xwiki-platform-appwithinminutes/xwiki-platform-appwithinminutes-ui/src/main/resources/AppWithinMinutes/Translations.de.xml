@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1323097478000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1445422650000</date>
-  <contentUpdateDate>1445422591000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -104,9 +101,9 @@ platform.appwithinminutes.classEditorUpdateTemplateHint=Speichern der Vorbelegun
 platform.appwithinminutes.classEditorUpdateSheetLabel=Anzeigenvorlage aktualisieren
 platform.appwithinminutes.classEditorUpdateSheetHint=Die Anzeigenvorlage neu erstellen, so dass sie alle Felder der Datenstruktur anzeigt ({0}).
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Übersetzungen für die Datenstrukturen aktualisieren
-platform.appwithinminutes.classEditorUpdateTranslationsHint=Aktualisierung der Übersetzungen, die für die Anzeige der Feldnamen und der Auswahllisten verwendet werden ({0}). 
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Aktualisierung der Übersetzungen, die für die Anzeige der Feldnamen und der Auswahllisten verwendet werden ({0}).
 
-platform.appwithinminutes.classEditorMultipleSheetsWarning=Diese Datenstruktur hat mehrere Anzeigenvorlagen 
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Diese Datenstruktur hat mehrere Anzeigenvorlagen
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Diese Datenstruktur hat zwei Felder mit demselben Namen\: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Vorbelegungen aktualisieren
 platform.appwithinminutes.classEditorBindSheetSaveComment=Anzeigenvorlage eingebunden
@@ -129,6 +126,7 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Textbereich
 platform.appwithinminutes.classEditorStringFieldName=Textzeile
 platform.appwithinminutes.classEditorContentFieldName=Inhalt
 platform.appwithinminutes.classEditorTitleFieldName=Titel
+### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Löschen
 platform.appwithinminutes.classEditorConfigureFieldLabel=Bearbeiten
@@ -175,7 +173,7 @@ platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Der Name des D
 ### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
 ### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Letzter Autor
-platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Der Benutzer, welcher als letztes den Eintrag bearbeitet hat 
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Der Benutzer, welcher als letztes den Eintrag bearbeitet hat
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Ersteller
 platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Der Benutzer, welcher den Eintrag erstellt hat.
 platform.appwithinminutes.liveTableEditorDocDateColumnName=Letzte Änderung
@@ -190,8 +188,8 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Bilder
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Eine spezielle Spalte, um Bilder für einen Eintrag anzuzeigen
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Eine spezielle Spalte, die Benutzeravatare anzeigt. Sie funktioniert nur, wenn in der Datenstruktur Benutzer verwendet werden.
-platform.appwithinminutes.liveTableEditorDescriptionHint=Die Beschreibung ist eine Zusammenfassung, wozu die Anwendung gut ist und was für Daten sie verwaltet. 
-platform.appwithinminutes.liveTableEditorColumnsHint=Wählen Sie die Spalten aus, die in der Tabelle auf der Startseite der Anwendung dargestellt werden. 
+platform.appwithinminutes.liveTableEditorDescriptionHint=Die Beschreibung ist eine Zusammenfassung, wozu die Anwendung gut ist und was für Daten sie verwaltet.
+platform.appwithinminutes.liveTableEditorColumnsHint=Wählen Sie die Spalten aus, die in der Tabelle auf der Startseite der Anwendung dargestellt werden.
 platform.appwithinminutes.liveTableEditorSaveComment=Tabelle aktualisieren
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Ziehen und platzieren Sie die Einträge, um die Reihenfolge zu ändern
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Löschen
@@ -217,7 +215,7 @@ platform.appwithinminutes.appHomePageDeleteAppLabel=Anwendung löschen
 platform.appwithinminutes.deleteAppConfirmation=Die Anwendung {0} und ALLE Einträge werden gelöscht. Sind Sie sicher, dass Sie fortfahren wollen?
 platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE Einträge der Anwendung {0} werden gelöscht. Sind Sie sicher, dass Sie fortfahren wollen?
 platform.appwithinminutes.deleteAppDoesNotExistError=Die angegebene Anwendung existiert nicht.
-platform.appwithinminutes.deleteAppInvalidAppError=Für den angegebenen Namen wurde keine gültige Anwendung gefunden. 
+platform.appwithinminutes.deleteAppInvalidAppError=Für den angegebenen Namen wurde keine gültige Anwendung gefunden.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Bitte geben Sie einen Anwendungsnamen an.
 
 ### Deprecated keys

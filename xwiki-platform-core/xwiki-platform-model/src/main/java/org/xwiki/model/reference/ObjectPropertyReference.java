@@ -66,6 +66,18 @@ public class ObjectPropertyReference extends EntityReference
     }
 
     /**
+     * Clone an ObjectPropertyReference, but use the specified parent for its new parent.
+     *
+     * @param reference the reference to clone
+     * @param parent the new parent to use
+     * @since 10.8RC1
+     */
+    public ObjectPropertyReference(EntityReference reference, EntityReference parent)
+    {
+        super(reference, parent);
+    }
+
+    /**
      * Deprecated constructor.
      * @param wiki the wiki of the document where the parent object of this property is
      * @param space the space of the document where the parent object of this property is
@@ -124,6 +136,20 @@ public class ObjectPropertyReference extends EntityReference
     @Override
     public ObjectPropertyReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (newParent == oldParent) {
+            return this;
+        }
+
         return new ObjectPropertyReference(this, oldParent, newParent);
+    }
+
+    @Override
+    public ObjectPropertyReference replaceParent(EntityReference newParent)
+    {
+        if (newParent == getParent()) {
+            return this;
+        }
+
+        return new ObjectPropertyReference(this, newParent);
     }
 }

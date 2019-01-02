@@ -1,0 +1,109 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="">
+  <web>XWiki.Notifications.Code.Macro</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.notifications.name=Notifications
+rendering.macro.notifications.description=Display notifications about events happened on the wiki.
+rendering.macro.notifications.parameter.count.name=Count
+rendering.macro.notifications.parameter.count.description=Maximum number of events to display by default
+rendering.macro.notifications.parameter.useUserPreferences.name=Use the preferences of the user
+rendering.macro.notifications.parameter.useUserPreferences.description=If true, the preferences of the user about notifications are used
+rendering.macro.notifications.parameter.displayOwnEvents.name=Display own events
+rendering.macro.notifications.parameter.displayOwnEvents.description=If true, the events of the current user are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.displayMinorEvents.name=Display minor events
+rendering.macro.notifications.parameter.displayMinorEvents.description=If true, the events concerning minor revisions of pages are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.displaySystemEvents.name=Display system events
+rendering.macro.notifications.parameter.displaySystemEvents.description=If true, the events triggered by the XWiki software are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.displayReadEvents.name=Display read events
+rendering.macro.notifications.parameter.displayReadEvents.description=If true, the events that the user have already marked as read are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.wikis.name=Wikis
+rendering.macro.notifications.parameter.wikis.description=List of wikis (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.spaces.name=Spaces
+rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.pages.name=Pages
+rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.displayReadStatus.name=Display "read" status
+rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
+rendering.macro.notifications.parameter.users.name=Users
+rendering.macro.notifications.parameter.users.description=List of users to consider (comma-separated). Ignored if "useUserPreferences" is set to "true".
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display followed users only
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events peformed by the given list of users (if empty, the list of followed users of the current user is used).
+rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
+rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
+rendering.macro.notifications.parameter.tags.name=Tags
+rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
+notifications.macro.noWatchedUsers=You are not following anybody.
+notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
+notifications.menu.nothing=No notifications available!
+notifications.menu.more=Load older notifications
+notifications.menu.details=Details ({0})</content>
+  <object>
+    <name>XWiki.Notifications.Code.Macro.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>8e54a70c-75c8-4328-a8b2-1843599c43bc</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

@@ -27,27 +27,24 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393442253000</creationDate>
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1464963428000</date>
-  <contentUpdateDate>1464963428000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: panels.available=Available Panels
-### Missing: panels.name=Name
-### Missing: panels.description=Description
-### Missing: panels.type=Type
-### Missing: panels.category=Category
+  <content>panels.available=Panells Disponibles
+panels.name=Nom
+panels.description=Descripció
+panels.type=Tipus
+panels.category=Categoria
 panels._actions=Accions
 panels.emptyvalue=
 panels.children.title=Pàgines Filles
 panels.siblings.title=Pàgines Germanes
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+panels.documentInformation.configureSyntaxes=Configurar més sintaxis
 </content>
 </xwikidoc>

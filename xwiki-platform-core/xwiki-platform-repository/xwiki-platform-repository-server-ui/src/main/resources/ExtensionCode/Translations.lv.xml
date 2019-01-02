@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1319458064000</creationDate>
   <parent>Extension.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1473775859000</date>
-  <contentUpdateDate>1473775859000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -48,8 +45,8 @@ extension.repository.category=Kategorija
 extension.repository.authors=Autori
 extension.repository.doc.creationDate=Izviedots
 extension.repository.doc.date=Mainīts
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.rating=Vērtējums
+extension.repository.installedCount=Uzstādījumi
 
 ## Administration UI
 admin.repository=Paplašinājumu krātuve

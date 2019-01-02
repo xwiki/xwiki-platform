@@ -57,6 +57,6 @@ public class RedirectClassDocumentInitializer extends AbstractMandatoryClassInit
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("location", "Location", 30);
+        xclass.addPageField("location", "Location", 30);
     }
 }

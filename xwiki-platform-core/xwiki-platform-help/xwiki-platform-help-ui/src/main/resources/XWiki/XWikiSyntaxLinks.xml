@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,19 +20,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.XWikiSyntaxLinks" locale="">
+<xwikidoc version="1.3" reference="XWiki.XWikiSyntaxLinks" locale="">
   <web>XWiki</web>
   <name>XWikiSyntaxLinks</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1300895617000</creationDate>
   <parent>XWiki.XWikiSyntax</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1454940903000</date>
-  <contentUpdateDate>1454940903000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxLinks</title>
   <comment/>
@@ -191,11 +188,15 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 * **##resource##**: A required string with the link reference in one of the following forms
 ** **URL**: Any URL in the form of **##[url:] (protocol:~/~/path)##**. Examples: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
 *** **##url:##** An optional string identifying the resource as an URL.
-** **Wiki page** reference in the form **##(doc: ) ~[~[wikiName:] spaceNameList.] (pageName)##**. Examples: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##
+** **Wiki page** {{info}}Since 10.6{{/info}} reference in the form ##(page: ) [wikiName:] (pageNameList)##**. Examples: ##page:Page##, ##page:myxwiki:Page##, ##page:ParentPage.ChildPage.SubChildPage##, ##page:../SiblingPage##, ##page:./ChildPage##
+*** **##page:##** A required string identifying the resource as an XWiki page. The same reference can be use for either a terminal or non-terminal page, both both exist it will lead to the non-terminal page.
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##
+*** **##pageNameList##**: A required list of slash-separated wiki Pages names pointing to the final linked wiki Page syntax. It's also possible to us ##.## and ##..## to indicate current or parent page/wiki. Examples: ##Main##, ##A/B##, ##A/B/C##, ##../Sibling##, ##./Child##
+** **Wiki document** reference in the form **##(doc: ) ~[~[wikiName:] spaceNameList.] (documentName)##**. Examples: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##
 *** **##doc:##** A required string identifying the resource as an XWiki terminal page. A non-terminal page can also be referenced this way, but it must append its ##.WebHome## part (e.g. ##doc:Sandbox.WebHome##).
 *** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
 *** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
-*** **##pageName##**: A required string containing the name of the linked wiki page. Example: ##Welcome##
+*** **##documentName##**: A required string containing the name of the linked wiki page. Example: ##Welcome##
 ** **Wiki space** {{info}}Since 7.4.1{{/info}} reference in the form **##(space: ) [wikiName:] (spaceNameList)##**. Examples: ##space:Main##, ##space:mywiki:Main##, ##space:A.B.C##
 *** **##space:##** A required string identifying the resource as an XWiki non-terminal page (i.e. a space).
 *** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##
@@ -231,9 +232,9 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 ** **##target##**: An optional parameter that allows to open link target in new window. Example: ##target="~_blank"##</content>
   <attachment>
     <filename>img.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1454612208000</date>
-    <version>1.2</version>
+    <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAAAAADgE0Q3AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfWBxcOEy+3/bdlAAADUElEQVRIx52WTW/cVBSG32tfezxJZiaT0EwnCkVKgVZI3cFAVYkFLEFCKoI/wz9Bgh/ApqqEWLQLFmUHAtJKqKIqMKhSJ50R+aCTTHzPey4L2/PVIru9C8u6Po/f83XtYzxefAUvwcACAMZPjrXc1gfJVm0VgPHA+HCQGmOMKcfQ6jYypeO/jQ1tWAGCng1sHRY4ehzYuBbUwzIojb1nOkmMBf5xNonW46iCUhoxPY3WLPBvEK826lFQAUq8xhawgNrE1muBqZJsFwVQWMAE8Vq0xIxv7a+rjhN38Z3Ezu3HQORgPO6G7VYSLjD9Gx92SJK8e//z15KFF3qJAgBmOZz+d5+ec8455+TSe18/mCw8NEAAPFvXGx9Z55yIiHPr79/suwq9d+fd0ImIc86JuFbrx5EvhwY7LndORCS9uPfo7HkNu7goQiWZXWhOn5wmpZB3M4JK6kTKleAKHVGSozAMKkCS6YiSSh4mjbiyUu4b03qjVpq98eMs3yLihCKj+lpUqvRzV0hRKkmlsjV8epaUKR2tO+co4kQoItJ1fx2Vutc9dCJ5F4mI7FPKO2JrNI+IjNrbjVLovP81s6aIk8HoaXc7KYXsZ40D5hhl8OjC5XNhKWQ2r0ym7k2423urgfLixu2sGZTKk/obVzq2AgRkZVKqnq502hZVoFcPEyU9VVVXl3vo//4aTVJIISmTqBaiktKBcapUVVXWrKkGfdNkjmhkjDcVoOGXJioYjf54uL1iyqDht7+3QdUsD/TRzb2Pdxc/lzAe9+xGM9/t//bLSQuFilIzsvN275VZaC6ag/o//MkVy4Iorqr0Pn7zg0tJsAyN7txn02R29My8o5+iCC/0crkCSm/3NyLmZizc0iIyVQAIbOdarxMUUP2r8wHpqXO+Kf0UmZ7BcOuLTbjIAsDDDQinxpr7VUQ2d2w5fLBZpHzsnV8MfuagLhx1OZjWSZpHupjnWUyLVdxJ84Y1uPa6kJSsRUmhZvdcZnD1kxyqAX6XuX1mKxSKyDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm+QsNjAcwUSSm2vBhYTIlAGk1xmQzinmZcfQ/40v+ffqYGLoAAAAASUVORK5CYII=</content>
     <filesize>959</filesize>

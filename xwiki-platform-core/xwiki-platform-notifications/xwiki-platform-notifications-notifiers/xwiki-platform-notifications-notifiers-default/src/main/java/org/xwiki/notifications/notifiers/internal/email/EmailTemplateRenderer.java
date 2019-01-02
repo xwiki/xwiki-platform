@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.Block;
@@ -93,9 +94,15 @@ public class EmailTemplateRenderer
             throws NotificationException
     {
         XWikiContext context = contextProvider.get();
+        DocumentReference currentUser = context.getUserReference();
         XWikiURLFactory originalURLFactory = context.getURLFactory();
         ScriptContext scriptContext = scriptContextManager.getScriptContext();
         try {
+            // Use the author of the template as current user so we can safely rely on the security system and we can
+            // make sure a wiki template written by a malicious user cannot access to more information than she should.
+            // Actually, templates should be using xwiki.getDocumentAsAuthor(), but many notifications templates does
+            // not and I don't want to break them.
+            context.setUserReference(template.getContent().getAuthorReference());
             // Bind the event to some variable in the velocity context
             scriptContext.setAttribute(EVENT_BINDING_NAME, event, ScriptContext.ENGINE_SCOPE);
             scriptContext.setAttribute(USER_BINDING_NAME, userId, ScriptContext.ENGINE_SCOPE);
@@ -120,6 +127,8 @@ public class EmailTemplateRenderer
             // Cleaning the velocity context
             scriptContext.removeAttribute(EVENT_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
             scriptContext.removeAttribute(USER_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
+            // Cleaning the current user
+            context.setUserReference(currentUser);
         }
     }
 

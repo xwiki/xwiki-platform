@@ -22,6 +22,7 @@ package org.xwiki.tool.utils;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -198,14 +199,14 @@ public class OldCoreHelper implements AutoCloseable
         this.xcontext.setWikiId(wikiId);
         this.xcontext.setMainXWiki(wikiId);
 
-        // Use a dummy Request/Response even in daemon mode so that XWiki's initialization can create a Servlet URL
-        // Factory and any code requiring those objects will work.
-        this.xcontext.setRequest(new XWikiServletRequestStub());
-        this.xcontext.setResponse(new XWikiServletResponseStub());
-
         // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
         // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.
-        this.xcontext.setURL(new URL("http://localhost/xwiki/bin/DummyAction/DumySpace/DummyPage"));
+        this.xcontext.setURL(new URL("http://localhost:8008/xwiki/bin/DummyAction/DumySpace/DummyPage"));
+
+        // Use a dummy Request/Response even in daemon mode so that XWiki's initialization can create a Servlet URL
+        // Factory and any code requiring those objects will work.
+        this.xcontext.setRequest(new XWikiServletRequestStub(this.xcontext.getURL(), "xwiki", Collections.emptyMap()));
+        this.xcontext.setResponse(new XWikiServletResponseStub());
 
         // Set a dummy Document in the context to act as the current document since when a document containing
         // objects is imported it'll generate Object diff events and the algorithm to compute an object diff

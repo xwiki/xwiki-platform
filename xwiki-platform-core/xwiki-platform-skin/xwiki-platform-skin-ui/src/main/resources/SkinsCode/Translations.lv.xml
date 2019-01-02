@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1426000188000</creationDate>
   <parent>SkinsCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1426004665000</date>
-  <contentUpdateDate>1426004665000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -42,22 +39,22 @@
   <content>skin.sheet.title=Apdare
 skin.sheet.properties=Apdares īpašības
 skin.sheet.deprecatedProperties=Novecojušas īpašības
-### Missing: skin.sheet.overriddenTemplates=Overridden templates
+skin.sheet.overriddenTemplates=Pārlabotās veidnes
 skin.sheet.addTemplate=Pievienot jaunu pārrakstītu veidni
 skin.sheet.add=Pievienot
 skin.sheet.overrideTemplateWarning=Šī sadaļa ļauj jums pārrakstīt apdares veidni. Šī ir tehniski sarežģīta lieta un jums ir jāsaprot, kādas var būt izmaiņu sekas.
-skin.sheet.deprecatedPropertiesWarning=Šī sadaļa ir tikai savietojamībai ar iepriekšējām versijām. Tā vietā jums būtu jāizmanto augstāk minētais 'pārrakstīt veidni' paņēmiens
+skin.sheet.deprecatedPropertiesWarning=Šī sadaļa ir tikai savietojamībai ar iepriekšējām versijām. Tā vietā jums būtu jāizmanto augstāk minētais 'pārrakstīt veidni' paņēmiens.
 skin.sheet.nojs=Jūs nevarat izmantot šo sadaļu bez JavaScript atbalsta. Bet tā vietā jūs varat izmantot {0}Objektu redaktoru{1} un pievienot manuāli {2} objektus.
 
 skin.sheet.js.deleting=Dzēšu...
-skin.sheet.js.deletingDone=Veidne ir izdzēsta\!
+skin.sheet.js.deletingDone=Veidne ir izdzēsta!
 skin.sheet.js.error.csrf=Neizdevās CSRF validācija. Mēģiniet vispirms atjaunot lapas saturu pārlūkprogrammā.
 skin.sheet.js.error.rights=Neizdevās saglabāt apdari jo jums nav nepieciešamo pieejas tiesību.
 skin.sheet.js.deleteConfirmationText=Vai tiešām vēlaties izdzēst šo veidni?
 skin.sheet.js.deleteConfirmationYes=Jā, izdzēst
 skin.sheet.js.deleteConfirmationNo=Nē, atcelt
 skin.sheet.js.adding=Pievieno...
-skin.sheet.js.addingDone=Veidne ir pievienota\!
+skin.sheet.js.addingDone=Veidne ir pievienota!
 
 ###############################################################################
 ## Deprecated

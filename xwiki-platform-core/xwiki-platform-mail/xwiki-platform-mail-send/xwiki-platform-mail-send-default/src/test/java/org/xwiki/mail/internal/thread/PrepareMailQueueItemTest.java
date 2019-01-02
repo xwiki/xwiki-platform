@@ -26,12 +26,12 @@ import java.util.UUID;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link PrepareMailQueueItem}.
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 public class PrepareMailQueueItemTest
 {
     @Test
-    public void verifyToString() throws Exception
+    public void verifyToString()
     {
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);

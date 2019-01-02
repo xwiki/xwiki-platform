@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1271083477000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1271850308000</date>
-  <contentUpdateDate>1271850308000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('invitation.applicationsPanelEntryLabel')</title>
   <comment/>
@@ -529,28 +526,54 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </commonPage>
     <emailClass>
+      <cache>0</cache>
+      <classname/>
+      <customDisplay/>
       <disabled>0</disabled>
+      <displayType>input</displayType>
+      <hint/>
+      <idField/>
+      <multiSelect>0</multiSelect>
       <name>emailClass</name>
       <number>5</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>Email message XClass</prettyName>
       <size>30</size>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </emailClass>
     <emailContainer>
+      <cache>0</cache>
+      <classname/>
+      <customDisplay/>
       <disabled>0</disabled>
+      <displayType>input</displayType>
+      <hint/>
+      <idField/>
+      <multiSelect>0</multiSelect>
       <name>emailContainer</name>
       <number>9</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>Document containing email XObjects</prettyName>
       <size>30</size>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <sort>none</sort>
+      <sql/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </emailContainer>
     <emailRegex>
       <disabled>0</disabled>
@@ -827,7 +850,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       <allow>1</allow>
     </property>
     <property>
-      <groups>XWiki.XWikiAllGroup,</groups>
+      <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
       <levels>view</levels>

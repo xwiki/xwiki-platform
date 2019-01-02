@@ -1,10 +1,19 @@
 #set ($title = "$!{pdfdoc.display('title', 'rendered', '', $pdfobj)}")
 #if ($title == '')
-  #if ($doc.space != $tdoc.plainTitle)
-    $!{escapetool.xml($doc.space)} - $!{escapetool.xml($tdoc.plainTitle)}
+  #set($pdfHeaderParentLabel = '')
+  #if ($doc.name == 'WebHome')
+    ## document is terminal, the parent is the previous last space in the list
+    #if("$!doc.documentReference.parent.parent.type" == 'SPACE')
+      #set($pdfHeaderParentRef = $doc.documentReference.parent.parent)
+      #set($pdfHeaderParentLabel = $xwiki.getDocument($pdfHeaderParentRef).plainTitle)
+    #end
   #else
-    $!{escapetool.xml($doc.space)}
+    ## document is not terminal, the parent is the last space in the list
+    #set($pdfHeaderParentRef = $doc.documentReference.getParent())
+    #set($pdfHeaderParentLabel = $xwiki.getDocument($pdfHeaderParentRef).plainTitle)
   #end
+  #if($pdfHeaderParentLabel != '')$!{escapetool.xml($pdfHeaderParentLabel)} - #{end}$!{escapetool.xml($tdoc.plainTitle)}
 #else
   $escapetool.xml($title)
 #end
+<hr style="border-width: 0.25pt"/>

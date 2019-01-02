@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1385047506000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1433258948000</date>
-  <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <comment/>
@@ -41,11 +38,13 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Solr Search Administration
 solr.admin.submit=Apply
+solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=You are not allowed to perform this action.
 solr.admin.error.norights=Administration rights are required to access this section.
+solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Status
-solr.admin.status.queueSize.label=Queue Size
+solr.admin.status.queueSize.label=Queue size
 solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
 
 solr.admin.indexing.title=Indexing
@@ -60,15 +59,17 @@ solr.admin.indexing.wiki.select_farm=Entire farm
 solr.admin.indexing.query.label=Custom query
 solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
 
+solr.admin.info.affectedDocuments=Affected documents in the index:
+
 solr.sortBy=Sort by:
 solr.sortBy.score=Relevance
 solr.sortBy.title_sort=Title
-solr.sortBy.date=Last Modification Date
-solr.sortBy.author_display_sort=Last Author
-solr.sortBy.filename_sort=File Name
-solr.sortBy.attsize_sort=File Size
-solr.sortBy.attdate_sort=Upload Date
-solr.sortBy.attauthor_display_sort=Uploaded By
+solr.sortBy.date=Last modification date
+solr.sortBy.author_display_sort=Last author
+solr.sortBy.filename_sort=File name
+solr.sortBy.attsize_sort=File size
+solr.sortBy.attdate_sort=Upload date
+solr.sortBy.attauthor_display_sort=Uploaded by
 solr.sortOrder.asc=Ascending
 solr.sortOrder.desc=Descending
 
@@ -90,7 +91,7 @@ solr.facets.hint=Select a category and activate filters on the current results
 solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
 solr.facets.collapseAll=Collapse all
-solr.facets.emptyValue=Empty Value
+solr.facets.emptyValue=Empty value
 solr.facets.moreValues={0} more
 
 solr.filterBy.type.document=Document
@@ -109,14 +110,14 @@ solr.filterBy.fileType.spreadsheet=Spreadsheet
 solr.filterBy.fileType.archive=Archive
 solr.filterBy.fileType.font=Font
 solr.filterBy.fileType.other=Other
-solr.facet.fileType.text.plain=Plain Text
+solr.facet.fileType.text.plain=Plain text
 solr.facet.fileType.text.javascript=JavaScript
-solr.facet.fileType.text.java-source=Java Source
+solr.facet.fileType.text.java-source=Java source
 solr.facet.fileType.text.sh=Shell Script
 solr.facet.fileType.image.icon=Icon
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
-solr.facet.fileType.other.octet-stream=Binary Data
+solr.facet.fileType.other.octet-stream=Binary data
 
 solr.facet.date.today=Today
 solr.facet.date.last7Days=Last 7 days
@@ -142,7 +143,7 @@ solr.facet.size.any=Any size
 
 solr.field.type=Result type
 solr.field.locale=Language
-solr.field.locale.emptyValue=No Language
+solr.field.locale.emptyValue=No language
 solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).
 solr.field.wiki=Wiki
 solr.field.spaces=Location
@@ -151,27 +152,27 @@ solr.field.space_facet=Location
 solr.field.name=Page
 solr.field.name_exact=Page
 solr.field.title=Title
-solr.field.author=Last Author
-solr.field.author_display=Last Author
+solr.field.author=Last author
+solr.field.author_display=Last author
 solr.field.creator=Creator
 solr.field.creator_display=Creator
-solr.field.date=Last Modification Date
-solr.field.creationdate=Creation Date
-solr.field.doccontent=Rendered Document Content
-solr.field.doccontentraw=Raw Document Content
-solr.field.class=Object Type
-solr.field.class.definedBy=Defined by {0} \u00BB {1}
-solr.field.propertyname=Property Name
-solr.field.propertyvalue=Property Value
-solr.field.filename=Attachment Name
-solr.field.attcontent=Attachment Content
+solr.field.date=Last modification date
+solr.field.creationdate=Creation date
+solr.field.doccontent=Rendered document content
+solr.field.doccontentraw=Raw document content
+solr.field.class=Object type
+solr.field.class.definedBy=Defined by {0} » {1}
+solr.field.propertyname=Property name
+solr.field.propertyvalue=Property value
+solr.field.filename=Attachment name
+solr.field.attcontent=Attachment content
 solr.field.comment=Comments
 solr.field.objcontent=Objects
-solr.field.mimetype=File Type
-solr.field.attauthor=Uploaded By
-solr.field.attauthor_display=Uploaded By
-solr.field.attdate=Upload Date
-solr.field.attsize=File Size
+solr.field.mimetype=File type
+solr.field.attauthor=Uploaded by
+solr.field.attauthor_display=Uploaded by
+solr.field.attdate=Upload date
+solr.field.attsize=File size
 
 solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
 solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?

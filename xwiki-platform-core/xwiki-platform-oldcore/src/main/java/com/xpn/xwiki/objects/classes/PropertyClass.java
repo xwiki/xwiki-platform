@@ -20,7 +20,6 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.Iterator;
-import java.util.List;
 
 import javax.script.ScriptContext;
 
@@ -36,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.stability.Unstable;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
@@ -281,7 +281,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             // dateFormat, multiSelect). It can be obtained from the XClass of the given object but only if the property
             // has been added to the XClass. We need to have it in the Velocity context for the use case when an XClass
             // property needs to be previewed before being added to the XClass.
-            scontext.setAttribute("field", new com.xpn.xwiki.api.PropertyClass(this, context), ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("field", new com.xpn.xwiki.api.PropertyClass(this, context),
+                ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("object", new com.xpn.xwiki.api.Object(object, context), ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("type", type, ScriptContext.ENGINE_SCOPE);
 
@@ -303,10 +304,17 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                     final String classSyntax = classDocument.getSyntax().toIdString();
                     // Using author reference since the document content is not relevant in this case.
                     DocumentReference authorReference = classDocument.getAuthorReference();
+                    if (authorReference == null && classDocument.isNew()) {
+                        // If the class document has not been saved yet (e.g. we could be previewing a class property in
+                        // the class editor) then use the context user as author (e.g. the user that is in the process
+                        // of creating the class).
+                        authorReference = context.getUserReference();
+                    }
 
                     // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. class
                     // document author).
-                    content = renderContentInContext(rawContent, classSyntax, authorReference, context);
+                    content = renderContentInContext(rawContent, classSyntax, authorReference,
+                        classDocument.getDocumentReference(), context);
                 } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
                     XWikiDocument displayerDoc = context.getWiki().getDocument(
                         StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
@@ -316,7 +324,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
                     // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. displayer
                     // document content author).
-                    content = renderContentInContext(rawContent, displayerDocSyntax, authorReference, context);
+                    content = renderContentInContext(rawContent, displayerDocSyntax, authorReference,
+                        displayerDoc.getDocumentReference(), context);
                 } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
                     content = context.getWiki().evaluateTemplate(
                         StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
@@ -335,12 +344,29 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Render content in the current document's context with the rights of the given user.
      * 
      * @since 8.3M2
+     * @deprecated since 10.11RC1, use
+     *             {@link #renderContentInContext(String, String, DocumentReference, DocumentReference, XWikiContext)}
+     *             instead
      */
-    protected String renderContentInContext(final String content, final String syntax, DocumentReference authorReference,
-        final XWikiContext context) throws Exception
+    @Deprecated
+    protected String renderContentInContext(final String content, final String syntax,
+        DocumentReference authorReference, final XWikiContext context) throws Exception
+    {
+        return renderContentInContext(content, syntax, authorReference, null, context);
+    }
+
+    /**
+     * Render content in the current document's context with the rights of the given user.
+     * 
+     * @since 10.11RC1
+     */
+    @Unstable
+    protected String renderContentInContext(final String content, final String syntax,
+        DocumentReference authorReference, DocumentReference secureDocument, final XWikiContext context)
+        throws Exception
     {
         return Utils.getComponent(AuthorExecutor.class)
-            .call(() -> context.getDoc().getRenderedContent(content, syntax, context), authorReference);
+            .call(() -> context.getDoc().getRenderedContent(content, syntax, context), authorReference, secureDocument);
     }
 
     @Override
@@ -435,6 +461,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
     /**
      * Set the text displayed in the object editor to help the user filling some content.
+     * 
      * @since 9.11RC1
      */
     public void setHint(String hint)

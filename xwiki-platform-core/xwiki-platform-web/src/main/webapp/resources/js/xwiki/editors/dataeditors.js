@@ -134,6 +134,7 @@ editors.XDataEditors = Class.create({
               },
               onComplete : function() {
                 item.disabled = false;
+                document.fire('xwiki:dom:refresh');
               },
               // IE converts 204 status code into 1223...
               on1223 : function(response) {
@@ -208,6 +209,7 @@ editors.XDataEditors = Class.create({
                   }.bind(this),
                   onComplete : function() {
                     item.disabled = false;
+                    document.fire('xwiki:dom:refresh');
                   }
                 },
                 /* Interaction parameters */
@@ -315,7 +317,7 @@ editors.XDataEditors = Class.create({
                 if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                   failureReason = 'Server not responding';
                 }
-                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.failed')" + failureReason, "error"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.failed') " + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;

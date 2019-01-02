@@ -22,8 +22,8 @@ package org.xwiki.rest.resources.classes;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides values for a class property.
@@ -32,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.8RC1
  */
 @Role
-@Unstable
 public interface ClassPropertyValuesProvider
 {
     /**
@@ -46,4 +45,18 @@ public interface ClassPropertyValuesProvider
      */
     PropertyValues getValues(ClassPropertyReference propertyReference, int limit, Object... filterParameters)
         throws XWikiRestException;
+
+    /**
+     * Resolves the given raw value into a {@link PropertyValue} of the specified class property.
+     *
+     * @param propertyReference the property to provide the value for
+     * @param rawValue raw value used to resolve the property value
+     * @return the property value based on the raw value or null if the raw value is empty
+     * @throws XWikiRestException if retrieving the property value fails
+     * @since 10.9
+     */
+    default PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
+        throws XWikiRestException {
+        throw new UnsupportedOperationException();
+    }
 }

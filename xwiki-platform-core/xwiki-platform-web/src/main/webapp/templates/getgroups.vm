@@ -1,80 +1,67 @@
-$response.setContentType("application/json")
-#set ($offset = $mathtool.toInteger($request.get('offset')))
-## offset starts from 0 in velocity and 1 in javascript
-#set( $off = $offset - 1 )
-#set ($limit = $mathtool.toInteger($request.get('limit')))
-
-#set( $rm = $xwiki.rightsmanager.groupsApi )
-
-#### get all the request parameters which are filters
-#set( $params = $request.getParameterMap() )
-#set( $keys = $params.keySet() )
-#set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo", "sort", "dir"] )
-#set( $docProps = ["fullName", "name"] )
+#set ($groupService = $xwiki.rightsmanager.groupsApi)
 #set ($filterMap = {})
-#set ($orderList = [])
-#foreach( $key in $keys )
-  #if(! $defaultKeys.contains( $key ) )
-     ## build the filters map
-     #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
-     #if( $docProps.contains( $key )) 
-        #set ($arr = [])
-        #set( $discard = $arr.add( $NULL ) ) ## this may be variable...
-        #set( $discard = $arr.add( "$value" ) )
-        #set( $discard = $filterMap.put("$key", $arr))
-        #set( $discard = $orderList.add( "$key" ))
-     #else
-        #set ($arr = [])
-        #set( $discard = $arr.add( "StringProperty" ) ) ## this may be variable...
-        #set( $discard = $arr.add( "$value" ) )
-        #set( $discard = $filterMap.put("$key", $arr))
-        #set ($arr2 = [])
-        #set( $discard = $arr2.add( "$key" ) )
-        #set( $discard = $arr2.add( "StringProperty" ) )
-        #set( $discard = $orderList.add( $arr2 ))
-     #end
-  #end
+#if ("$!request.name" != '')
+  #set ($filterMap.name = $request.name)
 #end
+#set ($limit = $mathtool.toInteger($request.limit))
+#set ($offset = $mathtool.toInteger($request.offset))
+## Sort by group page name.
+#set ($orderList = ['name'])
 
-#if($orderList.size() == 0)
-#set($disc = $orderList.add("name")) ## initially fiter by "name" !!!
-#end
-
-#foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
-#if( $value == "local" )
-  #set( $groups = $rm.getAllMatchedLocalGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countGroups = $rm.countAllMatchedLocalGroups( $filterMap ) )
-#elseif( $value == "global" )
-  #set( $groups = $rm.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countGroups = $rm.countAllMatchedGlobalGroups( $filterMap ) )
+## The live table offset starts from 1 so we need to subtract 1.
+#if ($request.wiki == 'local')
+  #set ($groups = $groupService.getAllMatchedLocalGroups($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
+  #set ($countGroups = $groupService.countAllMatchedLocalGroups($filterMap))
+#elseif ($request.wiki == 'global')
+  #set ($groups = $groupService.getAllMatchedGlobalGroups($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
+  #set ($countGroups = $groupService.countAllMatchedGlobalGroups($filterMap))
 #else
-  ## get both local and global groups
-  #set( $groups = $rm.getAllMatchedGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countGroups = $rm.countAllMatchedGroups( $filterMap ) )
+  ## Get both local and global groups.
+  #set ($groups = $groupService.getAllMatchedGroups($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
+  #set ($countGroups = $groupService.countAllMatchedGroups($filterMap))
 #end
 
-### json starts
-{
-"totalrows": $countGroups,
-"returnedrows": #if($countGroups < $limit) $countGroups #else $limit #end,
-"offset": $offset,
-"reqNo": $mathtool.toInteger($request.reqNo),
-"rows": [
-#foreach( $group in $groups )
-  #set($wikiname = $group.getWiki())
-  #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
-   #set( $grs = $xwiki.rightsmanager.getAllGroupsForUser( $group.fullName ) )
-   #if( $velocityCount > 1 ) , #end
-   {"username"      : "$!{escapetool.javascript($group.name)}", 
-    "fullname"      : "$!{escapetool.javascript($group.fullName)}",
-    "wikiname"      : "$!{escapetool.javascript($wikiname)}",
-    "members"       : "$xwiki.rightsmanager.countAllMembersNamesForGroup($group.fullName)", 
-    "userurl"       : "$xwiki.getURL($group.fullName)",
-    "usersaveurl"   : "$group.getURL('save')",
-    "userinlineurl" : "$group.getURL("edit", "xpage=plain")",
-    "docurl"        : "$xwiki.getURL("XWiki.XWikiPreferences", "admin", "section=Groups")"
-  }
+#set ($data = {
+  'totalrows': $countGroups,
+  'returnedrows': $mathtool.min($countGroups, $limit),
+  'offset': $offset,
+  'reqNo': $mathtool.toInteger($request.reqNo),
+  'rows': []
+})
+#foreach ($group in $groups)
+  #set ($wikiName = $group.wiki)
+  #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
+    #set ($wikiName = 'local')
+  #end
+  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
+  #set ($row = {
+    'username': $group.name,
+    'fullname': $group.fullName,
+    'wikiname': $wikiName,
+    'userurl': $group.getURL(),
+    'usersaveurl': $group.getURL('save'),
+    'userinlineurl': $group.getURL('edit', 'xpage=plain'),
+    'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Groups')
+  })
+  #if ($group.wiki == $xcontext.mainWikiName)
+    #set ($scope = 'global')
+  #else
+    #set ($scope = 'local')
+  #end
+  #set ($discard = $row.putAll({
+    'doc_fullName': $group.fullName,
+    'doc_wiki': $group.wiki,
+    'doc_url': $group.getURL(),
+    'doc_viewable': $services.security.authorization.hasAccess('view', $group.documentReference),
+    'doc_hasadmin': $xwiki.hasAdminRights(),
+    'doc_hasedit': $services.security.authorization.hasAccess('edit', $group.documentReference),
+    'doc_edit_url': $group.getURL('edit'),
+    'doc_hasdelete': $services.security.authorization.hasAccess('delete', $group.documentReference),
+    'doc_delete_url': $group.getURL('delete'),
+    'name': "#displayGroup($group.documentReference {'wrapAvatar': true})",
+    'members': $xwiki.rightsmanager.countAllMembersNamesForGroup($group.documentReference),
+    'scope': $services.localization.render("xe.admin.groups.$scope")
+  }))
+  #set ($discard = $data.rows.add($row))
 #end
-]}
-### end of json
-
+#jsonResponse($data)

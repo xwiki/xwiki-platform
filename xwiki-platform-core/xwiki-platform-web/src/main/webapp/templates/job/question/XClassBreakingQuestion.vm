@@ -1,0 +1,8 @@
+###
+### Template used to handle question of type XClassBreakingQuestion (display XClass that could be broken by a bad delete or move action).
+###
+#if ($request.qaction == 'data')
+  #template('job/question/XClassBreakingQuestion.data.vm')
+#else
+  #template('job/question/XClassBreakingQuestion.form.vm')
+#end

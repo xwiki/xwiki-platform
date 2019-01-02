@@ -20,15 +20,23 @@
 package org.xwiki.rest.internal.resources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Formatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.localization.LocalizationContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -37,6 +45,8 @@ import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.search.SearchSource;
+import org.xwiki.rest.model.jaxb.Hierarchy;
+import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
 import org.xwiki.rest.resources.objects.ObjectResource;
@@ -76,7 +86,10 @@ public class BaseSearchResult extends XWikiResource
 
     @Inject
     @Named("hidden/space")
-    private QueryFilter hiddenSpaceFilter;
+    private Provider<QueryFilter> hiddenSpaceFilterProvider;
+
+    @Inject
+    private LocalizationContext localizationContext;
 
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
@@ -84,10 +97,13 @@ public class BaseSearchResult extends XWikiResource
      * @param number number of results to be returned.
      * @param start 0-based start offset.
      * @param withPrettyNames true if the users are displayed with their full name
+     * @param isLocaleAware If true, fetches the documents with the best language (the one from the user
+     * or the default one from the document).
      */
     protected List<SearchResult> search(List<SearchScope> searchScopes, String keywords, String wikiName, String space,
         boolean hasProgrammingRights, int number, int start, boolean distinct, String orderField, String order,
-        Boolean withPrettyNames) throws IllegalArgumentException, UriBuilderException, QueryException, XWikiException
+        Boolean withPrettyNames, Boolean isLocaleAware) throws IllegalArgumentException, UriBuilderException,
+            QueryException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
 
@@ -100,7 +116,7 @@ public class BaseSearchResult extends XWikiResource
             List<SearchResult> result = new ArrayList<SearchResult>();
 
             result.addAll(searchPages(searchScopes, keywords, wikiName, space, hasProgrammingRights, number, start,
-                orderField, order, withPrettyNames));
+                orderField, order, withPrettyNames, isLocaleAware));
 
             if (searchScopes.contains(SearchScope.SPACES)) {
                 result.addAll(searchSpaces(keywords, wikiName, number, start));
@@ -125,22 +141,21 @@ public class BaseSearchResult extends XWikiResource
      * @param start 0-based start offset.
      * @param orderField the field to be used to order the results.
      * @param order "asc" or "desc"
+     * @param isLocaleAware If true, fetches the documents with the best language (the one from the user
+     * or the default one from the document).
      * @return the results.
      */
     protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,
         String space, boolean hasProgrammingRights, int number, int start, String orderField, String order,
-        Boolean withPrettyNames) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
+        Boolean withPrettyNames, Boolean isLocaleAware) throws QueryException, IllegalArgumentException,
+            UriBuilderException, XWikiException
     {
-        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
-
         String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            List<SearchResult> result = new ArrayList<SearchResult>();
-
             if (keywords == null) {
-                return result;
+                return new ArrayList<>();
             }
 
             Formatter f = new Formatter();
@@ -181,7 +196,20 @@ public class BaseSearchResult extends XWikiResource
                         acceptedScopes++;
                         break;
                     case TITLE:
-                        f.format("upper(doc.title) like :keywords ");
+                        f.format("(upper(doc.title) like :keywords");
+                        if (isLocaleAware) {
+                            f.format(" and (");
+                            f.format("(doc.language = :locale or"
+                                    + " (doc.language = '' and doc.defaultLanguage = :locale)) ");
+                            f.format("or (doc.language = :language or"
+                                    + " (doc.language = '' and doc.defaultLanguage = :language)) ");
+                            f.format("or (doc.language = '' and not exists("
+                                    + " from XWikiDocument as doc2"
+                                    + " where doc2.fullName = doc.fullName"
+                                    + " and (doc2.language = :locale or doc2.language = :language)))"
+                                    + ")");
+                        }
+                        f.format(") ");
                         acceptedScopes++;
                         break;
                 }
@@ -193,11 +221,11 @@ public class BaseSearchResult extends XWikiResource
 
             /* If we don't find any scope related to pages then return empty results */
             if (acceptedScopes == 0) {
-                return result;
+                return new ArrayList<>();
             }
 
             /* Build the order clause. */
-            String orderClause = null;
+            String orderClause;
             if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
@@ -211,84 +239,130 @@ public class BaseSearchResult extends XWikiResource
 
             // Add ordering
             f.format(") order by %s", orderClause);
+            String queryString = f.toString();
 
-            String query = f.toString();
+            Query query = this.queryManager.createQuery(queryString, Query.HQL)
+                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start)
+                    // Worst case scenario when making the locale aware query:
+                    // e.g.: Search matches a document translated in fr_CA and fr
+                    .setLimit(number * 2);
 
-            List<Object> queryResult = null;
-
-            /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
             if (space != null) {
-                queryResult =
-                    this.queryManager.createQuery(query, Query.XWQL)
-                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
-                        .bindValue("space", space).addFilter(Utils.getHiddenQueryFilter(this.componentManager))
-                        .setOffset(start).setLimit(number).execute();
-            } else {
-                queryResult =
-                    this.queryManager.createQuery(query, Query.XWQL)
-                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
-                        .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start).setLimit(number)
-                        .execute();
+                query.bindValue("space", space);
             }
 
-            for (Object object : queryResult) {
-                Object[] fields = (Object[]) object;
-
-                String spaceId = (String) fields[1];
-                List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
-                String pageName = (String) fields[2];
-                String language = (String) fields[3];
-
-                String pageId = Utils.getPageId(wikiName, spaces, pageName);
-                String pageFullName = Utils.getPageFullName(wikiName, spaces, pageName);
-
-                /* Check if the user has the right to see the found document */
-                if (xwikiApi.hasAccessLevel("view", pageId)) {
-                    Document doc = xwikiApi.getDocument(pageFullName);
-                    String title = doc.getDisplayTitle();
-                    SearchResult searchResult = objectFactory.createSearchResult();
-                    searchResult.setType("page");
-                    searchResult.setId(pageId);
-                    searchResult.setPageFullName(pageFullName);
-                    searchResult.setTitle(title);
-                    searchResult.setWiki(wikiName);
-                    searchResult.setSpace(spaceId);
-                    searchResult.setPageName(pageName);
-                    searchResult.setVersion(doc.getVersion());
-                    searchResult.setAuthor(doc.getAuthor());
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(doc.getDate());
-                    searchResult.setModified(calendar);
-
-                    if (withPrettyNames) {
-                        searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthorReference(), componentManager));
-                    }
-
-                    String pageUri = null;
-                    if (StringUtils.isBlank(language)) {
-                        pageUri =
-                            Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaces,
-                                pageName).toString();
-                    } else {
-                        searchResult.setLanguage(language);
-                        pageUri =
-                            Utils.createURI(this.uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
-                                spaces, pageName, language).toString();
-                    }
-
-                    Link pageLink = new Link();
-                    pageLink.setHref(pageUri);
-                    pageLink.setRel(Relations.PAGE);
-                    searchResult.getLinks().add(pageLink);
-
-                    result.add(searchResult);
-                }
+            // Search only pages translated in the user locale (e.g. fr_CA)
+            if (isLocaleAware && searchScopes.contains(SearchScope.TITLE)) {
+                Locale userLocale = localizationContext.getCurrentLocale();
+                query.bindValue("locale", userLocale.toString());
+                query.bindValue("language", userLocale.getLanguage());
             }
 
-            return result;
+            return getPagesSearchResults(query.execute(), wikiName, withPrettyNames, number, isLocaleAware);
         } finally {
             Utils.getXWikiContext(componentManager).setWikiId(database);
         }
+    }
+
+    /**
+     * Process the results of the query made by {@link #searchPages}
+     *
+     * @param queryResult results of the {@link #searchPages} query
+     * @param wikiName the wiki name
+     * @param withPrettyNames render the author name
+     * @param limit the maximum number of results
+     * @param withUniquePages add pages only once
+     * @return the list of {@link SearchResult}
+     * @throws XWikiException
+     */
+    protected List<SearchResult> getPagesSearchResults(List<Object> queryResult, String wikiName,
+            Boolean withPrettyNames, int limit, Boolean withUniquePages) throws XWikiException
+    {
+        List<SearchResult> result = new ArrayList<>();
+        Set<String> seenPages = new HashSet<>();
+        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+
+        for (Object object : queryResult) {
+            // Stop if there's a limit specified and we reach it.
+            if (limit > 0 && result.size() >= limit) {
+                break;
+            }
+
+            Object[] fields = (Object[]) object;
+
+            String spaceId = (String) fields[1];
+            List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
+            String pageName = (String) fields[2];
+            String language = (String) fields[3];
+
+            String pageId = Utils.getPageId(wikiName, spaces, pageName);
+            String pageFullName = Utils.getPageFullName(wikiName, spaces, pageName);
+
+            if (withUniquePages && seenPages.contains(pageFullName)) {
+                continue;
+            }
+            seenPages.add(pageFullName);
+
+            /* Check if the user has the right to see the found document */
+            if (xwikiApi.hasAccessLevel("view", pageId)) {
+                Document doc = xwikiApi.getDocument(pageFullName).getTranslatedDocument();
+                String title = doc.getDisplayTitle();
+                SearchResult searchResult = objectFactory.createSearchResult();
+                searchResult.setType("page");
+                searchResult.setId(pageId);
+                searchResult.setPageFullName(pageFullName);
+                searchResult.setTitle(title);
+                searchResult.setWiki(wikiName);
+                searchResult.setSpace(spaceId);
+                searchResult.setPageName(pageName);
+                searchResult.setVersion(doc.getVersion());
+                searchResult.setAuthor(doc.getAuthor());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(doc.getDate());
+                searchResult.setModified(calendar);
+
+                if (withPrettyNames) {
+                    searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthorReference(), componentManager));
+                }
+
+                String pageUri;
+                if (StringUtils.isBlank(language)) {
+                    pageUri = Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaces, pageName)
+                            .toString();
+                } else {
+                    searchResult.setLanguage(language);
+                    pageUri = Utils.createURI(this.uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
+                            spaces, pageName, language).toString();
+                }
+
+                Link pageLink = new Link();
+                pageLink.setHref(pageUri);
+                pageLink.setRel(Relations.PAGE);
+                searchResult.getLinks().add(pageLink);
+
+                Hierarchy hierarchy = new Hierarchy();
+                for (EntityReference entityReference : doc.getDocumentReference().getReversedReferenceChain()) {
+                    HierarchyItem hierarchyItem = new HierarchyItem();
+                    if (Arrays.asList(EntityType.SPACE, EntityType.DOCUMENT).contains(entityReference.getType())) {
+                        Document document = xwikiApi.getDocument(entityReference).getTranslatedDocument();
+                        hierarchyItem.setLabel(document.getPlainTitle());
+                        hierarchyItem.setUrl(xwikiApi.getURL(document.getDocumentReferenceWithLocale()));
+                    } else {
+                        hierarchyItem.setLabel(entityReference.getName());
+                        hierarchyItem.setUrl(xwikiApi.getURL(entityReference));
+                    }
+                    hierarchyItem.setName(entityReference.getName());
+                    hierarchyItem.setType(entityReference.getType().getLowerCase());
+                    hierarchy.withItems(hierarchyItem);
+                }
+                searchResult.setHierarchy(hierarchy);
+
+                result.add(searchResult);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -318,7 +392,7 @@ public class BaseSearchResult extends XWikiResource
             .bindValue("keywords", String.format("%%%s%%", escapedKeywords))
             .bindValue("prefix", String.format("%s%%", escapedKeywords))
             .setWiki(wikiName).setLimit(number).setOffset(start)
-            .addFilter(this.hiddenSpaceFilter).execute();
+            .addFilter(this.hiddenSpaceFilterProvider.get()).execute();
 
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
         for (Object object : queryResult) {
@@ -347,7 +421,7 @@ public class BaseSearchResult extends XWikiResource
                 if (spaceDoc != null && !spaceDoc.isNew()) {
                     Link pageLink = new Link();
                     pageLink.setHref(Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces,
-                        spaceDoc.getName()).toString());
+                        spaceDoc.getDocumentReference().getName()).toString());
                     pageLink.setRel(Relations.HOME);
                     searchResult.getLinks().add(pageLink);
                 }

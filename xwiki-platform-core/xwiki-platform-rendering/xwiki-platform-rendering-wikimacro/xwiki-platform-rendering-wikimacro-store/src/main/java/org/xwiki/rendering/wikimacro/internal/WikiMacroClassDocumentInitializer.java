@@ -23,15 +23,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.wiki.internal.AbstractAsyncClassDocumentInitializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Update XWiki.XWikiComments document with all required informations.
+ * Update XWiki.WikiMacroClass document with all required informations.
  * 
  * @version $Id$
  * @since 4.3M1
@@ -39,7 +39,8 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named(WikiMacroConstants.WIKI_MACRO_CLASS)
 @Singleton
-public class WikiMacroClassDocumentInitializer extends AbstractMandatoryClassInitializer implements WikiMacroConstants
+public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumentInitializer
+    implements WikiMacroConstants
 {
     private static final String PROPERTY_PIPE = "|";
 
@@ -70,5 +71,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractMandatoryClassIni
             "Content description (Not applicable for \"No content\" type)", 40, 5, TextAreaClass.ContentType.PURE_TEXT);
         // The code property contains wiki markup
         xclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20, TextAreaClass.EditorType.TEXT);
+
+        super.createClass(xclass);
     }
 }

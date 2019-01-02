@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1378723528000</creationDate>
   <parent>XWiki.SearchCode</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1392296157000</date>
-  <contentUpdateDate>1392296157000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Suggestion Service</title>
   <comment/>
@@ -81,8 +78,7 @@
 #if ("$!request.query" != '' &amp;&amp; "$!request.input" != '')
   #getSearchSuggestResults($results)
   #if ($request.media == 'json' || $request.getHeader('Accept') == 'application/json')
-    #set ($discard = $response.setContentType('application/json'))
-    $jsontool.serialize($results)
+    #jsonResponse($results)
   #else
     #serializeResultsAsXML($results)
   #end

@@ -65,7 +65,6 @@ public class XWikiCachingRightService implements XWikiRightService
     static {
         ACTION_MAP
             .putAction(LOGIN_ACTION, Right.LOGIN)
-            .putAction("imagecaptcha", Right.LOGIN)
             .putAction("view", Right.VIEW)
             .putAction(DELETE_ACTION, Right.DELETE)
             .putAction("distribution", Right.VIEW)

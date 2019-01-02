@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 
 /**
  * Base class for {@link ClassPropertyValuesProvider} implementations.
- * 
+ *
  * @param <T> the property type
  * @version $Id$
  * @since 9.8
@@ -55,6 +55,12 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
     protected static final String META_DATA_COUNT = "count";
 
     protected static final String META_DATA_ICON = "icon";
+
+    protected static final String META_DATA_HINT = "hint";
+
+    protected static final String META_DATA_URL = "url";
+
+    protected static final String TEXT_FILTER = "text";
 
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
@@ -88,6 +94,13 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         }
     }
 
+    @Override
+    public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
+        throws XWikiRestException
+    {
+        return this.getValueFromQueryResult(rawValue, getPropertyDefinition(propertyReference));
+    }
+
     @SuppressWarnings("unchecked")
     protected T getPropertyDefinition(ClassPropertyReference propertyReference) throws XWikiRestException
     {
@@ -119,9 +132,35 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         }
         if (!StringUtils.isEmpty(filter)) {
             query.addFilter(this.textFilter);
-            query.bindValue("text").anyChars().literal(filter).anyChars();
+            query.bindValue(TEXT_FILTER).anyChars().literal(filter).anyChars();
         }
         return getValuesFromQueryResults(query.execute(), propertyDefinition);
+    }
+
+    /**
+     * Execute the given query and create a {@see PropertyValue} with the first result (null if no results).
+     *
+     * @param query the query to execute
+     * @param filter the text filter
+     * @param propertyDefinition the property definition
+     * @return value of {@see getValueFromQueryResult} with the first query result or null if no results.
+     * @throws QueryException if an error occured during the query execution
+     */
+    protected PropertyValue getValue(Query query, String filter, T propertyDefinition) throws QueryException
+    {
+        PropertyValue propertyValue = null;
+
+        if (!StringUtils.isEmpty(filter)) {
+            query.addFilter(this.textFilter);
+            query.bindValue(TEXT_FILTER).literal(filter);
+        }
+
+        List<T> result = query.execute();
+        if (!result.isEmpty()) {
+            propertyValue = getValueFromQueryResult(result.get(0), propertyDefinition);
+        }
+
+        return propertyValue;
     }
 
     protected abstract PropertyValues getAllowedValues(T propertyDefinition, int limit, String filter) throws Exception;

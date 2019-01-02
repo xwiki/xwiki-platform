@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1349094183000</creationDate>
   <parent>XWiki.SearchAdmin</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1351958422000</date>
-  <contentUpdateDate>1351958422000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("solr.admin.title")</title>
   <comment/>
@@ -169,18 +166,18 @@
   ##
   #set ($exception = $xcontext.lastexception)
   #if ("$!exception" != '')
-    #set ($message = "$stringtool.capitalize($request.action) failed: $exception.message ($exception.class)")
+    #set ($message = "$services.localization.render('solr.admin.error.action', $stringtool.capitalize($request.action)) $exception.message ($exception.class)")
     #if ($isAjaxRequest)
       $response.sendError(500, $message)
     #else
       {{error}}$message{{/error}}
     #end
   #elseif (!$isAjaxRequest)
-    {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully triggered.{{/success}}
+    {{success}}$services.localization.render('solr.admin.success.action', $escapetool.xml($stringtool.capitalize($request.action))){{/success}}
     ## Only administrators with programmings rights are allowed to execute a custom query.
     #if ($hasProgramming &amp;&amp; !$stringtool.isBlank($request.customQuery))
 
-      {{info}}Affected documents in the index: $targetReferences{{/info}}
+      {{info}}$services.localization.render('solr.admin.info.affectedDocuments') $targetReferences{{/info}}
     #end
 
     #displaySolrAdminSection()

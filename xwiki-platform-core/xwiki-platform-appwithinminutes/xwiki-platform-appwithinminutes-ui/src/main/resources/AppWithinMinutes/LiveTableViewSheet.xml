@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1321357813000</creationDate>
   <parent>AppWithinMinutes.LiveTableClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1514830438000</date>
-  <contentUpdateDate>1514830438000</contentUpdateDate>
   <version>1.1</version>
   <title>#sheetTitle('LiveTable View Sheet' $doc.fullName.equals('AppWithinMinutes.LiveTableViewSheet'))</title>
   <comment/>
@@ -157,8 +154,8 @@
 {{/velocity}}</content>
   <attachment>
     <filename>locate.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1514830438000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAoxJREFUeNqMUztrFFEU/u48NyZr3I0iKMFHY2BBhaRVbLRUUoiNRLRctBQDYZNCBX+DohbBQtAQBcFCwbS6iykiIihEG0Uxu5OZyezM3Ifn3tlkt/TCuY8z537nO9+5w+r1OpRSSNMUjUYDcRwjz/NlKeUF7QdjfdPnntEJzLJeMA2gB+ccSZJgYWEBURSpYxMTUJYFuC4U+kNfpAyAlPi8tgZLn3Umi4J93zcsHMeBJN+vToCNxUVwyi7I9Lqx+MT4iaEBtmizzHmuiLYSQmhfkZCC3fIIyjMzJq3yPLOWZy4bv2KGC5ycar1y9Rp8zzeOLMtMdqJETFxDWbmeKcXg0nfHL4HlWQEQlXx0qJKH9x+QKDYE6XB79iYRIAasRycrgvWqz9rPtkXhWoL5eSUGNP7w7avqcq4CKqmztKQC8m1bZ2VFBfStm6aq2WwqJyaQXWmOfGwf0bZhhyGE7YPZNlxCxfR0ATvYCRLQJqFNCZIm8acLZY8SbduIVX32Gq2z54p2aboWTZ5uqX4XQisPi8rZDMN3bPPNpCrXjgNBU0cSGqVNqWYtEgVCkVWnsPVlFez8OvzZOXTu3cUYMEW5Ow42KaBECrMDBT/TSNlXRDuGqxDfd8PyKpCCQ0v6G2j9aLepBIEwevu+7EDAYzn1IzcAQkikXIJrjNI6WEC6lIch4y0tPHTpBysVOHsufjxNe1snv3TjTnP8zHX8bIdIMoHn9UPYflnZ/sPAiA8rCsxl9ECc7OXJVddPcPRxA5/+xjgxlCApdeGYPEW/tdk+wYyOwKJ3Igc7ol7VMP7oFvYOxfRAcqUkN/SjJMfTuVMIMwVeqeJIrbbzU/VA2c7PNTAm8f+jpad/AgwABu5JtlhhRBEAAAAASUVORK5CYII=</content>

@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -37,6 +38,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -47,7 +49,6 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -80,6 +81,9 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private MacroManager macroManager;
+    
+    @Inject
+    private MacroIdFactory macroIdFactory;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -258,7 +262,6 @@ public class RenderingScriptService implements ScriptService
      * @throws MacroLookupException if a macro component descriptor cannot be loaded
      * @since 9.7RC1
      */
-    @Unstable
     public List<MacroDescriptor> getMacroDescriptors(Syntax syntax) throws MacroLookupException
     {
         List<MacroDescriptor> macroDescriptors = new ArrayList<>();
@@ -266,6 +269,41 @@ public class RenderingScriptService implements ScriptService
             macroDescriptors.add(this.macroManager.getMacro(id).getDescriptor());
         }
         return macroDescriptors;
+    }
+
+    /**
+     * @param macroIdAsString a string representing a macro id
+     * @return the resolved macro id or {@code null} if resolving the given string fails
+     * @since 10.10RC1
+     */
+    @Unstable
+    public MacroId resolveMacroId(String macroIdAsString)
+    {
+        try {
+            return this.macroIdFactory.createMacroId(macroIdAsString);
+        } catch (ParseException e) {
+            this.logger.warn("Failed to resolve macro id [{}]. Root cause is: [{}]", macroIdAsString,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
+    }
+
+    /**
+     * @param macroId the macro id
+     * @return the descriptor of the specified macro if it exists, {@code null} otherwise
+     * @since 10.10RC1
+     */
+    @Unstable
+    public MacroDescriptor getMacroDescriptor(MacroId macroId)
+    {
+        if (this.macroManager.exists(macroId)) {
+            try {
+                return this.macroManager.getMacro(macroId).getDescriptor();
+            } catch (MacroLookupException e) {
+                // Shouldn't happen normally.
+            }
+        }
+        return null;
     }
 
     private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException

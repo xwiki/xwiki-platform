@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1413881393000</creationDate>
   <parent>Panels.ApplicationsPanel</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1413991026000</date>
-  <contentUpdateDate>1413990747000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.name == 'ApplicationsPanelConfigurationSheet')ApplicationsPanelConfiguration Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
   <comment/>

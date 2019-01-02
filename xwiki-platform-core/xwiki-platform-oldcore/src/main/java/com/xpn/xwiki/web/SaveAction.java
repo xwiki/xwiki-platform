@@ -277,7 +277,8 @@ public class SaveAction extends PreviewAction
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
 
-        CreateRequest request = refactoring.createCreateRequest(Arrays.asList(entityReference));
+        CreateRequest request = refactoring.getRequestFactory().createCreateRequest(Arrays.asList(entityReference));
+        request.setCheckAuthorRights(false);
         // Set the target document.
         request.setEntityReferences(Arrays.asList(entityReference));
         // Set the template to use.

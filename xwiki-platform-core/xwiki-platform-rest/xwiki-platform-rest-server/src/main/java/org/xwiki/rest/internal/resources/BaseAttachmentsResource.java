@@ -262,8 +262,8 @@ public class BaseAttachmentsResource extends XWikiResource
 
         for (com.xpn.xwiki.api.Attachment xwikiAttachment : ri) {
             URL url = Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(
-                xwikiAttachment.getFilename(), doc.getSpace(), doc.getName(), "download", null, doc.getWiki(),
-                Utils.getXWikiContext(componentManager));
+                xwikiAttachment.getFilename(), doc.getSpace(), doc.getDocumentReference().getName(), "download", null,
+                doc.getWiki(), Utils.getXWikiContext(componentManager));
             String attachmentXWikiAbsoluteUrl = url.toString();
             String attachmentXWikiRelativeUrl = Utils.getXWikiContext(componentManager).getURLFactory().getURL(url,
                 Utils.getXWikiContext(componentManager));
@@ -300,7 +300,7 @@ public class BaseAttachmentsResource extends XWikiResource
         Utils.getXWiki(componentManager).saveDocument(xwikiDocument, xcontext);
 
         URL url = Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(attachmentName,
-            doc.getSpace(), doc.getName(), "download", null, doc.getWiki(), xcontext);
+            doc.getSpace(), doc.getDocumentReference().getName(), "download", null, doc.getWiki(), xcontext);
         String attachmentXWikiAbsoluteUrl = url.toString();
         String attachmentXWikiRelativeUrl = xcontext.getURLFactory().getURL(url, xcontext);
 

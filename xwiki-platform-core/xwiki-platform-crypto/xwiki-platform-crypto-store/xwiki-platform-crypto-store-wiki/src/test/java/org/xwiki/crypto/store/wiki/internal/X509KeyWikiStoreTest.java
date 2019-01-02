@@ -41,6 +41,7 @@ import org.xwiki.crypto.store.KeyStore;
 import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.WikiStoreReference;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -127,7 +128,9 @@ public class X509KeyWikiStoreTest
     @Before
     public void setUp() throws Exception
     {
-        EntityReferenceProvider valueProvider = mock(EntityReferenceProvider.class);
+        this.mocker.registerMockComponent(EntityReferenceProvider.class, "default");
+
+        EntityReferenceProvider valueProvider = this.mocker.registerMockComponent(EntityReferenceProvider.class, "current");
         when(valueProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
         when(valueProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
         when(valueProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DOCUMENT_REFERENCE);

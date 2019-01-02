@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1203938786000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1203938786000</date>
-  <contentUpdateDate>1203938786000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -43,8 +40,8 @@
 </content>
   <attachment>
     <filename>arrowup.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1256566820000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQAMQaAKmpqff392JiYqWlpbKysnFxcYaGhpmZmX9/f46Ojnp6evHx8aKiovT09KGhoa+vr5eXl4SEhGlpaaurq/j4+IKCgu3t7bGxsaampqioqP///wAAAAAAAAAAAAAAAAAAACH5BAEAABoALAAAAAAQABAAAAUtoCaOZGmeaKqubLtSRMMGwAQtaoBl14FYKcfgAWAYKqlERFGQCASuqHRKLYUAADs=</content>
@@ -52,8 +49,8 @@
   </attachment>
   <attachment>
     <filename>attach.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251898026000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQAOZKAPPz8/X19ZKSktfX16+vr6WlpfDw8LS0tOTk5KysrF1dXWhoaJ6ent/f3/n5+Xp6eu/v76mpqaurq/r6+ufn55ubm+jo6PLy8vf3983NzZCQkLOzs5SUlKqqqmZmZnBwcIeHh15eXqOjo5iYmLm5udXV1aamppycnGlpaYyMjGJiYp2dnXFxcfb29o6Ojurq6qenp8rKys/Pz+bm5qSkpK6uroGBge3t7cLCwrKysmFhYbe3t9bW1ltbW42NjVZWVra2tpGRkbi4uFdXV4mJiYSEhJaWlrCwsKGhoZeXl////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAEoALAAAAAAQABAAAAeNgEqCg4SFhoQBBR0IFIeDADQiSQUuO44BJhsrPEoNKIcYBUcSA4IIC4YtFTU5JQ4+CSAKhQAnBAcxAUQRFR4GhAYMQAcZEw8wAiE3hBcMQiQDxgkaQxaEEEYESkg2HxJBPwGFDQIAghE4HDoXhhZF5kozKSoQhw4jAhQDCwovjkoYZLDoQQDev4MIHQUCADs=</content>
@@ -61,8 +58,8 @@
   </attachment>
   <attachment>
     <filename>boolean.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAFFQTFRFVVVVvr6+vr6+VVVVYWFhaWlpgYGBgoKCmpqanZ2doqKiqKioq6ursbGxtbW1vr6+wsLCzMzM1NTU1tbW2tra5ubm5+fn6Ojo6urq+Pj4////CxNS8gAAAAN0Uk5TAFd3we3r0gAAAAFiS0dEGnVn5DIAAABaSURBVBhXjc9LFkAwDEDRVCooGr8i3f9CDThpy8Qb3tkD+JHhVAUAwKcW+AZ52mMJA5XgaC3A4SwKnZcNnSj0iBPVSwJpLWIjGRyTxTEHEU8hQYgav18MfLoAP+0Mba1JB3cAAAAASUVORK5CYII=</content>
@@ -70,8 +67,8 @@
   </attachment>
   <attachment>
     <filename>class.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251897880000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQAOZRAO7u7ufn5+7u7+Xl5eXl5uvs7LbD23mi2Onp6Yyhxlp8svT19WaLwHag1XWe1PHw8fHx8ezs7G6Uynmj2WiOw/Ly8vX09GCFuvDx8fX19ebl5fT19JK03uXm5WSIvl+DuXOc0e/u7ubm5nCRwebm5Xqm3PPz81x+tVh6sO/v7nOd0nKaz3CZzm+Wy2OHvYat3fHx8Fd5rmyUyVNzqezr7F6Bt2ySyGGFu1FyqVR1q4Cex1R1rFZ2re7v7lFxqefn6FNzqlh7sfT09G+XzHqk21x+tObl5nqk2urq6fPy8u/v71iD0vb29pK56Hun3MPDw////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAFEALAAAAAAQABAAAAeqgFGCg4SFUQYcTiVHBw0OKissLTI6BlEvTZmam5ojUU6goaKiDFFETKipqqkuURMZCxtCC0+1tk8WF1EHFUu+SU9QwsMmNVENGA8wDxDBw8IQJ1EOAkoCAj0AKQDcAgAhClEgEQUFETS3tgUoUUMIvksIzs9IO1ESAT8B+/PDAUBRbBAYoGHAgIEEOoggQMIIjigJKDDwcONDEQVBYvDIMcNHAkMgQ4ocFAgAOw==</content>
@@ -79,8 +76,8 @@
   </attachment>
   <attachment>
     <filename>date.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAANVQTFRFAAAAAAAAAAAAAAAAAAAAAAAAAAAAPkA7QkRAVlZUY2ZiUFFOVlhVLjQ2Mjg6OD5AOT5AO0BCQEZIQUdISlBSTFFTTVJUVVdTYWNfY2VhZGZiaGpmbnBsfH55gYSFiIqFk5WRlZeYm5yaoKKjqquosLGusLKzuLm3wsPBwsTEw8TCxcbGyMjIyMnKycnKysrJysvKzc7Nzs/O0tLS1tbW2dnZ39/f4ODg4eHh4uLi4+Pi4+Pj5OTk5ubm5+fn6enp7Ozs7u7u8fHx8/Pz+/v6/f39////CEMQGwAAAA10Uk5TAAEEBgcZInR/obzN4e9mYq4AAAABYktHREYXuvntAAAApUlEQVQYGU3K1RLCQBBE0UGDLe62uDtLCITGM///SWwKy63ql1NNRNEYUUS+R0SG9GYQSZYTZqkcR4/1UUMLkPKohzeoHaDUSU+50GCc5s1DITs4n8ENF24oCrM9ywObL5jCHOe6wNKFGgMakosp1iOu/SCTTn2gwrDtvW1Z1vbhPCtEVcblertjsxo++p2qC/96dQ2Jsrc4kU/I0i8R8FNQeAuHXlN6JUhQmxb+AAAAAElFTkSuQmCC</content>
@@ -88,8 +85,8 @@
   </attachment>
   <attachment>
     <filename>dblist.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAARdQTFRFAAAAAAAAPj08LS0sPj08AAAAJCQjLy8uAAAADw8PDw8OGhoZDg4OGRkYGBgYICAfKCcmICAfJiYlDAwMFhYVAAAACwsLCwsLFBQUHBsbTU1MPz8/QUFAS0pJUVFQUVFSVlVVVlZVV1dWWFdWWFhXWVlaX19eYWFhYmJiZGRkampqa2pra2trcXFxdXV0dXV1dnZ3eHh3eHh4eXl4fHx8f39/goKCg4ODhoaGhoeGh4eHiIiIi4qLi4uKjIyMjY6Nj4+PkpGRk5OTk5SUlJOUl5eXmJiYmpqanJybnJycnZ2dn5+fn5+goKCgo6Ojqqqqq6urrKytra2trq6ur66ur7CwsLCwsbGxs7OztLS0tbW1tra2////uBxEHwAAABt0Uk5TABUwQVdakri7u8PIy87V2trd4eXq9/n6+/v9SHrJtQAAAAFiS0dEXOrYAJcAAACmSURBVBjTY2DABlg5hcXFhTlZoVxGHoOgsNDgIG0ZHkawAJdnkL+bs4ONpZkmF1hALDLIw9XJwdYiwEQSLMBhHhEdHRUV6acnyw8R0DDwdXG0N9ZSUoYIiAabqivKySmo2LnDtAT6h4eFBHl76QpBBHTAWqz0VTWEoFqsDEFa1IzcpSDuMPcBWgLWwgtxKZ+8NViLtCAzxO1MbNwiEhIiAuwsDMQAAP6VG/BAKg3xAAAAAElFTkSuQmCC</content>
@@ -97,8 +94,8 @@
   </attachment>
   <attachment>
     <filename>dbtreelist.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAA9QTFRFAAAASklFZGNdfX19////cjDIJwAAAAF0Uk5TAEDm2GYAAAABYktHRASPaNlRAAAAMUlEQVQImWNgFBQUYAABRmMjKMNICcqASTEwMzBgMiDSzMbGhmCdzDCdCCkidKHbBwBPMQUO9pa2vwAAAABJRU5ErkJggg==</content>
@@ -106,8 +103,8 @@
   </attachment>
   <attachment>
     <filename>document.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251108275000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQANU6APr6+vX19d/f38vLy9TU1Pf39/39/fb29sPDw+Li4sLCwvPz88bGxsjIyOrq6vHx8cDAwLS0tLq6uvT09MXFxezs7Obm5ufn57Gxsc3NzcfHx6+vr729vc7OzsrKyvDw8Ly8vPLy8unp6b6+vtbW1tPT09vb29XV1dnZ2e/v76qqqqWlpe3t7aysrNfX17i4uOPj466urt3d3c/Pz/j4+Pn5+fv7+8nJyczMzPz8/P///wAAAAAAAAAAAAAAAAAAACH5BAEAADoALAAAAAAQABAAAAaYQB0MdysaiwKDbqnD0Wy5qJSmSDJvtklg+0iJcheEVXfLFWqFwuLjyB0mFMGyXINIIhvVSpq7zXNQgDQBDxUOFn1/ORoKIy8RGDEtLIlkfFE2NAcLIZVlOR0eDAgQHCASB56XmDU1NKo5JCUzGQMNDQyvfpZSNjYAwMCwMiYoLicEyVC7n6t8uwM1zlI1OEsJA0faNzgJOkEAOw==</content>
@@ -115,8 +112,8 @@
   </attachment>
   <attachment>
     <filename>groups.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAJiS0dEAP+Hj8y/AAABiUlEQVQYGQXBwUuTcQAA0PfNnxOlLdKD0kC0DhazJANBKkyog5JRIUGeOgd2qU516NCx+iMEI4qCQgpKoUPrInYSijIUYYHg1tShTPft670AAHB2bPLesROV7ddv558rEwCAo7cevDgjEeWGHj4ZeHNdPQAjqUxmI16s5ae3LUjQ4viV9qnyTID84OTj/HmNwvfF/q8OiSTqqrKD5ZnA4ZP334/nGiL5y10K6oKGGDurBC7c7c39QYJePwVtYlXLhdIsga7uqqAZB/a0ywpSKspLNgkUf2XG05pR0yQtK9akx8T0TGHzVeDz03OXbvZnJKo+WlcEkYNo4NHCh0C9VNysSonsK9rRIpKI1XWe6hgNXH02dTGtgrQJn2xr0nAgktE9EjpOX7sdK4lQ1dCnKJGSaPhnaycM3+hpo1lAXU2ntdKP9VSyVfm78nt+ay6MjB0Ra5WW2LcrpXVjdkxFXQxhaXl4KKdVi8S+PSXLKypqAOHlnS/vBkf7ejuyqai6u7q2+G1lTg2A/+Bplm86nrVKAAAAAElFTkSuQmCC</content>
@@ -124,8 +121,8 @@
   </attachment>
   <attachment>
     <filename>levels.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAJiS0dEAP+Hj8y/AAABQ0lEQVQokWNgAINAp/m7+673Xuk5YOzNgAk0bae+1KljUGKQUYud9tg8HENB1UrrBhjbKKxqLwMLmoLmHSrBMLaVSeExBm40BW4lORtys7euXLZ8z4nLb1fd4JRBt0N0/tPj/0/+3/X/4f8j/+/8n7uLgQ1FXtnh9r93/08DFRz/f+//jv8P/ohZoChQd7/3//f/l/+vA015DMT7P3HroVrB3XHi5f8nQMNfARXd/r/4PoMEmiOkrA7/vvt/9+viY4tePPh/9n92H5oCPd/T/y/8T5jOwMBvvOTp2f/H/znHoyiwdt3298x/mywQW9Bq2aOr/3e+VtBHyDN37jzx/8B/aUcIL3H51j/3/mdMgsvzCvefvPx/81sOOagAT+upc/89G+AKZMy2fbv0P2MDAytMRMhCt5DfENkNxdYtDPwMWAAATL2VJjfw21YAAAAASUVORK5CYII=</content>
@@ -133,8 +130,8 @@
   </attachment>
   <attachment>
     <filename>metadata.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251898471000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQAMQcACoqKoiIiH9/f35+foqKipCQkIKCgmJiYubm5kREROXl5YuLi2BgYGdnZ+jo6IGBgUNDQ2pqamNjY+fn54aGhoSEhEFBQT8/P1dXV11dXVZWVi0tLf///wAAAAAAAAAAACH5BAEAABwALAAAAAAQABAAAAUzICeOZGmeaKqu7OkUibVMahERlFSpENFkj43qEjhoBgBVgGEYYAQqhAEAECha2Kx2qwoBADs=</content>
@@ -142,8 +139,8 @@
   </attachment>
   <attachment>
     <filename>number.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRF+vr6AAAAa2trcXFxdHR0n5+fpKSkqampzs7O1NTU4ODg4uLi5ubm6enp6+vr7+/v8vLy8/Pz9vb2+Pj4/Pz8////LgolFwAAAAF0Uk5TAEDm2GYAAAABYktHRBXl2PmjAAAAV0lEQVQYGa3B2RIBURBEwToo5tpaL/7/V72ORxEypd8tf1nyuu5ZvkUEYc7BIcLyPROSJJNMy4+qoupCcaqy/OxuemPrpttyzAwDDMcZy6/3nrX8ZekPPiAQBcchlLTgAAAAAElFTkSuQmCC</content>
@@ -151,8 +148,8 @@
   </attachment>
   <attachment>
     <filename>object.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251897889000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQAOZLAMDAwL29vdra2qOjo8LCwsfHx6KiosHBwdbW1svLy83NzbGxsfPz86ysrOPj4+Tk5Jqamuvr6/z8/LW1terq6sPDw+7u7t3d3fv7+9jY2N7e3uDg4PHx8ejo6MTExM7Ozufn56GhoaampvX19dfX1/b29r+/v+np6dXV1cnJyezs7LCwsMXFxdvb262trff399LS0vT09PDw8LOzs6+vr7i4uPj4+M/Pz5iYmKCgoKioqPLy8p+fn7Kysp2dnZ6entPT0+Hh4b6+vq6urqurq9/f3/39/dHR0bu7u8zMzP///////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAEsALAAAAAAQABAAAAfRgEuCgkVIBgZIRYOLgjZESpBKRCWMRQEDBgsIRhJACwYDAYpLj5AbDUdHRBuRREtJQyhGRgUTAwMTBRIYMEMmLhkKH0cNkUqoSQdCPisMJxcaBAKzAhUkSEg3OTQMHBZBBQmpSQtIAAAfPEMMMioUDwIZHkhCBBUACT86IzsgD0UtEAAgQDCAkBQ4DDrgAOKCAARCDhxAkgCAiCFGBAw50CGCBgTYEhQgEuIIBkEvkgxgEaFDEgUzIHiIwWiJBSEQFAQIUYNCzUUOegwZ9bMoo0AAOw==</content>
@@ -160,8 +157,8 @@
   </attachment>
   <attachment>
     <filename>password.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAHJQTFRFAAAAAAAAMDAwNTU1PT09WVlZWlpaW1tbXV1dhISEioqKjIyMkZGRmZmZnZ2dn5+foKCgpaWlsbGxu7u71NTU1dXV3t7e4ODg4eHh4uLi5ubm6enp6+vr7+/v8PDw8fHx8vLy8/Pz9vb2+Pj4/Pz8////7mfgvQAAAAF0Uk5TAEDm2GYAAAABYktHRCXDAckPAAAAaklEQVQYV62Oyw6CMBQFe0QEFbw8KsXHtS20//+L3iawIK5MmMxqVqPU/2jaoBVps4IehhQ97OjcYD+jYzBLeN4OTZ1sGd5LeBXZKU+WHtMk4V0dz9fkxWOeJXC4h0WEIMHFFXSI9PuxA18EKgrm/TlIcgAAAABJRU5ErkJggg==</content>
@@ -169,8 +166,8 @@
   </attachment>
   <attachment>
     <filename>space.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251108275000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQAPeCAP368////v777/788+TJb+PEY9uXO/777v788vTWT/jmlf/89fXbZfLQOe/Qev/9+vrts/7+/dqPOf788fTXVPLluv/+/dyyPvHPafXekf789vv36vnpoe7PcvnppPHScvPTRPvvuerLbO/UlOLDYdmLNPrsrPzz0O/SgPPTR+aydt2ZR/becvvyzOC8WOfPffLUf/PUSf368dunO+7KovjqwvbpyduVP/z01/fji/HQbNuiO/nonPLVgf789+jQhPTdqPz47fbgfPfihf788Pfjhfv36f799PLRO+XIbv/9+P/99vTXV/Tck/XaY+nBc/TbnvjkjvXbaPzyyPjmlPPXhty0QePEYtubO/LTefjlkfrx3tuoO/DLJum5hfPaltutOfXelO7OiPbedtudPPbcbPTYXP7+/P/+/u7PduDCWe/ThfPYjv767/HOMNujO+DAVtyuQNuRPv378/Xgn/v26P368vfhgduuPPHNLtu1PPXZXfbhrPbfdu3Kavz22PvyytmMNP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAIIALAAAAAAQABAAAAjBAAUJHEiwoMGDCBMSVEOigMMrcIIAmAhgzhmBeiIEQGMhwIYkBEK++FFBoBUfUTLQ4SPgyIAJAg48cCEwjowwTXr4EbEGhYM0HYxcEAimzggxT2wgGICASMwAeARyCaBkyYIBf6gU6SPFDI4ZAt9omBLCBI8cQsrsSQDixA6BZOxA8KBgyBgGTGIgcdMCi0ADbThoucPCCYUUDfJ0AWRA4IotQKB8YVMFRpYPOjDUuCGQhgo5gUKLDl1CgheFqFMHBAA7</content>
@@ -178,8 +175,8 @@
   </attachment>
   <attachment>
     <filename>staticlist.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAKtJREFUOMvdkjEKwlAQROeD19RO61TapdYqXWpzjRwjt5k3xbdIvqBgrw4sLMvuwrxd6edVWnKf7hWi0/FYhmGoYEEEyEYJwoggQNM0FUnatQVxFJAkmbUpRDYiVhyBRSLsb2RwvV0rRn3fl8v5XB0Umu/INBvIWPM8vzLAEWTNGzAQRMErD7zV+EYGXddVQOM4lsP+UNu9P8WyLG8MNmBPBu9D2xMZFKw/0gPJi8nAVk3WdgAAAABJRU5ErkJggg==</content>
@@ -187,8 +184,8 @@
   </attachment>
   <attachment>
     <filename>string.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEhQTFRF+vr6AAAAXV1dkZGRlZWVnp6en5+fsbGxu7u7wsLCysrK1NTU4ODg4uLi5ubm6enp6+vr7+/v8vLy8/Pz9vb2+Pj4/Pz8////23hbkAAAAAF0Uk5TAEDm2GYAAAABYktHRBcL1piPAAAAXElEQVQYV63OOxKCUBBFwTmgV/GhOM6H/e/UiMAysspeQZv9bujDMI31wJVVpvsEkwMnx12mBxEEcSOIkGkjkwTmJFOmJ0BRC0WVTE43DZybbple+4ELu74ff/AG9GUFcVY7ePAAAAAASUVORK5CYII=</content>
@@ -196,8 +193,8 @@
   </attachment>
   <attachment>
     <filename>textarea.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAORJREFUOMudkTFuhUAMRJ8t2pxiU+UeOYXL6BcBiRwiR0AhAglxkEg5BAXF6t+CCrYgTf7XIlLsZqQp1taMPV4xsyfgBbgAD6TjAnxjZuU8z/u6rn9y27YDQwh7CGGfpmk3s9cC+HDOsSwLACKCiACgqvda3BMRnHMArcY7pYpvNYAiFtd1nRS+7/u7ycGgaZqkyYdNY+cc8WkDVaWqqqQIwzAcDW6Ptm2TJsdH1PgGOeJTBICyLJMijON4jqCqdF2XdcBThBxx/I3v3vtssfce4E3M7BF4BlryUAJfBXD95Sf/wA+691xoT5R6SAAAAABJRU5ErkJggg==</content>
@@ -205,8 +202,8 @@
   </attachment>
   <attachment>
     <filename>users.png</filename>
+    <mimetype>image/png</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251988718000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAJiS0dEAP+Hj8y/AAABTElEQVQYGWXBzSuDARzA8R8tDiSlXJSyiEKSi4twc0R5a6Gm5CUuLlIOlPwBkpcVpVBcRovamj3PmEZ7HsaG8rYLByNp5eLlq9RTz/h8RAwp3QPrd0eJYGIxWmaT/xrGw7wSJ84rAcr7JFl28fxbhBAaGiHOmX6w5IlZqX0dD3soKHhxs0R+q5hVDm7iwoMPH262WaWwR8xya9e+Dgiio3GIn+WPzBpJktrlPOOWGDGu0WhxikWS5dTNfd7wQpxbZt4zquWPdPtugDAaOhEO6FiRZFXDLk7Q0dHR0HFSZhOTrIkrL3uoqCgoePEwdiRpYihp3sKLn0OCBAmg4GHzu6BeDJ0OlX1CnBElwinHqKg0TolhPBDllAtuiHHPNefohBnaEIO1bfYpwiMvJHjjmQcucTwVtItJflFv08KIa8I36RvdsTkq+sUqv34AuKvpg5bH+E8AAAAASUVORK5CYII=</content>
@@ -214,8 +211,8 @@
   </attachment>
   <attachment>
     <filename>wiki.gif</filename>
+    <mimetype>image/gif</mimetype>
     <author>xwiki:XWiki.Admin</author>
-    <date>1251108275000</date>
     <version>1.1</version>
     <comment/>
     <content>R0lGODlhEAAQAPfcAGWbYzp/N3LGZWejWqHZmTR8Mdzx2d3x2v3+/ezy653Dvs7jsW65z5zBvWa0zcLbpfz+/KzwtV6nx3eucpDUg7zaoJTPjNPqtarQxECGPHq9cnHFZHS8aVio3XG9bvb69qDXh23bd3amZW2zx3DGhM3nr6nuycnq0c/psLvhpWyrY4vauG22vovI15XMgI3P1W2tZ5HJh7HSsJXT2tXv1dTq0UOGv6/VvZHHekqYx0OEt57Ylk6SwXivzF3TbFKauVyv2rft1Fuv3GKllk3XZUbQamfbdtPtztrt1H3Rc2qpxoLLw4DQqLftwVipnV+pr3rRr4TLtVujyZC/eave3LDXva/fz1aizJ3Fm4DAeczquuj1zV6w0/j892y9wprWkY3qnYPYgVylxVaq4FGUTGWt1rTeoLTaxVGm2szrtWDYpnTHaFC8WcDYv7XPtHqoZqLZmaTIiDN7MGiXWW21zc7kspDShnupZ3mvdWaxzH67c9Lss3LFZm68xmu/YESGQu3z7DuCN8/p0J7gvMfork3ZZmmx17PXmaLYjIDLdWWfgbfj1GqtYJrAfo7ByYrcv4a3cIvL2dbyx53Cs2axeLXemHinubXe1l6bvOLzwKLU1I3AdpDN212oykmLR8fexFen0Fur337Lc73Yotbu0k+cSHvJb/X69cDcpnrGb6HQzn7CvEaHQ/b69dzwvmecZVepe2e8vHXJy5rlv5zY2UuayW+kbd7ywKLim4GzxazXporDhHPegr7gxUKMPZy+gVCNTVOZxp3XlGeWWqDSwHTGZ6bb1d3vvn20ysfq0HHWmoS9fm3EtK/XkqPQkZnBgbfQtrTvtWCwVj/Rd1ebtmzRkKfvsaffzEeMuZrflJLOiXHcev///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAANwALAAAAAAQABAAAAj/ALkJ5GZgR6I1Akx9ITVwIAI4AlJo6XWmii4/2roMhGAH0RYkR6xc0qQKQwwNpwQSAHFLEg1BxqhwauHoBo5l3A5syBQtQpNFtGbQGRElW4lSn4RVSmPNxIkXkRzEUsZrm7M4E0TtwQUmSDIGeWQZKUTEh54HZIq5ChNi1rVOXlaomVaEjYo6GfgcS1JtkAQuwfpAYfYE1oAFgVKhoPBoyRUgQmrZ0PFjiIhRfyw0M0OCiRhQY9DkwEZN0ZRfAGpIu8DBAwspoTrwcEJpGCo50Ljt2nQoyyolhspgYjTn2R0AAj/AgESIWC5kPSy5qPAGWIKBrfD4wjKpgQIZjQoADwDUUGAbW54CBGD1yk3DgAA7</content>

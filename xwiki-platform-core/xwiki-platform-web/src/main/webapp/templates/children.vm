@@ -43,7 +43,7 @@
     ##
     #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
     #set ($colprops = {
-      'doc.title'    : { 'link' : 'view', 'sortable': false },
+      'doc.title'    : { 'link' : 'view' },
       'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
       'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
       '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }
@@ -55,6 +55,7 @@
     #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=$queryFilters")
     #set ($options = { 
       'url' : "$doc.getURL('get', $urlParameters)",
+      'selectedColumn' : 'doc.location',
       'translationPrefix' : 'platform.index.',
       'outputOnlyHtml' : true
     })

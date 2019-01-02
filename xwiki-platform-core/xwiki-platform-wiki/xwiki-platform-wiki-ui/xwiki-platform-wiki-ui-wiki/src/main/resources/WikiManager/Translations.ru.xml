@@ -1,0 +1,139 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="ru">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>
+# Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
+core.menu.type.wiki=Вики
+core.menu.watchlist.add.wiki=Следить за Вики
+core.menu.watchlist.remove.wiki=Отменить слежение за Wiki
+core.menu.admin.wiki=Управление Вики
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Wiki информация
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Добро пожаловать в {0}{1}{2} wiki.
+platform.wiki.currentwiki.currentUserIsOwner=Вы владелец этой wiki.
+platform.wiki.currentwiki.currentUserIsAdmin=Вы администратор этой wiki.
+platform.wiki.currentwiki.joinNeedToLogin=Чтобы присоединиться к этой wiki, нужно войти в систему.
+platform.wiki.currentwiki.currentUserNotMember=Вы не участник этой wiki.
+platform.wiki.currentwiki.currentuserCanJoin=Если хотите, вы можете {0}присоединиться к этой wiki{1}.
+platform.wiki.currentwiki.currentUserIsMember=Вы участник этой вики wiki.
+platform.wiki.currentwiki.currentUserCanLeave=Если хотите, вы можете {0}покинуть эту wiki{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Чтобы увидеть полный список участников вики, см. {0} Каталог пользователей {1}.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Вы были приглашены присоединиться к этой вики.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Вы просили присоединиться к этой вики.
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Ваш запрос на присоединение к вики ''{0}'' был принят.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Ваш запрос на присоединение к вики ''{0}'' был отклонен.
+platform.wiki.currentwiki.candidateHandledSaveComment=Обработанный кандидат {0} ({1})
+platform.wiki.currentwiki.candidateHandledComment=Комментарий:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Запрос принят.
+platform.wiki.currentwiki.candidateRejectedSuccess=Запрос отклонен.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} уже является участником этой wiki.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} уже имеет ожидающий запрос. Пожалуйста, ответьте на этот запрос.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} уже получил ожидающее приглашение.
+platform.wiki.currentwiki.inviteSaveComment=Пользователь ''{0}'' был приглашен присоединиться к вики.
+platform.wiki.currentwiki.inviteNotification=Вас пригласили присоединиться к вики ''{0}''.
+platform.wiki.currentwiki.inviteSuccess={0} успешно приглашен.
+platform.wiki.currentwiki.invitationCancelSaveComment=Отмененное приглашение {0} ({1})
+platform.wiki.currentwiki.invitationCancelNotification=Ваше приглашение было отменено и больше не действует.
+platform.wiki.currentwiki.invitationCancelSuccess=Приглашение успешно отменено.
+platform.wiki.currentwiki.invitationCancelFailure=Ошибка, вы не можете отменить это приглашение.
+platform.wiki.currentwiki.candidateReviewFailure=Ошибка, вы не можете отменить это приглашение.
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Красивое название
+platform.wiki.currentwiki.prop.description.label=Описание
+platform.wiki.currentwiki.prop.owner.label=Владелец
+platform.wiki.currentwiki.prop.membershipType.label=Тип членства
+platform.wiki.currentwiki.prop.secure.label=Безопасность (SSL)
+platform.wiki.currentwiki.member.add=Добавьте или пригласите пользователей в wiki
+platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki информация
+platform.wiki.currentwiki.gadget.topActiveUsers.label=ТОП активных участников
+platform.wiki.currentwiki.panel.information.name.label=Название
+platform.wiki.currentwiki.panel.information.description.label=Описание
+platform.wiki.currentwiki.panel.information.members.label=Участники
+platform.wiki.currentwiki.invitation.view.label=Посмотреть приглашение
+platform.wiki.currentwiki.joinrequest.cancel.label=Отменить запрос
+platform.wiki.currentwiki.joinreques.request.label=Запрос присоединения
+platform.wiki.currentwiki.join.label=Присоединиться
+platform.wiki.currentwiki.leave.label=Покинуть Wiki
+platform.wiki.currentwiki.invite.username.label=Имя пользователя
+platform.wiki.currentwiki.invite.message.label=Сообщение
+platform.wiki.currentwiki.invite.button.label=Приглашение
+platform.wiki.currentwiki.candidates.label=Кандидаты
+platform.wiki.currentwiki.candidates.status.label=Состояние:
+platform.wiki.currentwiki.candidates.type.label=Тип:
+platform.wiki.currentwiki.candidates.reviewer.label=Администратор:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Сообщение администратора:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Частный комментарий:
+platform.wiki.currentwiki.candidates.accept.label=Принять
+platform.wiki.currentwiki.candidates.reject.label=Отклонить
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Отменить приглашение
+platform.wiki.currentwiki.wikiusers.title=Wiki пользователи
+platform.wiki.currentwiki.managewikis.title=Вики
+WikiManager.WikiCandidateMemberClass_status_pending=Ожидание
+WikiManager.WikiCandidateMemberClass_status_accepted=Принято
+WikiManager.WikiCandidateMemberClass_status_rejected=Отклонено
+WikiManager.WikiCandidateMemberClass_type_request=Запрос
+WikiManager.WikiCandidateMemberClass_type_invitation=Приглашение
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Отображаемое имя вики.
+platform.wiki.currentwiki.prop.description.hint=Краткое описание вики и ее назначение.
+platform.wiki.currentwiki.prop.owner.hint=Пользователь, у которого есть все права на вики.
+platform.wiki.currentwiki.prop.membershipType.hint=Как пользователи могут присоединиться к этой вики.
+platform.wiki.currentwiki.prop.secure.hint=Если включено, все внешние URL этой вики будут начинаться с {0} https: ~/~/{1}.
+platform.wiki.currentwiki.invite.username.hint=Имя пользователя для добавления в вики.
+platform.wiki.currentwiki.invite.message.hint=Сообщение для отправки пользователю.
+platform.wiki.currentwiki.candidates.hint=Пользователи, которые запросили или были приглашены присоединиться к вики.
+platform.wiki.currentwiki.candidates.empty=Ни один пользователь не запросил или не был приглашен присоединиться к вики.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=Управляйте настройками, такими как имя вики, описание, владелец и тип членства.
+admin.xwiki.workspaceusers.description=Управление участниками вики: добавление, удаление, приглашение, принятие или отклонение членов вики.
+admin.xwiki.usersconfiguration.title=Настройка
+admin.xwiki.members.title=Текущие участники
+admin.xwiki.users.title=Все пользователи
+    
+# DRAWER ITEM
+platform.wiki.drawer.homeWiki=Домашняя страница
+</content>
+</xwikidoc>

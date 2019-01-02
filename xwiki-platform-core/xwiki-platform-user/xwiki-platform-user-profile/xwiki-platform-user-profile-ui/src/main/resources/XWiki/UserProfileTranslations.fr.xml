@@ -27,12 +27,9 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1469191733000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1490262427000</date>
-  <contentUpdateDate>1490262416000</contentUpdateDate>
   <version>1.1</version>
   <title>User Profile Translations</title>
   <comment/>
@@ -46,5 +43,20 @@ XWiki.XWikiUsers_editor.hint=Choisissez l'éditeur par défaut, celui-ci remplac
 XWiki.XWikiUsers_usertype.hint=Choisissez quel type d'utilisateur sera celui par défaut. Les utilisateurs avancés auront accès à plusieurs fonctionnalités d'édition, de création de page terminal, etc.
 XWiki.XWikiUsers_extensionConflictSetup.hint=Précise si vous souhaitez que le Gestionnaire d'Extensions vous demande comment résoudre, par défaut, les conflits (par exemple vous demander que faire si le document à mettre à jour a été supprimé du wiki).
 userprofile.default=Par défaut
+user.profile.groups.title=Mes groupes
+user.profile.groups.description=Groupes auxquels votre compte appartient.
+user.profile.groups.table.group=Groupe
+platform.core.profile.category.groups=Mes groupes
+user.profile.notifications=Notifications
+user.profile.network.unfollow.question=Êtes-vous certain de ne plus vouloir suivre cet utilisateur ?
+user.profile.network.unfollow.question.yes=Oui, ne plus suivre
+user.profile.network.unfollow.question.no=Non, annuler
+user.profile.network.following=Vous suivez
+user.profile.network.notfollowing=Vous ne suivez pas
+user.profile.network.follow=Commencer à suivre
+user.profile.network.unfollow=Arrêter de suivre
+user.profile.network.done=Terminé
+user.profile.network.saving=Enregistrement en cours…
+user.profile.network.error=Erreur à l'enregistrement des paramètres de notification
 </content>
 </xwikidoc>

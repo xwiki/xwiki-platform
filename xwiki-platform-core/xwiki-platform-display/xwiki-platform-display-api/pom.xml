@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-display</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>11.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-display-api</artifactId>
   <name>XWiki Platform - Display - API</name>
@@ -34,6 +34,7 @@
     DocumentDisplayer to display the title and the content of XWiki documents.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.34</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>41</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

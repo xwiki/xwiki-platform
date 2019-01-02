@@ -177,6 +177,10 @@ public class DefaultHTMLConverterTest
         verify(xhtmlRenderer).render(same(xdom), any(WikiPrinter.class));
 
         // Verify that the syntax meta data has been set.
-        Assert.assertEquals(Syntax.valueOf("syntax/x.y"), xdom.getMetaData().getMetaData(MetaData.SYNTAX));
+        Syntax syntax = Syntax.valueOf(syntaxId);
+        Assert.assertEquals(syntax, xdom.getMetaData().getMetaData(MetaData.SYNTAX));
+
+        // Verify that the syntax has been set on the rendering context.
+        verify(((MutableRenderingContext) renderingContext)).push(null, null, syntax, null, false, syntax);
     }
 }

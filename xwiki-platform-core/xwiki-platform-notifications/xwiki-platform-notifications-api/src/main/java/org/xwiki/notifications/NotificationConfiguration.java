@@ -20,7 +20,6 @@
 package org.xwiki.notifications;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Get the configuration options concerning the Notification module.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.4RC1
  */
 @Role
-@Unstable
 public interface NotificationConfiguration
 {
     /**

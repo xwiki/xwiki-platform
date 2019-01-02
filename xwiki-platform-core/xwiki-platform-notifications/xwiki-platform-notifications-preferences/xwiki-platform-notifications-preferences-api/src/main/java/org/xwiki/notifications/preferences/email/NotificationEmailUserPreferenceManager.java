@@ -20,7 +20,6 @@
 package org.xwiki.notifications.preferences.email;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration for the emails for each user.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 9.11RC1
  */
 @Role
-@Unstable
 public interface NotificationEmailUserPreferenceManager
 {
     /**

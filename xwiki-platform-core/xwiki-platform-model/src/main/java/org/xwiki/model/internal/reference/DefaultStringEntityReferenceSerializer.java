@@ -19,6 +19,9 @@
  */
 package org.xwiki.model.internal.reference;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -53,7 +56,7 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
      * Constructor to be used when using this class as a POJO and not as a component.
      *
      * @param symbolScheme the scheme to use for serializing the passed references (i.e. defines the separators to use
-     *        between the Entity types, and the characters to escape and how to escape them)
+     *            between the Entity types, and the characters to escape and how to escape them)
      */
     public DefaultStringEntityReferenceSerializer(SymbolScheme symbolScheme)
     {
@@ -87,6 +90,44 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
         representation.append(StringUtils.replaceEach(currentReference.getName(),
             getSymbolScheme().getSymbolsRequiringEscapes(currentType),
             getSymbolScheme().getReplacementSymbols(currentType)));
+
+        // Add parameters if supported
+        Map<String, Serializable> entityParameters = currentReference.getParameters();
+        if (!entityParameters.isEmpty()) {
+            Character parameterSeparator = getSymbolScheme().getParameterSeparator(currentType);
+            if (parameterSeparator != null) {
+                representation.append(parameterSeparator);
+
+                serializeParameters(getSymbolScheme().getDefaultParameter(currentType), parameterSeparator,
+                    entityParameters, representation,
+                    getSymbolScheme().getParameterSymbolsRequiringEscapes(currentType),
+                    getSymbolScheme().getParameterReplacementSymbols(currentType));
+            }
+        }
+
+    }
+
+    private void serializeParameters(String defaultParameter, char separator, Map<String, Serializable> parameters,
+        StringBuilder representation, String[] parameterSymbolsRequiringEscapes, String[] parameterReplacementSymbols)
+    {
+        boolean first = true;
+        for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
+            if (entry.getValue() != null) {
+                if (!first) {
+                    representation.append(separator);
+                }
+
+                if (defaultParameter == null || !defaultParameter.equals(entry.getKey())) {
+                    representation.append(StringUtils.replaceEach(entry.getKey(), parameterSymbolsRequiringEscapes,
+                        parameterReplacementSymbols));
+                    representation.append('=');
+                }
+                representation.append(StringUtils.replaceEach(entry.getValue().toString(),
+                    parameterSymbolsRequiringEscapes, parameterReplacementSymbols));
+
+                first = false;
+            }
+        }
     }
 
     protected SymbolScheme getSymbolScheme()

@@ -36,7 +36,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.service.spi.Stoppable;
@@ -232,19 +234,17 @@ public class HibernateStore
     {
         DatabaseMetaData result;
         Connection connection = null;
-        // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
-        // See http://bit.ly/QAJXlr
-        ConnectionProvider connectionProvider =
-            ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
+        JdbcConnectionAccess jdbcConnectionAccess =
+                ((SessionImplementor) getSessionFactory().getCurrentSession()).getJdbcConnectionAccess();
         try {
-            connection = connectionProvider.getConnection();
+            connection = jdbcConnectionAccess.obtainConnection();
             result = connection.getMetaData();
         } catch (SQLException ignored) {
             result = null;
         } finally {
             if (connection != null) {
                 try {
-                    connectionProvider.closeConnection(connection);
+                    jdbcConnectionAccess.releaseConnection(connection);
                 } catch (SQLException ignored) {
                     // Ignore
                 }

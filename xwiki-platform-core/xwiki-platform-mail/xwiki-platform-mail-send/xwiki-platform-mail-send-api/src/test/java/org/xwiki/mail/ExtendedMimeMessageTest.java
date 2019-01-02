@@ -25,12 +25,12 @@ import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Unit tests for {@link org.xwiki.mail.ExtendedMimeMessage}.
@@ -47,24 +47,18 @@ public class ExtendedMimeMessageTest
     private static final String TEST_CONTENT = "Content";
 
     @Test
-    public void testOptimizedWrapping() throws Exception
+    public void wrap() throws Exception
     {
-        ExtendedMimeMessage mimeMessage = new ExtendedMimeMessage();
+        ExtendedMimeMessage extendedMimeMessage = new ExtendedMimeMessage();
+        assertThat(ExtendedMimeMessage.wrap(extendedMimeMessage), sameInstance(extendedMimeMessage));
 
-        assertThat(ExtendedMimeMessage.wrap(mimeMessage), sameInstance(mimeMessage));
-    }
-
-    @Test
-    public void testMimeMessageWrapping() throws Exception
-    {
         MimeMessage mimeMessage = new MimeMessage((Session) null);
         mimeMessage.setText(TEST_CONTENT);
-
-        assertThat((String) ExtendedMimeMessage.wrap(mimeMessage).getContent(), equalTo(TEST_CONTENT));
+        assertThat(ExtendedMimeMessage.wrap(mimeMessage).getContent(), equalTo(TEST_CONTENT));
     }
 
     @Test
-    public void testIsEmpty() throws Exception
+    public void isEmpty() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         assertThat(message.isEmpty(), is(true));
@@ -74,7 +68,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void testSetType() throws Exception
+    public void setType() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setType(TEST_XMAIL_TYPE);
@@ -83,7 +77,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void testGetType() throws Exception
+    public void getType() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader(XMAIL_TYPE_HEADER, TEST_XMAIL_TYPE);
@@ -92,7 +86,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void testGetMessageIdAndEnsureSaved() throws Exception
+    public void getMessageIdAndEnsureSaved() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setText(TEST_CONTENT);
@@ -103,7 +97,7 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
-    public void testGetUniqueMessageId() throws Exception
+    public void getUniqueMessageId() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setText(TEST_CONTENT);
@@ -119,6 +113,4 @@ public class ExtendedMimeMessageTest
         message.setMessageId(TEST_MESSAGE_ID);
         assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
     }
-
-
 }

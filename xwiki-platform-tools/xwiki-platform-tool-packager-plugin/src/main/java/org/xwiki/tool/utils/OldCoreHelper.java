@@ -205,7 +205,7 @@ public class OldCoreHelper implements AutoCloseable
 
         // Use a dummy Request/Response even in daemon mode so that XWiki's initialization can create a Servlet URL
         // Factory and any code requiring those objects will work.
-        this.xcontext.setRequest(new XWikiServletRequestStub(this.xcontext.getURL(), Collections.emptyMap()));
+        this.xcontext.setRequest(new XWikiServletRequestStub(this.xcontext.getURL(), "xwiki", Collections.emptyMap()));
         this.xcontext.setResponse(new XWikiServletResponseStub());
 
         // Set a dummy Document in the context to act as the current document since when a document containing

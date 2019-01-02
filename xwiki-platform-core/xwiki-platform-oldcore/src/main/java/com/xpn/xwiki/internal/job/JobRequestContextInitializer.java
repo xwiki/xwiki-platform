@@ -100,7 +100,7 @@ public class JobRequestContextInitializer extends AbstractEventListener
                 // Request
                 if (jobRequestContext.isRequestSet()) {
                     xcontext.setRequest(new XWikiServletRequestStub(jobRequestContext.getRequestURL(),
-                        jobRequestContext.getRequestParameters()));
+                        jobRequestContext.getRequestContextPath(), jobRequestContext.getRequestParameters()));
                 }
             }
         }

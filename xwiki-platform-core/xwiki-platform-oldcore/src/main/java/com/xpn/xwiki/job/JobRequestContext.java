@@ -76,6 +76,8 @@ public class JobRequestContext implements Serializable
 
     private URL requestURL;
 
+    private String requestContextPath;
+
     private Map<String, String[]> requestParameters;
 
     /**
@@ -100,6 +102,7 @@ public class JobRequestContext implements Serializable
             if (request != null) {
                 if (request.getRequestURL() != null) {
                     setRequestUrl(HttpServletUtils.getSourceURL(request));
+                    setRequestContextPath(request.getContextPath());
                 }
                 if (request.getParameterMap() != null) {
                     setRequestParameters(request.getParameterMap());
@@ -298,6 +301,26 @@ public class JobRequestContext implements Serializable
     public URL getRequestURL()
     {
         return this.requestURL;
+    }
+
+    /**
+     * @return the requestContextPath
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public String getRequestContextPath()
+    {
+        return this.requestContextPath;
+    }
+
+    /**
+     * @param requestContextPath the requestContextPath to set
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public void setRequestContextPath(String requestContextPath)
+    {
+        this.requestContextPath = requestContextPath;
     }
 
     /**

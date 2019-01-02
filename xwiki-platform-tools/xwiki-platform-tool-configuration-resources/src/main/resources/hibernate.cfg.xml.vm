@@ -53,6 +53,15 @@
     <property name="dbcp.maxWaitMillis">30000</property>
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 
+    <!--
+      Keep the old behavior. The new version of hibernate tries to delete and recreate unique
+      constraints when updating the database schema. The problem is that an exception is thrown
+      when the constraint to be deleted does not exists, which is the case with a new XWiki
+      instance.
+      See https://hibernate.atlassian.net/browse/HHH-8162
+    -->
+    <property name="hibernate.schema_update.unique_constraint_strategy">skip</property>
+
     <!-- Setting "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" will tell DBCP to cache
          Prepared Statements (it's off by default). Note that for backward compatibility the "dbcp.ps.maxActive" is also
          supported and when set it'll set "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" to

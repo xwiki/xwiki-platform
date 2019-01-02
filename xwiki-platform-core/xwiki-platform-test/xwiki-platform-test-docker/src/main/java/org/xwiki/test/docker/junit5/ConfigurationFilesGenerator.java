@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -125,7 +126,7 @@ public class ConfigurationFilesGenerator
         // Add user-specified properties (with possible overrides for default properties)
         properties.putAll(this.testConfiguration.getProperties());
 
-        VelocityContext context = new VelocityContext(properties);
+        VelocityContext context = new VelocityContext((Map) properties);
         return context;
     }
 

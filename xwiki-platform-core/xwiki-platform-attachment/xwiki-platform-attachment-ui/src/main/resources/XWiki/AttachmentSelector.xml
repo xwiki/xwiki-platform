@@ -45,7 +45,7 @@
   #set ($docAction = $request.get('docAction'))
   #set ($attachmentList = $targetAttachDocument.getAttachmentList())
   #if ($attachmentList &amp;&amp; $attachmentList.size() &gt; 0)
-    #set ($sortedAttachments = $sorttool.sort($attachmentList, 'date:desc'))
+    #set ($sortedAttachments = $collectionstool.sort($attachmentList, 'date:desc'))
     #set ($lastAttachment = $sortedAttachments.get(0))
   #end
   $response.sendRedirect($targetDocument.getURL($docAction, $escapetool.url({
@@ -84,7 +84,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
   #end
   #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
-  #set ($sortedAttachments = $sorttool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #set ($sortedAttachments = $collectionstool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
   #foreach ($attachment in $sortedAttachments)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())

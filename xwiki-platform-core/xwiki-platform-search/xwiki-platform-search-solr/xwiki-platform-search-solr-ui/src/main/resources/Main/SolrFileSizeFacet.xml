@@ -105,7 +105,7 @@
     #end
   #end
   ## Make sure we sort the intervals based on the number of matches.
-  #set ($intervals = $sorttool.sort($intervalsWithMatches, 'count:desc'))
+  #set ($intervals = $collectionstool.sort($intervalsWithMatches, 'count:desc'))
   ##
   ## Display the size intervals.
   ##

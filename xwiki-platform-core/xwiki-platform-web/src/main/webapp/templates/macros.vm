@@ -2188,7 +2188,7 @@ function (row, i, table) {
  *                          a safety measure because macros can't return values.
  *#
 #macro (sortCollectionOfMapsByField $collection $field $defaultValue $order $outputList)
-  ## If an alement has a null field, $sorttool.sort() won't return anything.
+  ## If an alement has a null field, $collectionstool.sort() won't return anything.
   ## To avoid this situation, we create a new list that contains the elements with a default field if it is missing
   #set ($newList = [])
   #foreach ($element in $collection)
@@ -2201,7 +2201,7 @@ function (row, i, table) {
       #set ($discard = $newList.add($element))
     #end
   #end
-  #set ($discard = $outputList.addAll($sorttool.sort($newList, "${field}:${order}")))
+  #set ($discard = $outputList.addAll($collectionstool.sort($newList, "${field}:${order}")))
 #end
 
 #**

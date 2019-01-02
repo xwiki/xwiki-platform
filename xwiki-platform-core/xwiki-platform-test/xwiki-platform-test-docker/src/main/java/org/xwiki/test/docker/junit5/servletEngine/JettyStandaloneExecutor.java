@@ -27,7 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -149,8 +150,8 @@ public class JettyStandaloneExecutor
 
     private VelocityContext createVelocityContext()
     {
-        Properties properties = new Properties();
-        properties.setProperty("xwikiDataDir", DATA_SUBDIR);
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("xwikiDataDir", DATA_SUBDIR);
         VelocityContext context = new VelocityContext(properties);
         return context;
     }

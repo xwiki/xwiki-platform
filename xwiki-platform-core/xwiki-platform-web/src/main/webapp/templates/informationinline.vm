@@ -25,7 +25,7 @@
     <dl>
       <dt>$services.localization.render('core.viewers.information.backlinks')</dt>
       <dd>
-        #set($blinks = $sorttool.sort($doc.getBacklinks()))
+        #set($blinks = $collectionstool.sort($doc.getBacklinks()))
         #if ($blinks.isEmpty())
           ## We display a "no backlinks" message to avoid having a blank information panel when there is nothing
           <span class="noitems">$services.localization.render('core.viewers.information.noBacklinks')</span>

@@ -94,7 +94,7 @@
   #databaseAddResults(", BaseObject as obj, StringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
   ## Search in big text fields (textarea properties)
   #databaseAddResults(", BaseObject as obj, LargeStringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
-  #set ($discard = $list.addAll($sorttool.sort($results, ['date'])))
+  #set ($discard = $list.addAll($collectionstool.sort($results, ['date'])))
 #end
 {{/velocity}}
 

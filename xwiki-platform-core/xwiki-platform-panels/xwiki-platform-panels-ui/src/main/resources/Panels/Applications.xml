@@ -213,7 +213,7 @@
     #set ($discard = $apps.add($app))
   #end
   ## Sort the apps
-  #foreach ($app in $sorttool.sort($apps, 'order'))
+  #foreach ($app in $collectionstool.sort($apps, 'order'))
     #maybeDisplayAppPanelEntry($app.uix, $configDoc)
   #end
 #end

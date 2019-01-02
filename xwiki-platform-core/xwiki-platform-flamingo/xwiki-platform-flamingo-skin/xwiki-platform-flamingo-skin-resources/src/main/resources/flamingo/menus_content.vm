@@ -154,7 +154,7 @@
   #end
   ## Display them, sorted by order
   #set ($canHaveMenuSeparator = false)
-  #foreach($uix in $sorttool.sort($extensions, 'order'))
+  #foreach($uix in $collectionstool.sort($extensions, 'order'))
     ## Maybe display a menu separator
     #if ("$!uix.separator" == 'true' && $canHaveMenuSeparator)
       #submenuseparator()

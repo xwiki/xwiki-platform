@@ -62,7 +62,7 @@
     #set ($filteredGroups = $groups)
   #end
   #if ($filteredGroups.size() &gt; 0)
-    #set ($filteredGroups = $sorttool.sort($filteredGroups))
+    #set ($filteredGroups = $collectionstool.sort($filteredGroups))
     #set($order = "$!request.sort")
     #if ($order == 'group' &amp;&amp; $request.get('dir').toLowerCase() == 'desc')
       ## Reverse order

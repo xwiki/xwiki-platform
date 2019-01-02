@@ -68,7 +68,7 @@
   #end
 #end
 ## Sort the displayedApp
-#set ($displayedApps = $sorttool.sort($displayedApps, 'order'))
+#set ($displayedApps = $collectionstool.sort($displayedApps, 'order'))
 ##########################
 ## Macro to display an application panel
 ##########################

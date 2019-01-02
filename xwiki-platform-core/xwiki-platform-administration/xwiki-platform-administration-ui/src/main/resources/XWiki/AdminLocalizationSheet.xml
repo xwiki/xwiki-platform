@@ -390,7 +390,7 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
 #set ($separator = '')
 #set ($currentLocale = $services.localization.currentLocale)
 #set ($locales = $services.localization.availableLocales)
-#foreach ($locale in $sorttool.sort($locales, 'displayName'))
+#foreach ($locale in $collectionstool.sort($locales, 'displayName'))
   #if ("$!locale" != '')
     $separator
     { code: '$locale', name: '$escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale))) &lt;small class="text-muted"&gt;($stringtool.capitalize($locale.getDisplayName($currentLocale)))&lt;/small&gt;'}##

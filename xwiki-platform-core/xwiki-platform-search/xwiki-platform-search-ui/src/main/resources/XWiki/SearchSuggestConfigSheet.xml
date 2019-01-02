@@ -138,7 +138,7 @@
 ## Display the list of search engines.
 #if ($sources.size() &gt; 0)
   &lt;ul class="nav nav-tabs searchEngines" role="tablist"&gt;
-  #foreach ($engine in $sorttool.sort($sources.keySet()))
+  #foreach ($engine in $collectionstool.sort($sources.keySet()))
     &lt;li#if ($engine == $searchEngine) class="active"#end role="presentation"&gt;
       &lt;a href="#${engine}SearchSuggestSources" aria-controls="${engine}SearchSuggestSources"
         role="tab" data-toggle="tab"&gt;$engine&lt;/a&gt;

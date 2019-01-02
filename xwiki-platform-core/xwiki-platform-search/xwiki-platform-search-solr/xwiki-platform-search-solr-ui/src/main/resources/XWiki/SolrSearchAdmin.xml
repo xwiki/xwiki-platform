@@ -187,7 +187,7 @@
 #macro(handleSolrAction $withValidToken)
   #set ($indexActions = ['index', 'reindex', 'delete'])
   #if ($withValidToken &amp;&amp; $indexActions.contains($request.action))
-    #set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+    #set ($allWikis = $collectionstool.sort($xwiki.wikiNames))
     #handleSolrIndexAction()
   #elseif ($request.action == 'getQueueSize')
     $response.setContentType('application/json')
@@ -196,7 +196,7 @@
       'timestamp': $datetool.date.time
     })
   #else
-    #set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+    #set ($allWikis = $collectionstool.sort($xwiki.wikiNames))
     #displaySolrAdminSection()
   #end
 #end

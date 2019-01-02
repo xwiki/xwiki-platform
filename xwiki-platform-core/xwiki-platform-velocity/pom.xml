@@ -42,8 +42,8 @@
       <artifactId>velocity-engine-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity-tools</artifactId>
+      <groupId>org.apache.velocity.tools</groupId>
+      <artifactId>velocity-tools-generic</artifactId>
     </dependency>
     <!-- Explicit dependency on dom4j since we're excluding it in the dependencyManagement section for
          velocity-tools -->

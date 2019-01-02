@@ -267,7 +267,7 @@
       #break
     #end
   #end
-  #set ($adminMenu = $sorttool.sort($adminMenu, 'score:desc'))
+  #set ($adminMenu = $collectionstool.sort($adminMenu, 'score:desc'))
 #end
 
 

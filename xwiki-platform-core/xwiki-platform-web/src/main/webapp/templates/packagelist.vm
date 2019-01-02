@@ -1,5 +1,5 @@
 #if ("$!{request.forceTestRights}" == "1")#template("xwikivars.vm")#end
-#set($attachments = $sorttool.sort($doc.attachmentList, ['date:desc']))
+#set($attachments = $collectionstool.sort($doc.attachmentList, ['date:desc']))
 #if($attachments.size() > 0)
   <ul class="xlist">
   #foreach ($attach in $attachments)

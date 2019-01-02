@@ -599,7 +599,7 @@ $services.localization.render('core.users.unknownUser')##
       'matches': $matches
     }))
   #end
-  #set ($highlighting = $sorttool.sort($highlighting, 'priority:desc'))
+  #set ($highlighting = $collectionstool.sort($highlighting, 'priority:desc'))
   #set ($return = $NULL)
   #setVariable("$return" $highlighting)
 #end

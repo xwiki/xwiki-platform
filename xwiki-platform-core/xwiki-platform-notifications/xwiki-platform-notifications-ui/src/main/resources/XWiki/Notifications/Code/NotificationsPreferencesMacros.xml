@@ -55,7 +55,7 @@
 #end
 #set ($apps = [])
 #set ($lastAppId = '')
-#foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
+#foreach ($type in $collectionstool.sort($types, ['applicationName', 'eventType']))
   #if ($lastAppId != $type.applicationId)
     #set ($lastAppId = $type.applicationId)
     #set ($lastApp = [])

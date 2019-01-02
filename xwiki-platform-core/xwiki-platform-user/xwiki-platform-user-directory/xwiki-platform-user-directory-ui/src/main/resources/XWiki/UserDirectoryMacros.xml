@@ -240,7 +240,7 @@
           #foreach ($property in $xwikiUsersClass.properties)
             #set ($discard = $propertyPrettyNameToNameMap.put($xwikiUsersClass.get($property.name).translatedPrettyName, $property.name))
           #end
-          #set ($sortedPropertyPrettyNameToNameList = $sorttool.sort($propertyPrettyNameToNameMap.entrySet(), 'key'))
+          #set ($sortedPropertyPrettyNameToNameList = $collectionstool.sort($propertyPrettyNameToNameMap.entrySet(), 'key'))
           ## Display each translated pretty name, except the ones already selected and passwords which we don`t want to expose unnecesarily.
           #foreach ($propertyEntry in $sortedPropertyPrettyNameToNameList)
             #set ($property = $xwikiUsersClass.get($propertyEntry.value))

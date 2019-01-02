@@ -51,7 +51,7 @@
       <customDisplay>{{velocity}}
 #if ($type == 'edit')
   {{html}}
-  #foreach ($syntax in $sorttool.sort($services.rendering.getAvailableParserSyntaxes()))
+  #foreach ($syntax in $collectionstool.sort($services.rendering.getAvailableParserSyntaxes()))
     #set ($checked = '')
     #if ($value.contains($syntax.toIdString()))
       #set ($checked = 'checked')

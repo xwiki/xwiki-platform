@@ -108,7 +108,7 @@
   #set ($discard = $mediaTypes.addAll($matchedGroups))
   ## Sort the media type groups based on the number of matches.
   ## Note that the sort tool doesn't change the passed list.
-  #set ($sortedMediaTypes = $sorttool.sort($mediaTypes, 'count:desc'))
+  #set ($sortedMediaTypes = $collectionstool.sort($mediaTypes, 'count:desc'))
   #set ($discard = $mediaTypes.clear())
   #set ($discard = $mediaTypes.addAll($sortedMediaTypes))
 #end

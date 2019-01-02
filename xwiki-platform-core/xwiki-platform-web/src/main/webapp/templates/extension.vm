@@ -1579,7 +1579,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
       }))
     #end
   #end
-  #set ($items = $sorttool.sort($items, ['namespacePrettyName', 'extensionName']))
+  #set ($items = $collectionstool.sort($items, ['namespacePrettyName', 'extensionName']))
   ## Paginate the extensions.
   #set ($hasPagination = false)
   ## We don't load the pagination CSS here (noSx:true) because the upgrade plan can be loaded through AJAX so

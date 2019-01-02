@@ -92,7 +92,7 @@ $response.setContentType("application/json")
   #foreach ($entry in $question.extensions.entrySet())
     #set ($discard = $extensions.add({'extension': $entry.value.extension, 'pages': $entry.value.pages, 'name': $entry.value.extension.name}))
   #end
-  #set ($extensions = $sorttool.sort($extensions, 'name'))
+  #set ($extensions = $collectionstool.sort($extensions, 'name'))
   #foreach ($ext in $extensions)
     #if ($velocityCount > $offset + $limit)
       #set ($howMany = $extensions.size() - $velocityCount + 1)

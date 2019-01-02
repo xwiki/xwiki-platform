@@ -94,16 +94,16 @@
     #set ($discard = $elements.add($element))
   #end
 #end
-#set ($elements = $sorttool.sort($elements, ['name']))
+#set ($elements = $collectionstool.sort($elements, ['name']))
 ## Also get the list of available filters for the user
 #set ($filters = $collectionstool.arrayList)
 #set ($discard = $filters.addAll($services.notification.filters.filters))
-#set ($filters = $sorttool.sort($filters, ['name']))
+#set ($filters = $collectionstool.sort($filters, ['name']))
 #set ($displayHiddenDocument = "$xwiki.getUserPreference('displayHiddenDocuments')" == '1')
 #foreach ($filter in $filters)
   #set ($filtersPreferences = $collectionstool.arrayList)
   #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter)))
-  #set ($filtersPreferences = $sorttool.sort($filtersPreferences, ['id']))
+  #set ($filtersPreferences = $collectionstool.sort($filtersPreferences, ['id']))
   #foreach ($preference in $filtersPreferences)
     #set ($page = $preference.pageOnly)
     #set ($space = $preference.page)

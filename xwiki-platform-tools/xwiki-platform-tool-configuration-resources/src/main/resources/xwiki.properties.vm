@@ -300,11 +300,9 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Velocity Tools that will be available from your scripts. The format is
 #-# velocity.tools = <name under which it'll be available in the context> = <class name>
 #-# Default values (no need to add them)
-#-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool
 #-#   velocity.tools = numbertool = org.xwiki.velocity.internal.XWikiNumberTool
 #-#   velocity.tools = datetool = org.xwiki.velocity.internal.XWikiDateTool
 #-#   velocity.tools = mathtool = org.xwiki.velocity.internal.XWikiMathTool
-#-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
 #-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
 #-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool
@@ -313,6 +311,8 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.tools = urltool = org.xwiki.velocity.tools.URLTool
 #-#   velocity.tools = exceptiontool = org.apache.commons.lang3.exception.ExceptionUtils
 #-#   velocity.tools = niotool = org.xwiki.velocity.tools.nio.NIOTool
+#-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool (deprecated)
+#-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool (deprecated)
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is

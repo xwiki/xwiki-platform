@@ -104,6 +104,14 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String SUFFIX_PROP_REQUEST_URL = "url";
 
     /**
+     * The suffix of the entry containing the request context path (usually the first element of the URL path.
+     * 
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public static final String SUFFIX_PROP_REQUEST_CONTEXTPATH = "contextpath";
+
+    /**
      * The suffix of the entry containing the request parameters.
      */
     public static final String SUFFIX_PROP_REQUEST_PARAMETERS = "parameters";
@@ -124,6 +132,14 @@ public class XWikiContextContextStore extends AbstractContextStore
      * Name of the entry containing the request URL.
      */
     public static final String PROP_REQUEST_URL = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_URL;
+
+    /**
+     * Name the entry containing the request context path (usually the first element of the URL path.
+     * 
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public static final String PROP_REQUEST_CONTEXTPATH = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_CONTEXTPATH;
 
     /**
      * Name of the entry containing the request parameters.
@@ -270,11 +286,20 @@ public class XWikiContextContextStore extends AbstractContextStore
         } catch (MalformedURLException e) {
             // Cannot happen
         }
+
+        saveRequestContextPath(contextStore, request);
     }
 
     private void saveRequestURL(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         contextStore.put(key, HttpServletUtils.getSourceURL(request));
+
+        saveRequestContextPath(contextStore, request);
+    }
+
+    private void saveRequestContextPath(Map<String, Serializable> contextStore, XWikiRequest request)
+    {
+        contextStore.put(PROP_REQUEST_CONTEXTPATH, request.getContextPath());
     }
 
     private void saveRequestParameters(Map<String, Serializable> contextStore, String key, XWikiRequest request)
@@ -411,12 +436,16 @@ public class XWikiContextContextStore extends AbstractContextStore
 
         boolean daemon;
 
+        String contextPath = null;
+
         // Fallback on the first request URL
         if (url == null) {
             XWikiRequest request = xcontext.getRequest();
 
             if (request != null) {
                 url = HttpServletUtils.getSourceURL(request);
+
+                contextPath = request.getContextPath();
 
                 if (parameters == null) {
                     parameters = request.getParameterMap();
@@ -426,19 +455,23 @@ public class XWikiContextContextStore extends AbstractContextStore
             // We don't want to take into account the context request URL when generating URLs
             daemon = true;
         } else {
+            // Find the request context path
+            contextPath = (String) contextStore.get(PROP_REQUEST_CONTEXTPATH);
+
             // We want to take into account the context request URL when generating URLs
             daemon = false;
         }
 
         // Set the context request
         if (url != null) {
-            restoreRequest(url, parameters, daemon, xcontext);
+            restoreRequest(url, contextPath, parameters, daemon, xcontext);
         }
     }
 
-    private void restoreRequest(URL url, Map<String, String[]> parameters, boolean daemon, XWikiContext xcontext)
+    private void restoreRequest(URL url, String contextPath, Map<String, String[]> parameters, boolean daemon,
+        XWikiContext xcontext)
     {
-        XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(url, parameters);
+        XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(url, contextPath, parameters);
         xcontext.setRequest(stubRequest);
         // Indicate that the URL should be taken into account when generating a URL
         stubRequest.setDaemon(daemon);

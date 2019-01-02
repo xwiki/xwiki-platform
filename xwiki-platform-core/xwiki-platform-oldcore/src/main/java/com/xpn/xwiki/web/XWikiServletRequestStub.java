@@ -94,6 +94,15 @@ public class XWikiServletRequestStub implements XWikiRequest
      */
     public XWikiServletRequestStub(URL requestURL, Map<String, String[]> requestParameters)
     {
+        this(requestURL, null, requestParameters);
+    }
+
+    /**
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public XWikiServletRequestStub(URL requestURL, String contextPath, Map<String, String[]> requestParameters)
+    {
         if (requestURL != null) {
             this.protocol = requestURL.getProtocol();
             this.scheme = requestURL.getProtocol();
@@ -108,6 +117,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
             setHost(requestURL.getHost());
         }
+
+        this.contextPath = contextPath;
 
         this.parameters = clone(requestParameters);
     }

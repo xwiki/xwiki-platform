@@ -22,15 +22,19 @@ package org.xwiki.mail;
 import java.io.OutputStream;
 
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link org.xwiki.mail.ExtendedMimeMessage}.
@@ -45,6 +49,25 @@ public class ExtendedMimeMessageTest
     private static final String TEST_XMAIL_TYPE = "MyType";
     private static final String TEST_MESSAGE_ID = "messageId";
     private static final String TEST_CONTENT = "Content";
+
+    public class ThrowingeExtendedMimeMessage extends ExtendedMimeMessage
+    {
+        @Override
+        public void addHeader(String name, String value) throws MessagingException
+        {
+            throw new MessagingException("error");
+        }
+
+        @Override public String getHeader(String name, String delimiter) throws MessagingException
+        {
+            throw new MessagingException("error");
+        }
+
+        @Override public void setHeader(String name, String value) throws MessagingException
+        {
+            throw new MessagingException("error");
+        }
+    }
 
     @Test
     public void wrap() throws Exception
@@ -77,12 +100,34 @@ public class ExtendedMimeMessageTest
     }
 
     @Test
+    public void setTypeWhenException()
+    {
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
+            ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();
+            message.setType(TEST_XMAIL_TYPE);
+        });
+        assertEquals("Failed to set Type header to [MyType]", exception.getMessage());
+        assertEquals("MessagingException: error", ExceptionUtils.getRootCauseMessage(exception));
+    }
+
+    @Test
     public void getType() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader(XMAIL_TYPE_HEADER, TEST_XMAIL_TYPE);
 
         assertThat(message.getType(), equalTo(TEST_XMAIL_TYPE));
+    }
+
+    @Test
+    public void getTypeWhenException()
+    {
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
+            ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();
+            message.getType();
+        });
+        assertEquals("Failed to get Type header", exception.getMessage());
+        assertEquals("MessagingException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 
     @Test
@@ -113,4 +158,16 @@ public class ExtendedMimeMessageTest
         message.setMessageId(TEST_MESSAGE_ID);
         assertThat(message.getUniqueMessageId(), equalTo("g9tEjV2+qAGNIFaQ44+P+iZtZZw="));
     }
+
+    @Test
+    public void setMessageIdWhenException()
+    {
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
+            ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();
+            message.setMessageId("whatever");
+        });
+        assertEquals("Failed to set Message ID header to [whatever]", exception.getMessage());
+        assertEquals("MessagingException: error", ExceptionUtils.getRootCauseMessage(exception));
+    }
+
 }

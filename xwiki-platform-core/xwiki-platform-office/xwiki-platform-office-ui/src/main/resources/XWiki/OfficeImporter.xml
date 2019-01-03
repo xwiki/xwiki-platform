@@ -136,7 +136,7 @@
       ##
       ## Child pages naming method:
       ##
-      #if ($targetDoc.name == 'WebHome')
+      #if ($targetDoc.documentReference.name == 'WebHome')
         ## When the target page is not terminal, the only logical strategy to use is "headingNames". It creates pages
         ## as children of the target, which seems to be the correct way in the nested pages paradigm.
         ## The other choices have no sense:

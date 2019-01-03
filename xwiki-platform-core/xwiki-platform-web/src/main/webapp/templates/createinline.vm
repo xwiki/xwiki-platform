@@ -248,10 +248,7 @@
         ## want to support changing the target location even if the current document is new.
         #if ($doc.isNew())
           ## Encourage the user to create the current document.
-          #set ($parentReference = $doc.documentReference.parent)
-          #if ($doc.name == 'WebHome')
-            #set ($parentReference = $parentReference.parent)
-          #end
+          #set ($parentReference = $doc.pageReference.parent)
         #else
           #getWikiHomePageReference($doc.wiki $homeReference)
           #if ($doc.documentReference.equals($homeReference) || $deprecatedSpaceCreate)

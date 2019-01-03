@@ -165,7 +165,7 @@
       <optgroup label="${escapetool.xml($classdoc.space)}">
       #set ($prevSpace = $classdoc.space)
     #end
-    <option value="${escapetool.xml($classdoc.fullName)}">${escapetool.xml($classdoc.name)}</option>
+    <option value="${escapetool.xml($classdoc.fullName)}">${escapetool.xml($classdoc.pageReference.name)}</option>
   #end
 #end
 #if($prevSpace != '')

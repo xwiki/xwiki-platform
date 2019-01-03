@@ -123,7 +123,7 @@
 ##                    CHILDREN
 #######################################################
 #macro(getChildren)
-  #if ($doc.name == 'WebHome') ## terminal documents have no child
+  #if ($doc.documentReference.name == 'WebHome') ## terminal documents have no child
     #set($childCountXWQL = "WHERE doc.fullName LIKE :space AND doc.fullName <> :fullName")
     #set ($query = $services.query.xwql($childCountXWQL))
     #set ($query = $query.bindValue('space').literal("${doc.space}.").anyChars().query())
@@ -170,7 +170,7 @@
   #if($services.parentchild.isParentChildMechanismEnabled())
     #set($childrenStatement = 'where doc.fullName <> :parentFullName and (doc.parent = :parentFullName or (doc.parent = :parentName and doc.space = :parentSpace))')
     #set($childrenQuery = $services.query.xwql($childrenStatement))
-    #set($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.name).bindValue('parentSpace', $doc.space))
+    #set($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.documentReference.name).bindValue('parentSpace', $doc.space))
     #set($children = $childrenQuery.addFilter('unique').execute())
     #if($children && $children.size() > 0)
       #define($heading)

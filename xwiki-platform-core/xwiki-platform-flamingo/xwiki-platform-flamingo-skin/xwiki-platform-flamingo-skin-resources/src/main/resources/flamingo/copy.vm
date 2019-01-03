@@ -41,12 +41,8 @@
         ## Target Page
         ##------------
         #template('locationPicker_macros.vm')
-        #set ($parentReference = $doc.documentReference.parent)
-        #set ($name = $doc.name)
-        #if ($doc.name == $defaultDocumentName)
-          #set ($name = $parentReference.name)
-          #set ($parentReference = $parentReference.parent)
-        #end
+        #set ($parentReference = $doc.pageReference.parent)
+        #set ($name = $doc.pageReference.name)
         #locationPicker({
           'id': 'target',
           'title': {

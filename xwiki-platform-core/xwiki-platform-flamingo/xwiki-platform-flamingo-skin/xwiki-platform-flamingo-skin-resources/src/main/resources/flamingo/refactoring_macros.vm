@@ -11,7 +11,7 @@
     #hierarchy()
     <input type="hidden" name="sourceWikiName" value="$!escapetool.xml($doc.wiki)" />
     <input type="hidden" name="sourceSpaceName" value="$!escapetool.xml($doc.space)" />
-    <input type="hidden" name="sourcePageName" value="$!escapetool.xml($doc.name)" />
+    <input type="hidden" name="sourcePageName" value="$!escapetool.xml($doc.documentReference.name)" />
   </dd>
 #end
 
@@ -43,7 +43,7 @@
 
 #macro (displayChildrenCheckbox $options)
   ## Check if the document can have children.
-  #if ($doc.name == $defaultDocumentName)
+  #if ($doc.documentReference.name == $defaultDocumentName)
     #set ($spaceReference = $doc.documentReference.parent)
     #countNestedDocuments($spaceReference $childCount)
     #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children&displayHidden=true')))
@@ -89,7 +89,7 @@
       #if ($request.terminal)
         #set ($checked = $request.terminal == 'true')
       #else
-        #set ($checked = $doc.name != $defaultDocumentName)
+        #set ($checked = $doc.documentReference.name != $defaultDocumentName)
       #end
       <input type="checkbox" name="terminal" value="true" #if ($checked)checked="checked"#end />
       $services.localization.render($options.label)

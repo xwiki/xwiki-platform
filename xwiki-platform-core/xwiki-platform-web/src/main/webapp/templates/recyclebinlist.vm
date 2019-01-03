@@ -2,7 +2,7 @@
 #set($dds = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.locale))
 #displayDeletedDocuments($dds, 'docs')
 
-#if ($doc.name == 'WebHome')
+#if ($doc.documentReference.name == 'WebHome')
   ## Also display the list of terminal documents sharing the same location.
   ## eg. If the current document is: "A.B.WebHome", we should also display any deleted terminal page called "A.B".
   ## This is important because when the user delete a terminal document and go back to the location, she should see

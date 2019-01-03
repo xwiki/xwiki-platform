@@ -9,7 +9,7 @@
   #if ($services.parentchild.isParentChildMechanismEnabled())
     #set ($discard = $docextralinks.add(['children', $services.localization.render('docextra.children'), -1, 'folder', {'hierarchy': 'parentchild'}]))
   #else
-    #if ($doc.name == 'WebHome')
+    #if ($doc.documentReference.name == 'WebHome')
       #set ($discard = $docextralinks.add(['children', $services.localization.render('docextra.children'), -1, 'folder', '', 'tmChildren']))
     #else
       ## Terminal document

@@ -60,7 +60,7 @@
     </div>
     <div id="exportModelOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
       <div class="panel-body">
-        #if ($doc.name == 'WebHome')
+        #if ($doc.documentReference.name == 'WebHome')
           #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
           <div class="row">
             <div class="col-xs-6">
@@ -88,7 +88,7 @@
         <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.html')</a>
         #if($hasAdmin && $services.xar.isXARExportAvailable())
           #set($exportURL = "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,'default'))")
-          #if ($doc.name == 'WebHome')
+          #if ($doc.documentReference.name == 'WebHome')
             ## When nested page also export WebPreferences which contain among other things the right of this entity
             #set($exportURL = "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,'default'))}.WebPreferences")
           #end

@@ -64,7 +64,7 @@ $response.setContentType("application/json")
       #set ($pageDoc = $xwiki.getDocument($pageReference))
       #set ($title = $pageDoc.getRenderedTitle('html/5.0'))
       #if ("$!title" == '')
-        #set ($title = $pageDoc.name)
+        #set ($title = $pageDoc.pageReference.name)
       #end
       #set ($discard = $data.add({
         'id': $services.model.serialize($pageReference, 'default'),

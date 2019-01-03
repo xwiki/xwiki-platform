@@ -37,7 +37,7 @@
       #else
         #template('refactoring_macros.vm')
         ## Determine if the new document should be terminal.
-        #isTargetDocumentTerminal($doc.name)
+        #isTargetDocumentTerminal($doc.documentReference.name)
         #getNestedDocumentReference($request.newWikiName $request.newSpaceName $request.newPageName $NULL $terminal
           $newDocReference)
         #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))

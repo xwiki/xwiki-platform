@@ -38,7 +38,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
             <optgroup label="${escapetool.xml($classdoc.space)}">
             #set($prevSpace = ${classdoc.space})
           #end
-          <option value="$classdoc.getURL('edit', 'editor=class')">${escapetool.xml($classdoc.name)}</option>
+          <option value="$classdoc.getURL('edit', 'editor=class')">${escapetool.xml($classdoc.pageReference.name)}</option>
         #end
       #end
       #if($prevSpace != '')

@@ -137,7 +137,7 @@
         <label for="sourcePageName">$services.localization.render('core.copy.sourcepage')</label>
         <span class="xHint">$services.localization.render('core.copy.sourcepage.hint')</span>
       </dt>
-      <dd>$!{escapetool.xml($doc.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.name)}" size="60"/></dd>
+      <dd>$!{escapetool.xml($doc.documentReference.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.documentReference.name)}" size="60"/></dd>
       ##------------------
       ## Translation field
       ##------------------
@@ -192,7 +192,7 @@
         <label for="targetPageName">$services.localization.render('core.copy.targetpage')</label>
         <span class="xHint">$services.localization.render('core.copy.targetpage.hint')</span>
       </dt>
-      <dd><input type="text" id="targetPageName" name="targetPageName" value="$!{escapetool.xml($doc.name)}" size="60" /></dd>
+      <dd><input type="text" id="targetPageName" name="targetPageName" value="$!{escapetool.xml($doc.documentReference.name)}" size="60" /></dd>
     </dl>
     <div class="buttons">
       <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/></span>

@@ -31,7 +31,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   #end
   <textarea readonly="readonly" class="wiki-code" rows="25" cols="80">
 #foreach($line in $contentLines)
-$doc.name.format("%${positions}d:", $velocityCount) $line
+$doc.documentReference.name.format("%${positions}d:", $velocityCount) $line
 #end</textarea>
 #else
   <a href="$doc.getURL('view', "viewer=code&amp;showlinenumbers=1&amp;$!docvariant")" id="toggleLineNumbers">$services.localization.render('core.viewers.code.showLineNumbers')</a>

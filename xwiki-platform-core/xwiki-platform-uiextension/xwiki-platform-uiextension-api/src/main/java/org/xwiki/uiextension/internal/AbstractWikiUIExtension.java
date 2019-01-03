@@ -109,7 +109,7 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         try {
             BlockAsyncRendererConfiguration executorConfiguration = configure();
 
-            result = this.executor.execute(executorConfiguration, this.contextEntries);
+            result = this.executor.execute(executorConfiguration);
         } catch (Exception e) {
             result = new CompositeBlock(this.errorBlockGenerator
                 .generateErrorBlocks(String.format("Failed to execute UIX with id [%s]", getId()), e, false));
@@ -136,8 +136,7 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         executorConfiguration.setDefaultSyntax(this.syntax);
 
         // The author of the source
-        executorConfiguration.setAuthorReference(getAuthorReference());
-        executorConfiguration.setSourceReference(getDocumentReference());
+        executorConfiguration.setSecureReference(getDocumentReference(), getAuthorReference());
 
         // The syntax in which the result will be rendered
         executorConfiguration.setTargetSyntax(this.renderingContext.getTargetSyntax());
@@ -157,6 +156,8 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
             // The role type and hint of the UI extension component so that the cache is invalidated when modified
             executorConfiguration.useComponent(getRoleType(), getRoleHint());
         }
+
+        executorConfiguration.setContextEntries(this.contextEntries);
 
         return executorConfiguration;
     }

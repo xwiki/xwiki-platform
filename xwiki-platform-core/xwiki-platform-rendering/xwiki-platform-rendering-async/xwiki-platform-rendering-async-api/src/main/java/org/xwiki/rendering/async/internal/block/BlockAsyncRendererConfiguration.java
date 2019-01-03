@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.xwiki.component.descriptor.ComponentRole;
 import org.xwiki.component.descriptor.DefaultComponentRole;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -40,17 +40,11 @@ import org.xwiki.rendering.transformation.TransformationContext;
  * @version $Id$
  * @since 10.10RC1
  */
-public class BlockAsyncRendererConfiguration
+public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
 {
     private List<String> id;
 
     private Block block;
-
-    private boolean authorReferenceSet;
-
-    private DocumentReference authorReference;
-
-    private DocumentReference sourceReference;
 
     private boolean asyncAllowed;
 
@@ -117,49 +111,6 @@ public class BlockAsyncRendererConfiguration
     public Block getBlock()
     {
         return this.block;
-    }
-
-    /**
-     * @return true if the reference of the author have been set
-     */
-    public boolean isAuthorReferenceSet()
-    {
-        return this.authorReferenceSet;
-    }
-
-    /**
-     * @return the reference of the author of the code
-     */
-    public DocumentReference getAuthorReference()
-    {
-        return this.authorReference;
-    }
-
-    /**
-     * @param authorReference the reference of the author of the code
-     */
-    public void setAuthorReference(DocumentReference authorReference)
-    {
-        this.authorReference = authorReference;
-        this.authorReferenceSet = true;
-    }
-
-    /**
-     * @return the reference of the document containing the executed block
-     * @since 10.11RC1
-     */
-    public DocumentReference getSourceReference()
-    {
-        return this.sourceReference;
-    }
-
-    /**
-     * @param sourceReference the reference of the document containing the executed block
-     * @since 10.11RC1
-     */
-    public void setSourceReference(DocumentReference sourceReference)
-    {
-        this.sourceReference = sourceReference;
     }
 
     /**

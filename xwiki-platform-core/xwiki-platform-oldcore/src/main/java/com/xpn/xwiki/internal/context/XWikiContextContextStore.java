@@ -79,7 +79,15 @@ public class XWikiContextContextStore extends AbstractContextStore
     /**
      * Name of the entry containing the author.
      */
-    public static final String PROP_AUTHOR = "author";
+    public static final String PROP_SECURE_AUTHOR = "author";
+
+    /**
+     * Name of the entry containing the secure document.
+     * 
+     * @since 10.11.1
+     * @since 11.0RC1
+     */
+    public static final String PROP_SECURE_DOCUMENT = "secureDocument";
 
     /**
      * Name of the entry containing the locale.
@@ -200,8 +208,8 @@ public class XWikiContextContextStore extends AbstractContextStore
      */
     public XWikiContextContextStore()
     {
-        super(PROP_WIKI, PROP_USER, PROP_AUTHOR, PROP_LOCALE, PROP_REQUEST_BASE, PROP_REQUEST_URL,
-            PROP_REQUEST_PARAMETERS, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_REQUEST_BASE, PROP_REQUEST_URL, PROP_REQUEST_PARAMETERS,
+            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -218,7 +226,7 @@ public class XWikiContextContextStore extends AbstractContextStore
             }
 
             save(contextStore, PROP_USER, xcontext.getUserReference(), entries);
-            save(contextStore, PROP_AUTHOR, xcontext.getAuthorReference(), entries);
+            save(contextStore, PROP_SECURE_AUTHOR, xcontext.getAuthorReference(), entries);
             save(contextStore, PROP_LOCALE, xcontext.getLocale(), entries);
 
             save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
@@ -329,8 +337,13 @@ public class XWikiContextContextStore extends AbstractContextStore
         // User
         if (contextStore.containsKey(PROP_USER)) {
             xcontext.setUserReference((DocumentReference) contextStore.get(PROP_USER));
-        } else {
+
             // If the current user is not a criteria set one which will always have all the required rights
+        } else if (contextStore.containsKey(PROP_SECURE_AUTHOR)) {
+            // If the author is provided use it to be as close as possible to the expected behavior
+            xcontext.setUserReference((DocumentReference) contextStore.get(PROP_SECURE_AUTHOR));
+        } else {
+            // Fallback on superadmin when no author is provided
             xcontext.setUserReference(SUPERADMIN_REFERENCE);
         }
 
@@ -351,27 +364,72 @@ public class XWikiContextContextStore extends AbstractContextStore
 
     private void restoreAuthor(Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
-        if (contextStore.containsKey(PROP_AUTHOR)) {
-            DocumentReference authorReference = (DocumentReference) contextStore.get(PROP_AUTHOR);
+        if (contextStore.containsKey(PROP_SECURE_AUTHOR)) {
+            DocumentReference authorReference = (DocumentReference) contextStore.get(PROP_SECURE_AUTHOR);
 
-            if (!Objects.equals(xcontext.getAuthorReference(), authorReference)) {
-                XWikiDocument secureDocument = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
+            restoreAuthor(contextStore, authorReference, xcontext);
+        }
+    }
 
-                if (secureDocument != null) {
+    private void restoreAuthor(Map<String, Serializable> contextStore, DocumentReference authorReference,
+        XWikiContext xcontext)
+    {
+        DocumentReference secureDocumentReference = (DocumentReference) contextStore.get(PROP_SECURE_DOCUMENT);
+
+        XWikiDocument secureDocument = null;
+
+        if (secureDocumentReference != null) {
+            secureDocument = getSecureDocument(secureDocumentReference, authorReference, xcontext);
+        }
+
+        // If there is no requested secure document (which is usually a bad practice), invent one
+        if (secureDocument == null) {
+            secureDocument = new XWikiDocument(new DocumentReference(
+                authorReference != null ? authorReference.getWikiReference().getName() : xcontext.getMainXWiki(),
+                "SUSpace", "SUPage"));
+            secureDocument.setAuthorReference(authorReference);
+            secureDocument.setCreatorReference(authorReference);
+        }
+
+        // Set the context author
+        secureDocument.setContentAuthorReference(authorReference);
+
+        xcontext.put(XWikiDocument.CKEY_SDOC, secureDocument);
+    }
+
+    private XWikiDocument getSecureDocument(DocumentReference secureDocumentReference,
+        DocumentReference authorReference, XWikiContext xcontext)
+    {
+        XWikiDocument secureDocument = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
+
+        if (secureDocument != null && secureDocument.getDocumentReference().equals(secureDocumentReference)) {
+            // If the document does not have the right content author clone it to avoid messing with the
+            // cache
+            if (!Objects.equals(secureDocument.getContentAuthorReference(), authorReference)) {
+                // Clone the document to avoid messing with the cache
+                secureDocument = secureDocument.clone();
+            }
+        } else {
+            try {
+                // Get the requested secure document
+                secureDocument = xcontext.getWiki().getDocument(secureDocumentReference, xcontext);
+
+                // If the document does not have the right content author clone it to avoid messing with the
+                // cache
+                if (!Objects.equals(secureDocument.getContentAuthorReference(), authorReference)) {
                     secureDocument = secureDocument.clone();
-                } else {
-                    secureDocument = new XWikiDocument(new DocumentReference(authorReference != null
-                        ? authorReference.getWikiReference().getName() : xcontext.getMainXWiki(), "SUSpace", "SUPage"));
-                    secureDocument.setAuthorReference(authorReference);
-                    secureDocument.setCreatorReference(authorReference);
                 }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to load secure document [{}]", secureDocumentReference, e);
 
-                // Set the context author
-                secureDocument.setContentAuthorReference(authorReference);
-
-                xcontext.put(XWikiDocument.CKEY_SDOC, secureDocument);
+                // Fallback on a new empty XWikiDocument instance
+                secureDocument = new XWikiDocument(secureDocumentReference);
+                secureDocument.setAuthorReference(authorReference);
+                secureDocument.setCreatorReference(authorReference);
             }
         }
+
+        return secureDocument;
     }
 
     private void restoreDocument(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)

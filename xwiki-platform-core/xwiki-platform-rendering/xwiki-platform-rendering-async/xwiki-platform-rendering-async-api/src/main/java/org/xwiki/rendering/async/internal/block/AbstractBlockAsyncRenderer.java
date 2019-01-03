@@ -24,7 +24,6 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -32,7 +31,6 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.security.authorization.AuthorExecutor;
 
 /**
  * Helper to execute Block based asynchronous renderer.
@@ -51,24 +49,7 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
     protected Transformation macroTransformation;
 
     @Inject
-    protected AuthorExecutor authorExecutor;
-
-    @Inject
     protected RenderingContext renderingContext;
-
-    protected void transform(Block block, TransformationContext transformationContext, DocumentReference author,
-        DocumentReference secureDocument) throws TransformationException
-    {
-        try {
-            this.authorExecutor.call(() -> {
-                transform(block, transformationContext);
-
-                return null;
-            }, author, secureDocument);
-        } catch (Exception e) {
-            throw new TransformationException("Failed to execute transformations", e);
-        }
-    }
 
     protected void transform(Block block, TransformationContext transformationContext) throws TransformationException
     {

@@ -34,6 +34,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -44,6 +46,8 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -160,5 +164,56 @@ public class XWikiContextContextStoreTest
             this.oldcore.getXWikiContext().getDoc().getDocumentReference());
         assertEquals(this.wikiURL.toString(), this.oldcore.getXWikiContext().getRequest().getRequestURL().toString());
         assertFalse(((XWikiServletRequestStub) this.oldcore.getXWikiContext().getRequest()).isDaemon());
+        assertNull(this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC));
+    }
+
+    @Test
+    public void restoreAuthor() throws XWikiException
+    {
+        assertNull(this.oldcore.getXWikiContext().getAuthorReference());
+        assertNull(this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC));
+        assertNull(this.oldcore.getXWikiContext().getUserReference());
+
+        DocumentReference authorReference = new DocumentReference("authorwiki", "authorspace", "author");
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+        contextStore.put(XWikiContextContextStore.PROP_SECURE_AUTHOR, authorReference);
+
+        this.store.restore(contextStore);
+
+        assertEquals(this.oldcore.getXWikiContext().getUserReference(), authorReference);
+
+        XWikiDocument secureDocument1 = (XWikiDocument) this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC);
+        assertNotNull(secureDocument1);
+        assertEquals(new DocumentReference("authorwiki", "SUSpace", "SUPage"), secureDocument1.getDocumentReference());
+        assertEquals(authorReference, secureDocument1.getContentAuthorReference());
+        assertEquals(authorReference, this.oldcore.getXWikiContext().getAuthorReference());
+
+        this.store.restore(contextStore);
+
+        assertEquals(this.oldcore.getXWikiContext().getUserReference(), authorReference);
+
+        XWikiDocument secureDocument2 = (XWikiDocument) this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC);
+        assertNotNull(secureDocument2);
+        assertNotSame(secureDocument1, secureDocument2);
+        assertEquals(new DocumentReference("authorwiki", "SUSpace", "SUPage"), secureDocument2.getDocumentReference());
+        assertEquals(authorReference, secureDocument2.getContentAuthorReference());
+        assertEquals(authorReference, this.oldcore.getXWikiContext().getAuthorReference());
+
+        DocumentReference secureDocumentReference =
+            new DocumentReference("securewiki", "securespace", "securedocument");
+        contextStore.put(XWikiContextContextStore.PROP_SECURE_DOCUMENT, secureDocumentReference);
+
+        this.store.restore(contextStore);
+
+        assertEquals(this.oldcore.getXWikiContext().getUserReference(), authorReference);
+
+        XWikiDocument secureDocument3 = (XWikiDocument) this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC);
+        assertNotNull(secureDocument3);
+        assertEquals(secureDocumentReference, secureDocument3.getDocumentReference());
+        assertEquals(authorReference, secureDocument3.getContentAuthorReference());
+        assertEquals(authorReference, this.oldcore.getXWikiContext().getAuthorReference());
+        assertNotSame(this.oldcore.getSpyXWiki().getDocument(secureDocumentReference, this.oldcore.getXWikiContext()),
+            secureDocument3);
     }
 }

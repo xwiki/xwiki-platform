@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.async.internal.block;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -29,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutorResponse;
 import org.xwiki.rendering.async.internal.AsyncRendererWrapper;
@@ -85,8 +84,7 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
     private JobProgressManager progress;
 
     @Override
-    public Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries)
-        throws JobException, RenderingException
+    public Block execute(BlockAsyncRendererConfiguration configuration) throws JobException, RenderingException
     {
         this.progress.pushLevelProgress(3, this);
 
@@ -107,18 +105,18 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
 
             // Start renderer execution if there is none already running/available
             return execute(configuration.getDecorator() != null
-                ? new DecoratorWrapper(configuration.getDecorator(), renderer) : renderer, contextEntries);
+                ? new DecoratorWrapper(configuration.getDecorator(), renderer) : renderer, configuration);
         } finally {
             this.progress.popLevelProgress(this);
         }
     }
 
     @Override
-    public Block execute(BlockAsyncRenderer renderer, Set<String> contextEntries)
+    public Block execute(BlockAsyncRenderer renderer, AsyncRendererConfiguration configuration)
         throws JobException, RenderingException
     {
         // Start renderer execution if there is none already running/available
-        AsyncRendererExecutorResponse response = this.executor.render(renderer, contextEntries);
+        AsyncRendererExecutorResponse response = this.executor.render(renderer, configuration);
 
         // Get result
         BlockAsyncRendererResult result = (BlockAsyncRendererResult) response.getStatus().getResult();

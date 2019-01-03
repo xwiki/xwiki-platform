@@ -197,4 +197,11 @@ public class DefaultExtendedRenderingConfigurationTest
         assertEquals(1, configuredSyntaxes.size());
         assertTrue(configuredSyntaxes.contains(xwikiSyntax20));
     }
+    @Test
+    public void getDefaultContentSyntax() throws Exception
+    {
+        CoreConfiguration coreConfiguration = componentManager.getInstance(CoreConfiguration.class);
+        when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        assertEquals(Syntax.XWIKI_2_1, this.defaultExtendedRenderingConfiguration.getDefaultContentSyntax());
+    }
 }

@@ -22,8 +22,8 @@ package org.xwiki.officeimporter.internal.converter;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.artofsolving.jodconverter.document.DocumentFamily;
-import org.artofsolving.jodconverter.document.DocumentFormat;
+import org.jodconverter.document.DocumentFamily;
+import org.jodconverter.document.DocumentFormat;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.server.OfficeServer;

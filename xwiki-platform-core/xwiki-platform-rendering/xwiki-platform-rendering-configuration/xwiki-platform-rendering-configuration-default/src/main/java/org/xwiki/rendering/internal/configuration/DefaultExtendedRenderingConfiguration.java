@@ -145,6 +145,7 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
     {
         // TODO: Move the code from DefaultCoreConfiguration here and introduce a new property for it, for ex:
         // rendering.defaultContentSyntax
+        // However keep supporting the old property for backward-compatibility reasons.
         return this.coreConfiguration.getDefaultDocumentSyntax();
     }
 

@@ -71,4 +71,22 @@ public privileged aspect DocumentCompatibilityAspect
     {
         rename(newDocumentName, backlinkDocumentNames);
     }
+
+    /**
+     * @return the last part of the document's reference. For example if the reference of a document is
+     *         {@code MySpace.Mydoc}, the returned name is {@code MyDoc}. For a nested document, the last part of the
+     *         reference is always {@code WebHome} and thus the returned name is {@code Webhome}. It's better to use
+     *         {@link #getPageReference()} or {@link #getDocumentReference()}, e.g. with
+     *         {@code getPageReference().getName()} or {@code getDocumentReference().getName()}. To get the space name
+     *         of the nested document you can use {@code getPageReference().getName()} or
+     *         {@code getDocumentReference().getParent().getName()}.
+     * @see #getPageReference()
+     * @see #getDocumentReference()
+     * @deprecated since 11.0RC1, use {@link #getDocumentReference()} instead
+     */
+    @Deprecated
+    public String Document.getName()
+    {
+        return this.doc.getDocumentReference().getName();
+    }
 }

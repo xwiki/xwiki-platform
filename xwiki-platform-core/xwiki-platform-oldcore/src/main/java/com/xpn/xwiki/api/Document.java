@@ -272,22 +272,6 @@ public class Document extends Api
     }
 
     /**
-     * @return the last part of the document's reference. For example if the reference of a document is
-     *         {@code MySpace.Mydoc}, the returned name is {@code MyDoc}. For a nested document, the last part of the
-     *         reference is always {@code WebHome} and thus the returned name is {@code Webhome}. It's better to use
-     *         {@link #getPageReference()} or {@link #getDocumentReference()}, e.g. with
-     *         {@code getPageReference().getName()} or {@code getDocumentReference().getName()}. To get the space name
-     *         of the nested document you can use {@code getPageReference().getName()} or
-     *         {@code getDocumentReference().getParent().getName()}.
-     * @see #getPageReference()
-     * @see #getDocumentReference()
-     */
-    public String getName()
-    {
-        return this.doc.getDocumentReference().getName();
-    }
-
-    /**
      * Return the full local space reference of the Document. For example a document located in sub-space
      * <code>space11</code> of space <code>space1</code> will return <code>space1.space11</code>.
      *

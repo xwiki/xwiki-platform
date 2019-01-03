@@ -27,6 +27,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiComponent;
+import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -98,11 +99,14 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         // Initialize the renderer
         renderer.initialize(this, parameters, macroContent, context);
 
+        AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
+        configuration.setSecureReference(getDocumentReference(), getAuthorReference());
+        configuration.setContextEntries(this.contextEntries);
+
         // Execute the renderer
         Block result;
         try {
-            // TODO: add right checking (view on current document ?)
-            result = this.executor.execute(renderer, this.contextEntries);
+            result = this.executor.execute(renderer, configuration);
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to execute wiki macro", e);
         }

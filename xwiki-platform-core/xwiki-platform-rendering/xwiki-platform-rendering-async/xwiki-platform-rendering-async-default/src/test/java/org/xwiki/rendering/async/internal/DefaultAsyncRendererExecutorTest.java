@@ -63,6 +63,8 @@ public class DefaultAsyncRendererExecutorTest
 
     private static final Set<String> CELEMENTS = new LinkedHashSet<>(Arrays.asList(CELEMENT1, CELEMENT2));
 
+    private AsyncRendererConfiguration configuration;
+
     @MockComponent
     private JobExecutor jobs;
 
@@ -91,6 +93,9 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.render(false, false)).thenReturn(new AsyncRendererResult("false false"));
         when(this.renderer.render(true, false)).thenReturn(new AsyncRendererResult("true false"));
         when(this.renderer.render(false, true)).thenReturn(new AsyncRendererResult("false true"));
+
+        this.configuration = new AsyncRendererConfiguration();
+        this.configuration.setContextEntries(CELEMENTS);
 
         Map<String, Serializable> map = new HashMap<>();
         map.put(CELEMENT1, "value1\\");
@@ -126,7 +131,7 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.isAsyncAllowed()).thenReturn(true);
         when(this.renderer.isCacheAllowed()).thenReturn(true);
 
-        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, CELEMENTS);
+        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, this.configuration);
 
         assertNull(response.getAsyncClientId());
         assertEquals("1/2/celement1/value1%255c/celement2/value2%252f", response.getJobIdHTTPPath());
@@ -145,7 +150,7 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.isAsyncAllowed()).thenReturn(true);
         when(this.renderer.isCacheAllowed()).thenReturn(true);
 
-        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, CELEMENTS);
+        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, this.configuration);
 
         assertNotNull(response.getAsyncClientId());
         assertEquals(Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f"),
@@ -164,7 +169,7 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.isAsyncAllowed()).thenReturn(false);
         when(this.renderer.isCacheAllowed()).thenReturn(true);
 
-        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, CELEMENTS);
+        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, this.configuration);
 
         assertNull(response.getAsyncClientId());
         assertEquals(Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f"),
@@ -183,7 +188,7 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.isAsyncAllowed()).thenReturn(true);
         when(this.renderer.isCacheAllowed()).thenReturn(false);
 
-        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, CELEMENTS);
+        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, this.configuration);
 
         assertNotNull(response.getAsyncClientId());
         assertEquals(Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f",
@@ -203,7 +208,7 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.isAsyncAllowed()).thenReturn(false);
         when(this.renderer.isCacheAllowed()).thenReturn(false);
 
-        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, CELEMENTS);
+        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, this.configuration);
 
         assertNull(response.getAsyncClientId());
         assertNull(response.getStatus().getRequest().getId());

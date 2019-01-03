@@ -20,7 +20,6 @@
 package org.xwiki.rendering.async.internal;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.xwiki.component.annotation.Role;
@@ -63,12 +62,12 @@ public interface AsyncRendererExecutor
      * Start and cache or return the status of the job corresponding to the passed renderer.
      * 
      * @param renderer the execution
-     * @param contextEntries the list of context entries to take remember for the execution
+     * @param configuration the configuration of the execution
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
      * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
      * @since 10.11RC1
      */
-    AsyncRendererExecutorResponse render(AsyncRenderer renderer, Set<String> contextEntries)
+    AsyncRendererExecutorResponse render(AsyncRenderer renderer, AsyncRendererConfiguration configuration)
         throws JobException, RenderingException;
 }

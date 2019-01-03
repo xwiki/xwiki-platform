@@ -19,12 +19,11 @@
  */
 package org.xwiki.rendering.async.internal.block;
 
-import java.util.Set;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
@@ -42,22 +41,25 @@ public interface BlockAsyncRendererExecutor
      * Start and cache or return the status of the job corresponding to the passed renderer.
      * 
      * @param configuration the configuration of the execution
-     * @param contextEntries the list of context entries required for the execution
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
      * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
+     * @since 10.11.1
+     * @since 11.0RC1
      */
-    Block execute(BlockAsyncRendererConfiguration configuration, Set<String> contextEntries)
-        throws JobException, RenderingException;
+    Block execute(BlockAsyncRendererConfiguration configuration) throws JobException, RenderingException;
 
     /**
      * Start and cache or return the status of the job corresponding to the passed renderer.
      * 
      * @param renderer the renderer to execute
-     * @param contextEntries the list of context entries required for the execution
+     * @param configuration the configuration of the execution
      * @return the {@link JobStatus}
      * @throws JobException when failing to start the job
      * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
+     * @since 10.11.1
+     * @since 11.0RC1
      */
-    Block execute(BlockAsyncRenderer renderer, Set<String> contextEntries) throws JobException, RenderingException;
+    Block execute(BlockAsyncRenderer renderer, AsyncRendererConfiguration configuration)
+        throws JobException, RenderingException;
 }

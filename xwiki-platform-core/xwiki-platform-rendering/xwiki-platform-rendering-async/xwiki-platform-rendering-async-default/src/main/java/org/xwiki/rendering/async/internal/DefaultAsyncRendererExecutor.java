@@ -23,9 +23,9 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,6 +49,9 @@ import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
+import org.xwiki.security.authorization.AuthorExecutor;
+
+import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 
 /**
  * Default implementation of {@link AsyncRendererExecutor}.
@@ -75,6 +78,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
     @Inject
     private AsyncContext asyncContext;
+
+    @Inject
+    protected AuthorExecutor authorExecutor;
 
     @Inject
     @Named("context")
@@ -127,13 +133,13 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     }
 
     @Override
-    public AsyncRendererExecutorResponse render(AsyncRenderer renderer, Set<String> contextEntries)
+    public AsyncRendererExecutorResponse render(AsyncRenderer renderer, AsyncRendererConfiguration configuration)
         throws JobException, RenderingException
     {
         boolean async = renderer.isAsyncAllowed() && this.asyncContext.isEnabled();
 
         // Get context and job id
-        Map<String, Serializable> context = getContext(renderer, async, contextEntries);
+        Map<String, Serializable> context = getContext(renderer, async, configuration);
 
         // Generate job id
         List<String> jobId = getJobId(renderer, context);
@@ -189,7 +195,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                     ((DefaultAsyncContext) this.asyncContext).pushContextUse();
                 }
 
-                AsyncRendererResult result = renderer.render(false, true);
+                AsyncRendererResult result = syncRender(renderer, true, configuration);
 
                 // Get suff to invalidate the cache
                 if (this.asyncContext instanceof DefaultAsyncContext) {
@@ -207,7 +213,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
                 this.cache.put(status);
             } else {
-                AsyncRendererResult result = renderer.render(false, false);
+                AsyncRendererResult result = syncRender(renderer, false, configuration);
 
                 // Ceate a pseudo job status
                 status = new AsyncRendererJobStatus(request, result);
@@ -217,6 +223,21 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         }
 
         return response;
+    }
+
+    private AsyncRendererResult syncRender(AsyncRenderer renderer, boolean cached,
+        AsyncRendererConfiguration configuration) throws RenderingException
+    {
+        if (configuration.isSecureReferenceSet()) {
+            try {
+                return this.authorExecutor.call(() -> renderer.render(false, cached),
+                    configuration.getSecureAuthorReference(), configuration.getSecureDocumentReference());
+            } catch (Exception e) {
+                throw new RenderingException("Failed to execute renderer", e);
+            }
+        } else {
+            return renderer.render(false, cached);
+        }
     }
 
     private void injectUses(AsyncRendererJobStatus status)
@@ -239,18 +260,33 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         }
     }
 
-    private Map<String, Serializable> getContext(AsyncRenderer renderer, boolean async, Set<String> contextEntries)
-        throws JobException
+    private Map<String, Serializable> getContext(AsyncRenderer renderer, boolean async,
+        AsyncRendererConfiguration configuration) throws JobException
     {
-        if ((async || renderer.isCacheAllowed()) && contextEntries != null) {
-            try {
-                return this.contextStore.save(contextEntries);
-            } catch (ComponentLookupException e) {
-                throw new JobException("Failed to save the context", e);
+        Map<String, Serializable> savedContext = null;
+
+        if (async || renderer.isCacheAllowed()) {
+            if (configuration.getContextEntries() != null) {
+                try {
+                    savedContext = this.contextStore.save(configuration.getContextEntries());
+                } catch (ComponentLookupException e) {
+                    throw new JobException("Failed to save the context", e);
+                }
+            }
+
+            // If async inject the configured author
+            if (async && configuration.isSecureReferenceSet()) {
+                if (savedContext == null) {
+                    savedContext = new HashMap<>();
+                }
+
+                savedContext.put(XWikiContextContextStore.PROP_SECURE_AUTHOR, configuration.getSecureAuthorReference());
+                savedContext.put(XWikiContextContextStore.PROP_SECURE_DOCUMENT,
+                    configuration.getSecureDocumentReference());
             }
         }
 
-        return null;
+        return savedContext;
     }
 
     private AsyncRendererJobStatus getCurrent(List<String> jobId)

@@ -38,7 +38,8 @@ import org.xwiki.icon.IconSetManager;
  * Save and restore well icon related information.
  * 
  * @version $Id$
- * @since 10.11RC1
+ * @since 10.11.1
+ * @since 11.0RC1
  */
 @Component
 @Singleton

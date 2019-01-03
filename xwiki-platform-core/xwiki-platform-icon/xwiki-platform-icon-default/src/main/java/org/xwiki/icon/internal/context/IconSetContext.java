@@ -31,7 +31,8 @@ import org.xwiki.icon.IconSet;
  * Control context icon set.
  * 
  * @version $Id$
- * @since 10.11RC1
+ * @since 10.11.1
+ * @since 11.0RC1
  */
 @Component(roles = IconSetContext.class)
 @Singleton

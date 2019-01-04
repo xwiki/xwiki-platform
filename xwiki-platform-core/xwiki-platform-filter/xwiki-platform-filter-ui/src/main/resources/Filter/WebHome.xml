@@ -53,7 +53,7 @@
     #end
   #end
 #end
-## Set response output by default
+## Set request input by default
 #if (!$inputProperties.source &amp;&amp; $services.filter.getInputFilterStreamDescriptor($request.input).getPropertyDescriptor('source'))
   #set($sourceStandardInput = true)
   #set($void = $inputProperties.put('source', $request.inputStream))

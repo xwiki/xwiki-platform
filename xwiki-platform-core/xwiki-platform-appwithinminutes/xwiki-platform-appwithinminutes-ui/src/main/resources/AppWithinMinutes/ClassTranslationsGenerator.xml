@@ -59,7 +59,7 @@ $escapetool.h Class fields
 #end
 
 $escapetool.h Live table generic keys
-#set ($appName = $doc.name.replaceAll('Class', '').toLowerCase())
+#set ($appName = $doc.documentReference.name.replaceAll('Class', '').toLowerCase())
 #set ($prefix = "${appName}.livetable.")
 #set ($liveTableGenericKeys = {
   'doc.title': 'liveTableEditorDocTitleColumnName',
@@ -89,7 +89,7 @@ $escapetool.h Live table specific keys
 #end
 
 $escapetool.h Other keys
-#map("${appName}.entry.name" $stringtool.removeEnd($doc.name, 'Class'))
+#map("${appName}.entry.name" $stringtool.removeEnd($doc.documentReference.name, 'Class'))
 
 $escapetool.h Deprecated keys
 #map("${appName}.dataSpace.title" 'Data')

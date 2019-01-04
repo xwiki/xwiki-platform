@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if(!$doc.name.endsWith('Sheet'))$services.localization.render('appWithinMinutes.classEditor.title', [$stringtool.removeEnd($doc.title, 'Class').trim()])#{else}$doc.name#end</title>
+  <title>#if(!$doc.documentReference.name.endsWith('Sheet'))$services.localization.render('appWithinMinutes.classEditor.title', [$stringtool.removeEnd($doc.title, 'Class').trim()])#{else}$doc.documentReference.name#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -608,7 +608,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
     #set($templateRef = $services.model.resolveDocument("${className}Template"))
     #set($templateDoc = $xwiki.getDocument($templateRef))
-    #set($discard = $templateDoc.setParent($doc.name))
+    #set($discard = $templateDoc.setParent($doc.documentReference.name))
     #if ($request.templateTitle)
       #set($discard = $templateDoc.setTitle($request.templateTitle))
     #end
@@ -646,7 +646,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #if($sheetReference)
       #set($sheetDoc = $xwiki.getDocument($sheetReference))
       #set($sheetGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassSheetGenerator'))
-      #set($discard = $sheetDoc.setParent($doc.name))
+      #set($discard = $sheetDoc.setParent($doc.documentReference.name))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content,
         $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
       #set($discard = $sheetDoc.setHidden(true))
@@ -670,7 +670,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set ($scope = 'WIKI')
     #end
     #set($discard = $translationsObj.set('scope', $scope))
-    #set($discard = $translationsDoc.setParent($doc.name))
+    #set($discard = $translationsDoc.setParent($doc.documentReference.name))
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
     #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content,
       $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))

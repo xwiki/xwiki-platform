@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -69,11 +70,6 @@ import com.xpn.xwiki.api.Document;
 @Singleton
 public class XarExtensionScriptService extends AbstractExtensionScriptService
 {
-    /**
-     * The install request property that specifies which user triggered the XAR repair job.
-     */
-    private static final String PROPERTY_USER_REFERENCE = "user.reference";
-
     @Inject
     private Packager packager;
 
@@ -118,11 +114,11 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
         installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, id, namespace));
         DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
         if (currentUserReference != null) {
-            installRequest.setProperty(PROPERTY_USER_REFERENCE, currentUserReference);
+            installRequest.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE, currentUserReference);
             // We set the string value because the extension repository doesn't know how to serialize/parse an extension
             // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
             // because ExtensionPropertySerializers are not components (they are currently hard-coded).
-            installRequest.setExtensionProperty(PROPERTY_USER_REFERENCE, currentUserReference.toString());
+            installRequest.setExtensionProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE, currentUserReference.toString());
         }
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {

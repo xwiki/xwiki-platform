@@ -141,15 +141,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Backward compatibility module to allow users using the old {{activity}} macro in pages to have them continue
-         working -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-notification-activitymacro</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <optional>true</optional>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-messagestream-ui</artifactId>
@@ -210,4 +201,20 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>legacy</id>
+      <dependencies>
+        <!-- Backward compatibility module to allow users using the old {{activity}} macro in pages to have them continue
+         working -->
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-notification-activitymacro</artifactId>
+          <version>${project.version}</version>
+          <type>xar</type>
+          <optional>true</optional>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>

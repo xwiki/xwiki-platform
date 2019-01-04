@@ -35,7 +35,7 @@
   <date>1454671965000</date>
   <contentUpdateDate>1454454402000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if($doc.name == 'StepSheet')Step Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
+  <title>#if($doc.documentReference.name == 'StepSheet')Step Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

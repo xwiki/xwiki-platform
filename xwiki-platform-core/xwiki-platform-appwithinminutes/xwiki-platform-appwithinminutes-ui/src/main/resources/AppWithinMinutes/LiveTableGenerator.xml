@@ -123,7 +123,7 @@ ${escapetool.h}set (${escapetool.d}columnsProperties = {
 #set($className = $liveTableObj.getProperty('class').value)
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
-#set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
+#set($shortName = $classDoc.documentReference.name.replaceAll("Class", "").toLowerCase())
 #generateColumnProperties()
 ${escapetool.h}set (${escapetool.d}options = {
   'className': '#escapeSingleQuotes($className)',

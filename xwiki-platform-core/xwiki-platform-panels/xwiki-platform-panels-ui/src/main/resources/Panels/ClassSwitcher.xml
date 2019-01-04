@@ -146,7 +146,7 @@ $xwiki.jsx.use('Panels.ClassSwitcher')##
           &lt;optgroup label="$classdoc.space"&gt;
       #set($prevSpace = $classdoc.space)
     #end
-    &lt;option value="$classdoc.getURL("edit", "editor=class")"&gt;$classdoc.name&lt;/option&gt;
+    &lt;option value="$classdoc.getURL("edit", "editor=class")"&gt;$classdoc.documentReference.name&lt;/option&gt;
   #end
 #end
 #if($optGroupOpen)

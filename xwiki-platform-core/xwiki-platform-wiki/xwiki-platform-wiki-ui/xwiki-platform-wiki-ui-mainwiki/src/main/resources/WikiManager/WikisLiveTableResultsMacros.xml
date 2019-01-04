@@ -290,9 +290,9 @@
     #set($discard = $itemDoc.use($className))
     #if ($isTranslation)
       ## Display the language after the document name so that not all translated documents have the same name displayed
-      #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+      #set($discard = $row.put('doc_name', "$itemDoc.documentReference.name ($docLanguage)"))
     #else
-      #set($discard = $row.put('doc_name', $itemDoc.name))
+      #set($discard = $row.put('doc_name', $itemDoc.documentReference.name))
     #end
     #set($discard = $row.put('doc_fullName', $fullname))
     #set($discard = $row.put('doc_space', $itemDoc.space))

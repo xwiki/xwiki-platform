@@ -49,7 +49,7 @@
   #set ($currSpace = $request.getParameter('space'))
   #set ($redirectQuery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;section=Panels.PanelWizard&amp;$!docvariant")
   #set ($redirectMode = 'admin')
-  #if ($doc.name != 'XWikiPreferences' &amp;&amp; $doc.name != 'WebPreferences')
+  #if ($doc.documentReference.name != 'XWikiPreferences' &amp;&amp; $doc.documentReference.name != 'WebPreferences')
     #set ($redirectDoc = 'XWiki.XWikiPreferences')
     #set ($mustRedirect = true)
   #end

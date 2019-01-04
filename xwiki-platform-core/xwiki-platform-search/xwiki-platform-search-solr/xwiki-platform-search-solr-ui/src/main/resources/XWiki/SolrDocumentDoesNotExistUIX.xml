@@ -224,11 +224,7 @@
     </class>
     <property>
       <content>{{velocity}}
-#set ($docName = $doc.name)
-#if ($doc.name == 'WebHome')
-  ## Use the last space name as doc name for non-terminal documents.
-  #set ($docName = ${doc.documentReference.lastSpaceReference.name})
-#end
+#set ($docName = $doc.pageReference.name)
 ##
 ## Handle the case when there are spaces in the doc name
 #set ($docNameWords = $stringtool.split($docName, ' '))
@@ -262,7 +258,7 @@
 ## Terminal doc with the same name as the current doc
 #set ($suggestionsQueryString = "${suggestionsQueryString} OR name:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
 ## Document in a space named like the current terminal doc, if it is the case.
-#if ($doc.name != 'WebHome')
+#if ($doc.documentReference.name != 'WebHome')
   #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
 #end
 ## Document in a space named like on of the spaces of the current doc.

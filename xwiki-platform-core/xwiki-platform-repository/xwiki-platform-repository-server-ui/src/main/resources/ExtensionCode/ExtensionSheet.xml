@@ -227,8 +227,8 @@
         $extension.set('id', "${defaultIdPrefix}${request.name.toLowerCase().replace(' ', '-')}")##
         $extension.set('name', $request.name)##
       #else
-        $extension.set('id', "${defaultIdPrefix}${doc.name.toLowerCase().replace(' ', '-')}")##
-        $extension.set('name', $doc.name)##
+        $extension.set('id', "${defaultIdPrefix}${doc.documentReference.name.toLowerCase().replace(' ', '-')}")##
+        $extension.set('name', $doc.documentReference.name)##
       #end
       $extension.set('authors', $xcontext.user)##
       {{html}}&lt;input value="${escapetool.xml($extension.getProperty('id').value)}" name="ExtensionCode.ExtensionClass_0_id" type="hidden"&gt;{{/html}}

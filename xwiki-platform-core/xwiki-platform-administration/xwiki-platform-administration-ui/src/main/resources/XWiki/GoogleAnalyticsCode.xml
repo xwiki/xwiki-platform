@@ -71,7 +71,7 @@
 {{/velocity}}
 
 {{velocity}}
-#if ($doc.name != 'XWikiPreferences' &amp;&amp; $xcontext.action == 'view')
+#if ($doc.documentReference.name != 'XWikiPreferences' &amp;&amp; $xcontext.action == 'view')
   $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics'))
 #end
 #set ($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))

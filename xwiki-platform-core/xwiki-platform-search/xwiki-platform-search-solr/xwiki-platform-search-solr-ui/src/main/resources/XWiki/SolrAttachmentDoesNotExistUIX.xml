@@ -236,11 +236,7 @@
 #set ($filenameSplitWildcard = "*$!{stringtool.join($filenameWords, '*,*')}*")
 ##
 ## Determine the document name.
-#set ($docName = $doc.name)
-#if ($doc.name == 'WebHome')
-  ## Use the last space name as doc name for non-terminal documents.
-  #set ($docName = ${doc.documentReference.lastSpaceReference.name})
-#end
+#set ($docName = $doc.pageReference.name)
 ##
 ## Handle the case when there are spaces in the doc name.
 #set ($docNameWords = $stringtool.split($docName, ' '))
@@ -267,7 +263,7 @@
 #end
 ##
 ## Files in the same document
-#set ($suggestionsQueryString = "filename:($filenameSplit, $filenameSplitFuzzy, $filenameSplitWildcard) OR (space_exact:""$doc.space"" AND name_exact:""$doc.name"")")
+#set ($suggestionsQueryString = "filename:($filenameSplit, $filenameSplitFuzzy, $filenameSplitWildcard) OR (space_exact:""$doc.space"" AND name_exact:""$doc.documentReference.name"")")
 ## Files in a document with a similar name or space elements as the current doc.
 #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings, $spaceReferenceWildcardStrings) OR name:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
 ##

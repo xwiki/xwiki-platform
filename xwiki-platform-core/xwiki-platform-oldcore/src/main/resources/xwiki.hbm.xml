@@ -167,6 +167,8 @@
         <property name="docId" type="long" column="XWA_DOC_ID" index="ATT_DOC_ID" />
         <property name="filename" type="string" column="XWA_FILENAME" length="255" not-null="true" />
         <property name="longSize" type="long" not-null="true">
+          <!-- XWikiDocument#setLongSize() does not support null so we need to indicated a default value to use
+               when the column is added during migrations  -->
           <column name="XWA_LONGSIZE" default="-1"></column>
         </property>
         <!-- Kept for retro compatibility, so that existing queries using att.filesize will still work. -->

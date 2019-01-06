@@ -107,9 +107,10 @@ def builds = [
   'Quality' : {
     build(
       name: 'Quality',
-      goals: 'clean install jacoco:report',
+      goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy',
-      xvnc: false
+      xvnc: false,
+      sonar = true
     )
   }
 ]
@@ -204,20 +205,23 @@ def build(map)
   node(map.node ?: '') {
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
-      if (map.goals != null) {
+      if (map.goals) {
         goals = map.goals
       }
-      if (map.profiles != null) {
+      if (map.profiles) {
         profiles = map.profiles
       }
-      if (map.properties != null) {
+      if (map.properties) {
         properties = map.properties
       }
-      if (map.pom != null) {
+      if (map.pom) {
         pom = map.pom
       }
-      if (map.mavenFlags != null) {
+      if (map.mavenFlags) {
         mavenFlags = map.mavenFlags
+      }
+      if (map.sonar) {
+        sonar = map.sonar
       }
     }
   }

@@ -200,7 +200,7 @@ $services.localization.render('xe.scheduler.welcome')
 
 #else
 
-  {{warning}}$services.localization.render('xe.scheduler.jobs.warning')){{/warning}}
+  {{warning}}$services.localization.render('xe.scheduler.jobs.warning'){{/warning}}
 
 #end
 {{/velocity}}</content>

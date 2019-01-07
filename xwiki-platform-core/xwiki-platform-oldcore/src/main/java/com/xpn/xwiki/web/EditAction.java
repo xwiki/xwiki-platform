@@ -217,7 +217,7 @@ public class EditAction extends XWikiAction
         // Update the edited title.
         if (editForm.getTitle() != null) {
             document.setTitle(editForm.getTitle());
-        } else if (sectionNumber > 0) {
+        } else if (sectionNumber > 0 && document.getSections().size() > 0) {
             // The edited content is either the content of the specified section or the content provided on the
             // request. We assume the content provided on the request is meant to overwrite the specified section.
             // In both cases the document content is currently having one section, so we can take its title.

@@ -110,7 +110,7 @@ def builds = [
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy',
       xvnc: false,
-      sonar = true
+      sonar: true
     )
   }
 ]

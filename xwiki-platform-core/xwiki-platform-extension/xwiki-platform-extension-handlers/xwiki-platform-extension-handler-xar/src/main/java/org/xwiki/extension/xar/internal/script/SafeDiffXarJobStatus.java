@@ -22,12 +22,13 @@ package org.xwiki.extension.xar.internal.script;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
 import org.xwiki.job.internal.script.safe.SafeJobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Safe version of {@link DiffXarJobStatus}.
@@ -40,20 +41,24 @@ public class SafeDiffXarJobStatus extends SafeJobStatus<DiffXarJobStatus>
     /**
      * The component used to check access rights.
      */
-    private DocumentAccessBridge documentAccessBridge;
+    private ContextualAuthorizationManager authorization;
 
     /**
      * Creates a new safe instance that wraps the given unsafe instance.
      * 
      * @param status the wrapped object
      * @param safeProvider the provider of instances safe for public scripts
-     * @param documentAccessBridge the component used to check access rights
+     * @param authorization the component used to check access rights
+     * @since 9.11.9
+     * @since 10.11.1
+     * @since 11.0RC1
      */
     public SafeDiffXarJobStatus(DiffXarJobStatus status, ScriptSafeProvider<?> safeProvider,
-        DocumentAccessBridge documentAccessBridge)
+        ContextualAuthorizationManager authorization)
     {
         super(status, safeProvider);
-        this.documentAccessBridge = documentAccessBridge;
+
+        this.authorization = authorization;
     }
 
     /**
@@ -68,7 +73,7 @@ public class SafeDiffXarJobStatus extends SafeJobStatus<DiffXarJobStatus>
             if (documentReference == null) {
                 documentReference = documentDiff.getNextReference();
             }
-            if (this.documentAccessBridge.isDocumentViewable(documentReference)) {
+            if (this.authorization.hasAccess(Right.VIEW, documentReference)) {
                 safeDocumentDiffs.add(documentDiff);
             }
         }

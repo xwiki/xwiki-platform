@@ -19,6 +19,7 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,6 +27,11 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParser;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -277,5 +283,67 @@ public class EscapeLikeParametersFilterTest
         expectedPositionalMap.put(1, "%Foo!!%");
 
         assertEquals(expectedPositionalMap, filteredQuery.getPositionalParameters());
+    }
+
+    @Test
+    public void notLike()
+    {
+        String statement = "select doc.fullName from XWikiDocument doc where doc.fullName not like ?";
+        Query query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn(statement);
+        Map<Integer, Object> positionalParameters = new HashMap<>();
+        positionalParameters.put(0, new DefaultQueryParameter(null).like("Foo.%"));
+
+        when(query.getPositionalParameters()).thenReturn(positionalParameters);
+
+        Query query1 = this.filter.filterQuery(query);
+        String expectedStatement = "select doc.fullName from XWikiDocument doc where doc.fullName not like ? escape '!'";
+        assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
+
+        statement = "select doc.fullName from XWikiDocument doc where (doc.fullName not like ?)";
+        query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn(statement);
+        positionalParameters = new HashMap<>();
+        positionalParameters.put(0, new DefaultQueryParameter(null).like("Foo.%"));
+
+        when(query.getPositionalParameters()).thenReturn(positionalParameters);
+
+        query1 = this.filter.filterQuery(query);
+        expectedStatement = "select doc.fullName from XWikiDocument doc where (doc.fullName not like ? escape '!')";
+        assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
+
+        statement = "select doc.fullName from XWikiDocument doc where not (doc.fullName not like ? and "
+            + "doc.fullName like ?)";
+        query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn(statement);
+        positionalParameters = new HashMap<>();
+        positionalParameters.put(0, new DefaultQueryParameter(null).like("Foo.%"));
+
+        when(query.getPositionalParameters()).thenReturn(positionalParameters);
+
+        query1 = this.filter.filterQuery(query);
+        expectedStatement = "select doc.fullName from XWikiDocument doc where not (doc.fullName not like ? escape '!' "
+            + "and doc.fullName like ? escape '!')";
+        assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
+
+        statement = "select doc.fullName from XWikiDocument doc where ((doc.fullName not like ? and doc.fullName "
+            + "not like ?) or doc.fullName not like ?) limit 5";
+        query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement()).thenReturn(statement);
+        positionalParameters = new HashMap<>();
+        positionalParameters.put(0, new DefaultQueryParameter(null).like("Foo.%"));
+        positionalParameters.put(1, new DefaultQueryParameter(null).like("B.%"));
+        positionalParameters.put(2, new DefaultQueryParameter(null).like("H.%"));
+
+        when(query.getPositionalParameters()).thenReturn(positionalParameters);
+
+        query1 = this.filter.filterQuery(query);
+        expectedStatement = "select doc.fullName from XWikiDocument doc where ((doc.fullName not like ? escape '!' "
+            + "and doc.fullName not like ? escape '!') or doc.fullName not like ? escape '!') limit 5";
+        assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
     }
 }

@@ -28,10 +28,12 @@ import org.xwiki.query.Query;
 import org.xwiki.query.WrappingQuery;
 
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.JdbcNamedParameter;
 import net.sf.jsqlparser.expression.JdbcParameter;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -141,21 +143,98 @@ public class EscapeLikeParametersQuery extends WrappingQuery
     private String modifyStatement(String statementString) throws JSQLParserException
     {
         Statement statement = CCJSqlParserUtil.parse(statementString);
+
         if (statement instanceof Select) {
             Select select = (Select) statement;
             SelectBody selectBody = select.getSelectBody();
             if (selectBody instanceof PlainSelect) {
                 PlainSelect plainSelect = (PlainSelect) selectBody;
                 Expression where = plainSelect.getWhere();
-                where.accept(new XWikiExpressionVisitor());
+                XWikiExpressionVisitor xWikiExpressionVisitor = new XWikiExpressionVisitor();
+                where.accept(xWikiExpressionVisitor);
+
+                /*
+                 *  This should be removed once {@link XWikiLikeExpression} is removed.
+                 */
+                if (xWikiExpressionVisitor.likeExpression != null) {
+                    plainSelect.setWhere(xWikiExpressionVisitor.likeExpression);
+                }
             }
         }
 
         return statement.toString();
     }
 
+    /**
+     * This class needs to be removed once JSQLParser has been released with a fix for
+     * https://github.com/JSQLParser/JSqlParser/issues/726.
+     *
+     * This class override the behaviour of LikeExpression and ensure that the redundant "NOT" is not returned
+     * when calling toString().
+     */
+    private final class XWikiLikeExpression extends LikeExpression
+    {
+        private XWikiLikeExpression(LikeExpression likeExpression)
+        {
+            this.setRightExpression(likeExpression.getRightExpression());
+            this.setLeftExpression(likeExpression.getLeftExpression());
+            this.setCaseInsensitive(likeExpression.isCaseInsensitive());
+            this.setEscape(likeExpression.getEscape());
+            if (likeExpression.isNot()) {
+                this.setNot();
+            }
+
+            this.setASTNode(likeExpression.getASTNode());
+        }
+
+        @Override
+        public String toString()
+        {
+            String value = super.toString();
+            if (this.isNot()) {
+                return value.substring(4);
+            } else {
+                return value;
+            }
+        }
+    }
+
     private class XWikiExpressionVisitor extends ExpressionVisitorAdapter
     {
+        private XWikiLikeExpression likeExpression;
+
+        /**
+         *  This should be removed once {@link XWikiLikeExpression} is removed.
+         */
+        @Override
+        public void visit(Parenthesis expr)
+        {
+            expr.getExpression().accept(this);
+            if (this.likeExpression != null) {
+                expr.setExpression(this.likeExpression);
+                this.likeExpression = null;
+            }
+        }
+
+        /**
+         *  This should be removed once {@link XWikiLikeExpression} is removed.
+         */
+        @Override
+        public void visitBinaryExpression(BinaryExpression expr)
+        {
+            expr.getLeftExpression().accept(this);
+            if (this.likeExpression != null) {
+                expr.setLeftExpression(this.likeExpression);
+                this.likeExpression = null;
+            }
+
+            expr.getRightExpression().accept(this);
+            if (this.likeExpression != null) {
+                expr.setRightExpression(this.likeExpression);
+                this.likeExpression = null;
+            }
+        }
+
         @Override
         public void visit(LikeExpression expr)
         {
@@ -163,6 +242,13 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                 expr.setEscape("!");
             }
             expr.accept(new XWikiLikeExpressionVisitor());
+
+            /*
+             *  This should be removed once {@link XWikiLikeExpression} is removed.
+             */
+            if (expr.isNot()) {
+                this.likeExpression = new XWikiLikeExpression(expr);
+            }
         }
     }
 

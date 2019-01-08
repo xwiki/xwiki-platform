@@ -249,8 +249,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext)
     {
-        BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor();
-        BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start(testConfiguration);
+        BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor(testConfiguration);
+        BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start();
 
         // Store it so that we can retrieve it later on.
         // Note that we don't need to stop it as this is taken care of by TestContainers

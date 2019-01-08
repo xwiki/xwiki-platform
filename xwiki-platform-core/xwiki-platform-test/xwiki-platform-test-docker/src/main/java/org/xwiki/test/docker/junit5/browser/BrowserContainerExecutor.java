@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.SeleniumUtils;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -37,39 +38,49 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserContainerExecutor.class);
 
+    private TestConfiguration testConfiguration;
+
+    /**
+     * @param testConfiguration the configuration used to parameterize this container.
+     */
+    public BrowserContainerExecutor(TestConfiguration testConfiguration)
+    {
+        this.testConfiguration = testConfiguration;
+    }
+
     /**
      * Create and start the {@link BrowserWebDriverContainer} based on the test given test configuration.
      *
-     * @param testConfiguration the configuration used to parameterize this container.
      * @return the started browser driver container.
      */
-    public BrowserWebDriverContainer start(TestConfiguration testConfiguration)
+    public BrowserWebDriverContainer start()
     {
-        LOGGER.info("(*) Starting browser [{}]...", testConfiguration.getBrowser());
+        LOGGER.info("(*) Starting browser [{}]...", this.testConfiguration.getBrowser());
         Browser browser = testConfiguration.getBrowser();
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
-            .withDesiredCapabilities(browser.getCapabilities())
+            .withCapabilities(browser.getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
 
             // In case some test-resources are provided, they need to be available from the browser
             // for example in order to upload some files on the wiki.
-            .withFileSystemBind(getTestResourcePathOnHost(testConfiguration), browser.getTestResourcesPath());
+            .withFileSystemBind(getTestResourcePathOnHost(), browser.getTestResourcesPath());
 
-        if (testConfiguration.isVerbose()) {
+        if (this.testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Test resource path mapped: On Host [%s], in Docker: [%s]",
-                getTestResourcePathOnHost(testConfiguration), browser.getTestResourcesPath()));
-            LOGGER.info(String.format("Docker image used: [%s]",
-                BrowserWebDriverContainer.getImageForCapabilities(testConfiguration.getBrowser().getCapabilities())));
+                getTestResourcePathOnHost(), browser.getTestResourcesPath()));
+            LOGGER.info(String.format("Docker image used: [%s]", BrowserWebDriverContainer.getImageForCapabilities(
+                this.testConfiguration.getBrowser().getCapabilities(),
+                SeleniumUtils.determineClasspathSeleniumVersion())));
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
         webDriverContainer.start();
 
-        if (testConfiguration.vnc()) {
+        if (this.testConfiguration.vnc()) {
             LOGGER.info("VNC server address = " + webDriverContainer.getVncAddress());
         }
 
@@ -79,14 +90,14 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
     /**
      * @return the path where the test resources are stored by Maven after test compilation, on the host.
      */
-    private String getTestResourcePathOnHost(TestConfiguration testConfiguration)
+    private String getTestResourcePathOnHost()
     {
         String testClassesDirectory;
         String mavenBuildDir = System.getProperty("maven.build.dir");
         if (mavenBuildDir == null) {
             testClassesDirectory = "target/test-classes";
         } else {
-            testClassesDirectory = String.format("%s/test-classes", testConfiguration.getOutputDirectory());
+            testClassesDirectory = String.format("%s/test-classes", this.testConfiguration.getOutputDirectory());
         }
         return testClassesDirectory;
     }

@@ -2396,10 +2396,20 @@ public class XWiki implements EventListener
 
     public String getSkinFile(String filename, XWikiContext context)
     {
-        return getSkinFile(filename, false, context);
+        return getSkinFile(filename, context, null);
+    }
+
+    public String getSkinFile(String filename, XWikiContext context, String version)
+    {
+        return getSkinFile(filename, false, version, context);
     }
 
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
+    {
+        return getSkinFile(filename, forceSkinAction, null, context);
+    }
+
+    public String getSkinFile(String filename, boolean forceSkinAction, String version, XWikiContext context)
     {
         XWikiURLFactory urlf = context.getURLFactory();
 
@@ -2424,7 +2434,7 @@ public class XWiki implements EventListener
 
             // Look for a resource file
             if (resourceExists("/resources/" + filename)) {
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, version, context);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2445,10 +2455,21 @@ public class XWiki implements EventListener
 
     public String getSkinFile(String filename, String skin, XWikiContext context)
     {
-        return getSkinFile(filename, skin, false, context);
+        return getSkinFile(filename, skin, context, null);
+    }
+
+    public String getSkinFile(String filename, String skin, XWikiContext context, String version)
+    {
+        return getSkinFile(filename, skin, false, context, version);
     }
 
     public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
+    {
+        return getSkinFile(filename, skinId, forceSkinAction, context, null);
+    }
+
+    public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context,
+        String version)
     {
         try {
             Skin skin = getInternalSkinManager().getSkin(skinId);
@@ -2463,7 +2484,7 @@ public class XWiki implements EventListener
             if (resourceExists("/resources/" + filename)) {
                 XWikiURLFactory urlf = context.getURLFactory();
 
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, version, context);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {

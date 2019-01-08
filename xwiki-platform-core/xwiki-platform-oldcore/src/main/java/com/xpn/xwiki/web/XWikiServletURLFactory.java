@@ -483,6 +483,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
+        return createResourceURL(filename, forceSkinAction, null, context);
+    }
+
+    @Override
+    public URL createResourceURL(String filename, boolean forceSkinAction, String version, XWikiContext context)
+    {
         StringBuilder path = new StringBuilder(this.contextPath);
         if (forceSkinAction) {
             addServletPath(path, context.getWikiId(), context);
@@ -490,6 +496,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
         path.append("resources");
         addFileName(path, filename, false, context);
+        if (version != null) {
+            path.append("?v=");
+            path.append(version);
+        }
         try {
             return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {

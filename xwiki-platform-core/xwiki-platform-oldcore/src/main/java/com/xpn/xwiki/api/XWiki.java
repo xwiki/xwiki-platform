@@ -1027,7 +1027,7 @@ public class XWiki extends Api
      */
     public String getSkinFile(String filename)
     {
-        return this.xwiki.getSkinFile(filename, getXWikiContext());
+        return this.xwiki.getSkinFile(filename, getXWikiContext(), this.xwiki.getVersion());
     }
 
     /**
@@ -1042,7 +1042,7 @@ public class XWiki extends Api
      */
     public String getSkinFile(String filename, boolean forceSkinAction)
     {
-        return this.xwiki.getSkinFile(filename, forceSkinAction, getXWikiContext());
+        return this.xwiki.getSkinFile(filename, forceSkinAction, this.xwiki.getVersion(), getXWikiContext());
     }
 
     /**

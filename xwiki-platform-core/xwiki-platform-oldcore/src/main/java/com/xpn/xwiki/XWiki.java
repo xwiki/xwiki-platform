@@ -2404,20 +2404,10 @@ public class XWiki implements EventListener
 
     public String getSkinFile(String filename, XWikiContext context)
     {
-        return getSkinFile(filename, context, null);
-    }
-
-    public String getSkinFile(String filename, XWikiContext context, String version)
-    {
-        return getSkinFile(filename, false, version, context);
+        return getSkinFile(filename, false, context);
     }
 
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
-    {
-        return getSkinFile(filename, forceSkinAction, null, context);
-    }
-
-    public String getSkinFile(String filename, boolean forceSkinAction, String version, XWikiContext context)
     {
         XWikiURLFactory urlf = context.getURLFactory();
 

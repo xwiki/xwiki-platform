@@ -571,9 +571,6 @@ function setPanelWidth() {
 //----------------------------------------------------------------
 
 function panelEditorInit() {
-  // Stop listening from inserted elements
-  panelsObserver.disconnect()
-
   tipobj = $("dhtmltooltip");
 
   parentNode = null;

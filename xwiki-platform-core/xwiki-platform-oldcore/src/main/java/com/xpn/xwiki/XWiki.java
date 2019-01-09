@@ -33,6 +33,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +47,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -80,6 +85,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -2433,8 +2441,11 @@ public class XWiki implements EventListener
             }
 
             // Look for a resource file
-            if (resourceExists("/resources/" + filename)) {
-                URL url = urlf.createResourceURL(filename, forceSkinAction, version, context);
+            String resourceFilePath = "/resources/" + filename;
+            if (resourceExists(resourceFilePath)) {
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                url = new URIBuilder(url.toURI()).addParameters(getResourceURLParameters(resourceFilePath)).build()
+                    .toURL();
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2453,23 +2464,34 @@ public class XWiki implements EventListener
         return urlf.getURL(url, context);
     }
 
-    public String getSkinFile(String filename, String skin, XWikiContext context)
+    private List<NameValuePair> getResourceURLParameters(String resourceFilePath)
     {
-        return getSkinFile(filename, skin, context, null);
+        List<NameValuePair> parameters = new LinkedList<>();
+        parameters.add(new BasicNameValuePair("xwikiVersion", this.getVersion()));
+
+        try {
+            URL resource = getResource(resourceFilePath);
+            Path resourcePath = Paths.get(resource.toURI());
+            long size = Files.size(resourcePath);
+
+            if (size != 0) {
+                parameters.add(new BasicNameValuePair("size", String.valueOf(size)));
+            }
+
+            FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+            parameters.add(new BasicNameValuePair("filedate", String.valueOf(lastModifiedTime.toMillis())));
+        } catch (Exception e) {
+            LOGGER.debug("Error when trying to access properties of resource file [{}]", resourceFilePath, e);
+        }
+        return parameters;
     }
 
-    public String getSkinFile(String filename, String skin, XWikiContext context, String version)
+    public String getSkinFile(String filename, String skin, XWikiContext context)
     {
-        return getSkinFile(filename, skin, false, context, version);
+        return getSkinFile(filename, skin, context);
     }
 
     public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
-    {
-        return getSkinFile(filename, skinId, forceSkinAction, context, null);
-    }
-
-    public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context,
-        String version)
     {
         try {
             Skin skin = getInternalSkinManager().getSkin(skinId);
@@ -2484,7 +2506,7 @@ public class XWiki implements EventListener
             if (resourceExists("/resources/" + filename)) {
                 XWikiURLFactory urlf = context.getURLFactory();
 
-                URL url = urlf.createResourceURL(filename, forceSkinAction, version, context);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {

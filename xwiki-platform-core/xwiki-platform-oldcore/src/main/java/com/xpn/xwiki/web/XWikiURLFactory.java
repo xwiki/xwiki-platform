@@ -106,18 +106,6 @@ public interface XWikiURLFactory
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
     /**
-     * Create a resource url based on the given filename.
-     * @param filename filename of the resource
-     * @param forceSkinAction true to make sure that static files are retrieved through the skin action, to allow
-     *            parsing of velocity on CSS files
-     * @param version when given add a query param to the url with the version
-     * @param context current context.
-     * @return URL to access this file
-     * @since 11.0RC1
-     */
-    URL createResourceURL(String filename, boolean forceSkinAction, String version, XWikiContext context);
-
-    /**
      * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
      *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this

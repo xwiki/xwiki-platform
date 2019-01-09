@@ -381,12 +381,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     @Override
-    public URL createResourceURL(String filename, boolean forceSkinAction, String version, XWikiContext context)
-    {
-        return createResourceURL(filename, forceSkinAction, context);
-    }
-
-    @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         try {

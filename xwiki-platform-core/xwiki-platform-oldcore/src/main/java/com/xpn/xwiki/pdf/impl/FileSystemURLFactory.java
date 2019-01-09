@@ -106,14 +106,14 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     }
 
     @Override
-    public URL createResourceURL(String filename, boolean forceSkinAction, String version, XWikiContext context)
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         try {
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getResourceKey(filename);
             if (!usedFiles.containsKey(key)) {
                 if (!copyResource("/resources/" + filename, key, usedFiles, context)) {
-                    return super.createResourceURL(filename, forceSkinAction, version, context);
+                    return super.createResourceURL(filename, forceSkinAction, context);
                 }
             }
             return usedFiles.get(key).toURI().toURL();

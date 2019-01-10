@@ -116,7 +116,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       dropdown.addClass('active');
     },
     persist: false,
-    preload: 'focus',
+    preload: true,
     render: {
       item: renderItem,
       option: renderOption,
@@ -135,6 +135,12 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
         var wrapper = this.$wrapper;
         wrapper.addClass(this.settings.loadingClass);
       }
+    },
+    onItemAdd: function(value, item) {
+      item.find('a.xwiki-selectize-option-label').click(function(event) {
+        // Clicking on the label should select the option not follow the link.
+        event.preventDefault();
+      });
     }
   };
 

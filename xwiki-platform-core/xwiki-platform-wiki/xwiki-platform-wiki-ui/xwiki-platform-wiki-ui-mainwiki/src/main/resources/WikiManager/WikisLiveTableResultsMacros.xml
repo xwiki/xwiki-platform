@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="WikiManager.WikisLiveTableResultsMacros" locale="">
   <web>WikiManager</web>
   <name>WikisLiveTableResultsMacros</name>
   <language/>
@@ -37,10 +37,12 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
+
 {{velocity output="false"}}
 #*
-* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on XWikiServerTemplate.
-* This should be removed when https://jira.xwiki.org/browse/XWIKI-10010 is fixed.
+* We override the following macro from XWiki.LiveTableResultsMacros to:
+* - disable the filter on XWikiServerTemplate (revert when https://jira.xwiki.org/browse/XWIKI-10010 is fixed)
+* - put order by value in MAX() function and GROUP BY (revert when https://jira.xwiki.org/browse/XWIKI-15595 is fixed)
 *#
 #macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
   ## Additional columns, should *not* contain parameters, all added column names must be filtered
@@ -94,18 +96,22 @@
     #livetable_getTableAlias($tableAlias)
     ##
     #if($order.startsWith('doc.'))
-      #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
+      #if ($order == "doc.fullName")
+        #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
+      #else
+        #set($orderSql = " order by MAX(${safe_tableAlias.replace('_','.')}) ${orderDirection}")
+      #end
     #elseif($tablelist.contains($tableAlias))
       #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
       #if ($multiselect != '1')
-        #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+        #set ($orderSql = " order by MAX(${safe_tableAlias}.value) ${orderDirection}")
       #end
     #elseif($order == 'averagevote')
       #livetable_getTableName($order)
       #set($fromSql = "${fromSql}, BaseObject as objratings, ${tableName} ${safe_tableAlias}")
       #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
       #set($discard = $whereParams.add("${order}"))
-      #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      #set($orderSql = " order by MAX(${safe_tableAlias}.value) ${orderDirection}")
     #else
       #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
       #if("$multiselect" != '1')
@@ -113,7 +119,7 @@
         #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
         #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
         #set($discard = $whereParams.add("${order}"))
-        #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+        #set($orderSql = " order by MAX(${safe_tableAlias}.value) ${orderDirection}")
       #end
     #end
   #end
@@ -164,6 +170,12 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
+  ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+  ## Group by doc.fullName if needed
+  #if ($orderSql &amp;&amp; $orderSql.contains('order by MAX('))
+    #set($orderSql = "GROUP BY doc.fullName $orderSql")
+  #end
+  #################################################
   #set($sql = "$countSql $!{orderSql}")
 #end
 #*
@@ -182,7 +194,7 @@
   #end
   ######## WIKI UI MAINWIKI CUSTOMIZATION #########
   ## The descriptors are always hidden, so we don't filter on the hidden column.
-  #set($query = $services.query.hql($sql).addFilter('currentlanguage').addFilter('unique').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #set($query = $services.query.hql($sql).addFilter('currentlanguage').setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #################################################
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))

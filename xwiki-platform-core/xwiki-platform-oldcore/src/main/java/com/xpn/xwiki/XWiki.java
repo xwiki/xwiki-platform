@@ -280,6 +280,11 @@ public class XWiki implements EventListener
     private static final String NO_VALUE = "---";
 
     /**
+     * Query parameters used to determine if a resource is in the browser cache.
+     */
+    private static final String CACHE_VERSION = "cache-version";
+
+    /**
      * List of top level space names that can be used in the fake context document created when accessing a resource
      * with the 'skin' action.
      */
@@ -2470,7 +2475,7 @@ public class XWiki implements EventListener
             return getResourceURLParameters(resourceUrl);
         } catch (MalformedURLException e) {
             LOGGER.debug("Error while getting URL for resource filepath [{}]", resource.getPath(), e);
-            return Collections.singletonMap("xwikiVersion", getVersion());
+            return Collections.singletonMap(CACHE_VERSION, getVersion());
         }
     }
 
@@ -2481,7 +2486,7 @@ public class XWiki implements EventListener
             return getResourceURLParameters(resourceUrl);
         } catch (MalformedURLException e) {
             LOGGER.debug("Error while getting URL for resource filepath [{}]", resourceFilePath, e);
-            return Collections.singletonMap("xwikiVersion", getVersion());
+            return Collections.singletonMap(CACHE_VERSION, getVersion());
         }
     }
 
@@ -2492,10 +2497,10 @@ public class XWiki implements EventListener
         try {
             Path resourcePath = Paths.get(resourceUrl.toURI());
             FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
-            parameters.put("filedate", String.valueOf(lastModifiedTime.toMillis()));
+            parameters.put(CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));
         } catch (Exception e) {
             LOGGER.debug("Error when trying to access properties of resource URL [{}]", resourceUrl, e);
-            parameters.put("xwikiVersion", getVersion());
+            parameters.put(CACHE_VERSION, getVersion());
         }
         return parameters;
     }

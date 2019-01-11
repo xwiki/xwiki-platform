@@ -204,7 +204,7 @@ def build(map)
 {
   node(map.node ?: '') {
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError"
       if (map.goals) {
         goals = map.goals
       }

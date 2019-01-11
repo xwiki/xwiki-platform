@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.usertype.UserCollectionType;
 
@@ -43,7 +43,7 @@ public class ListPropertyCollectionType implements UserCollectionType
 {
 
     @Override
-    public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister)
+    public PersistentCollection instantiate(SharedSessionContractImplementor session, CollectionPersister persister)
         throws HibernateException
     {
         return new ListPropertyPersistentList(session);
@@ -51,7 +51,7 @@ public class ListPropertyCollectionType implements UserCollectionType
 
     @Override
     @SuppressWarnings("unchecked")
-    public PersistentCollection wrap(SessionImplementor session, Object collection)
+    public PersistentCollection wrap(SharedSessionContractImplementor session, Object collection)
     {
         if (collection instanceof NotifyList) {
             return new ListPropertyPersistentList(session, (NotifyList) collection);
@@ -85,14 +85,8 @@ public class ListPropertyCollectionType implements UserCollectionType
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object replaceElements(
-        Object original,
-        Object target,
-        CollectionPersister persister,
-        Object owner,
-        Map copyCache,
-        SessionImplementor session)
-        throws HibernateException
+    public Object replaceElements(Object original, Object target, CollectionPersister persister, Object owner,
+            Map copyCache, SharedSessionContractImplementor session) throws HibernateException
     {
         Collection cTarget = (Collection) target;
         Collection cOriginal = (Collection) original;

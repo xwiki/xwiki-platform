@@ -2957,9 +2957,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Configuration config = getConfiguration();
 
             // don't add a mapping that's already there
+            /*
             if (config.getClassMapping(className) != null) {
                 return false;
             }
+            */
 
             config.addXML(makeMapping(className, custommapping));
             config.buildMappings();
@@ -2995,6 +2997,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private boolean isValidCustomMapping(BaseClass bclass, Configuration config)
     {
+        /*
         PersistentClass mapping = config.getClassMapping(bclass.getName());
         if (mapping == null) {
             return true;
@@ -3016,6 +3019,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 return false;
             }
         }
+        */
 
         return true;
     }
@@ -3030,6 +3034,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } else {
             hibconfig = getConfiguration();
         }
+        /*
         PersistentClass mapping = hibconfig.getClassMapping(bclass.getName());
         if (mapping == null) {
             return null;
@@ -3042,6 +3047,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             list.add(propname);
         }
         return list;
+        */
+        return null;
     }
 
     private boolean isValidColumnType(String name, String className)

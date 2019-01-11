@@ -26,10 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.NamedSQLQueryDefinition;
+import org.hibernate.query.NativeQuery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -274,7 +274,7 @@ public class HqlQueryExecutorTest
         DefaultQuery query = new DefaultQuery("queryName", this.executor);
 
         Session session = mock(Session.class);
-        SQLQuery sqlQuery = mock(SQLQuery.class);
+        NativeQuery sqlQuery = mock(NativeQuery.class);
         when(session.getNamedQuery(query.getStatement())).thenReturn(sqlQuery);
         when(sqlQuery.getQueryString()).thenReturn("foo");
 
@@ -284,7 +284,7 @@ public class HqlQueryExecutorTest
         when(filter.filterStatement("foo", "sql")).thenReturn("bar");
         when(filter.filterQuery(any(Query.class))).then(returnsFirstArg());
 
-        SQLQuery finalQuery = mock(SQLQuery.class);
+        NativeQuery finalQuery = mock(NativeQuery.class);
         when(session.createSQLQuery("bar")).thenReturn(finalQuery);
 
         NamedSQLQueryDefinition definition = mock(NamedSQLQueryDefinition.class);
@@ -338,7 +338,7 @@ public class HqlQueryExecutorTest
         ComponentManager cm = this.mocker.getInstance(ComponentManager.class, "context");
         when(cm.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
 
-        when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.Query.class));
+        when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.query.Query.class));
 
         this.executor.createHibernateQuery(session, query);
 

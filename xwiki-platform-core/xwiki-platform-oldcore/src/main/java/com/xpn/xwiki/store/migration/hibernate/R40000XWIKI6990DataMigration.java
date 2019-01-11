@@ -409,6 +409,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         private void createTemporaryTable()
         {
             Configuration tempConfig = getTempTableMapping();
+            /*
             Mapping mapping = tempConfig.buildMapping();
             PersistentClass pClass = tempConfig.getClassMapping(TEMPENTITY);
             if (!R40000XWIKI6990DataMigration.this.logger.isDebugEnabled()) {
@@ -427,6 +428,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     R40000XWIKI6990DataMigration.this.loggerManager.popLogListener();
                 }
             }
+            */
         }
 
         /**
@@ -440,6 +442,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("DELETE FROM ").append(TEMPTABLE);
             this.session.createSQLQuery(sb.toString()).executeUpdate();
 
+            /*
             if (R40000XWIKI6990DataMigration.this.dialect.dropTemporaryTableAfterUse()) {
                 sb = new StringBuilder(128);
                 sb.append("DROP TABLE ").append(TEMPTABLE);
@@ -458,6 +461,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 }
             }
+            */
         }
 
         /**
@@ -828,6 +832,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private PersistentClass getClassMapping(String className) throws DataMigrationException
     {
+        /*
         PersistentClass pClass = this.configuration.getClassMapping(className);
 
         if (pClass == null) {
@@ -843,6 +848,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         return pClass;
+        */
+        return null;
     }
 
     /**
@@ -1067,7 +1074,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             "1".equals(getXWikiContext().getWiki().Param("xwiki.store.migration." + this.getName() + ".safemode", "0"));
 
         // Use safe mode if the database has no temporary table supported by hibernate
-        useSafeUpdates = useSafeUpdates || !this.dialect.supportsTemporaryTables();
+        //useSafeUpdates = useSafeUpdates || !this.dialect.supportsTemporaryTables();
 
         // Proceed to document id conversion
         if (!docs.isEmpty()) {
@@ -1837,6 +1844,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     boolean hasDynamicMapping) throws XWikiException
                 {
                     if (INTERNAL.equals(mapping) || hasDynamicMapping) {
+                        /*
                         PersistentClass klass = R40000XWIKI6990DataMigration.this.configuration.getClassMapping(name);
                         if (!R40000XWIKI6990DataMigration.this.isMySQLMyISAM) {
                             List<Table> tables = getForeignKeyTables(klass);
@@ -1851,6 +1859,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
                         // Update key types for custom mapped class
                         appendDataTypeChangeLogs(sb, klass);
+                        */
                     }
                 }
             }, context);

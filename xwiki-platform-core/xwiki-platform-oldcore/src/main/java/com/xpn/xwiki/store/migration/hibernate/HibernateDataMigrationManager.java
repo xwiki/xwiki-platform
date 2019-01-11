@@ -155,7 +155,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                 @Override
                 public Object doInHibernate(Session session) throws HibernateException
                 {
-                    session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
+                    //session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
                     session.save(version);
 
                     return null;

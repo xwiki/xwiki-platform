@@ -22,7 +22,7 @@ package com.xpn.xwiki.internal.objects;
 import java.util.ArrayList;
 
 import org.hibernate.collection.internal.PersistentList;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.ListProperty.NotifyList;
@@ -40,7 +40,7 @@ public class ListPropertyPersistentList extends PersistentList
      * @param session The session implementor. {@link PersistentList}.
      * @param list The notify list to wrap with this list holder.
      */
-    public ListPropertyPersistentList(SessionImplementor session, NotifyList list)
+    public ListPropertyPersistentList(SharedSessionContractImplementor session, NotifyList list)
     {
         super(session, list);
     }
@@ -48,7 +48,7 @@ public class ListPropertyPersistentList extends PersistentList
     /**
      * @param session The session implementor. {@link PersistentList}.
      */
-    public ListPropertyPersistentList(SessionImplementor session)
+    public ListPropertyPersistentList(SharedSessionContractImplementor session)
     {
         super(session);
     }

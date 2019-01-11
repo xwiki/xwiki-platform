@@ -235,7 +235,7 @@ public class HibernateStore
         DatabaseMetaData result;
         Connection connection = null;
         JdbcConnectionAccess jdbcConnectionAccess =
-                ((SessionImplementor) getSessionFactory().getCurrentSession()).getJdbcConnectionAccess();
+                ((SessionImplementor) getSessionFactory().openSession()).getJdbcConnectionAccess();
         try {
             connection = jdbcConnectionAccess.obtainConnection();
             result = connection.getMetaData();
@@ -549,6 +549,7 @@ public class HibernateStore
         Session session = getCurrentSession();
         closeSession(session);
 
+        /*
         // Close all connections
         if (getSessionFactory() != null) {
             // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
@@ -559,6 +560,7 @@ public class HibernateStore
                 ((Stoppable) connectionProvider).stop();
             }
         }
+        */
     }
 
     /**

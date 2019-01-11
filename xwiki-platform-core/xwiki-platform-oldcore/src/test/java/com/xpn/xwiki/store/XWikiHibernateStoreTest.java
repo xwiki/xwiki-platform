@@ -25,12 +25,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.id.SequenceGenerator;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -174,7 +174,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         when(session.getSessionFactory()).thenReturn(sessionFactory);
         when(sessionFactory.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
-        SQLQuery sqlQuery = mock(SQLQuery.class);
+        NativeQuery sqlQuery = mock(NativeQuery.class);
         when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
@@ -196,7 +196,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         when(session.getSessionFactory()).thenReturn(sessionFactory);
         when(sessionFactory.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
-        SQLQuery sqlQuery = mock(SQLQuery.class);
+        NativeQuery sqlQuery = mock(NativeQuery.class);
         when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 

@@ -79,6 +79,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
             // Close all connections in the Connection Pool.
             // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
             // See http://bit.ly/QAJXlr
+            /*
             ConnectionProvider provider = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider();
             // If the user has specified a Data Source we shouldn't close it. Fortunately the way Hibernate works is
             // the following: if the user has configured Hibernate to use a Data Source then Hibernate will use
@@ -86,6 +87,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
             if (provider instanceof Stoppable) {
                 ((Stoppable) provider).stop();
             }
+            */
         }
     }
 
@@ -223,7 +225,6 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
         }
 
         // There is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
-        @Override
         protected InputStream getConfigurationInputStream(String resource) throws HibernateException
         {
             InputStream stream = Util.getResourceAsStream(resource);

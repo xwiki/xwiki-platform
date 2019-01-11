@@ -19,9 +19,11 @@
  */
 package com.xpn.xwiki.store;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.DatabaseMetaData;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -33,13 +35,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.id.SequenceGenerator;
-import org.hibernate.mapping.Table;
-import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.hibernate.tool.schema.extract.internal.DatabaseInformationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.phase.Initializable;
@@ -204,7 +208,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     private synchronized void initHibernate() throws HibernateException
     {
-        this.store.getConfiguration().configure(getPath());
+        this.store.getConfiguration().configure(new File(getPath()));
 
         if (this.sessionFactory == null) {
             this.sessionFactory = Utils.getComponent(HibernateSessionFactory.class);
@@ -367,7 +371,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        AtomicReference<String[]> schemaSQL = new AtomicReference<>(null);
+        AtomicReference<String[]> schemaSQL = new AtomicReference<>(new String[]{});
 
         Session session;
         boolean bTransaction = true;
@@ -387,15 +391,18 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
                 || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode())) {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
+                /*
                 Iterator iter = config.getTableMappings();
                 while (iter.hasNext()) {
                     Table table = (Table) iter.next();
                     table.setSchema(contextSchema);
                 }
+                */
             }
 
             session.doWork(connection -> {
-                DatabaseMetadata meta = new DatabaseMetadata(connection, this.store.getDialect());
+                config.
+                MetadataSources metadata = new MetadataSources(new StandardServiceRegistryBuilder().);
                 schemaSQL.set(config.generateSchemaUpdateScript(this.store.getDialect(), meta));
 
                 // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired

@@ -948,7 +948,7 @@
         <separator> </separator>
         <separators/>
         <sort>none</sort>
-        <sql>select doc.fullName from XWikiDocument doc, BaseObject obj where doc.fullName = obj.name and obj.className = 'XWiki.XWikiSkins'</sql>
+        <sql>, BaseObject obj where doc.fullName = obj.name and obj.className = 'XWiki.XWikiSkins'</sql>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>

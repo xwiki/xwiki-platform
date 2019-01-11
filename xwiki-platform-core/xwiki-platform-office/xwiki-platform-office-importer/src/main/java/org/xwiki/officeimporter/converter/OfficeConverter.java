@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.converter;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
+import org.jodconverter.document.DocumentFormatRegistry;
 
 /**
  * Interface used to convert documents between various office formats.

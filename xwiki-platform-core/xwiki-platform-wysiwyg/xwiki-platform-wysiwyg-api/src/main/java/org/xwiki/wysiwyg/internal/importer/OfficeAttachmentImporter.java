@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.artofsolving.jodconverter.document.DocumentFamily;
-import org.artofsolving.jodconverter.document.DocumentFormat;
+import org.jodconverter.document.DocumentFamily;
+import org.jodconverter.document.DocumentFormat;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;

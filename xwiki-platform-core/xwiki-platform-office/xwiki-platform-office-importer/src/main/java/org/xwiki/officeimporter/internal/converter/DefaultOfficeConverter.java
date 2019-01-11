@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.artofsolving.jodconverter.OfficeDocumentConverter;
-import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
+import org.jodconverter.LocalConverter;
+import org.jodconverter.document.DocumentFormatRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
@@ -50,7 +50,7 @@ public class DefaultOfficeConverter implements OfficeConverter
     /**
      * Converter provided by JODConverter library.
      */
-    private OfficeDocumentConverter converter;
+    private LocalConverter converter;
 
     /**
      * Working directory to be used when working with files.
@@ -63,7 +63,7 @@ public class DefaultOfficeConverter implements OfficeConverter
      * @param converter provided by JODConverter library.
      * @param workDir space for holding temporary file.
      */
-    public DefaultOfficeConverter(OfficeDocumentConverter converter, File workDir)
+    public DefaultOfficeConverter(LocalConverter converter, File workDir)
     {
         this.converter = converter;
         this.workDir = workDir;
@@ -97,7 +97,9 @@ public class DefaultOfficeConverter implements OfficeConverter
             }
 
             // Perform the conversion.
-            this.converter.convert(storage.getInputFile(), storage.getOutputFile());
+            this.converter.convert(storage.getInputFile())
+                .to(storage.getOutputFile())
+                .execute();
 
             // Collect all the output artifacts.
             Map<String, byte[]> result = new HashMap<String, byte[]>();

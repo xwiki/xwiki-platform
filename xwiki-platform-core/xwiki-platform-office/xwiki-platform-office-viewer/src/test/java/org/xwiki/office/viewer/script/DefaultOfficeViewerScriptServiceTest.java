@@ -25,9 +25,9 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.junit.Assert;
 
-import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -71,7 +71,7 @@ public class DefaultOfficeViewerScriptServiceTest
         OfficeServer officeServer = mocker.getInstance(OfficeServer.class);
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(officeServer.getConverter()).thenReturn(officeConverter);
-        when(officeConverter.getFormatRegistry()).thenReturn(new DefaultDocumentFormatRegistry());
+        when(officeConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
 
         for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
             "application/vnd.oasis.opendocument.presentation", "application/vnd.ms-powerpoint",

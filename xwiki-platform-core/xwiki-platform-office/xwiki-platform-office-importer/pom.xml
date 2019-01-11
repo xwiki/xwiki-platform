@@ -78,16 +78,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.artofsolving.jodconverter</groupId>
-      <artifactId>jodconverter-core</artifactId>
-      <!--
-        We have forked the JODConverter project because it is not maintained any more by its creator. This is a custom
-        release that includes fixes required by XWiki.
-
-        GitHub: https://github.com/xwiki/jodconverter
-        JIRA: https://jira.xwiki.org/browse/XJODC
-      -->
-      <version>3.1-xwiki</version>
+      <groupId>org.jodconverter</groupId>
+      <artifactId>jodconverter-local</artifactId>
+      <version>4.2.2</version>
     </dependency>
     <dependency>
       <!--

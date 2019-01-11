@@ -47,7 +47,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,9 +85,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -2407,7 +2404,8 @@ public class XWiki implements EventListener
         return getSkinFile(filename, false, context);
     }
 
-    public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
+    public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context,
+        Map<String, String> queryParameters)
     {
         XWikiURLFactory urlf = context.getURLFactory();
 
@@ -2417,7 +2415,9 @@ public class XWiki implements EventListener
             if (skin != null) {
                 Resource<?> resource = skin.getResource(filename);
                 if (resource != null) {
-                    return resource.getURL(forceSkinAction);
+                    queryParameters.putAll(getResourceURLParameters(resource));
+                    String resourceUrl = resource.getURL(forceSkinAction, queryParameters);
+                    return resourceUrl;
                 }
             } else {
                 // Try in the current parent skin
@@ -2425,7 +2425,9 @@ public class XWiki implements EventListener
                 if (parentSkin != null) {
                     Resource<?> resource = parentSkin.getResource(filename);
                     if (resource != null) {
-                        return resource.getURL(forceSkinAction);
+                        queryParameters.putAll(getResourceURLParameters(resource));
+                        String resourceUrl = resource.getURL(forceSkinAction, queryParameters);
+                        return resourceUrl;
                     }
                 }
             }
@@ -2433,9 +2435,9 @@ public class XWiki implements EventListener
             // Look for a resource file
             String resourceFilePath = "/resources/" + filename;
             if (resourceExists(resourceFilePath)) {
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
-                url = new URIBuilder(url.toURI()).addParameters(getResourceURLParameters(resourceFilePath)).build()
-                    .toURL();
+                queryParameters.putAll(getResourceURLParameters(resourceFilePath));
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                    queryParameters);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2446,32 +2448,54 @@ public class XWiki implements EventListener
 
         // If all else fails, use the default base skin, even if the URLs could be invalid.
         URL url;
+
         if (forceSkinAction) {
             url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
         } else {
             url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
         }
-        return urlf.getURL(url, context);
+        queryParameters.putAll(getResourceURLParameters(url));
+        return urlf.getURL(url, context, queryParameters);
     }
 
-    private List<NameValuePair> getResourceURLParameters(String resourceFilePath)
+    public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
     {
-        List<NameValuePair> parameters = new LinkedList<>();
-        parameters.add(new BasicNameValuePair("xwikiVersion", this.getVersion()));
+        return getSkinFile(filename, forceSkinAction, context, new LinkedHashMap<>());
+    }
+
+    private Map<String, String> getResourceURLParameters(Resource<?> resource)
+    {
+        try {
+            URL resourceUrl = getResource(resource.getPath());
+            return getResourceURLParameters(resourceUrl);
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Error while getting URL for resource filepath [{}]", resource.getPath(), e);
+            return Collections.singletonMap("xwikiVersion", getVersion());
+        }
+    }
+
+    private Map<String, String> getResourceURLParameters(String resourceFilePath)
+    {
+        try {
+            URL resourceUrl = getResource(resourceFilePath);
+            return getResourceURLParameters(resourceUrl);
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Error while getting URL for resource filepath [{}]", resourceFilePath, e);
+            return Collections.singletonMap("xwikiVersion", getVersion());
+        }
+    }
+
+    private Map<String, String> getResourceURLParameters(URL resourceUrl)
+    {
+        Map<String, String> parameters = new LinkedHashMap<>();
 
         try {
-            URL resource = getResource(resourceFilePath);
-            Path resourcePath = Paths.get(resource.toURI());
-            long size = Files.size(resourcePath);
-
-            if (size != 0) {
-                parameters.add(new BasicNameValuePair("size", String.valueOf(size)));
-            }
-
+            Path resourcePath = Paths.get(resourceUrl.toURI());
             FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
-            parameters.add(new BasicNameValuePair("filedate", String.valueOf(lastModifiedTime.toMillis())));
+            parameters.put("filedate", String.valueOf(lastModifiedTime.toMillis()));
         } catch (Exception e) {
-            LOGGER.debug("Error when trying to access properties of resource file [{}]", resourceFilePath, e);
+            LOGGER.debug("Error when trying to access properties of resource URL [{}]", resourceUrl, e);
+            parameters.put("xwikiVersion", getVersion());
         }
         return parameters;
     }

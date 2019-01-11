@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -1043,6 +1044,22 @@ public class XWiki extends Api
     public String getSkinFile(String filename, boolean forceSkinAction)
     {
         return this.xwiki.getSkinFile(filename, forceSkinAction, getXWikiContext());
+    }
+
+    /**
+     * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
+     * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
+     * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
+     *
+     * @param filename Filename to be looked up in the skin (logo.gif, style.css)
+     * @param forceSkinAction true to make sure that static files are retrieved through the skin action, to allow
+     *            parsing of velocity on CSS files
+     * @param queryParameters Create the URL with the given query parameters
+     * @return URL to access this file
+     */
+    public String getSkinFile(String filename, boolean forceSkinAction, Map<String, String> queryParameters)
+    {
+        return this.xwiki.getSkinFile(filename, forceSkinAction, getXWikiContext(), queryParameters);
     }
 
     /**

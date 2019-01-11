@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
+import java.util.Map;
 
 import javax.inject.Provider;
 
@@ -57,12 +58,18 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
     @Override
     public String getURL(XWikiDocument document) throws Exception
     {
+        return getURL(document, null);
+    }
+
+    @Override
+    public String getURL(XWikiDocument document, Map<String, String> queryParameters) throws Exception
+    {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         XWikiURLFactory urlf = xcontext.getURLFactory();
 
         URL url = urlf.createSkinURL(this.reference.getName(), document.getSpace(), document.getName(),
             document.getDatabase(), xcontext);
-        return urlf.getURL(url, xcontext);
+        return urlf.getURL(url, xcontext, queryParameters);
     }
 }

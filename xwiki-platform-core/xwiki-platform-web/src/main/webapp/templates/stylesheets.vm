@@ -11,10 +11,9 @@
 #if ($themeDoc)
   #set ($discard = $urlParametersMap.put("colorTheme", $services.model.serialize($themeDoc.getDocumentReference(), "default")))
 #end
-#set ($urlParameters = $escapetool.xml($escapetool.url($urlParametersMap)))
-#set ($defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true))
-<link href="${defaultStyleURL}?${urlParameters}" rel="stylesheet" type="text/css" media="all" />
-<link href="$xwiki.getSkinFile('print.css', true)?${urlParameters}" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />
+#set ($defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true, ${urlParametersMap}))
+<link href="${defaultStyleURL}" rel="stylesheet" type="text/css" media="all" />
+<link href="$xwiki.getSkinFile('print.css', true, $urlParametersMap)" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />
 #set ($a11y = "$!{request.getCookie('a11y').getValue()}")
 #if ($a11y == '')
   #set ($a11y = "$!{xwiki.getUserPreference('accessibility')}")
@@ -28,13 +27,13 @@
 #if ($stylesheets != '')
   #foreach ($stylesheet in $stylesheets.split(','))
     #if (!$stylesheet.equalsIgnoreCase($defaultstyle))
-      <link href="$xwiki.getSkinFile($stylesheet, true)?${urlParameters}" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${velocityCount}" />
+      <link href="$xwiki.getSkinFile($stylesheet, true, ${urlParametersMap})" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${velocityCount}" />
     #end
   #end
 #end
 ## IE specific stylesheets
 <!--[if IE]>
-  <link href="$xwiki.getSkinFile('ie-all.css', true)#if (!$urlParametersMap.isEmpty())?${urlParameters}#end" rel="stylesheet" type="text/css" />
+  <link href="$xwiki.getSkinFile('ie-all.css', true, ${urlParametersMap})" rel="stylesheet" type="text/css" />
 <![endif]-->
 ## Hook for inserting CSS skin extensions
 #styleSheetExtensionHooks

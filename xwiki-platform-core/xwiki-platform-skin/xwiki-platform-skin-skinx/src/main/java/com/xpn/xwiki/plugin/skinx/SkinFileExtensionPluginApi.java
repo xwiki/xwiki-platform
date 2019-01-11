@@ -71,7 +71,6 @@ public class SkinFileExtensionPluginApi extends SkinExtensionPluginApi
     {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("forceSkinAction", forceSkinAction);
-        parameters.put("version", getXWikiContext().getWiki().getVersion());
         this.getProtectedPlugin().use(resource, parameters, getXWikiContext());
     }
 }

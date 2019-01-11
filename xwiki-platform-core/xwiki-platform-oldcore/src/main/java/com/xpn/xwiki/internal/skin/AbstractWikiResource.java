@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import java.util.Map;
+
 import javax.inject.Provider;
 
 import org.xwiki.filter.input.InputSource;
@@ -91,4 +93,12 @@ public abstract class AbstractWikiResource<R extends EntityReference, I extends 
     }
 
     public abstract String getURL(XWikiDocument document) throws Exception;
+
+    @Override
+    public String getURL(boolean forceSkinAction, Map<String, String> queryParameters) throws Exception
+    {
+        return getURL(getDocument());
+    }
+
+    public abstract String getURL(XWikiDocument document, Map<String, String> queryParameters) throws Exception;
 }

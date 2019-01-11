@@ -426,19 +426,6 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     /**
-     * Return the query string part with the version of the wiki itself, to add to the URL of a resource.
-     * As for {@link #getDocumentVersionQueryString(DocumentReference, XWikiContext)} the goal here is to avoid browsers
-     * using an outdated version from their cache in some other usecases.
-     *
-     * @param context the XWiki context
-     * @return the query string part handling the version of the document
-     */
-    private String getWikiVersionQueryString(XWikiContext context)
-    {
-        return "wikiVersion=" + sanitize(context.getWiki().getVersion());
-    }
-
-    /**
      * Return the query string part with the language of the document (if any).
      *  
      * @param context the XWiki Context
@@ -467,10 +454,9 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     protected String getDocumentSkinExtensionURL(DocumentReference documentReference, String documentName,
             String pluginName, XWikiContext context)
     {
-        String queryString = String.format("%s&amp;%s&amp;%s%s",
+        String queryString = String.format("%s&amp;%s%s",
                 getLanguageQueryString(context),
                 getDocumentVersionQueryString(documentReference, context),
-                getWikiVersionQueryString(context),
                 parametersAsQueryString(documentName, context));
 
         return context.getWiki().getURL(documentReference, pluginName, queryString, "", context);

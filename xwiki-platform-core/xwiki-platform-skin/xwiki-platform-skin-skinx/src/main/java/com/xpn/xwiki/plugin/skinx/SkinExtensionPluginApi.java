@@ -20,7 +20,6 @@
 
 package com.xpn.xwiki.plugin.skinx;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
@@ -35,8 +34,6 @@ import com.xpn.xwiki.plugin.PluginApi;
  */
 public class SkinExtensionPluginApi extends PluginApi<AbstractSkinExtensionPlugin>
 {
-    private static final String VERSION_KEY = "version";
-
     /**
      * XWiki Plugin API constructor.
      * 
@@ -58,8 +55,7 @@ public class SkinExtensionPluginApi extends PluginApi<AbstractSkinExtensionPlugi
      */
     public void use(String resource)
     {
-        Map<String, Object> parameters = new HashMap<>();
-        this.use(resource, parameters);
+        this.getProtectedPlugin().use(resource, getXWikiContext());
     }
 
     /**
@@ -76,9 +72,6 @@ public class SkinExtensionPluginApi extends PluginApi<AbstractSkinExtensionPlugi
      */
     public void use(String resource, Map<String, Object> parameters)
     {
-        if (!parameters.containsKey(VERSION_KEY)) {
-            parameters.put(VERSION_KEY, getXWikiContext().getWiki().getVersion());
-        }
         this.getProtectedPlugin().use(resource, parameters, getXWikiContext());
     }
 

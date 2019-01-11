@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.template;
 
 import java.net.URL;
+import java.util.Map;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.filter.input.DefaultURLInputSource;
@@ -47,5 +48,11 @@ public class ClassloaderResource extends AbstractInputSourceResource<URLInputSou
     {
         // Does not make any sense in this case
         throw new NotImplementedException("Method not implemented");
+    }
+
+    @Override
+    public String getURL(boolean forceSkinAction, Map<String, String> queryParameters) throws Exception
+    {
+        return getURL(forceSkinAction);
     }
 }

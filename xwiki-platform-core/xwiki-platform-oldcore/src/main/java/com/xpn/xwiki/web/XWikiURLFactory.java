@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -105,6 +106,9 @@ public interface XWikiURLFactory
 
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
+    URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
+        Map<String, String> queryParameters);
+
     /**
      * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
      *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
@@ -168,6 +172,8 @@ public interface XWikiURLFactory
      * @return the converted URL as a string
      */
     String getURL(URL url, XWikiContext context);
+
+    String getURL(URL url, XWikiContext context, Map<String, String> queryParameters);
 
     /**
      * Generate the base external URL to access this server.

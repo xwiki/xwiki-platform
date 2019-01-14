@@ -621,7 +621,7 @@ public abstract class XWikiAction extends Action
                 renderingContext.getDefaultSyntax(), "init.vm", renderingContext.isRestricted(), Syntax.XHTML_1_0);
         }
 
-        xcontext.getResponse().setStatus(503);
+        xcontext.getResponse().setStatus(202);
         xcontext.getResponse().setContentType("text/html; charset=UTF-8");
 
         try {

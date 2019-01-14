@@ -35,9 +35,6 @@ public class ResourceType
      */
     private String id;
 
-    /**
-     * True if this type represents a static resource.
-     */
     private boolean isStatic;
 
     /**
@@ -99,7 +96,7 @@ public class ResourceType
     }
 
     /**
-     * @return true if this type represents a static resource
+     * @return true if this type represents a static resource (i.e: a ResourcesResource or a SkinResource only)
      */
     public boolean isStatic()
     {

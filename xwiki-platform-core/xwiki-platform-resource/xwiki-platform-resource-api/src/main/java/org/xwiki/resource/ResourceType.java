@@ -36,11 +36,26 @@ public class ResourceType
     private String id;
 
     /**
+     * True if this type represents a static resource.
+     */
+    private boolean isStatic;
+
+    /**
      * @param id see {@link #getId()}
      */
     public ResourceType(String id)
     {
+        this(id, false);
+    }
+
+    /**
+     * @param id see {@link #getId()}
+     * @param isStatic see {@link #isStatic()}
+     */
+    public ResourceType(String id, boolean isStatic)
+    {
         this.id = id;
+        this.isStatic = isStatic;
     }
 
     /**
@@ -81,5 +96,13 @@ public class ResourceType
         return new EqualsBuilder()
             .append(getId(), rhs.getId())
             .isEquals();
+    }
+
+    /**
+     * @return true if this type represents a static resource
+     */
+    public boolean isStatic()
+    {
+        return this.isStatic;
     }
 }

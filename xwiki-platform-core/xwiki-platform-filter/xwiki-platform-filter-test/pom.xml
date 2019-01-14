@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter</artifactId>
-    <version>10.11.1-SNAPSHOT</version>
+    <version>10.11.1</version>
   </parent>
   <artifactId>xwiki-platform-filter-test</artifactId>
   <name>XWiki Platform - Filter - Tests - Parent POM</name>

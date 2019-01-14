@@ -62,10 +62,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     }
     var url = option && option.url;
     if (typeof url === 'string') {
-      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url).click(function(event) {
-        // Clicking on the label should select the option not follow the link.
-        event.preventDefault();
-      });
+      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url);
       output.find('.xwiki-selectize-option-label').replaceWith(anchor);
     }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
@@ -116,7 +113,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       dropdown.addClass('active');
     },
     persist: false,
-    preload: true,
+    preload: 'focus',
     render: {
       item: renderItem,
       option: renderOption,
@@ -136,8 +133,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
         wrapper.addClass(this.settings.loadingClass);
       }
     },
-    onItemAdd: function(value, item) {
-      item.find('a.xwiki-selectize-option-label').click(function(event) {
+    onInitialize: function() {
+      this.${escapetool.d}control.on('click', 'a.xwiki-selectize-option-label', function(event) {
         // Clicking on the label should select the option not follow the link.
         event.preventDefault();
       });

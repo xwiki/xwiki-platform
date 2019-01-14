@@ -37,9 +37,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>
-### Missing: admin.syntaxes=Syntaxes
-### Missing: admin.syntaxes.description=Choose the default page syntax and configure the available markup syntaxes.
-### Missing: Rendering.RenderingConfigClass_disabledSyntaxes=Disabled Syntaxes
-### Missing: Rendering.RenderingConfigClass_disabledSyntaxes.hint=The list of markup syntaxes in which pages cannot be written
+admin.syntaxes=Syntaxes
+admin.syntaxes.description=Sélectionnez la syntaxe de page par défaut et indiquez les autres syntaxes disponibles.
+Rendering.RenderingConfigClass_disabledSyntaxes=Syntaxes désactivées
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste des syntaxes dans lesquelles les pages ne peuvent pas être rédigées.
 </content>
 </xwikidoc>

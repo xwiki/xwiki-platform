@@ -108,8 +108,13 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
         }
 
-        databaseContainer.withCommand(
-            "--character-set-server=utf8 --collation-server=utf8_bin --explicit-defaults-for-timestamp=1");
+        // Note: the "explicit-defaults-for-timestamp" parameter has been introduced in MySQL 5.6.6+ only and using it
+        // in older versions make MySQL fail to start.
+        StringBuilder command = new StringBuilder("--character-set-server=utf8 --collation-server=utf8_bin");
+        if (!testConfiguration.getDatabaseTag().startsWith("5.5")) {
+            command.append(" --explicit-defaults-for-timestamp=1");
+        }
+        databaseContainer.withCommand(command.toString());
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
     }

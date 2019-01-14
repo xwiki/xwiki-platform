@@ -96,7 +96,7 @@ XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=La syntaxe utilisée par 
 
 # Localization Section
 XWiki.XWikiPreferences_multilingual.hint=Active le mode multi-langues si le contenu de votre wiki est multi-langues. Cela permettra aux utilisateurs de traduire les pages du wiki et d'utiliser l'interface dans la langue de leur choix.
-XWiki.XWikiPreferences_languages.hint=Sélectionnez les langues qui seront disponibles pour les utilisateurs, ils seront capables de traduire et d'afficher les articles du wiki dans chacune de ces langues (si le mode 'multilingue' est activé).
+XWiki.XWikiPreferences_languages.hint=Sélectionnez les langues qui seront disponibles pour les utilisateurs, ils seront capables de traduire et d'afficher les articles du wiki dans chacune de ces langues (si le mode 'Multi-langues' est activé).
 XWiki.XWikiPreferences_default_language.hint=Sélectionner la langue par défaut du wiki
 XWiki.XWikiPreferences_dateformat.hint=Définit le format d’affichage des dates (par exemple la Date de création d'une page)
 XWiki.XWikiPreferences_timezone.hint=Définir globalement le fuseau horaire des dates
@@ -114,7 +114,7 @@ administration.section.export.withHistory.hint=Inclure l'historique de la page d
 administration.section.export.backupPack.hint=Définit si le package est une sauvegarde. Cette option n'influe pas sur le contenu des pages mais, lors de l'import, pré-sélectionne l'option "Importer le package comme une sauvegarde". Dans ce cas, l'auteur est conservé. Au contraire lors de l'import d'un package normal, l'utilisateur effectuant l'import devient automatiquement le dernier auteur des pages importées.
 
 # Other Category
-admin.other=Autre
+admin.other=Divers
 admin.other.description=Autres configurations pour les extensions.
 administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Définit si le suivi Google Analytics™ est actif ou non

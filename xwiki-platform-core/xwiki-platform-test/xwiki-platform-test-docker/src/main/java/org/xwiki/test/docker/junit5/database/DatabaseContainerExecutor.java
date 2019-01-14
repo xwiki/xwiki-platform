@@ -111,7 +111,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         // Note: the "explicit-defaults-for-timestamp" parameter has been introduced in MySQL 5.6.6+ only and using it
         // in older versions make MySQL fail to start.
         StringBuilder command = new StringBuilder("--character-set-server=utf8 --collation-server=utf8_bin");
-        if (!testConfiguration.getDatabaseTag().startsWith("5.5")) {
+        if (testConfiguration.getDatabaseTag() == null || !testConfiguration.getDatabaseTag().startsWith("5.5")) {
             command.append(" --explicit-defaults-for-timestamp=1");
         }
         databaseContainer.withCommand(command.toString());

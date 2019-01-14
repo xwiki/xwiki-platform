@@ -2413,6 +2413,13 @@ public class XWiki implements EventListener
         Map<String, String> queryParameters)
     {
         XWikiURLFactory urlf = context.getURLFactory();
+        Map<String,String> queryParametersMap;
+
+        if (queryParameters == null) {
+            queryParametersMap = new HashMap<>();
+        } else {
+            queryParametersMap = new HashMap<>(queryParameters);
+        }
 
         try {
             // Try in the specified skin
@@ -2420,8 +2427,8 @@ public class XWiki implements EventListener
             if (skin != null) {
                 Resource<?> resource = skin.getResource(filename);
                 if (resource != null) {
-                    queryParameters.putAll(getResourceURLParameters(resource));
-                    String resourceUrl = resource.getURL(forceSkinAction, queryParameters);
+                    queryParametersMap.putAll(getResourceURLParameters(resource));
+                    String resourceUrl = resource.getURL(forceSkinAction, queryParametersMap);
                     return resourceUrl;
                 }
             } else {
@@ -2430,8 +2437,8 @@ public class XWiki implements EventListener
                 if (parentSkin != null) {
                     Resource<?> resource = parentSkin.getResource(filename);
                     if (resource != null) {
-                        queryParameters.putAll(getResourceURLParameters(resource));
-                        String resourceUrl = resource.getURL(forceSkinAction, queryParameters);
+                        queryParametersMap.putAll(getResourceURLParameters(resource));
+                        String resourceUrl = resource.getURL(forceSkinAction, queryParametersMap);
                         return resourceUrl;
                     }
                 }
@@ -2440,9 +2447,9 @@ public class XWiki implements EventListener
             // Look for a resource file
             String resourceFilePath = "/resources/" + filename;
             if (resourceExists(resourceFilePath)) {
-                queryParameters.putAll(getResourceURLParameters(resourceFilePath));
+                queryParametersMap.putAll(getResourceURLParameters(resourceFilePath));
                 URL url = urlf.createResourceURL(filename, forceSkinAction, context,
-                    queryParameters);
+                    queryParametersMap);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {

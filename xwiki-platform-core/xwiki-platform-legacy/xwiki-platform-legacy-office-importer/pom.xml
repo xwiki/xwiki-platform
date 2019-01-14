@@ -135,6 +135,26 @@
           </classpathDependencyExcludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration><![CDATA[
+            {
+              "revapi": {
+                "ignore" : [
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method org.artofsolving.jodconverter.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()",
+                    "new": "method org.jodconverter.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()",
+                    "justification": "Migration to the official maintained fork of JodConverter which changed the package name."
+                  },
+                ]
+              }
+            }
+          ]]></analysisConfiguration>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -168,6 +168,7 @@
       'index': $macroDescriptor.parameterDescriptorMap.size()
     })
   #end
+  #set ($groupDescriptorTree = {})
   #foreach ($entry in $macroDescriptor.parameterDescriptorMap.entrySet())
     #set ($parameterDescriptor = $entry.value)
     ## Translate the parameter name and description.
@@ -183,6 +184,10 @@
       'type': $parameterDescriptor.parameterType,
       'index': $foreach.index
     })
+    #set ($groupDescriptor = $parameterDescriptor.groupDescriptor)
+    #if ($groupDescriptor)
+      #handleMacroParameterGroup($groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)
+    #end
     #if ($translatedParameterDescriptor.type.getName() == 'java.lang.String'
         &amp;&amp; ($parameterDescriptor.defaultValue == 'false' || $parameterDescriptor.defaultValue == 'true')
         &amp;&amp; $macroDescriptor.parametersBeanClass.getSimpleName() == 'WikiMacroParameters')
@@ -202,7 +207,57 @@
     ## descriptor map keys
     #set ($discard = $data.parameterDescriptorMap.put($entry.key.toLowerCase(), $translatedParameterDescriptor))
   #end
+  #if ($groupDescriptorTree.groups)
+    #set ($data.groupDescriptorTree = $groupDescriptorTree.groups)
+  #end
   #set ($data.requiredSkinExtensions = "#getRequiredSkinExtensions")
+#end
+
+## Builds the group tree with the following structure:
+##
+## {
+##   'parentGroupId': {
+##     'id': 'parentGroupId',
+##     'name': 'Parent Group',
+##     'feature': 'someFeature',
+##     'groups': {
+##       'childGroupId': {...},
+##       ...
+##     }
+##   },
+##   ...
+## }
+#macro (handleMacroParameterGroup $groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)
+  #if ($groupDescriptor.group &amp;&amp; $groupDescriptor.group.size() &gt; 0)
+    #set ($translatedParameterDescriptor.group = $groupDescriptor.group)
+    #set ($parentGroup = $groupDescriptorTree)
+    #foreach ($groupId in $groupDescriptor.group)
+      #if (!$parentGroup.groups)
+        #set ($parentGroup.groups = {})
+      #end
+      #set ($childGroup = $parentGroup.groups.get($groupId))
+      #if (!$childGroup)
+        #if ($groupId == $translatedParameterDescriptor.id)
+          #set ($groupName = $translatedParameterDescriptor.name)
+        #else
+          #set ($groupTranslationKey = "${macroTranslationKey}.group.$groupId")
+          #set ($groupName = "#maybeTranslate(""${groupTranslationKey}.name"" $groupId)")
+        #end
+        #set ($childGroup = {
+          'id': $groupId,
+          'name': $groupName
+        })
+        #set ($discard = $parentGroup.groups.put($groupId, $childGroup))
+      #end
+      #set ($parentGroup = $childGroup)
+    #end
+    #if ("$!groupDescriptor.feature" != '')
+      #set ($parentGroup.feature = $groupDescriptor.feature)
+    #end
+  #elseif ($groupDescriptor.feature)
+    ## This group is made of a single parameter. The feature then refers to this parameter.
+    #set ($translatedParameterDescriptor.feature = $groupDescriptor.feature)
+  #end
 #end
 
 #macro (initRequiredSkinExtensions)

@@ -37,7 +37,8 @@ ul.macro-list .macro-description,
 .macro-editor .macro-description,
 ul.macro-parameters .macro-parameter-description,
 ul.macro-parameters > li.more,
-ul.macro-parameters > li.empty {
+ul.macro-parameters > li.empty,
+ul.macro-parameter-group-members > li.more {
   color: #656565;
   color: $theme.textSecondaryColor;
   font-size: smaller;
@@ -46,7 +47,8 @@ ul.macro-parameters > li.empty {
 .macro-name::first-letter,
 .macro-description::first-letter,
 .macro-parameter-name::first-letter,
-.macro-parameter-description::first-letter {
+.macro-parameter-description::first-letter,
+.macro-parameter-group-name::first-letter {
   text-transform: capitalize;
 }
 
@@ -62,7 +64,8 @@ ul.macro-parameters {
   padding: 0;
 }
 
-ul.macro-parameters > li {
+ul.macro-parameters > li,
+ul.macro-parameter-group-members > li {
   padding: .5em 0;
 }
 
@@ -91,10 +94,12 @@ ul.macro-parameters > li {
   margin-bottom: 5px;
 }
 
-ul.macro-parameters > .more {
+ul.macro-parameters > .more,
+ul.macro-parameter-group-members > .more {
   cursor: pointer;
 }
-ul.macro-parameters > .more a {
+ul.macro-parameters > .more a,
+ul.macro-parameter-group-members > .more a {
   color: #656565;
   color: $theme.textSecondaryColor;
 }
@@ -117,4 +122,16 @@ ul.macro-parameters .arrow-right {
   border-left: 4px solid $theme.textSecondaryColor;
   border-top: 4px solid transparent;
   margin-right: 4px;
+}
+
+.macro-parameter-group > .tab-content {
+  border-bottom: 1px solid $theme.borderColor;
+  border-left: 1px solid $theme.borderColor;
+  border-right: 1px solid $theme.borderColor;
+  padding: .5em;
+}
+
+ul.macro-parameter-group-members {
+  padding: 0;
+  list-style: none;
 }

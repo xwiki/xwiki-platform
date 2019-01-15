@@ -21,6 +21,7 @@ package org.xwiki.resource;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents the type of Resource (eg Entity, Temporary, etc).
@@ -48,7 +49,10 @@ public class ResourceType
     /**
      * @param id see {@link #getId()}
      * @param isStatic see {@link #isStatic()}
+     *
+     * @since 11.0RC1
      */
+    @Unstable
     public ResourceType(String id, boolean isStatic)
     {
         this.id = id;
@@ -96,8 +100,13 @@ public class ResourceType
     }
 
     /**
-     * @return true if this type represents a static resource (i.e: a ResourcesResource or a SkinResource only)
+     * @return true if this type represents a static resource containing only static content and which should be served
+     * directly by the Servlet Container without going through XWiki processing and handling
+     * (e.g: a ResourcesResource or a SkinResource)
+     *
+     * @since 11.0RC1
      */
+    @Unstable
     public boolean isStatic()
     {
         return this.isStatic;

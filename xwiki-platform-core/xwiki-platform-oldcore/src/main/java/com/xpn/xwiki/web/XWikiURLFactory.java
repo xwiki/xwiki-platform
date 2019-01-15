@@ -23,6 +23,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiURLFactory
@@ -106,6 +108,16 @@ public interface XWikiURLFactory
 
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
+    /**
+     * Create a resource URL for the given filename with some parameters.
+     * @param filename the asked resource file.
+     * @param forceSkinAction if true force to use the /skins/ directory
+     * @param context the current context
+     * @param queryParameters parameters to add to the URL
+     * @return a URL returning the wanted file.
+     * @since 11.0RC1
+     */
+    @Unstable
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
         Map<String, String> queryParameters);
 

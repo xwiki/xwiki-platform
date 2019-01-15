@@ -1056,7 +1056,9 @@ public class XWiki extends Api
      *            parsing of velocity on CSS files
      * @param queryParameters Create the URL with the given query parameters
      * @return URL to access this file
+     * @since 11.0RC1
      */
+    @Unstable
     public String getSkinFile(String filename, boolean forceSkinAction, Map<String, String> queryParameters)
     {
         return this.xwiki.getSkinFile(filename, forceSkinAction, getXWikiContext(), queryParameters);

@@ -28,6 +28,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.skin.ResourceRepository;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -100,5 +101,14 @@ public abstract class AbstractWikiResource<R extends EntityReference, I extends 
         return getURL(getDocument());
     }
 
+    /**
+     * Create URL for the given document with some query parameters.
+     * @param document the document wanted for the URL
+     * @param queryParameters some parameters to add in the URL
+     * @return a URL for the given document with some parameters
+     * @throws Exception if the URL cannot be built.
+     * @since 11.0RC1
+     */
+    @Unstable
     public abstract String getURL(XWikiDocument document, Map<String, String> queryParameters) throws Exception;
 }

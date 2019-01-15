@@ -2409,6 +2409,16 @@ public class XWiki implements EventListener
         return getSkinFile(filename, false, context);
     }
 
+    /**
+     * Build and return a skin file url based on the given parameters.
+     * @param filename the file name of the skin file wanted
+     * @param forceSkinAction if true force the usage of directory /skins/ in the URL
+     * @param context current context for the request
+     * @param queryParameters parameters to add to the URL
+     * @return a resource URL for the asked filename
+     * @since 11.0RC1
+     */
+    @Unstable
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context,
         Map<String, String> queryParameters)
     {

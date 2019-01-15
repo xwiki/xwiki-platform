@@ -22,6 +22,7 @@ package org.xwiki.skin;
 import java.util.Map;
 
 import org.xwiki.filter.input.InputSource;
+import org.xwiki.stability.Unstable;
 
 /**
  * @param <I> the type of the {@link InputSource}
@@ -75,7 +76,9 @@ public interface Resource<I extends InputSource>
      * @param queryParameters add the following parameters to the URL
      * @return a URL to the resource
      * @throws Exception when failing to create a URL for the resource
+     * @since 11.0RC1
      */
+    @Unstable
     default String getURL(boolean forceSkinAction, Map<String, String> queryParameters) throws Exception {
         return getURL(forceSkinAction);
     }

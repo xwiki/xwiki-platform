@@ -39,11 +39,6 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-servlet</artifactId>
       <version>${project.version}</version>
     </dependency>

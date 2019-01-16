@@ -21,6 +21,7 @@ package org.xwiki.rendering.async.internal;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class DefaultAsyncRendererExecutorTest
         Map<String, Serializable> map = new HashMap<>();
         map.put(CELEMENT1, "value1\\");
         map.put(CELEMENT2, "value2/");
-        when(this.context.save(CELEMENTS)).thenReturn(map);
+        when(this.context.save(CELEMENTS)).thenReturn(Collections.unmodifiableMap(map));
 
         this.job = mock(Job.class);
 

@@ -134,7 +134,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       }
     },
     onInitialize: function() {
-      this.${escapetool.d}control.on('click', 'a.xwiki-selectize-option-label', function(event) {
+      var control = this.$control;
+      control.on('click', 'a.xwiki-selectize-option-label', function(event) {
         // Clicking on the label should select the option not follow the link.
         event.preventDefault();
       });

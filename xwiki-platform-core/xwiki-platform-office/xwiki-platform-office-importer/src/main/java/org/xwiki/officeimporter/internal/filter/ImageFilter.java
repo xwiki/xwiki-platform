@@ -179,12 +179,19 @@ public class ImageFilter extends AbstractHTMLFilter
             int separator = value.lastIndexOf('/');
             fileName = separator < 0 ? value : value.substring(separator + 1);
             try {
+
+                // the + character is not escaped in HtmlCleaner as it is an authorized character
+                // but when decoding it for URL it would be replaced by a space
+                // so we encode it manually here.
+                fileName = fileName.replaceAll("\\+", "%2B");
                 // We have to decode the image file name in case it contains URL special characters.
                 fileName = URLDecoder.decode(fileName, UTF_8);
 
-                // we also need to replace the "&amp;" by "&" since the fileName of the image could contain "&".
-                // note that if the image name contains "&amp;" the produced html would contain "&amp;amp;"
+                // we also need to replace the "&amp;" by "&" since HtmlCleaner replace them automatically to &amp;
                 fileName = fileName.replaceAll("&amp;", "&");
+
+                // '@' must also be escaped in order to resolve properly the path in XWiki
+                fileName = fileName.replaceAll("@", "\\\\@");
             } catch (Exception e) {
                 // This shouldn't happen. Use the encoded image file name.
             }

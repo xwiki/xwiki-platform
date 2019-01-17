@@ -162,10 +162,10 @@ public class OfficeImporterIT
         deletePage(testName);
 
         // Test ODT file with accents
-        resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù.odt");
+        resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù <!-_.+*();?:@=.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         wikiEditPage = resultPage.editWiki();
-        regex = "(?<imageName>Test_accents & e\\$u_html_[\\w]+\\.png)";
+        regex = "(?<imageName>Test_accents & e\\$u <!-_\\.\\+\\*\\(\\);\\?:\\\\@=_html_[\\w]+\\.png)";
         pattern = Pattern.compile(regex, Pattern.MULTILINE);
         matcher = pattern.matcher(wikiEditPage.getContent());
         assertTrue(matcher.find());
@@ -173,7 +173,9 @@ public class OfficeImporterIT
         resultPage = wikiEditPage.clickCancel();
         attachmentsPane = resultPage.openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
-        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName));
+
+        // the \ before the @ needs to be removed as it's not in the filename
+        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replaceAll("\\\\@", "@")));
         deletePage(testName);
     }
 

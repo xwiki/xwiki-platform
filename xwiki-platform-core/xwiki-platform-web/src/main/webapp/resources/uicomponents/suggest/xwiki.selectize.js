@@ -62,10 +62,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     }
     var url = option && option.url;
     if (typeof url === 'string') {
-      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url).click(function(event) {
-        // Clicking on the label should select the option not follow the link.
-        event.preventDefault();
-      });
+      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url);
       output.find('.xwiki-selectize-option-label').replaceWith(anchor);
     }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
@@ -135,6 +132,13 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
         var wrapper = this.$wrapper;
         wrapper.addClass(this.settings.loadingClass);
       }
+    },
+    onInitialize: function() {
+      var control = this.$control;
+      control.on('click', 'a.xwiki-selectize-option-label', function(event) {
+        // Clicking on the label should select the option not follow the link.
+        event.preventDefault();
+      });
     }
   };
 

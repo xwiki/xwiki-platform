@@ -552,16 +552,22 @@ function revert() {
 //----------------------------------------------------------------
 
 function setPanelWidth() {
-  var classesToRemove = ['Small', 'Medium', 'Large'];
-  for (var i=0; i<classesToRemove.length; ++i) {
-    var c = classesToRemove[i];
+  var availableClasses = ['Small', 'Medium', 'Large'];
+  for (var i=0; i<availableClasses.length; ++i) {
+    var c = availableClasses[i];
     mainContainer.removeClassName('panel-left-width-'+c);
     mainContainer.removeClassName('panel-right-width-'+c);
     window.leftPanels.removeClassName('panel-width-'+c);
     window.rightPanels.removeClassName('panel-width-'+c);
   }
-  var leftPanelsWidth = leftPanelsWidthInput.value != '---' ? leftPanelsWidthInput.value : 'Medium';
-  var rightPanelsWidth = rightPanelsWidthInput.value != '---' ? rightPanelsWidthInput.value : 'Medium';
+  var leftPanelsWidth = 'Medium';
+  var rightPanelsWidth = 'Medium';
+  if (availableClasses.includes(leftPanelsWidthInput.value)) {
+      leftPanelsWidth = leftPanelsWidthInput.value;
+  }
+  if (availableClasses.includes(rightPanelsWidthInput.value)) {
+      rightPanelsWidth = rightPanelsWidthInput.value;
+  }
   mainContainer.addClassName('panel-left-width-'+leftPanelsWidth);
   mainContainer.addClassName('panel-right-width-'+rightPanelsWidth);
   window.leftPanels.addClassName('panel-width-'+leftPanelsWidth);

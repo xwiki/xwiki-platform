@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+"-//Hibernate/Hibernate Mapping DTD//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="org.xwiki.eventstream.store.internal.LegacyEvent" table="activitystream_events">
+    <id name="eventId" type="string" unsaved-value="undefined">
+      <column name="ase_eventid" length="48" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="requestId" type="string" column="ase_requestid" length="48" index="EVENT_REQUESTID" />
+    <property name="stream" type="string" column="ase_stream" length="255" index="EVENT_STREAM" />
+    <property name="date" type="timestamp" column="ase_date" index="EVENT_DATE" />
+    <property name="priority" type="integer" column="ase_priority" index="EVENT_PRIORITY" />
+    <property name="type" type="string" column="ase_type" length="255" index="EVENT_TYPE" />
+    <property name="application" type="string" column="ase_application" length="255" index="EVENT_APP" />
+    <property name="user" type="string" column="ase_user" length="255" index="EVENT_USER" />
+    <property name="wiki" type="string" column="ase_wiki" length="255" index="EVENT_WIKI" />
+    <property name="space" type="string" column="ase_space" length="255" index="EVENT_SPACE" />
+    <property name="page" type="string" column="ase_page" length="255" index="EVENT_PAGE" />
+    <!--<property name="hidden" type="boolean" column="ase_hidden" index="EVENT_HIDDEN" />-->
+    <property name="url" type="string" column="ase_url" length="2000" />
+    <property name="title" type="string" column="ase_title" length="2000" />
+    <property name="body" type="string" column="ase_body" length="2000" />
+    <property name="version" type="string" column="ase_version" length="30" />
+    <property name="param1" type="string" column="ase_param1" length="2000" />
+    <property name="param2" type="string" column="ase_param2" length="2000" />
+    <property name="param3" type="string" column="ase_param3" length="2000" />
+    <property name="param4" type="string" column="ase_param4" length="2000" />
+    <property name="param5" type="string" column="ase_param5" length="2000" />
+    <!-- The map mapping below was a feature introduced in https://jira.xwiki.org/browse/XWIKI-6839 to add support for
+         named parameters. However it's currently causing serious performance issues (see
+         https://jira.xwiki.org/browse/XWIKI-7520) and has had to be disabled for now.
+         TODO: Remove this comment below when https://jira.xwiki.org/browse/XWIKI-7554 is fixed
+    -->
+    <!--map name="parameters" table="activitystream_events_params" lazy="false">
+      <key column="eventId"/>
+      <index column="name" type="string" length="255"/>
+      <element column="value" type="string" length="2000"/>
+    </map-->
+
+    <!--
+    <set name="target" table="activitystream_events_targets" lazy="false">
+      <key column="eventId" />
+      <element column="value" type="string" length="255" />
+    </set>-->
+  </class>
+  <!--
+  <class name="com.xpn.xwiki.plugin.activitystream.impl.ActivityEventStatusImpl" table="activitystream_events_status">
+    <composite-id>
+      <key-many-to-one name="activityEvent" class="com.xpn.xwiki.plugin.activitystream.impl.LegacyEvent"
+        column="ases_eventid" lazy="false"/>
+      <key-property name="entityId" type="string" column="ases_entityid"/>
+    </composite-id>
+    <property name="read" type="boolean" column="ases_read" />
+  </class>
+  -->
+</hibernate-mapping>

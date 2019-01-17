@@ -1,0 +1,6 @@
+org.xwiki.eventstream.store.internal.LegacyEventConverter
+org.xwiki.eventstream.store.internal.LegacyEventDeleter
+org.xwiki.eventstream.store.internal.LegacyEventLoader
+org.xwiki.eventstream.store.internal.LegacyEventSaver
+org.xwiki.eventstream.store.internal.LegacyEventStream
+org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration

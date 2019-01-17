@@ -139,7 +139,7 @@
 #macro(displayAddObject $class)
   <div id="add_xobject_${escapetool.xml($class.name)}" class="add_xobject">
     <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
-      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;classname=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
     </div>
   </div>
 #end

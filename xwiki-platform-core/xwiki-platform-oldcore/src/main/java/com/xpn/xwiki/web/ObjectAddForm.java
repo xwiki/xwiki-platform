@@ -47,7 +47,12 @@ public class ObjectAddForm extends XWikiForm
     @Override
     public void readRequest()
     {
-        setClassName(getRequest().getParameter("classname"));
+        // We need to support both 'classname' and 'className' since an inconsistency has been introduced.
+        String className = getRequest().getParameter("classname");
+        if (className == null) {
+            className = getRequest().getParameter("className");
+        }
+        setClassName(className);
     }
 
     public Map<String, String[]> getObject(String prefix)

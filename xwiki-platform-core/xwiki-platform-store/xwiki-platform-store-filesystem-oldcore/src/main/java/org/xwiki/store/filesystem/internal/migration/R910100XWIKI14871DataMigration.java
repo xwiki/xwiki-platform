@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Date;
 
@@ -43,28 +42,21 @@ import org.apache.commons.io.FileUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
-import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Migration for XWIKI-9065. Make sure to generate database entry for attachment deleted on filesystem.
@@ -76,17 +68,11 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Named("R910100XWIKI14871")
 @Singleton
-public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigration
+public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigration
 {
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
     private ConfigurationSource configuration;
-
-    @Inject
-    private FilesystemStoreTools fstools;
-
-    @Inject
-    private Logger logger;
 
     @Inject
     @Named("local")
@@ -108,29 +94,25 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
     public void hibernateMigrate() throws XWikiException, DataMigrationException
     {
         // Move back metadata of deleted attachments located in the filesystem store
-        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Void>()
-        {
-            @Override
-            public Void doInHibernate(Session session)
-            {
-                try {
-                    migrateMetadatas(session);
-                } catch (Exception e) {
-                    throw new HibernateException("Failed to move deleted attachments metadata to the database", e);
-                }
-
-                return null;
+        getStore().executeWrite(getXWikiContext(), session -> {
+            try {
+                migrateMetadatas(session);
+            } catch (Exception e) {
+                throw new HibernateException("Failed to move deleted attachments metadata to the database", e);
             }
+
+            return null;
         });
     }
 
     private void migrateMetadatas(Session session)
         throws IOException, XMLStreamException, FactoryConfigurationError, ParserConfigurationException, SAXException
     {
-        this.logger.info("Migrating filesystem attachment metadatas storded in [{}]",
-            this.fstools.getStorageLocationFile());
+        File storageLocationFile = getPre11StoreRootDirectory();
 
-        File pathByIdStore = this.fstools.getGlobalFile("DELETED_ATTACHMENT_ID_MAPPINGS.xml");
+        this.logger.info("Migrating filesystem attachment metadatas storded in [{}]", storageLocationFile);
+
+        File pathByIdStore = new File(storageLocationFile, "~GLOBAL_DELETED_ATTACHMENT_ID_MAPPINGS.xml");
         if (pathByIdStore.exists()) {
             try (FileInputStream stream = new FileInputStream(pathByIdStore)) {
                 XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(stream);
@@ -146,13 +128,10 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
                     xmlReader.nextTag();
                     String value2 = xmlReader.getElementText();
 
-                    long id;
                     String path;
                     if (xmlReader.getLocalName().equals("path")) {
-                        id = Long.valueOf(value1);
                         path = value2;
                     } else {
-                        id = Long.valueOf(value2);
                         path = value1;
                     }
 
@@ -172,20 +151,20 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
                         continue;
                     }
 
-                    storeDeletedAttachment(directory, id, session);
+                    storeDeletedAttachment(directory, session);
                 }
             }
         }
     }
 
-    private void storeDeletedAttachment(File directory, long id, Session session)
+    private void storeDeletedAttachment(File directory, Session session)
         throws ParserConfigurationException, SAXException, IOException
     {
         this.logger.info("Storing attachment metadata [{}] in the database", directory);
 
         // Find document reference
         File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
-        DocumentReference documentReference = getDocumentReference(documentDirectory);
+        DocumentReference documentReference = getPre11DocumentReference(documentDirectory);
 
         if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
             // Parse ~DELETED_ATTACH_METADATA.xml
@@ -238,33 +217,6 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
     private String encode(String name) throws UnsupportedEncodingException
     {
         return URLEncoder.encode(name, "UTF-8");
-    }
-
-    private String decode(String name) throws UnsupportedEncodingException
-    {
-        return URLDecoder.decode(name, "UTF-8");
-    }
-
-    private DocumentReference getDocumentReference(File directory) throws IOException
-    {
-        String name = decode(directory.getName());
-
-        return new DocumentReference(name, (SpaceReference) getEntityReference(directory.getParentFile()));
-    }
-
-    private EntityReference getEntityReference(File directory) throws IOException
-    {
-        String name = decode(directory.getName());
-
-        File root = this.fstools.getStorageLocationFile();
-
-        File parent = directory.getParentFile();
-
-        if (parent.getCanonicalPath().equals(root.getCanonicalPath())) {
-            return new WikiReference(name);
-        } else {
-            return new SpaceReference(name, getEntityReference(parent));
-        }
     }
 
     private String getElementText(Document doc, String elementName, String def)

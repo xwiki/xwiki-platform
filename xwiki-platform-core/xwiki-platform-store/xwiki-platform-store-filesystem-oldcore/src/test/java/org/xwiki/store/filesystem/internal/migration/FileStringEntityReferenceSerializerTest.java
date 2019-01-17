@@ -17,22 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.internal;
+package org.xwiki.store.filesystem.internal.migration;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.model.internal.reference.PathStringDocumentReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.store.filesystem.internal.migration.FileStringEntityReferenceSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link PathStringDocumentReferenceResolver} and {@link FileStringEntityReferenceSerializer}.
+ * Unit tests for {@link FileStringEntityReferenceSerializer}.
  * 
  * @version $Id$
  */
-public class PathStringReferenceTest
+public class FileStringEntityReferenceSerializerTest
 {
     private FileStringEntityReferenceSerializer serializer = new FileStringEntityReferenceSerializer();
 

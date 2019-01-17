@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.internal;
+package org.xwiki.store.filesystem.internal.migration;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.store.internal.FileSystemStoreUtils;
 
 /**
  * Generate a path representation of an entity reference (eg "Wiki/Space/Page" for a Document Reference in the "wiki"
@@ -32,17 +33,19 @@ import org.xwiki.model.reference.EntityReference;
  * <p>
  * Parameters:
  * <ul>
- * <li>0: a boolean, if true make the path support case insensitive filesystem (by adding a hash to each element of the
- * path). Default is false.</li>
+ * <li>0: a boolean, if true make the path support case insensitive filesystem (by encoding upper case characters).
+ * Default is false.</li>
  * <li>1: a boolean, if true the last element is a file (mostly about keeping the last '.'). Default is folder.</li>
  * </ul>
  *
  * @version $Id$
- * @since 3.0M2
+ * @since 10.4RC1
+ * @deprecated not used anymore in "file" store implementation (now hash based paths)
  */
 @Component
 @Named(FileSystemStoreUtils.HINT)
 @Singleton
+@Deprecated
 public class FileStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
     private boolean isCaseInsensitive(Object... parameters)
@@ -69,9 +72,6 @@ public class FileStringEntityReferenceSerializer extends AbstractStringEntityRef
         boolean isLastReference, Object... parameters)
     {
         if (currentReference.getParent() != null) {
-            // Note: Java will convert the file separator to the proper separator for the underlying FileSystem.
-            // Note: Using "/" allows us to reuse the serialized result into URLs. Caveat: The % character might need
-            // to be escaped as %25 in this case as otherwise the browser will automatically decode % encoding.
             representation.append('/');
         }
 

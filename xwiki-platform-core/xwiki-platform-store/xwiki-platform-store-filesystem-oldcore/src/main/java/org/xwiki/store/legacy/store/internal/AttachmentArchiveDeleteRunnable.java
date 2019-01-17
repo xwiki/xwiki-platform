@@ -23,17 +23,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+
 /**
- * A TransactionRunnable for deleting attachment archives.
- * It uses FileDeleteTransactionRunnable so the attachment will either be deleted or fail
- * safely, it should not hang in a halfway state.
+ * A TransactionRunnable for deleting attachment archives. It uses FileDeleteTransactionRunnable so the attachment will
+ * either be deleted or fail safely, it should not hang in a halfway state.
  *
  * @version $Id$
  * @since 3.0M2
@@ -45,11 +45,10 @@ public class AttachmentArchiveDeleteRunnable extends StartableTransactionRunnabl
      * @param fileTools tools for getting the metadata and versions of the attachment and locks.
      * @param provider the file provider for gettign the files to delete.
      */
-    public AttachmentArchiveDeleteRunnable(final XWikiAttachmentArchive archive,
-        final FilesystemStoreTools fileTools,
+    public AttachmentArchiveDeleteRunnable(final XWikiAttachmentArchive archive, final FilesystemStoreTools fileTools,
         final AttachmentFileProvider provider)
     {
-        final List<File> toDelete = new ArrayList<File>();
+        final List<File> toDelete = new ArrayList<>();
         toDelete.add(provider.getAttachmentVersioningMetaFile());
 
         final Version[] versions = archive.getVersions();
@@ -58,9 +57,8 @@ public class AttachmentArchiveDeleteRunnable extends StartableTransactionRunnabl
         }
 
         for (File file : toDelete) {
-            new FileDeleteTransactionRunnable(file,
-                fileTools.getBackupFile(file),
-                fileTools.getLockForFile(file)).runIn(this);
+            new FileDeleteTransactionRunnable(file, fileTools.getBackupFile(file), fileTools.getLockForFile(file))
+                .runIn(this);
         }
     }
 }

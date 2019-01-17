@@ -32,7 +32,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.hibernate.HibernateException;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
@@ -42,7 +41,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
-import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Migration for XWIKI-14758. Change the path syntax to support case insensitive filesystems.
@@ -53,17 +51,11 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Named("R1001000XWIKI14758")
 @Singleton
-public class R1001000XWIKI14758DataMigration extends AbstractHibernateDataMigration
+public class R1001000XWIKI14758DataMigration extends AbstractFileStoreDataMigration
 {
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
     private ConfigurationSource configuration;
-
-    @Inject
-    private FilesystemStoreTools fstools;
-
-    @Inject
-    private Logger logger;
 
     @Override
     public String getDescription()
@@ -83,7 +75,7 @@ public class R1001000XWIKI14758DataMigration extends AbstractHibernateDataMigrat
         // Move back metadata of deleted attachments located in the filesystem store
         getStore().executeWrite(getXWikiContext(), session -> {
             try {
-                migrateDocument(this.fstools.getWikiDir(getXWikiContext().getWikiId()));
+                migrateDocument(getPre11WikiDir(getXWikiContext().getWikiId()));
             } catch (Exception e) {
                 throw new HibernateException("Failed to refactor filesystem store paths", e);
             }
@@ -105,7 +97,7 @@ public class R1001000XWIKI14758DataMigration extends AbstractHibernateDataMigrat
         if (newDirectory.isDirectory()) {
             for (File child : newDirectory.listFiles()) {
                 if (child.isDirectory()) {
-                    if (child.getName().equals(FilesystemStoreTools.DOCUMENT_DIR_NAME)) {
+                    if (child.getName().equals(THIS_DIR_NAME)) {
                         // Migrate content of the document
                         migrateThis(child);
                     } else {
@@ -136,7 +128,7 @@ public class R1001000XWIKI14758DataMigration extends AbstractHibernateDataMigrat
     private void migrateThis(File directory) throws IOException
     {
         for (File child : directory.listFiles()) {
-            if (child.getName().equals(FilesystemStoreTools.ATTACHMENT_DIR_NAME)) {
+            if (child.getName().equals(FilesystemStoreTools.ATTACHMENTS_DIR_NAME)) {
                 // Migrate attachments
                 migrateAttachments(child);
             } else {

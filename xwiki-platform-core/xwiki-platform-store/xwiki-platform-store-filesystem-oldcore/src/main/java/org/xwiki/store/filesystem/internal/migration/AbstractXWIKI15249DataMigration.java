@@ -55,18 +55,18 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
 
     protected File getDocumentContentDir(final DocumentReference documentReference)
     {
-        File documentDir = new File(this.fstools.getStorageLocationFile(),
-            this.fileEntitySerializer.serialize(documentReference, true));
-        File documentContentDir = new File(documentDir, FilesystemStoreTools.DOCUMENT_DIR_NAME);
+        File documentDir =
+            new File(getPre11StoreRootDirectory(), this.fileEntitySerializer.serialize(documentReference, true));
+        File documentContentDir = new File(documentDir, THIS_DIR_NAME);
 
         // Add the locale
         Locale documentLocale = documentReference.getLocale();
         if (documentLocale != null) {
             final File documentLocalesDir =
                 new File(documentContentDir, FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
-            final File documentLocaleDir = new File(documentLocalesDir, documentLocale.equals(Locale.ROOT)
-                ? FilesystemStoreTools.DOCUMENT_LOCALES_ROOT_NAME : documentLocale.toString());
-            documentContentDir = new File(documentLocaleDir, FilesystemStoreTools.DOCUMENTLOCALE_DIR_NAME);
+            final File documentLocaleDir = new File(documentLocalesDir,
+                documentLocale.equals(Locale.ROOT) ? DOCUMENT_LOCALE_ROOT_NAME : documentLocale.toString());
+            documentContentDir = new File(documentLocaleDir, THIS_DIR_NAME);
         }
 
         return documentContentDir;
@@ -75,7 +75,7 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
     protected File getAttachmentDir(final AttachmentReference attachmentReference)
     {
         File docDir = getDocumentContentDir(attachmentReference.getDocumentReference());
-        File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENT_DIR_NAME);
+        File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
 
         return new File(attachmentsDir, FileSystemStoreUtils.encode(attachmentReference.getName(), true));
     }

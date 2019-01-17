@@ -28,14 +28,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.locks.LockProvider;
 
@@ -51,14 +52,6 @@ import org.xwiki.store.locks.LockProvider;
 public class FilesystemStoreTools implements Initializable
 {
     /**
-     * The name of the directory where document information is stored. This must have a URL illegal character in it,
-     * otherwise it will be confused if/when nested spaces are implemented.
-     * 
-     * @since 10.0
-     */
-    public static final String DOCUMENT_DIR_NAME = "~this";
-
-    /**
      * The directory within each document's directory for document locales.
      * 
      * @since 10.0
@@ -66,43 +59,25 @@ public class FilesystemStoreTools implements Initializable
     public static final String DOCUMENT_LOCALES_DIR_NAME = "locales";
 
     /**
-     * The folder name of {@link Locale#ROOT}.
-     * 
-     * @since 10.0
-     */
-    public static final String DOCUMENT_LOCALES_ROOT_NAME = "~";
-
-    /**
-     * The name of the directory where document locale information is stored. This must have a URL illegal character in
-     * it, otherwise it will be confused if/when nested spaces are implemented.
-     */
-    public static final String DOCUMENTLOCALE_DIR_NAME = DOCUMENT_DIR_NAME;
-
-    /**
      * The directory within each document's directory where the document's attachments are stored.
+     * 
+     * @since 11.0RC1
      */
-    public static final String ATTACHMENT_DIR_NAME = "attachments";
-
-    /**
-     * The name of the directory in the work directory where the hirearchy will be stored.
-     */
-    private static final String STORAGE_DIR_NAME = "storage";
+    public static final String ATTACHMENTS_DIR_NAME = "attachments";
 
     /**
      * The directory within each document's directory for attachments which have been deleted.
+     * 
+     * @since 11.0RC1
      */
-    private static final String DELETED_ATTACHMENT_DIR_NAME = "deleted-attachments";
-
-    /**
-     * The part of the deleted attachment directory name after this is the date of deletion, The part before this is the
-     * URL encoded attachment filename.
-     */
-    private static final String DELETED_ATTACHMENT_NAME_SEPARATOR = "-id";
+    public static final String DELETED_ATTACHMENTS_DIR_NAME = "deleted-attachments";
 
     /**
      * The directory within each document's directory for documents which have been deleted.
+     * 
+     * @since 11.0RC1
      */
-    private static final String DELETED_DOCUMENT_DIR_NAME = "deleted-documents";
+    public static final String DELETED_DOCUMENTS_DIR_NAME = "deleted-documents";
 
     /**
      * When a file is being saved, the original will be moved to the same name with this after it. If the save operation
@@ -117,13 +92,6 @@ public class FilesystemStoreTools implements Initializable
      * the original filename.
      */
     private static final String TEMP_FILE_SUFFIX = "~tmp";
-
-    /**
-     * Serializer used for obtaining a safe file path from a document reference.
-     */
-    @Inject
-    @Named(FileSystemStoreUtils.HINT)
-    private EntityReferenceSerializer<String> fileEntitySerializer;
 
     @Inject
     private FilesystemAttachmentsConfiguration config;
@@ -143,22 +111,19 @@ public class FilesystemStoreTools implements Initializable
     private Environment environment;
 
     /**
-     * This is the directory where all of the attachments will stored.
+     * This is the root directory of the stored data.
      */
-    private File storageDir;
+    private File storeRootDirectory;
 
     /**
      * Testing Constructor.
      *
-     * @param pathSerializer an EntityReferenceSerializer for generating file paths.
      * @param storageDir the directory to store the content in.
      * @param lockProvider a means of getting locks for making sure only one thread accesses an attachment at a time.
      */
-    public FilesystemStoreTools(final EntityReferenceSerializer<String> pathSerializer, final File storageDir,
-        final LockProvider lockProvider)
+    public FilesystemStoreTools(final File storageDir, final LockProvider lockProvider)
     {
-        this.fileEntitySerializer = pathSerializer;
-        this.storageDir = storageDir;
+        this.storeRootDirectory = storageDir;
         this.lockProvider = lockProvider;
     }
 
@@ -172,14 +137,20 @@ public class FilesystemStoreTools implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
+        // General location when filesystem based stored put data
+        File storeDirectory = new File(this.environment.getPermanentDirectory(), "store");
+        // Specific location for file component
+        File fileStorageDirectory = new File(storeDirectory, FileSystemStoreUtils.HINT);
+
         try {
-            this.storageDir = new File(this.environment.getPermanentDirectory(), STORAGE_DIR_NAME).getCanonicalFile();
+            this.storeRootDirectory = fileStorageDirectory.getCanonicalFile();
         } catch (IOException e) {
             throw new InitializationException("Invalid permanent directory", e);
         }
 
-        if (config.cleanOnStartup()) {
-            final File dir = this.storageDir;
+        // TODO: make this useless (by cleaning empty directories as soon as they appear)
+        if (this.config.cleanOnStartup()) {
+            final File dir = this.storeRootDirectory;
 
             new Thread(() -> deleteEmptyDirs(dir, 0)).start();
         }
@@ -274,30 +245,11 @@ public class FilesystemStoreTools implements Initializable
 
     /**
      * @return the absolute path to the directory where the files are stored.
+     * @since 11.0RC1
      */
-    public String getStorageLocationPath()
+    public File getStoreRootDirectory()
     {
-        return this.storageDir.getPath();
-    }
-
-    /**
-     * @return the absolute path to the directory where the files are stored.
-     * @since 9.10RC1
-     */
-    public File getStorageLocationFile()
-    {
-        return this.storageDir;
-    }
-
-    /**
-     * Get a file which is global for the entire installation.
-     *
-     * @param name a unique identifier for the file.
-     * @return a file unique to the given name.
-     */
-    public File getGlobalFile(final String name)
-    {
-        return new File(this.storageDir, "~GLOBAL_" + FileSystemStoreUtils.encode(name, false));
+        return this.storeRootDirectory;
     }
 
     /**
@@ -313,12 +265,17 @@ public class FilesystemStoreTools implements Initializable
         return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName());
     }
 
-    private File getAttachmentDir(final AttachmentReference attachmentReference)
+    /**
+     * @param attachmentReference the attachment reference
+     * @return the attachment directory
+     * @since 11.0RC1
+     */
+    public File getAttachmentDir(final AttachmentReference attachmentReference)
     {
         final File docDir = getDocumentContentDir(attachmentReference.getDocumentReference());
-        final File attachmentsDir = new File(docDir, ATTACHMENT_DIR_NAME);
+        final File attachmentsDir = new File(docDir, ATTACHMENTS_DIR_NAME);
 
-        return new File(attachmentsDir, FileSystemStoreUtils.encode(attachmentReference.getName(), true));
+        return hashDirectory(attachmentsDir, attachmentReference.getName());
     }
 
     /**
@@ -329,14 +286,16 @@ public class FilesystemStoreTools implements Initializable
      * @param attachment the attachment to get the file for.
      * @param index the index of the deleted attachment.
      * @return a directory which will be repeatable only with the same inputs.
+     * @since 11.0RC1
      */
-    private File getDeletedAttachmentDir(final AttachmentReference attachment, final long index)
+    public File getDeletedAttachmentDir(final AttachmentReference attachment, final long index)
     {
         final DocumentReference doc = attachment.getDocumentReference();
         final File docDir = getDocumentContentDir(doc);
-        final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENT_DIR_NAME);
-        final String fileName = attachment.getName() + DELETED_ATTACHMENT_NAME_SEPARATOR + index;
-        return new File(deletedAttachmentsDir, FileSystemStoreUtils.encode(fileName, false));
+        final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENTS_DIR_NAME);
+        final File deletedAttachmentDir = hashDirectory(deletedAttachmentsDir, attachment.getName());
+
+        return new File(deletedAttachmentDir, String.valueOf(index));
     }
 
     /**
@@ -346,11 +305,13 @@ public class FilesystemStoreTools implements Initializable
      * @param documentReference the document to get the file for.
      * @param index the index of the deleted document.
      * @return a directory which will be repeatable only with the same inputs.
+     * @since 11.0RC1
      */
-    private File getDeletedDocumentContentDir(final DocumentReference documentReference, final long index)
+    public File getDeletedDocumentContentDir(final DocumentReference documentReference, final long index)
     {
         final File docDir = getDocumentContentDir(documentReference);
-        final File deletedDocumentContentsDir = new File(docDir, DELETED_DOCUMENT_DIR_NAME);
+        final File deletedDocumentContentsDir = new File(docDir, DELETED_DOCUMENTS_DIR_NAME);
+
         return new File(deletedDocumentContentsDir, String.valueOf(index));
     }
 
@@ -361,34 +322,52 @@ public class FilesystemStoreTools implements Initializable
      */
     public File getWikiDir(String wikiId)
     {
-        return new File(this.storageDir, wikiId);
+        return new File(this.storeRootDirectory, wikiId);
+    }
+
+    private File hashDirectory(File parent, String name)
+    {
+        String md5 = DigestUtils.md5Hex(name);
+
+        // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
+        // files in one folder
+        File documentDir1 = new File(parent, String.valueOf(md5.charAt(0)));
+        File documentDir2 = new File(documentDir1, String.valueOf(md5.charAt(1)));
+
+        return new File(documentDir2, String.valueOf(md5.substring(2)));
     }
 
     /**
-     * Get the directory associated with this document. This is a path obtained from the owner document reference, where
-     * each reference segment (wiki, spaces, document name) contributes to the final path. For a document called
-     * xwiki:Main.WebHome, the directory will be: <code>(storageDir)/xwiki/Main/WebHome/~this/</code>
+     * Get the directory associated with this document.
      *
      * @param documentReference the DocumentReference for the document to get the directory for.
      * @return a file path corresponding to the attachment location; each segment in the path is URL-encoded in order to
      *         be safe.
+     * @since 11.0RC1
      */
-    private File getDocumentContentDir(final DocumentReference documentReference)
+    public File getDocumentContentDir(final DocumentReference documentReference)
     {
-        final File documentDir =
-            new File(this.storageDir, this.fileEntitySerializer.serialize(documentReference, true));
-        File documentContentDir = new File(documentDir, DOCUMENT_DIR_NAME);
+        File wikiDir = getWikiDir(documentReference.getWikiReference().getName());
 
-        // Add the locale
+        String localKey =
+            LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(documentReference.getLocale() != null
+                ? new DocumentReference(documentReference, (Locale) null) : documentReference);
+        String md5 = DigestUtils.md5Hex(localKey);
+
+        // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
+        // files in one folder
+        File documentDir1 = new File(wikiDir, String.valueOf(md5.charAt(0)));
+        File documentDir2 = new File(documentDir1, String.valueOf(md5.charAt(1)));
+        File documentDirFinal = new File(documentDir2, String.valueOf(md5.substring(2)));
+
+        // Add the locale (if any)
         Locale documentLocale = documentReference.getLocale();
-        if (documentLocale != null) {
-            final File documentLocalesDir = new File(documentContentDir, DOCUMENT_LOCALES_DIR_NAME);
-            final File documentLocaleDir = new File(documentLocalesDir,
-                documentLocale.equals(Locale.ROOT) ? DOCUMENT_LOCALES_ROOT_NAME : documentLocale.toString());
-            documentContentDir = new File(documentLocaleDir, DOCUMENTLOCALE_DIR_NAME);
+        if (documentLocale != null && !documentLocale.equals(Locale.ROOT)) {
+            File documentLocalesDir = new File(documentDirFinal, DOCUMENT_LOCALES_DIR_NAME);
+            documentDirFinal = new File(documentLocalesDir, documentLocale.toString());
         }
 
-        return documentContentDir;
+        return documentDirFinal;
     }
 
     /**

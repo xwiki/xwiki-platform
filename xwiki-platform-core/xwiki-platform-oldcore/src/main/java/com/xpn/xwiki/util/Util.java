@@ -28,8 +28,6 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.oro.text.PatternCache;
@@ -889,14 +888,10 @@ public class Util
         long hash = 0;
 
         try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            byte[] digest = md5.digest(uid.getBytes("UTF-8"));
+            byte[] digest = DigestUtils.md5(uid);
             for (int l = digest.length, i = Math.max(0, digest.length - 9); i < l; i++) {
                 hash = hash << 8 | ((long) digest[i] & 0xFF);
             }
-        } catch (NoSuchAlgorithmException ex) {
-            LOGGER.error("Cannot retrieve MD5 provider for hashing", ex);
-            throw new RuntimeException("MD5 hash is required for id hash");
         } catch (Exception ex) {
             LOGGER.error("Id computation failed during MD5 processing", ex);
             throw new RuntimeException("MD5 hash is required for id hash");

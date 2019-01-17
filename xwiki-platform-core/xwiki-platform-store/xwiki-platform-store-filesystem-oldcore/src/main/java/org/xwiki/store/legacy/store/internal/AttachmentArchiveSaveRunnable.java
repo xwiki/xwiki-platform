@@ -77,7 +77,7 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
         }
 
         final Version[] versions = archive.getVersions();
-        final List<XWikiAttachment> attachmentVersions = new ArrayList<XWikiAttachment>(versions.length);
+        final List<XWikiAttachment> attachmentVersions = new ArrayList<>(versions.length);
 
         // Add the content files which need updating and add the attachments to the list.
         for (int i = 0; i < versions.length; i++) {

@@ -38,6 +38,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Mapping needed by the Notifications, which is a dependency (activity stream is also needed by notifications) -->
+    <xwikiDbHbmCommonExtraMappings>notification-filter-preferences.hbm.xml,activitystream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>

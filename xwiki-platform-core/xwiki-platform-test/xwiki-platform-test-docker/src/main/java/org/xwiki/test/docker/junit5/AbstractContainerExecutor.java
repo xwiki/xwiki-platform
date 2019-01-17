@@ -47,7 +47,7 @@ public abstract class AbstractContainerExecutor
             container.getDockerClient().pullImageCmd(container.getDockerImageName());
         }
 
-        container.start();
+        DockerTestUtils.startContainer(container);
 
         // Display logs after the container has been started so that we can see problems happening in the containers
         DockerTestUtils.followOutput(container, getClass());

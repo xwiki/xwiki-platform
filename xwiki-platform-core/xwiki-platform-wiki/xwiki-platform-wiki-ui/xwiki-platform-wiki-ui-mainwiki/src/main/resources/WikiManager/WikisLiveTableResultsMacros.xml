@@ -195,9 +195,19 @@
   ######## WIKI UI MAINWIKI CUSTOMIZATION #########
   ## The descriptors are always hidden, so we don't filter on the hidden column.
   #set($query = $services.query.hql($sql).addFilter('currentlanguage').setLimit($limit).setOffset($offset).bindValues($sqlParams))
-  #################################################
   #set($items = $query.execute())
-  #set($discard = $map.put('totalrows', $query.count()))
+  #if ($sql.contains('GROUP BY doc.fullName'))
+    ## The group by we have to use to make sure we get unique documents break $query.count so we remove it
+    #set($countQuery = $services.query.hql($sql.replace('GROUP BY doc.fullName', '')))
+    #set($void = $countQuery.setWiki($query.wiki))
+    #foreach($entry in $query.positionalParameters.entrySet())
+      #set($void = $countQuery.bindValue($entry.key, $entry.value))
+    #end
+  #else
+    $countQuery = $query
+  #end
+  #set($discard = $map.put('totalrows', $countQuery.count()))
+  #################################################
   #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
   #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
   #set($rows = [])

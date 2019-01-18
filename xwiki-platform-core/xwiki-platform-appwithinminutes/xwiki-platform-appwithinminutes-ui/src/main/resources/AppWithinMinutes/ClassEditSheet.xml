@@ -794,6 +794,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -809,7 +810,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -1000,6 +1003,7 @@ return XWiki;
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -1015,7 +1019,9 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -1767,6 +1773,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -1782,7 +1789,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -1983,6 +1992,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 }</code>
     </property>
     <property>
+      <contentType/>
+    </property>
+    <property>
       <name>Framework</name>
     </property>
     <property>
@@ -2008,6 +2020,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -2023,7 +2036,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -2140,6 +2155,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 #fields .toggle-switcher {
   cursor: pointer;
 }</code>
+    </property>
+    <property>
+      <contentType/>
     </property>
     <property>
       <name>Widgets</name>

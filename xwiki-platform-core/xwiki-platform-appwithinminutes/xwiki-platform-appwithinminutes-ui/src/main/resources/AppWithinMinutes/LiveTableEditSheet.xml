@@ -325,6 +325,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -659,6 +660,7 @@ return XWiki;
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -832,6 +834,9 @@ return XWiki;
 #inline .xToolbar div.clearfloats {
   clear: left;
 }</code>
+    </property>
+    <property>
+      <contentType/>
     </property>
     <property>
       <name>Style</name>

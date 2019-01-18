@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="AppWithinMinutes.CreateApplication" locale="">
   <web>AppWithinMinutes</web>
   <name>CreateApplication</name>
   <language/>
@@ -36,7 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="AppWithinMinutes.WizardStep"/}}
+  <content>{{velocity}}
+#if ($request.wizard == 'true')
+  {{include reference="AppWithinMinutes.WizardStep"/}}
+#end
+{{/velocity}}
 
 {{template name="locationPicker_macros.vm" /}}
 
@@ -167,10 +171,10 @@
     ## CSRF protection is not needed because this step only redirects to the next one passing data in the query string.
     #processStep
   #end
-#else
+#elseif ($request.wizard == 'true')
   #showStep
+  #set ($displayDocExtra = false)
 #end
-#set ($displayDocExtra = false)
 {{/velocity}}</content>
   <object>
     <name>AppWithinMinutes.CreateApplication</name>

@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if(!$doc.documentReference.name.endsWith('Sheet'))$services.localization.render('appWithinMinutes.classEditor.title', [$stringtool.removeEnd($doc.title, 'Class').trim()])#{else}$doc.documentReference.name#end</title>
+  <title>#if ("$!appTitle" != '')$appTitle#else$doc.pageReference.name#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -120,7 +120,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
             #end
             #set($formFieldIconRendered = "&lt;img src='$formFieldIconURL' alt='$escapetool.xml($formFieldDoc.plainTitle)' class='icon' /&gt;")
           #end
-          ** (% class="field" %){{html}}
+          ** (% class="field" %){{html clean="false"}}
               $formFieldIconRendered
               $escapetool.xml($formFieldDoc.plainTitle)
               ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
@@ -170,7 +170,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #end
     ##
     (% class="hidden" %)
-    {{html}}
+    {{html clean="false"}}
       ## Output the field meta data even if the field is not supported to preserve it when the class is saved.
       #foreach($field in $unknownFields)
         #displayFieldMetaData($field)
@@ -193,7 +193,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #elseif ($classSheets.size() == 1)
     #set ($sheetReference = $classSheets.get(0))
   #end
-  {{html}}
+  {{html clean="false"}}
   ## Hide the options if neither the sheet nor the template nor the translation bundle exists. They don't have to be
   ## updated, they have to be created.
   &lt;dl id="options" #if (!$xwiki.exists($sheetReference) &amp;&amp; !$xwiki.exists($templateReference)
@@ -272,7 +272,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($discard = $xwiki.jsx.use($formFieldDoc.fullName))
   #end
   (% class="hidden" %)
-  {{html}}
+  {{html clean="false"}}
     #displayFieldMetaData($field)
     ## We need this information to avoid querying and loading all FormField documents twice.
     ## NOTE: We use a different ID format to avoid collisions with the field meta properties.
@@ -319,7 +319,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #if($property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
     ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;#displayPropertyEditInput($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
   #else
-    ; {{html}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
+    ; {{html clean="false"}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
     : {{html clean="false"}}#displayPropertyEditInput($property, $prefix, $field){{/html}}
   #end
 #end
@@ -345,7 +345,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
   ## Output also the LinkExtension hook because $xwiki.linkx.use() is used to load CSS files from WebJars.
   ## The class editor moves this resource includes in the HTML page head.
-  {{html}}
+  {{html clean="false"}}
   &lt;!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin --&gt;
   #skinExtensionHooks
   {{/html}}
@@ -448,8 +448,11 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #previewField()
   #else
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
-    (% class="hidden" %)
-    {{html}}&lt;input type="hidden" name="xpage" value="plain" /&gt;{{/html}}
+    (% class="hidden" %)(((
+      {{html clean="false"}}&lt;input type="hidden" name="xpage" value="plain" /&gt;{{/html}}
+      ## Compute the application title to be used as the wizard step title.
+      #getAppTitle
+    )))
 
     #displayEditForm()
   #end
@@ -693,7 +696,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #updateAndSaveTranslations
   #if($action == 'save')
     #if($errorMessage)
-      {{error}}{{html}}$errorMessage{{/html}}{{/error}}
+      {{error}}{{html clean="false"}}$errorMessage{{/html}}{{/error}}
     #elseif("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
       #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))

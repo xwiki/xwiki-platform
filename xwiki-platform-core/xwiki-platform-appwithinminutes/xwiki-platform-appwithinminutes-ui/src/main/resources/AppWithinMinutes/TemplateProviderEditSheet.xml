@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if(!$doc.documentReference.name.endsWith('Sheet'))$services.localization.render('appWithinMinutes.templateProviderEditor.title', [$stringtool.removeEnd($doc.documentReference.name, 'TemplateProvider')])#{else}$doc.documentReference.name#end</title>
+  <title>#if ("$!appTitle" != '')$appTitle#else$doc.pageReference.name#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -82,31 +82,6 @@
   #end
   #set ($discard = $templateProviderObj.set('creationRestrictions', $creationRestrictions))
   #set ($discard = $templateProviderObj.set('creationRestrictionsAreSuggestions', $creationRestrictionsAreSuggestions))
-#end
-
-#macro (getAppReference)
-  #set ($appLocalRef = $doc.getValue('dataSpaceName'))
-  #if ("$!appLocalRef" != '')
-    ## Between 6.3M2 (XWIKI-11249) and 7.3RC1 (XWIKI-12741).
-    #set ($appReference = $services.model.resolveSpace($appLocalRef))
-  #else
-    ## Possible locations:
-    ## 1. same space (&lt;6.2M1, XWIKI-8757)
-    ## 2. sibling space (between 6.2M1 and 6.3M2)
-    ## 3. grand parent space (7.3RC1+)
-    #set ($appReferences = [
-      $doc.documentReference.parent,
-      $services.model.createSpaceReference($stringtool.removeEnd($doc.documentReference.name, 'TemplateProvider'),
-        $doc.documentReference.parent.parent),
-      $doc.documentReference.parent.parent
-    ])
-    #foreach ($item in $appReferences)
-      #set ($appReference = $item)
-      #if ($xwiki.getDocument($appReference).getObject($appDescriptorClassName))
-        #break
-      #end
-    #end
-  #end
 #end
 
 #macro (maybeAddXRedirectToNextWizardStep)
@@ -252,7 +227,8 @@
 #macro (doEdit)
   #if("$!request.wizard" == 'true')
     #appWizardHeader('entries')
-
+    ## Compute the application title to be used as the wizard step title.
+    #getAppTitle
   #end
   #displayEditForm
   #if("$!request.wizard" == 'true')

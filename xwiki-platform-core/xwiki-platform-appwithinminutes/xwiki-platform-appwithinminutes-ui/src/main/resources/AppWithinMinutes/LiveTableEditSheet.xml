@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro(listAvailableColumns)
-  {{html}}
+  {{html clean="false"}}
   &lt;select id="availableColumns"&gt;
     #set($className = "$!liveTableObj.getValue('class')")
     #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
@@ -83,7 +83,7 @@
 #end
 
 #macro(displayFormFields)
-  {{html wiki="true"}}
+  {{html wiki="true" clean="false"}}
   (% class="hidden" %)
   (((
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
@@ -94,6 +94,9 @@
     ## We have to pass the list of available columns to the JavaScript code.
     #listAvailableColumns()
   )))
+  ; &lt;label for="xwikidoctitleinput"&gt;$services.localization.render('core.editors.content.titleField.label')&lt;/label&gt;##
+    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorTitleHint')
+  : &lt;input id="xwikidoctitleinput" type="text" name="title" value="$escapetool.xml($doc.title)"/&gt;
   ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
     (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorDescriptionHint')
   : $doc.display('description')
@@ -117,7 +120,7 @@
         #set ($icon = $uix.parameters.icon)
       #end
     #end
-    {{html wiki="true"}}
+    {{html wiki="true" clean="false"}}
     ; &lt;label for="applicationIcon"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
       (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorIconHintWithPicker',
         [$xwiki.getSkinFile('icons/silk/index_abc.png')])  
@@ -149,7 +152,7 @@
       #appWizardFooter('presentation')
     #end
   )))
-  {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
+  {{html clean="false"}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
 #end
 
 #macro (maybeGrantSpaceAdminRight $spaceRef)
@@ -234,22 +237,39 @@
 
 #macro(updateAndSaveIcon)
   #set($uix = $doc.getObject('XWiki.UIExtensionClass', true))
-  #set($appName = $doc.documentReference.parent.name)
-  #set($discard = $uix.set('name', "platform.panels.${appName}Application"))
+  #set($discard = $uix.set('name', "platform.panels.${doc.pageReference.name}Application"))
   #set($discard = $uix.set('extensionPointId', 'org.xwiki.platform.panels.Applications'))
-  #set($discard = $uix.set('parameters', "label=${appName}${util.newline}target=${doc.fullName}${util.newline}icon=${request.applicationIcon}"))
+  #set ($uixParams = [
+    "label=$doc.plainTitle",
+    "target=$doc.fullName",
+    "icon=$request.applicationIcon"
+  ])
+  #set ($discard = $uix.set('parameters', $stringtool.join($uixParams, $util.newline)))
   #set ($hasWikiAdminRights = $services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
   #set($discard = $uix.set('scope', "#if ($hasWikiAdminRights)wiki#{else}user#end"))
   #set($discard = $doc.save('Updated application icon', true))
 #end
 
+#macro (excludeFromNavigationPanel)
+  #set ($navigationPanelConfig = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
+  #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
+  #set ($discard = $exclusions.add($doc.fullName))
+  #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
+  #set ($discard = $navigationPanelConfig.save("Exclude the $doc.pageReference.name application"))
+#end
+
 #macro(doSave)
+  ## Exclude the application home page from the Navigation panel when the application is created at the top level.
+  #set ($shouldExcludeFromNavigationPanel = $doc.isNew() &amp;&amp; $doc.pageReference.parent.type == 'WIKI')
   #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
   #updateAndSaveIcon()
+  #if ($shouldExcludeFromNavigationPanel)
+    #excludeFromNavigationPanel
+  #end
   #if($action == 'save')
     #if($errorMessage)
-      {{error}}{{html}}$errorMessage{{/html}}{{/error}}
+      {{error}}{{html clean="false"}}$errorMessage{{/html}}{{/error}}
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())

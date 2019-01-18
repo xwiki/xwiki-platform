@@ -75,13 +75,13 @@
 
 #macro (askForDeleteConfirmation $appReference $scope)
   ## Confirmation dialog
-  #set ($appName = $appReference.name)
+  #set ($appTitle = $xwiki.getDocument($appReference).plainTitle)
   #if ($scope == 'entries')
     #set ($confirmationMessage = $services.localization.render(
-      'platform.appwithinminutes.deleteAppEntriesConfirmation', $escapetool.xml($appName)))
+      'platform.appwithinminutes.deleteAppEntriesConfirmation', [$escapetool.xml($appTitle)]))
   #else
     #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppConfirmation',
-      $escapetool.xml($appName)))
+      [$escapetool.xml($appTitle)]))
   #end
   #set ($cancelURL = $doc.getURL())
   #set ($confirmParams = {
@@ -101,10 +101,20 @@
     $escapetool.xml($cancelURL) $services.localization.render('yes') $services.localization.render('no'))
   {{/html}}
 #end
+
+#macro (removeExcludeFromNavigationPanel $appHomeReference)
+  #set ($navigationPanelConfig = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
+  #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
+  #if ($exclusions.remove($services.model.serialize($appHomeReference, 'local')))
+    #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
+    #set ($discard = $navigationPanelConfig.save("Remove exclude for $appHomeReference.parent.name application"))
+  #end
+#end
 {{/velocity}}
 
 {{velocity}}
 #if ("$!request.appName" != '')
+  #set ($displayDocExtra = false)
   #if ($request.resolve == 'true')
     #set ($appReference = $services.model.resolveSpace($request.appName))
   #else
@@ -127,11 +137,17 @@
       #set ($classReference = $services.model.resolveDocument($classLocalReference, 'explicit', $appHomeReference))
       ##
       #set ($pageReferences = [])
+      #set ($shouldRemoveExcludeFromNavigationPanel = false)
       #getApplicationDataPages($classReference $pageReferences)
       #if ($scope != 'entries')
         #getApplicationCodePages($appReference $classReference $pageReferences)
+        ## Remove the exclude from the Navigation Panel if the deleted application is at the top level.
+        #set ($shouldRemoveExcludeFromNavigationPanel = $appReference.parent.type == 'WIKI')
       #end
       #bulkDelete($pageReferences)
+      #if ($shouldRemoveExcludeFromNavigationPanel)
+        #removeExcludeFromNavigationPanel($appHomeReference)
+      #end
       ##
       #if ($errors.size() &gt; 0)
         {{error}}$errors.get(0){{/error}}

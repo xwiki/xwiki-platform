@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Applikation på minuten
 platform.appwithinminutes.description=Skapa webbapplikationer för att samarbeta på bara några minuter med hjälp av XWikis kraftfulla system för att hantera strukturerad data.
 platform.appwithinminutes.createAppButtonLabel=Skapa applikation
 platform.appwithinminutes.appsLiveTableHeading=Applikationer
-platform.appwithinminutes.appsLiveTable.doc.space=Applikationsnamn
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Senaste författare
 platform.appwithinminutes.appsLiveTable.doc.date=Uppdaterad
 platform.appwithinminutes.appsLiveTable._actions=Operationer
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Den här applikationen finns reda
 platform.appwithinminutes.appNameEmptyError=Mata in applikationens namn.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Fältpalett
 platform.appwithinminutes.classEditorPaletteHint=Dra och släpp fält från paletten för att skapa formuläret.
 platform.appwithinminutes.classEditorCanvasHint=Dra fält från palleten och släpp dem i detta utrymme.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Lägg till
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Ta bort
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Biler
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=En specialiserad kolumn för att visa bilder som finns som bilagor till postsidan
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=En speciell kolumn för att visa användarens avatar. Detta fungerar endast för en tabell som bundits till klassen XWiki.XWikiUsers.
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Beskrivningen innehåller en kort sammanfattning av vad applikationen gör och vilken data den hanterar.
 platform.appwithinminutes.liveTableEditorColumnsHint=Välj de kolumner som skall visas i live-tabellen på applikationens hemsida.
 platform.appwithinminutes.liveTableEditorSaveComment=Uppdatera live-tabell
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Presentation
 platform.appwithinminutes.wizardStep3Title=Anpassa din applikations hemsida
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Anpassa din applikations hemsida
+
+### Since 11.0RC1
+platform.appwithinminutes.appsLiveTable.doc.space=Applikationsnamn
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

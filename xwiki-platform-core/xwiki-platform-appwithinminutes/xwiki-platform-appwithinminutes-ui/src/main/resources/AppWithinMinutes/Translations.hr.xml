@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Aplikacija u nekoliko minuta
 platform.appwithinminutes.description=U nekoliko minuta izradite kolaboracijske mrežne aplikacije temeljene na XWikijevom moćnom sustavu upravljanja strukturiranim podatcima.
 platform.appwithinminutes.createAppButtonLabel=Izradi aplikaciju
 platform.appwithinminutes.appsLiveTableHeading=Aplikacije
-platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Posljednji autor
 platform.appwithinminutes.appsLiveTable.doc.date=Datum ažuriranja
 platform.appwithinminutes.appsLiveTable._actions=Akcije
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Ova aplikacija već postoji. Ako 
 platform.appwithinminutes.appNameEmptyError=Molim unesite ime aplikacije.
 
 ### Wizard Step 2: Application Structure
-appWithinMinutes.classEditor.title=Struktura aplikacije {0}
 platform.appwithinminutes.classEditorPaletteTitle=Paleta polja
 platform.appwithinminutes.classEditorPaletteHint=Povucite i ispustite polja iz palete kako biste izradili formu koja će biti korištena za unos vaših podataka.
 platform.appwithinminutes.classEditorCanvasHint=Povucite polja iz palete te ih ispustite u ovaj okvir.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Identifikator
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Dodaj
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Obriši
 
-appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}
 appWithinMinutes.templateProviderEditor.hint=Aplikacijski zapisi su wiki stranice koje sadrže strukturirane podatke.
 appWithinMinutes.templateProviderEditor.icon.hint=Ikona pridružena aplikacijskom zapisu.
 appWithinMinutes.templateProviderEditor.description.hint=Kratki opis aplikacijskog zapisa.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Slike
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Poseban stupac za prikaz slika pridruženih podatkovnoj stranici
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Poseban stupac za prikaz korisnikovog avatara. Radi samo za tablicu povezanu s klasom XWiki.XWikiUsers.
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Sadržaj koji će biti prikazan na početnoj stranici iznad tablice s podacima aplikacije. Upotrijebite ga za opis aplikacije.
 platform.appwithinminutes.liveTableEditorColumnsHint=Odaberite stupce koje biste željeli uključiti u tablicu koja se prikazuje na početnoj stranici aplikacije.
 platform.appwithinminutes.liveTableEditorSaveComment=Ažuriraj tablicu
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Prezentacija
 platform.appwithinminutes.wizardStep3Title=Prilagodite početnu stranicu vaše aplikacije
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Prilagodite početnu stranicu aplikacije
+
+### Since 11.0RC1
+platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
+appWithinMinutes.classEditor.title=Struktura aplikacije {0}
+appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}
 </content>
 </xwikidoc>

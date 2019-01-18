@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Lietotne dažās minūtēs
 platform.appwithinminutes.description=Balstoties uz Xwiki strukturēto datu pārvaldības sistēmu, dažu minūšu laikā varat izveidot savu tīmekļa lietotni.
 platform.appwithinminutes.createAppButtonLabel=Izveidot lietotni
 platform.appwithinminutes.appsLiveTableHeading=Lietotnes
-platform.appwithinminutes.appsLiveTable.doc.space=Lietotnes nosaukums
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Autors
 platform.appwithinminutes.appsLiveTable.doc.date=Atjaunots
 platform.appwithinminutes.appsLiveTable._actions=Darbības
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Tāda lietotne jau pastāv. Ja tu
 platform.appwithinminutes.appNameEmptyError=Lūdzu ievadiet lietotnes nosaukumu.
 
 ### Wizard Step 2: Application Structure
-appWithinMinutes.classEditor.title={0} struktūra
 platform.appwithinminutes.classEditorPaletteTitle=Lauku palete
 platform.appwithinminutes.classEditorPaletteHint=Velciet un nometiet laukus, lai izveidotu savu formu.
 platform.appwithinminutes.classEditorCanvasHint=Velciet laukus no paletes uz šo lauku.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Pievienot
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Dzēst
 
-appWithinMinutes.templateProviderEditor.title={0} ieraksti
 appWithinMinutes.templateProviderEditor.hint=Lietotnes ieraksti ir viki lapas, kuras satur strukturētus datus.
 appWithinMinutes.templateProviderEditor.icon.hint=Lietotnes norādes ikona.
 appWithinMinutes.templateProviderEditor.description.hint=Īss lietotnes norādes apraksts.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Attēli
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Īpaša kolonna, kurā attēlot ierakstam pievienoto attēlus
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Iemiesojums
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Kolonna ierakstu lapā, kurā parādīt lietotāja iemiesojumu. Strādā tikai XWiki.XWikiUsers klasei
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Aprakstā norāda, ko lietotne dara un kādus datus tā apstrādā.
 platform.appwithinminutes.liveTableEditorColumnsHint=Izvēlieties kolonnas, kuras vēlaties parādīt lietotnes mājas lapas tabulā.
 platform.appwithinminutes.liveTableEditorSaveComment=Atjaunot tabulu
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Izskats
 platform.appwithinminutes.wizardStep3Title=Pielāgojiet lietotnes izskatu
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Pielāgojiet lietotnes sākuma lapu
+
+### Since 11.0RC1
+platform.appwithinminutes.appsLiveTable.doc.space=Lietotnes nosaukums
+appWithinMinutes.classEditor.title={0} struktūra
+appWithinMinutes.templateProviderEditor.title={0} ieraksti
 </content>
 </xwikidoc>

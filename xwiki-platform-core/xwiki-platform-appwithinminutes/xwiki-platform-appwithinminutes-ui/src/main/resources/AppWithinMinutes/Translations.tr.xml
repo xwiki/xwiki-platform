@@ -41,7 +41,7 @@
 platform.appwithinminutes.description=XWiki güçlü yapılandırılmış veri yönetim sistemine dayalı dakika içinde ortak web uygulamaları oluşturun .
 platform.appwithinminutes.createAppButtonLabel=Oluşturma Uygulama
 platform.appwithinminutes.appsLiveTableHeading=Uygulamaları
-platform.appwithinminutes.appsLiveTable.doc.space=Uygulama adı
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Son yazar
 platform.appwithinminutes.appsLiveTable.doc.date=Güncelleme tarihi
 platform.appwithinminutes.appsLiveTable._actions=Eylemleri
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Bu uygulama zaten var . Eğerbir 
 ### Missing: platform.appwithinminutes.appNameEmptyError=Please enter the application name.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Alan Palet
 platform.appwithinminutes.classEditorPaletteHint=formunuzu oluşturmak içinpaletten Sürükle &amp; Bırak alanlar.
 platform.appwithinminutes.classEditorCanvasHint=Sürüklepaletinden alanlar ve bu alanda onları bırakın .
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ekle
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Sil
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Görüntüler
 ### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 ### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 ### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
 platform.appwithinminutes.liveTableEditorColumnsHint=Eğercanlı tabloya eklemek istediğinizsütunları seçinUygulama ana sayfasında görüntülenir .
 platform.appwithinminutes.liveTableEditorSaveComment=Güncelleme LiveTable
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Sunum
 platform.appwithinminutes.wizardStep3Title=uygulamanızınana sayfa özelleştirme
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=uygulamanınana sayfasını kişiselleştirin .
+
+### Since 11.0RC1
+platform.appwithinminutes.appsLiveTable.doc.space=Uygulama adı
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

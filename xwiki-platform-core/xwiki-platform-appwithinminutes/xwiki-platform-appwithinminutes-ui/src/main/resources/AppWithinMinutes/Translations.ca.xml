@@ -41,7 +41,7 @@
 ### Missing: platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
 ### Missing: platform.appwithinminutes.createAppButtonLabel=Create Application
 ### Missing: platform.appwithinminutes.appsLiveTableHeading=Applications
-### Missing: platform.appwithinminutes.appsLiveTable.doc.space=Application name
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 ### Missing: platform.appwithinminutes.appsLiveTable.doc.author=Last author
 ### Missing: platform.appwithinminutes.appsLiveTable.doc.date=Update date
 ### Missing: platform.appwithinminutes.appsLiveTable._actions=Actions
@@ -91,7 +91,6 @@
 ### Missing: platform.appwithinminutes.appNameEmptyError=Please enter the application name.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 ### Missing: platform.appwithinminutes.classEditorPaletteTitle=Field Palette
 ### Missing: platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
 ### Missing: platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Avui
 ### Missing: platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Add
 ### Missing: platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Delete
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,12 +186,13 @@ platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Avui
 ### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
 ### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 ### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 ### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
 ### Missing: platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
 ### Missing: platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
 ### Missing: platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
 ### Missing: platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
-### Missing: platform.appwithinminutes.liveTableEditorAddColumnHint=Add
+### Missing: platform.appwithinminutes.liveTableEditorAddColumnHint=Add selected column
 ### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
@@ -246,5 +245,10 @@ platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Avui
 ### Missing: platform.appwithinminutes.wizardStep3Title=Customize your application homepage
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 ### Missing: platform.appwithinminutes.wizardStep3Description=Customize the application homepage
+
+### Since 11.0RC1
+### Missing: platform.appwithinminutes.appsLiveTable.doc.space=Application name
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

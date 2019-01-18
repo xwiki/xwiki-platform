@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Aplikace za pár minut
 platform.appwithinminutes.description=Vytvoření webové aplikace s možností společného přístupu  a úprav během pár minut na základě mocného strukturovaného systému správy dat platformy XWiki.
 platform.appwithinminutes.createAppButtonLabel=Vytvořit aplikaci
 platform.appwithinminutes.appsLiveTableHeading=Aplikace
-platform.appwithinminutes.appsLiveTable.doc.space=Název aplikace
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Poslední autor
 platform.appwithinminutes.appsLiveTable.doc.date=Datum aktualizace
 ### Missing: platform.appwithinminutes.appsLiveTable._actions=Actions
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Tato aplikace již existuje. Pře
 platform.appwithinminutes.appNameEmptyError=Zadejte název aplikace,prosím.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Paleta polí
 platform.appwithinminutes.classEditorPaletteHint=Přetáhněte myší pole z palety pro vytvoření formuláře.
 platform.appwithinminutes.classEditorCanvasHint=Přetáhněte pole z palety a umístěte je do této oblasti
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Přidat
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Smazat
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=obrázky
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Speciální sloupec pro zobrazení obrázků přiložených ke stránce položky
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Speciální sloupec pro zobrazení avataru (obrázku uživatele). Funguje pouze pro tabulku spřaženou s třídou XWiki.XWikiUsers
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Popis stručně shrnuje co aplikace dělá a jaký druh údajů bude zpracovávat.
 platform.appwithinminutes.liveTableEditorColumnsHint=Vyberte sloupce, které chcete zahrnout do "živé" tabulky zobrazené na úvodní stránce aplikace.
 platform.appwithinminutes.liveTableEditorSaveComment=Aktualizace "živé" tabulky
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Prezentace
 platform.appwithinminutes.wizardStep3Title=Upravte domovskou stránku aplikace.
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Přizpůsobte domovskou stránku aplikace.
+
+### Since 11.0RC1
+platform.appwithinminutes.appsLiveTable.doc.space=Název aplikace
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

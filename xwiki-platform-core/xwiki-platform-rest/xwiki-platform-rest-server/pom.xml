@@ -154,11 +154,6 @@
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
     </dependency>
-    <!-- Replace the version triggered by JAXB by a more accurate one -->
-    <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>javax.activation</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>

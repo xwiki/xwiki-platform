@@ -138,8 +138,8 @@
           </exclusion>
           <!-- Artifact id changed -->
           <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -652,6 +652,13 @@
                 <features>dom4j:dom4j</features>
               </extensionOverride>
               <extensionOverride>
+                <!-- Right id of the JAXB API -->
+                <id>jakarta.xml.bind:jakarta.xml.bind-api</id>
+                <features>
+                  javax.xml.bind:jaxb-api
+                </features>
+              </extensionOverride>
+              <extensionOverride>
                 <!-- Right id of the JAXB reference implementation -->
                 <id>org.glassfish.jaxb:jaxb-runtime</id>
                 <features>
@@ -748,9 +755,10 @@
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>com.sun.activation:javax.activation</id>
+                <id>jakarta.activation:jakarta.activation-api</id>
                 <features>javax.activation:activation</features>
                 <features>javax.activation:javax.activation-api</features>
+                <features>com.sun.activation:javax.activation</features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

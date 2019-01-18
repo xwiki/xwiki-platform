@@ -60,6 +60,8 @@
       #end
     &lt;/optgroup&gt;
   &lt;/select&gt;
+  &lt;a href="#addColumn" class="addColumn" title="$services.localization.render(
+    'platform.appwithinminutes.liveTableEditorAddColumnHint')"&gt;$services.icon.renderHTML('add')&lt;/a&gt;
 #end
 
 #macro (displayHelpPanel)
@@ -509,7 +511,7 @@ XWiki.LiveTableEditor = Class.create({
     this.columnsSelect = $('availableColumns');
     this.columnsSelect.selectedIndex = -1;
 
-    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.liveTableEditorAddColumnHint'))'});
+    var addButton = this.columnsSelect.next('a.addColumn');
     addButton.observe('click', this._onAddColumn.bindAsEventListener(this));
 
     var picker = new Element('div', {'class': 'columnPicker'}).insert(this.columnsSelect).insert(addButton);
@@ -851,10 +853,9 @@ return XWiki;
   width: auto;
 }
 
-.columnPicker input[type=image] {
+.columnPicker a.addColumn {
   margin: 0 .5em;
   padding: 0;
-  vertical-align: text-bottom;
 }
 
 .form-body {

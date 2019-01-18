@@ -74,7 +74,7 @@ editors.XDataEditors = Class.create({
           url = this.editedDocument.getURL('edit', Object.toQueryString({
             xpage: 'editobject',
             xaction: 'addObject',
-            className: classNameVal
+            classname: classNameVal
           }));
         }
         if (!item.disabled && validClassName) {

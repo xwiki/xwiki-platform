@@ -36,78 +36,124 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
-#macro(listAvailableColumns)
-  {{html clean="false"}}
+  <content>{{include reference="XWiki.TemplateProviderMacros" /}}
+
+{{velocity output="false"}}
+#macro (listAvailableColumns)
   &lt;select id="availableColumns"&gt;
-    #set($className = "$!liveTableObj.getValue('class')")
-    #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
-    #if($classFields.size() &gt; 0)
-      &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
-        #foreach($field in $classFields)
+    #set ($className = "$!liveTableObj.getValue('class')")
+    #set ($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
+    #if ($classFields.size() &gt; 0)
+      &lt;optgroup label="$escapetool.xml($services.localization.render(
+          'platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
+        #foreach ($field in $classFields)
           &lt;option value="$field.name"&gt;$escapetool.xml($field.translatedPrettyName)&lt;/option&gt;
         #end
       &lt;/optgroup&gt;
     #end
-    &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
-      #foreach($entry in $genericColumns.entrySet())
-        &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;$escapetool.xml($entry.value.get(0))&lt;/option&gt;
+    &lt;optgroup label="$escapetool.xml($services.localization.render(
+        'platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
+      #foreach ($entry in $genericColumns.entrySet())
+        &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;
+          $escapetool.xml($entry.value.get(0))
+        &lt;/option&gt;
       #end
     &lt;/optgroup&gt;
   &lt;/select&gt;
-  {{/html}}
 #end
 
-#macro(displayHelpPanel)
-  #set($genericColumns = {
-    'doc.title': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')],
-    'doc.name': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')],
-    'doc.location': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocLocationColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocLocationColumnDescription')],
-    'doc.author': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')],
-    'doc.creator': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')],
-    'doc.date': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')],
-    'doc.creationDate': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')],
-    '_actions': [$services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnDescription')],
-    '_attachments': [$services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')],
-    '_images': [$services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnDescription')]
+#macro (displayHelpPanel)
+  #set ($genericColumns = {
+    'doc.title': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')
+    ],
+    'doc.name': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')
+    ],
+    'doc.location': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocLocationColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocLocationColumnDescription')
+    ],
+    'doc.author': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')
+    ],
+    'doc.creator': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')
+    ],
+    'doc.date': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')
+    ],
+    'doc.creationDate': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')
+    ],
+    '_actions': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnDescription')
+    ],
+    '_attachments': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')
+    ],
+    '_images': [
+      $services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnName'),
+      $services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnDescription')
+    ]
   })
-  (% class="wizard-help" %)
-  (((
-    **$services.localization.render('platform.appwithinminutes.liveTableEditorHelpTitle')** $services.localization.render('platform.appwithinminutes.liveTableEditorHelpDescription')
-
-    #foreach($columnId in ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
-      ; {{{$genericColumns.get($columnId).get(0)}}}
-      : {{{$genericColumns.get($columnId).get(1)}}}
-    #end
-  )))
+  &lt;div class="wizard-help"&gt;
+    &lt;p&gt;
+      &lt;strong&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorHelpTitle')&lt;/strong&gt;
+      $services.localization.render('platform.appwithinminutes.liveTableEditorHelpDescription')
+    &lt;/p&gt;
+    &lt;dl&gt;
+      #foreach ($columnId in ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
+        &lt;dt&gt;$genericColumns.get($columnId).get(0)&lt;/dt&gt;
+        &lt;dd&gt;$genericColumns.get($columnId).get(1)&lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+  &lt;/div&gt;
 #end
 
-#macro(displayFormFields)
-  {{html wiki="true" clean="false"}}
-  (% class="hidden" %)
-  (((
+#macro (displayFormFields)
+  &lt;div class="hidden"&gt;
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
     &lt;input type="hidden" name="xpage" value="plain" /&gt;
     ## We prevent the class name and the data space from being edited directly. They can be specified in the URL.
-    $doc.display('class', 'hidden')
-    $doc.display('dataSpace', 'hidden')
+    #displayPropertyValue('class', 'hidden')
+    #displayPropertyValue('dataSpace', 'hidden')
     ## We have to pass the list of available columns to the JavaScript code.
     #listAvailableColumns()
-  )))
-  ; &lt;label for="xwikidoctitleinput"&gt;$services.localization.render('core.editors.content.titleField.label')&lt;/label&gt;##
-    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorTitleHint')
-  : &lt;input id="xwikidoctitleinput" type="text" name="title" value="$escapetool.xml($doc.title)"/&gt;
-  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
-    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorDescriptionHint')
-  : $doc.display('description')
-  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;##
-    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')
-  : $doc.display('columns')
-  {{/html}}
+  &lt;/div&gt;
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label for="xwikidoctitleinput"&gt;$services.localization.render('core.editors.content.titleField.label')&lt;/label&gt;
+      &lt;span class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorTitleHint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;&lt;input id="xwikidoctitleinput" type="text" name="title" value="$escapetool.xml($doc.title)"/&gt;&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;
+        $doc.displayPrettyName('description', false, false)
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('platform.appwithinminutes.liveTableEditorDescriptionHint')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayPropertyValue('description')&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
+      &lt;span class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayPropertyValue('columns')&lt;/dd&gt;
+  &lt;/dl&gt;
 #end
 
-#macro(displayIcon)
-  #if($services.uix)
+#macro (displayIcon)
+  #if ($services.uix)
     #set ($icon = 'icon:application')
     #set ($templateProviderReference = "$stringtool.removeEnd($className, 'Class')TemplateProvider")
     #set ($entryIcon = $xwiki.getDocument($templateProviderReference).getValue('icon'))
@@ -120,39 +166,45 @@
         #set ($icon = $uix.parameters.icon)
       #end
     #end
-    {{html wiki="true" clean="false"}}
-    ; &lt;label for="applicationIcon"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
-      (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorIconHintWithPicker',
-        [$xwiki.getSkinFile('icons/silk/index_abc.png')])  
-    : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!escapetool.xml($icon)" /&gt;
-    {{/html}}
-
-    {{iconPicker id="applicationIcon" prefix="icon:" /}}
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="applicationIcon"&gt;
+          $services.localization.render('platform.appwithinminutes.liveTableEditorIcon')
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;
+          $services.localization.render('platform.appwithinminutes.liveTableEditorIconHintWithPicker',
+            [$xwiki.getSkinFile('icons/silk/index_abc.png')])
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!escapetool.xml($icon)" /&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
   #end
 #end
 
-#macro(doEdit)
-  #set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
-  #set($discard = $doc.use($liveTableObj))
-  #set($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
-  #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
-  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
-  #if("$!request.wizard" == 'true')
+#macro (doEdit)
+  {{html clean="false"}}
+  #set ($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
+  #set ($discard = $doc.use($liveTableObj))
+  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
+  #set ($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
+  #if ("$!request.wizard" == 'true')
     #appWizardHeader('presentation')
-
   #end
   #displayHelpPanel()
-  (% class="form-body" %)
-  (((
+  &lt;div class="form-body"&gt;
     #displayFormFields()
-
     #displayIcon()
-    #if("$!request.wizard" == 'true')
-
+    #if ("$!request.wizard" == 'true')
       #appWizardFooter('presentation')
     #end
-  )))
-  {{html clean="false"}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
+  &lt;/div&gt;
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  {{/html}}
+
+  {{iconPicker id="applicationIcon" prefix="icon:" /}}
 #end
 
 #macro (maybeGrantSpaceAdminRight $spaceRef)
@@ -185,9 +237,9 @@
   #end
 #end
 
-#macro(updateAndSaveLiveTable)
-  #set($discard = $doc.updateObjectFromRequest('AppWithinMinutes.LiveTableClass'))
-  #set($liveTableGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableGenerator'))
+#macro (updateAndSaveLiveTable)
+  #set ($discard = $doc.updateObjectFromRequest('AppWithinMinutes.LiveTableClass'))
+  #set ($liveTableGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableGenerator'))
 
   ## Generate the LiveTable by displaying the LiveTableGenerator document in the context of the current document.
   #set ($displayParameters = $services.display.createDocumentDisplayerParameters())
@@ -220,10 +272,10 @@
   #end
   #set ($discard = $dataHomePage.setContent($generatedLiveTableContent))
 
-  #set($minorEdit = "$!request.minorEdit" != '')
-  #set($comment = $request.comment)
-  #if("$!comment" == '')
-    #set($comment = $services.localization.render('platform.appwithinminutes.liveTableEditorSaveComment'))
+  #set ($minorEdit = "$!request.minorEdit" != '')
+  #set ($comment = $request.comment)
+  #if ("$!comment" == '')
+    #set ($comment = $services.localization.render('platform.appwithinminutes.liveTableEditorSaveComment'))
   #end
 
   #if ($dataHomePage != $doc)
@@ -232,13 +284,13 @@
   #end
 
   ## Save the application home page.
-  #set($discard = $doc.save($comment, $minorEdit))
+  #set ($discard = $doc.save($comment, $minorEdit))
 #end
 
-#macro(updateAndSaveIcon)
-  #set($uix = $doc.getObject('XWiki.UIExtensionClass', true))
-  #set($discard = $uix.set('name', "platform.panels.${doc.pageReference.name}Application"))
-  #set($discard = $uix.set('extensionPointId', 'org.xwiki.platform.panels.Applications'))
+#macro (updateAndSaveIcon)
+  #set ($uix = $doc.getObject('XWiki.UIExtensionClass', true))
+  #set ($discard = $uix.set('name', "platform.panels.${doc.pageReference.name}Application"))
+  #set ($discard = $uix.set('extensionPointId', 'org.xwiki.platform.panels.Applications'))
   #set ($uixParams = [
     "label=$doc.plainTitle",
     "target=$doc.fullName",
@@ -246,8 +298,8 @@
   ])
   #set ($discard = $uix.set('parameters', $stringtool.join($uixParams, $util.newline)))
   #set ($hasWikiAdminRights = $services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
-  #set($discard = $uix.set('scope', "#if ($hasWikiAdminRights)wiki#{else}user#end"))
-  #set($discard = $doc.save('Updated application icon', true))
+  #set ($discard = $uix.set('scope', "#if ($hasWikiAdminRights)wiki#{else}user#end"))
+  #set ($discard = $doc.save('Updated application icon', true))
 #end
 
 #macro (excludeFromNavigationPanel)
@@ -258,7 +310,7 @@
   #set ($discard = $navigationPanelConfig.save("Exclude the $doc.pageReference.name application"))
 #end
 
-#macro(doSave)
+#macro (doSave)
   ## Exclude the application home page from the Navigation panel when the application is created at the top level.
   #set ($shouldExcludeFromNavigationPanel = $doc.isNew() &amp;&amp; $doc.pageReference.parent.type == 'WIKI')
   #maybeGrantSpaceAdminRights()
@@ -267,15 +319,17 @@
   #if ($shouldExcludeFromNavigationPanel)
     #excludeFromNavigationPanel
   #end
-  #if($action == 'save')
-    #if($errorMessage)
-      {{error}}{{html clean="false"}}$errorMessage{{/html}}{{/error}}
+  #if ($action == 'save')
+    #if ($errorMessage)
+      {{html clean="false"}}
+      &lt;div class="box errormessage"&gt;$errorMessage&lt;/div&gt;
+      {{/html}}
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())
     #end
   #else
-    #if($errorMessage)
+    #if ($errorMessage)
       $response.sendError(400, $errorMessage)
     #else
       $response.setStatus(204)
@@ -285,27 +339,27 @@
 {{/velocity}}
 
 {{velocity}}
-#if("$!request.wizard" == 'true')
+#if ("$!request.wizard" == 'true')
   {{include reference="AppWithinMinutes.WizardStep" /}}
 #end
 {{/velocity}}
 
 {{velocity}}
 ## Determine the action button that triggered the request
-#set($action = $xcontext.action)
-#foreach($paramName in $request.getParameterMap().keySet())
-  #if($paramName.startsWith('xaction_'))
-    #set($action = $paramName.substring(8))
+#set ($action = $xcontext.action)
+#foreach ($paramName in $request.getParameterMap().keySet())
+  #if ($paramName.startsWith('xaction_'))
+    #set ($action = $paramName.substring(8))
     #break
   #end
 #end
-#if($action == 'edit')
+#if ($action == 'edit')
   #doEdit()
-#elseif($action == 'save' || $action == 'saveandcontinue')
-  #if($services.csrf.isTokenValid($request.form_token))
+#elseif ($action == 'save' || $action == 'saveandcontinue')
+  #if ($services.csrf.isTokenValid($request.form_token))
     #doSave()
   #else
-    $response.sendRedirect($services.csrf.getResubmissionURL());
+    $response.sendRedirect($services.csrf.getResubmissionURL())
   #end
 #end
 {{/velocity}}</content>

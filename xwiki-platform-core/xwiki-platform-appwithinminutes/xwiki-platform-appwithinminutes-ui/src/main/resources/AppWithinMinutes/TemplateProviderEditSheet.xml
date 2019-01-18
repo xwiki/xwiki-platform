@@ -39,7 +39,7 @@
   <content>{{include reference="XWiki.TemplateProviderMacros" /}}
 
 {{velocity}}
-#if("$!request.wizard" == 'true')
+#if ("$!request.wizard" == 'true')
   {{include reference="AppWithinMinutes.WizardStep" /}}
 #end
 {{/velocity}}
@@ -107,7 +107,6 @@
 #end
 
 #macro (displayEditForm)
-  {{html clean="false"}}
   #set ($discard = $xwiki.ssx.use('XWiki.TemplateProviderMacros'))
   #set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderMacros'))
   #if ($doc.isNew())
@@ -219,19 +218,16 @@
     &lt;/div&gt;
     #locationPickerModal
   &lt;/div&gt;
-  {{/html}}
-
-  {{iconPicker id="XWiki\\.TemplateProviderClass_0_icon" prefix="" /}}
 #end
 
 #macro (doEdit)
-  #if("$!request.wizard" == 'true')
+  #if ("$!request.wizard" == 'true')
     #appWizardHeader('entries')
     ## Compute the application title to be used as the wizard step title.
     #getAppTitle
   #end
   #displayEditForm
-  #if("$!request.wizard" == 'true')
+  #if ("$!request.wizard" == 'true')
     #appWizardFooter('entries')
   #end
 #end
@@ -239,7 +235,11 @@
 
 {{velocity}}
 #if ($doc.getObject('XWiki.TemplateProviderClass'))
+  {{html clean="false"}}
   #doEdit
+  {{/html}}
+
+  {{iconPicker id="XWiki\\.TemplateProviderClass_0_icon" prefix="" /}}
 #end
 {{/velocity}}</content>
   <object>

@@ -45,18 +45,23 @@
 {{template name="locationPicker_macros.vm" /}}
 
 {{velocity output="false"}}
-#macro(showStep)
-  {{html wiki="true"}}
+#macro (showStep)
   #appWizardHeader('name')
-  (% class="wizard-help" %)
-  (((
-    **$services.localization.render('platform.appwithinminutes.wizardStepHelpTitle')** $services.localization.render('platform.appwithinminutes.wizardStepHelpDescription')
-    (% class="steps vertical" %)
-    #foreach($step in $awmSteps)
-      * (% class="number" %)$mathtool.add($foreach.index, 1)(%%) (% class="name" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.name")(%%)
-        (% class="description" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.description")
-    #end
-  )))
+  &lt;div class="wizard-help"&gt;
+    &lt;p&gt;
+      &lt;strong&gt;$services.localization.render('platform.appwithinminutes.wizardStepHelpTitle')&lt;/strong&gt;
+      $services.localization.render('platform.appwithinminutes.wizardStepHelpDescription')
+    &lt;/p&gt;
+    &lt;ul class="steps vertical"&gt;
+      #foreach($step in $awmSteps)
+        &lt;li&gt;
+          &lt;span class="number"&gt;$mathtool.add($foreach.index, 1)&lt;/span&gt;
+          &lt;span class="name"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.name")&lt;/span&gt;
+          &lt;span class="description"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.description")&lt;/span&gt;
+        &lt;/li&gt;
+      #end
+    &lt;/ul&gt;
+  &lt;/div&gt;
   &lt;form action="$doc.getURL()" method="post" class="xform wizard-body"&gt;
     #locationPicker({
       'id': 'app',
@@ -80,7 +85,6 @@
     &lt;div class="appName-preview"&gt;&lt;/div&gt;
     #appWizardFooter(1)
   &lt;/form&gt;
-  {{/html}}
 #end
 
 #macro (processStep)
@@ -112,7 +116,7 @@
 #macro (validateAppName)
   #getAppReference
   #if (!$appReference)
-    (% class="xErrorMsg" %)$services.localization.render('platform.appwithinminutes.appNameEmptyError')
+    &lt;span class="xErrorMsg"&gt;$services.localization.render('platform.appwithinminutes.appNameEmptyError')&lt;/span&gt;
   #else
     #getAppDescriptor($appReference)
     #if ($appDescriptor)
@@ -126,14 +130,17 @@
       #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
       #set ($appClassRef = $services.model.createDocumentReference("$!{appReference.name}Class", $appCodeRef))
     #end
-    ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
-    : {{{$!xwiki.getDocument($appReference).externalURL}}}
-    ; $services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')
-    : {{html clean="false"}}#hierarchy($appClassRef.parent){{/html}}
+    &lt;dl&gt;
+      &lt;dt&gt;$services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')&lt;/dt&gt;
+      &lt;dd&gt;&lt;pre&gt;$!escapetool.xml($xwiki.getDocument($appReference).externalURL)&lt;/pre&gt;&lt;/dd&gt;
+      &lt;dt&gt;$services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')&lt;/dt&gt;
+      &lt;dd&gt;#hierarchy($appClassRef.parent)&lt;/dd&gt;
+    &lt;/dl&gt;
     #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
     #if ($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
-
-      {{warning}}$services.localization.render('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
+      &lt;div class="box warningmessage"&gt;
+        $services.localization.render('platform.appwithinminutes.appNameIsUsedWarning')
+      &lt;/div&gt;
     #end
   #end
 #end
@@ -164,6 +171,7 @@
 {{/velocity}}
 
 {{velocity}}
+{{html clean="false"}}
 #if ("$!request.appName" != '')
   #if ($xcontext.action == 'get')
     #validateAppName
@@ -175,6 +183,7 @@
   #showStep
   #set ($displayDocExtra = false)
 #end
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>AppWithinMinutes.CreateApplication</name>

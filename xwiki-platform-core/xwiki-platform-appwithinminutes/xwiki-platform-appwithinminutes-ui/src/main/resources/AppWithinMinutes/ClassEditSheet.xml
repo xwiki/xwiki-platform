@@ -90,99 +90,100 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #**
  * Displays the field palette.
  *#
-#macro(displayFieldPalette)
-  (% id="palette" %)
-  (((
-    **$services.localization.render('platform.appwithinminutes.classEditorPaletteTitle')**
-
-    (% class="xHint" %)
-    $services.localization.render('platform.appwithinminutes.classEditorPaletteHint')
-
+#macro (displayFieldPalette)
+  &lt;div id="palette"&gt;
+    &lt;p&gt;&lt;strong&gt;$services.localization.render('platform.appwithinminutes.classEditorPaletteTitle')&lt;/strong&gt;&lt;/p&gt;
+    &lt;p class="xHint"&gt;$services.localization.render('platform.appwithinminutes.classEditorPaletteHint')&lt;/p&gt;
     ## List all form field types, grouped by category.
-    #set($formFieldDocs = [])
-    #set($formFieldClassName = 'AppWithinMinutes.FormFieldClass')
-    #set($categoryListStatement = 'from doc.object(AppWithinMinutes.FormFieldCategoryClass) as category order by category.priority')
-    #foreach($category in $services.query.xwql($categoryListStatement).execute())
-      #set($categoryDoc = $xwiki.getDocument($category))
-      * (% class="category" %)$categoryDoc.plainTitle
-        #set($formFieldsForCategoryStatement = "from doc.object($formFieldClassName) as field where field.category = :category order by field.priority")
-        #set($formFieldsForCategoryQuery = $services.query.xwql($formFieldsForCategoryStatement).bindValue('category', $category))
-        #foreach($formField in $formFieldsForCategoryQuery.execute())
-          #set($formFieldDoc = $xwiki.getDocument($formField))
-          #set($discard = $formFieldDocs.add($formFieldDoc))
-          #set($formFieldIcon = $formFieldDoc.getObject($formFieldClassName).getProperty('icon').value)
-          #set($formFieldIconRendered = $services.icon.renderHTML($formFieldIcon))
+    #set ($formFieldDocs = [])
+    #set ($formFieldClassName = 'AppWithinMinutes.FormFieldClass')
+    #set ($categoryListStatement = 'from doc.object(AppWithinMinutes.FormFieldCategoryClass) as category order by category.priority')
+    &lt;ul&gt;
+    #foreach ($category in $services.query.xwql($categoryListStatement).execute())
+      #set ($categoryDoc = $xwiki.getDocument($category))
+      &lt;li&gt;
+        &lt;div class="category"&gt;$categoryDoc.plainTitle&lt;/div&gt;
+        #set ($formFieldsForCategoryStatement = "from doc.object($formFieldClassName) as field where field.category = :category order by field.priority")
+        #set ($formFieldsForCategoryQuery = $services.query.xwql($formFieldsForCategoryStatement).bindValue('category', $category))
+        &lt;ul&gt;
+        #foreach ($formField in $formFieldsForCategoryQuery.execute())
+          #set ($formFieldDoc = $xwiki.getDocument($formField))
+          #set ($discard = $formFieldDocs.add($formFieldDoc))
+          #set ($formFieldIcon = $formFieldDoc.getObject($formFieldClassName).getProperty('icon').value)
+          #set ($formFieldIconRendered = $services.icon.renderHTML($formFieldIcon))
           #if ("$!formFieldIconRendered" == "")
-            #if($formFieldIcon.contains('/'))
-              #set($formFieldIconURL = $xwiki.getSkinFile($formFieldIcon))
+            #if ($formFieldIcon.contains('/'))
+              #set ($formFieldIconURL = $xwiki.getSkinFile($formFieldIcon))
             #else
-              #set($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
+              #set ($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
             #end
-            #set($formFieldIconRendered = "&lt;img src='$formFieldIconURL' alt='$escapetool.xml($formFieldDoc.plainTitle)' class='icon' /&gt;")
+            #set ($formFieldIconRendered = "&lt;img src='$formFieldIconURL' alt='$escapetool.xml($formFieldDoc.plainTitle)' class='icon' /&gt;")
           #end
-          ** (% class="field" %){{html clean="false"}}
-              $formFieldIconRendered
-              $escapetool.xml($formFieldDoc.plainTitle)
-              ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
-              ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through
-              ## the query string even if it doesn't match the action (e.g. the 'get' action).
-              ## The sheet parameter is required when editing a new class because the request will be made to a document that doesn't exist.
-              ## FIXME2: In the future don't force the text editor type and instead use the default editor. This means
-              ## that if the WYSIWYG editor is used, we'll need to convert the HTML into the target syntax so that the
-              ## Template in #updateAndSaveTemplate is saved with target syntax and not HTML.
-              ## See https://jira.xwiki.org/browse/XWIKI-13789
-              &lt;input type="hidden" value="$doc.getURL('edit', "xpage=plain&amp;sheet=AppWithinMinutes.ClassEditSheet&amp;field=$escapetool.url($formFieldDoc.fullName)&amp;xeditmode=text")" class="data"/&gt;
-            {{/html}}
+          &lt;li class="field"&gt;
+            $formFieldIconRendered
+            $escapetool.xml($formFieldDoc.plainTitle)
+            ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
+            ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through
+            ## the query string even if it doesn't match the action (e.g. the 'get' action).
+            ## The sheet parameter is required when editing a new class because the request will be made to a document that doesn't exist.
+            ## FIXME2: In the future don't force the text editor type and instead use the default editor. This means
+            ## that if the WYSIWYG editor is used, we'll need to convert the HTML into the target syntax so that the
+            ## Template in #updateAndSaveTemplate is saved with target syntax and not HTML.
+            ## See https://jira.xwiki.org/browse/XWIKI-13789
+            #set ($fieldURL = $doc.getURL('edit', $escapetool.url({
+              'xpage': 'plain',
+              'sheet': 'AppWithinMinutes.ClassEditSheet',
+              'field': $formFieldDoc.fullName,
+              'xeditmode': 'text'
+            })))
+            &lt;input type="hidden" value="$fieldURL" class="data"/&gt;
+          &lt;/li&gt;
         #end
+        &lt;/ul&gt;
+      &lt;/li&gt;
     #end
-  )))
+    &lt;/ul&gt;
+  &lt;/div&gt;
 #end
 
 #**
  * Displays the field canvas.
  *#
-#macro(displayFieldCanvas)
-  #set($propertyType2FormField = {})
-  #foreach($formFieldDoc in $formFieldDocs)
+#macro (displayFieldCanvas)
+  #set ($propertyType2FormField = {})
+  #foreach ($formFieldDoc in $formFieldDocs)
     ## Use the type of the field template.
-    #set($type = $formFieldDoc.getxWikiClass().properties.get(0).classType)
-    #set($discard = $propertyType2FormField.put($type, $formFieldDoc))
+    #set ($type = $formFieldDoc.getxWikiClass().properties.get(0).classType)
+    #set ($discard = $propertyType2FormField.put($type, $formFieldDoc))
   #end
-  (% id="canvas" %)
-  (((
-    (% class="hint" %)
-    $services.localization.render('platform.appwithinminutes.classEditorCanvasHint')
-
-    #set($unknownFields = [])
-    #set($empty = true)
-    #foreach ($field in $doc.getxWikiClass().properties)
-      #set($formFieldDoc = $propertyType2FormField.get($field.classType))
-      #if($formFieldDoc)
-        #set($empty = false)
-        * (((#displayField($field $formFieldDoc))))
-      #else
-        #set($discard = $unknownFields.add($field))
+  &lt;div id="canvas"&gt;
+    &lt;p class="hint"&gt;
+      $services.localization.render('platform.appwithinminutes.classEditorCanvasHint')
+    &lt;/p&gt;
+    &lt;ul&gt;
+      #set ($unknownFields = [])
+      #foreach ($field in $doc.getxWikiClass().properties)
+        #set ($formFieldDoc = $propertyType2FormField.get($field.classType))
+        #if ($formFieldDoc)
+          &lt;li&gt;#displayField($field $formFieldDoc)&lt;/li&gt;
+        #else
+          #set($discard = $unknownFields.add($field))
+        #end
       #end
-    #end
-    #if(!$empty)
-      ## Leave an empty line to separate the blocks.
-
-    #end
-    ##
-    (% class="hidden" %)
-    {{html clean="false"}}
+    &lt;/ul&gt;
+    &lt;div class="hidden"&gt;
       ## Output the field meta data even if the field is not supported to preserve it when the class is saved.
-      #foreach($field in $unknownFields)
+      #foreach ($field in $unknownFields)
         #displayFieldMetaData($field)
       #end
-    {{/html}}
-  )))
+    &lt;/div&gt;
+  &lt;/div&gt;
 #end
 
 #**
  * Display the options to create/update the class template, the class sheet and the class translation bundle.
  *#
-#macro(displayClassOptions)
+#macro (displayClassOptions)
   #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
   #set ($templateReference = $services.model.resolveDocument("${className}Template"))
   #set ($translationsReference = $services.model.resolveDocument("${className}Translations"))
@@ -193,7 +194,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #elseif ($classSheets.size() == 1)
     #set ($sheetReference = $classSheets.get(0))
   #end
-  {{html clean="false"}}
   ## Hide the options if neither the sheet nor the template nor the translation bundle exists. They don't have to be
   ## updated, they have to be created.
   &lt;dl id="options" #if (!$xwiki.exists($sheetReference) &amp;&amp; !$xwiki.exists($templateReference)
@@ -242,7 +242,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       &lt;/span&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
-  {{/html}}
 #end
 
 #macro (pageLink $reference)
@@ -254,73 +253,74 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set ($action = 'create')
     #set ($discard = $params.put('parent', $doc.fullName))
   #end
-  &lt;span class="$class"&gt;##
-    &lt;a href="$escapetool.xml($xwiki.getURL($reference, $action, $escapetool.url($params)))"&gt;##
-      $escapetool.xml($reference.name)##
-    &lt;/a&gt;##
-  &lt;/span&gt;##
+  &lt;span class="$class"&gt;&lt;a href="$escapetool.xml($xwiki.getURL($reference, $action, $escapetool.url($params)))"
+    &gt;$escapetool.xml($reference.name)&lt;/a&gt;&lt;/span&gt;##
 #end
 
 #**
  * Display a form field.
  *#
-#macro(displayField $field $formFieldDoc)
-  #if($formFieldDoc.getObject('XWiki.StyleSheetExtension'))
-    #set($discard = $xwiki.ssx.use($formFieldDoc.fullName))
+#macro (displayField $field $formFieldDoc)
+  #if ($formFieldDoc.getObject('XWiki.StyleSheetExtension'))
+    #set ($discard = $xwiki.ssx.use($formFieldDoc.fullName))
   #end
-  #if($formFieldDoc.getObject('XWiki.JavaScriptExtension'))
-    #set($discard = $xwiki.jsx.use($formFieldDoc.fullName))
+  #if ($formFieldDoc.getObject('XWiki.JavaScriptExtension'))
+    #set ($discard = $xwiki.jsx.use($formFieldDoc.fullName))
   #end
-  (% class="hidden" %)
-  {{html clean="false"}}
+  &lt;div class="hidden"&gt;
     #displayFieldMetaData($field)
     ## We need this information to avoid querying and loading all FormField documents twice.
     ## NOTE: We use a different ID format to avoid collisions with the field meta properties.
     &lt;input type="hidden" id="template-$field.name" name="template-$field.name"
       value="$escapetool.xml($formFieldDoc.fullName)"
       data-propertyName="$escapetool.xml($formFieldDoc.getxWikiClass().propertyNames[0])" /&gt;
-  {{/html}}
-
-  #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
-  #set($templateRef = $services.model.resolveDocument("${className}Template"))
-  #set($templateDoc = $xwiki.getDocument($templateRef))
+  &lt;/div&gt;
+  #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+  #set ($templateRef = $services.model.resolveDocument("${className}Template"))
+  #set ($templateDoc = $xwiki.getDocument($templateRef))
   ## Simulate the editing of the class instance from the template document.
   ## Note that we can't simply call display on the template document because $field could be a new field that hasn't
   ## been added to the class yet (so the object from the template doesn't have this field yet).
-  (% class="field-viewer" %)
-  #displayFieldProperty($field "${doc.fullName}_0_" $templateDoc.getObject($doc.fullName, true))
-
-  #set($propertyNames = ['name', 'prettyName', 'number', 'required', 'hint'])
-  #set($formFieldObj = $formFieldDoc.getObject('AppWithinMinutes.FormFieldClass'))
-  #set($customPropertyNames = $formFieldObj.getProperty('properties').value.split('\s+'))
-  #set($discard = $customPropertyNames.removeAll($propertyNames))
-  #set($discard = $propertyNames.addAll($customPropertyNames.subList(0, $customPropertyNames.size())))
-  (% class="field-config" %)
-  #foreach($propertyName in $propertyNames)
-    #set($propertyDefinition = $field.xWikiClass.get($propertyName))
-    #if($propertyDefinition)
-      #displayFieldProperty($propertyDefinition "field-${field.name}_" $field)
+  &lt;dl class="field-viewer"&gt;
+    #displayFieldProperty($field "${doc.fullName}_0_" $templateDoc.getObject($doc.fullName, true))
+  &lt;/dl&gt;
+  #set ($propertyNames = ['name', 'prettyName', 'number', 'required', 'hint'])
+  #set ($formFieldObj = $formFieldDoc.getObject('AppWithinMinutes.FormFieldClass'))
+  #set ($customPropertyNames = $formFieldObj.getProperty('properties').value.split('\s+'))
+  #set ($discard = $customPropertyNames.removeAll($propertyNames))
+  #set ($discard = $propertyNames.addAll($customPropertyNames.subList(0, $customPropertyNames.size())))
+  &lt;dl class="field-config"&gt;
+    #foreach ($propertyName in $propertyNames)
+      #set ($propertyDefinition = $field.xWikiClass.get($propertyName))
+      #if ($propertyDefinition)
+        #displayFieldProperty($propertyDefinition "field-${field.name}_" $field)
+      #end
     #end
-  #end
+  &lt;/dl&gt;
 #end
 
 #**
  * Display the field meta data. This is needed to preserve the field when its type is not supported by the editor.
  *#
-#macro(displayFieldMetaData $field)
+#macro (displayFieldMetaData $field)
   &lt;input type="hidden" id="type-$field.name" name="type-$field.name" value="$field.classType" /&gt;
 #end
 
 #**
  * Displays a configuration property of a class field. This macro can also be used to display a property of an object.
  *#
-#macro(displayFieldProperty $property $prefix $field)
-  #set($displayFormType = $property.getProperty('displayFormType'))
-  #if($property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
-    ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;#displayPropertyEditInput($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
+#macro (displayFieldProperty $property $prefix $field)
+  #set ($displayFormType = $property.getProperty('displayFormType'))
+  #if ($property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
+    &lt;dt&gt;
+      &lt;label for="$!{prefix}$property.name"&gt;
+        #displayPropertyEditInput($property, $prefix, $field)$escapetool.xml($property.prettyName)
+      &lt;/label&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;&lt;/dd&gt;
   #else
-    ; {{html clean="false"}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
-    : {{html clean="false"}}#displayPropertyEditInput($property, $prefix, $field){{/html}}
+    &lt;dt&gt;&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;&lt;/dt&gt;
+    &lt;dd&gt;#displayPropertyEditInput($property, $prefix, $field)&lt;/dd&gt;
   #end
 #end
 
@@ -329,9 +329,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * instance of an XWiki class or a class field. In the first case the property represents an object field and in the
  * second case the property represents a field meta property.
  *#
-#macro(displayPropertyEditInput $property $prefix $object)
-  #set($wrappedProperty = $property.propertyClass)
-  #if($wrappedProperty.isCustomDisplayed($xcontext.context))
+#macro (displayPropertyEditInput $property $prefix $object)
+  #set ($wrappedProperty = $property.propertyClass)
+  #if ($wrappedProperty.isCustomDisplayed($xcontext.context))
     $xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object)
   #else
     $doc.displayEdit($property, $prefix, $object)
@@ -341,26 +341,23 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #**
  * Called when a new form field is added via AJAX.
  *#
-#macro(displayNewField)
+#macro (displayNewField)
   ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
   ## Output also the LinkExtension hook because $xwiki.linkx.use() is used to load CSS files from WebJars.
   ## The class editor moves this resource includes in the HTML page head.
-  {{html clean="false"}}
   &lt;!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin --&gt;
   #skinExtensionHooks
-  {{/html}}
-
-  #set($formFieldDoc = $xwiki.getDocument($request.field))
-  #set($formFieldDocClassFields = $formFieldDoc.getxWikiClass().getXWikiClass().properties)
-  #if($formFieldDocClassFields.size() &gt; 0)
+  #set ($formFieldDoc = $xwiki.getDocument($request.field))
+  #set ($formFieldDocClassFields = $formFieldDoc.getxWikiClass().getXWikiClass().properties)
+  #if ($formFieldDocClassFields.size() &gt; 0)
     ## Clone the field template.
-    #set($field = $formFieldDocClassFields.get(0).clone())
-    #if("$!field.prettyName" == '')
-      #set($discard = $field.setPrettyName($formFieldDoc.title))
+    #set ($field = $formFieldDocClassFields.get(0).clone())
+    #if ("$!field.prettyName" == '')
+      #set ($discard = $field.setPrettyName($formFieldDoc.title))
     #end
-    #set($xclass = $doc.getxWikiClass().getXWikiClass())
-    #set($discard = $xclass.addField($field.name, $field))
-    #set($discard = $field.setObject($xclass))
+    #set ($xclass = $doc.getxWikiClass().getXWikiClass())
+    #set ($discard = $xclass.addField($field.name, $field))
+    #set ($discard = $field.setObject($xclass))
     #displayField($doc.getxWikiClass().get($field.name) $formFieldDoc)
   #else
     Unsupported form field.
@@ -370,90 +367,87 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #**
  * Preview a class field (requires Programming Right).
  *#
-#macro(previewField)
+#macro (previewField)
   ## Find the request parameter that specifies the field template.
-  #foreach($paramName in $request.getParameterMap().keySet())
-    #if($paramName.startsWith('template-'))
-      #set($fieldName = $paramName.substring(9))
-      #set($fieldTemplateDoc = $xwiki.getDocument($request.getParameter($paramName)))
+  #foreach ($paramName in $request.getParameterMap().keySet())
+    #if ($paramName.startsWith('template-'))
+      #set ($fieldName = $paramName.substring(9))
+      #set ($fieldTemplateDoc = $xwiki.getDocument($request.getParameter($paramName)))
       #break
     #end
   #end
   ##
   ## Clone the field template.
-  #set($field = $fieldTemplateDoc.getxWikiClass().getXWikiClass().properties.get(0).clone())
+  #set ($field = $fieldTemplateDoc.getxWikiClass().getXWikiClass().properties.get(0).clone())
   ##
   ## Update the field meta properties based on the submitted data.
-  #set($valuesFromRequest = $xcontext.context.getForm().getObject("field-$fieldName"))
-  #set($discard = $field.getxWikiClass().fromMap($valuesFromRequest, $field))
+  #set ($valuesFromRequest = $xcontext.context.getForm().getObject("field-$fieldName"))
+  #set ($discard = $field.getxWikiClass().fromMap($valuesFromRequest, $field))
   ##
   ## Don't rename the field (ignore the submitted name).
-  #set($discard = $field.setName($fieldName))
+  #set ($discard = $field.setName($fieldName))
   ##
   ## We have to add the field to the class before setting its value.
   ## (otherwise the field value from the request is ignored).
-  #set($xclass = $doc.getxWikiClass().getXWikiClass())
-  #set($discard = $xclass.addField($fieldName, $field))
-  #set($discard = $field.setObject($xclass))
+  #set ($xclass = $doc.getxWikiClass().getXWikiClass())
+  #set ($discard = $xclass.addField($fieldName, $field))
+  #set ($discard = $field.setObject($xclass))
   ##
   ## Create an object that has this field and set its value from request.
-  #set($object = $fieldTemplateDoc.getObject($doc.fullName, true))
+  #set ($object = $fieldTemplateDoc.getObject($doc.fullName, true))
   ##
   ## Filter empty values from the request, otherwise the update method could try to select an invalid value.
-  #set($values = [])
-  #foreach($value in $request.getParameterValues("${doc.fullName}_0_$fieldName"))
-    #if($value != '')
-      #set($discard = $values.add($value))
+  #set ($values = [])
+  #foreach ($value in $request.getParameterValues("${doc.fullName}_0_$fieldName"))
+    #if ($value != '')
+      #set ($discard = $values.add($value))
     #end
   #end
-  #if($values.size() &gt; 0)
-    #set($stringArray = $request.getParameterValues("template-$fieldName"))
-    #set($discard = $xclass.fromMap({$fieldName: $values.toArray($stringArray)}, $object.getXWikiObject()))
+  #if ($values.size() &gt; 0)
+    #set ($stringArray = $request.getParameterValues("template-$fieldName"))
+    #set ($discard = $xclass.fromMap({$fieldName: $values.toArray($stringArray)}, $object.getXWikiObject()))
   #end
   ##
   ## Display the field.
-  #set($field = $doc.getxWikiClass().get($fieldName))
-  {{html clean="false"}}#displayPropertyEditInput($field, "${doc.fullName}_0_", $object){{/html}}
+  #set ($field = $doc.getxWikiClass().get($fieldName))
+  #displayPropertyEditInput($field, "${doc.fullName}_0_", $object)
 #end
 
 #**
  * Display the edit class form.
  *#
-#macro(displayEditForm)
-  $xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
-  $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet')##
-  $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet')##
-  $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator')##
-  #if("$!request.wizard" == 'true')
+#macro (displayEditForm)
+  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet'))
+  #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet'))
+  #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
+  #if ("$!request.wizard" == 'true')
     #appWizardHeader('structure')
-
   #end
   #displayFieldPalette()
   #displayFieldCanvas()
   #displayClassOptions()
   #if("$!request.wizard" == 'true')
-
     #appWizardFooter('structure')
   #end
-  (% class="clearfloats" %)((()))
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
 #end
 
 #**
  * Displays either the edit class form or a new form field. The later is used when adding a new form field via AJAX.
  *#
-#macro(doEdit)
-  #if("$!request.field" != '')
+#macro (doEdit)
+  #if ("$!request.field" != '')
     #displayNewField()
-  #elseif("$!request.preview" == 'true')
+  #elseif ("$!request.preview" == 'true')
     #previewField()
   #else
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
-    (% class="hidden" %)(((
-      {{html clean="false"}}&lt;input type="hidden" name="xpage" value="plain" /&gt;{{/html}}
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="xpage" value="plain" /&gt;
       ## Compute the application title to be used as the wizard step title.
       #getAppTitle
-    )))
-
+    &lt;/div&gt;
     #displayEditForm()
   #end
 #end
@@ -687,17 +681,17 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #**
  * Updates and saves the class definition, the class sheet and the class template.
  *#
-#macro(doSave)
-  #set($minorEdit = "$!request.minorEdit" != '')
+#macro (doSave)
+  #set ($minorEdit = "$!request.minorEdit" != '')
   #maybeCreateCodeSpace
   #updateAndSaveClass
   #updateAndSaveTemplate
   #updateAndSaveSheet
   #updateAndSaveTranslations
-  #if($action == 'save')
-    #if($errorMessage)
-      {{error}}{{html clean="false"}}$errorMessage{{/html}}{{/error}}
-    #elseif("$!request.wizard" == 'true')
+  #if ($action == 'save')
+    #if ($errorMessage)
+      &lt;div class="box errormessage"&gt;$errorMessage&lt;/div&gt;
+    #elseif ("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
       #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
       #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
@@ -717,7 +711,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       $response.sendRedirect($doc.getURL())
     #end
   #else
-    #if($errorMessage)
+    #if ($errorMessage)
       $response.sendError(400, $errorMessage)
     #else
       $response.setStatus(204)
@@ -733,23 +727,25 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 {{/velocity}}
 
 {{velocity}}
+{{html clean="false"}}
 ## Determine the action button that triggered the request
-#set($action = 'edit')
-#foreach($paramName in $request.getParameterMap().keySet())
-  #if($paramName.startsWith('xaction_'))
-    #set($action = $paramName.substring(8))
+#set ($action = 'edit')
+#foreach ($paramName in $request.getParameterMap().keySet())
+  #if ($paramName.startsWith('xaction_'))
+    #set ($action = $paramName.substring(8))
     #break
   #end
 #end
-#if($action == 'edit')
+#if ($action == 'edit')
   #doEdit()
-#elseif($action == 'save' || $action == 'saveandcontinue')
-  #if($services.csrf.isTokenValid($request.form_token))
+#elseif ($action == 'save' || $action == 'saveandcontinue')
+  #if ($services.csrf.isTokenValid($request.form_token))
     #doSave()
   #else
-    $response.sendRedirect($services.csrf.getResubmissionURL());
+    $response.sendRedirect($services.csrf.getResubmissionURL())
   #end
 #end
+{{/html}}
 {{/velocity}}</content>
   <attachment>
     <filename>arrow-move.png</filename>

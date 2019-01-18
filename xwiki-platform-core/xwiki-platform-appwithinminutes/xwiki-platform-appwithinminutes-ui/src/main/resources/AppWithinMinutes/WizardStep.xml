@@ -39,50 +39,62 @@
   <content>{{velocity output="false"}}
 #set ($awmSteps = ['name', 'structure', 'entries', 'presentation'])
 
-#macro(appWizardHeader $stepId)
-  {{html wiki="true"}}
-  (% class="wizard-header" %)
-  (((
-    #set($stepNumber = $awmSteps.indexOf($stepId) + 1)
-    #set($stepTitle = $services.localization.render("appWithinMinutes.wizardStep.${stepId}.title"))
-    = $services.localization.render('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])  =
-
-    (% class="steps" %)
-    #foreach($step in $awmSteps)
-      #set($index = $foreach.index + 1)
-      #set($extraClassName = "#if($stepNumber == $index) active#elseif($stepNumber &gt; $index) done#end")
-      * (% class="number$extraClassName" %)#if($stepNumber &gt; $index)&amp;${escapetool.h}10004;#else$index#end(%%) (% class="name$extraClassName" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.name")
-    #end
-
+#macro (appWizardHeader $stepId)
+  &lt;div class="wizard-header"&gt;
+    #set ($stepNumber = $awmSteps.indexOf($stepId) + 1)
+    #set ($stepTitle = $services.localization.render("appWithinMinutes.wizardStep.${stepId}.title"))
+    &lt;h1&gt;$services.localization.render('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])&lt;/h1&gt;
+    &lt;ul class="steps"&gt;
+      #foreach ($step in $awmSteps)
+        #set ($index = $foreach.index + 1)
+        #set ($extraClassName = "#if ($stepNumber == $index) active#elseif ($stepNumber &gt; $index) done#end")
+        &lt;li&gt;
+          &lt;span class="number$extraClassName"&gt;
+            #if ($stepNumber &gt; $index)
+              &amp;${escapetool.h}10004;
+            #else
+              $index
+            #end
+          &lt;/span&gt;
+          &lt;span class="name$extraClassName"&gt;
+            $services.localization.render("appWithinMinutes.wizardStep.${step}.name")
+          &lt;/span&gt;
+        &lt;/li&gt;
+      #end
+    &lt;/ul&gt;
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
-  )))
-  {{/html}}
+  &lt;/div&gt;
 #end
 
-#macro(appWizardFooter $stepId)
-  {{html wiki="true"}}
-  (% class="wizard-footer buttons" %)
-  (((
-    #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonLabel'))
-    #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonTip'))
-    #if($stepId == 'presentation')##
-      #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonLabel'))
-      #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonTip'))
-      #set($templateProviderReference = "$stringtool.removeEnd($className, 'Class')TemplateProvider")
-      #set($previousURL = $xwiki.getURL($templateProviderReference, 'edit',
+#macro (appWizardFooter $stepId)
+  &lt;div class="wizard-footer buttons"&gt;
+    #set ($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonLabel'))
+    #set ($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonTip'))
+    #if ($stepId == 'presentation')
+      #set ($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonLabel'))
+      #set ($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonTip'))
+      #set ($templateProviderReference = "$stringtool.removeEnd($className, 'Class')TemplateProvider")
+      #set ($previousURL = $xwiki.getURL($templateProviderReference, 'edit',
         'wizard=true&amp;sheet=AppWithinMinutes.TemplateProviderEditSheet'))
-    #elseif($stepId == 'entries')
-      #set($classReference = "$stringtool.removeEnd($doc.fullName, 'TemplateProvider')Class")
-      #set($previousURL = $xwiki.getURL($classReference, 'edit', 'wizard=true'))
-    #elseif($stepId == 'structure' &amp;&amp; $doc.isNew())##
-      #set($previousURL = $xwiki.getURL('AppWithinMinutes.CreateApplication'))
+    #elseif ($stepId == 'entries')
+      #set ($classReference = "$stringtool.removeEnd($doc.fullName, 'TemplateProvider')Class")
+      #set ($previousURL = $xwiki.getURL($classReference, 'edit', 'wizard=true'))
+    #elseif ($stepId == 'structure' &amp;&amp; $doc.isNew())
+      #set ($previousURL = $xwiki.getURL('AppWithinMinutes.CreateApplication'))
     #end
-    #if($previousURL)##
-      &lt;span class="buttonwrapper left"&gt;&lt;a href="$previousURL" title="$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonTip'))" class="button secondary"&gt;$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonLabel'))&lt;/a&gt;&lt;/span&gt;##
+    #if ($previousURL)
+      &lt;span class="buttonwrapper left"&gt;
+        &lt;a href="$previousURL" class="button secondary"
+            title="$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonTip'))"&gt;
+          $escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonLabel'))
+        &lt;/a&gt;
+      &lt;/span&gt;
     #end
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="wizard-next" name="xaction_save" value="$escapetool.xml($nextLabel)" title="$escapetool.xml($nextTip)" class="button"/&gt;&lt;/span&gt;
-  )))
-  {{/html}}
+    &lt;span class="buttonwrapper"&gt;
+      &lt;input type="submit" id="wizard-next" name="xaction_save" value="$escapetool.xml($nextLabel)"
+        title="$escapetool.xml($nextTip)" class="button"/&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
 #end
 
 #macro (getAppReference)
@@ -97,7 +109,7 @@
     ## 3. grand parent space (7.3RC1+)
     #set ($appReferences = [
       $doc.documentReference.parent,
-      $services.model.createSpaceReference($stringtool.removeEnd($doc.name, 'TemplateProvider'),
+      $services.model.createSpaceReference($stringtool.removeEnd($doc.documentReference.name, 'TemplateProvider'),
         $doc.documentReference.parent.parent),
       $doc.documentReference.parent.parent
     ])
@@ -111,18 +123,18 @@
 #end
 
 #macro (getAppTitle)
-  #getAppReference##
+  #getAppReference
   #set ($appTitle = $xwiki.getDocument($appReference).plainTitle)
 #end
 {{/velocity}}
 
 {{velocity}}
-#if($doc.fullName == 'AppWithinMinutes.WizardStep')
+#if ($doc.fullName == 'AppWithinMinutes.WizardStep')
   Code shared by all AppWithinMinutes wizard steps.
 #else
   ## Use the style sheet and the JavaScript code required by the velocity macros previously defined.
-  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-  #set($discard = $xwiki.jsx.use('AppWithinMinutes.WizardStep'))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.WizardStep'))
 #end
 {{/velocity}}</content>
   <object>

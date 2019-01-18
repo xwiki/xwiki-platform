@@ -208,14 +208,19 @@
 ##
 ## Ajax object add:
 #if ("$!{request.xaction}" == 'addObject')
-  #set ($class = $xwiki.getClass(${request.classname}))
+  ## We keep 'className' for backward compatibility and use 'classname' to be consistent with other actions.
+  #set ($classname = ${request.classname})
+  #if ("$!classname" == '')
+    #set ($classname = ${request.className})
+  #end
+  #set ($class = $xwiki.getClass($classname))
   #set ($props = $class.getProperties())
   #if ($props.isEmpty())
     $response.setStatus(404)
-    #error($services.localization.render('core.editors.object.add.invalidClassName', [$request.classname]))
+    #error($services.localization.render('core.editors.object.add.invalidClassName', [$classname]))
   #else
-    #set ($isNewClass = $doc.getObjects(${request.classname}).isEmpty())
-    #set ($newobj = $doc.newObject(${request.classname}))
+    #set ($isNewClass = $doc.getObjects($classname).isEmpty())
+    #set ($newobj = $doc.newObject($classname))
     #set ($discard = $doc.save())
     #if ("$!{request.xredirect}" != '')
       $response.sendRedirect($request.xredirect)

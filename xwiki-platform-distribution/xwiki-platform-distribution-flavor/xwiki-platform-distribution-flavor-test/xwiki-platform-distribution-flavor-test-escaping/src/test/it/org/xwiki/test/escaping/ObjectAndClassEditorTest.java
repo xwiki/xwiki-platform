@@ -60,7 +60,7 @@ public class ObjectAndClassEditorTest extends AbstractManualTest
         // add a new object of that class to the class document
         AbstractEscapingTest.getUrlContent(createUrl("view", test, test, params(kv("xpage", "editobject"),
                                                                                 kv("xaction", "addObject"),
-                                                                                kv("className", test + "." + test))));
+                                                                                kv("classname", test + "." + test))));
         // set the property of that object
         AbstractEscapingTest.getUrlContent(createUrl("save", test, test, params(kv("classname", "-"),
                                                                                 kv(escapeUrl(test + "." + test + "_0_test"), test),

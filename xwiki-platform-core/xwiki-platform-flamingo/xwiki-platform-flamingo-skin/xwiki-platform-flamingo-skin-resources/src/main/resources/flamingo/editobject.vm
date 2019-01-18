@@ -139,7 +139,7 @@
 #macro(displayAddObject $class)
   <div id="add_xobject_${escapetool.xml($class.name)}" class="add_xobject">
     <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
-      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;classname=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
     </div>
   </div>
 #end
@@ -208,14 +208,19 @@
 ##
 ## Ajax object add:
 #if ("$!{request.xaction}" == 'addObject')
-  #set ($class = $xwiki.getClass(${request.className}))
+  ## We keep 'className' for backward compatibility and use 'classname' to be consistent with other actions.
+  #set ($classname = ${request.classname})
+  #if ("$!classname" == '')
+    #set ($classname = ${request.className})
+  #end
+  #set ($class = $xwiki.getClass($classname))
   #set ($props = $class.getProperties())
   #if ($props.isEmpty())
     $response.setStatus(404)
-    #error($services.localization.render('core.editors.object.add.invalidClassName', [$request.className]))
+    #error($services.localization.render('core.editors.object.add.invalidClassName', [$classname]))
   #else
-    #set ($isNewClass = $doc.getObjects(${request.className}).isEmpty())
-    #set ($newobj = $doc.newObject(${request.className}))
+    #set ($isNewClass = $doc.getObjects($classname).isEmpty())
+    #set ($newobj = $doc.newObject($classname))
     #set ($discard = $doc.save())
     #if ("$!{request.xredirect}" != '')
       $response.sendRedirect($request.xredirect)

@@ -43,6 +43,7 @@ help.tipsPanel.jumpToPageTip=Jump to any page in the wiki with Ctrl+G or Meta+G.
 help.tipsPanel.improveXWikiTip=Did you know that you can improve XWiki? Take 5 minutes to [[fill this survey&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] and help this open source project!
 help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
 help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
 help.macroList.title=Available Macros
 help.macroList.id=Id
 help.macroList.name=Name

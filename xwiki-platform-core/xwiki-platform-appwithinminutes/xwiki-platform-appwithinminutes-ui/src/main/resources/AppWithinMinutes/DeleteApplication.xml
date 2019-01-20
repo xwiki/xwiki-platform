@@ -103,7 +103,7 @@
 #end
 
 #macro (removeExcludeFromNavigationPanel $appHomeReference)
-  #set ($navigationPanelConfig = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
+  #set ($navigationPanelConfig = $xwiki.getDocument($navigationPanelConfigReference))
   #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
   #if ($exclusions.remove($services.model.serialize($appHomeReference, 'local')))
     #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
@@ -138,11 +138,14 @@
       ##
       #set ($pageReferences = [])
       #set ($shouldRemoveExcludeFromNavigationPanel = false)
+      #set ($navigationPanelConfigReference = 'PanelsCode.NavigationConfiguration')
       #getApplicationDataPages($classReference $pageReferences)
       #if ($scope != 'entries')
         #getApplicationCodePages($appReference $classReference $pageReferences)
-        ## Remove the exclude from the Navigation Panel if the deleted application is at the top level.
-        #set ($shouldRemoveExcludeFromNavigationPanel = $appReference.parent.type == 'WIKI')
+        ## Remove the exclude from the Navigation Panel if the deleted application is at the top level and the current
+        ## user has the right to edit the Navigation Panel configuration.
+        #set ($shouldRemoveExcludeFromNavigationPanel = $appReference.parent.type == 'WIKI'
+          &amp;&amp; $services.security.authorization.hasAccess('edit', $navigationPanelConfigReference))
       #end
       #bulkDelete($pageReferences)
       #if ($shouldRemoveExcludeFromNavigationPanel)

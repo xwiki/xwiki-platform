@@ -19,7 +19,6 @@
  */
 package org.xwiki.appwithinminutes.test.po;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -41,7 +40,7 @@ public class ApplicationsLiveTableElement extends LiveTableElement
     /**
      * The title of the live table column that displays the application name.
      */
-    private static final String APP_NAME_COLUMN_TITLE = "Application name";
+    private static final String APP_NAME_COLUMN_TITLE = "Application";
 
     /**
      * Creates a new instance.
@@ -60,26 +59,12 @@ public class ApplicationsLiveTableElement extends LiveTableElement
         return hasRow(APP_NAME_COLUMN_TITLE, appName);
     }
 
-    /**
-     * @param appPath the application path
-     * @return {@code true} if the specified application is listed, {@code false} otherwise
-     */
-    public boolean isApplicationListed(String... appPath)
+    public ApplicationHomePage viewApplication(String appName)
     {
-        return hasRow(APP_NAME_COLUMN_TITLE, join(appPath));
-    }
-
-    public ApplicationHomePage viewApplication(String... path)
-    {
-        String escapedPath = getUtil().escapeXPath(join(path));
-        getDriver().findElementWithoutWaiting(
-            By.xpath("//td[contains(@class, 'doc_space')]/a[. = " + escapedPath + "]")).click();
+        String escapedAppName = getUtil().escapeXPath(appName);
+        String xpath = "//td[contains(@class, 'doc_title')]/a[. = " + escapedAppName + "]";
+        getDriver().findElementWithoutWaiting(By.xpath(xpath)).click();
         return new ApplicationHomePage();
-    }
-
-    private String join(String... path)
-    {
-        return StringUtils.join(path, " \u00BB ");
     }
 
     /**
@@ -132,7 +117,7 @@ public class ApplicationsLiveTableElement extends LiveTableElement
     {
         String escapedAppName = appName.replace("\\", "\\\\").replace("'", "\\'");
         String actionLinkXPath =
-            "//tr[td[contains(@class, 'doc_space') and . = '" + escapedAppName
+            "//tr[td[contains(@class, 'doc_title') and . = '" + escapedAppName
                 + "']]/td[@class = 'actions']//a[contains(@class, 'action" + action + "')]";
         WebElement liveTableBody = getDriver().findElement(By.id("livetable-display"));
         liveTableBody.findElement(By.xpath(actionLinkXPath)).click();
@@ -145,7 +130,7 @@ public class ApplicationsLiveTableElement extends LiveTableElement
     {
         String escapedAppName = appName.replace("\\", "\\\\").replace("'", "\\'");
         String actionLinkXPath =
-            "//tr[td[contains(@class, 'doc_space') and . = '" + escapedAppName
+            "//tr[td[contains(@class, 'doc_title') and . = '" + escapedAppName
                 + "']]/td[@class = 'actions']//a[contains(@class, 'action" + action + "')]";
         WebElement liveTableBody = getDriver().findElement(By.id("livetable-display"));
         return liveTableBody.findElements(By.xpath(actionLinkXPath)).size() > 0;

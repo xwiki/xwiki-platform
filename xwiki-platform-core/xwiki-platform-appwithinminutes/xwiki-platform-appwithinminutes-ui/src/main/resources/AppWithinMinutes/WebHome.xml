@@ -148,14 +148,6 @@ $services.localization.render('platform.appwithinminutes.description')
     </property>
     <property>
       <code>document.observe('xwiki:livetable:newrow', function(event) {
-  // Fix the display of the application name.
-  var appLink = event.memo.row.down('td.doc_space a');
-  var appReference = XWiki.Model.resolve(event.memo.data['doc_space'], XWiki.EntityType.SPACE);
-  var appLocation = appReference.getReversedReferenceChain().map(function(spaceReference) {
-    return spaceReference.name;
-  }).join(' \u00BB ');
-  appLink.update(appLocation.escapeHTML());
-
   // Add the xredirect parameter to the query string of the delete action to
   // redirect the user back to the live table after an application is deleted.
   var deleteLink = event.memo.row.down('td.actions').down('a.actiondelete');

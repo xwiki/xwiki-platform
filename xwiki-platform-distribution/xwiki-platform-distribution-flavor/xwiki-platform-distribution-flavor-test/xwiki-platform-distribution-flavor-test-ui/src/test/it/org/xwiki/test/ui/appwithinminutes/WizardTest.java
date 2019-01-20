@@ -21,6 +21,7 @@ package org.xwiki.test.ui.appwithinminutes;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -237,10 +238,11 @@ public class WizardTest extends AbstractTest
         // Assert that the created application is listed in the live table.
         ApplicationsLiveTableElement appsLiveTable = appWithinMinutesHomePage.getAppsLiveTable();
         appsLiveTable.waitUntilReady();
-        Assert.assertTrue(appsLiveTable.isApplicationListed(appPath));
+        Assert.assertTrue(appsLiveTable.isApplicationListed(appName));
 
         // Delete the application entries.
-        homePage = appsLiveTable.viewApplication(appPath);
+        homePage = appsLiveTable.viewApplication(appName);
+        Assert.assertEquals('/' + StringUtils.join(appPath, '/'), homePage.getBreadcrumbContent());
         homePage.clickDeleteAllEntries().clickYes();
         // Verify that the entries live table is empty.
         entriesLiveTable = homePage.getEntriesLiveTable();
@@ -252,7 +254,7 @@ public class WizardTest extends AbstractTest
         // Verify that the application is not listed anymore.
         appsLiveTable = AppWithinMinutesHomePage.gotoPage().getAppsLiveTable();
         appsLiveTable.waitUntilReady();
-        Assert.assertFalse(appsLiveTable.isApplicationListed(appPath));
+        Assert.assertFalse(appsLiveTable.isApplicationListed(appName));
     }
 
     /**

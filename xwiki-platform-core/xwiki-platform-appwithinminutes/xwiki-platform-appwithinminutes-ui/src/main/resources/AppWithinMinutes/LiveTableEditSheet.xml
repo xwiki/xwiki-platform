@@ -291,7 +291,7 @@
 
 #macro (updateAndSaveIcon)
   #set ($uix = $doc.getObject('XWiki.UIExtensionClass', true))
-  #set ($discard = $uix.set('name', "platform.panels.${doc.pageReference.name}Application"))
+  #set ($discard = $uix.set('name', "platform.panels.${doc.space}Application"))
   #set ($discard = $uix.set('extensionPointId', 'org.xwiki.platform.panels.Applications'))
   #set ($uixParams = [
     "label=$doc.plainTitle",
@@ -305,16 +305,20 @@
 #end
 
 #macro (excludeFromNavigationPanel)
-  #set ($navigationPanelConfig = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
+  #set ($navigationPanelConfig = $xwiki.getDocument($navigationPanelConfigReference))
   #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
-  #set ($discard = $exclusions.add($doc.fullName))
-  #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
-  #set ($discard = $navigationPanelConfig.save("Exclude the $doc.pageReference.name application"))
+  #if ($exclusions.add($doc.fullName))
+    #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
+    #set ($discard = $navigationPanelConfig.save("Exclude the $doc.pageReference.name application"))
+  #end
 #end
 
 #macro (doSave)
-  ## Exclude the application home page from the Navigation panel when the application is created at the top level.
-  #set ($shouldExcludeFromNavigationPanel = $doc.isNew() &amp;&amp; $doc.pageReference.parent.type == 'WIKI')
+  ## Exclude the application home page from the Navigation panel if the application is created at the top level by an
+  ## user that has edit right on the Navigation panel configuration.
+  #set ($navigationPanelConfigReference = 'PanelsCode.NavigationConfiguration')
+  #set ($shouldExcludeFromNavigationPanel = $doc.isNew() &amp;&amp; $doc.pageReference.parent.type == 'WIKI'
+    &amp;&amp; $services.security.authorization.hasAccess('edit', $navigationPanelConfigReference))
   #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
   #updateAndSaveIcon()

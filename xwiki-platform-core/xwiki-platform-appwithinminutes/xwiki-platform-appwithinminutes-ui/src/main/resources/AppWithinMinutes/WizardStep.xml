@@ -80,14 +80,13 @@
       #set ($classReference = "$stringtool.removeEnd($doc.fullName, 'TemplateProvider')Class")
       #set ($previousURL = $xwiki.getURL($classReference, 'edit', 'wizard=true'))
     #elseif ($stepId == 'structure' &amp;&amp; $doc.isNew())
-      #set ($previousURL = $xwiki.getURL('AppWithinMinutes.CreateApplication'))
+      #set ($previousURL = $xwiki.getURL('AppWithinMinutes.CreateApplication', 'view', 'wizard=true'))
     #end
     #if ($previousURL)
       &lt;span class="buttonwrapper left"&gt;
-        &lt;a href="$previousURL" class="button secondary"
-            title="$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonTip'))"&gt;
-          $escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonLabel'))
-        &lt;/a&gt;
+        &lt;a href="$previousURL" class="button secondary" title="$escapetool.xml($services.localization.render(
+          'platform.appwithinminutes.wizardStepPreviousButtonTip'))"&gt;$escapetool.xml($services.localization.render(
+          'platform.appwithinminutes.wizardStepPreviousButtonLabel'))&lt;/a&gt;
       &lt;/span&gt;
     #end
     &lt;span class="buttonwrapper"&gt;

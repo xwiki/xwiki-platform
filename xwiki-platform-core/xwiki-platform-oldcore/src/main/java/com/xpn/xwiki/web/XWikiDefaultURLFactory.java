@@ -19,10 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedList;
@@ -113,7 +109,7 @@ public abstract class XWikiDefaultURLFactory implements XWikiURLFactory
             }
 
             return new URIBuilder(url.toURI()).addParameters(listParameters).build().toURL();
-        } catch (URISyntaxException | IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error while building URL with provided query parameters", e);
         }
     }

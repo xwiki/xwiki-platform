@@ -162,6 +162,14 @@ public interface XWikiURLFactory
 
     URL getRequestURL(XWikiContext context);
 
+    /**
+     * Build a new URL containing the given query parameters.
+     * @param url the base URL to which add some query parameters
+     * @param queryParameters the map of query parameters to add
+     * @return a new URL containing the given query parameters
+     * @since 11.0RC1
+     */
+    @Unstable
     URL addQueryParameters(URL url, Map<String, String> queryParameters);
 
     /**

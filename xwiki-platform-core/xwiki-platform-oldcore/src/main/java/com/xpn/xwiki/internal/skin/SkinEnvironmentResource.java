@@ -58,6 +58,7 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
         } else {
             url = urlf.createSkinURL(this.resourceName, getRepository().getId(), xcontext);
         }
+
         return urlf.getURL(url, xcontext);
     }
 }

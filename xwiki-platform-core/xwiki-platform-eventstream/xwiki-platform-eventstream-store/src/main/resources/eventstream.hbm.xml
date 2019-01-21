@@ -60,20 +60,17 @@
       <element column="value" type="string" length="2000"/>
     </map-->
 
-    <!--
     <set name="target" table="activitystream_events_targets" lazy="false">
       <key column="eventId" />
       <element column="value" type="string" length="255" />
-    </set>-->
+    </set>
   </class>
-  <!--
-  <class name="com.xpn.xwiki.plugin.activitystream.impl.ActivityEventStatusImpl" table="activitystream_events_status">
+  <class name="org.xwiki.eventstream.store.internal.LegacyEventStatus" table="activitystream_events_status">
     <composite-id>
-      <key-many-to-one name="activityEvent" class="com.xpn.xwiki.plugin.activitystream.impl.LegacyEvent"
+      <key-many-to-one name="activityEvent" class="org.xwiki.eventstream.store.internal.LegacyEvent"
         column="ases_eventid" lazy="false"/>
       <key-property name="entityId" type="string" column="ases_entityid"/>
     </composite-id>
     <property name="read" type="boolean" column="ases_read" />
   </class>
-  -->
 </hibernate-mapping>

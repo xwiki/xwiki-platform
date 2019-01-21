@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
+import org.xwiki.eventstream.EventStatus;
+import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -158,5 +160,35 @@ public class LegacyEventConverter
 
         result.setTarget(e.getTarget());
         return result;
+    }
+
+    /**
+     * Convert an {@link EventStatus} to an {@link LegacyEventStatus}.
+     *
+     * @param eventStatus the status to transform
+     * @return the equivalent activity event status
+     */
+    public LegacyEventStatus convertEventStatusToLegacyActivityStatus(EventStatus eventStatus)
+    {
+        LegacyEventStatus legacyEventStatus = new LegacyEventStatus();
+        legacyEventStatus.setActivityEvent(convertEventToLegacyActivity(eventStatus.getEvent()));
+        legacyEventStatus.setEntityId(eventStatus.getEntityId());
+        legacyEventStatus.setRead(eventStatus.isRead());
+        return legacyEventStatus;
+    }
+
+    /**
+     * Convert an {@link LegacyEventStatus} to an {@link EventStatus}.
+     *
+     * @param eventStatus the activity event status to transform
+     * @return the equivalent event status
+     */
+    public EventStatus convertLegacyActivityStatusToEventStatus(LegacyEventStatus eventStatus)
+    {
+        return new DefaultEventStatus(
+                convertLegacyActivityToEvent(eventStatus.getActivityEvent()),
+                eventStatus.getEntityId(),
+                eventStatus.isRead()
+        );
     }
 }

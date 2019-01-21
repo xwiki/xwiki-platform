@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
-import java.util.Map;
 
 import javax.inject.Provider;
 
@@ -49,12 +48,6 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
     @Override
     public String getURL(boolean forceSkinAction) throws Exception
     {
-        return getURL(forceSkinAction, null);
-    }
-
-    @Override
-    public String getURL(boolean forceSkinAction, Map<String, String> queryParameters) throws Exception
-    {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiURLFactory urlf = xcontext.getURLFactory();
 
@@ -65,7 +58,6 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
         } else {
             url = urlf.createSkinURL(this.resourceName, getRepository().getId(), xcontext);
         }
-
-        return urlf.getURL(url, xcontext, queryParameters);
+        return urlf.getURL(url, xcontext);
     }
 }

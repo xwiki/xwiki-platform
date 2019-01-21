@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import java.util.Map;
-
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.environment.Environment;
 
@@ -42,11 +40,5 @@ public class TemplateEnvironmentResource extends AbstractEnvironmentResource
     {
         // Does not make any sense in this case
         throw new NotImplementedException("Method not implemented");
-    }
-
-    @Override
-    public String getURL(boolean forceSkinAction, Map<String, String> queryParameters) throws Exception
-    {
-       return getURL(forceSkinAction);
     }
 }

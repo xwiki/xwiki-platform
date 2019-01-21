@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import java.util.Map;
-
 import javax.inject.Provider;
 
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
@@ -28,7 +26,6 @@ import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.skin.ResourceRepository;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -58,21 +55,5 @@ public class AttachmentWikiResource extends AbstractWikiResource<AttachmentRefer
     public String getURL(XWikiDocument document) throws Exception
     {
         return document.getAttachmentURL(this.reference.getName(), "skin", this.xcontextProvider.get());
-    }
-
-    @Override
-    public String getURL(XWikiDocument document, Map<String, String> queryParameters) throws Exception
-    {
-        StringBuilder queryString = new StringBuilder();
-
-        for (Map.Entry<String, String> parameters : queryParameters.entrySet()) {
-            queryString.append(parameters.getKey())
-                .append("=")
-                .append(parameters.getValue())
-                .append("&");
-        }
-
-        return document.getAttachmentURL(this.reference.getName(), "skin", StringUtils.removeEnd(queryString.toString(),
-            "&"), this.xcontextProvider.get());
     }
 }

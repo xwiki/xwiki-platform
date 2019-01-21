@@ -19,6 +19,7 @@
  */
 package org.xwiki.skin;
 
+import java.net.URL;
 import java.util.Map;
 
 import org.xwiki.filter.input.InputSource;
@@ -68,18 +69,4 @@ public interface Resource<I extends InputSource>
      * @throws Exception when failing to create a URL for the resource
      */
     String getURL(boolean forceSkinAction) throws Exception;
-
-    /**
-     * Create a URL for the resource.
-     *
-     * @param forceSkinAction true if a dynamic skin URL should be forced
-     * @param queryParameters add the following parameters to the URL
-     * @return a URL to the resource
-     * @throws Exception when failing to create a URL for the resource
-     * @since 11.0RC1
-     */
-    @Unstable
-    default String getURL(boolean forceSkinAction, Map<String, String> queryParameters) throws Exception {
-        return getURL(forceSkinAction);
-    }
 }

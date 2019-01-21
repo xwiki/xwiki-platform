@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import java.util.Map;
-
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.filter.input.StringInputSource;
 
@@ -45,11 +43,5 @@ public class StringResource extends AbstractInputSourceResource<StringInputSourc
     {
         // A StringResource does not depends on a particular URL
         throw new NotImplementedException("Method not implemented");
-    }
-
-    @Override
-    public String getURL(boolean forceSkinAction, Map<String, String> queryParameters) throws Exception
-    {
-        return getURL(forceSkinAction);
     }
 }

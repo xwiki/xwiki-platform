@@ -85,6 +85,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -2437,9 +2438,7 @@ public class XWiki implements EventListener
             if (skin != null) {
                 Resource<?> resource = skin.getResource(filename);
                 if (resource != null) {
-                    queryParametersMap.putAll(getResourceURLParameters(resource));
-                    String resourceUrl = resource.getURL(forceSkinAction, queryParametersMap);
-                    return resourceUrl;
+                    return createURLForResource(resource, forceSkinAction, queryParametersMap, context, urlf);
                 }
             } else {
                 // Try in the current parent skin
@@ -2447,9 +2446,7 @@ public class XWiki implements EventListener
                 if (parentSkin != null) {
                     Resource<?> resource = parentSkin.getResource(filename);
                     if (resource != null) {
-                        queryParametersMap.putAll(getResourceURLParameters(resource));
-                        String resourceUrl = resource.getURL(forceSkinAction, queryParametersMap);
-                        return resourceUrl;
+                        return createURLForResource(resource, forceSkinAction, queryParametersMap, context, urlf);
                     }
                 }
             }
@@ -2457,9 +2454,9 @@ public class XWiki implements EventListener
             // Look for a resource file
             String resourceFilePath = "/resources/" + filename;
             if (resourceExists(resourceFilePath)) {
-                queryParametersMap.putAll(getResourceURLParameters(resourceFilePath));
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
-                    queryParametersMap);
+                queryParametersMap.putAll(getResourceURLCacheParameters(resourceFilePath));
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                url = urlf.addQueryParameters(url, queryParameters);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2476,8 +2473,19 @@ public class XWiki implements EventListener
         } else {
             url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
         }
-        queryParameters.putAll(getResourceURLParameters(url));
-        return urlf.getURL(url, context, queryParameters);
+        queryParameters.putAll(getResourceURLCacheParameters(url));
+        url = urlf.addQueryParameters(url, queryParameters);
+        return urlf.getURL(url, context);
+    }
+
+    private String createURLForResource(Resource<?> resource, boolean forceSkinAction,
+        Map<String, String> queryParametersMap, XWikiContext context, XWikiURLFactory urlf) throws Exception
+    {
+        queryParametersMap.putAll(getResourceURLCacheParameters(resource));
+        String resourceUrlString = resource.getURL(forceSkinAction);
+        URL resourceUrl = new URIBuilder(resourceUrlString).build().toURL();
+        resourceUrl = urlf.addQueryParameters(resourceUrl, queryParametersMap);
+        return urlf.getURL(resourceUrl, context);
     }
 
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
@@ -2485,29 +2493,29 @@ public class XWiki implements EventListener
         return getSkinFile(filename, forceSkinAction, context, new LinkedHashMap<>());
     }
 
-    private Map<String, String> getResourceURLParameters(Resource<?> resource)
+    private Map<String, String> getResourceURLCacheParameters(Resource<?> resource)
     {
         try {
             URL resourceUrl = getResource(resource.getPath());
-            return getResourceURLParameters(resourceUrl);
+            return getResourceURLCacheParameters(resourceUrl);
         } catch (MalformedURLException e) {
-            LOGGER.debug("Error while getting URL for resource filepath [{}]", resource.getPath(), e);
+            LOGGER.debug("Error while getting URL for resource path [{}]", resource.getPath(), e);
             return Collections.singletonMap(CACHE_VERSION, getVersion());
         }
     }
 
-    private Map<String, String> getResourceURLParameters(String resourceFilePath)
+    private Map<String, String> getResourceURLCacheParameters(String resourceFilePath)
     {
         try {
             URL resourceUrl = getResource(resourceFilePath);
-            return getResourceURLParameters(resourceUrl);
+            return getResourceURLCacheParameters(resourceUrl);
         } catch (MalformedURLException e) {
-            LOGGER.debug("Error while getting URL for resource filepath [{}]", resourceFilePath, e);
+            LOGGER.debug("Error while getting URL for resource path [{}]", resourceFilePath, e);
             return Collections.singletonMap(CACHE_VERSION, getVersion());
         }
     }
 
-    private Map<String, String> getResourceURLParameters(URL resourceUrl)
+    private Map<String, String> getResourceURLCacheParameters(URL resourceUrl)
     {
         Map<String, String> parameters = new LinkedHashMap<>();
 

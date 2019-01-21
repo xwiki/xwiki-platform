@@ -19,7 +19,19 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -86,5 +98,23 @@ public abstract class XWikiDefaultURLFactory implements XWikiURLFactory
     public String getURL(URL url, XWikiContext context)
     {
         return url.toString();
+    }
+
+    @Override
+    public URL addQueryParameters(URL url, Map<String, String> queryParameters) {
+        List<NameValuePair> listParameters = new LinkedList<>();
+
+        try {
+            for (Map.Entry<String, String> parameter : queryParameters.entrySet()) {
+                listParameters.add(new BasicNameValuePair(
+                    URLEncoder.encode(parameter.getKey(), "UTF8"),
+                    URLEncoder.encode(parameter.getValue(), "UTF8")
+                ));
+            }
+
+            return new URIBuilder(url.toURI()).addParameters(listParameters).build().toURL();
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException("Error while building URL with provided query parameters", e);
+        }
     }
 }

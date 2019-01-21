@@ -109,19 +109,6 @@ public interface XWikiURLFactory
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
     /**
-     * Create a resource URL for the given filename with some parameters.
-     * @param filename the asked resource file.
-     * @param forceSkinAction if true force to use the /skins/ directory
-     * @param context the current context
-     * @param queryParameters parameters to add to the URL
-     * @return a URL returning the wanted file.
-     * @since 11.0RC1
-     */
-    @Unstable
-    URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
-        Map<String, String> queryParameters);
-
-    /**
      * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
      *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
@@ -175,6 +162,8 @@ public interface XWikiURLFactory
 
     URL getRequestURL(XWikiContext context);
 
+    URL addQueryParameters(URL url, Map<String, String> queryParameters);
+
     /**
      * Converts a URL to a string representation. It's up to the implementation to decide whether to perform
      * transformations or not on the URL. For example some implementations will convert the URL to a relative URL if the
@@ -184,8 +173,6 @@ public interface XWikiURLFactory
      * @return the converted URL as a string
      */
     String getURL(URL url, XWikiContext context);
-
-    String getURL(URL url, XWikiContext context, Map<String, String> queryParameters);
 
     /**
      * Generate the base external URL to access this server.

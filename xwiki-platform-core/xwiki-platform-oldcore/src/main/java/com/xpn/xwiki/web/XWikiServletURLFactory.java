@@ -485,13 +485,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
-        return createResourceURL(filename, forceSkinAction, context, null);
-    }
-
-    @Override
-    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
-        Map<String, String> queryParameters)
-    {
         StringBuilder path = new StringBuilder(this.contextPath);
         if (forceSkinAction) {
             addServletPath(path, context.getWikiId(), context);
@@ -499,20 +492,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
         path.append("resources");
         addFileName(path, filename, false, context);
-        if (queryParameters != null && !queryParameters.isEmpty()) {
-            path.append("?");
-            Iterator<Map.Entry<String, String>> entryIterator = queryParameters.entrySet().iterator();
-            while (entryIterator.hasNext()) {
-                Map.Entry<String, String> entry = entryIterator.next();
-                path.append(entry.getKey());
-                path.append("=");
-                path.append(entry.getValue());
-
-                if (entryIterator.hasNext()) {
-                    path.append("&");
-                }
-            }
-        }
         try {
             return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {
@@ -676,12 +655,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public String getURL(URL url, XWikiContext context)
     {
-        return getURL(url, context, null);
-    }
-
-    @Override
-    public String getURL(URL url, XWikiContext context, Map<String, String> queryParameters)
-    {
         String relativeURL = "";
 
         try {
@@ -698,26 +671,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     if (!StringUtils.isEmpty(querystring)) {
                         relativeURLBuilder.append("?")
                             .append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
-                    }
-
-                    if (queryParameters != null && !queryParameters.isEmpty()) {
-                        if (StringUtils.isEmpty(querystring)) {
-                            relativeURLBuilder.append("?");
-                        } else {
-                            relativeURLBuilder.append("&");
-                        }
-
-                        Iterator<Map.Entry<String, String>> entryIterator = queryParameters.entrySet().iterator();
-                        while (entryIterator.hasNext()) {
-                            Map.Entry<String, String> entry = entryIterator.next();
-                            relativeURLBuilder.append(entry.getKey())
-                                .append("=")
-                                .append(entry.getValue());
-
-                            if (entryIterator.hasNext()) {
-                                relativeURLBuilder.append("&");
-                            }
-                        }
                     }
 
                     String anchor = url.getRef();

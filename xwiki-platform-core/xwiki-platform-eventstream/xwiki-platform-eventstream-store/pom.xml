@@ -56,6 +56,11 @@
             <artifactId>xwiki-commons-observation-api</artifactId>
             <version>${commons.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-annotation-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.xwiki.commons</groupId>

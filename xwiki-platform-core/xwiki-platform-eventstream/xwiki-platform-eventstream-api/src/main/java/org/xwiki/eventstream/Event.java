@@ -354,4 +354,23 @@ public interface Event
     default Set<String> getTarget() {
         return Collections.emptySet();
     }
+
+    /**
+     * @return if the event should be hidden or not
+     * @since 11.0RC1
+     */
+    default boolean getHidden()
+    {
+        return false;
+    }
+
+    /**
+     * @param isHidden if the event should be hidden or not
+     * @since 11.0RC1
+     */
+    default void setHidden(boolean isHidden)
+    {
+        LoggerFactory.getLogger(Event.class)
+                .warn("org.xwiki.eventstream.Event#setHidden() has been called without being reimplemented.");
+    }
 }

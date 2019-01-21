@@ -2456,7 +2456,7 @@ public class XWiki implements EventListener
             if (resourceExists(resourceFilePath)) {
                 queryParametersMap.putAll(getResourceURLCacheParameters(resourceFilePath));
                 URL url = urlf.createResourceURL(filename, forceSkinAction, context);
-                url = urlf.addQueryParameters(url, queryParameters);
+                url = urlf.addQueryParameters(url, queryParametersMap);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2473,8 +2473,8 @@ public class XWiki implements EventListener
         } else {
             url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
         }
-        queryParameters.putAll(getResourceURLCacheParameters(url));
-        url = urlf.addQueryParameters(url, queryParameters);
+        queryParametersMap.putAll(getResourceURLCacheParameters(url));
+        url = urlf.addQueryParameters(url, queryParametersMap);
         return urlf.getURL(url, context);
     }
 

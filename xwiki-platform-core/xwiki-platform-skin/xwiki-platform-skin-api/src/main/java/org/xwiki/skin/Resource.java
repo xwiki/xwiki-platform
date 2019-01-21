@@ -19,11 +19,7 @@
  */
 package org.xwiki.skin;
 
-import java.net.URL;
-import java.util.Map;
-
 import org.xwiki.filter.input.InputSource;
-import org.xwiki.stability.Unstable;
 
 /**
  * @param <I> the type of the {@link InputSource}

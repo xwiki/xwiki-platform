@@ -580,10 +580,10 @@ function init() {
   if (!form) {
     return false;
   }
-  // Let the sheet handle the form submit.
-  // NOTE: The code that handles Save&amp;Continue uses this URL to make the AJAX request and Firefox 3.6 doesn't resolve
-  // the empty string to the current page URL so we have to explicitly specify it.
-  form.action = window.location.href;
+  // Let the sheet handle the form submit. The form is submitted by default to the preview action which dispatches the
+  // request to the save action if the save button is detected on the request parameters. By submitting to the edit
+  // action the edit sheet is evaluated and thus it can handle the save by itself.
+  form.action = XWiki.currentDocument.getURL('edit');
 
   // Apply the vertical form layout standard.
   form.addClassName('xform');

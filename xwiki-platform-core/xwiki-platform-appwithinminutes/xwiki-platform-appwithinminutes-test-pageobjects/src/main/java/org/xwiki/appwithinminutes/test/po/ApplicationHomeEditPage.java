@@ -54,6 +54,12 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     private WebElement descriptionTextArea;
 
     /**
+     * The field used to input the application title.
+     */
+    @FindBy(id = "xwikidoctitleinput")
+    private WebElement titleInput;
+
+    /**
      * Clicks on the Previous Step button.
      *
      * @return the page that represents the previous step of the App Within Minutes wizard
@@ -80,6 +86,25 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     protected <T extends ViewPage> T createViewPage()
     {
         return (T) new ApplicationHomePage();
+    }
+
+    /**
+     * Sets the application title.
+     * 
+     * @param title the new application title
+     */
+    public void setTitle(String title)
+    {
+        this.titleInput.clear();
+        this.titleInput.sendKeys(title);
+    }
+
+    /**
+     * @return the value of the application title input
+     */
+    public String getTitle()
+    {
+        return this.titleInput.getAttribute("value");
     }
 
     /**

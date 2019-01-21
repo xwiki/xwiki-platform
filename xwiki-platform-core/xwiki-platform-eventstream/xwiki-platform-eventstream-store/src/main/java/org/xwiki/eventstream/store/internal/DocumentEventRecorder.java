@@ -41,8 +41,6 @@ import org.xwiki.observation.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Store the recordable event inside the event stream (except events that are already handled by the Activity Stream

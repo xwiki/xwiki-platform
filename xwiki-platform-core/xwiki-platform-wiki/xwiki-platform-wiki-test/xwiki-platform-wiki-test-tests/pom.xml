@@ -190,6 +190,39 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
+        <dependencies>
+          <!-- TODO: remove the need for this dependency in the future. The reason we need it right now is because
+               the Packager Mojo will use the Import Mojo to import XARs but since we've defined the
+               xwikiDbHbmCommonExtraMappings property up there, it's using it and thus we need the mapping file to be
+               in the classpath. -->
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-activitystream-api</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-notifications-filters-default</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
            browser several times -->
       <plugin>

@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
@@ -85,11 +86,19 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         if (getXWikiContext().isMainWiki()) {
             // Move the whole store folder content to the new location
             File oldStore = getPre11StoreRootDirectory();
+
+            // Check if there is a filesystem store at all
+            File[] children = oldStore.listFiles();
+            if (ArrayUtils.isEmpty(children)) {
+                // Nothing to migrate
+                return;
+            }
+
             File newStore = this.fstools.getStoreRootDirectory();
 
             this.logger.info("Moving content of folder [{}] to new location [{}]", oldStore, newStore);
 
-            for (File child : oldStore.listFiles()) {
+            for (File child : children) {
                 try {
                     FileUtils.moveToDirectory(child, newStore, true);
                 } catch (IOException e) {

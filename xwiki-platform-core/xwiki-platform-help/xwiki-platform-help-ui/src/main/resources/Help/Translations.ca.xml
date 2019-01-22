@@ -43,6 +43,7 @@
 ### Missing: help.tipsPanel.improveXWikiTip=Did you know that you can improve XWiki? Take 5 minutes to [[fill this survey&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] and help this open source project!
 ### Missing: help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
 ### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
 ### Missing: help.macroList.title=Available Macros
 ### Missing: help.macroList.id=Id
 ### Missing: help.macroList.name=Name

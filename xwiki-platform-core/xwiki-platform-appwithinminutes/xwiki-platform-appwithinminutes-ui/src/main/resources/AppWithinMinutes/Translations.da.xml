@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Minut-app
 platform.appwithinminutes.description=Skab en fælles anvendelse på få minutter med XWikis avancerede håndtering af datastrukturer (AppWithinMinutes).
 platform.appwithinminutes.createAppButtonLabel=Opret Minut-app
 platform.appwithinminutes.appsLiveTableHeading=Minut-apps
-platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Senest ændret af
 platform.appwithinminutes.appsLiveTable.doc.date=Ændringsdato
 platform.appwithinminutes.appsLiveTable._actions=Handlinger
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Minut-app findes allerede. Hvis d
 platform.appwithinminutes.appNameEmptyError=Giv Minut-app'en et navn
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Felt-palette
 platform.appwithinminutes.classEditorPaletteHint=Træk og slip felter fra paletten til data feltet.
 platform.appwithinminutes.classEditorCanvasHint=Træk felter fra paletten og slip dem i dette område.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Tilføj
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Fjern
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Billeder
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Særlig kolonne med henvisninger til billeder for funktionen.
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Logo
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Særlig kolonne til at vise brugerlogo (avatar). Virker kun for klasser bundet til XWiki.Xwikiusers
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Beskrivelsen indeholder en kort introduktion til hvade Minut-app'en kan og hvilke data den kan arbejde på.
 platform.appwithinminutes.liveTableEditorColumnsHint=Vælg de kolonner du kunne tænke dig at se på Minut-app'ens startside.
 platform.appwithinminutes.liveTableEditorSaveComment=Opdatér Live-tabeller
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Præsentation
 platform.appwithinminutes.wizardStep3Title=Design din Minut-apps startside
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Gør startsiden for din Minut-app personlig.
+
+### Since 11.0RC1
+platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

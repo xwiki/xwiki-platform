@@ -43,6 +43,7 @@ help.tipsPanel.jumpToPageTip=Idite na bilo koju stranicu u wikiju s Ctrl+G ili M
 help.tipsPanel.improveXWikiTip=Jeste li znali da možete poboljšati XWiki? Odvojite 5 minuta kako biste [[ispunili ovu anketu&gt;&gt;http\://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] i pomogli ovom projektu otvorenog koda\!
 help.tipsPanel.breadcrumbsTip=Možete kliknuti na strelice pored elemenata mrvica kako biste brzo navigirali do stranica srodnika i djece.
 ### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
 help.macroList.title=Dostupni makroi
 help.macroList.id=Identifikator
 help.macroList.name=Ime

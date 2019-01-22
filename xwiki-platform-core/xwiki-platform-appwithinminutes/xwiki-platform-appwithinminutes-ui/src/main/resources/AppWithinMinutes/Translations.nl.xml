@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=App Binnen Minuten
 platform.appwithinminutes.description=Maak binnen enkele minuten webapplicaties, op basis van XWiki's krachtige beheersysteem voor gestructureerde gegevens.
 platform.appwithinminutes.createAppButtonLabel=Maak Applicatie
 platform.appwithinminutes.appsLiveTableHeading=Applicaties
-platform.appwithinminutes.appsLiveTable.doc.space=Applicatienaam
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Laatste auteur
 platform.appwithinminutes.appsLiveTable.doc.date=Datum gewijzigd
 platform.appwithinminutes.appsLiveTable._actions=Acties
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Deze applicatie bestaat al. Als u
 platform.appwithinminutes.appNameEmptyError=Geef alstublieft de applicatienaam op.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Veldenkiezer
 platform.appwithinminutes.classEditorPaletteHint=Sleep velden uit de kiezer en laat ze vallen op uw formulier om uw formulier op te bouwen.
 platform.appwithinminutes.classEditorCanvasHint=Sleep velden uit de kiezer en laat ze in dit gebied vallen.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Toevoegen
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Verwijderen
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Afbeeldingen
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Een speciale kolom met afbeeldingen die bij de gegevenspagina zijn gevoegd
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Een speciale kolom voor het tonen van de avatar van de gebruiker. Werkt alleen voor een tabel die aan de XWiki.XWikiUsers Class is gebonden.
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=De omschrijving geeft een korte samenvatting van wat de applicatie doet en welke gegevens ermee beheerd worden.
 platform.appwithinminutes.liveTableEditorColumnsHint=Selecteer de kolommen die u wilt opnemen in de live table die wordt weergegeven op de homepage van de applicatie.
 platform.appwithinminutes.liveTableEditorSaveComment=LiveTable bijwerken
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Presentatie
 platform.appwithinminutes.wizardStep3Title=Pas de homepage van uw applicatie aan
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Personaliseer de homepage van uw applicatie.
+
+### Since 11.0RC1
+platform.appwithinminutes.appsLiveTable.doc.space=Applicatienaam
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

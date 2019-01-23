@@ -37,50 +37,50 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Home page
-### Missing: platform.appwithinminutes.homePageTitle=App Within Minutes
-### Missing: platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
-### Missing: platform.appwithinminutes.createAppButtonLabel=Create Application
-### Missing: platform.appwithinminutes.appsLiveTableHeading=Applications
-### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
-### Missing: platform.appwithinminutes.appsLiveTable.doc.author=Last author
-### Missing: platform.appwithinminutes.appsLiveTable.doc.date=Update date
-### Missing: platform.appwithinminutes.appsLiveTable._actions=Actions
-### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
+platform.appwithinminutes.homePageTitle=Додаток За Хвилину
+platform.appwithinminutes.description=Створюйте спільні веб-програми протягом декількох хвилин на основі потужної структурованої системи керування даними XWiki.
+platform.appwithinminutes.createAppButtonLabel=Створити додаток
+platform.appwithinminutes.appsLiveTableHeading=Додатки
+platform.appwithinminutes.appsLiveTable.doc.title=Додаток
+platform.appwithinminutes.appsLiveTable.doc.author=Редактор
+platform.appwithinminutes.appsLiveTable.doc.date=Оновлено
+platform.appwithinminutes.appsLiveTable._actions=Дії
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Надати права на адміністрування простору.
 
 ### AWM Applications panel entry
-### Missing: platform.appwithinminutes.appPanelCreateEntry=Create your own!
+platform.appwithinminutes.appPanelCreateEntry=Створити власний!
 
 ### Wizard step
-### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
-### Missing: appWithinMinutes.wizardStep.name.name=Name
-### Missing: appWithinMinutes.wizardStep.name.title=Name your application
-### Missing: appWithinMinutes.wizardStep.name.description=Choose the application name
-### Missing: appWithinMinutes.wizardStep.structure.name=Structure
-### Missing: appWithinMinutes.wizardStep.structure.title=Structure your data
-### Missing: appWithinMinutes.wizardStep.structure.description=Describe the application data
-### Missing: appWithinMinutes.wizardStep.entries.name=Entries
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
-### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
-### Missing: appWithinMinutes.wizardStep.presentation.name=Presentation
-### Missing: appWithinMinutes.wizardStep.presentation.title=Customize your application home page
-### Missing: appWithinMinutes.wizardStep.presentation.description=Customize the application home page
-### Missing: platform.appwithinminutes.wizardStepNextButtonLabel=Next Step
-### Missing: platform.appwithinminutes.wizardStepNextButtonTip=Go to next step
-### Missing: platform.appwithinminutes.wizardStepFinishButtonLabel=Finish
-### Missing: platform.appwithinminutes.wizardStepFinishButtonTip=Go to the application home page
-### Missing: platform.appwithinminutes.wizardStepPreviousButtonLabel=Previous Step
-### Missing: platform.appwithinminutes.wizardStepPreviousButtonTip=Go to previous step
-### Missing: platform.appwithinminutes.wizardStepHelpTitle=Steps
-### Missing: platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
+platform.appwithinminutes.wizardStepHeading=Крок {0} — {1}
+appWithinMinutes.wizardStep.name.name=Назва
+appWithinMinutes.wizardStep.name.title=Назвіть свою програму
+appWithinMinutes.wizardStep.name.description=Виберіть назву програми
+appWithinMinutes.wizardStep.structure.name=Структура
+appWithinMinutes.wizardStep.structure.title=Структура ваших даних
+appWithinMinutes.wizardStep.structure.description=Опишіть дані додатка
+appWithinMinutes.wizardStep.entries.name=Записи
+appWithinMinutes.wizardStep.entries.title=Розташуйте свої дані
+appWithinMinutes.wizardStep.entries.description=Виберіть, де зберігати дані
+appWithinMinutes.wizardStep.presentation.name=Представлення
+appWithinMinutes.wizardStep.presentation.title=Налаштуйте домашню сторінку програми
+appWithinMinutes.wizardStep.presentation.description=Налаштуйте домашню сторінку програми
+platform.appwithinminutes.wizardStepNextButtonLabel=Наступний крок
+platform.appwithinminutes.wizardStepNextButtonTip=Перейти далі
+platform.appwithinminutes.wizardStepFinishButtonLabel=Завершення
+platform.appwithinminutes.wizardStepFinishButtonTip=Перейти на домашню сторінку додатка
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Попередній крок
+platform.appwithinminutes.wizardStepPreviousButtonTip=Повернутись назад
+platform.appwithinminutes.wizardStepHelpTitle=Кроки
+platform.appwithinminutes.wizardStepHelpDescription=Цей майстер проведе вас через процес створення додатка. Кроки такі:
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
-### Missing: appWithinMinutes.codeSpace.title=Code
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
+appWithinMinutes.createApp.location.label=Розташування
+appWithinMinutes.createApp.location.hint=Розташування в ієрархії сторінок, де буде створено додаток.
+appWithinMinutes.createApp.parent.label=Батько
+appWithinMinutes.createApp.parent.hint=Батько нового додатка. Залиште це поле порожнім, якщо ви хочете створити додаток найвищого рівня.
+appWithinMinutes.createApp.parent.placeholder=Шлях.До.Батька
+appWithinMinutes.codeSpace.title=Код
+appWithinMinutes.codeSpace.description=Розташування коду додатка.
 ### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
 ### Missing: platform.appwithinminutes.appNamePageTitle=Create Application
 ### Missing: platform.appwithinminutes.appNameLabel=Application Name

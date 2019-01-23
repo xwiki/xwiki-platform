@@ -81,80 +81,80 @@ appWithinMinutes.createApp.parent.hint=Батько нового додатка.
 appWithinMinutes.createApp.parent.placeholder=Шлях.До.Батька
 appWithinMinutes.codeSpace.title=Код
 appWithinMinutes.codeSpace.description=Розташування коду додатка.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
-### Missing: platform.appwithinminutes.appNamePageTitle=Create Application
-### Missing: platform.appwithinminutes.appNameLabel=Application Name
-### Missing: platform.appwithinminutes.appNameHint=The application name determines the homepage URL and the location where the application code is stored.
-### Missing: platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Application homepage URL
-### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
-### Missing: platform.appwithinminutes.appNameIsUsedWarning=This application already exists. If you go to the next step you will be editing the existing application.
-### Missing: platform.appwithinminutes.appNameEmptyError=Please enter the application name.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Приховані сторінки також перелічені, навіть якщо ваші поточні налаштування профілю користувача не дозволяють це робити, інакше жодну з сторінок коду додатка не буде видно, оскільки вони за умовчанням приховані.
+platform.appwithinminutes.appNamePageTitle=Створити додаток
+platform.appwithinminutes.appNameLabel=Назва додатка
+platform.appwithinminutes.appNameHint=Назва додатка визначає URL-адресу домашньої сторінки та місце, де зберігається код додатка.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL домашньої сторінки додатка
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Розташування коду додатка
+platform.appwithinminutes.appNameIsUsedWarning=Такий додаток вже існує. Якщо ви перейдете до наступного кроку, то редагуватимете існуючий додаток.
+platform.appwithinminutes.appNameEmptyError=Будь ласка, введіть назву додатка.
 
 ### Wizard Step 2: Application Structure
-### Missing: platform.appwithinminutes.classEditorPaletteTitle=Field Palette
-### Missing: platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
-### Missing: platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
+platform.appwithinminutes.classEditorPaletteTitle=Палітра полів
+platform.appwithinminutes.classEditorPaletteHint=Перетягніть поля з палітри, щоб створити форму, яка буде використана для введення даних.
+platform.appwithinminutes.classEditorCanvasHint=Перетягніть поля з палітри і скиньте їх у цій області.
 
-### Missing: platform.appwithinminutes.classEditorUpdateTemplateLabel=Update the template
-### Missing: platform.appwithinminutes.classEditorUpdateTemplateHint=The template ({0}) stores the default field values.
-### Missing: platform.appwithinminutes.classEditorUpdateSheetLabel=Update the sheet
-### Missing: platform.appwithinminutes.classEditorUpdateSheetHint=The sheet ({0}) is used to display and edit the structured data.
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Оновити шаблон
+platform.appwithinminutes.classEditorUpdateTemplateHint=Шаблон ({0}) зберігає значення полів за умовчанням.
+platform.appwithinminutes.classEditorUpdateSheetLabel=Оновити аркуш
+platform.appwithinminutes.classEditorUpdateSheetHint=Аркуш  ({0}) використовується для відображення і редагування структурованих даних.
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Оновити переклад
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Оновлення перекладу користувацьких назв полів і значень списку ({0}).
 
-### Missing: platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.
-### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=The class has two fields with the same name: {0}
-### Missing: platform.appwithinminutes.classEditorTemplateSaveComment=Update default values
-### Missing: platform.appwithinminutes.classEditorBindSheetSaveComment=Bind class sheet
-### Missing: platform.appwithinminutes.classEditorSheetSaveComment=Update class sheet
-### Missing: platform.appwithinminutes.classEditorTranslationsSaveComment=Update translations
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Цей клас містить кілька аркушів.
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Клас містить два поля з однаковими назвами: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=Оновити значення за умовчанням
+platform.appwithinminutes.classEditorBindSheetSaveComment=Прив'язати аркуш класу
+platform.appwithinminutes.classEditorSheetSaveComment=Оновити аркуш класу
+platform.appwithinminutes.classEditorTranslationsSaveComment=Оновити переклади
 
-### Missing: platform.appwithinminutes.classEditorStandardCategoryName=Standard
-### Missing: platform.appwithinminutes.classEditorPickersCategoryName=Pickers
-### Missing: platform.appwithinminutes.classEditorDocumentCategoryName=Page
-### Missing: platform.appwithinminutes.classEditorAdvancedCategoryName=Advanced
+platform.appwithinminutes.classEditorStandardCategoryName=Звичайний
+platform.appwithinminutes.classEditorPickersCategoryName=Вибирачі
+platform.appwithinminutes.classEditorDocumentCategoryName=Сторінка
+platform.appwithinminutes.classEditorAdvancedCategoryName=Додатково
 
-### Missing: platform.appwithinminutes.classEditorDBListFieldName=Database List
-### Missing: platform.appwithinminutes.classEditorGroupsFieldName=Group
-### Missing: platform.appwithinminutes.classEditorUsersFieldName=User
-### Missing: platform.appwithinminutes.classEditorDateFieldName=Date
-### Missing: platform.appwithinminutes.classEditorStaticListFieldName=Static List
-### Missing: platform.appwithinminutes.classEditorBooleanFieldName=Boolean
-### Missing: platform.appwithinminutes.classEditorNumberFieldName=Number
-### Missing: platform.appwithinminutes.classEditorTextAreaFieldName=Long Text
-### Missing: platform.appwithinminutes.classEditorStringFieldName=Short Text
-### Missing: platform.appwithinminutes.classEditorContentFieldName=Content
-### Missing: platform.appwithinminutes.classEditorTitleFieldName=Title
-### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
+platform.appwithinminutes.classEditorDBListFieldName=Список з БД
+platform.appwithinminutes.classEditorGroupsFieldName=Група
+platform.appwithinminutes.classEditorUsersFieldName=Користувач
+platform.appwithinminutes.classEditorDateFieldName=Дата
+platform.appwithinminutes.classEditorStaticListFieldName=Статичний список
+platform.appwithinminutes.classEditorBooleanFieldName=Логічне
+platform.appwithinminutes.classEditorNumberFieldName=Число
+platform.appwithinminutes.classEditorTextAreaFieldName=Довгий текст
+platform.appwithinminutes.classEditorStringFieldName=Короткий текст
+platform.appwithinminutes.classEditorContentFieldName=Вміст
+platform.appwithinminutes.classEditorTitleFieldName=Заголовок
+platform.appwithinminutes.classEditorPageFieldName=Сторінка
 
-### Missing: platform.appwithinminutes.classEditorDeleteFieldLabel=Delete
-### Missing: platform.appwithinminutes.classEditorConfigureFieldLabel=Configure
-### Missing: platform.appwithinminutes.classEditorPreviewFieldLabel=Preview
-### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=Hide configuration panel and apply changes
-### Missing: platform.appwithinminutes.classEditorMoveFieldLabel=Move
-### Missing: platform.appwithinminutes.classEditorMoveFieldHint=Drag and drop to change the order
+platform.appwithinminutes.classEditorDeleteFieldLabel=Вилучити
+platform.appwithinminutes.classEditorConfigureFieldLabel=Налаштувати
+platform.appwithinminutes.classEditorPreviewFieldLabel=Переглянути
+platform.appwithinminutes.classEditorPreviewFieldHint=Приховати панель конфігурації і застосувати зміни
+platform.appwithinminutes.classEditorMoveFieldLabel=Перенести
+platform.appwithinminutes.classEditorMoveFieldHint=Перетягніть для зміни порядку
 
-### Missing: platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Default value
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Значення за умовчанням
 
 ### Date Picker
-### Missing: platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
-### Missing: platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Clear
-### Missing: platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Now
-### Missing: platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Today
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Гаразд
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Очистити
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Зараз
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Сьогодні
 
 ### Static List Editor
-### Missing: platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Value
-### Missing: platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
-### Missing: platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Add
-### Missing: platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Delete
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Значення
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Ідентифікатор
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Додати
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Вилучити
 
-### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
+appWithinMinutes.templateProviderEditor.hint=Записи додатка є вікі-сторінками з структурованими даними.
+appWithinMinutes.templateProviderEditor.icon.hint=Значок, пов'язаний з додатком.
+appWithinMinutes.templateProviderEditor.description.hint=Короткий опис додатка.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Звідки створювати записи
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Якщо розташування не вибране, записи можна створювати з будь якої сторінки.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Де створювати записи
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Якщо розташування не вибране, записи можна створювати в будь якому місці вікі.
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
@@ -246,7 +246,7 @@ appWithinMinutes.codeSpace.description=Розташування коду дод�
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 ### Missing: platform.appwithinminutes.wizardStep3Description=Customize the application homepage
 
-### Since 11.0RC1
+### Since 11.0
 ### Missing: platform.appwithinminutes.appsLiveTable.doc.space=Application name
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>

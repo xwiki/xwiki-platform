@@ -21,6 +21,8 @@ package org.xwiki.officeimporter.test.ui;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +38,12 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
+import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -130,6 +134,16 @@ public class OfficeImporterIT
         // Test ODT file
         resultPage = importFile(testName, "ooffice.3.0/Test.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
+        WikiEditPage wikiEditPage = resultPage.editWiki();
+        String regex = "(?<imageName>Test_html_[\\w]+\\.png)";
+        Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(wikiEditPage.getContent());
+        assertTrue(matcher.find());
+        String imageName = matcher.group("imageName");
+        resultPage = wikiEditPage.clickCancel();
+        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        assertEquals(4, attachmentsPane.getNumberOfAttachments());
+        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName));
         deletePage(testName);
 
         // Test ODP file
@@ -145,6 +159,23 @@ public class OfficeImporterIT
         resultPage = importFile(testName, "ooffice.3.0/Test.ods");
         assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
         assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet2"));
+        deletePage(testName);
+
+        // Test ODT file with accents
+        resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù <!-_.+*();?:@=.odt");
+        assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
+        wikiEditPage = resultPage.editWiki();
+        regex = "(?<imageName>Test_accents & e\\$u <!-_\\.\\+\\*\\(\\);\\?:\\\\@=_html_[\\w]+\\.png)";
+        pattern = Pattern.compile(regex, Pattern.MULTILINE);
+        matcher = pattern.matcher(wikiEditPage.getContent());
+        assertTrue(matcher.find());
+        imageName = matcher.group("imageName");
+        resultPage = wikiEditPage.clickCancel();
+        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        assertEquals(4, attachmentsPane.getNumberOfAttachments());
+
+        // the \ before the @ needs to be removed as it's not in the filename
+        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replaceAll("\\\\@", "@")));
         deletePage(testName);
     }
 

@@ -124,6 +124,10 @@ $response.setContentType("application/json")
       'children': true,
       'state': {
         'selected': $selected
+      },
+      'a_attr': {
+        'href': $pageDoc.getURL('view'),
+        'class': 'jstree-no-links'
       }
     }))
   #elseif ($type == 'freePages')

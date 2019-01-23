@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Upravte domovskou stránku aplikace.
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Přizpůsobte domovskou stránku aplikace.
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Název aplikace
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries

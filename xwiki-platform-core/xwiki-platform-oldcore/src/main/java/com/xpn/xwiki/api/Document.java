@@ -281,7 +281,7 @@ public class Document extends Api
      *         {@code getDocumentReference().getParent().getName()}.
      * @see #getPageReference()
      * @see #getDocumentReference()
-     * @deprecated since 11.0RC1, use {@link #getDocumentReference()} instead
+     * @deprecated since 11.0, use {@link #getDocumentReference()} instead
      */
     @Deprecated
     public String getName()

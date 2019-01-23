@@ -61,21 +61,21 @@ public class FilesystemStoreTools implements Initializable
     /**
      * The directory within each document's directory where the document's attachments are stored.
      * 
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String ATTACHMENTS_DIR_NAME = "attachments";
 
     /**
      * The directory within each document's directory for attachments which have been deleted.
      * 
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String DELETED_ATTACHMENTS_DIR_NAME = "deleted-attachments";
 
     /**
      * The directory within each document's directory for documents which have been deleted.
      * 
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String DELETED_DOCUMENTS_DIR_NAME = "deleted-documents";
 
@@ -245,7 +245,7 @@ public class FilesystemStoreTools implements Initializable
 
     /**
      * @return the absolute path to the directory where the files are stored.
-     * @since 11.0RC1
+     * @since 11.0
      */
     public File getStoreRootDirectory()
     {
@@ -268,7 +268,7 @@ public class FilesystemStoreTools implements Initializable
     /**
      * @param attachmentReference the attachment reference
      * @return the attachment directory
-     * @since 11.0RC1
+     * @since 11.0
      */
     public File getAttachmentDir(final AttachmentReference attachmentReference)
     {
@@ -286,7 +286,7 @@ public class FilesystemStoreTools implements Initializable
      * @param attachment the attachment to get the file for.
      * @param index the index of the deleted attachment.
      * @return a directory which will be repeatable only with the same inputs.
-     * @since 11.0RC1
+     * @since 11.0
      */
     public File getDeletedAttachmentDir(final AttachmentReference attachment, final long index)
     {
@@ -305,7 +305,7 @@ public class FilesystemStoreTools implements Initializable
      * @param documentReference the document to get the file for.
      * @param index the index of the deleted document.
      * @return a directory which will be repeatable only with the same inputs.
-     * @since 11.0RC1
+     * @since 11.0
      */
     public File getDeletedDocumentContentDir(final DocumentReference documentReference, final long index)
     {
@@ -343,7 +343,7 @@ public class FilesystemStoreTools implements Initializable
      * @param documentReference the DocumentReference for the document to get the directory for.
      * @return a file path corresponding to the attachment location; each segment in the path is URL-encoded in order to
      *         be safe.
-     * @since 11.0RC1
+     * @since 11.0
      */
     public File getDocumentContentDir(final DocumentReference documentReference)
     {

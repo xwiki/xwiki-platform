@@ -50,7 +50,7 @@ public class ResourceType
      * @param id see {@link #getId()}
      * @param isStatic see {@link #isStatic()}
      *
-     * @since 11.0RC1
+     * @since 11.0
      */
     @Unstable
     public ResourceType(String id, boolean isStatic)
@@ -104,7 +104,7 @@ public class ResourceType
      * directly by the Servlet Container without going through XWiki processing and handling
      * (e.g: a ResourcesResource or a SkinResource)
      *
-     * @since 11.0RC1
+     * @since 11.0
      */
     @Unstable
     public boolean isStatic()

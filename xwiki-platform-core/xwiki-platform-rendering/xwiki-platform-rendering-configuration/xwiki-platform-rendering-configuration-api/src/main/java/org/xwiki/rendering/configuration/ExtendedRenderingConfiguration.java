@@ -85,7 +85,7 @@ public interface ExtendedRenderingConfiguration
 
     /**
      * @return the default Syntax to use when creating new content (Documents, etc).
-     * @since 11.0RC1
+     * @since 11.0
      */
     @Unstable
     default Syntax getDefaultContentSyntax()

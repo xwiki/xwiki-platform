@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Customize your application homepage
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Customize the application homepage
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Application name
 appWithinMinutes.classEditor.title={0} Structure
 appWithinMinutes.templateProviderEditor.title={0} Entries</content>

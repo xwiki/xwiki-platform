@@ -53,7 +53,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * support long references.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.0
  */
 @Component
 @Named("R1100000XWIKI15620")

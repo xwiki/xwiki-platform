@@ -44,7 +44,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Base class used by migrations on file store.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.0
  */
 public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDataMigration implements Initializable
 {

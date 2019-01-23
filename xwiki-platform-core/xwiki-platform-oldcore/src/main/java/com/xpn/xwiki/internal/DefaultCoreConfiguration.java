@@ -70,7 +70,7 @@ public class DefaultCoreConfiguration implements CoreConfiguration
     /**
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      * @since 2.3M1
-     * @deprecated starting with 11.0RC1, use
+     * @deprecated starting with 11.0, use
      *     {@link org.xwiki.rendering.configuration.ExtendedRenderingConfiguration#getDefaultContentSyntax()}
      */
     @Override

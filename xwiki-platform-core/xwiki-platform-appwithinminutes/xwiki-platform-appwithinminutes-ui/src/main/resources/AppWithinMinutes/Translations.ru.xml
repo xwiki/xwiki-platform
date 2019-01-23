@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Настройка домашней �
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Персонализировать домашнюю страницу приложения
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Название приложения
 appWithinMinutes.classEditor.title={0} Структура
 appWithinMinutes.templateProviderEditor.title={0} Записей

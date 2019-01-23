@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Pielāgojiet lietotnes izskatu
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Pielāgojiet lietotnes sākuma lapu
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Lietotnes nosaukums
 appWithinMinutes.classEditor.title={0} struktūra
 appWithinMinutes.templateProviderEditor.title={0} ieraksti

@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * Tests of {@link XarExtensionScriptService}.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.0
  */
 @ComponentTest
 public class XarExtensionScriptServiceTest

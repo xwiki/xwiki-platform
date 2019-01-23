@@ -25,7 +25,7 @@ import org.apache.commons.io.FilenameUtils;
  * Internal class for providing static utilities used by multiple classes in this package.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.0
  */
 public final class StoreFileUtils
 {
@@ -47,7 +47,7 @@ public final class StoreFileUtils
      * @param versionName the name of the version of the file. This will also be URL encoded.
      * @return a string representing the filename and version which is guaranteed not to collide with any other file
      *         gotten through DefaultFilesystemStoreTools.
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static String getStoredFilename(final String filename, final String versionName)
     {

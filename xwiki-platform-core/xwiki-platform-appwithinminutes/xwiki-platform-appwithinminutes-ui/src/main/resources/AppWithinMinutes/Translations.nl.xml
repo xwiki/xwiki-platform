@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Pas de homepage van uw applicatie aan
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Personaliseer de homepage van uw applicatie.
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Applicatienaam
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries

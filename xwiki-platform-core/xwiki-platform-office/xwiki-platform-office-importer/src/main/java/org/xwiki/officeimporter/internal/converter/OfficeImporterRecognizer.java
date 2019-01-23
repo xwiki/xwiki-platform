@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
  * Recognizes office formats.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.0
  */
 @Role
 public interface OfficeImporterRecognizer

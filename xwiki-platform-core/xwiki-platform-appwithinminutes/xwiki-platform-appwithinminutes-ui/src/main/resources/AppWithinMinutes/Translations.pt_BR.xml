@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Personalize a página inicial da sua 
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Personalize a página inicial da sua aplicação.
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Nome da Aplicação
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries

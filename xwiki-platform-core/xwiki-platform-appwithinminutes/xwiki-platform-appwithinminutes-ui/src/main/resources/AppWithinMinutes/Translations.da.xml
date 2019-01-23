@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Design din Minut-apps startside
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Gør startsiden for din Minut-app personlig.
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries

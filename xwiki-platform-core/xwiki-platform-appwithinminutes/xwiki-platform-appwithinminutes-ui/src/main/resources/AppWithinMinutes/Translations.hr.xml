@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep3Title=Prilagodite početnu stranicu vaše a
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Prilagodite početnu stranicu aplikacije
 
-### Since 11.0RC1
+### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
 appWithinMinutes.classEditor.title=Struktura aplikacije {0}
 appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}

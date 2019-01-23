@@ -85,7 +85,7 @@ public class XWikiContextContextStore extends AbstractContextStore
      * Name of the entry containing the secure document.
      * 
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String PROP_SECURE_DOCUMENT = "secureDocument";
 
@@ -115,7 +115,7 @@ public class XWikiContextContextStore extends AbstractContextStore
      * The suffix of the entry containing the request context path (usually the first element of the URL path.
      * 
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String SUFFIX_PROP_REQUEST_CONTEXTPATH = "contextpath";
 
@@ -145,7 +145,7 @@ public class XWikiContextContextStore extends AbstractContextStore
      * Name the entry containing the request context path (usually the first element of the URL path.
      * 
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String PROP_REQUEST_CONTEXTPATH = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_CONTEXTPATH;
 

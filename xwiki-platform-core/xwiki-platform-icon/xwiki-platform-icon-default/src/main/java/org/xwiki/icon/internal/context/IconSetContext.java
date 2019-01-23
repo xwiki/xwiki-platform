@@ -32,7 +32,7 @@ import org.xwiki.icon.IconSet;
  * 
  * @version $Id$
  * @since 10.11.1
- * @since 11.0RC1
+ * @since 11.0
  */
 @Component(roles = IconSetContext.class)
 @Singleton

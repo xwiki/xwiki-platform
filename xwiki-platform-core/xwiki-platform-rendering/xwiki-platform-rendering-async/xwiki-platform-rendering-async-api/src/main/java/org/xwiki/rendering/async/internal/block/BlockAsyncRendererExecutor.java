@@ -45,7 +45,7 @@ public interface BlockAsyncRendererExecutor
      * @throws JobException when failing to start the job
      * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     Block execute(BlockAsyncRendererConfiguration configuration) throws JobException, RenderingException;
 
@@ -58,7 +58,7 @@ public interface BlockAsyncRendererExecutor
      * @throws JobException when failing to start the job
      * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     Block execute(BlockAsyncRenderer renderer, AsyncRendererConfiguration configuration)
         throws JobException, RenderingException;

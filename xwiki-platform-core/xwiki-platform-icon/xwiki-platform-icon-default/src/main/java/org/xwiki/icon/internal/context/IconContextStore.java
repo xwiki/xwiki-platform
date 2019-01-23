@@ -39,7 +39,7 @@ import org.xwiki.icon.IconSetManager;
  * 
  * @version $Id$
  * @since 10.11.1
- * @since 11.0RC1
+ * @since 11.0
  */
 @Component
 @Singleton

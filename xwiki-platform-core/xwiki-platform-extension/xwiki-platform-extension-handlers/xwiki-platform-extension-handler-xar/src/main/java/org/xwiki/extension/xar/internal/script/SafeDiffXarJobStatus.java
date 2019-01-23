@@ -51,7 +51,7 @@ public class SafeDiffXarJobStatus extends SafeJobStatus<DiffXarJobStatus>
      * @param authorization the component used to check access rights
      * @since 9.11.9
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public SafeDiffXarJobStatus(DiffXarJobStatus status, ScriptSafeProvider<?> safeProvider,
         ContextualAuthorizationManager authorization)

@@ -2417,7 +2417,7 @@ public class XWiki implements EventListener
      * @param context current context for the request
      * @param queryParameters parameters to add to the URL
      * @return a resource URL for the asked filename
-     * @since 11.0RC1
+     * @since 11.0
      */
     @Unstable
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context,

@@ -131,5 +131,5 @@ macroEditor.changeMacro=Changer de Macro
 macroEditor.submit=Envoyer
 macroEditor.content=Contenu
 macroEditor.noParameters=Cette macro n'a aucun paramètres.
-macroEditor.descriptorRequestFailed=La reherche du descripteur de la macro {0} a échoué.</content>
+macroEditor.descriptorRequestFailed=La recherche du descripteur de la macro {0} a échoué.</content>
 </xwikidoc>

@@ -28,14 +28,14 @@ def builds = [
   'Main' : {
     build(
       name: 'Main',
-      profiles: 'legacy,integration-tests,office-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshotModules',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
     )
   },
   'Distribution' : {
     build(
       name: 'Distribution',
-      profiles: 'legacy,integration-tests,office-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshotModules',
       pom: 'xwiki-platform-distribution/pom.xml'
     )
   },

@@ -36,6 +36,8 @@
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Skip jacoco since we're not interested in coverage for test code (we would need tests for tests!) -->
+    <xwiki.jacoco.skip>true</xwiki.jacoco.skip>
   </properties>
   <modules>
     <module>xwiki-platform-linkchecker-test-pageobjects</module>

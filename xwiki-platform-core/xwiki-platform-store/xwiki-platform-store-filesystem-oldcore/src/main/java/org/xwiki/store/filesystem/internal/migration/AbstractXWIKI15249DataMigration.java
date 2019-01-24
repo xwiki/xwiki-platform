@@ -32,6 +32,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
+import com.xpn.xwiki.store.migration.DataMigrationException;
+
 /**
  * Migrations for XWIKI-15249. Make sure all attachments have the right content and archive store id.
  *
@@ -51,6 +53,19 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
     public AbstractXWIKI15249DataMigration(String tableName, String fieldName)
     {
         super(tableName, fieldName);
+    }
+
+    @Override
+    public void migrate() throws DataMigrationException
+    {
+        // This migration should only be executed if upgrading from > 10.1
+        int version = getCurrentDBVersion().getVersion();
+        if (version < 1001000 && version < 1004001) {
+            super.migrate();
+        } else {
+            this.logger
+                .info("Skipping the migration (it's only needed when migrating from a version greater than 10.1)");
+        }
     }
 
     protected File getDocumentContentDir(final DocumentReference documentReference)

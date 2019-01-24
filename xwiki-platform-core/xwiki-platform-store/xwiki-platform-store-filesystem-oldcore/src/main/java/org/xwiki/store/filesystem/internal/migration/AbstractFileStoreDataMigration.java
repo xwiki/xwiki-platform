@@ -129,5 +129,4 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
             }
         }
     }
-
 }

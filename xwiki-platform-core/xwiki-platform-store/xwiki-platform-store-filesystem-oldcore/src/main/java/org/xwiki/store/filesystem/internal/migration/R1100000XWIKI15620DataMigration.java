@@ -233,18 +233,18 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     private void migrateDeletedAttachments(File documentContentDirectory, DocumentReference documentReference)
         throws IOException
     {
-        File attachmentsDirectory =
+        File deletedAttachmentsDirectory =
             new File(documentContentDirectory, FilesystemStoreTools.DELETED_ATTACHMENTS_DIR_NAME);
 
-        if (attachmentsDirectory.isDirectory()) {
-            for (File oldDeletedAttachmentDirectory : attachmentsDirectory.listFiles()) {
+        if (deletedAttachmentsDirectory.isDirectory()) {
+            for (File oldDeletedAttachmentDirectory : deletedAttachmentsDirectory.listFiles()) {
                 if (oldDeletedAttachmentDirectory.isDirectory()) {
                     String folderName = FileSystemStoreUtils.decode(oldDeletedAttachmentDirectory.getName());
 
                     // Parse <attachmentName>-id<id>
                     int index = folderName.lastIndexOf('-');
                     String attachmentName = folderName.substring(0, index);
-                    int id = Integer.parseInt(folderName.substring(index + 3));
+                    long id = Long.parseLong(folderName.substring(index + 1));
 
                     AttachmentReference attachmentReference =
                         new AttachmentReference(attachmentName, documentReference);

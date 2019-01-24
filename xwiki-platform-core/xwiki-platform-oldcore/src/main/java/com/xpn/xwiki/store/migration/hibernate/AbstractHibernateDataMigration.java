@@ -22,6 +22,7 @@ package com.xpn.xwiki.store.migration.hibernate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -33,6 +34,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
+import com.xpn.xwiki.store.migration.DataMigrationManager;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
@@ -49,6 +51,10 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
      */
     @Inject
     protected ComponentManager componentManager;
+
+    @Inject
+    @Named(XWikiHibernateBaseStore.HINT)
+    protected Provider<DataMigrationManager> manager;
 
     /**
      * Execution context used to access XWikiContext.
@@ -125,5 +131,15 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     public String getLiquibaseChangeLog() throws DataMigrationException
     {
         return null;
+    }
+
+    /**
+     * @return the current DB version (after executing the previous migrations)
+     * @throws DataMigrationException when failing to get the current DB version
+     * @since 11.0
+     */
+    protected XWikiDBVersion getCurrentDBVersion() throws DataMigrationException
+    {
+        return this.manager.get().getDBVersion();
     }
 }

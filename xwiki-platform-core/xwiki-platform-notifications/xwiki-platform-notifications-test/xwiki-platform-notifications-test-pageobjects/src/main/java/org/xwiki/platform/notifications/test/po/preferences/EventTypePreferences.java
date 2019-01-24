@@ -23,7 +23,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BootstrapSwitch;
-import org.xwiki.stability.Unstable;
 
 /**
  * Wrap the notification preferences of a given event type.

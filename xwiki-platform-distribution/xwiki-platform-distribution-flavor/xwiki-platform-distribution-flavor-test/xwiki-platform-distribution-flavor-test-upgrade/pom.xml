@@ -98,6 +98,28 @@
                 <skip>${xwiki.test.skipUnpack}</skip>
               </configuration>
             </execution>
+            <!-- Unpack new flavor extensions -->
+            <!-- Unpack it first to not break previous version data -->
+            <execution>
+              <id>unzip-flavor</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
+                    <artifactId>${xwikiExecutionXIPArtifactId}</artifactId>
+                    <version>${project.version}</version>
+                    <type>xip</type>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${xwikiExecutionDirectory}/data/extension/repository</outputDirectory>
+                <!-- Allow skipping the unpack -->
+                <skip>${xwiki.test.skipUnpack}</skip>
+              </configuration>
+            </execution>
             <!-- Unpack old version of the application data -->
             <execution>
               <id>unzip-data</id>
@@ -115,27 +137,6 @@
                   </artifactItem>
                 </artifactItems>
                 <outputDirectory>${xwikiExecutionDirectory}/data/</outputDirectory>
-                <!-- Allow skipping the unpack -->
-                <skip>${xwiki.test.skipUnpack}</skip>
-              </configuration>
-            </execution>
-            <!-- Unpack new flavor extensions -->
-            <execution>
-              <id>unzip-flavor</id>
-              <phase>pre-integration-test</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>${xwiki.extension.distribution.ui.groupId}</groupId>
-                    <artifactId>${xwikiExecutionXIPArtifactId}</artifactId>
-                    <version>${project.version}</version>
-                    <type>xip</type>
-                  </artifactItem>
-                </artifactItems>
-                <outputDirectory>${xwikiExecutionDirectory}/data/extension/repository</outputDirectory>
                 <!-- Allow skipping the unpack -->
                 <skip>${xwiki.test.skipUnpack}</skip>
               </configuration>

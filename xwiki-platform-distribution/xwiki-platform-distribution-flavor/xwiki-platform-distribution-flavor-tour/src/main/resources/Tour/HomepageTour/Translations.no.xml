@@ -40,18 +40,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
 <content>## Homepage Tour (by steps order)
-### Missing: tour.homepageTour.welcome.title=Welcome to XWiki
-### Missing: tour.homepageTour.welcome.content=In the next couple of minutes you will discover your wiki's interface and basic functionalities.
-### Missing: tour.homepageTour.panels.title=Panels
+tour.homepageTour.welcome.title=Velkommen til XWiki
+tour.homepageTour.welcome.content=I løpet av de neste minuttene vil du oppdage wikiens grensesnitt og grunnleggende funksjoner.
+tour.homepageTour.panels.title=Paneler
 ### Missing: tour.homepageTour.panels.contentA=The current panels allow you to access your wiki's applications and pages.
-### Missing: tour.homepageTour.panels.contentB=Administrators can customize them and decide which panels are shown.
-### Missing: tour.homepageTour.breadcrumbs.title=Breadcrumbs
-### Missing: tour.homepageTour.breadcrumbs.contentA=The breadcrumbs allow you to identify where your page is located and navigate the hierarchy.
-### Missing: tour.homepageTour.breadcrumbs.contentB=The {0} button will always take you to the wiki''s home page.
-### Missing: tour.homepageTour.pageContent.title=Page Content
-### Missing: tour.homepageTour.pageContent.contentA=This is the place where the content of the current page is displayed.
-### Missing: tour.homepageTour.pageContent.contentB=Edit this page to add tables, lists, macros and structure in order to organize your knowledge.
-### Missing: tour.homepageTour.pageMenu.title=Page Menu
+tour.homepageTour.panels.contentB=Administratorer kan tilpasse dem og bestemme hvilke paneler som vises.
+tour.homepageTour.breadcrumbs.title=Brødsmuler
+tour.homepageTour.breadcrumbs.contentA=Brødsmulene lar deg identifisere hvor siden din er plassert og navigere i hierarkiet.
+tour.homepageTour.breadcrumbs.contentB=Knappen {0} tar deg alltid til wikiens hjemmeside.
+tour.homepageTour.pageContent.title=Sideinnhold
+tour.homepageTour.pageContent.contentA=Dette er stedet der innholdet på gjeldende side vises.
+tour.homepageTour.pageContent.contentB=Rediger denne siden for å legge til tabeller, lister, makroer og strukturer for å organisere kunnskapen din.
+tour.homepageTour.pageMenu.title=Sidemeny
 ### Missing: tour.homepageTour.pageMenu.contentA=This menu contains page related actions. With the appropriate rights, you can edit, create, administer or delete pages.
 ### Missing: tour.homepageTour.pageMenu.contentB=The {0} button reveals more actions like Export, Print and Share.
 ### Missing: tour.homepageTour.pageTabs.title=Page Tabs

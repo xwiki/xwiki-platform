@@ -28,6 +28,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.properties.internal.DefaultBeanManager;
@@ -44,8 +45,6 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -94,6 +93,9 @@ public class RssMacroTest
     @MockComponent
     private MacroContentParser contentParser;
 
+    @Mock
+    private RomeFeedFactory romeFeedFactory;
+
     @BeforeEach
     public void setup()
     {
@@ -119,16 +121,11 @@ public class RssMacroTest
     @Test
     public void testInvalidDocument() throws Exception
     {
-        // Use a Mock SyndFeedInput to control what it returns for the test.
-        Mockery mockery = new Mockery();
-        final RomeFeedFactory mockFactory = mockery.mock(RomeFeedFactory.class);
         final RssMacroParameters parameters = new RssMacroParameters();
         MacroExecutionException expectedException = new MacroExecutionException("Error");
-        mockery.checking(new Expectations() {{
-            oneOf(mockFactory).createFeed(with(same(parameters))); will(throwException(expectedException));
-        }});
-        this.macro.setFeedFactory(mockFactory);
+        when(romeFeedFactory.createFeed(parameters)).thenThrow(expectedException);
 
+        this.macro.setFeedFactory(romeFeedFactory);
         // Dummy URL since a feed URL is mandatory
         parameters.setFeed("http://www.xwiki.org");
 
@@ -151,18 +148,14 @@ public class RssMacroTest
         rssMacroParameters.setFeed("http://www.xwiki.org");
 
         MacroTransformationContext macroTransformationContext = mock(MacroTransformationContext.class);
-        Mockery mockery = new Mockery();
-        final RomeFeedFactory mockFactory = mockery.mock(RomeFeedFactory.class);
         File feedFile = new File("src/test/resources/feed1.xml");
 
         SyndFeed syndFeed = new SyndFeedInput().build(new XmlReader(new FileInputStream(feedFile), true,
             rssMacroParameters.getEncoding()));
 
-        mockery.checking(new Expectations() {{
-            oneOf(mockFactory).createFeed(with(same(rssMacroParameters))); will(returnValue(syndFeed));
-        }});
-        this.macro.setFeedFactory(mockFactory);
+        when(romeFeedFactory.createFeed(rssMacroParameters)).thenReturn(syndFeed);
         when(context.getProperty("RssMacro.feed")).thenReturn(syndFeed);
+        this.macro.setFeedFactory(romeFeedFactory);
 
         List<Block> expectedBlockList = Collections.singletonList(
             new GroupBlock(Collections.singletonList(new WordBlock("foo")))

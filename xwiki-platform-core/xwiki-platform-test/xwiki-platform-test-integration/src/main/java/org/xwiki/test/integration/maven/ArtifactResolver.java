@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.integration.maven;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,19 +62,23 @@ public class ArtifactResolver
 
     private static final String JAR = "jar";
 
-    private TestConfiguration testConfiguration;
+    private boolean isOffline;
+
+    private boolean isDebug;
 
     private RepositoryResolver repositoryResolver;
 
     private Map<String, List<ArtifactResult>> artifactResultCache = new HashMap<>();
 
     /**
-     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param isOffline if true then don't go out to resolve artifacts
+     * @param isDebug if true then display debugging messages in the standard output
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public ArtifactResolver(TestConfiguration testConfiguration, RepositoryResolver repositoryResolver)
+    public ArtifactResolver(boolean isOffline, boolean isDebug, RepositoryResolver repositoryResolver)
     {
-        this.testConfiguration = testConfiguration;
+        this.isOffline = isOffline;
+        this.isDebug = isDebug;
         this.repositoryResolver = repositoryResolver;
     }
 
@@ -155,7 +159,7 @@ public class ArtifactResolver
 
             DependencyNode node = collectResult.getRoot();
 
-            if (this.testConfiguration.isDebug()) {
+            if (this.isDebug) {
                 LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
                 node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
             }
@@ -164,7 +168,7 @@ public class ArtifactResolver
             t1 = System.currentTimeMillis();
             DependencyResult dependencyResult = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
-            if (this.testConfiguration.isDebug()) {
+            if (this.isDebug) {
                 LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
             }
 
@@ -205,7 +209,7 @@ public class ArtifactResolver
         // Since we want to be able to provision SNAPSHOT extensions, we need to configure the SNAPSHOT
         // extension repository. We do that by adding a dependency which will inject it automatically in the
         // default list of extension repositories.
-        if (this.testConfiguration == null || !this.testConfiguration.isOffline()) {
+        if (!this.isOffline) {
             Artifact artifact = new DefaultArtifact(COMMONS_GROUPID,
                 "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
             dependentArtifacts.add(artifact);

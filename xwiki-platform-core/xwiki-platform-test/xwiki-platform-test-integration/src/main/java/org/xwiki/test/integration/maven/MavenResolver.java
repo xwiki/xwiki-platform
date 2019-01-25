@@ -17,10 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.integration.maven;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -54,21 +55,21 @@ public class MavenResolver
 
     private Map<String, Model> modelCache = new HashMap<>();
 
-    private TestConfiguration testConfiguration;
+    private List<String> profiles;
 
     private ArtifactResolver artifactResolver;
 
     private RepositoryResolver repositoryResolver;
 
     /**
-     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param profiles the list of Maven profile to enable when reading/resolving pom files
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public MavenResolver(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+    public MavenResolver(List<String> profiles, ArtifactResolver artifactResolver,
         RepositoryResolver repositoryResolver)
     {
-        this.testConfiguration = testConfiguration;
+        this.profiles = profiles;
         this.artifactResolver = artifactResolver;
         this.repositoryResolver = repositoryResolver;
     }
@@ -111,7 +112,7 @@ public class MavenResolver
 
             DefaultModelBuildingRequest modelBuildingRequest = new DefaultModelBuildingRequest()
                 .setPomFile(pomFile)
-                .setActiveProfileIds(this.testConfiguration.getProfiles())
+                .setActiveProfileIds(this.profiles)
                 .setModelResolver(resolver)
                 // We don't care about many things in the POM such as plugins for example so asking for minimal
                 // validation.

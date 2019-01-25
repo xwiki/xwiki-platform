@@ -40,6 +40,9 @@ import org.xwiki.test.docker.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.junit5.servletEngine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.MavenResolver;
+import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -96,9 +99,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
 
         // Initialize resolvers.
-        RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration);
-        ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration, repositoryResolver);
-        MavenResolver mavenResolver = new MavenResolver(testConfiguration, artifactResolver, repositoryResolver);
+        RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
+        ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration.isOffline(),
+            testConfiguration.isDebug(), repositoryResolver);
+        MavenResolver mavenResolver =
+            new MavenResolver(testConfiguration.getProfiles(), artifactResolver, repositoryResolver);
 
         // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {

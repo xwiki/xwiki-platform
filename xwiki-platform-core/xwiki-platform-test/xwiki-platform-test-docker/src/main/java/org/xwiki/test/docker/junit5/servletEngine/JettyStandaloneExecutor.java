@@ -37,11 +37,11 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.test.docker.junit5.ArtifactResolver;
 import org.xwiki.test.docker.junit5.DockerTestUtils;
-import org.xwiki.test.docker.junit5.MavenResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.MavenResolver;
 
 /**
  * Create a Jetty Standalone packaging on the file system and start/stop Jetty.

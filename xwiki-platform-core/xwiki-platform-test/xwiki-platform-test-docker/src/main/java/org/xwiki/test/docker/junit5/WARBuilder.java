@@ -36,6 +36,9 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.MavenResolver;
+import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.tool.extension.util.ExtensionMojoHelper;
 
 /**

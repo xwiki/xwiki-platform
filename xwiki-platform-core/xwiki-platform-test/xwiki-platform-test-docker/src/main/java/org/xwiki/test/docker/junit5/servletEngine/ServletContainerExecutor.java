@@ -33,10 +33,10 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
-import org.xwiki.test.docker.junit5.ArtifactResolver;
-import org.xwiki.test.docker.junit5.MavenResolver;
-import org.xwiki.test.docker.junit5.RepositoryResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.MavenResolver;
+import org.xwiki.test.integration.maven.RepositoryResolver;
 
 import com.github.dockerjava.api.model.Image;
 

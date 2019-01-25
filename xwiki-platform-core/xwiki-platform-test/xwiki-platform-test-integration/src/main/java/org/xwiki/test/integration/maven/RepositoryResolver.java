@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.integration.maven;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,14 +57,14 @@ public class RepositoryResolver
 
     private List<RemoteRepository> repositories;
 
-    private TestConfiguration testConfiguration;
+    private boolean isOffline;
 
     /**
-     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param isOffline if true then don't go out to resolve artifacts
      */
-    public RepositoryResolver(TestConfiguration testConfiguration)
+    public RepositoryResolver(boolean isOffline)
     {
-        this.testConfiguration = testConfiguration;
+        this.isOffline = isOffline;
         this.system = newRepositorySystem();
         this.repositories = newRemoteRepositories();
         this.systemSession = newSession(this.system);
@@ -124,7 +124,7 @@ public class RepositoryResolver
         LocalRepository localRepo = new LocalRepository(localRepoLocation);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
-        if (this.testConfiguration != null && this.testConfiguration.isOffline()) {
+        if (this.isOffline) {
             session.setOffline(true);
         }
 

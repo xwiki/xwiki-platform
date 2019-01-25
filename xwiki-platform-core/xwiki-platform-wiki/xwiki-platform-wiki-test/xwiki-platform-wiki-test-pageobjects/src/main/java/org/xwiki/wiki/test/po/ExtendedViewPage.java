@@ -19,6 +19,7 @@
  */
 package org.xwiki.wiki.test.po;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -31,7 +32,13 @@ public class ExtendedViewPage extends ViewPage
     public WikiIndexPage goToWikiIndex()
     {
         toggleDrawer();
-        wikiIndex.click();
+        // Calling click() doesn't have the expected result: the mouse is moved over the link (we can see that the
+        // link is hovered because it gets underlined and the link URL is displayed in the browser status bar) but
+        // the link does not seems to be clicked. If we pause the test and click the link ourselves everything
+        // is fine. So it seems this is a Selenium / WebDriver bug.
+        // The workaround is to use the Enter / Return key.
+        // TODO: try click() again when upgrading Selenium (we are quite late right now)
+        this.wikiIndex.sendKeys(Keys.RETURN);
         return new WikiIndexPage();
     }
 

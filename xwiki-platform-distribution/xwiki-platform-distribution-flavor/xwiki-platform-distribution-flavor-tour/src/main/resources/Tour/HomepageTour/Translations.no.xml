@@ -43,7 +43,7 @@
 tour.homepageTour.welcome.title=Velkommen til XWiki
 tour.homepageTour.welcome.content=I løpet av de neste minuttene vil du oppdage wikiens grensesnitt og grunnleggende funksjoner.
 tour.homepageTour.panels.title=Paneler
-### Missing: tour.homepageTour.panels.contentA=The current panels allow you to access your wiki's applications and pages.
+tour.homepageTour.panels.contentA=Det nåværende panelene gir deg enkel tilgang til wikiens programmer og sider.
 tour.homepageTour.panels.contentB=Administratorer kan tilpasse dem og bestemme hvilke paneler som vises.
 tour.homepageTour.breadcrumbs.title=Brødsmuler
 tour.homepageTour.breadcrumbs.contentA=Brødsmulene lar deg identifisere hvor siden din er plassert og navigere i hierarkiet.
@@ -60,7 +60,7 @@ tour.homepageTour.pageTabs.contentB=Du kan også legge ved filer, sammenligne si
 tour.homepageTour.header.title=Overskrift
 tour.homepageTour.header.contentA=Du kan søke etter innhold, se etter endringer i siden eller få tilgang til brukerprofilen din.
 tour.homepageTour.header.contentB=Knappen {0} åpner en skuff som inneholder wiki-relaterte handlinger som Administrasjon og oversikter.
-### Missing: tour.homepageTour.tourComplete.title=Tour Complete
-### Missing: tour.homepageTour.tourComplete.contentA=This completes your tour on XWiki's interface and basic functionalities.
-### Missing: tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.</content>
+tour.homepageTour.tourComplete.title=Rundreise fullført
+tour.homepageTour.tourComplete.contentA=Dette fullfører rundreisen din på XWiki-grensesnittet og grunnleggende funksjoner.
+tour.homepageTour.tourComplete.contentB=For mer informasjon om hver funksjon, gå til {0}dokumentasjonen{1}.</content>
 </xwikidoc>

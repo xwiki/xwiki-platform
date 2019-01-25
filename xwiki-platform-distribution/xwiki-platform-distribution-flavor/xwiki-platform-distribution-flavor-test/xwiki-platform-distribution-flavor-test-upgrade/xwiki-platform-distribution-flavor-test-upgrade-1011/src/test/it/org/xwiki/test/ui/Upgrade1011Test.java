@@ -24,6 +24,6 @@ package org.xwiki.test.ui;
  * 
  * @version $Id$
  */
-public class AllTests extends UpgradeTest
+public class Upgrade1011Test extends UpgradeTest
 {
 }

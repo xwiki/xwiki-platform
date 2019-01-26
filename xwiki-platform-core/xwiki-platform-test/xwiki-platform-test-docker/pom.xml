@@ -37,7 +37,7 @@
 
     <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
     <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
-    <selenium.version>3.141.59</selenium.version>
+    <selenium.version>3.14.0</selenium.version>
 
     <!-- selenium requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
          details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava

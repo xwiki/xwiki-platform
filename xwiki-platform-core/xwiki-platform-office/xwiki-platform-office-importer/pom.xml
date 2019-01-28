@@ -33,8 +33,8 @@
   <properties>
     <!-- Skipping revapi since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>53</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>57</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

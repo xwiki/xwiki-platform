@@ -48,6 +48,11 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class OfficeServerScriptServiceTest
 {
+
+    private final static String ERROR_PRIVILEGES = "Inadequate privileges.";
+
+    private static final String ERROR_FORBIDDEN = "Office server administration is forbidden for sub-wikis.";
+
     @InjectMockComponents
     private OfficeServerScriptService officeServerScriptService;
 
@@ -89,7 +94,7 @@ public class OfficeServerScriptServiceTest
         assertFalse(this.officeServerScriptService.startServer());
         verify(this.officeServer, never()).start();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
-            OfficeServerScriptService.ERROR_FORBIDDEN);
+            ERROR_FORBIDDEN);
     }
 
     @Test
@@ -100,7 +105,7 @@ public class OfficeServerScriptServiceTest
         assertFalse(this.officeServerScriptService.startServer());
         verify(this.officeServer, never()).start();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
-            OfficeServerScriptService.ERROR_PRIVILEGES);
+            ERROR_PRIVILEGES);
     }
 
     @Test
@@ -132,7 +137,7 @@ public class OfficeServerScriptServiceTest
         assertFalse(this.officeServerScriptService.stopServer());
         verify(this.officeServer, never()).stop();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
-            OfficeServerScriptService.ERROR_FORBIDDEN);
+            ERROR_FORBIDDEN);
     }
 
     @Test
@@ -143,7 +148,7 @@ public class OfficeServerScriptServiceTest
         assertFalse(this.officeServerScriptService.stopServer());
         verify(this.officeServer, never()).stop();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
-            OfficeServerScriptService.ERROR_PRIVILEGES);
+            ERROR_PRIVILEGES);
     }
 
     @Test

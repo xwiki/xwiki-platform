@@ -30,8 +30,6 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.UntypedRecordableEvent;
 
-import com.xpn.xwiki.plugin.activitystream.internal.DefaultRecordableEventConverter;
-
 /**
  * This event converter is used to properly store a {@link UntypedRecordableEvent} in database.
  * It overrides {@link DefaultRecordableEventConverter}.

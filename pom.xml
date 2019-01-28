@@ -32,7 +32,7 @@
   </parent>
   <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-tour</artifactId>
-  <version>1.2</version>
+  <version>1.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Tour Application - Parent POM</name>
   <description>Let users create tour guides for any page</description>
@@ -57,7 +57,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-tour.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-tour.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-tour/tree/master</url>
-    <tag>application-tour-1.2</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

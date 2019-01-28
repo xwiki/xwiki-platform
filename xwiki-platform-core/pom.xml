@@ -152,13 +152,6 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
-                    "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
-                    "annotation": "@org.xwiki.properties.annotation.PropertyMandatory",
-                    "justification": "Not a breackage in this context"
-                  }
                 ]
               }
             }

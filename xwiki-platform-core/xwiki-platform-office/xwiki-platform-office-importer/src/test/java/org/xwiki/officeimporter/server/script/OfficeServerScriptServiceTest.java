@@ -40,6 +40,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test the behaviour of {@link OfficeServerScriptService}.
+ *
+ * @version $Id$
+ */
 @ComponentTest
 public class OfficeServerScriptServiceTest
 {

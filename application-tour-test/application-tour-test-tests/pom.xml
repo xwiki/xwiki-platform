@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>application-tour-test</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
   </parent>
   <artifactId>application-tour-test-tests</artifactId>
   <name>Tour Application - Tests - Functional Tests</name>

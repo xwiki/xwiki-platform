@@ -80,11 +80,11 @@ public class DocumentEventRecorder
         String eventType;
 
         if (event instanceof DocumentCreatedEvent) {
-            eventType = EventType.ADD_ATTACHMENT;
+            eventType = EventType.CREATE;
         } else if (event instanceof DocumentUpdatedEvent) {
-            eventType = EventType.UPDATE_ATTACHMENT;
+            eventType = EventType.UPDATE;
         } else if (event instanceof DocumentDeletedEvent) {
-            eventType = EventType.DELETE_ATTACHMENT;
+            eventType = EventType.DELETE;
             // When we receive a DELETE event, the given document is blank and does not have version & hidden tag
             // properly set.
             currentDoc.setVersion(originalDoc.getVersion());

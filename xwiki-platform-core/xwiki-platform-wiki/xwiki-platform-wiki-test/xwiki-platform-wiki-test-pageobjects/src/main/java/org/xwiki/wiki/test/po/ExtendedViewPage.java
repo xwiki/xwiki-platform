@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 public class ExtendedViewPage extends ViewPage
 {
-    @FindBy(xpath = "//div[contains(@class, 'drawer-menu-item-text') and contains(text(), 'Wiki Index')]")
+    @FindBy(xpath = "//div[contains(@class, 'drawer-menu-item-text') and contains(text(), 'Wiki Index')]/..")
     private WebElement wikiIndex;
 
     public WikiIndexPage goToWikiIndex()

@@ -52,12 +52,12 @@ public class OfficeServerScriptService implements ScriptService
     /**
      * Error message used to indicate that office server administration is restricted for main wiki.
      */
-    private static final String ERROR_FORBIDDEN = "Office server administration is forbidden for sub-wikis.";
+    protected static final String ERROR_FORBIDDEN = "Office server administration is forbidden for sub-wikis.";
 
     /**
      * Error message used to indicate that the current user does not have enough rights to perform the requested action.
      */
-    private static final String ERROR_PRIVILEGES = "Inadequate privileges.";
+    protected static final String ERROR_PRIVILEGES = "Inadequate privileges.";
 
     /**
      * The object used to log messages.

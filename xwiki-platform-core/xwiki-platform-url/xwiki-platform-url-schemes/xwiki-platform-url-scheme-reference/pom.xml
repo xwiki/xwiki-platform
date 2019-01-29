@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url-schemes</artifactId>
-    <version>10.11.2</version>
+    <version>10.11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-scheme-reference</artifactId>
   <name>XWiki Platform - URL - Scheme - Reference Implementation</name>

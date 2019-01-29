@@ -36,14 +36,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.descriptor=Descriptor
-### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
-### Missing: admin.wiki.description=Describe your wiki (pretty name and description) and set its owner and homepage.
-### Missing: platform.wiki.admin.wiki.ownerProblemConfirmation=The new owner's user does not exist or it may come from a different wiki.\\nAre you sure you want to use it and continue with the save operation?
-### Missing: platform.wiki.admin.wiki.csrfInvalidError=Invalid security (CSRF) token. Please refresh the page and try again.
-### Missing: platform.wiki.admin.wiki.requiredFieldsError=The 'Homepage' field cannot be empty.
-### Missing: platform.wiki.admin.wiki.ownerWarning=Warning: Once you change this, the previous owner will lose their owner rights. If that is you, make sure you do not lock yourself out of the wiki. If that happens by mistake, you will need to contact the main wiki's administrators or use the superadmin account.
+  <content>admin.wikis=Wikier
+admin.wikis.descriptor=Nøkkelord
+admin.wikis.descriptor.description=Konfigurer wiki-nøkkelord
+admin.wiki.description=Beskriv din wiki (navn og beskrivelse) og sett eier og hjemmeside.
+platform.wiki.admin.wiki.ownerProblemConfirmation=Den nye eierens bruker eksisterer ikke, eller den er fra en annen wiki.\\nEr du sikker på at du vil bruke den og fortsette med lagringsoperasjonen?
+platform.wiki.admin.wiki.csrfInvalidError=Ugyldig sikkerhetsnøkkel (CSRF). Oppdater siden og prøv igjen.
+platform.wiki.admin.wiki.requiredFieldsError=Feltet 'Hjemmeside' kan ikke være tomt.
+platform.wiki.admin.wiki.ownerWarning=Advarsel: Når du endrer dette, vil den forrige eieren miste eierrettighetene sine. Hvis det er deg, sørg for at du ikke låser deg selv ute av wikien. Hvis det skjer ved en feil, må du kontakte hovedwiki-administratoren eller bruke superadminkontoen.
 
 ###############################################################################
 ## Deprecated

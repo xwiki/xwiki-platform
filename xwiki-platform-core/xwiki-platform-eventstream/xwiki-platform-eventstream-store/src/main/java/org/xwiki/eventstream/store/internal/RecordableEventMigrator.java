@@ -42,7 +42,7 @@ import java.util.List;
  * Fix entries stored in the activity stream events table that have an absolute serialized reference in the "page"
  * field. It concerns some RecordableEvent generated between 9.2RC1 and 9.3RC1.
  *
- * @since 11.0RC1
+ * @since 11.1RC1
  * @version $Id$
  */
 @Component

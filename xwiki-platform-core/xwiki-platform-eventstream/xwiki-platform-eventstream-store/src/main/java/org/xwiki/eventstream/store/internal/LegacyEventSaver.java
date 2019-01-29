@@ -44,7 +44,7 @@ import java.util.Date;
 /**
  * Save an event into the legacy event store.
  *
- * @since 11.0RC1
+ * @since 11.1RC1
  * @version $Id$
  */
 @Component(roles = LegacyEventSaver.class)

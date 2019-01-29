@@ -30,7 +30,7 @@ import java.io.Serializable;
  *
  * TODO: migrate the database schema so we don't need to use this legacy class anymore.
  *
- * @since 11.0RC1
+ * @since 11.1RC1
  * @version $Id$
  */
 public class LegacyEventStatus implements Serializable

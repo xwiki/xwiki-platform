@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * Load events from the Legacy Event Store.
  *
- * @since 11.0RC1
+ * @since 11.1RC1
  * @version $Id$
  */
 @Component(roles = LegacyEventLoader.class)

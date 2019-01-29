@@ -357,7 +357,7 @@ public interface Event
 
     /**
      * @return if the event should be hidden or not
-     * @since 11.0RC1
+     * @since 11.1RC1
      */
     default boolean getHidden()
     {
@@ -366,7 +366,7 @@ public interface Event
 
     /**
      * @param isHidden if the event should be hidden or not
-     * @since 11.0RC1
+     * @since 11.1RC1
      */
     default void setHidden(boolean isHidden)
     {

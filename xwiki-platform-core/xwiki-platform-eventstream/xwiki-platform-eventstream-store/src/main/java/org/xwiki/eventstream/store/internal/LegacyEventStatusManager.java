@@ -44,7 +44,7 @@ import java.util.List;
  * Legacy implementation of {@link EventStatusManager} which use the Activity Stream storage.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.1RC1
  */
 @Component
 @Singleton

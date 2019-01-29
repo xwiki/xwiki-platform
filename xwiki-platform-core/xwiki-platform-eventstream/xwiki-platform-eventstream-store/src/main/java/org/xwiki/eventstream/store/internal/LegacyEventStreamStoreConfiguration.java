@@ -30,7 +30,7 @@ import javax.inject.Singleton;
  * Internal helper to get some configuration about the Legacy Event Store.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.1RC1
  */
 @Component(roles = LegacyEventStreamStoreConfiguration.class)
 @Singleton

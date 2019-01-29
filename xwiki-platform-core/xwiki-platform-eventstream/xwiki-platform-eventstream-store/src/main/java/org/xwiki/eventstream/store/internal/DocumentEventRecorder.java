@@ -47,7 +47,7 @@ import javax.inject.Singleton;
  * implementation).
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.1RC1
  */
 @Component(roles = DocumentEventRecorder.class)
 @Singleton

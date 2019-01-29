@@ -39,7 +39,7 @@ import javax.inject.Singleton;
  * Delete an event from the legacy event store.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.1RC1
  */
 @Component(roles = LegacyEventDeleter.class)
 @Singleton

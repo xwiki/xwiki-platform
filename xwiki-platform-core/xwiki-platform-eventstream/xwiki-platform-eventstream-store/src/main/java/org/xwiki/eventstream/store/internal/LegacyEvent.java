@@ -28,7 +28,7 @@ import java.util.Set;
  * TODO: migrate the database schema so we don't need to use this legacy class anymore.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.1RC1
  */
 public class LegacyEvent
 {

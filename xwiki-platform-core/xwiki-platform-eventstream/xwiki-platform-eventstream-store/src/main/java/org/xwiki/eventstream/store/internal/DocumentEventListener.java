@@ -53,7 +53,7 @@ import java.util.List;
  * implementation).
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.1RC1
  */
 @Component
 @Singleton

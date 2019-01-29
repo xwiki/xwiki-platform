@@ -42,7 +42,7 @@ import java.net.URL;
  * (which is used for the storage) and the opposite.
  *
  * @version $Id$
- * @since 11.0RC1
+ * @since 11.1RC1
  */
 @Component(roles = LegacyEventConverter.class)
 @Singleton

@@ -69,7 +69,7 @@
 
     <!-- Hibernate configuration -->
     <xwiki.db.common.extraMappings>
-      activitystream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
+      eventstream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
     </xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
@@ -104,7 +104,6 @@
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
   com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
-  com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin,\
   com.xpn.xwiki.plugin.tag.TagPlugin,\
   com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
     </platform.xwiki.cfg.plugins.default>

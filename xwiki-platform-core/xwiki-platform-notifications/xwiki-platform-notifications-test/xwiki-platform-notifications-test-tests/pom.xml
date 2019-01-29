@@ -35,12 +35,11 @@
       com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
-      com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin,\
       com.xpn.xwiki.plugin.scheduler.SchedulerPlugin
     </xwikiCfgPlugins>
-    <!-- Mapping needed by the ActivityStream migrator since AS is a dependency of the User Directory -->
+    <!-- Mapping needed by the EventStream migrator since AS is a dependency of the User Directory -->
     <!-- Mapping needed by the Mail Sender -->
-    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml,mailsender.hbm.xml,notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <xwikiDbHbmCommonExtraMappings>eventstream.hbm.xml,mailsender.hbm.xml,notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
   </properties>
@@ -114,13 +113,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activitystream-api</artifactId>
+      <artifactId>xwiki-platform-eventstream-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-default</artifactId>
+      <artifactId>xwiki-platform-eventstream-store</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -177,7 +176,7 @@
                in the classpath. -->
           <dependency>
             <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-activitystream-api</artifactId>
+            <artifactId>xwiki-platform-eventstream-store</artifactId>
             <version>${project.version}</version>
           </dependency>
           <dependency>

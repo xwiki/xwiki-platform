@@ -69,11 +69,11 @@
             </hibernateConfig>
           </configuration>
           <dependencies>
-            <!-- Since we're building XWiki Standard, we need to add the ActivityStream plugin as a dependency,
+            <!-- Since we're building XWiki Standard, we need to add the Event Stream Store as a dependency,
                  which has its own mapping and migrators. -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-activitystream-api</artifactId>
+              <artifactId>xwiki-platform-eventstream-store</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- Annotation has it own migrator that we need to execute to set the rigth version to the DB. -->

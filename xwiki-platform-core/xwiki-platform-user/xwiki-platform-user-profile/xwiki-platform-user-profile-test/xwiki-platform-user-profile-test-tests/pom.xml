@@ -37,9 +37,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- Mapping required by the Event Stream API implementation that we're using during tests (based on the old
-      ActivityStreamPlugin, see below). -->
-    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <!-- Mapping required by the Event Stream API implementation that we're using during tests. -->
+    <xwikiDbHbmCommonExtraMappings>eventstream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>
@@ -48,11 +47,9 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- We need to package an implementation of the Event Stream API and the only implementation available ATM is based
-      on the old ActivityStreamPlugin. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-activitystream-api</artifactId>
+      <artifactId>xwiki-platform-eventstream-store</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -86,11 +83,11 @@
           </execution>
         </executions>
         <dependencies>
-          <!-- Need explicit dependency here so the package tool does not fail to find activitystream.hbm.xml in the
+          <!-- Need explicit dependency here so the package tool does not fail to find eventstream.hbm.xml in the
                classpath (see above). -->
           <dependency>
             <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-activitystream-api</artifactId>
+            <artifactId>xwiki-platform-eventstream-store</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
           </dependency>

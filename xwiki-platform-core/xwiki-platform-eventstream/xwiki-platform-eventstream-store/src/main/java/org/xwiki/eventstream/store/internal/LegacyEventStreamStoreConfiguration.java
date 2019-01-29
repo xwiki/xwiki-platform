@@ -36,7 +36,7 @@ import javax.inject.Singleton;
 @Singleton
 public class LegacyEventStreamStoreConfiguration
 {
-    private static final String LEGACY_PREFERENCE_PREFIX = "xwiki.eventstream.store.legacy.";
+    private static final String LEGACY_PREFERENCE_PREFIX = "xwiki.plugin.activitystream.";
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -59,6 +59,7 @@ public class LegacyEventStreamStoreConfiguration
             return true;
         }
 
+        // TODO: introduce new properties in xwiki.properties and deprecated the old ones
         return configurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "uselocalstore", 1).equals(1);
     }
 
@@ -76,6 +77,7 @@ public class LegacyEventStreamStoreConfiguration
             return false;
         }
 
+        // TODO: introduce new properties in xwiki.properties and deprecated the old ones
         return configurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "usemainstore", 1).equals(1);
     }
 }

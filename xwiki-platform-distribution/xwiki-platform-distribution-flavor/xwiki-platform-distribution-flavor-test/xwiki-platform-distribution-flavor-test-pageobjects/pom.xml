@@ -82,11 +82,6 @@
       <artifactId>xwiki-platform-tag-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-watchlist-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>cpsuite</groupId>

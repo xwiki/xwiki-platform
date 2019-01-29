@@ -124,12 +124,6 @@
               <artifactId>xwiki-platform-mail-send-storage</artifactId>
               <version>${project.version}</version>
             </dependency>
-            <!-- Watchlist API has a migrator to change property types from StaticList to DBList -->
-            <dependency>
-              <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-watchlist-api</artifactId>
-              <version>${project.version}</version>
-            </dependency>
             <!-- Notification Filters Default module has a migrator to handle scope filter preferences -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>

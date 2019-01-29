@@ -86,6 +86,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
       var deleteTree = questionForm.find('.deleteTree');
 
       if (deleteTree.length) {
+        deleteTree.addClass('jstree-no-links');
         // Register data callback
         questionForm.data('job-answer-properties-extra', getAnswerProperties);
 

@@ -142,7 +142,7 @@
           <dependencies>
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-activitystream-api</artifactId>
+              <artifactId>xwiki-platform-eventstream-store</artifactId>
               <version>${project.version}</version>
               <scope>runtime</scope>
             </dependency>

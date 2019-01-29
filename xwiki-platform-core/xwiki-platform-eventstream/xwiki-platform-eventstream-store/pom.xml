@@ -36,6 +36,12 @@
             <artifactId>xwiki-platform-eventstream-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Dependency to make sure there is a default implementation of RecordableEventConverter -->
+        <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-eventstream-default</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-component-wiki</artifactId>

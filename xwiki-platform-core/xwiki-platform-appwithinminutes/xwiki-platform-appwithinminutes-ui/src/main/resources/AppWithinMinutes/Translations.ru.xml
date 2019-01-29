@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Приложение за несколь
 platform.appwithinminutes.description=Создать веб-приложение для совместной работы на основе мощной системы управления структурированными данными в течение нескольких минут.
 platform.appwithinminutes.createAppButtonLabel=Создать приложение
 platform.appwithinminutes.appsLiveTableHeading=Приложения
-platform.appwithinminutes.appsLiveTable.doc.space=Название приложения
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Последний автор
 platform.appwithinminutes.appsLiveTable.doc.date=Дата изменения
 platform.appwithinminutes.appsLiveTable._actions=Действия
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Такое приложение �
 platform.appwithinminutes.appNameEmptyError=Пожалуйста, введите название приложения.
 
 ### Wizard Step 2: Application Structure
-appWithinMinutes.classEditor.title={0} Структура
 platform.appwithinminutes.classEditorPaletteTitle=Палитра полей
 platform.appwithinminutes.classEditorPaletteHint=Перетяните поля из палитры для создание формы.
 platform.appwithinminutes.classEditorCanvasHint=Перетяните поля из палитры в эту область.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Идентиф�
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Добавить
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Удалить
 
-appWithinMinutes.templateProviderEditor.title={0} Записей
 appWithinMinutes.templateProviderEditor.hint=Записи приложения - это вики-страницы, которые содержат структурированные данные.
 appWithinMinutes.templateProviderEditor.icon.hint=Значок, связанный с приложением.
 appWithinMinutes.templateProviderEditor.description.hint=Короткое описание приложения.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Изображения
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Специальная колонка для демонстрации изображений, которые прикреплены к странице
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Аватар
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Специальная колонка для вывода аватара пользователя. Работает только в случае связи таблицы с классом XWiki.XWikiUsers
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Описание дает краткую информацию о том, что приложение делает и какие данные использует.
 platform.appwithinminutes.liveTableEditorColumnsHint=Выберите колонки, которые вы хотите включить в интерактивную таблицу LiveTable на домашней странице вашего приложения.
 platform.appwithinminutes.liveTableEditorSaveComment=Обновить интерактивную таблицу LiveTable
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Внешний вид
 platform.appwithinminutes.wizardStep3Title=Настройка домашней страницы приложения
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Персонализировать домашнюю страницу приложения
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Название приложения
+appWithinMinutes.classEditor.title={0} Структура
+appWithinMinutes.templateProviderEditor.title={0} Записей
 </content>
 </xwikidoc>

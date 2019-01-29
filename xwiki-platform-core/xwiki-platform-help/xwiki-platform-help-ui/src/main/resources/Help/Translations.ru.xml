@@ -44,6 +44,7 @@ help.tipsPanel.jumpToPageTip=Перейти на любую страницу в 
 help.tipsPanel.improveXWikiTip=Знаете ли вы, что вы можете улучшить XWiki? Потратьте 5 минут, чтобы [[заполнить этот опрос&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] и помочь этому проекту с открытым исходным кодом!
 help.tipsPanel.breadcrumbsTip=Вы можете нажать на стрелки рядом с элементами хлебной крошки, чтобы быстро перейти к родственным и дочерним страницам.
 help.tipsPanel.advancedHiddenShortcutTip=Нажмите сочетание клавиш x+x+x+a, чтобы переключить [[Расширенный режим&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] и x+x+x+h для переключения отображения [[скрытых страниц&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
 help.macroList.title=Доступные макросы
 help.macroList.id=ID
 help.macroList.name=Название

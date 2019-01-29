@@ -76,7 +76,7 @@ annotations.action.create.error.unauthorized=Vous n'êtes pas autorisé à annot
 annotations.action.create.error.unauthorizedguest=Vous n'êtes pas autorisé à annoter ce document. Commencez par vous identifier.
 annotations.action.create.helpmessage=Pour annoter un texte, sélectionnez-le puis appuyez sur {0}.
 annotations.action.create.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents rédigés en syntaxe XWiki 1.0.
-annotations.action.create.error.notarget=Pas de cible (page) spécifiée pour créer une annotation.
+annotations.action.create.error.notarget=Aucune cible (page) spécifiée pour créer une annotation.
 
 annotations.action.view.hide.text=masquer
 annotations.action.view.form.loaderror=Échec :

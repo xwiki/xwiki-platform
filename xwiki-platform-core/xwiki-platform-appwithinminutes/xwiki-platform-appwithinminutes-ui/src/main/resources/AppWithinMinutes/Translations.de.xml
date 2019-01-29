@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Anwendung erstellen in wenigen Minuten
 platform.appwithinminutes.description=Erstellen Sie kollaborative Web-Anwendungen in wenigen Minuten, basierend auf der XWiki Plattform und deren strukturierter Datenverwaltung.
 platform.appwithinminutes.createAppButtonLabel=Anwendung erstellen
 platform.appwithinminutes.appsLiveTableHeading=Anwendungen
-platform.appwithinminutes.appsLiveTable.doc.space=Anwendungsname
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Letzter Autor
 platform.appwithinminutes.appsLiveTable.doc.date=Änderungsdatum
 platform.appwithinminutes.appsLiveTable._actions=Aktionen
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Diese Anwendung gibt es schon. We
 platform.appwithinminutes.appNameEmptyError=Bitte geben Sie der Anwendung einen Namen.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Felder-Palette
 platform.appwithinminutes.classEditorPaletteHint=Ziehen Sie Felder aus dieser Palette in den Inhaltsbereich, um die Datenstruktur zu erzeugen.
 platform.appwithinminutes.classEditorCanvasHint=Ziehen Sie Felder aus der Felder-Palette in diesen Bereich, um die Datenstruktur zu erzeugen.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Hinzufügen
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Löschen
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Bilder
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Eine spezielle Spalte, um Bilder für einen Eintrag anzuzeigen
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Eine spezielle Spalte, die Benutzeravatare anzeigt. Sie funktioniert nur, wenn in der Datenstruktur Benutzer verwendet werden.
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Die Beschreibung ist eine Zusammenfassung, wozu die Anwendung gut ist und was für Daten sie verwaltet.
 platform.appwithinminutes.liveTableEditorColumnsHint=Wählen Sie die Spalten aus, die in der Tabelle auf der Startseite der Anwendung dargestellt werden.
 platform.appwithinminutes.liveTableEditorSaveComment=Tabelle aktualisieren
@@ -246,5 +245,10 @@ platform.appwithinminutes.wizardStep3Name=Anzeige
 platform.appwithinminutes.wizardStep3Title=Passen Sie die Startseite Ihrer Anwendung an.
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Geben Sie der Startseite Ihrer Anwendung ein eigenes Aussehen.
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Anwendungsname
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

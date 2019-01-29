@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livetable</artifactId>
-    <version>10.11.2-SNAPSHOT</version>
+    <version>10.11.2</version>
   </parent>
   <artifactId>xwiki-platform-livetable-ui</artifactId>
   <name>XWiki Platform - Livetable - UI</name>

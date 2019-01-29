@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>10.11.2-SNAPSHOT</version>
+    <version>10.11.2</version>
   </parent>
   <artifactId>xwiki-platform-store-serialization</artifactId>
   <name>XWiki Platform - Store - Serialization</name>

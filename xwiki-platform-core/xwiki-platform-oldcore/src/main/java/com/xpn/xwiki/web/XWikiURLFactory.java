@@ -167,7 +167,7 @@ public interface XWikiURLFactory
      * @param url the base URL to which add some query parameters
      * @param queryParameters the map of query parameters to add
      * @return a new URL containing the given query parameters
-     * @since 11.0
+     * @since 11.1RC1
      */
     @Unstable
     URL addQueryParameters(URL url, Map<String, String> queryParameters);

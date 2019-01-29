@@ -20,6 +20,12 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.inject.Provider;
 
@@ -49,6 +55,13 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
     public String getURL(boolean forceSkinAction) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+
+        URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
+        Map<String, String> parameters = new LinkedHashMap<>();
+        Path resourcePath = Paths.get(resourceUrl.toURI());
+        FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+        parameters.put("cache-version", String.valueOf(lastModifiedTime.toMillis()));
+
         XWikiURLFactory urlf = xcontext.getURLFactory();
 
         URL url;
@@ -59,6 +72,7 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
             url = urlf.createSkinURL(this.resourceName, getRepository().getId(), xcontext);
         }
 
+        url = urlf.addQueryParameters(url, parameters);
         return urlf.getURL(url, xcontext);
     }
 }

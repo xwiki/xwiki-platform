@@ -85,7 +85,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -2417,7 +2416,7 @@ public class XWiki implements EventListener
      * @param context current context for the request
      * @param queryParameters parameters to add to the URL
      * @return a resource URL for the asked filename
-     * @since 11.0
+     * @since 11.1RC1
      */
     @Unstable
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context,
@@ -2438,7 +2437,7 @@ public class XWiki implements EventListener
             if (skin != null) {
                 Resource<?> resource = skin.getResource(filename);
                 if (resource != null) {
-                    return createURLForResource(resource, forceSkinAction, queryParametersMap, context, urlf);
+                    return resource.getURL(forceSkinAction);
                 }
             } else {
                 // Try in the current parent skin
@@ -2446,7 +2445,7 @@ public class XWiki implements EventListener
                 if (parentSkin != null) {
                     Resource<?> resource = parentSkin.getResource(filename);
                     if (resource != null) {
-                        return createURLForResource(resource, forceSkinAction, queryParametersMap, context, urlf);
+                        return resource.getURL(forceSkinAction);
                     }
                 }
             }
@@ -2478,30 +2477,9 @@ public class XWiki implements EventListener
         return urlf.getURL(url, context);
     }
 
-    private String createURLForResource(Resource<?> resource, boolean forceSkinAction,
-        Map<String, String> queryParametersMap, XWikiContext context, XWikiURLFactory urlf) throws Exception
-    {
-        queryParametersMap.putAll(getResourceURLCacheParameters(resource));
-        String resourceUrlString = resource.getURL(forceSkinAction);
-        URL resourceUrl = new URIBuilder(resourceUrlString).build().toURL();
-        resourceUrl = urlf.addQueryParameters(resourceUrl, queryParametersMap);
-        return urlf.getURL(resourceUrl, context);
-    }
-
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
     {
         return getSkinFile(filename, forceSkinAction, context, new LinkedHashMap<>());
-    }
-
-    private Map<String, String> getResourceURLCacheParameters(Resource<?> resource)
-    {
-        try {
-            URL resourceUrl = getResource(resource.getPath());
-            return getResourceURLCacheParameters(resourceUrl);
-        } catch (MalformedURLException e) {
-            LOGGER.debug("Error while getting URL for resource path [{}]", resource.getPath(), e);
-            return Collections.singletonMap(CACHE_VERSION, getVersion());
-        }
     }
 
     private Map<String, String> getResourceURLCacheParameters(String resourceFilePath)

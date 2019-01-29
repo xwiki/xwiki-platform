@@ -472,20 +472,20 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       /// Add a tooltip to each switch
       ///
       $('.bootstrap-switch-id-notificationPageOnly').tooltip({
-        title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.page'))',
+        title: '$escapetool.javascript($services.localization.render('notifications.switches.tooltip.page'))',
         placement: 'bottom'
       });
-      var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
+      var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('notifications.switches.tooltip.pageAndChildren'))';
       if (xm.documentReference.name != 'WebHome') {
         // Adapt the tooltip when the current document is terminal
-        watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
+        watchSpaceToolTip = '$escapetool.javascript($services.localization.render('notifications.switches.tooltip.space'))';
       }
       $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
         title: watchSpaceToolTip,
         placement: 'bottom'
       });
       $('.bootstrap-switch-id-notificationWiki').tooltip({
-        title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.wiki'))',
+        title: '$escapetool.javascript($services.localization.render('notifications.switches.tooltip.wiki'))',
         placement: 'bottom'
       });
     }
@@ -520,7 +520,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
       }).fail (function() {
         notification.hide();
-        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('watchlist.notifications.changeStatusError'))', 'error');
+        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('notifications.switches.changeStatusError'))', 'error');
         allWatchSwitches.bootstrapSwitch('disabled', false);
       });
     };

@@ -107,7 +107,7 @@
   com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
     </platform.xwiki.cfg.plugins.default>
     <!-- Legacy plugin list -->
-    </platform.xwiki.cfg.plugins.legacy>
+    <platform.xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.default}</platform.xwiki.cfg.plugins.legacy>
     <xwiki.cfg.plugins.default>${platform.xwiki.cfg.plugins.default}</xwiki.cfg.plugins.default>
     <xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.legacy}</xwiki.cfg.plugins.legacy>
     <!-- Indicate the default list. -->

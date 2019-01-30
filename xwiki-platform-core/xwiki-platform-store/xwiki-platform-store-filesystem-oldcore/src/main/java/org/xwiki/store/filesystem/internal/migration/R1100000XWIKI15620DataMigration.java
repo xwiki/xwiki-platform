@@ -87,7 +87,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
 
         // Check if there is a filesystem store at all
         File[] children = oldStore.listFiles();
-        if (!ArrayUtils.isEmpty(children)) {
+        if (ArrayUtils.isEmpty(children)) {
             // Nothing to migrate
             return;
         }

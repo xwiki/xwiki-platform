@@ -43,6 +43,7 @@
     #set ($discard = $docextras.add(['History', 'history', $services.localization.render('docextra.history'), -1, 'historyinline.vm', $services.localization.render('core.shortcuts.view.history')]))
   #end
   #if ($showinformation)
+    $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
     #set ($discard = $docextras.add(['Information', 'information', $services.localization.render('docextra.information'), -1, 'informationinline.vm', $services.localization.render('core.shortcuts.view.information')]))
   #end
 #end

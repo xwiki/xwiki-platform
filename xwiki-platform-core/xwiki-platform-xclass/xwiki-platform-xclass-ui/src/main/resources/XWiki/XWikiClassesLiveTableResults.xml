@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.XWikiClassesLiveTableResults" locale="">
+<xwikidoc version="1.3" reference="XWiki.XWikiClassesLiveTableResults" locale="">
   <web>XWiki</web>
   <name>XWikiClassesLiveTableResults</name>
   <language/>
@@ -39,12 +39,20 @@
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 
 {{velocity wiki="false"}}
-#set ($extra = "and (doc.xWikiClassXML is not null and doc.xWikiClassXML like '&lt;%')")
-#set ($params = [])
-#if ("$!request.space" != '')
-  #set ($extra = "${extra} and doc.space = ?")
-  #set ($discard = $params.add($request.space))
+#if ($xcontext.action == 'get' &amp;&amp; $request.outputSyntax == 'plain')
+  ## Include only the pages that have a class definition.
+  #set ($extra = "and (doc.xWikiClassXML is not null and doc.xWikiClassXML like '&lt;%')")
+  #set ($params = [])
+  #addLivetableLocationFilter($extra $params $!request.location)
+  #set ($output = {})
+  #gridresultwithfilter_buildJSON('' $request.collist.split(',') '' $extra $params $output)
+  ## Compute the page count for each class.
+  #foreach ($row in $output.rows)
+    #set ($statement = ', BaseObject as obj where doc.translation = 0 and ' +
+      'doc.fullName = obj.name and obj.className = :className')
+    #set ($row.pageCount = $services.query.hql($statement).bindValue('className', $row.doc_fullName).count())
+  #end
+  #jsonResponse($output)
 #end
-#gridresultwithfilter('' $request.collist.split(',') '' $extra $params)
 {{/velocity}}</content>
 </xwikidoc>

@@ -105,8 +105,8 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
         });
     }
 
-    private void migrateMetadatas(Session session)
-        throws IOException, XMLStreamException, FactoryConfigurationError, ParserConfigurationException, SAXException
+    private void migrateMetadatas(Session session) throws IOException, XMLStreamException, FactoryConfigurationError,
+        ParserConfigurationException, SAXException, DataMigrationException
     {
         File storageLocationFile = getPre11StoreRootDirectory();
 
@@ -158,7 +158,7 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
     }
 
     private void storeDeletedAttachment(File directory, Session session)
-        throws ParserConfigurationException, SAXException, IOException
+        throws ParserConfigurationException, SAXException, IOException, DataMigrationException
     {
         this.logger.info("Storing attachment metadata [{}] in the database", directory);
 

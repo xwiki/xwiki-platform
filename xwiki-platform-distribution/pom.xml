@@ -99,7 +99,6 @@
   com.xpn.xwiki.plugin.svg.SVGPlugin,\
   com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
   com.xpn.xwiki.plugin.image.ImagePlugin,\
-  com.xpn.xwiki.plugin.diff.DiffPlugin,\
   com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
@@ -108,8 +107,6 @@
   com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
     </platform.xwiki.cfg.plugins.default>
     <!-- Legacy plugin list -->
-    <platform.xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.default},\
-  com.xpn.xwiki.plugin.watchlist.WatchListPlugin
     </platform.xwiki.cfg.plugins.legacy>
     <xwiki.cfg.plugins.default>${platform.xwiki.cfg.plugins.default}</xwiki.cfg.plugins.default>
     <xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.legacy}</xwiki.cfg.plugins.legacy>

@@ -38,11 +38,12 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.TemplateProviderMacros" /}}
 
+{{include reference="AppWithinMinutes.VelocityMacros" /}}
+
 {{velocity output="false"}}
-#macro (listAvailableColumns)
+#macro (listAvailableColumns $classReference)
   &lt;select id="availableColumns"&gt;
-    #set ($className = "$!liveTableObj.getValue('class')")
-    #set ($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
+    #set ($classFields = $xwiki.getDocument($classReference).getxWikiClass().properties)
     #if ($classFields.size() &gt; 0)
       &lt;optgroup label="$escapetool.xml($services.localization.render(
           'platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
@@ -126,10 +127,12 @@
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
     &lt;input type="hidden" name="xpage" value="plain" /&gt;
     ## We prevent the class name and the data space from being edited directly. They can be specified in the URL.
-    #displayPropertyValue('class', 'hidden')
+    #getAppClassReference($doc)
+    &lt;input type="hidden" name="AppWithinMinutes.LiveTableClass_0_class"
+      value="$escapetool.xml($services.model.serialize($classReference, 'local'))" /&gt;
     #displayPropertyValue('dataSpace', 'hidden')
     ## We have to pass the list of available columns to the JavaScript code.
-    #listAvailableColumns()
+    #listAvailableColumns($classReference)
   &lt;/div&gt;
   &lt;dl&gt;
     &lt;dt&gt;
@@ -154,20 +157,35 @@
   &lt;/dl&gt;
 #end
 
-#macro (displayIcon)
-  #if ($services.uix)
-    #set ($icon = 'icon:application')
-    #set ($templateProviderReference = "$stringtool.removeEnd($className, 'Class')TemplateProvider")
+#macro (getApplicationIcon $classReference)
+  #set ($applicationIcon = '')
+  ## Look for the corresponding UI extension.
+  #set ($uixPointId = 'org.xwiki.platform.panels.Applications')
+  #set ($uixObject = $doc.getObject('XWiki.UIExtensionClass', 'extensionPointId', $uixPointId))
+  #set ($uixId = $uixObject.getValue('name'))
+  #foreach ($uix in $services.uix.getExtensions($uixPointId))
+    #if ($uix.id == $uixId)
+      #set ($applicationIcon = $uix.parameters.icon)
+    #end
+  #end
+  #if ("$!applicationIcon" == '')
+    ## Fallback on the entry icon.
+    #set ($templateProviderReference = $services.model.createDocumentReference(
+      "$stringtool.removeEnd($classReference.name, 'Class')TemplateProvider",
+      $classReference.parent
+    ))
     #set ($entryIcon = $xwiki.getDocument($templateProviderReference).getValue('icon'))
     #if ("$!entryIcon" != '')
-      ## Use the entry icon by default, if set.
-      #set ($icon = "icon:$entryIcon")
+      #set ($applicationIcon = "icon:$entryIcon")
+    #else
+      #set ($applicationIcon = 'icon:application')
     #end
-    #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
-      #if ($uix.id == "platform.panels.${doc.space}Application" &amp;&amp; "$!uix.parameters.icon" != '')
-        #set ($icon = $uix.parameters.icon)
-      #end
-    #end
+  #end
+#end
+
+#macro (displayIcon)
+  #if ($services.uix)
+    #getApplicationIcon($classReference)
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;label for="applicationIcon"&gt;
@@ -179,7 +197,8 @@
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!escapetool.xml($icon)" /&gt;
+        &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10"
+          value="$!escapetool.xml($applicationIcon)" /&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
   #end

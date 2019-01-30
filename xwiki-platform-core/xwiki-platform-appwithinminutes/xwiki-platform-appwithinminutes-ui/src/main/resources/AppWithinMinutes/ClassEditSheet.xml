@@ -36,7 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{groovy}}
+  <content>{{include reference="AppWithinMinutes.VelocityMacros" /}}
+
+{{groovy}}
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Object;

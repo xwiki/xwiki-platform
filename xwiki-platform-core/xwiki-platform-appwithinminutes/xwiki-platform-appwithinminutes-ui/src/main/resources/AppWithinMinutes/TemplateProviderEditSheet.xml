@@ -38,6 +38,8 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.TemplateProviderMacros" /}}
 
+{{include reference="AppWithinMinutes.VelocityMacros" /}}
+
 {{velocity}}
 #if ("$!request.wizard" == 'true')
   {{include reference="AppWithinMinutes.WizardStep" /}}
@@ -47,12 +49,15 @@
 {{velocity output="false"}}
 #set ($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
 
-#macro (initializeTemplateProvider)
+#macro (updateHiddenTemplateProviderProperties)
   #set ($prefix = $stringtool.removeEnd($doc.documentReference.name, 'TemplateProvider'))
   #set ($discard = $doc.setTitle("$prefix Template Provider"))
   #set ($templateProviderObj = $doc.getObject('XWiki.TemplateProviderClass'))
   #set ($discard = $templateProviderObj.set('name', "${prefix.toLowerCase()}.entry.name"))
   #set ($discard = $templateProviderObj.set('template', $stringtool.removeEnd($doc.fullName, 'Provider')))
+#end
+
+#macro (initVisibleTemplateProviderProperties $templateProviderObj)
   #getAppReference
   #set ($localStringAppRef = $services.model.serialize($appReference, 'local'))
   #set ($icon = 'application')
@@ -109,8 +114,9 @@
 #macro (displayEditForm)
   #set ($discard = $xwiki.ssx.use('XWiki.TemplateProviderMacros'))
   #set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderMacros'))
+  #updateHiddenTemplateProviderProperties
   #if ($doc.isNew())
-    #initializeTemplateProvider
+    #initVisibleTemplateProviderProperties($templateProviderObj)
   #end
   &lt;div class="hidden"&gt;
     &lt;input type="hidden" name="title" value="$escapetool.xml($doc.title)" /&gt;

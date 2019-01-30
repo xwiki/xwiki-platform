@@ -95,36 +95,6 @@
     &lt;/span&gt;
   &lt;/div&gt;
 #end
-
-#macro (getAppReference)
-  #set ($appLocalRef = $doc.getValue('dataSpaceName'))
-  #if ("$!appLocalRef" != '')
-    ## Between 6.3M2 (XWIKI-11249) and 7.3RC1 (XWIKI-12741).
-    #set ($appReference = $services.model.resolveSpace($appLocalRef))
-  #else
-    ## Possible locations:
-    ## 1. same space (&lt;6.2M1, XWIKI-8757)
-    ## 2. sibling space (between 6.2M1 and 6.3M2)
-    ## 3. grand parent space (7.3RC1+)
-    #set ($appReferences = [
-      $doc.documentReference.parent,
-      $services.model.createSpaceReference($stringtool.removeEnd($doc.documentReference.name, 'TemplateProvider'),
-        $doc.documentReference.parent.parent),
-      $doc.documentReference.parent.parent
-    ])
-    #foreach ($item in $appReferences)
-      #set ($appReference = $item)
-      #if ($xwiki.getDocument($appReference).getObject($appDescriptorClassName))
-        #break
-      #end
-    #end
-  #end
-#end
-
-#macro (getAppTitle)
-  #getAppReference
-  #set ($appTitle = $xwiki.getDocument($appReference).plainTitle)
-#end
 {{/velocity}}
 
 {{velocity}}

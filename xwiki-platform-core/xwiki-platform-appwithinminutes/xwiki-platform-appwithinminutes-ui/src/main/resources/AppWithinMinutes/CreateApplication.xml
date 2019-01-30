@@ -36,7 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{include reference="AppWithinMinutes.VelocityMacros"/}}
+
+{{velocity}}
 #if ($request.wizard == 'true')
   {{include reference="AppWithinMinutes.WizardStep"/}}
 #end
@@ -92,10 +94,9 @@
   #getAppReference
   #getAppDescriptor($appReference)
   #if ($appDescriptor)
-    ## Edit an existing application. Use the configured class name.
-    #set ($appClassRef = $appDescriptor.getObject($appDescriptorClassName).getValue('class'))
-    ## The class reference is relative to the document holding the application descriptor.
-    #set ($appClassRef = $services.model.resolveDocument($appClassRef, 'explicit', $appDescriptor.documentReference))
+    ## Edit an existing application.
+    #getAppClassReference($appDescriptor)
+    #set ($appClassRef = $classReference)
   #else
     ## Create a new application. Use the default class name.
     #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
@@ -121,10 +122,8 @@
     #getAppDescriptor($appReference)
     #if ($appDescriptor)
       ## Edit an existing application.
-      #set ($appDescriptorObj = $appDescriptor.getObject($appDescriptorClassName))
-      #set ($appClassRef = $appDescriptorObj.getValue('class'))
-      ## The class reference is relative to the document holding the application descriptor.
-      #set ($appClassRef = $services.model.resolveDocument($appClassRef, 'explicit', $appDescriptor.documentReference))
+      #getAppClassReference($appDescriptor)
+      #set ($appClassRef = $classReference)
     #else
       ## Create a new application.
       #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
@@ -166,6 +165,8 @@
   #set ($appDescriptors = $services.query.xwql($appDescriptorStatement).bindValue('space', $localSpaceReference).execute())
   #if ($appDescriptors.size() &gt; 0)
     #set ($appDescriptor = $xwiki.getDocument($appDescriptors.get(0)))
+  #else
+    #set ($appDescriptor = $NULL)
   #end
 #end
 {{/velocity}}

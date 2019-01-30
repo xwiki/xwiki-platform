@@ -244,7 +244,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                     // Parse <attachmentName>-id<id>
                     int index = folderName.lastIndexOf('-');
                     String attachmentName = folderName.substring(0, index);
-                    long id = Long.parseLong(folderName.substring(index + 1));
+                    long id = Long.parseLong(folderName.substring(index + 3));
 
                     AttachmentReference attachmentReference =
                         new AttachmentReference(attachmentName, documentReference);

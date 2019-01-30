@@ -80,42 +80,47 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         return new XWikiDBVersion(1100000);
     }
 
+    private void migrateRoot(File newStore) throws DataMigrationException
+    {
+        // Move the whole store folder content to the new location
+        File oldStore = getPre11StoreRootDirectory();
+
+        // Check if there is a filesystem store at all
+        File[] children = oldStore.listFiles();
+        if (!ArrayUtils.isEmpty(children)) {
+            // Nothing to migrate
+            return;
+        }
+
+        this.logger.info("Moving content of folder [{}] to new location [{}]", oldStore, newStore);
+
+        for (File child : children) {
+            try {
+                FileUtils.moveToDirectory(child, newStore, true);
+            } catch (IOException e) {
+                throw new DataMigrationException("Failed to move old filesystem store to the new location", e);
+            }
+        }
+
+        // Get rid of old store
+        try {
+            Files.delete(oldStore.toPath());
+        } catch (IOException e) {
+            this.logger.warn("Failed to delete old store location [{}]", oldStore);
+        }
+    }
+
     @Override
     public void hibernateMigrate() throws XWikiException, DataMigrationException
     {
+        File newStore = this.fstools.getStoreRootDirectory();
+
         if (getXWikiContext().isMainWiki()) {
-            // Move the whole store folder content to the new location
-            File oldStore = getPre11StoreRootDirectory();
-
-            // Check if there is a filesystem store at all
-            File[] children = oldStore.listFiles();
-            if (ArrayUtils.isEmpty(children)) {
-                // Nothing to migrate
-                return;
-            }
-
-            File newStore = this.fstools.getStoreRootDirectory();
-
-            this.logger.info("Moving content of folder [{}] to new location [{}]", oldStore, newStore);
-
-            for (File child : children) {
-                try {
-                    FileUtils.moveToDirectory(child, newStore, true);
-                } catch (IOException e) {
-                    throw new DataMigrationException("Failed to move old filesystem store to the new location", e);
-                }
-            }
-
-            // Switch root store directory
-            setStoreRootDirectory(newStore);
-
-            // Get rid of old store
-            try {
-                Files.delete(oldStore.toPath());
-            } catch (IOException e) {
-                this.logger.warn("Failed to delete old store location [{}]", oldStore);
-            }
+            migrateRoot(newStore);
         }
+
+        // Set right root directory
+        setStoreRootDirectory(newStore);
 
         // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
         getStore().executeWrite(getXWikiContext(), session -> {

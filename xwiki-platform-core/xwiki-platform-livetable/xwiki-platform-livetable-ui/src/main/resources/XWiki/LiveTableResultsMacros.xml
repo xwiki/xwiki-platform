@@ -336,6 +336,7 @@
       #set ($translatedDoc = $itemDoc.translatedDocument)
     #end
     #set($discard = $itemDoc.use($className))
+    #set($discard = $row.put('doc_objectCount', $itemDoc.getObjectNumbers($className)))
     #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
     #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))

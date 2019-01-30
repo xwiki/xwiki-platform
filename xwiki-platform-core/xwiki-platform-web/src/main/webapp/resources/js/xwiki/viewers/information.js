@@ -48,6 +48,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 
   $(document).on('click', '#button-paste', function() {
     copyToClipboard('#reference-value');
-    alert("$services.localization.render('core.viewers.information.pageReference.copied')");
+    new XWiki.widgets.Notification("$services.localization.render('core.viewers.information.pageReference.copied')",
+      'info');
   });
 });

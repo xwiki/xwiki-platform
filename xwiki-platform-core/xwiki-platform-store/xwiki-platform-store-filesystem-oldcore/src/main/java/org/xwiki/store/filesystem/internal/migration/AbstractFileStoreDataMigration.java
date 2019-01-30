@@ -109,11 +109,16 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
         }
     }
 
-    protected DocumentReference getPre11DocumentReference(File directory) throws IOException
+    protected DocumentReference getPre11DocumentReference(File directory) throws DataMigrationException
     {
-        String name = FileSystemStoreUtils.decode(directory.getName());
+        try {
+            String name = FileSystemStoreUtils.decode(directory.getName());
 
-        return new DocumentReference(name, (SpaceReference) getPre11EntityReference(directory.getParentFile()));
+            return new DocumentReference(name, (SpaceReference) getPre11EntityReference(directory.getParentFile()));
+        } catch (Exception e) {
+            throw new DataMigrationException("Failed to get document reference for filesystem path [" + directory
+                + "] (root=" + getStoreRootDirectory() + ")");
+        }
     }
 
     protected void moveFolderContent(File sourceFolder, File toFolder) throws DataMigrationException

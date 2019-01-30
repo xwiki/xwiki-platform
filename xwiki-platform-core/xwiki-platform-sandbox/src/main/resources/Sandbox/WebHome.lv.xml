@@ -87,22 +87,21 @@ XWiki var veidot dažādus sarakstus:
 1. 1. līmeņa vienība
 
 = Tabulas =
-XWiki dokumentā var veidot tabulas: 
 
-== Vienkārša tabula ==
-| 1. šūna | 2. šūna | 3. šūna | 4. šūna | 5. šūna | 6. šūna | 7. šūna | 8. šūna | 9. šūna
+XWiki dokumentā var veidot tabulas:
 
 == Tabula ar virsrakstu 1. rindā ==
+
 |= tabulas virsraksts |= tabulas virsraksts |= tabulas virsraksts
 | šūna | šūna | šūna
 | šūna | šūna | šūna
 
 == Tabula ar virsrakstu 2. rindās ==
+
 |= tabulas virsraksts |= tabulas virsraksts
 |= tabulas virsraksts |= tabulas virsraksts
 | šūna | šūna 
 | šūna | šūna
-
 
 = Saites =
 XWiki dokumentā var veidot saites uz citām Xwiki lapām (šajā vietnē) un ārējām lapām: 
@@ -117,7 +116,6 @@ XWiki dokumentā var ievietot lapas pielikumā augšuplādētus attēlus:
 
 [[image:XWikiLogo.png]] 
 
-
 = Makrosi =
 Ar makrosiem var veidot dinamisku lapu saturu un tie paver daudz un dažādas iespējas. Ir arī makrosi īpašam teksta noformējumam, piemēram:
 
@@ -126,7 +124,6 @@ Ar makrosiem var veidot dinamisku lapu saturu un tie paver daudz un dažādas ie
 Sekojošais makross parāda tekstu brīdinājuma ziņojuma rāmī:
 
 {{warning}}Sveika pasaule!{{/warning}} 
-
 
 == Satura rādītājs ==
 

@@ -104,13 +104,7 @@ You can create various types of lists in your wiki pages:
 
 = 表格 =
 
-You can create simple tables right into wiki pages:
-
-== Simple table ==
-
-| cell 1 | cell 2 | cell 3
-| cell 4 | cell 5 | cell 6
-| cell 7 | cell 8 | cell 9
+You can create tables right into wiki pages:
 
 == Table with headers in the top row ==
 

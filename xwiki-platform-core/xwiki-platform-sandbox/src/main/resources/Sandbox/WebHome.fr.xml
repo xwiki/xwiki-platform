@@ -92,13 +92,7 @@ Vous pouvez créer divers types de listes dans vos pages wiki:
 
 = Tableaux =
 
-Vous pouvez créer des tableaux simples directement dans vos pages wiki :
-
-== Tableau simple ==
-
-| cellule 1 | cellule 2 | cellule 3
-| cellule 4 | cellule 5 | cellule 6
-| cellule 7 | cellule 8 | cellule 9
+Vous pouvez créer des tableaux directement dans vos pages wiki :
 
 == Tableau avec en-tête en première ligne ==
 

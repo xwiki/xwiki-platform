@@ -105,12 +105,6 @@ Du kan angive forskellige typer lister i dine wiki-sider:
 
 Du kan oprette tabeller i wiki-siderne:
 
-== Enkel tabel ==
-
-| celle 1 | celle 2 | celle 3
-| celle 4 | celle 5 | celle 6
-| celle 7 | celle 8 | celle 9
-
 == Tabeller med overskrifter i første række ==
 
 |= tabeloverskrift |= tabeloverskrift |= tabeloverskrift

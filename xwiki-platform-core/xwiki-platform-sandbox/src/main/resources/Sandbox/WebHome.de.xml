@@ -107,12 +107,6 @@ Sie können verschiedene Arten von Listen in Ihren Texten einfügen :
 
 Sie können einfache Tabellen in Ihren Wiki-Seiten erzeugen:
 
-== Einfache Tabelle ==
-
-| Zelle 1 | Zelle 2 | Zelle 3
-| Zelle 4 | Zelle 5 | Zelle 6
-| Zelle 7 | Zelle 8 | Zelle 9
-
 == Tabelle mit einer Kopfzeile oben ==
 
 |= Kopf |= Kopf |= Kopf

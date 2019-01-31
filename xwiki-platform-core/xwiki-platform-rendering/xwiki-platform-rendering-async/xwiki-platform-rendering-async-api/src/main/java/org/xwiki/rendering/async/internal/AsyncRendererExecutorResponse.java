@@ -53,6 +53,8 @@ public class AsyncRendererExecutorResponse
     {
         this.status = status;
         this.asyncClientId = clientId;
+
+        status.addClient(asyncClientId);
     }
 
     /**

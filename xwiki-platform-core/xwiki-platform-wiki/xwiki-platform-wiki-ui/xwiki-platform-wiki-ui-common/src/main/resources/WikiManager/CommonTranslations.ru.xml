@@ -36,14 +36,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.descriptor=Descriptor
-### Missing: admin.wikis.descriptor.description=Configure the wiki descriptor
-### Missing: admin.wiki.description=Describe your wiki (pretty name and description) and set its owner and homepage.
-### Missing: platform.wiki.admin.wiki.ownerProblemConfirmation=The new owner's user does not exist or it may come from a different wiki.\\nAre you sure you want to use it and continue with the save operation?
-### Missing: platform.wiki.admin.wiki.csrfInvalidError=Invalid security (CSRF) token. Please refresh the page and try again.
-### Missing: platform.wiki.admin.wiki.requiredFieldsError=The 'Homepage' field cannot be empty.
-### Missing: platform.wiki.admin.wiki.ownerWarning=Warning: Once you change this, the previous owner will lose their owner rights. If that is you, make sure you do not lock yourself out of the wiki. If that happens by mistake, you will need to contact the main wiki's administrators or use the superadmin account.
+  <content>admin.wikis=Вики
+admin.wikis.descriptor=Дескриптор
+admin.wikis.descriptor.description=Настроить дескриптор вики
+admin.wiki.description=Опишите свою вики (красивое имя и описание) и установите ее владельца и домашнюю страницу.
+platform.wiki.admin.wiki.ownerProblemConfirmation=Пользователь нового владельца не существует или может быть из другой вики. \\nВы уверены, что хотите использовать его и продолжить операцию сохранения?
+platform.wiki.admin.wiki.csrfInvalidError=Неверный токен безопасности (CSRF). Пожалуйста, обновите страницу и попробуйте снова.
+platform.wiki.admin.wiki.requiredFieldsError=Поле «Домашняя страница» не может быть пустым.
+platform.wiki.admin.wiki.ownerWarning=Предупреждение: как только вы измените это, предыдущий владелец потеряет свои права владельца. Если это вы, убедитесь, что вы не заблокированы из вики. Если это произойдет по ошибке, вам необходимо связаться с администраторами основного вики или использовать учетную запись superadmin.
 
 ###############################################################################
 ## Deprecated

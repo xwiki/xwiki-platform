@@ -36,5 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>administration.templateProvider.description=Описание
+administration.templateProvider.description.hint=Информация, которая будет отображаться для поставщика шаблонов при создании новой страницы.
+administration.templateProvider.icon=Иконка
+administration.templateProvider.icon.hint=Значок, отображаемый для поставщика шаблонов при создании новой страницы. Выберите один из {0} полного списка значков {1}.
+administration.templateProvider.creationRestrictions=Ограничения создания
+administration.templateProvider.creationRestrictions.hint=Список расположений (включая их дочерних), где этот шаблон может использоваться для создания страницы
+administration.templateProvider.creationRestrictions.none=Этот шаблон может создавать страницы везде
+administration.templateProvider.creationRestrictionsAreSuggestions=Создание ограничений как предложения
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Позволяет пользователю выбрать любое место для создания страницы с этим шаблоном, используя первое ограничение на создание в качестве предварительно заполненного местоположения по умолчанию, когда шаблон выбирается из списка.</content>
 </xwikidoc>

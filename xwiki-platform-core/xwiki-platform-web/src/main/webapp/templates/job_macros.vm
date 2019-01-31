@@ -5,7 +5,7 @@ $services.template.execute('logging_macros.vm')
 #macro (displayJobProgressBar $jobStatus)
   #if ($jobStatus.state == 'NONE')
     <div class="box info">
-      $services.localization.render("job.waiting");
+      $services.localization.render("job.state.NONE.hint");
     </div>
   #else
     <div class="ui-progress">

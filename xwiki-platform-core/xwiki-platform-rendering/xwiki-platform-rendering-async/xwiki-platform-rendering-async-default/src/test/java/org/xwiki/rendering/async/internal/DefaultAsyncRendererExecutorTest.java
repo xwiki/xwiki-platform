@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -83,7 +85,7 @@ public class DefaultAsyncRendererExecutorTest
 
     private AsyncRenderer renderer;
 
-    private Job job;
+    private AsyncRendererJob job;
 
     @BeforeEach
     private void beforeEach() throws RenderingException, ComponentLookupException, JobException
@@ -103,7 +105,7 @@ public class DefaultAsyncRendererExecutorTest
         map.put(CELEMENT2, "value2/");
         when(this.context.save(CELEMENTS)).thenReturn(Collections.unmodifiableMap(map));
 
-        this.job = mock(Job.class);
+        this.job = mock(AsyncRendererJob.class);
 
         when(this.jobs.execute(same(AsyncRendererJobStatus.JOBTYPE), any(AsyncRendererJobRequest.class)))
             .thenAnswer(new Answer<Job>()
@@ -144,7 +146,7 @@ public class DefaultAsyncRendererExecutorTest
     @Test
     public void rendererAsyncCachedContextEnabled() throws JobException, RenderingException
     {
-        // Disabled async in the context
+        // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
 
         when(this.renderer.getId()).thenReturn(Arrays.asList("1", "2"));
@@ -163,7 +165,7 @@ public class DefaultAsyncRendererExecutorTest
     @Test
     public void rendererNotAsyncCachedContextEnabled() throws JobException, RenderingException
     {
-        // Disabled async in the context
+        // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
 
         when(this.renderer.getId()).thenReturn(Arrays.asList("1", "2"));
@@ -182,7 +184,7 @@ public class DefaultAsyncRendererExecutorTest
     @Test
     public void rendererAsyncNotCachedContextEnabled() throws JobException, RenderingException
     {
-        // Disabled async in the context
+        // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
 
         when(this.renderer.getId()).thenReturn(Arrays.asList("1", "2"));
@@ -202,7 +204,7 @@ public class DefaultAsyncRendererExecutorTest
     @Test
     public void rendererNotAsyncNotCachedContextEnabled() throws JobException, RenderingException
     {
-        // Disabled async in the context
+        // Enable async in the context
         when(this.asyncContext.isEnabled()).thenReturn(true);
 
         when(this.renderer.getId()).thenReturn(Arrays.asList("1", "2"));
@@ -215,5 +217,29 @@ public class DefaultAsyncRendererExecutorTest
         assertNull(response.getStatus().getRequest().getId());
         assertNull(response.getJobIdHTTPPath());
         assertEquals("false false", response.getStatus().getResult().getResult());
+    }
+
+    @Test
+    public void rendererAsyncAlreadyRunning() throws JobException, RenderingException
+    {
+        List<String> jobId = Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f");
+
+        AsyncRendererJobRequest request = mock(AsyncRendererJobRequest.class);
+        AsyncRendererJobStatus status = mock(AsyncRendererJobStatus.class);
+        when(status.getRequest()).thenReturn(request);
+        when(this.job.getStatus()).thenReturn(status);
+        when(this.jobs.getJob(jobId)).thenReturn(this.job);
+
+        // Enable async in the context
+        when(this.asyncContext.isEnabled()).thenReturn(true);
+
+        when(this.renderer.getId()).thenReturn(Arrays.asList("1", "2"));
+        when(this.renderer.isAsyncAllowed()).thenReturn(true);
+        when(this.renderer.isCacheAllowed()).thenReturn(true);
+
+        AsyncRendererExecutorResponse response = this.executor.render(this.renderer, this.configuration);
+
+        assertNotNull(response.getAsyncClientId());
+        assertSame(status, response.getStatus());
     }
 }

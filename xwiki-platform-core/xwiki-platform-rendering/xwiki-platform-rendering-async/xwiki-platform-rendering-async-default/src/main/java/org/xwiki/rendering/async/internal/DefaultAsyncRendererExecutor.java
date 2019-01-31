@@ -149,10 +149,15 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
             if (status != null) {
                 if (status.getResult() != null) {
-                    injectUses(status);
-                }
+                    // Available cached result, return it
 
-                return new AsyncRendererExecutorResponse(status);
+                    injectUses(status);
+
+                    return new AsyncRendererExecutorResponse(status);
+                } else if (async) {
+                    // Already running job, associate it with another client
+                    return new AsyncRendererExecutorResponse(status, this.clientIdCount.incrementAndGet());
+                }
             }
         }
 
@@ -181,8 +186,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             Job job = this.executor.execute(AsyncRendererJobStatus.JOBTYPE, request);
 
             AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
-
-            status.addClient(asyncClientId);
 
             response = new AsyncRendererExecutorResponse(status, asyncClientId);
         } else {

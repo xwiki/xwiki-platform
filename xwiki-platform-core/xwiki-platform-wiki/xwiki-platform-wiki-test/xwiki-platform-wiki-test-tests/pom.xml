@@ -38,8 +38,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- Mapping needed by the Notifications, which is a dependency (activity stream is also needed by notifications) -->
-    <xwikiDbHbmCommonExtraMappings>notification-filter-preferences.hbm.xml,activitystream.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <!-- Mapping needed by the Notifications, which is a dependency (event stream is also needed by notifications) -->
+    <xwikiDbHbmCommonExtraMappings>notification-filter-preferences.hbm.xml,eventstream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>
@@ -205,7 +205,7 @@
                in the classpath. -->
           <dependency>
             <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-activitystream-api</artifactId>
+            <artifactId>xwiki-platform-eventstream-store</artifactId>
             <version>${project.version}</version>
           </dependency>
           <dependency>

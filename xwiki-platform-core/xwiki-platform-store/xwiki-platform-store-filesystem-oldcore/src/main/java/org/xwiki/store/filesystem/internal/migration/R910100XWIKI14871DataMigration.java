@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,6 +72,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Singleton
 public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigration
 {
+    private static final Pattern STORAGE = Pattern.compile("/storage/");
+
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
     private ConfigurationSource configuration;
@@ -140,9 +144,17 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
 
                     File directory = new File(path);
                     if (!directory.exists()) {
-                        this.logger.warn("[{}] does not exist", directory);
+                        this.logger.warn("[{}] does not exist, trying to find the new location", directory);
 
-                        continue;
+                        directory = findNewPath(path);
+
+                        if (directory == null) {
+                            this.logger.warn("Could not find the deleted attachment in any other location");
+
+                            continue;
+                        } else {
+                            this.logger.info("Found deleted attachment on [{}]", directory);
+                        }
                     }
 
                     if (!directory.isDirectory()) {
@@ -155,6 +167,22 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
                 }
             }
         }
+    }
+
+    private File findNewPath(String path)
+    {
+        Matcher matcher = STORAGE.matcher(path);
+
+        if (matcher.find()) {
+            String relative = path.substring(matcher.end());
+
+            File newPath = new File(getStoreRootDirectory(), relative);
+            if (newPath.exists()) {
+                return newPath;
+            }
+        }
+
+        return null;
     }
 
     private void storeDeletedAttachment(File directory, Session session)

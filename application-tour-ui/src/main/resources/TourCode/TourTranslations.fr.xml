@@ -98,6 +98,5 @@ tour.upgrade.successNothing=Aucune page n'a besoin d'être mise à jour !
 
 # Template
 tour.template.name=Visite guidée
-tour.template.description=Tour étape par étape
-</content>
+tour.template.description=Tour étape par étape</content>
 </xwikidoc>

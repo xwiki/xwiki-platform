@@ -57,7 +57,7 @@ public class ClassSheetPage extends ViewPage
     /**
      * The link to the class editor. This is displayed only if the class has properties.
      */
-    @FindBy(linkText = "add or modify the class properties")
+    @FindBy(xpath = "//li//a[. = 'class editor']")
     private WebElement editClassLink;
 
     /**

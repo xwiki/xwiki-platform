@@ -36,5 +36,59 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>rendering.macro.documentTree.name=Дерево страниц
+rendering.macro.documentTree.description=Отображает дерево страниц XWiki.
+rendering.macro.documentTree.parameter.readOnly.name=Только чтение
+rendering.macro.documentTree.parameter.readOnly.description=Должен ли пользователь иметь возможность изменять древовидную структуру при условии, что у него есть необходимые права?
+rendering.macro.documentTree.parameter.showWikis.name=Показать вики
+rendering.macro.documentTree.parameter.showWikis.description=Показывать ли узлы вики или нет. Это можно использовать только в основной вики и если исходный текст дерева был сохранен с правами программирования.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Показать вики красивое имя
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Показывать красивое имя вики вместо идентификатора вики при отображении узла вики.
+rendering.macro.documentTree.parameter.showSpaces.name=Показать пространства
+rendering.macro.documentTree.parameter.showSpaces.description=Показывать ли пространства. Страницы сгруппированы по пространствам.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Показать заголовок страницы
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Показывать ли заголовок страницы вместо имени страницы при отображении узла страницы.
+rendering.macro.documentTree.parameter.showTranslations.name=Показать переводы
+rendering.macro.documentTree.parameter.showTranslations.description=Показывать ли переводы страницы или нет.
+rendering.macro.documentTree.parameter.showAttachments.name=Показывать вложения
+rendering.macro.documentTree.parameter.showAttachments.description=Показывать вложения или нет.
+rendering.macro.documentTree.parameter.showObjects.name=Показывать объекты
+rendering.macro.documentTree.parameter.showObjects.description=Показывать ли объекты страницы или нет.
+rendering.macro.documentTree.parameter.showClassProperties.name=Показать свойства класса
+rendering.macro.documentTree.parameter.showClassProperties.description=Показывать ли свойства класса для страниц, которые определяют классы.
+rendering.macro.documentTree.parameter.root.name=Корень
+rendering.macro.documentTree.parameter.root.description=Идентификатор корневого узла. Это полезно, если вы хотите отобразить только потомков данного узла (который является указанным корнем). Дерево отображает дочерние элементы корневого узла на первом уровне, поэтому корневой узел фактически не отображается. Все дерево отображается, если корневой узел не указан. Формат идентификатора узла - entityType: entityReference, где типом сущности может быть, например, wiki, space, document. Например: wiki: xwiki, пробел: xwiki: Main, документ: xwiki: Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=Показать корень
+rendering.macro.documentTree.parameter.showRoot.description=Показывать ли корневой узел или нет. Корневой узел не отображается по умолчанию, поскольку он обычно подразумевается из контекста, в котором отображается дерево (например, метка перед деревом). Однако в некоторых случаях вы можете захотеть отобразить корневой узел: чтобы иметь возможность создать новый узел под корнем.
+rendering.macro.documentTree.parameter.compact.name=Компактный вид
+rendering.macro.documentTree.parameter.compact.description=Если у вас ограниченное пространство по горизонтали, то вам, вероятно, следует установить значение true. В результате значки узлов и соединяющие их ребра будут скрыты. Также будут применены некоторые специальные стили, чтобы гарантировать, что дерево занимает меньше горизонтального пространства при сохранении полностью видимых меток узла.
+rendering.macro.documentTree.parameter.links.name=Ссылки
+rendering.macro.documentTree.parameter.links.description=Указывает, должны ли метки узла выглядеть и вести себя как ссылки (якоря).
+rendering.macro.documentTree.parameter.checkboxes.name=Флажки
+rendering.macro.documentTree.parameter.checkboxes.description=Отображать ли флажок перед каждым узлом дерева, чтобы позволить пользователю выбрать несколько узлов дерева.
+rendering.macro.documentTree.parameter.openTo.name=Открыть для
+rendering.macro.documentTree.parameter.openTo.description=Идентификатор узла, которому нужно открыть дерево. Все предки указанного узла, вплоть до корня дерева, также будут открыты. Формат идентификатора узла - тот, который используется для корневого параметра.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Показать только для просмотра
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Показывать только узлы вики, пространства и страницы, для которых текущий пользователь имеет право просмотра. Если для этого параметра установлено значение false, то узлы вики, пространства и страницы, которые не видны текущему пользователю, перечислены в дереве с использованием их имен. Пользователь не сможет видеть их содержимое, перейдя по их ссылкам (пользователь просто будет знать об их существовании).
+rendering.macro.documentTree.parameter.filterByClass.name=Фильтровать по классу
+rendering.macro.documentTree.parameter.filterByClass.description=Показывать только те страницы, которые имеют объект указанного типа. Значением этого параметра является полное имя страницы XWiki, которая содержит определение класса. Например, Blog.CategoryClass может использоваться для отображения только тех страниц, которые представляют категории блогов. Оставьте этот параметр пустым, если вы не хотите ограничивать тип страниц, отображаемых в дереве.
+rendering.macro.documentTree.parameter.finder.name=Поле поиска
+rendering.macro.documentTree.parameter.finder.description=Показать текстовый ввод, который можно использовать для поиска узлов дерева. Ввод отображается над деревом и предлагает подсказки при вводе на основе содержимого дерева. Когда предложение выбрано, дерево расширяется до соответствующего узла.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Режим иерархии страниц
+rendering.macro.documentTree.parameter.hierarchyMode.description=Указывает, какую иерархию использовать между страницами. Возможные значения: «ссылка» (по умолчанию) и «родитель». Если используется «ссылка», то иерархия страниц определяется с использованием только ссылки на страницу, особенно компонент вложенных пространств ссылки на страницу. Если используется «parentchild», то иерархия основана на отношении «родитель / потомок», определяемом полем «родительский» страницы из базы данных.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Фильтровать скрытые документы
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Установите для этого параметра значение false, если вы хотите включить скрытые документы в дерево. В противном случае, если значение равно true, скрытые документы исключаются или включаются в зависимости от предпочтений текущего пользователя.
+rendering.macro.documentTree.parameter.limit.name=Максимальное количество дочерних
+rendering.macro.documentTree.parameter.limit.description=Максимальное количество дочерних узлов, отображаемых при первом раскрытии родительского узла. Остальные дочерние узлы доступны через ссылку «подробнее ...». Этот параметр в основном используется для разбиения на страницы дочерних узлов и, таким образом, помогает масштабировать дерево, когда число дочерних узлов велико.
+rendering.macro.documentTree.parameter.exclusions.name=Исключения
+rendering.macro.documentTree.parameter.exclusions.description=Список узлов для исключения из дерева. Узлы указываются по их идентификатору и разделяются запятой.
+
+index.documentTree.empty=Страницы не найдены
+index.documentTree.more={0} подробнее ...
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=Показать дочерние документы
+rendering.macro.documentTree.parameter.showChildDocuments.description=Показывать ли дочерние документы на основе родительского поля документа.</content>
 </xwikidoc>

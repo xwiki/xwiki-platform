@@ -76,7 +76,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     {
         this.xwikiContext = context.clone();
         long queueSize = context.getWiki().ParamAsLong("stats.queue.size", 200);
-        this.queue = new ArrayBlockingQueue<XWikiStatsStoreItem>((int) queueSize);
+        this.queue = new ArrayBlockingQueue<>((int) queueSize);
     }
 
     @Override
@@ -144,8 +144,8 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     {
         XWikiStatsStoreItem stat = this.queue.take();
 
-        List<List<XWikiStatsStoreItem>> statsList = new ArrayList<List<XWikiStatsStoreItem>>();
-        Map<String, List<XWikiStatsStoreItem>> statsMap = new HashMap<String, List<XWikiStatsStoreItem>>();
+        List<List<XWikiStatsStoreItem>> statsList = new ArrayList<>();
+        Map<String, List<XWikiStatsStoreItem>> statsMap = new HashMap<>();
 
         do {
             if (stat instanceof StopStatsRegisterObject) {
@@ -157,7 +157,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
             List<XWikiStatsStoreItem> stats = statsMap.get(statId);
 
             if (stats == null) {
-                stats = new ArrayList<XWikiStatsStoreItem>();
+                stats = new ArrayList<>();
 
                 statsMap.put(statId, stats);
                 statsList.add(stats);

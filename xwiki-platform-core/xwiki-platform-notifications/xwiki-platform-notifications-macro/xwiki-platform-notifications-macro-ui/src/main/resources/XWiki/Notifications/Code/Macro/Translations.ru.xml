@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="ru">
+  <web>XWiki.Notifications.Code.Macro</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.notifications.name=Уведомления
+rendering.macro.notifications.description=Отображать уведомления о событиях, произошедших в вики.
+rendering.macro.notifications.parameter.count.name=Считать
+rendering.macro.notifications.parameter.count.description=Максимальное количество событий для отображения по умолчанию
+rendering.macro.notifications.parameter.useUserPreferences.name=Используйте настройки пользователя
+rendering.macro.notifications.parameter.useUserPreferences.description=Если установлено значение true, используются настройки пользователя относительно уведомлений
+rendering.macro.notifications.parameter.displayOwnEvents.name=Показать собственные события
+rendering.macro.notifications.parameter.displayOwnEvents.description=Если true, события текущего пользователя отображаются, иначе скрыты.
+rendering.macro.notifications.parameter.displayMinorEvents.name=Показать незначительные события
+rendering.macro.notifications.parameter.displayMinorEvents.description=Если true, события, касающиеся незначительных изменений страниц, отображаются так же, как и другие. Иначе скрыты.
+rendering.macro.notifications.parameter.displaySystemEvents.name=Показывать системные события
+rendering.macro.notifications.parameter.displaySystemEvents.description=Если true, события, запускаемые программным обеспечением XWiki, отображаются как другие. Иначе скрыты.
+rendering.macro.notifications.parameter.displayReadEvents.name=Показать прочитанные события
+rendering.macro.notifications.parameter.displayReadEvents.description=Если true, события, которые пользователь уже пометил как прочитанные, отображаются, как и другие. Иначе скрыты.
+rendering.macro.notifications.parameter.wikis.name=Вики
+rendering.macro.notifications.parameter.wikis.description=Список вики (разделенных запятыми) для рассмотрения. Этот параметр игнорируется, если для useUserPreferences установлено значение "true".
+rendering.macro.notifications.parameter.spaces.name=Пространства
+rendering.macro.notifications.parameter.spaces.description=Список пробелов (через запятую) для рассмотрения. Этот параметр игнорируется, если для useUserPreferences установлено значение "true".
+rendering.macro.notifications.parameter.pages.name=Страницы
+rendering.macro.notifications.parameter.pages.description=Список страниц (полные ссылки, разделенные запятыми) для рассмотрения. Этот параметр игнорируется, если для useUserPreferences установлено значение "true".
+rendering.macro.notifications.parameter.displayReadStatus.name=Показать статус «прочитано»
+### Missing: rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
+rendering.macro.notifications.parameter.users.name=Пользователи
+rendering.macro.notifications.parameter.users.description=Список пользователей для рассмотрения (через запятую). Игнорируется, если для «useUserPreferences» установлено значение «true».
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Показывать только подписчиков
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Отображать только события, выполненные данным списком пользователей (если он пуст, используется список отслеживаемых пользователей текущего пользователя).
+rendering.macro.notifications.parameter.displayRSSLink.name=Показать RSS ссылку
+rendering.macro.notifications.parameter.displayRSSLink.description=Отображение ссылки на RSS-просмотр текущего макроса.
+rendering.macro.notifications.parameter.tags.name=Теги
+rendering.macro.notifications.parameter.tags.description=Список тегов для рассмотрения (через запятую). Это работает только на текущей вики. Игнорируется, если для «useUserPreferences» установлено значение «true».
+notifications.macro.noWatchedUsers=Вы ни на кого не подписаны.
+notifications.macro.whenNotView=Макрос уведомлений. Может быть видно в режиме просмотра.
+notifications.menu.nothing=Нет доступных уведомлений!
+notifications.menu.more=Загрузить старые уведомления
+notifications.menu.details=Подробности ({0})</content>
+</xwikidoc>

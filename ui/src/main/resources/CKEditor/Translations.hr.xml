@@ -131,6 +131,5 @@ macroEditor.changeMacro=Promijeni makro
 macroEditor.submit=Podnesi
 macroEditor.content=Sadržaj
 macroEditor.noParameters=Ovaj makro nema parametara.
-macroEditor.descriptorRequestFailed=Dohvat macro opisnika {0} nije uspio.
-</content>
+macroEditor.descriptorRequestFailed=Dohvat macro opisnika {0} nije uspio.</content>
 </xwikidoc>

@@ -38,7 +38,6 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-test-checker</module>
-    <module>xwiki-platform-test-docker</module>
     <module>xwiki-platform-test-integration</module>
     <module>xwiki-platform-test-oldcore</module>
     <module>xwiki-platform-test-page</module>
@@ -49,6 +48,7 @@
       <modules>
         <module>xwiki-platform-test-ui</module>
         <module>xwiki-platform-test-upgrade</module>
+        <module>xwiki-platform-test-docker</module>
       </modules>
     </profile>
   </profiles>

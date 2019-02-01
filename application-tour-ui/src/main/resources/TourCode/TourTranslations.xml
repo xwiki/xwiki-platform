@@ -92,14 +92,13 @@ tour.steps.edit=Edit
 tour.steps.delete=Delete
 
 # Upgrade
-tour.upgrade.title = Upgrade
-tour.upgrade.successList = Successfully converted the following pages:
-tour.upgrade.successNothing = You have nothing to upgrade!
+tour.upgrade.title=Upgrade
+tour.upgrade.successList=Successfully converted the following pages:
+tour.upgrade.successNothing=You have nothing to upgrade!
 
 # Template
 tour.template.name=Tour
-tour.template.description=Step by step tour
-</content>
+tour.template.description=Step by step tour</content>
   <object>
     <name>TourCode.TourTranslations</name>
     <number>0</number>

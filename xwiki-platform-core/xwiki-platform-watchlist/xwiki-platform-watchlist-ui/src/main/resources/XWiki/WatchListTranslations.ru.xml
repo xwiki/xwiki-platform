@@ -36,6 +36,30 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-  </content>
+  <content>### Macro "watchlist"
+rendering.macro.watchlist.name=Список наблюдений
+rendering.macro.watchlist.description=Показать содержание вашего текущего списка наблюдения.
+
+### XWiki.WatchListClass
+XWiki.WatchListClass_interval_realtime=Непрерывно
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Ежечасно
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Ежедневно
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Еженедельно
+
+### Notification Icons    
+watchlist.notifications.icons.on=ВКЛ
+watchlist.notifications.icons.off=ВЫКЛ
+watchlist.notifications.icons.tooltip.page=Наблюдать за страницей
+watchlist.notifications.icons.tooltip.pageAndChildren=Наблюдать за страницей и дочерними
+watchlist.notifications.icons.tooltip.space=Наблюдать за родительской страницей и дочерними
+watchlist.notifications.icons.tooltip.wiki=Наблюдать за Вики
+watchlist.notifications.changeStatusError=Не удалось изменить статус списка наблюдений.
+watchlist.settings=Настройки
+
+### Watchlist livetable (in the macro)
+watchlist.table.scope.wiki=Все страницы вики
+watchlist.table.scope.pageandchildren=Страница + Дочерние
+watchlist.table.scope.pageonly=Только страница
+watchlist.table.location=Расположение
+watchlist.table.scope=Область</content>
 </xwikidoc>

@@ -20,17 +20,17 @@ $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'la
           #displayDocumentList($pages true $blacklistedSpaces)
         #end
       </dd>
-    </dl>
-    <dl>
       <dt>$services.localization.render('core.viewers.information.pageReference')</dt>
       <dd id="information-reference">
         <span class="noitems">$services.localization.render('core.viewers.information.pageReference.tips')</span>
         <div class="input-group">
           <div class="input-group-addon btn btn-default" id="button-inout" title="$services.localization.render('core.viewers.information.pageReference.globalButton')">
-            <span class="fa fa-globe"></span>
+            $services.icon.renderHTML('world')
           </div>
           <span class="form-control" id="reference-value">$doc.getDocumentReference().getLocaleDocumentReference()</span>
-          <div class="input-group-addon btn btn-default" id="button-paste" title="$services.localization.render('core.viewers.information.pageReference.copyButton')"><span class="fa fa-paste"></span></div>
+          <div class="input-group-addon btn btn-default" id="button-paste" title="$services.localization.render('core.viewers.information.pageReference.copyButton')">
+            $services.icon.renderHTML('paste')
+          </div>
         </div>
       </dd>
     </dl>

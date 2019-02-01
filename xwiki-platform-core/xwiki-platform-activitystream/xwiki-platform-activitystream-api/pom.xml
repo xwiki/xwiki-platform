@@ -79,6 +79,13 @@
       <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
     </dependency>
+    <!-- Requires an implementation for RecordableEventConverter at runtime -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

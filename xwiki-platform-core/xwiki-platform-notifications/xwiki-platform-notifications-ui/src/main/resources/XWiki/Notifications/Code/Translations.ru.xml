@@ -109,7 +109,7 @@ notifications.settings.filters.preferences.hint=Создайте фильтры,
 notifications.settings.filters.preferences.forGuest=Войдите или зарегистрируйтесь для обработки ваших фильтров уведомлений.
 
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.table.name=Наименование
+notifications.settings.filters.preferences.table.name=Название
 notifications.settings.filters.preferences.table.filterType=Тип фильтра
 notifications.settings.filters.preferences.table.eventTypes=События
 notifications.settings.filters.preferences.table.notificationFormats=Форматы
@@ -144,7 +144,7 @@ notifications.settings.preferences.hint=Захватывайте, какие с�
 notifications.settings.applications.title=Приложения
 notifications.settings.applications.hint=Это список приложений, которые могут отправлять уведомления. Вы можете включить или отключить любой из них.
 notifications.settings.applications.forGuest=Войдите или зарегистрируйтесь для обработки ваших настроек уведомлений.
-notifications.settings.applications.appName=Наименование
+notifications.settings.applications.appName=Название
 notifications.settings.events=События
 notifications.settings.watch.title=Просмотренные страницы
 notifications.settings.watch.autowatchmode=Автоматический просмотр страницы

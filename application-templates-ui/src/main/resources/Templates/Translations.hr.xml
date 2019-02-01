@@ -49,6 +49,5 @@ template.templateProvider.meeting.name=Izvještaj sa sastanka
 template.templateProvider.meeting.description=Dnevni red i bilješke
 
 template.templateProvider.simplePage.name=Obična stranica
-template.templateProvider.simplePage.description=S tablicom sadržaja
-</content>
+template.templateProvider.simplePage.description=S tablicom sadržaja</content>
 </xwikidoc>

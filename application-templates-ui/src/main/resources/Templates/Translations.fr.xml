@@ -49,6 +49,5 @@ template.templateProvider.meeting.name=Compte-rendu de réunion
 template.templateProvider.meeting.description=Calendrier et Notes
 
 template.templateProvider.simplePage.name=Page simple
-template.templateProvider.simplePage.description=Avec table des matières
-</content>
+template.templateProvider.simplePage.description=Avec table des matières</content>
 </xwikidoc>

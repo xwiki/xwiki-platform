@@ -163,10 +163,20 @@ public class UpgradeTest extends AbstractTest
 
         reportStep();
 
-        // Make sure we have back on home page
+        // Make sure we are back on home page
         ViewPage page = new ViewPage();
 
         assertEquals("xwiki:Main.WebHome", page.getMetaDataValue("reference"));
+
+        ////////////////////
+        // Custom validation
+
+        postUpdateValidate();
+    }
+
+    protected void postUpdateValidate() throws Exception
+    {
+
     }
 
     private void welcomeStep()

@@ -48,6 +48,7 @@
     <upgradetest.previousdata.groupId>${upgradetest.previousflavor.groupId}</upgradetest.previousdata.groupId>
     <upgradetest.previousdata.artifactId>xwiki-platform-distribution-flavor-data-hsqldb</upgradetest.previousdata.artifactId>
     <upgradetest.previousdata.version>${upgradetest.previousflavor.version}</upgradetest.previousdata.version>
+    <upgradetest.previousdata.classifier/>
   </properties>
   <dependencies>
     <dependency>
@@ -69,6 +70,7 @@
     <module>xwiki-platform-distribution-flavor-test-upgrade-1011</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-911</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-84</module>
+    <module>xwiki-platform-distribution-flavor-test-upgrade-84-filestore</module>
   </modules>
   <build>
     <pluginManagement>
@@ -133,6 +135,7 @@
                   <artifactItem>
                     <groupId>${upgradetest.previousdata.groupId}</groupId>
                     <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
+                    <classifier>${upgradetest.previousdata.classifier}</classifier>
                     <version>${upgradetest.previousdata.version}</version>
                     <type>zip</type>
                   </artifactItem>

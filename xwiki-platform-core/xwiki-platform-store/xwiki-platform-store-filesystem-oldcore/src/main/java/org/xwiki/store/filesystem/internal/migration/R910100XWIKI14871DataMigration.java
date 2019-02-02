@@ -114,7 +114,7 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
     {
         File storageLocationFile = getPre11StoreRootDirectory();
 
-        this.logger.info("Migrating filesystem attachment metadatas storded in [{}]", storageLocationFile);
+        this.logger.info("Migrating filesystem attachment metadatas stored in [{}]", storageLocationFile);
 
         File pathByIdStore = new File(storageLocationFile, "~GLOBAL_DELETED_ATTACHMENT_ID_MAPPINGS.xml");
         if (pathByIdStore.exists()) {

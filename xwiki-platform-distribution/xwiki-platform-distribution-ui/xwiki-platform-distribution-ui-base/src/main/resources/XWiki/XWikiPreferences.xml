@@ -2815,6 +2815,7 @@ Your account on ${wikiname} has been successfully activated. You can now login a
 &lt;meta name="keywords" content="$escapetool.xml($keywords.replaceAll('[|,]', ' ').trim())" /&gt;
 &lt;meta name="rating" content="General" /&gt;
 &lt;meta name="author" content="$escapetool.xml($!xwiki.getUserName($doc.getAuthor(), false))" /&gt;
+## Render extensions adding content to the page head, if any.
 #foreach($uix in $services.uix.getExtensions("org.xwiki.platform.head", {'sortByParameter' : 'order'}))
   $services.rendering.render($uix.execute(), 'xhtml/1.0')
 #end

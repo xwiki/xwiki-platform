@@ -52,8 +52,6 @@ public final class DockerTestUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerTestUtils.class);
 
-    private static final String DOCKERSOCKET = "/var/run/docker.sock";
-
     private DockerTestUtils()
     {
         // Prevents instantiation.
@@ -164,9 +162,6 @@ public final class DockerTestUtils
      */
     public static void startContainer(GenericContainer container)
     {
-        // Make it also when docker is executed inside another docker container
-        container.withFileSystemBind(DOCKERSOCKET, DOCKERSOCKET);
-
         container.start();
     }
 }

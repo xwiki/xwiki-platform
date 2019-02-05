@@ -1,4 +1,21 @@
+.reference-group {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.reference-group .btn {
+  float: left;
+  margin: 0;
+  width: 10%;
+  min-width: 2.5em;
+}
+
 #reference-value {
   text-overflow: ellipsis;
   overflow: hidden;
+  width: 80%;
+  white-space: nowrap;
+  display: inline-block;
+  float: left;
+  border-radius: 0px;
 }

@@ -25,14 +25,15 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     var localReference = xm.documentReference.relativeTo(xm.documentReference.getRoot());
     var globalReference = xm.documentReference;
 
-    if (button.hasClass('btn-default')) {
-      referenceValue.text(globalReference);
-      button.removeClass('btn-default');
-      button.attr('title',"$services.localization.render('core.viewers.information.pageReference.localButton')");
-    } else {
+    if (button.hasClass('btn-info')) {
       referenceValue.text(localReference);
-      button.addClass('btn-default');
+      button.removeClass('btn-info');
       button.attr('title',"$services.localization.render('core.viewers.information.pageReference.globalButton')");
+    } else {
+      referenceValue.text(globalReference);
+      button.addClass('btn-info');
+      button.attr('title',"$services.localization.render('core.viewers.information.pageReference.localButton')");
+
     }
   });
 

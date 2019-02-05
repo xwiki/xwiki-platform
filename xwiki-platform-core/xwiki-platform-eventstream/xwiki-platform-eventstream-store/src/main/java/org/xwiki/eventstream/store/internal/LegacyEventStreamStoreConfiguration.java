@@ -39,12 +39,19 @@ public class LegacyEventStreamStoreConfiguration
 {
     private static final String LEGACY_PREFERENCE_PREFIX = "xwiki.plugin.activitystream.";
 
+    private static final String PREFERENCE_PREFIX = "eventstream.";
+
+    private static final String DAYS_TO_KEEP_EVENTS = "daystokeepevents";
+
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     @Named("xwikicfg")
     private ConfigurationSource legacyConfigurationSource;
+
+    @Inject
+    private ConfigurationSource configurationSource;
 
     /**
      * This method determine if events must be store in the local wiki. If the activitystream is set not to store events
@@ -61,8 +68,7 @@ public class LegacyEventStreamStoreConfiguration
             return true;
         }
 
-        // TODO: introduce new properties in xwiki.properties and deprecated the old ones
-        return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "uselocalstore", 1).equals(1);
+        return getProperty("uselocalstore", true);
     }
 
     /**
@@ -79,8 +85,20 @@ public class LegacyEventStreamStoreConfiguration
             return false;
         }
 
-        // TODO: introduce new properties in xwiki.properties and deprecated the old ones
-        return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "usemainstore", 1).equals(1);
+        return getProperty("usemainstore", true);
+    }
+
+    private boolean getProperty(String name, boolean defaultValue)
+    {
+        if (configurationSource.containsKey(PREFERENCE_PREFIX + name)) {
+            return configurationSource.getProperty(PREFERENCE_PREFIX + name);
+        }
+
+        if (legacyConfigurationSource.containsKey(LEGACY_PREFERENCE_PREFIX + name)) {
+            return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + name).equals(1);
+        }
+
+        return defaultValue;
     }
 
     /**
@@ -88,7 +106,7 @@ public class LegacyEventStreamStoreConfiguration
      */
     public int getNumberOfDaysToKeep()
     {
-        // TODO: introduce new properties in xwiki.properties and deprecated the old ones
-        return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "daystokeepevents", 0);
+        return configurationSource.getProperty(PREFERENCE_PREFIX + DAYS_TO_KEEP_EVENTS,
+                legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + DAYS_TO_KEEP_EVENTS, 0));
     }
 }

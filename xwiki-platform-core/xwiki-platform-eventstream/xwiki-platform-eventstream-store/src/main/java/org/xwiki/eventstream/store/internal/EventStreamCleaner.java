@@ -20,6 +20,7 @@
 package org.xwiki.eventstream.store.internal;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
@@ -50,6 +51,9 @@ public class EventStreamCleaner
     @Inject
     private QueryManager queryManager;
 
+    @Inject
+    private Logger logger;
+
     /**
      * Remove old events (according to the configuration) from the event stream.
      */
@@ -64,7 +68,7 @@ public class EventStreamCleaner
                     eventStream.deleteEvent(event);
                 }
             } catch (QueryException e) {
-                // TODO
+                logger.error("Impossible to clean the old events of the event stream.", e);
             }
         }
     }

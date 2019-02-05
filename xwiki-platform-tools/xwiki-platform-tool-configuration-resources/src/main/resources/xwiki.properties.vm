@@ -938,6 +938,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
 #-# delete events older than the configured value.
 #-# The default is :
-# eventstream.daystokeepevents=0
+# eventstream.daystokeepevents = 0
 
 $!xwikiPropertiesAdditionalProperties

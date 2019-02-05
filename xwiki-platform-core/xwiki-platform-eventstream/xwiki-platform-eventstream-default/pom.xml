@@ -28,11 +28,13 @@
     <version>11.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-eventstream-default</artifactId>
-  <name>XWiki Platform - Event Stream - Default bridge</name>
-  <description>Default bridge to oldcore for the Event Stream API module.</description>
+  <name>XWiki Platform - Event Stream - Default Bridge</name>
+  <description>Bridge to Old core for the Event Stream API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>97</xwiki.pitest.mutationThreshold>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Event Stream Bridge</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

@@ -29,7 +29,11 @@
     </parent>
     <artifactId>xwiki-platform-eventstream-store</artifactId>
     <name>XWiki Platform - Event Stream - Store</name>
-    <description>Provide a store implementation for Event Stream based on the legacy Activity Stream.</description>
+    <description>Store for Event Stream Events</description>
+    <properties>
+        <!-- Name to display by the Extension Manager -->
+        <xwiki.extension.name>Event Stream Store</xwiki.extension.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.xwiki.platform</groupId>

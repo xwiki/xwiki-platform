@@ -29,14 +29,13 @@
   </parent>
   <artifactId>xwiki-platform-eventstream-api</artifactId>
   <name>XWiki Platform - Event Stream - API</name>
-  <description>
-    Store and query events from the wiki. At the moment this API replaces the older ActivityStream API.
-    However, at this stage it still uses the ActivityStream implementation as its back-end.
-  </description>
+  <description>API for Event Stream events</description>
   <properties>
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-eventstream</xwiki.extension.features>
     <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>76</xwiki.pitest.mutationThreshold>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Event Stream API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

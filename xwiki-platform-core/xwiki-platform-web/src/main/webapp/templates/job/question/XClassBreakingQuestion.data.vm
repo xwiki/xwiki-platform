@@ -119,30 +119,35 @@ $response.setContentType("application/json")
   #if ($type == 'xclass')
     #set ($discard = $data.add({
       'id': $serializedReference,
-      'text': "$title ($serializedReference)",
+      'text': $title,
       'icon': 'fa fa-file-o',
       'children': true,
       'state': {
         'selected': $selected
       },
-      'data': {
-        'link': $pageDoc.getURL('view')
+      'a_attr': {
+        'href': $pageDoc.getURL('view'),
+        'title': $serializedReference
       }
     }))
   #elseif ($type == 'freePages')
     #set ($discard = $data.add({
       'id': $serializedReference,
-      'text': "$title ($serializedReference)",
+      'text': $title,
       'icon': 'fa fa-file-o',
       'children': false,
       'state': {
         'selected': $selected
+      },
+      'a_attr': {
+        'href': $pageDoc.getURL('view'),
+        'title': $serializedReference
       }
     }))
   #elseif ($type == 'objects')
     #set ($discard = $data.add({
       'id': "object-$serializedReference",
-      'text': "$title ($serializedReference)",
+      'text': $title,
       'icon': 'fa fa-cubes',
       'children': false,
       'state': {
@@ -150,6 +155,10 @@ $response.setContentType("application/json")
       },
       'data': {
         'type': 'object'
+      },
+      'a_attr': {
+        'href': $pageDoc.getURL('view'),
+        'title': $serializedReference
       }
     }))
   #end

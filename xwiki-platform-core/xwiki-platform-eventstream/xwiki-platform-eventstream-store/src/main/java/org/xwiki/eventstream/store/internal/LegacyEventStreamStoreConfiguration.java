@@ -24,6 +24,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
@@ -42,7 +43,8 @@ public class LegacyEventStreamStoreConfiguration
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    private ConfigurationSource configurationSource;
+    @Named("xwikicfg")
+    private ConfigurationSource legacyConfigurationSource;
 
     /**
      * This method determine if events must be store in the local wiki. If the activitystream is set not to store events
@@ -60,7 +62,7 @@ public class LegacyEventStreamStoreConfiguration
         }
 
         // TODO: introduce new properties in xwiki.properties and deprecated the old ones
-        return configurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "uselocalstore", 1).equals(1);
+        return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "uselocalstore", 1).equals(1);
     }
 
     /**
@@ -78,6 +80,15 @@ public class LegacyEventStreamStoreConfiguration
         }
 
         // TODO: introduce new properties in xwiki.properties and deprecated the old ones
-        return configurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "usemainstore", 1).equals(1);
+        return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "usemainstore", 1).equals(1);
+    }
+
+    /**
+     * @return the number of days events should be kept (default: infinite duration).
+     */
+    public int getNumberOfDaysToKeep()
+    {
+        // TODO: introduce new properties in xwiki.properties and deprecated the old ones
+        return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + "daystokeepevents", 0);
     }
 }

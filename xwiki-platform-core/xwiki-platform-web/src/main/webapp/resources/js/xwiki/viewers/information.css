@@ -1,0 +1,4 @@
+#reference-value {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

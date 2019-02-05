@@ -1,4 +1,5 @@
 $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
+$xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
 ###
 ### Display document information
 ###

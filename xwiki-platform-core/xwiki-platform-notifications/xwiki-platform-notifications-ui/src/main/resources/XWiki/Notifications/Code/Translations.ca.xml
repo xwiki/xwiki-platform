@@ -203,5 +203,12 @@ notifications.menu.header.settings=Preferències
 ### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
 ### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
 ### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
+
+## Notifications switches
+### Missing: notifications.switches.tooltip.page=Watch this page
+### Missing: notifications.switches.tooltip.pageAndChildren=Watch this page and its children
+### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
+### Missing: notifications.switches.tooltip.wiki=Watch this wiki
+### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.
 </content>
 </xwikidoc>

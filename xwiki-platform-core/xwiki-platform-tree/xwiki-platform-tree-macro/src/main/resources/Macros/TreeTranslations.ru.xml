@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=Дерево
+rendering.macro.tree.description=Отображает древовидную иерархию, определенную содержимым макроса или параметром источника.
+rendering.macro.tree.parameter.reference.name=Ссылка
+rendering.macro.tree.parameter.reference.description=Ссылка на ресурс, который описывает древовидную структуру и ее контекстное меню и который вызывается для выполнения действий над узлами дерева. Этот ресурс используется для динамической загрузки дерева (по требованию), когда открывается узел дерева, и для запроса контекстного меню, когда пользователь щелкает правой кнопкой мыши узел дерева, в котором оно есть. Так что ресурс не статичен. Для статических деревьев вы должны вместо этого использовать макрос содержимого. Ссылка может быть ссылкой на документ или URL / путь.
+rendering.macro.tree.parameter.root.name=Корень
+rendering.macro.tree.parameter.root.description=Идентификатор корневого узла. Это полезно, если вы хотите отобразить только потомков данного узла (который является указанным корнем). Дерево отображает дочерние элементы корневого узла на первом уровне, поэтому корневой узел фактически не отображается. Все дерево отображается, если корневой узел не указан.
+rendering.macro.tree.parameter.showRoot.name=Показать Корень
+rendering.macro.tree.parameter.showRoot.description=Показывать ли корневой узел или нет. Корневой узел не отображается по умолчанию, поскольку он обычно подразумевается из контекста, в котором отображается дерево (например, метка перед деревом). Однако в некоторых случаях вы можете захотеть отобразить корневой узел: чтобы иметь возможность создать новый узел под корнем.
+rendering.macro.tree.parameter.dragAndDrop.name=Перетаскивание
+rendering.macro.tree.parameter.dragAndDrop.description=Указывает, должен ли пользователь иметь возможность перетаскивания узлов дерева.
+rendering.macro.tree.parameter.contextMenu.name=Контекстное меню
+rendering.macro.tree.parameter.contextMenu.description=Показывать ли контекстное меню, когда пользователь щелкает правой кнопкой мыши узел дерева.
+rendering.macro.tree.parameter.class.name=Класс
+rendering.macro.tree.parameter.class.description=Дополнительные классы CSS для добавления к верхнему уровню HTML-элемента дерева.
+rendering.macro.tree.parameter.icons.name=Иконки
+rendering.macro.tree.parameter.icons.description=Показывать ли значки узлов дерева или нет. Возможно, вы захотите скрыть значки, если все узлы дерева одного типа или если вы хотите выиграть некоторое горизонтальное пространство.
+rendering.macro.tree.parameter.edges.name=Ребра
+rendering.macro.tree.parameter.edges.description=Показывать ли ребра, которые соединяют узлы родного дерева между собой и с их родителем.
+rendering.macro.tree.parameter.links.name=Ссылки
+rendering.macro.tree.parameter.links.description=Указывает, должны ли метки узла выглядеть и вести себя как ссылки (якоря).
+rendering.macro.tree.parameter.checkboxes.name=Флажки
+rendering.macro.tree.parameter.checkboxes.description=Отображать ли флажок перед каждым узлом дерева, чтобы позволить пользователю выбрать несколько узлов дерева.
+rendering.macro.tree.parameter.openTo.name=Открыть для
+rendering.macro.tree.parameter.openTo.description=Идентификатор узла, которому нужно открыть дерево. Все предки указанного узла, вплоть до корня дерева, также будут открыты.
+rendering.macro.tree.parameter.finder.name=Поле поиска
+rendering.macro.tree.parameter.finder.description=Показать текстовый ввод, который можно использовать для поиска узлов дерева. Ввод отображается над деревом и предлагает подсказки при вводе на основе содержимого дерева. Когда предложение выбрано, дерево расширяется до соответствующего узла.
+rendering.macro.tree.parameter.limit.name=Количество дочерних узлов
+rendering.macro.tree.parameter.limit.description=Максимальное количество дочерних узлов, отображаемых при первом раскрытии родительского узла. Остальные дочерние узлы доступны через ссылку «подробнее ...». Этот параметр в основном используется для разбиения на страницы дочерних узлов и, таким образом, помогает масштабировать дерево, когда число дочерних узлов велико. Дерево передает этот параметр источнику дерева, поэтому он работает только с динамическими деревьями, источник которых реализует ограничение числа дочерних элементов.
+rendering.macro.tree.content.description=Вы можете использовать вложенные неупорядоченные списки HTML для описания древовидной структуры. См. Http://www.jstree.com/docs/html/ для получения дополнительной информации.
+tree.macro.editModeWarning=Это дерево не может быть отображено в режиме редактирования.</content>
+</xwikidoc>

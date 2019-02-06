@@ -1,0 +1,218 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Translations" locale="ru">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>
+
+platform.core.profile.category.notifications=Уведомления
+notifications.filters.cancel=Отмена
+notifications.filters.submit=Сохранить
+notifications.filters.type.label=Тип фильтра:
+notifications.filters.type.hint=Как фильтр должен действовать в отношении события в заданном месте
+notifications.filters.location.label=Область фильтра:
+notifications.filters.location.hint=Какая часть вики должна быть связана с фильтром?
+
+## Advanced filters options
+notifications.settings.filters.advanced=Расширенные возможности фильтрации
+notifications.filters.advanced.toggles.hint=Эти фильтры активированы по умолчанию, вы можете отключить их, используя кнопку рядом с каждым фильтром.
+notifications.filters.advanced.toggles.table.name=Имя фильтра
+notifications.filters.advanced.toggles.table.description=Описание
+notifications.filters.advanced.toggles.table.toggle=Переключатель
+notifications.filters.advanced.modal.close=Закрыть
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=Системный фильтр
+notifications.filters.description.systemUserNotificationFilter=Скрыть уведомления от пользователя системы
+notifications.filters.name.ownEventsNotificationFilter=Собственный фильтр событий
+notifications.filters.description.ownEventsNotificationFilter=Скрыть уведомления о вашей активности
+notifications.filters.name.eventReadAlertFilter=Фильтр чтения событий (оповещение)
+notifications.filters.description.eventReadAlertFilter=Скрыть уведомления, которые вы пометили как прочитанные
+notifications.filters.name.eventReadEmailFilter=Фильтр событий чтения (электронная почта)
+notifications.filters.description.eventReadEmailFilter=Скрыть уведомления, которые вы пометили как прочитанные
+notifications.filters.name.minorEventAlertNotificationFilter=Незначительное событие (оповещение)
+notifications.filters.description.minorEventAlertNotificationFilter=Скрыть уведомления о незначительных изменениях на страницах
+notifications.filters.name.minorEventEmailNotificationFilter=Незначительное событие (электронная почта)
+notifications.filters.description.minorEventEmailNotificationFilter=Скрыть уведомления о незначительных изменениях на страницах
+
+## Filter Types
+notifications.filters.type.inclusive=Включительно
+notifications.filters.type.exclusive=Исключая
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=Фильтр уведомлений об области
+notifications.filters.preferences.scopeNotificationFilter.page=Только страница
+notifications.filters.preferences.scopeNotificationFilter.space=Страница и дочерние
+notifications.filters.preferences.scopeNotificationFilter.wiki=Вики
+
+notifications.filters.preferences.allEvents=-
+
+notifications.filters.preferences.addPreference.filterType.inclusive=Включая
+notifications.filters.preferences.addPreference.filterType.exclusive=Исключая
+notifications.filters.preferences.addPreference.notificationFormat.label=Формат оповещения
+notifications.filters.preferences.addPreference.notificationFormat.hint=На какой формат уведомления должен применяться фильтр?
+notifications.filters.preferences.addPreference.eventType.label=Тип события
+notifications.filters.preferences.addPreference.eventType.hint=Какой тип события должен быть нацелен на фильтр?
+notifications.filters.preferences.addPreference.location.label=Область применения фильтра
+notifications.filters.preferences.addPreference.location.hint=На какую страницу должен быть нацелен фильтр?
+notifications.filters.preferences.delete.inProgress=Удаление...
+notifications.filters.preferences.delete.done=Настройки фильтра удалены!
+notifications.filters.preferences.delete.error=Не удалось удалить настройки фильтра
+notifications.filters.preferences.setEnabled.inProgress=Сохранение...
+notifications.filters.preferences.setEnabled.done=Настройки фильтра сохранены!
+notifications.filters.preferences.setEnabled.error=ошибка сохранения настроек фильтра
+
+## Notifications toggles
+notifications.toggle.disabled.hint=Вам нужно включить уведомления в ваших настройках, если вы хотите посмотреть эти места
+
+## Notifications formats
+### Missing: notifications.format.alert=Alert
+### Missing: notifications.format.email=Email
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=Фильтры
+notifications.settings.filters.preferences.hint=Создайте фильтры, чтобы более точно контролировать, когда активные события должны вызывать уведомления.
+notifications.settings.filters.preferences.forGuest=Войдите или зарегистрируйтесь для обработки ваших фильтров уведомлений.
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Название
+notifications.settings.filters.preferences.table.filterType=Тип фильтра
+notifications.settings.filters.preferences.table.eventTypes=События
+notifications.settings.filters.preferences.table.notificationFormats=Форматы
+notifications.settings.filters.preferences.table.isEnabled=включено?
+notifications.settings.filters.preferences.table._actions=Действия
+
+notifications.menu.header=Уведомления
+notifications.menu.header.settings=Настройки
+notifications.menu.clear=Очистить всё
+notifications.menu.clearing=Очистка уведомлений
+notifications.menu.cleared=Уведомления очищены
+notifications.settings.title=Настройки уведомлений
+notifications.settings.error.notAdmin=Вы должны быть администратором, чтобы увидеть это.
+notifications.settings.menu=Меню уведомлений
+notifications.settings.menu.hint=Меню уведомлений расположено в правом верхнем углу страницы, и вы можете увидеть его, нажав на звонок ({0})
+notifications.settings.email=Email
+notifications.settings.email.forGuest=Войдите или зарегистрируйтесь для обработки ваших настроек уведомлений.
+notifications.settings.email.disabled=Уведомления по электронной почте отключены. Пожалуйста, свяжитесь с вашим администратором.
+notifications.settings.email.hint=Вам регулярно отправляется письмо с краткой информацией о том, что произошло в вики
+notifications.settings.email.title=Настройки электронной почты
+notifications.settings.email.frequency=Частота электронной почты
+notifications.settings.email.frequency.hint=Выберите, как часто вы хотите получать электронное письмо с краткой информацией о том, что произошло в вики.
+notifications.settings.email.diffType.hint=Выберите уровень детализации, который вы хотите получать обо всех изменениях в электронном письме.
+notifications.settings.saving=Ваши настройки сохраняются ...
+notifications.settings.saved=Сохранено!
+notifications.settings.savingfailed=Не удалось сохранить настройки
+notifications.settings.filters=Фильтры ({0})
+notifications.settings.addFilter=Добавить фильтр
+notifications.settings.errorFilterWiki=Ошибка: вы должны выбрать вики, а не страницу
+notifications.settings.preferences=Свойства
+notifications.settings.preferences.hint=Захватывайте, какие события происходят, и отправляйте их в потоке или по электронной почте.
+notifications.settings.applications.title=Приложения
+notifications.settings.applications.hint=Это список приложений, которые могут отправлять уведомления. Вы можете включить или отключить любой из них.
+notifications.settings.applications.forGuest=Войдите или зарегистрируйтесь для обработки ваших настроек уведомлений.
+notifications.settings.applications.appName=Название
+notifications.settings.events=События
+notifications.settings.watch.title=Просмотренные страницы
+notifications.settings.watch.autowatchmode=Автоматический просмотр страницы
+notifications.settings.watch.autowatchmode.hint=Решите, хотите ли вы просматривать страницу после того, как поработали над ней
+notifications.settings.watch.forGuest=Войдите или зарегистрируйтесь для обработки ваших настроек уведомлений.
+notifications.settings.watch.disabled=Наблюдаемые объекты отключены. Пожалуйста, свяжитесь с вашим администратором.
+notifications.events.by=изменено {0}.
+notifications.events.lastChange=Последние изменения: {0}.
+notifications.events.lastComment=Последние комментарии: {0}.
+notifications.preferences.scope.table.scope=Область
+notifications.preferences.scope.table.location=Расположение
+notifications.preferences.scope.table.scopeFilterType=Тип фильтра
+notifications.preferences.scope.table._actions=Действия
+notifications.email.title=Событие (я) в вики:
+notifications.email.subject={0} событий в вики
+notifications.email.seeChanges=Изменения: {0}
+notifications.email.linkDetails=Подробнее
+notifications.rss.feedLink=Новостная лента(RSS)
+### Missing: notifications.rss.feedLinkDescription=Event feed for notifications
+notifications.rss.feedTitle=Уведомления RSS-ленты
+notifications.rss.feedDescription=Эта RSS-лента может быть настроен на странице вашего профиля.
+### Missing: notifications.rss.seeChanges=Changes: {0}
+### Missing: notifications.globalsettings.email=Notifications Email
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hourly
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Weekly
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Live
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Details of the changes
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Nothing
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standard
+### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Inclusive
+### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Exclusive
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Never
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Every time I make a modification
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Every time I make a major modification
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Only when I create a new page
+
+## User profile
+### Missing: notifications.userprofile.following=Following
+### Missing: notifications.userprofile.notfollowing=Not following
+### Missing: notifications.userprofile.follow=Start following
+### Missing: notifications.userprofile.unfollow=Stop following
+### Missing: notifications.userprofile.done=Done
+### Missing: notifications.userprofile.saving=Saving...
+### Missing: notifications.userprofile.error=Error saving the notification setting
+
+## Macros description
+### Missing: rendering.macro.notificationsApplicationsPreferences.name=Notifications Applications Preferences
+### Missing: rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+
+### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
+### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+
+## Toggle notification filters labels
+### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
+### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
+### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
+
+## Notifications switches
+### Missing: notifications.switches.tooltip.page=Watch this page
+### Missing: notifications.switches.tooltip.pageAndChildren=Watch this page and its children
+### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
+### Missing: notifications.switches.tooltip.wiki=Watch this wiki
+### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.
+
+</content>
+</xwikidoc>

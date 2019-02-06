@@ -39,40 +39,40 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-<content>### Missing: platform.flamingo.themes.home.title=Themes for Flamingo
-### Missing: platform.flamingo.themes.home.currenttheme=Current Theme
-### Missing: platform.flamingo.themes.home.otherthemes=Other available Themes
-### Missing: platform.flamingo.themes.home.warningOldColorThemeInstalled=This is the application to manage the Flamingo Themes. A Flamingo Theme is a customizable variation of any skin based on Flamingo. If you want to manage Color Themes for Colibri-based skins, you should go to {0}Colibri Color Themes Application{1}.
-### Missing: platform.flamingo.themes.home.warningCurrentOldColorTheme=The current Theme is a Colibri Color Theme which is not optimized to work with a skin based on Flamingo. We have tried our best to make it compatible, but the results might not be optimal.
-### Missing: platform.flamingo.themes.home.useThisTheme=Use this Theme
-### Missing: platform.flamingo.themes.home.newThemeName=Theme name...
-### Missing: platform.flamingo.themes.home.create=Create new Theme
-### Missing: platform.flamingo.themes.home.create.invalid=Invalid Theme name!
-### Missing: platform.flamingo.themes.home.create.csrf=For security reasons, please confirm that you want to create a Theme called "{0}".
-### Missing: platform.flamingo.themes.home.create.confirm=Confirm
-### Missing: platform.flamingo.themes.home.set.success=Theme set to "{0}".
-### Missing: platform.flamingo.themes.title.variables=Variables
-### Missing: platform.flamingo.themes.title.preview=Preview
-### Missing: platform.flamingo.themes.autorefresh=Auto refresh
-### Missing: platform.flamingo.themes.refresh=Refresh
-### Missing: platform.flamingo.themes.refreshwarning=The refresh can take several seconds.
-### Missing: platform.flamingo.themes.loading=Loading...
-### Missing: platform.flamingo.themes.category.logos=Logos
-### Missing: platform.flamingo.themes.category.base-colors=Base colors
-### Missing: platform.flamingo.themes.category.typography=Typography
-### Missing: platform.flamingo.themes.category.forms=Forms
-### Missing: platform.flamingo.themes.category.buttons=Buttons
-### Missing: platform.flamingo.themes.category.tables=Tables
-### Missing: platform.flamingo.themes.category.navbar=Navigation Bar
-### Missing: platform.flamingo.themes.category.dropdowns=Drop downs
-### Missing: platform.flamingo.themes.category.panels=Panels
-### Missing: platform.flamingo.themes.category.breadcrumb=Breadcrumb
-### Missing: platform.flamingo.themes.category.advanced=Advanced
-### Missing: platform.flamingo.themes.defaultvalue=Default
-### Missing: platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
-### Missing: platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
-### Missing: platform.flamingo.themes.local=Local
-### Missing: platform.flamingo.themes.global=Global
+<content>platform.flamingo.themes.home.title=Темы Фламинго
+platform.flamingo.themes.home.currenttheme=Текущая тема
+platform.flamingo.themes.home.otherthemes=Другие темы
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Это приложение для управления темами фламинго. Тема Фламинго - это настраиваемая вариация любого скина на основе Фламинго. Если вы хотите управлять Цветовыми темами для оболочек на основе Colibri, перейдите в {0} Приложение Цветовые темы Colibri {1}.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Текущей темой является Colibri Color Theme, которая не оптимизирована для работы со скинами на основе фламинго. Мы старались сделать его совместимым, но результаты могут быть не оптимальными.
+platform.flamingo.themes.home.useThisTheme=Использовать эту тему
+platform.flamingo.themes.home.newThemeName=Название темы...
+platform.flamingo.themes.home.create=Создать новую тему
+platform.flamingo.themes.home.create.invalid=Неверное название темы!
+platform.flamingo.themes.home.create.csrf=По соображениям безопасности, пожалуйста, подтвердите, что вы хотите создать тему под названием "{0}".
+platform.flamingo.themes.home.create.confirm=Подтвердить
+platform.flamingo.themes.home.set.success=Тема установлена на "{0}".
+platform.flamingo.themes.title.variables=Переменные
+platform.flamingo.themes.title.preview=Предпросмотр
+platform.flamingo.themes.autorefresh=Автообновление
+platform.flamingo.themes.refresh=Обновить
+platform.flamingo.themes.refreshwarning=Обновление может занять несколько секунд.
+platform.flamingo.themes.loading=Загрузка...
+platform.flamingo.themes.category.logos=Логотипы
+platform.flamingo.themes.category.base-colors=Базовые цвета
+platform.flamingo.themes.category.typography=Шрифты
+platform.flamingo.themes.category.forms=Формы
+platform.flamingo.themes.category.buttons=Кнопки
+platform.flamingo.themes.category.tables=Таблицы
+platform.flamingo.themes.category.navbar=Панель навигации
+platform.flamingo.themes.category.dropdowns=Списки выбора
+platform.flamingo.themes.category.panels=Панели
+platform.flamingo.themes.category.breadcrumb=Хлебные крошки
+platform.flamingo.themes.category.advanced=Дополнительно
+platform.flamingo.themes.defaultvalue=По-умолчанию
+platform.flamingo.themes.lessCode.description=В этом поле вы можете напрямую написать LESS-код, который будет добавлен в скин.
+platform.flamingo.themes.incompatiblebrowser=Извините, предварительный просмотр не работает с этой версией Internet Explorer. Вам нужно использовать более новый браузер.
+platform.flamingo.themes.local=Локальные
+platform.flamingo.themes.global=Глобальные
 
 ###############################################################################
 ## Deprecated
@@ -85,7 +85,7 @@
 #######################################
 ## until 7.3M1
 #######################################
-### Missing: platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
+platform.flamingo.themes.lessCode.warning=К сожалению, это поле не учитывается при предварительном просмотре.
 
 #@deprecatedend</content>
 </xwikidoc>

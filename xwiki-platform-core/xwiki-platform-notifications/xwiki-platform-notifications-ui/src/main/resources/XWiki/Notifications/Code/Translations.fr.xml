@@ -203,5 +203,12 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=C
 notifications.filters.preferences.label.page=Activer/désactiver les notifications de Page uniquement
 notifications.filters.preferences.label.space=Activer/désactiver les notifications de Page et enfants
 notifications.filters.preferences.label.wiki=Activer/désactiver les notifications du Wiki
+
+## Notifications switches
+notifications.switches.tooltip.page=Suivre cette page
+notifications.switches.tooltip.pageAndChildren=Suivre cette page et ses enfants
+notifications.switches.tooltip.space=Suivre la page parente et ses enfants
+notifications.switches.tooltip.wiki=Suivre ce wiki
+notifications.switches.changeStatusError=Échec lors du chargement du status des notifications.
 </content>
 </xwikidoc>

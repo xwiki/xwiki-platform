@@ -2423,13 +2423,6 @@ public class XWiki implements EventListener
         Map<String, String> queryParameters)
     {
         XWikiURLFactory urlf = context.getURLFactory();
-        Map<String,String> queryParametersMap;
-
-        if (queryParameters == null) {
-            queryParametersMap = new HashMap<>();
-        } else {
-            queryParametersMap = new HashMap<>(queryParameters);
-        }
 
         try {
             // Try in the specified skin
@@ -2453,8 +2446,9 @@ public class XWiki implements EventListener
             // Look for a resource file
             String resourceFilePath = "/resources/" + filename;
             if (resourceExists(resourceFilePath)) {
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
-                    getResourceURLCacheParameters(resourceFilePath));
+                Map<String,String> queryParametersMap = getResourceURLCacheParameters(resourceFilePath);
+                queryParametersMap.putAll(queryParameters);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context, queryParametersMap);
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {

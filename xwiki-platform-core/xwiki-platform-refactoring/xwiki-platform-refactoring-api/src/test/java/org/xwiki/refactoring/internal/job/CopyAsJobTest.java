@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -72,13 +71,6 @@ public class CopyAsJobTest extends AbstractEntityJobTest
         run(request);
 
         verify(this.modelBridge).copy(sourceReference, copyReference);
-
-        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
-        verify(linkRefactoring, never()).renameLinks(any(DocumentReference.class), any(DocumentReference.class),
-            any(DocumentReference.class));
-        verify(linkRefactoring).updateRelativeLinks(sourceReference, copyReference);
-
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
-        verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
     }
 }

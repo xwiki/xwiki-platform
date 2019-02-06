@@ -17,44 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.internal.job;
+package org.xwiki.refactoring.event;
 
-import java.util.Collection;
-
-import javax.inject.Named;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.observation.event.AbstractCancelableEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
+import org.xwiki.stability.Unstable;
 
 /**
- * A job that can rename entities.
+ * Event fired when multiple entities are about to be renamed.
  * 
  * @version $Id$
- * @since 7.2M1
+ * @since 11.1RC1
  */
-@Component
-@Named(RefactoringJobs.RENAME)
-public class RenameJob extends MoveJob
+@Unstable
+public class EntitiesRenamingEvent extends AbstractCancelableEvent implements BeginFoldEvent
 {
-    @Override
-    public String getType()
-    {
-        return RefactoringJobs.RENAME;
-    }
-
-    @Override
-    protected void process(Collection<EntityReference> entityReferences)
-    {
-        if (entityReferences.size() == 1) {
-            process(entityReferences.iterator().next());
-        }
-    }
-
-    @Override
-    protected boolean processOnlySameSourceDestinationTypes()
-    {
-        // rename always process same destination types
-        return true;
-    }
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
 }

@@ -37,15 +37,16 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.refactoring.internal.LinkRefactoring;
+import org.xwiki.refactoring.event.DocumentRenamedEvent;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
+import org.xwiki.refactoring.event.EntitiesRenamedEvent;
+import org.xwiki.refactoring.event.EntitiesRenamingEvent;
 import org.xwiki.refactoring.internal.job.AbstractEntityJob.Visitor;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -117,8 +118,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a document.",
             EntityType.DOCUMENT);
 
-        run(createRequest(new SpaceReference("Space", new WikiReference("wiki")), new DocumentReference("test", "A",
-            "B")));
+        run(createRequest(new SpaceReference("Space", new WikiReference("wiki")),
+            new DocumentReference("test", "A", "B")));
         verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a space.",
             EntityType.DOCUMENT);
 
@@ -207,8 +208,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger()).error(
-            "You don't have sufficient permissions over the destination document [{}].", newReference);
+        verify(this.mocker.getMockedLogger())
+            .error("You don't have sufficient permissions over the destination document [{}].", newReference);
 
         verifyNoMove();
     }
@@ -237,8 +238,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger()).error(
-            "You don't have sufficient permissions over the destination document [{}].", newReference);
+        verify(this.mocker.getMockedLogger())
+            .error("You don't have sufficient permissions over the destination document [{}].", newReference);
 
         verifyNoMove();
     }
@@ -267,8 +268,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger()).error(
-            "You don't have sufficient permissions over the source document [{}].", oldReference);
+        verify(this.mocker.getMockedLogger())
+            .error("You don't have sufficient permissions over the source document [{}].", oldReference);
 
         verifyNoMove();
     }
@@ -297,8 +298,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger()).error(
-            "You don't have sufficient permissions over the source document [{}].", oldReference);
+        verify(this.mocker.getMockedLogger())
+            .error("You don't have sufficient permissions over the source document [{}].", oldReference);
 
         verifyNoMove();
     }
@@ -309,10 +310,6 @@ public class MoveJobTest extends AbstractMoveJobTest
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
 
-        DocumentReference backLinkReference = new DocumentReference("wiki", "Three", "BackLink");
-        when(this.modelBridge.getBackLinkedReferences(oldReference, "wiki"))
-            .thenReturn(Arrays.asList(backLinkReference));
-
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
         when(this.modelBridge.exists(newReference)).thenReturn(true);
 
@@ -320,56 +317,107 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         when(this.modelBridge.delete(newReference)).thenReturn(true);
         when(this.modelBridge.copy(oldReference, newReference)).thenReturn(true);
+        when(this.modelBridge.delete(oldReference)).thenReturn(true);
 
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(false);
         request.setCheckAuthorRights(false);
         request.setInteractive(false);
         request.setUserReference(userReference);
-        run(request);
+        Job job = run(request);
 
-        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
-        verify(linkRefactoring).renameLinks(backLinkReference, oldReference, newReference);
-        verify(linkRefactoring).updateRelativeLinks(oldReference, newReference);
+        verify(this.observationManager).notify(new EntitiesRenamingEvent(), job, request);
+        verify(this.observationManager).notify(new DocumentRenamingEvent(oldReference, newReference), job, request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(oldReference);
-        verify(this.modelBridge).createRedirect(oldReference, newReference);
-        verify(this.modelBridge).updateParentField(oldReference, newReference);
+
+        verify(this.observationManager).notify(new DocumentRenamedEvent(oldReference, newReference), job, request);
+        verify(this.observationManager).notify(new EntitiesRenamedEvent(), job, request);
     }
 
     @Test
-    public void updateLinksOnFarm() throws Throwable
+    public void cancelEntitiesRenamingEvent() throws Throwable
     {
-        DocumentReference oldReference = new DocumentReference("foo", "One", "Page");
+        DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
 
-        DocumentReference newReference = new DocumentReference("foo", "Two", "Page");
-        when(this.modelBridge.exists(newReference)).thenReturn(false);
+        DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
+        when(this.modelBridge.exists(newReference)).thenReturn(true);
 
-        when(this.modelBridge.copy(oldReference, newReference)).thenReturn(true);
-
-        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("foo", "bar"));
-
-        DocumentReference aliceReference = new DocumentReference("foo", "Alice", "BackLink");
-        when(this.modelBridge.getBackLinkedReferences(oldReference, "foo")).thenReturn(Arrays.asList(aliceReference));
-
-        DocumentReference bobReference = new DocumentReference("bar", "Bob", "BackLink");
-        when(this.modelBridge.getBackLinkedReferences(oldReference, "bar")).thenReturn(Arrays.asList(bobReference));
-
-        MoveRequest request = createRequest(oldReference, newReference.getParent());
+        MoveRequest request = createRequest(oldReference, newReference);
         request.setCheckRights(false);
         request.setCheckAuthorRights(false);
         request.setInteractive(false);
-        request.setUpdateLinksOnFarm(true);
 
-        GroupedJob job = (GroupedJob) run(request);
-        assertEquals(RefactoringJobs.GROUP, job.getGroupPath().toString());
+        doAnswer((Answer<Void>) invocation -> {
+            ((EntitiesRenamingEvent) invocation.getArgument(0)).cancel();
+            return null;
+        }).when(this.observationManager).notify(eq(new EntitiesRenamingEvent()), any(MoveJob.class), eq(request));
 
-        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
-        verify(linkRefactoring).renameLinks(aliceReference, oldReference, newReference);
-        verify(linkRefactoring).renameLinks(bobReference, oldReference, newReference);
+        Job job = run(request);
+
+        verify(this.observationManager).notify(new EntitiesRenamingEvent(), job, request);
+        verify(this.observationManager, never()).notify(any(DocumentRenamingEvent.class), any(), any());
+
+        verify(this.modelBridge, never()).delete(any());
+        verify(this.modelBridge, never()).copy(any(), any());
+
+        verify(this.observationManager, never()).notify(any(DocumentRenamedEvent.class), any(), any());
+        verify(this.observationManager, never()).notify(any(EntitiesRenamedEvent.class), any(), any());
+    }
+
+    @Test
+    public void cancelDocumentRenamingEvent() throws Throwable
+    {
+        SpaceReference sourceReference = new SpaceReference("wiki", "Source");
+        DocumentReference oldAliceReference = new DocumentReference("Alice", sourceReference);
+        when(this.modelBridge.exists(oldAliceReference)).thenReturn(true);
+        DocumentReference oldBobReference = new DocumentReference("Bob", sourceReference);
+        when(this.modelBridge.exists(oldBobReference)).thenReturn(true);
+        when(this.modelBridge.getDocumentReferences(sourceReference))
+            .thenReturn(Arrays.asList(oldAliceReference, oldBobReference));
+
+        SpaceReference destinationReference = new SpaceReference("wiki", "Destination");
+        DocumentReference newAliceReference =
+            new DocumentReference("Alice", new SpaceReference("Source", destinationReference));
+        DocumentReference newBobReference =
+            new DocumentReference("Bob", new SpaceReference("Source", destinationReference));
+        when(this.modelBridge.copy(oldBobReference, newBobReference)).thenReturn(true);
+        when(this.modelBridge.delete(oldBobReference)).thenReturn(true);
+
+        MoveRequest request = createRequest(sourceReference, destinationReference);
+        request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
+
+        // Cancel the rename of the first document.
+        doAnswer((Answer<Void>) invocation -> {
+            ((DocumentRenamingEvent) invocation.getArgument(0)).cancel();
+            return null;
+        }).when(this.observationManager).notify(eq(new DocumentRenamingEvent(oldAliceReference, newAliceReference)),
+            any(MoveJob.class), eq(request));
+
+        Job job = run(request);
+
+        verify(this.observationManager).notify(new EntitiesRenamingEvent(), job, request);
+
+        // The rename of the first document is canceled.
+        verify(this.observationManager).notify(new DocumentRenamingEvent(oldAliceReference, newAliceReference), job,
+            request);
+        verify(this.modelBridge, never()).copy(oldAliceReference, newAliceReference);
+        verify(this.modelBridge, never()).delete(oldAliceReference);
+        verify(this.observationManager, never()).notify(new DocumentRenamedEvent(oldAliceReference, newAliceReference),
+            job, request);
+
+        // The second document is still renamed.
+        verify(this.observationManager).notify(new DocumentRenamingEvent(oldBobReference, newBobReference), job,
+            request);
+        verify(this.modelBridge).copy(oldBobReference, newBobReference);
+        verify(this.modelBridge).delete(oldBobReference);
+        verify(this.observationManager).notify(new DocumentRenamedEvent(oldBobReference, newBobReference), job,
+            request);
+
+        verify(this.observationManager).notify(new EntitiesRenamedEvent(), job, request);
     }
 
     @Test
@@ -384,18 +432,9 @@ public class MoveJobTest extends AbstractMoveJobTest
         MoveRequest request = createRequest(source, destination);
         request.setCheckRights(false);
         request.setCheckAuthorRights(false);
-        request.setAutoRedirect(false);
-        request.setUpdateLinks(false);
         run(request);
 
         verify(this.modelBridge).delete(source);
-        verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
-
-        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
-        verify(linkRefactoring, never()).renameLinks(any(DocumentReference.class), any(DocumentReference.class),
-            any(DocumentReference.class));
-        verify(linkRefactoring, never()).updateRelativeLinks(any(DocumentReference.class),
-            any(DocumentReference.class));
     }
 
     @Test
@@ -417,8 +456,7 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         verify(this.modelBridge).copy(docFromSpace, new DocumentReference("tennis", "C", "X"));
 
-        ObservationManager observationManager = this.mocker.getInstance(ObservationManager.class);
-        verify(observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
+        verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
             eq(Collections.singletonMap(docFromSpace, new EntitySelection(docFromSpace))));
     }
 
@@ -454,12 +492,12 @@ public class MoveJobTest extends AbstractMoveJobTest
         GroupedJob job = (GroupedJob) getMocker().getComponentUnderTest();
         job.initialize(request);
 
-        assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "A")), job.getGroupPath());
+        assertEquals(new JobGroupPath(Arrays.asList(RefactoringJobs.GROUP, "chess", "A")), job.getGroupPath());
 
         request.setUpdateLinksOnFarm(true);
         job.initialize(request);
 
-        assertEquals(new JobGroupPath(Arrays.asList("refactoring")), job.getGroupPath());
+        assertEquals(new JobGroupPath(Arrays.asList(RefactoringJobs.GROUP)), job.getGroupPath());
     }
 
     @Test
@@ -471,12 +509,11 @@ public class MoveJobTest extends AbstractMoveJobTest
         MoveRequest request = createRequest(sourceReference, destinationReference);
         request.setCheckRights(false);
 
-        ObservationManager observationManager = this.mocker.getInstance(ObservationManager.class);
         doAnswer((Answer<Void>) invocation -> {
             DocumentsDeletingEvent event = invocation.getArgument(0);
             event.cancel();
             return null;
-        }).when(observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class), any(Map.class));
+        }).when(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class), any(Map.class));
 
         run(request);
 
@@ -492,13 +529,12 @@ public class MoveJobTest extends AbstractMoveJobTest
         MoveRequest request = createRequest(sourceReference, destinationReference);
         request.setCheckRights(false);
 
-        ObservationManager observationManager = this.mocker.getInstance(ObservationManager.class);
         doAnswer((Answer<Void>) invocation -> {
             Map<EntityReference, EntitySelection> concernedEntities =
                 (Map<EntityReference, EntitySelection>) invocation.getArgument(2);
             concernedEntities.get(sourceReference).setSelected(false);
             return null;
-        }).when(observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class), any(Map.class));
+        }).when(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class), any(Map.class));
 
         run(request);
 

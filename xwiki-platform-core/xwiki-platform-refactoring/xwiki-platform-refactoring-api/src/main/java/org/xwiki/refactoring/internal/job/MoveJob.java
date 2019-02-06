@@ -19,12 +19,21 @@
  */
 package org.xwiki.refactoring.internal.job;
 
+import java.util.Collection;
+
 import javax.inject.Named;
 
+import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.refactoring.event.DocumentRenamedEvent;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
+import org.xwiki.refactoring.event.EntitiesRenamedEvent;
+import org.xwiki.refactoring.event.EntitiesRenamingEvent;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.security.authorization.Right;
 
 /**
  * A job that can move entities to a new parent within the hierarchy.
@@ -43,30 +52,97 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     }
 
     @Override
-    protected boolean isDeleteSources()
+    protected void runInternal() throws Exception
     {
-        return this.request.isDeleteSource();
-    }
+        this.progressManager.pushLevelProgress(3, this);
 
-    @Override
-    protected void postMove(DocumentReference oldReference, DocumentReference newReference)
-    {
-        // Create an automatic redirect.
-        this.progressManager.startStep(this);
-        if (isDeleteSources() && this.request.isAutoRedirect()) {
-            this.modelBridge.createRedirect(oldReference, newReference);
+        try {
+            this.progressManager.startStep(this);
+            EntitiesRenamingEvent entitiesRenamingEvent = new EntitiesRenamingEvent();
+            this.observationManager.notify(entitiesRenamingEvent, this, this.getRequest());
+            if (entitiesRenamingEvent.isCanceled()) {
+                return;
+            }
+            this.progressManager.endStep(this);
+
+            this.progressManager.startStep(this);
+            super.runInternal();
+            this.progressManager.endStep(this);
+
+            this.progressManager.startStep(this);
+            EntitiesRenamedEvent entitiesRenamedEvent = new EntitiesRenamedEvent();
+            this.observationManager.notify(entitiesRenamedEvent, this, this.getRequest());
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
         }
     }
 
     @Override
-    protected void postUpdateDocuments(DocumentReference oldReference, DocumentReference newReference)
+    protected void getEntities(Collection<EntityReference> entityReferences)
     {
-        // (legacy) Preserve existing parent-child relationships by updating the parent field of documents
-        // having the moved document as parent.
-        this.progressManager.startStep(this);
-        if (this.request.isUpdateParentField()) {
-            this.modelBridge.updateParentField(oldReference, newReference);
+        super.getEntities(entityReferences);
+
+        // Send the event
+        DocumentsDeletingEvent event = new DocumentsDeletingEvent();
+        this.observationManager.notify(event, this, this.concernedEntities);
+
+        // Stop the job if some listener has canceled the action
+        if (event.isCanceled()) {
+            getStatus().cancel();
         }
-        this.progressManager.endStep(this);
+    }
+
+    @Override
+    protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference)
+    {
+        if (!hasAccess(Right.DELETE, oldReference)) {
+            // The move operation is implemented as Copy + Delete.
+            this.logger.error("You are not allowed to delete [{}].", oldReference);
+            return false;
+        } else {
+            return super.checkAllRights(oldReference, newReference);
+        }
+    }
+
+    @Override
+    protected boolean copyOrMove(DocumentReference oldReference, DocumentReference newReference)
+    {
+        this.progressManager.pushLevelProgress(4, this);
+
+        try {
+            // Step 1: Send before event.
+            this.progressManager.startStep(this);
+            DocumentRenamingEvent documentRenamingEvent = new DocumentRenamingEvent(oldReference, newReference);
+            this.observationManager.notify(documentRenamingEvent, this, this.getRequest());
+            if (documentRenamingEvent.isCanceled()) {
+                return false;
+            }
+            this.progressManager.endStep(this);
+
+            // Step 2: Copy the source document.
+            this.progressManager.startStep(this);
+            if (!super.copyOrMove(oldReference, newReference)) {
+                return false;
+            }
+            this.progressManager.endStep(this);
+
+            // Step 3: Delete the source document.
+            this.progressManager.startStep(this);
+            if (!this.modelBridge.delete(oldReference)) {
+                return false;
+            }
+            this.progressManager.endStep(this);
+
+            // Step 4: Send after event.
+            this.progressManager.startStep(this);
+            DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(oldReference, newReference);
+            this.observationManager.notify(documentRenamedEvent, this, this.getRequest());
+            this.progressManager.endStep(this);
+
+            return true;
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
     }
 }

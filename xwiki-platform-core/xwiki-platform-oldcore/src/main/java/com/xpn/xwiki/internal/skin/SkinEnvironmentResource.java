@@ -32,6 +32,7 @@ import javax.inject.Provider;
 import org.xwiki.environment.Environment;
 import org.xwiki.skin.ResourceRepository;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -56,23 +57,26 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
         Map<String, String> parameters = new LinkedHashMap<>();
-        Path resourcePath = Paths.get(resourceUrl.toURI());
-        FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
-        parameters.put("cache-version", String.valueOf(lastModifiedTime.toMillis()));
+        try {
+            URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
+            Path resourcePath = Paths.get(resourceUrl.toURI());
+            FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+            parameters.put(XWiki.CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));
+        } catch (Exception e) {
+            parameters.put(XWiki.CACHE_VERSION, xcontext.getWiki().getVersion());
+        }
 
         XWikiURLFactory urlf = xcontext.getURLFactory();
 
         URL url;
 
         if (forceSkinAction) {
-            url = urlf.createSkinURL(this.resourceName, "skins", getRepository().getId(), xcontext);
+            url = urlf.createSkinURL(this.resourceName, "skins", getRepository().getId(), xcontext, parameters);
         } else {
-            url = urlf.createSkinURL(this.resourceName, getRepository().getId(), xcontext);
+            url = urlf.createSkinURL(this.resourceName, getRepository().getId(), xcontext, parameters);
         }
 
-        url = urlf.addQueryParameters(url, parameters);
         return urlf.getURL(url, xcontext);
     }
 }

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.HttpServletUtils;
@@ -444,23 +445,37 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return this.createURL(spaces, name, action, querystring, anchor, xwikidb, context);
     }
 
+    private URL buildURL(URL serverUrl, String path, Map<String, String> queryParameters, XWikiContext context)
+    {
+        try {
+            URIBuilder uriBuilder = new URIBuilder(serverUrl.toURI()).setPath(path);
+            for (Map.Entry<String, String> queryParameter : queryParameters.entrySet()) {
+                uriBuilder.addParameter(queryParameter.getKey(), queryParameter.getValue());
+            }
+            return normalizeURL(uriBuilder.build().toURL(), context);
+        } catch (MalformedURLException | URISyntaxException e) {
+            return null;
+        }
+    }
+
     @Override
-    public URL createSkinURL(String filename, String skin, XWikiContext context)
+    public URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, String> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         path.append("skins/");
         path.append(skin);
         addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
+            return buildURL(getServerURL(context), path.toString(), queryParameters, context);
         } catch (MalformedURLException e) {
-            // This should not happen
+            // should not happen
             return null;
         }
     }
 
     @Override
-    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
+    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context,
+        Map<String, String> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         addServletPath(path, xwikidb, context);
@@ -473,7 +488,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addName(path, name, "skin", context);
         addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
+            return buildURL(getServerURL(xwikidb, context), path.toString(), queryParameters, context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -481,7 +496,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
+        Map<String, String> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         if (forceSkinAction) {
@@ -491,7 +507,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         path.append("resources");
         addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
+            return buildURL(getServerURL(context), path.toString(), queryParameters, context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;

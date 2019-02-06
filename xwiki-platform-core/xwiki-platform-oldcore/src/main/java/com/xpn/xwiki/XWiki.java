@@ -266,6 +266,11 @@ public class XWiki implements EventListener
 
     public static final String DEFAULT_SKIN = InternalSkinConfiguration.DEFAULT_SKIN;
 
+    /**
+     * Query parameters used to control the browser cache version of a resource.
+     */
+    public static final String CACHE_VERSION = "cache-version";
+
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
@@ -278,11 +283,6 @@ public class XWiki implements EventListener
 
     /** Represents no value (ie the default value will be used) in xproperties */
     private static final String NO_VALUE = "---";
-
-    /**
-     * Query parameters used to determine if a resource is in the browser cache.
-     */
-    private static final String CACHE_VERSION = "cache-version";
 
     /**
      * List of top level space names that can be used in the fake context document created when accessing a resource
@@ -2453,9 +2453,8 @@ public class XWiki implements EventListener
             // Look for a resource file
             String resourceFilePath = "/resources/" + filename;
             if (resourceExists(resourceFilePath)) {
-                queryParametersMap.putAll(getResourceURLCacheParameters(resourceFilePath));
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
-                url = urlf.addQueryParameters(url, queryParametersMap);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                    getResourceURLCacheParameters(resourceFilePath));
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2472,8 +2471,6 @@ public class XWiki implements EventListener
         } else {
             url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
         }
-        queryParametersMap.putAll(getResourceURLCacheParameters(url));
-        url = urlf.addQueryParameters(url, queryParametersMap);
         return urlf.getURL(url, context);
     }
 

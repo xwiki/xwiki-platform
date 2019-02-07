@@ -67,7 +67,7 @@ public abstract class XWikiDefaultURLFactory implements XWikiURLFactory
 
     @Override
     public URL createSkinURL(String filename, String spaces, String name, XWikiContext context,
-        Map<String, String> queryParameters)
+        Map<String, Object> queryParameters)
     {
         return createSkinURL(filename, spaces, name, context.getWikiId(), context, queryParameters);
     }

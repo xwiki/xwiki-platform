@@ -119,7 +119,7 @@ public interface XWikiURLFactory
      * @since 11.1RC1
      */
     @Unstable
-    URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, String> queryParameters);
+    URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, Object> queryParameters);
 
     /**
      * Create an URL for the filename located in the spaces and with given repository.
@@ -143,7 +143,7 @@ public interface XWikiURLFactory
      */
     @Unstable
     URL createSkinURL(String filename, String spaces, String name, XWikiContext context,
-        Map<String, String> queryParameters);
+        Map<String, Object> queryParameters);
 
     /**
      * Create an URL for the filename located in the spaces and with given repository.
@@ -169,7 +169,7 @@ public interface XWikiURLFactory
      */
     @Unstable
     URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context,
-        Map<String, String> queryParameters);
+        Map<String, Object> queryParameters);
 
     /**
      * Create an URL for the file resource.
@@ -191,7 +191,7 @@ public interface XWikiURLFactory
      */
     @Unstable
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
-        Map<String, String> queryParameters);
+        Map<String, Object> queryParameters);
 
     /**
      * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If

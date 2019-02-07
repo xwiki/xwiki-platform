@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -445,12 +446,28 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return this.createURL(spaces, name, action, querystring, anchor, xwikidb, context);
     }
 
-    private URL buildURL(URL serverUrl, String path, Map<String, String> queryParameters, XWikiContext context)
+    private URL buildURL(URL serverUrl, String path, Map<String, Object> queryParameters, XWikiContext context)
     {
         try {
             URIBuilder uriBuilder = new URIBuilder(serverUrl.toURI()).setPath(path);
-            for (Map.Entry<String, String> queryParameter : queryParameters.entrySet()) {
-                uriBuilder.addParameter(queryParameter.getKey(), queryParameter.getValue());
+            for (Map.Entry<String, Object> queryParameter : queryParameters.entrySet()) {
+                String key = queryParameter.getKey();
+                Object paramValue = queryParameter.getValue();
+
+                if (paramValue instanceof String) {
+                    uriBuilder.addParameter(key, (String) paramValue);
+                } else if (paramValue instanceof String[]) {
+                    for (String paramValueElement : (String[]) paramValue) {
+                        uriBuilder.addParameter(key, paramValueElement);
+                    }
+                } else if (paramValue instanceof Collection) {
+                    for (Object paramValueElement : (Collection) paramValue) {
+                        uriBuilder.addParameter(key, paramValueElement.toString());
+                    }
+                } else {
+                    uriBuilder.addParameter(key, paramValue.toString());
+                }
+
             }
             return normalizeURL(uriBuilder.build().toURL(), context);
         } catch (MalformedURLException | URISyntaxException e) {
@@ -459,7 +476,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, String> queryParameters)
+    public URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, Object> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         path.append("skins/");
@@ -475,7 +492,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     @Override
     public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context,
-        Map<String, String> queryParameters)
+        Map<String, Object> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         addServletPath(path, xwikidb, context);
@@ -497,7 +514,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
-        Map<String, String> queryParameters)
+        Map<String, Object> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         if (forceSkinAction) {

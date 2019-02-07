@@ -24,9 +24,12 @@ import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.EventListener;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
@@ -66,6 +69,10 @@ public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
         getComponentManager().unregisterComponent(EventListener.class, "XObjectEventGeneratorListener");
         getComponentManager().unregisterComponent(EventListener.class, "AttachmentEventGeneratorListener");
         getComponentManager().unregisterComponent(EventListener.class, "XClassPropertyEventGeneratorListener");
+        getComponentManager().unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
+        getComponentManager().unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
+        getComponentManager().unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
+        getComponentManager().unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
     }
 
     protected void setContext(XWikiContext ctx)

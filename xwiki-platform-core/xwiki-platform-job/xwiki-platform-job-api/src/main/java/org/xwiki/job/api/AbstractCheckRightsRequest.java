@@ -60,7 +60,7 @@ public abstract class AbstractCheckRightsRequest extends AbstractRequest
      */
     public boolean isCheckAuthorRights()
     {
-        return getProperty(PROPERTY_CHECK_AUTHOR_RIGHTS, true);
+        return getProperty(PROPERTY_CHECK_AUTHOR_RIGHTS, isCheckRights());
     }
 
     /**

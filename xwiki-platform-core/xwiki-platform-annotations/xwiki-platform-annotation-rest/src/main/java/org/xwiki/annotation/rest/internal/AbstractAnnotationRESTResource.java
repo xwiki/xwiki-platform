@@ -49,6 +49,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.XWikiServletResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
@@ -109,8 +111,27 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         Collection<Annotation> annotations = annotationService.getAnnotations(documentName);
         // filter them according to the request
         Collection<Annotation> filteredAnnotations = filterAnnotations(annotations, request);
-        // render the document with the filtered annotations on it
-        String renderedHTML = renderDocumentWithAnnotations(documentName, null, DEFAULT_ACTION, filteredAnnotations);
+
+        // Block the redirects as they are leading to an unexpected result for the annotations.
+        XWikiContext context = this.xcontextProvider.get();
+        XWikiResponse contextResponse = context.getResponse();
+        String renderedHTML;
+        try {
+            context.setResponse(new XWikiServletResponse(contextResponse)
+            {
+                @Override
+                public void sendRedirect(String location)
+                {
+                    // Do nothing as the purpose is to block the redirects.
+                }
+            });
+            // render the document with the filtered annotations on it
+            renderedHTML = renderDocumentWithAnnotations(documentName, null, DEFAULT_ACTION, filteredAnnotations);
+        } finally {
+            // Reset response to initial
+            context.setResponse(contextResponse);
+        }
+
         // prepare the annotated content
         AnnotatedContent annotatedContentResponse = factory.createAnnotatedContent();
         annotatedContentResponse.getAnnotations().addAll(

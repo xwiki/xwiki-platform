@@ -51,6 +51,7 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -114,6 +115,11 @@ public class XarExtensionHandlerTest
     @Before
     public void setUp() throws Exception
     {
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
+
         // mock
 
         this.contextUser = new DocumentReference(getXWikiContext().getWikiId(), "XWiki", "ExtensionUser");

@@ -28,6 +28,7 @@ import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.observation.EventListener;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -50,6 +51,11 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     public void setUp() throws Exception
     {
         super.setUp();
+
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
 
         this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
 

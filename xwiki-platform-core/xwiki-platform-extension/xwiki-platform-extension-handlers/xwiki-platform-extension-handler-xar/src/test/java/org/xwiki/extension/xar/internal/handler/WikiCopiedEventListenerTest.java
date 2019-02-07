@@ -35,6 +35,7 @@ import org.xwiki.extension.repository.internal.local.DefaultLocalExtensionReposi
 import org.xwiki.extension.test.EmptyExtension;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -86,6 +87,15 @@ public class WikiCopiedEventListenerTest
 
         this.localExtensionDependency1 = this.localExtensionRepository.storeExtension(extensionDependency);
         this.localExtension1 = this.localExtensionRepository.storeExtension(extension);
+
+        this.repositoryUtil.getComponentManager().unregisterComponent(EventListener.class,
+            "refactoring.automaticRedirectCreator");
+        this.repositoryUtil.getComponentManager().unregisterComponent(EventListener.class,
+            "refactoring.backLinksUpdater");
+        this.repositoryUtil.getComponentManager().unregisterComponent(EventListener.class,
+            "refactoring.relativeLinksUpdater");
+        this.repositoryUtil.getComponentManager().unregisterComponent(EventListener.class,
+            "refactoring.legacyParentFieldUpdater");
     }
 
     @AfterComponent

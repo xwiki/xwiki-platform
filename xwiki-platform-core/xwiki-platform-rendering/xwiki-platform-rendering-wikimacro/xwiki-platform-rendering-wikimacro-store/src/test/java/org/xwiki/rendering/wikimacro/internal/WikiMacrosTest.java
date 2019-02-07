@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
@@ -58,6 +59,11 @@ public class WikiMacrosTest
     @Before
     public void before() throws Exception
     {
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
+
         this.macroDocument = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
         this.macroDocument.setSyntax(Syntax.XWIKI_2_0);
         this.macroObject = new BaseObject();

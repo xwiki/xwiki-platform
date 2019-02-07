@@ -147,7 +147,5 @@ Denne makro markerer tekst på en måde, så læserens opmærksomhed fanges:
 
 Denne makro laver automatisk en indholdsfortegnelse baseret på overskrifter i wiki-siden:
 
-{{toc/}}
-
-</content>
+{{toc/}}</content>
 </xwikidoc>

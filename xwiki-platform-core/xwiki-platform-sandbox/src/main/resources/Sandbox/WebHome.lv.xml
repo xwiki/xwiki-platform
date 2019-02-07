@@ -129,6 +129,5 @@ Sekojošais makross parāda tekstu brīdinājuma ziņojuma rāmī:
 
 Šis makross automātiski izveido lapas satura rādītāju, izmantojot lapā saliktos virsrakstus:
 
-{{toc/}}
-</content>
+{{toc/}}</content>
 </xwikidoc>

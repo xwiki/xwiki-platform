@@ -2414,13 +2414,9 @@ public class XWiki implements EventListener
      * @param filename the file name of the skin file wanted
      * @param forceSkinAction if true force the usage of directory /skins/ in the URL
      * @param context current context for the request
-     * @param queryParameters parameters to add to the URL
      * @return a resource URL for the asked filename
-     * @since 11.1RC1
      */
-    @Unstable
-    public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context,
-        Map<String, String> queryParameters)
+    public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
     {
         XWikiURLFactory urlf = context.getURLFactory();
 
@@ -2446,9 +2442,8 @@ public class XWiki implements EventListener
             // Look for a resource file
             String resourceFilePath = "/resources/" + filename;
             if (resourceExists(resourceFilePath)) {
-                Map<String,String> queryParametersMap = getResourceURLCacheParameters(resourceFilePath);
-                queryParametersMap.putAll(queryParameters);
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context, queryParametersMap);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                    getResourceURLCacheParameters(resourceFilePath));
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2466,11 +2461,6 @@ public class XWiki implements EventListener
             url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
         }
         return urlf.getURL(url, context);
-    }
-
-    public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
-    {
-        return getSkinFile(filename, forceSkinAction, context, new LinkedHashMap<>());
     }
 
     private Map<String, String> getResourceURLCacheParameters(String resourceFilePath)

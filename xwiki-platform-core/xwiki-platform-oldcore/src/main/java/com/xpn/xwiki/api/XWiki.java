@@ -1047,24 +1047,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
-     * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
-     * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
-     *
-     * @param filename Filename to be looked up in the skin (logo.gif, style.css)
-     * @param forceSkinAction true to make sure that static files are retrieved through the skin action, to allow
-     *            parsing of velocity on CSS files
-     * @param queryParameters Create the URL with the given query parameters
-     * @return URL to access this file
-     * @since 11.1RC1
-     */
-    @Unstable
-    public String getSkinFile(String filename, boolean forceSkinAction, Map<String, String> queryParameters)
-    {
-        return this.xwiki.getSkinFile(filename, forceSkinAction, getXWikiContext(), queryParameters);
-    }
-
-    /**
      * API to retrieve the current skin for this request and user The skin is first derived from the request "skin"
      * parameter If this parameter does not exist, the user preference "skin" is looked up If this parameter does not
      * exist or is empty, the space preference "skin" is looked up If this parameter does not exist or is empty, the

@@ -50,7 +50,6 @@ import org.xwiki.test.ui.XWikiWebDriver;
 import com.google.common.primitives.Ints;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
 
 /**
  * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that peforms the

@@ -31,9 +31,11 @@ import javax.inject.Provider;
 
 import org.xwiki.environment.Environment;
 import org.xwiki.skin.ResourceRepository;
+import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
@@ -44,6 +46,8 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
 {
     protected Provider<XWikiContext> xcontextProvider;
 
+    private URLConfiguration urlConfiguration;
+
     public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository,
         Environment environment, Provider<XWikiContext> xcontextProvider)
     {
@@ -52,18 +56,30 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
         this.xcontextProvider = xcontextProvider;
     }
 
+    private URLConfiguration getURLConfiguration() {
+        if (this.urlConfiguration == null) {
+            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
+        }
+
+        return this.urlConfiguration;
+    }
+
     @Override
     public String getURL(boolean forceSkinAction) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         Map<String, String> parameters = new LinkedHashMap<>();
-        try {
-            URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
-            Path resourcePath = Paths.get(resourceUrl.toURI());
-            FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
-            parameters.put(XWiki.CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));
-        } catch (Exception e) {
+        if (getURLConfiguration().useResourceLastModificationDate()) {
+            try {
+                URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
+                Path resourcePath = Paths.get(resourceUrl.toURI());
+                FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+                parameters.put(XWiki.CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));
+            } catch (Exception e) {
+                parameters.put(XWiki.CACHE_VERSION, xcontext.getWiki().getVersion());
+            }
+        } else {
             parameters.put(XWiki.CACHE_VERSION, xcontext.getWiki().getVersion());
         }
 

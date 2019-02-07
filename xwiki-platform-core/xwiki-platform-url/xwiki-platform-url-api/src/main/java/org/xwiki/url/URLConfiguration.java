@@ -35,4 +35,11 @@ public interface URLConfiguration
      *         implementations and thus allows to completely control the format of XWiki URLs.
      */
     String getURLFormatId();
+
+    /**
+     * @return true means that we'll check for the last modification date of a resource to put it as a query parameter
+     *         of the URL. This mechanism allows to avoid cache issues with the browser when modifying a file.
+     *         false means we'll fallback on the wiki version to handle this cache issue.
+     */
+    boolean useResourceLastModificationDate();
 }

@@ -168,6 +168,7 @@ import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -422,6 +423,8 @@ public class XWiki implements EventListener
 
     private EditConfiguration editConfiguration;
 
+    private URLConfiguration urlConfiguration;
+
     private StoreConfiguration storeConfiguration;
 
     private ObservationManager observationManager;
@@ -495,6 +498,14 @@ public class XWiki implements EventListener
         }
 
         return this.editConfiguration;
+    }
+
+    private URLConfiguration getURLConfiguration() {
+        if (this.urlConfiguration == null) {
+            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
+        }
+
+        return this.urlConfiguration;
     }
 
     private StoreConfiguration getStoreConfiguration()
@@ -2478,14 +2489,19 @@ public class XWiki implements EventListener
     {
         Map<String, String> parameters = new LinkedHashMap<>();
 
-        try {
-            Path resourcePath = Paths.get(resourceUrl.toURI());
-            FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
-            parameters.put(CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));
-        } catch (Exception e) {
-            LOGGER.debug("Error when trying to access properties of resource URL [{}]", resourceUrl, e);
+        if (getURLConfiguration().useResourceLastModificationDate()) {
+            try {
+                Path resourcePath = Paths.get(resourceUrl.toURI());
+                FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+                parameters.put(CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));
+            } catch (Exception e) {
+                LOGGER.debug("Error when trying to access properties of resource URL [{}]", resourceUrl, e);
+                parameters.put(CACHE_VERSION, getVersion());
+            }
+        } else {
             parameters.put(CACHE_VERSION, getVersion());
         }
+
         return parameters;
     }
 

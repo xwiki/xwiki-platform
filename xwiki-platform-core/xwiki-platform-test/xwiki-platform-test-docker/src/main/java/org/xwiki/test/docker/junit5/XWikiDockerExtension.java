@@ -49,6 +49,9 @@ import org.xwiki.test.ui.XWikiWebDriver;
 
 import com.google.common.primitives.Ints;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+
 /**
  * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that peforms the
  * following tasks.
@@ -93,6 +96,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     {
         // Note: TestConfiguration is created in evaluateExecutionCondition()à which executes before beforeAll()
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+
+        // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
+        // of debugging information.
+        if (testConfiguration.isDebug()) {
+            DockerTestUtils.setLogbackLoggerLevel("org.testcontainers", Level.INFO);
+            DockerTestUtils.setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
+        }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
         // "host.testcontainers.internal" host name.

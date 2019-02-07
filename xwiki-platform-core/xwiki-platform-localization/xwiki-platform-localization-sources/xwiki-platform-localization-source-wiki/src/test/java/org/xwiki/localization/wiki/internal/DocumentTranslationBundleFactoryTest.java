@@ -36,6 +36,7 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
@@ -79,6 +80,11 @@ public class DocumentTranslationBundleFactoryTest
     @Before
     public void before() throws Exception
     {
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
+        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
+
         this.oldcore.getXWikiContext().setMainXWiki("xwiki");
         this.oldcore.getXWikiContext().setWikiId("xwiki");
 

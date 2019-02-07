@@ -37,6 +37,7 @@ import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
@@ -99,6 +100,10 @@ public class ExtensionManagerScriptServiceTest
         // lookup
 
         this.scriptService = this.mocker.getInstance(ScriptService.class, "extension");
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
+        this.mocker.unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
     }
 
     // tools

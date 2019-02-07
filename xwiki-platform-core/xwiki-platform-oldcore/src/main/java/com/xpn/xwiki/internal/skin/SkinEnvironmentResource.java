@@ -49,19 +49,12 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
     private URLConfiguration urlConfiguration;
 
     public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository,
-        Environment environment, Provider<XWikiContext> xcontextProvider)
+        Environment environment, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
         super(path, resourceName, repository, environment);
 
         this.xcontextProvider = xcontextProvider;
-    }
-
-    private URLConfiguration getURLConfiguration() {
-        if (this.urlConfiguration == null) {
-            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
-        }
-
-        return this.urlConfiguration;
+        this.urlConfiguration = urlConfiguration;
     }
 
     @Override
@@ -69,8 +62,8 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        Map<String, String> parameters = new LinkedHashMap<>();
-        if (getURLConfiguration().useResourceLastModificationDate()) {
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        if (this.urlConfiguration.useResourceLastModificationDate()) {
             try {
                 URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
                 Path resourcePath = Paths.get(resourceUrl.toURI());

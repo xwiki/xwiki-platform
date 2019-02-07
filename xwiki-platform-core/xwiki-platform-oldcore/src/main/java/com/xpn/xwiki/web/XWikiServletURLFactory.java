@@ -456,9 +456,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
                 if (paramValue instanceof String) {
                     uriBuilder.addParameter(key, (String) paramValue);
-                } else if (paramValue instanceof String[]) {
-                    for (String paramValueElement : (String[]) paramValue) {
-                        uriBuilder.addParameter(key, paramValueElement);
+                } else if (paramValue instanceof Object[]) {
+                    for (Object paramValueElement : (Object[]) paramValue) {
+                        uriBuilder.addParameter(key, paramValueElement.toString());
                     }
                 } else if (paramValue instanceof Collection) {
                     for (Object paramValueElement : (Collection) paramValue) {

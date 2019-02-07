@@ -2474,7 +2474,7 @@ public class XWiki implements EventListener
         return urlf.getURL(url, context);
     }
 
-    private Map<String, String> getResourceURLCacheParameters(String resourceFilePath)
+    private Map<String, Object> getResourceURLCacheParameters(String resourceFilePath)
     {
         try {
             URL resourceUrl = getResource(resourceFilePath);
@@ -2485,9 +2485,9 @@ public class XWiki implements EventListener
         }
     }
 
-    private Map<String, String> getResourceURLCacheParameters(URL resourceUrl)
+    private Map<String, Object> getResourceURLCacheParameters(URL resourceUrl)
     {
-        Map<String, String> parameters = new LinkedHashMap<>();
+        Map<String, Object> parameters = new LinkedHashMap<>();
 
         if (getURLConfiguration().useResourceLastModificationDate()) {
             try {

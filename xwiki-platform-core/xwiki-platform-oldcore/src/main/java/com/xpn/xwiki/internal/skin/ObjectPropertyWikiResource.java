@@ -62,7 +62,7 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        Map<String, String> parameters = new LinkedHashMap<>();
+        Map<String, Object> parameters = new LinkedHashMap<>();
         parameters.put(XWiki.CACHE_VERSION, document.getVersion());
 
         XWikiURLFactory urlf = xcontext.getURLFactory();

@@ -760,6 +760,10 @@
                 <features>javax.activation:javax.activation-api</features>
                 <features>com.sun.activation:javax.activation</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>com.google.code.findbugs:jsr305</id>
+                <features>com.google.code.findbugs:annotations</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

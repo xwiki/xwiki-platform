@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Access content of archives (Zip, Tar, Jar, GZip, etc)</description>
   <properties>
-    <truevfs.version>0.11.0</truevfs.version>
+    <truevfs.version>0.12.0</truevfs.version>
     <truecommons.version>2.5.0</truecommons.version>
     <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>66</xwiki.pitest.mutationThreshold>
@@ -69,12 +69,24 @@
       <groupId>net.java.truevfs</groupId>
       <artifactId>truevfs-access</artifactId>
       <version>${truevfs.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
       <artifactId>truevfs-driver-jar</artifactId>
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
@@ -84,7 +96,7 @@
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
-      <artifactId>truevfs-kernel-impl</artifactId>
+      <artifactId>truevfs-kernel-impl_2.12</artifactId>
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
     </dependency>
@@ -93,6 +105,12 @@
       <artifactId>truecommons-key-default</artifactId>
       <scope>runtime</scope>
       <version>${truecommons.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
@@ -141,6 +159,11 @@
       <artifactId>truecommons-key-macosx</artifactId>
       <scope>runtime</scope>
       <version>${truecommons.version}</version>
+    </dependency>
+    <!-- Pull the right artifact for findbugs annotations -->
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->

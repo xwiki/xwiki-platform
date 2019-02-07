@@ -57,13 +57,21 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
         this.urlConfiguration = urlConfiguration;
     }
 
+    private URLConfiguration getURLConfiguration() {
+        if (this.urlConfiguration == null) {
+            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
+        }
+
+        return this.urlConfiguration;
+    }
+
     @Override
     public String getURL(boolean forceSkinAction) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        Map<String, Object> parameters = new LinkedHashMap<>();
-        if (this.urlConfiguration.useResourceLastModificationDate()) {
+        Map<String, String> parameters = new LinkedHashMap<>();
+        if (getURLConfiguration().useResourceLastModificationDate()) {
             try {
                 URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
                 Path resourcePath = Paths.get(resourceUrl.toURI());

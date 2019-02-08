@@ -31,6 +31,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.test.AllLogRule;
+import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -60,9 +61,10 @@ public class EnvironmentSkinTest
         Provider<XWikiContext> xcontextProvider = mock(Provider.class);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
+        URLConfiguration urlConfiguration = mock(URLConfiguration.class);
 
         this.skin = new EnvironmentSkin("test", mock(InternalSkinManager.class), mock(InternalSkinConfiguration.class),
-            mock(Logger.class), this.environment, xcontextProvider);
+            mock(Logger.class), this.environment, xcontextProvider, urlConfiguration);
     }
 
     @Test

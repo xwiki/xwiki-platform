@@ -67,4 +67,27 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration><![CDATA[
+            {
+              "revapi": {
+                "ignore" : [
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method boolean org.xwiki.url.URLConfiguration::useResourceLastModificationDate()",
+                    "justification": "Introduce a new URL configuration in the xwiki.properties configuration file."
+                  },
+                ]
+              }
+            }
+          ]]></analysisConfiguration>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

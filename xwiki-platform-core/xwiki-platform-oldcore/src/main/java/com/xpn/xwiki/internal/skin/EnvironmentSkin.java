@@ -59,20 +59,14 @@ public class EnvironmentSkin extends AbstractSkin
     private URLConfiguration urlConfiguration;
 
     public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
-        Logger logger, Environment environment, Provider<XWikiContext> xcontextProvider)
+        Logger logger, Environment environment, Provider<XWikiContext> xcontextProvider,
+        URLConfiguration urlConfiguration)
     {
         super(id, skinManager, configuration, logger);
 
         this.environment = environment;
         this.xcontextProvider = xcontextProvider;
-    }
-
-    private URLConfiguration getURLConfiguration() {
-        if (this.urlConfiguration == null) {
-            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
-        }
-
-        return this.urlConfiguration;
+        this.urlConfiguration = urlConfiguration;
     }
 
     @Override
@@ -139,7 +133,7 @@ public class EnvironmentSkin extends AbstractSkin
     protected AbstractEnvironmentResource createResource(String resourcePath, String resourceName)
     {
         return new SkinEnvironmentResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider,
-            getURLConfiguration());
+            this.urlConfiguration);
     }
 
     private String getResourcePath(String resource, boolean testExist)

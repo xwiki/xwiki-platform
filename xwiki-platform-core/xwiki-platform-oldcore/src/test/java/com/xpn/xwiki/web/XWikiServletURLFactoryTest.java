@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -544,6 +545,23 @@ public class XWikiServletURLFactoryTest
         // Verify that the URL factory encodes each path segment.
         URL url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext());
         assertEquals("http://127.0.0.1/xwiki/resources/o;ne/t%3Fw&o/t=hr%23e%20e", url.toString());
+
+        Map<String, Object> queryParametersMap = new LinkedHashMap<>();
+        queryParametersMap.put("cache-version", "11.1-SNAPSHOT#");
+        queryParametersMap.put("anArrayOfInt", new int[] { 42, 56 });
+        queryParametersMap.put("aListWithStringToEncode", Arrays.asList("épervier", "androïde"));
+        queryParametersMap.put("aCustomObject", new Object() {
+            @Override
+            public String toString() {
+                return "foo";
+            }
+        });
+        url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext(),
+            queryParametersMap);
+        assertEquals("http://127.0.0.1/xwiki/resources/o;ne/t%3Fw&o/t=hr%23e%20e?cache-version=11.1-SNAPSHOT%23"
+            + "&anArrayOfInt=42&anArrayOfInt=56"
+            + "&aListWithStringToEncode=%C3%A9pervier&aListWithStringToEncode=andro%C3%AFde"
+            + "&aCustomObject=foo", url.toString());
     }
 
     @Test

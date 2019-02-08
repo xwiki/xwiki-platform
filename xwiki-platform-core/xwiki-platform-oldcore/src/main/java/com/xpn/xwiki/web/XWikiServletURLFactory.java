@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,7 +34,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.HttpServletUtils;
@@ -446,31 +447,75 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return this.createURL(spaces, name, action, querystring, anchor, xwikidb, context);
     }
 
+    private void appendQueryParameter(String key, Object paramValue, StringBuilder stringBuilder)
+        throws UnsupportedEncodingException
+    {
+        if (paramValue instanceof String) {
+            stringBuilder.append(key);
+            stringBuilder.append("=");
+            stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
+        } else if (paramValue.getClass().isArray()) {
+            Class ofArray = paramValue.getClass().getComponentType();
+            if (ofArray.isPrimitive()) {
+                int length = Array.getLength(paramValue);
+                for (int i = 0; i < length; i++) {
+                    appendQueryParameter(key, Array.get(paramValue, i).toString(), stringBuilder);
+                    if (i < length - 1) {
+                        stringBuilder.append("&");
+                    }
+                }
+            } else {
+                Object[] zeArray = (Object[]) paramValue;
+                for (int i = 0; i < zeArray.length; i++) {
+                    appendQueryParameter(key, zeArray[i].toString(), stringBuilder);
+
+                    if (i < zeArray.length - 1) {
+                        stringBuilder.append("&");
+                    }
+                }
+            }
+        } else if (paramValue instanceof Collection) {
+            Collection zeCollection = (Collection) paramValue;
+            int index = 0;
+            for (Object paramValueElement : zeCollection) {
+                appendQueryParameter(key, paramValueElement.toString(), stringBuilder);
+
+                if (index < zeCollection.size() - 1) {
+                    stringBuilder.append("&");
+                }
+                index++;
+            }
+        } else {
+            appendQueryParameter(key, paramValue.toString(), stringBuilder);
+        }
+    }
+
     private URL buildURL(URL serverUrl, String path, Map<String, Object> queryParameters, XWikiContext context)
     {
         try {
-            URIBuilder uriBuilder = new URIBuilder(serverUrl.toURI()).setPath(path);
-            for (Map.Entry<String, Object> queryParameter : queryParameters.entrySet()) {
-                String key = queryParameter.getKey();
-                Object paramValue = queryParameter.getValue();
+            URL resultUrl = new URL(serverUrl, path);
 
-                if (paramValue instanceof String) {
-                    uriBuilder.addParameter(key, (String) paramValue);
-                } else if (paramValue instanceof Object[]) {
-                    for (Object paramValueElement : (Object[]) paramValue) {
-                        uriBuilder.addParameter(key, paramValueElement.toString());
+            if (!queryParameters.isEmpty()) {
+                StringBuilder stringBuilder = new StringBuilder(resultUrl.toExternalForm());
+                stringBuilder.append('?');
+                int parametersSize = queryParameters.size();
+                int currentIndex = 0;
+                for (Map.Entry<String, Object> queryParameter : queryParameters.entrySet()) {
+                    String key = queryParameter.getKey();
+                    Object paramValue = queryParameter.getValue();
+                    appendQueryParameter(key, paramValue, stringBuilder);
+
+                    if (currentIndex < parametersSize - 1) {
+                        stringBuilder.append("&");
                     }
-                } else if (paramValue instanceof Collection) {
-                    for (Object paramValueElement : (Collection) paramValue) {
-                        uriBuilder.addParameter(key, paramValueElement.toString());
-                    }
-                } else {
-                    uriBuilder.addParameter(key, paramValue.toString());
+
+                    currentIndex++;
                 }
-
+                resultUrl = new URL(stringBuilder.toString());
             }
-            return normalizeURL(uriBuilder.build().toURL(), context);
-        } catch (MalformedURLException | URISyntaxException e) {
+            return normalizeURL(resultUrl, context);
+        } catch (MalformedURLException|UnsupportedEncodingException e) {
+            // should not happen
             return null;
         }
     }

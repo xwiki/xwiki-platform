@@ -451,7 +451,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         throws UnsupportedEncodingException
     {
         if (paramValue instanceof String) {
-            stringBuilder.append(key);
+            stringBuilder.append(URLEncoder.encode(key, "UTF-8"));
             stringBuilder.append("=");
             stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
         } else if (paramValue.getClass().isArray()) {

@@ -41,8 +41,12 @@ public interface URLConfiguration
      * @return true means that we'll check for the last modification date of a resource to put it as a query parameter
      *         of the URL. This mechanism allows to avoid cache issues with the browser when modifying a file.
      *         false means we'll fallback on the wiki version to handle this cache issue.
+     *         Its default value is true.
      * @since 11.1RC1
      */
     @Unstable
-    boolean useResourceLastModificationDate();
+    default boolean useResourceLastModificationDate()
+    {
+        return true;
+    }
 }

@@ -556,12 +556,15 @@ public class XWikiServletURLFactoryTest
                 return "foo";
             }
         });
+        queryParametersMap.put("paramètre", new String[] { "foo", "bâr"});
+
         url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext(),
             queryParametersMap);
         assertEquals("http://127.0.0.1/xwiki/resources/o;ne/t%3Fw&o/t=hr%23e%20e?cache-version=11.1-SNAPSHOT%23"
             + "&anArrayOfInt=42&anArrayOfInt=56"
             + "&aListWithStringToEncode=%C3%A9pervier&aListWithStringToEncode=andro%C3%AFde"
-            + "&aCustomObject=foo", url.toString());
+            + "&aCustomObject=foo"
+            + "&param%C3%A8tre=foo&param%C3%A8tre=b%C3%A2r", url.toString());
     }
 
     @Test

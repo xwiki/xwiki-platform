@@ -29,7 +29,6 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -218,8 +217,11 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
                 builder.append(SEPARATOR);
             }
             builder.append(URLEncoder.encode(name, XWiki.DEFAULT_ENCODING)).append(SEPARATOR);
-            builder.append(URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING)).append(SEPARATOR);
-            builder.append(URLEncoder.encode(StringUtils.defaultString(revision), XWiki.DEFAULT_ENCODING));
+            builder.append(URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING));
+            if (!StringUtils.isEmpty(revision)) {
+                builder.append(SEPARATOR);
+                builder.append(URLEncoder.encode(revision, XWiki.DEFAULT_ENCODING));
+            }
             return builder.toString();
         } catch (UnsupportedEncodingException e) {
             // This should never happen, UTF-8 is always available
@@ -288,14 +290,11 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     {
         File tempdir = (File) context.get("pdfexportdir");
         String prefix = "pdf";
-        String extension = FilenameUtils.getExtension(key);
-        String suffix = extension.length() > 0 ? "." + extension : null;
         try {
-            return File.createTempFile(prefix, suffix, tempdir);
+            return File.createTempFile(prefix, null, tempdir);
         } catch (IOException e) {
             throw new IOException(String.format("Failed to create temporary file during PDF export, for key [%s], "
-                + "prefix [%s] and suffix [%s], in directory [%s] (exist: [%s])", key, prefix, suffix, tempdir,
-                tempdir.exists()), e);
+                + "prefix [%s], in directory [%s] (exist: [%s])", key, prefix, tempdir, tempdir.exists()), e);
         }
     }
 }

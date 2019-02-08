@@ -28,6 +28,8 @@ import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.refactoring.internal.LinkRefactoring;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -52,6 +54,10 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
         super.setUp();
 
         this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
+
+        // avoid dependency issue with refactoring listeners
+        this.mocker.registerMockComponent(ModelBridge.class);
+        this.mocker.registerMockComponent(LinkRefactoring.class);
 
         this.xarExtensionRepository =
             this.mocker.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);

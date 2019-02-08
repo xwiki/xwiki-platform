@@ -100,10 +100,6 @@ public class ExtensionManagerScriptServiceTest
         // lookup
 
         this.scriptService = this.mocker.getInstance(ScriptService.class, "extension");
-        this.mocker.unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
-        this.mocker.unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
-        this.mocker.unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
-        this.mocker.unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
     }
 
     // tools

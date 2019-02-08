@@ -56,6 +56,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
+import org.xwiki.refactoring.internal.LinkRefactoring;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
@@ -368,6 +370,15 @@ public class MockitoOldcore
             componentManagerDescriptor.setRoleHint("context");
             componentManagerDescriptor.setRoleType(ComponentManager.class);
             this.componentManager.registerComponent(componentManagerDescriptor, this.componentManager);
+        }
+
+        // Register mock components for refactoring listener components
+        if (!this.componentManager.hasComponent(ModelBridge.class)) {
+            this.componentManager.registerMockComponent(ModelBridge.class);
+        }
+
+        if (!this.componentManager.hasComponent(LinkRefactoring.class)) {
+            this.componentManager.registerMockComponent(LinkRefactoring.class);
         }
 
         // XWiki

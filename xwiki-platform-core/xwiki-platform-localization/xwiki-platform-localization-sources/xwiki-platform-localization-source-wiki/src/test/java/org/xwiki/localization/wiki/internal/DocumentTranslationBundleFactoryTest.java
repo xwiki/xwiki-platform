@@ -80,11 +80,6 @@ public class DocumentTranslationBundleFactoryTest
     @Before
     public void before() throws Exception
     {
-        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
-        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
-        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
-        this.oldcore.getMocker().unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
-
         this.oldcore.getXWikiContext().setMainXWiki("xwiki");
         this.oldcore.getXWikiContext().setWikiId("xwiki");
 

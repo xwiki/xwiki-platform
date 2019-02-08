@@ -35,8 +35,10 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
+import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Represents a skin stored in the file system.
@@ -54,13 +56,17 @@ public class EnvironmentSkin extends AbstractSkin
 
     private Provider<XWikiContext> xcontextProvider;
 
+    private URLConfiguration urlConfiguration;
+
     public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
-        Logger logger, Environment environment, Provider<XWikiContext> xcontextProvider)
+        Logger logger, Environment environment, Provider<XWikiContext> xcontextProvider,
+        URLConfiguration urlConfiguration)
     {
         super(id, skinManager, configuration, logger);
 
         this.environment = environment;
         this.xcontextProvider = xcontextProvider;
+        this.urlConfiguration = urlConfiguration;
     }
 
     @Override
@@ -126,7 +132,8 @@ public class EnvironmentSkin extends AbstractSkin
 
     protected AbstractEnvironmentResource createResource(String resourcePath, String resourceName)
     {
-        return new SkinEnvironmentResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider);
+        return new SkinEnvironmentResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider,
+            this.urlConfiguration);
     }
 
     private String getResourcePath(String resource, boolean testExist)

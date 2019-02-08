@@ -33,6 +33,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +47,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -163,6 +168,7 @@ import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -260,6 +266,11 @@ public class XWiki implements EventListener
     public static final String CKEY_BASESKIN = InternalSkinManager.CKEY_PARENTSKIN;
 
     public static final String DEFAULT_SKIN = InternalSkinConfiguration.DEFAULT_SKIN;
+
+    /**
+     * Query parameters used to control the browser cache version of a resource.
+     */
+    public static final String CACHE_VERSION = "cache-version";
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
@@ -412,6 +423,8 @@ public class XWiki implements EventListener
 
     private EditConfiguration editConfiguration;
 
+    private URLConfiguration urlConfiguration;
+
     private StoreConfiguration storeConfiguration;
 
     private ObservationManager observationManager;
@@ -485,6 +498,14 @@ public class XWiki implements EventListener
         }
 
         return this.editConfiguration;
+    }
+
+    private URLConfiguration getURLConfiguration() {
+        if (this.urlConfiguration == null) {
+            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
+        }
+
+        return this.urlConfiguration;
     }
 
     private StoreConfiguration getStoreConfiguration()
@@ -2399,6 +2420,13 @@ public class XWiki implements EventListener
         return getSkinFile(filename, false, context);
     }
 
+    /**
+     * Build and return a skin file url based on the given parameters.
+     * @param filename the file name of the skin file wanted
+     * @param forceSkinAction if true force the usage of directory /skins/ in the URL
+     * @param context current context for the request
+     * @return a resource URL for the asked filename
+     */
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
     {
         XWikiURLFactory urlf = context.getURLFactory();
@@ -2423,8 +2451,10 @@ public class XWiki implements EventListener
             }
 
             // Look for a resource file
-            if (resourceExists("/resources/" + filename)) {
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+            String resourceFilePath = "/resources/" + filename;
+            if (resourceExists(resourceFilePath)) {
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                    getResourceURLCacheParameters(resourceFilePath));
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2435,12 +2465,44 @@ public class XWiki implements EventListener
 
         // If all else fails, use the default base skin, even if the URLs could be invalid.
         URL url;
+
         if (forceSkinAction) {
             url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
         } else {
             url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
         }
         return urlf.getURL(url, context);
+    }
+
+    private Map<String, Object> getResourceURLCacheParameters(String resourceFilePath)
+    {
+        try {
+            URL resourceUrl = getResource(resourceFilePath);
+            return getResourceURLCacheParameters(resourceUrl);
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Error while getting URL for resource path [{}]", resourceFilePath, e);
+            return Collections.singletonMap(CACHE_VERSION, getVersion());
+        }
+    }
+
+    private Map<String, Object> getResourceURLCacheParameters(URL resourceUrl)
+    {
+        Map<String, Object> parameters = new LinkedHashMap<>();
+
+        if (getURLConfiguration().useResourceLastModificationDate()) {
+            try {
+                Path resourcePath = Paths.get(resourceUrl.toURI());
+                FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+                parameters.put(CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));
+            } catch (Exception e) {
+                LOGGER.debug("Error when trying to access properties of resource URL [{}]", resourceUrl, e);
+                parameters.put(CACHE_VERSION, getVersion());
+            }
+        } else {
+            parameters.put(CACHE_VERSION, getVersion());
+        }
+
+        return parameters;
     }
 
     public String getSkinFile(String filename, String skin, XWikiContext context)
@@ -2460,10 +2522,12 @@ public class XWiki implements EventListener
             }
 
             // Look for a resource file
-            if (resourceExists("/resources/" + filename)) {
+            String resourceFilePath = "/resources/" + filename;
+            if (resourceExists(resourceFilePath)) {
                 XWikiURLFactory urlf = context.getURLFactory();
 
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                    getResourceURLCacheParameters(resourceFilePath));
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {

@@ -20,6 +20,8 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.inject.Provider;
 
@@ -28,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.skin.ResourceRepository;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -59,10 +62,13 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        parameters.put(XWiki.CACHE_VERSION, document.getVersion());
+
         XWikiURLFactory urlf = xcontext.getURLFactory();
 
         URL url = urlf.createSkinURL(this.reference.getName(), document.getSpace(), document.getName(),
-            document.getDatabase(), xcontext);
+            document.getDatabase(), xcontext, parameters);
         return urlf.getURL(url, xcontext);
     }
 }

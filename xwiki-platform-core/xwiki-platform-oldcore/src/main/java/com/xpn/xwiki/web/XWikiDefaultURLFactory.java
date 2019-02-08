@@ -20,6 +20,15 @@
 package com.xpn.xwiki.web;
 
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -53,7 +62,32 @@ public abstract class XWikiDefaultURLFactory implements XWikiURLFactory
     @Override
     public URL createSkinURL(String filename, String spaces, String name, XWikiContext context)
     {
-        return createSkinURL(filename, spaces, name, context.getWikiId(), context);
+        return createSkinURL(filename, spaces, name, context, Collections.emptyMap());
+    }
+
+    @Override
+    public URL createSkinURL(String filename, String spaces, String name, XWikiContext context,
+        Map<String, Object> queryParameters)
+    {
+        return createSkinURL(filename, spaces, name, context.getWikiId(), context, queryParameters);
+    }
+
+    @Override
+    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
+    {
+        return this.createSkinURL(filename, spaces, name, xwikidb, context, Collections.emptyMap());
+    }
+
+    @Override
+    public URL createSkinURL(String filename, String skin, XWikiContext context)
+    {
+        return createSkinURL(filename, skin, context, Collections.emptyMap());
+    }
+
+    @Override
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
+    {
+        return this.createResourceURL(filename, forceSkinAction, context, Collections.emptyMap());
     }
 
     @Override

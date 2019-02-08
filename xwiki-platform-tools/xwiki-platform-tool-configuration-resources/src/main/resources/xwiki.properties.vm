@@ -665,6 +665,14 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is:
 # url.standard.hideViewAction=false
 
+#-# [Since 11.1RC1]
+#-# Whether a the last modified date of the file to be loaded should be checked and put in the URL query parameter.
+#-# Disabling this might improve a bit the performance on some old hard drives, or custom filesystem, however
+#-# it might imply the need to force-reload some resources in the browser, when migrating.
+#-#
+#-# The default is:
+# url.useResourceLastModificationDate=true
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------

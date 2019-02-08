@@ -54,4 +54,10 @@ public class DefaultURLConfiguration implements URLConfiguration
         // Note: the format corresponds to the component hint for the Resource Factory implementation to use.
         return this.configuration.get().getProperty(PREFIX + "format", "standard");
     }
+
+    @Override
+    public boolean useResourceLastModificationDate()
+    {
+        return this.configuration.get().getProperty(PREFIX + "useResourceLastModificationDate", true);
+    }
 }

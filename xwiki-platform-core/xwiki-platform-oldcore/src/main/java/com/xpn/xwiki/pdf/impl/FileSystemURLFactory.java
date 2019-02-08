@@ -288,12 +288,14 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     {
         File tempdir = (File) context.get("pdfexportdir");
         String prefix = "pdf";
-        String suffix = "." + FilenameUtils.getExtension(key);
+        String extension = FilenameUtils.getExtension(key);
+        String suffix = extension.length() > 0 ? "." + extension : null;
         try {
             return File.createTempFile(prefix, suffix, tempdir);
         } catch (IOException e) {
-            throw new IOException("Failed to create temporary PDF export file with prefix [" + prefix + "], suffix ["
-                + suffix + "] in directory [" + tempdir + "]", e);
+            throw new IOException(String.format("Failed to create temporary file during PDF export, for key [%s], "
+                + "prefix [%s] and suffix [%s], in directory [%s] (exist: [%s])", key, prefix, suffix, tempdir,
+                tempdir.exists()));
         }
     }
 }

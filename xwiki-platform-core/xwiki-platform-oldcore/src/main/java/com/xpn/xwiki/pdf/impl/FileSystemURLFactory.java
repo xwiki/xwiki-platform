@@ -295,7 +295,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         } catch (IOException e) {
             throw new IOException(String.format("Failed to create temporary file during PDF export, for key [%s], "
                 + "prefix [%s] and suffix [%s], in directory [%s] (exist: [%s])", key, prefix, suffix, tempdir,
-                tempdir.exists()));
+                tempdir.exists()), e);
         }
     }
 }

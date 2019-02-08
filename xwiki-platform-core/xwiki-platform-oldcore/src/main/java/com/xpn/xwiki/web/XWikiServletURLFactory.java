@@ -452,7 +452,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         if (paramValue instanceof String) {
             stringBuilder.append(URLEncoder.encode(key, "UTF-8"));
-            stringBuilder.append("=");
+            stringBuilder.append('=');
             stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
         } else if (paramValue.getClass().isArray()) {
             Class ofArray = paramValue.getClass().getComponentType();
@@ -461,7 +461,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 for (int i = 0; i < length; i++) {
                     appendQueryParameter(key, Array.get(paramValue, i).toString(), stringBuilder);
                     if (i < length - 1) {
-                        stringBuilder.append("&");
+                        stringBuilder.append('&');
                     }
                 }
             } else {
@@ -470,7 +470,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     appendQueryParameter(key, zeArray[i].toString(), stringBuilder);
 
                     if (i < zeArray.length - 1) {
-                        stringBuilder.append("&");
+                        stringBuilder.append('&');
                     }
                 }
             }
@@ -481,7 +481,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 appendQueryParameter(key, paramValueElement.toString(), stringBuilder);
 
                 if (index < zeCollection.size() - 1) {
-                    stringBuilder.append("&");
+                    stringBuilder.append('&');
                 }
                 index++;
             }

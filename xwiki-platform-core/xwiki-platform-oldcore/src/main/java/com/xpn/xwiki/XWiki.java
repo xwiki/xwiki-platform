@@ -2507,7 +2507,7 @@ public class XWiki implements EventListener
 
     public String getSkinFile(String filename, String skin, XWikiContext context)
     {
-        return getSkinFile(filename, skin, context);
+        return getSkinFile(filename, skin, false, context);
     }
 
     public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
@@ -2522,10 +2522,12 @@ public class XWiki implements EventListener
             }
 
             // Look for a resource file
-            if (resourceExists("/resources/" + filename)) {
+            String resourceFilePath = "/resources/" + filename;
+            if (resourceExists(resourceFilePath)) {
                 XWikiURLFactory urlf = context.getURLFactory();
 
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                    getResourceURLCacheParameters(resourceFilePath));
                 return urlf.getURL(url, context);
             }
         } catch (Exception e) {

@@ -44,7 +44,7 @@
   #set ($classPrettyName = $stringtool.removeEnd($classReference.name, 'Class'))
   #set ($translationKey = "solr.field.class.$classPrettyName")
   #if ($services.localization.get($translationKey))
-    #set ($classPrettyName = $services.localization.render('$translationKey'))
+    #set ($classPrettyName = $services.localization.render($translationKey))
   #else
     ## Some of the default classes have names starting with 'XWiki'.
     #set ($classPrettyName = $stringtool.removeStart($classPrettyName, 'XWiki'))

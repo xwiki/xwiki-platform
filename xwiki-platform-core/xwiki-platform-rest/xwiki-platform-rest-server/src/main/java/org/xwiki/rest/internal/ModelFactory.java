@@ -123,6 +123,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
 @Singleton
 public class ModelFactory
 {
+    private static final String PASSWORD_TYPE = "Password";
+
     private final ObjectFactory objectFactory;
 
     @Inject
@@ -267,7 +269,9 @@ public class ModelFactory
     public void toObject(com.xpn.xwiki.api.Object xwikiObject, org.xwiki.rest.model.jaxb.Object restObject)
     {
         for (Property restProperty : restObject.getProperties()) {
-            xwikiObject.set(restProperty.getName(), restProperty.getValue());
+            if (!PASSWORD_TYPE.equals(restProperty.getType())) {
+                xwikiObject.set(restProperty.getName(), restProperty.getValue());
+            }
         }
     }
 
@@ -325,10 +329,12 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            try {
-                property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
-            } catch (XWikiException e) {
-                // Should never happen
+            if (!PASSWORD_TYPE.equals(property.getType())) {
+                try {
+                    property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
+                } catch (XWikiException e) {
+                    // Should never happen
+                }
             }
 
             String propertyUri;

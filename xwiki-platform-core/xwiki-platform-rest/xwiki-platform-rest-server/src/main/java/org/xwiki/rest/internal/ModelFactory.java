@@ -37,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.DefaultRequest;
 import org.xwiki.job.Request;
@@ -46,6 +47,7 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -125,6 +127,8 @@ public class ModelFactory
 {
     private static final String PASSWORD_TYPE = "Password";
 
+    private static final String EMAIL_TYPE = "Email";
+
     private final ObjectFactory objectFactory;
 
     @Inject
@@ -135,6 +139,9 @@ public class ModelFactory
 
     @Inject
     private JAXBConverter jaxbConverter;
+
+    @Inject
+    private Logger logger;
 
     public ModelFactory()
     {
@@ -269,7 +276,7 @@ public class ModelFactory
     public void toObject(com.xpn.xwiki.api.Object xwikiObject, org.xwiki.rest.model.jaxb.Object restObject)
     {
         for (Property restProperty : restObject.getProperties()) {
-            if (!PASSWORD_TYPE.equals(restProperty.getType())) {
+            if (isTypePublic(restProperty, true)) {
                 xwikiObject.set(restProperty.getName(), restProperty.getValue());
             }
         }
@@ -329,7 +336,7 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (!PASSWORD_TYPE.equals(property.getType())) {
+            if (isTypePublic(property, false)) {
                 try {
                     property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
                 } catch (XWikiException e) {
@@ -1068,5 +1075,41 @@ public class ModelFactory
         }
 
         return log;
+    }
+
+    /**
+     * check if the given property should be exposed via REST
+     * @param restProperty the property to be read/written
+     * @param forWrite true iff we want to write to the XObject property
+     * @return true if the property is considered public for read or write
+     */
+    private boolean isTypePublic(Property restProperty, boolean forWrite)
+    {
+        if (PASSWORD_TYPE.equals(restProperty.getType())) {
+            return false;
+        }
+
+        if (!forWrite && EMAIL_TYPE.equals(restProperty.getType())) {
+            boolean obfuscate = true;
+            XWikiContext context = xcontextProvider.get();
+            try {
+                int configValue = -1;
+                XWikiDocument mailConfigDoc = context.getWiki().getDocument(new DocumentReference("MailConfig", new SpaceReference(context.getWikiId(), "Mail")), context);
+                BaseObject mailConfig = mailConfigDoc.getXObject(new DocumentReference("GeneralMailConfigClass", new SpaceReference(context.getWikiId(), "Mail")));
+                if (mailConfig != null) {
+                    configValue = mailConfig.getIntValue("obfuscate");
+                }
+                if (configValue < 0) {
+                    // we handle backward compatibility by also looking in the XWikiPreferences xobject
+                    configValue = context.getWiki().getXWikiPreferenceAsInt("obfuscateEmailAddresses", 1, context);
+                }
+                obfuscate = (configValue == 1);
+            } catch (XWikiException e) {
+                logger.warn("could not determine if emails should be obfuscated", e);
+            }
+            return ! obfuscate;
+        }
+
+        return true;
     }
 }

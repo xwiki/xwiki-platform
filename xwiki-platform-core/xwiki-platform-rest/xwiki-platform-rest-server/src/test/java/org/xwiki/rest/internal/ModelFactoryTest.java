@@ -26,7 +26,6 @@ import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Property;
-import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -38,8 +37,10 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,26 +55,27 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-@ComponentTest
+@OldcoreTest
 public class ModelFactoryTest
 {
-    protected XWikiContext xcontext = mock(XWikiContext.class);
+    @Mock
+    private XWikiContext xcontext;
     
     @InjectComponentManager
-    protected ComponentManager componentManager;
+    private ComponentManager componentManager;
 
     @MockComponent
-    protected Provider<XWikiContext> xcontextProvider;
+    private Provider<XWikiContext> xcontextProvider;
 
     @MockComponent
-    SpaceReferenceResolver<String> resolver;
+    private SpaceReferenceResolver<String> resolver;
     
     @InjectMockComponents
-    ModelFactory modelFactory;
+    private ModelFactory modelFactory;
     
     @Test
     @SuppressWarnings("deprecation")
-    void testToRestObject() throws Exception
+    void toRestObjectCheckWhichObjectValuesAreAvailable() throws Exception
     {
         when(xcontextProvider.get()).thenReturn(xcontext);
         
@@ -98,7 +100,7 @@ public class ModelFactoryTest
         StringProperty pwElement = new StringProperty();
         pwElement.setName("passwordValue");
         pwElement.setClassType("Password");
-        pwElement.setValue("abcd");
+        pwElement.setValue("secret");
         when(xwikiObject.get("passwordValue")).thenReturn(pwElement);
         
         when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField});
@@ -114,9 +116,6 @@ public class ModelFactoryTest
         when(doc.getSpace()).thenReturn("Space");
         when(doc.getName()).thenReturn("Page");
         when(doc.getDocumentReference()).thenReturn(new DocumentReference("Page", spaceRef));
-        when(resolver.resolve(eq("Space"), any(String.class))).thenReturn(spaceRef);
-        
-        com.xpn.xwiki.web.Utils.setComponentManager(componentManager);
         
         //
         // now we get around to call the method under test

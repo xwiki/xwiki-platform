@@ -131,7 +131,7 @@ public class UpdateObjectsOnClassRenameListener extends AbstractEventListener
                 updateObjects(documentsToUpdate, oldClassReference, newClassReference);
             }
         } catch (QueryException e) {
-            this.logger.warn("Failed to update the xobjects of type [{}] after the xclass has been renamed to [{}].",
+            this.logger.error("Failed to update the xobjects of type [{}] after the xclass has been renamed to [{}].",
                 oldClassReference, newClassReference, e);
         }
     }
@@ -149,7 +149,7 @@ public class UpdateObjectsOnClassRenameListener extends AbstractEventListener
                 try {
                     updateObjects(documentReference, oldClassReference, newClassReference);
                 } catch (XWikiException e) {
-                    this.logger.warn(
+                    this.logger.error(
                         "Failed to update the xobjects from [{}] after the xclass [{}] has been renamed to [{}].",
                         documentReference, oldClassReference, newClassReference, e);
                 }

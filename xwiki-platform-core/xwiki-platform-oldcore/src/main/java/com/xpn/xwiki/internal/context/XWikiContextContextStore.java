@@ -33,7 +33,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
@@ -220,18 +219,13 @@ public class XWikiContextContextStore extends AbstractContextStore
         if (xcontext != null) {
             save(contextStore, PROP_WIKI, xcontext.getWikiId(), entries);
 
-            // No need to save the request wiki if it's the same as the current wiki
-            if (!StringUtils.equals((String) contextStore.get(PROP_WIKI), xcontext.getOriginalWikiId())) {
-                save(contextStore, PROP_REQUEST_WIKI, xcontext.getOriginalWikiId(), entries);
-            }
-
             save(contextStore, PROP_USER, xcontext.getUserReference(), entries);
             save(contextStore, PROP_SECURE_AUTHOR, xcontext.getAuthorReference(), entries);
             save(contextStore, PROP_LOCALE, xcontext.getLocale(), entries);
 
             save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
 
-            save(contextStore, PREFIX_PROP_REQUEST, xcontext.getRequest(), entries);
+            save(contextStore, PREFIX_PROP_REQUEST, xcontext.getRequest(), entries, xcontext);
         }
     }
 
@@ -255,7 +249,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     }
 
     private void save(Map<String, Serializable> contextStore, String prefix, XWikiRequest request,
-        Collection<String> entries)
+        Collection<String> entries, XWikiContext xcontext)
     {
         if (request != null) {
             save((key, subkey) -> {
@@ -273,7 +267,7 @@ public class XWikiContextContextStore extends AbstractContextStore
                         break;
 
                     case SUFFIX_PROP_REQUEST_WIKI:
-                        // Handled in a different place
+                        contextStore.put(key, xcontext.getOriginalWikiId());
                         break;
 
                     // TODO: add support for request input stream
@@ -466,7 +460,7 @@ public class XWikiContextContextStore extends AbstractContextStore
         xcontext.setDoc(document);
     }
 
-    private void restoreRequest(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
+    private URL restoreURL(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         // Find and set the wiki corresponding to the request
         String requestWiki = (String) contextStore.get(PROP_REQUEST_WIKI);
@@ -481,7 +475,6 @@ public class XWikiContextContextStore extends AbstractContextStore
         if (url == null) {
             url = (URL) contextStore.get(PROP_REQUEST_BASE);
         }
-        Map<String, String[]> parameters = (Map<String, String[]>) contextStore.get(PROP_REQUEST_PARAMETERS);
 
         // Try to deduce missing URL from the request wiki (if provided)
         if (url == null && requestWiki != null) {
@@ -490,7 +483,21 @@ public class XWikiContextContextStore extends AbstractContextStore
             } catch (MalformedURLException e) {
                 this.logger.warn("Failed to get the URL for stored context wiki [{}]", requestWiki);
             }
+
+            // Assume we always want to behave as a HTTP request when the wiki request is provided
+            if (url == null) {
+                url = HttpServletUtils.getSourceURL(xcontext.getRequest());
+            }
         }
+
+        return url;
+    }
+
+    private void restoreRequest(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
+    {
+        URL url = restoreURL(storedWikiId, contextStore, xcontext);
+
+        Map<String, String[]> parameters = (Map<String, String[]>) contextStore.get(PROP_REQUEST_PARAMETERS);
 
         boolean daemon;
 

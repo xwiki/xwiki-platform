@@ -41,6 +41,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -132,6 +134,12 @@ public class XWikiContextContextStoreTest
         assertFalse(contextStore.containsKey(XWikiContextContextStore.PROP_REQUEST_WIKI));
 
         this.oldcore.getXWikiContext().setOriginalWikiId(REQUESTWIKI);
+
+        this.store.save(contextStore, this.store.getSupportedEntries());
+
+        assertFalse(contextStore.containsKey(XWikiContextContextStore.PROP_REQUEST_WIKI));
+
+        this.oldcore.getXWikiContext().setRequest(mock(XWikiRequest.class));
 
         this.store.save(contextStore, this.store.getSupportedEntries());
 

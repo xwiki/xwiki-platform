@@ -20,8 +20,10 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Class that holds the types of Rights and the types of States of a check-box
@@ -71,7 +73,9 @@ public class EditRightsPane extends BaseElement
         static State getButtonState(WebElement button)
         {
             for (State s : values()) {
-                if ((button.getAttribute("src").endsWith(s.imageURL))) {
+                // starting with 11.1RC1 the resource URLs can now contain a query parameter to avoid cache issue
+                // so we cannot rely to a full URL anymore
+                if ((button.getAttribute("src").contains(s.imageURL))) {
                     return s;
                 }
             }
@@ -127,8 +131,12 @@ public class EditRightsPane extends BaseElement
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementEndsWithAttributeValue(buttonLocator, "src",
-                currentState.getNextState().imageURL);
+            getDriver().waitUntilCondition(webDriver -> {
+                // starting with 11.1RC1 the resource URLs can now contain a query parameter to avoid cache issue
+                // so we cannot rely to a full URL anymore
+                return webDriver.findElement(buttonLocator).getAttribute("src")
+                    .contains(currentState.getNextState().imageURL);
+            });
         } finally {
             getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
         }
@@ -154,7 +162,11 @@ public class EditRightsPane extends BaseElement
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementEndsWithAttributeValue(buttonLocator, "src", currentState.imageURL);
+            getDriver().waitUntilCondition(webDriver -> {
+                // starting with 11.1RC1 the resource URLs can now contain a query parameter to avoid cache issue
+                // so we cannot rely to a full URL anymore
+                return webDriver.findElement(buttonLocator).getAttribute("src").contains(currentState.imageURL);
+            });
         } finally {
             getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
         }

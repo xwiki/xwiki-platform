@@ -37,11 +37,8 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.jdbc.Work;
-import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
-import org.hibernate.service.spi.Stoppable;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -232,26 +229,17 @@ public class HibernateStore
      */
     public DatabaseMetaData getDatabaseMetaData()
     {
-        DatabaseMetaData result;
-        Connection connection = null;
-        JdbcConnectionAccess jdbcConnectionAccess =
-                ((SessionImplementor) getSessionFactory().openSession()).getJdbcConnectionAccess();
-        try {
-            connection = jdbcConnectionAccess.obtainConnection();
-            result = connection.getMetaData();
-        } catch (SQLException ignored) {
-            result = null;
-        } finally {
-            if (connection != null) {
-                try {
-                    jdbcConnectionAccess.releaseConnection(connection);
-                } catch (SQLException ignored) {
-                    // Ignore
-                }
+        try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
+            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
+
+            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                return connection.getMetaData();
+            } catch (SQLException e) {
+                // Log something ?
             }
         }
 
-        return result;
+        return null;
     }
 
     /**
@@ -364,7 +352,7 @@ public class HibernateStore
             // Make sure we are in this mode
             try {
                 if (session != null) {
-                    session.setFlushMode(FlushMode.COMMIT);
+                    session.setHibernateFlushMode(FlushMode.COMMIT);
                 }
             } catch (org.hibernate.SessionException ex) {
                 session = null;
@@ -550,17 +538,11 @@ public class HibernateStore
         closeSession(session);
 
         /*
-        // Close all connections
-        if (getSessionFactory() != null) {
-            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
-            // See http://bit.ly/QAJXlr
-            ConnectionProvider connectionProvider =
-                ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
-            if (connectionProvider instanceof Stoppable) {
-                ((Stoppable) connectionProvider).stop();
-            }
-        }
-        */
+         * // Close all connections if (getSessionFactory() != null) { // Note that we need to do the cast because this
+         * is how Hibernate suggests to get the Connection Provider. // See http://bit.ly/QAJXlr ConnectionProvider
+         * connectionProvider = ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider(); if
+         * (connectionProvider instanceof Stoppable) { ((Stoppable) connectionProvider).stop(); } }
+         */
     }
 
     /**
@@ -589,17 +571,8 @@ public class HibernateStore
             @Override
             public void execute(Connection connection) throws SQLException
             {
-                Statement stmt = null;
-                try {
-                    stmt = connection.createStatement();
+                try (Statement stmt = connection.createStatement()) {
                     stmt.execute(sql);
-                } finally {
-                    try {
-                        if (stmt != null) {
-                            stmt.close();
-                        }
-                    } catch (Exception e) {
-                    }
                 }
             }
         });

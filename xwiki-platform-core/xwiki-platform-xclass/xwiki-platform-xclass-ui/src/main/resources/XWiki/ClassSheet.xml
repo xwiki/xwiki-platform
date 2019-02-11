@@ -129,6 +129,7 @@
       '&lt;/a&gt;{{/html}}'
     ]){{/warning}}
   #else
+    (% id="HClassProperties" %)
     = {{translation key="platform.xclass.defaultClassSheet.properties.heading"/}} =
     #foreach($property in $doc.getxWikiClass().properties)
       * $services.rendering.escape("$property.prettyName ($property.name: $xwiki.metaclass.get($property.classType).prettyName)", $xwiki.currentContentSyntaxId)
@@ -140,6 +141,7 @@
 
   #end
   #if ($hasClassSheets &amp;&amp; $hasClassTemplate)
+    (% id="HCreatePage" %)
     = {{translation key="platform.xclass.defaultClassSheet.createPage.heading"/}} =
     #if("$!targetDocRef" != '' &amp;&amp; $xwiki.exists($targetDocRef))
 
@@ -195,7 +197,8 @@
     &lt;/form&gt;
     {{/html}}
 
-  #end ## has class sheet and class template
+  #end## has class sheet and class template
+  (% id="HExistingPages" %)
   = {{translation key="platform.xclass.defaultClassSheet.pages.heading"/}} =
 
   {{translation key="platform.xclass.defaultClassSheet.pages.description"/}}
@@ -219,6 +222,7 @@
   #livetable("classEntries" $columns $columnsProperties $options)
   {{/html}}
 
+  (% id="HClassSheets" %)
   = {{translation key="platform.xclass.defaultClassSheet.sheets.heading"/}} =
   #if (!$hasClassSheets || !$hasClassTemplate)
 
@@ -280,6 +284,7 @@
     #end
   #end
 
+  (% id="HClassTemplate" %)
   = {{translation key="platform.xclass.defaultClassSheet.template.heading"/}} =
 
     {{info}}$services.localization.render('platform.xclass.defaultClassSheet.template.description',

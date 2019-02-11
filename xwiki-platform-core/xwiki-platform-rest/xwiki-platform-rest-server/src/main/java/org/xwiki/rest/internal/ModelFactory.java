@@ -102,6 +102,8 @@ import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -136,6 +138,9 @@ public class ModelFactory
 
     @Inject
     private JAXBConverter jaxbConverter;
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
 
     @Inject
     private Logger logger;
@@ -273,9 +278,7 @@ public class ModelFactory
     public void toObject(com.xpn.xwiki.api.Object xwikiObject, org.xwiki.rest.model.jaxb.Object restObject)
     {
         for (Property restProperty : restObject.getProperties()) {
-            if (isPublicType(restProperty, true)) {
-                xwikiObject.set(restProperty.getName(), restProperty.getValue());
-            }
+            xwikiObject.set(restProperty.getName(), restProperty.getValue());
         }
     }
 
@@ -333,11 +336,12 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (isPublicType(property, false)) {
+            if (isPublicType(property)) {
                 try {
                     property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
                 } catch (XWikiException e) {
                     // Should never happen
+                    logger.warn("unexpected exception when accessing property ["+propertyClass.getName()+"]", e);
                 }
             }
 
@@ -1077,13 +1081,12 @@ public class ModelFactory
     /**
      * Check if the given property should be exposed via REST.
      * @param restProperty the property to be read/written
-     * @param forWrite true if we want to write to the XObject property
-     * @return true if the property is considered public for read or write
+     * @return true if the property is considered public
      */
-    private boolean isPublicType(Property restProperty, boolean forWrite)
+    private boolean isPublicType(Property restProperty)
     {
         if (PASSWORD_TYPE.equals(restProperty.getType())) {
-            return false;
+            return authorizationManager.hasAccess(Right.ADMIN);
         }
 
         return true;

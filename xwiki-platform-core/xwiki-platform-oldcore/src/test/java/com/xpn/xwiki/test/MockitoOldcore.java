@@ -384,7 +384,9 @@ public class MockitoOldcore
 
         // Make sure to a have an URLConfiguration component.
         if (!this.componentManager.hasComponent(URLConfiguration.class)) {
-            this.componentManager.registerMockComponent(URLConfiguration.class);
+            URLConfiguration mockUrlConfigComponent =
+                this.componentManager.registerMockComponent(URLConfiguration.class);
+            when(mockUrlConfigComponent.getURLFormatId()).thenReturn("standard");
         }
 
         // XWiki

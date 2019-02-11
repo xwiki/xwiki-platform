@@ -28,6 +28,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -195,6 +196,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     @Override
+    public URL createSkinURL(String filename, String skin, XWikiContext context,
+        Map<String, java.lang.Object> queryParameters)
+    {
+        // for export we can skip the query parameters
+        return createSkinURL(filename, skin, context);
+    }
+
+    @Override
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
         try {
@@ -224,7 +233,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
         return createSkinURL(filename, spaces, name, null, context, false);
     }
 
-    public URL createSkinURL(String filename, String spaces, String name, XWikiContext context, boolean skipSkinDirectory)
+    public URL createSkinURL(String filename, String spaces, String name, XWikiContext context,
+        boolean skipSkinDirectory)
     {
         return createSkinURL(filename, spaces, name, null, context, skipSkinDirectory);
     }
@@ -235,14 +245,22 @@ public class ExportURLFactory extends XWikiServletURLFactory
         return createSkinURL(fileName, spaces, name, wikiId, context, false);
     }
 
+    @Override
+    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context,
+        Map<String, Object> queryParameters)
+    {
+        // for export we can skip the query parameters
+        return createSkinURL(filename, spaces, name, xwikidb, context, false);
+    }
+
     public URL createSkinURL(String fileName, String spaces, String name, String wikiId, XWikiContext context,
         boolean skipSkinDirectory)
     {
         URL skinURL;
         if (wikiId == null) {
-            skinURL = super.createSkinURL(fileName, spaces, name, context);
+            skinURL = super.createSkinURL(fileName, spaces, name, context, Collections.emptyMap());
         } else {
-            skinURL = super.createSkinURL(fileName, spaces, name, wikiId, context);
+            skinURL = super.createSkinURL(fileName, spaces, name, wikiId, context, Collections.emptyMap());
         }
 
         if (!"skins".equals(spaces)) {
@@ -378,6 +396,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 }
             }
         }
+    }
+
+    @Override
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
+        Map<String, Object> queryParameters)
+    {
+        // for export we can skip the query parameters
+        return createResourceURL(filename, forceSkinAction, context);
     }
 
     @Override

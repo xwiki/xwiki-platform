@@ -23,7 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DocumentRenamingEvent}.
@@ -54,5 +57,50 @@ public class DocumentRenamingEventTest
 
         assertNotEquals(new DocumentRenamingEvent(alice, bob).hashCode(),
             new DocumentRenamingEvent(alice, carol).hashCode());
+    }
+
+    @Test
+    public void cancel()
+    {
+        DocumentRenamingEvent event = new DocumentRenamingEvent();
+
+        assertFalse(event.isCanceled());
+        assertNull(event.getReason());
+
+        event.cancel("Something");
+
+        assertTrue(event.isCanceled());
+        assertEquals("Something", event.getReason());
+    }
+
+    @Test
+    public void matches()
+    {
+        assertFalse(new DocumentRenamingEvent().matches(null));
+        assertFalse(new DocumentRenamingEvent().matches(new DocumentRenamedEvent()));
+
+        assertTrue(new DocumentRenamingEvent().matches(new DocumentRenamingEvent()));
+        assertTrue(new DocumentRenamingEvent().matches(new DocumentRenamingEvent(alice, bob)));
+
+        assertFalse(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent()));
+        assertFalse(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(bob, null)));
+        assertFalse(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(null, alice)));
+
+        assertTrue(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(alice, null)));
+        assertTrue(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(alice, carol)));
+
+        assertFalse(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent()));
+        assertFalse(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(null, bob)));
+        assertFalse(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(alice, null)));
+
+        assertTrue(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(null, alice)));
+        assertTrue(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(carol, alice)));
+
+        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent()));
+        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(bob, alice)));
+        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(alice, carol)));
+        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(carol, bob)));
+
+        assertTrue(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(alice, bob)));
     }
 }

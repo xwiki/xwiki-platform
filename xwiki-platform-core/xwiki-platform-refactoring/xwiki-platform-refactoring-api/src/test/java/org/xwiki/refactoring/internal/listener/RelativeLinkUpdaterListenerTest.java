@@ -89,14 +89,6 @@ public class RelativeLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutReferences()
-    {
-        this.listener.onEvent(new DocumentRenamedEvent(), null, null);
-
-        verify(this.linkRefactoring, never()).updateRelativeLinks(any(), any());
-    }
-
-    @Test
     public void onDocumentCopiedWithUpdateLinks()
     {
         copyRequest.setUpdateLinks(true);
@@ -122,14 +114,6 @@ public class RelativeLinkUpdaterListenerTest
         this.listener.onEvent(documentCopiedEvent, null, null);
 
         verify(this.linkRefactoring).updateRelativeLinks(oldReference, newReference);
-    }
-
-    @Test
-    public void onDocumentCopiedWithoutReferences()
-    {
-        this.listener.onEvent(new DocumentCopiedEvent(), null, null);
-
-        verify(this.linkRefactoring, never()).updateRelativeLinks(any(), any());
     }
 
     @Test

@@ -72,9 +72,9 @@ public class AutomaticRedirectCreatorListener extends AbstractEventListener
             if (autoRedirect) {
                 DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
                 this.logger.info("Creating automatic redirect from [{}] to [{}].",
-                    documentRenamedEvent.getOldReference(), documentRenamedEvent.getNewReference());
-                this.modelBridge.createRedirect(documentRenamedEvent.getOldReference(),
-                    documentRenamedEvent.getNewReference());
+                    documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
+                this.modelBridge.createRedirect(documentRenamedEvent.getSourceReference(),
+                    documentRenamedEvent.getTargetReference());
             }
         }
     }

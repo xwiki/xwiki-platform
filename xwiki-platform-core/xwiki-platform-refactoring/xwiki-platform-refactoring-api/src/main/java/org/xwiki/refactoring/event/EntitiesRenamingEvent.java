@@ -19,8 +19,9 @@
  */
 package org.xwiki.refactoring.event;
 
-import org.xwiki.observation.event.AbstractCancelableEvent;
 import org.xwiki.observation.event.BeginFoldEvent;
+import org.xwiki.observation.event.CancelableEvent;
+import org.xwiki.refactoring.internal.event.AbstractEvent;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -30,10 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.1RC1
  */
 @Unstable
-public class EntitiesRenamingEvent extends AbstractCancelableEvent implements BeginFoldEvent
+public class EntitiesRenamingEvent extends AbstractEvent implements BeginFoldEvent, CancelableEvent
 {
-    /**
-     * Serialization identifier.
-     */
-    private static final long serialVersionUID = 1L;
 }

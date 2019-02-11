@@ -19,8 +19,8 @@
  */
 package org.xwiki.refactoring.event;
 
-import org.xwiki.observation.event.AbstractFilterableEvent;
 import org.xwiki.observation.event.EndFoldEvent;
+import org.xwiki.refactoring.internal.event.AbstractEvent;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -30,10 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.1RC1
  */
 @Unstable
-public class EntitiesRenamedEvent extends AbstractFilterableEvent implements EndFoldEvent
+public class EntitiesRenamedEvent extends AbstractEvent implements EndFoldEvent
 {
-    /**
-     * Serialization identifier.
-     */
-    private static final long serialVersionUID = 1L;
 }

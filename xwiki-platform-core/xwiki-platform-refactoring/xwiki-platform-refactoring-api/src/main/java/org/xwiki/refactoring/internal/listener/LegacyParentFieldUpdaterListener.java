@@ -73,9 +73,9 @@ public class LegacyParentFieldUpdaterListener extends AbstractEventListener
             if (updateParentField) {
                 DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
                 this.logger.info("Updating the document parent fields from [{}] to [{}].",
-                    documentRenamedEvent.getOldReference(), documentRenamedEvent.getNewReference());
-                this.modelBridge.updateParentField(documentRenamedEvent.getOldReference(),
-                    documentRenamedEvent.getNewReference());
+                    documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
+                this.modelBridge.updateParentField(documentRenamedEvent.getSourceReference(),
+                    documentRenamedEvent.getTargetReference());
             }
         }
     }

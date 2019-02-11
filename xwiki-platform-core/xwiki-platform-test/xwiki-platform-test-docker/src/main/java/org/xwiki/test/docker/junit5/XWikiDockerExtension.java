@@ -99,7 +99,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
         if (testConfiguration.isDebug()) {
-            DockerTestUtils.setLogbackLoggerLevel("org.testcontainers", Level.INFO);
+            DockerTestUtils.setLogbackLoggerLevel("org.testcontainers", Level.DEBUG);
             DockerTestUtils.setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
         }
 
@@ -246,17 +246,24 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
     {
-        TestConfiguration testConfiguration = new TestConfiguration(
-            extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
-        // Save the test configuration so that we can access it in afterAll()
-        saveTestConfiguration(extensionContext, testConfiguration);
+        // This test could be executing as a Nested test and this have no @UITest annotation, in which case we can
+        // skip the check since it has already been checked by the parent test class.
+        UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
+        if (uiTest != null) {
+            TestConfiguration testConfiguration = new TestConfiguration(uiTest);
+            // Save the test configuration so that we can access it in afterAll()
+            saveTestConfiguration(extensionContext, testConfiguration);
 
-        // Skip the test if the Servlet Engine selected is in the forbidden list
-        if (isServletEngineForbidden(testConfiguration)) {
-            return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
-                testConfiguration.getServletEngine()));
+            // Skip the test if the Servlet Engine selected is in the forbidden list
+            if (isServletEngineForbidden(testConfiguration)) {
+                return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
+                    testConfiguration.getServletEngine()));
+            } else {
+                return ConditionEvaluationResult.enabled(String.format("Servlet Engine [%s] is supported, continuing",
+                    testConfiguration.getServletEngine()));
+            }
         } else {
-            return ConditionEvaluationResult.enabled("Servlet Engine [%s] is supported, continuing");
+            return ConditionEvaluationResult.enabled("Servlet Engine is supported by parent Test class, continuing");
         }
     }
 

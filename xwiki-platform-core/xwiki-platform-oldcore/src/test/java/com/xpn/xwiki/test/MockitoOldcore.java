@@ -66,6 +66,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -379,6 +380,11 @@ public class MockitoOldcore
 
         if (!this.componentManager.hasComponent(LinkRefactoring.class)) {
             this.componentManager.registerMockComponent(LinkRefactoring.class);
+        }
+
+        // Make sure to a have an URLConfiguration component.
+        if (!this.componentManager.hasComponent(URLConfiguration.class)) {
+            this.componentManager.registerMockComponent(URLConfiguration.class);
         }
 
         // XWiki

@@ -28,7 +28,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
             <div class="btn btn-default" id="button-inout" title="$services.localization.render('core.viewers.information.pageReference.globalButton')">
               $services.icon.renderHTML('world')
             </div>
-            <span class="form-control" id="reference-value">$doc.getDocumentReference().getLocaleDocumentReference()</span>
+            <span class="form-control" id="reference-value">$escapetool.xml($services.model.serialize($doc.getDocumentReference().getLocalDocumentReference(), "local"))</span>
             <div class="btn btn-default" id="button-paste" title="$services.localization.render('core.viewers.information.pageReference.copyButton')">
               $services.icon.renderHTML('paste')
             </div>

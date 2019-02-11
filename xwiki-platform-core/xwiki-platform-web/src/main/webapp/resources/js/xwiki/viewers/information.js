@@ -33,7 +33,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       referenceValue.text(globalReference);
       button.addClass('btn-info');
       button.attr('title',"$services.localization.render('core.viewers.information.pageReference.localButton')");
-
     }
   });
 

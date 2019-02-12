@@ -619,7 +619,7 @@ define(
       if (parameterDescriptor) {
         var value = formData[parameterId];
         if ($.isArray(value)) {
-          value = parameterDescriptor.type === 'java.lang.Boolean' ? value[0] : value.join();
+          value = isBooleanType(parameterDescriptor.type) ? value[0] : value.join();
         }
         var defaultValue = parameterDescriptor.defaultValue;
         if (value !== '' && (defaultValue === undefined || defaultValue === null || (defaultValue + '') !== value)) {
@@ -628,6 +628,10 @@ define(
       }
     }
     return macroCall;
+  },
+
+  isBooleanType = function(type) {
+    return type === 'boolean' || type === 'java.lang.Boolean';
   },
 
   createMacroEditorAPI = function(macroEditor) {

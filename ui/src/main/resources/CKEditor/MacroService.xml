@@ -278,7 +278,8 @@
 #end
 
 #macro (getMacroParameterEditTemplate $translatedParameterDescriptor)
-  #if ($translatedParameterDescriptor.type.getName() == 'java.lang.Boolean')
+  #if ($translatedParameterDescriptor.type.getName() == 'boolean'
+      || $translatedParameterDescriptor.type.getName() == 'java.lang.Boolean')
     &lt;input type="checkbox" name="$escapetool.xml($translatedParameterDescriptor.id)" value="true"/&gt;##
     ## We need to submit something in case the checkbox is not checked.
     &lt;input type="hidden" name="$escapetool.xml($translatedParameterDescriptor.id)" value="false"/&gt;

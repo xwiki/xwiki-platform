@@ -39,6 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>template.templateProvider.article.name=Статья
+template.templateProvider.article.description=Страница статьи
+
+template.templateProvider.encyclopedia.name=Энциклопедия
+template.templateProvider.encyclopedia.description=Страница энциклопедии
+
+template.templateProvider.meeting.name=Отчет о совещании
+template.templateProvider.meeting.description=Повестка дня и заметки
+
+template.templateProvider.simplePage.name=Простая страница
+template.templateProvider.simplePage.description=С оглавлением</content>
   
 </xwikidoc>

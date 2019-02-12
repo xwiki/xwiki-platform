@@ -31,6 +31,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentCopiedEvent;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.LinkRefactoring;
+import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 
 /**
@@ -68,22 +69,13 @@ public class RelativeLinkUpdaterListener extends AbstractEventListener
     {
         boolean updateRelativeLinks =
             data instanceof AbstractCopyOrMoveRequest ? ((AbstractCopyOrMoveRequest) data).isUpdateLinks() : true;
-        DocumentReference oldReference = null;
-        DocumentReference newReference = null;
-
-        if (event instanceof DocumentCopiedEvent && updateRelativeLinks) {
-            DocumentCopiedEvent documentCopiedEvent = (DocumentCopiedEvent) event;
-            oldReference = documentCopiedEvent.getSourceReference();
-            newReference = documentCopiedEvent.getTargetReference();
-        } else if (event instanceof DocumentRenamedEvent && updateRelativeLinks) {
-            DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
-            oldReference = documentRenamedEvent.getOldReference();
-            newReference = documentRenamedEvent.getNewReference();
-        }
-
-        if (oldReference != null && newReference != null) {
-            this.logger.info("Updating the relative links from [{}].", newReference);
-            this.linkRefactoring.updateRelativeLinks(oldReference, newReference);
+        if (updateRelativeLinks && (event instanceof DocumentCopiedEvent || event instanceof DocumentRenamedEvent)) {
+            @SuppressWarnings("unchecked")
+            AbstractEntityCopyOrRenameEvent<DocumentReference> copyOrRenameEvent =
+                (AbstractEntityCopyOrRenameEvent<DocumentReference>) event;
+            this.logger.info("Updating the relative links from [{}].", copyOrRenameEvent.getTargetReference());
+            this.linkRefactoring.updateRelativeLinks(copyOrRenameEvent.getSourceReference(),
+                copyOrRenameEvent.getTargetReference());
         }
     }
 }

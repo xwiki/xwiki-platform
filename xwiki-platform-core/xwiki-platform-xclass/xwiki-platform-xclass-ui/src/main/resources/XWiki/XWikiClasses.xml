@@ -67,6 +67,7 @@ $services.localization.render('platform.xclass.classes.description', [
   '&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/]]'
 ])
 
+(% id="HClassTemplates" %)
 = {{translation key="platform.xclass.classes.templates.heading"/}} =
 
 {{translation key="platform.xclass.classes.templates.description"/}}
@@ -75,6 +76,7 @@ $services.localization.render('platform.xclass.classes.description', [
 * [[$services.localization.render('platform.xclass.classes.templates.classTemplate')&gt;&gt;ClassTemplate]]
 * [[$services.localization.render('platform.xclass.classes.templates.objectSheet')&gt;&gt;ObjectSheet]]
 
+(% id="HCreateClass" %)
 = {{translation key="platform.xclass.classes.createClass.heading"/}} =
 
 $services.localization.render('platform.xclass.classes.createClass.description', ['//', '//'])
@@ -125,6 +127,7 @@ $services.localization.render('platform.xclass.classes.createClass.description',
 {{/html}}
 {{/velocity}}
 
+(% id="HClassesLiveTable" %)
 = {{translation key="platform.xclass.classes.livetable.heading"/}} =
 
 {{velocity}}

@@ -17,19 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.event;
+package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.EndFoldEvent;
-import org.xwiki.refactoring.internal.event.AbstractEvent;
-import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 
 /**
- * Event fired after multiple entities have been copied.
+ * Event triggered after {@link MandatoryDocumentInitializer} components have been executed.
  * 
  * @version $Id$
+ * @since 10.11.3
  * @since 11.1RC1
  */
-@Unstable
-public class EntitiesCopiedEvent extends AbstractEvent implements EndFoldEvent
+public class MandatoryDocumentsInitializedEvent implements EndFoldEvent
 {
+    /**
+     * Unique instance of {@link MandatoryDocumentsInitializedEvent}.
+     */
+    public static final MandatoryDocumentsInitializedEvent EVENT = new MandatoryDocumentsInitializedEvent();
+
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        return otherEvent instanceof MandatoryDocumentsInitializedEvent;
+    }
 }

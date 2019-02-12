@@ -40,6 +40,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -102,7 +103,7 @@ public class CopyJobTest extends AbstractEntityJobTest
         request.setEntityParameters(sourceReference, parameters);
         Job job = run(request);
 
-        verify(this.observationManager).notify(new EntitiesCopyingEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesCopyingEvent.class), same(job), same(request));
         verify(this.observationManager).notify(new DocumentCopyingEvent(sourceReference, copyDestination), job,
             request);
 
@@ -111,7 +112,7 @@ public class CopyJobTest extends AbstractEntityJobTest
         verify(this.mocker.getMockedLogger(), never()).error(any());
 
         verify(this.observationManager).notify(new DocumentCopiedEvent(sourceReference, copyDestination), job, request);
-        verify(this.observationManager).notify(new EntitiesCopiedEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesCopiedEvent.class), same(job), same(request));
     }
 
     @Test
@@ -126,11 +127,11 @@ public class CopyJobTest extends AbstractEntityJobTest
         doAnswer((Answer<Void>) invocation -> {
             ((EntitiesCopyingEvent) invocation.getArgument(0)).cancel();
             return null;
-        }).when(this.observationManager).notify(eq(new EntitiesCopyingEvent()), any(CopyJob.class), eq(request));
+        }).when(this.observationManager).notify(any(EntitiesCopyingEvent.class), any(CopyJob.class), same(request));
 
         Job job = run(request);
 
-        verify(this.observationManager).notify(new EntitiesCopyingEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesCopyingEvent.class), same(job), same(request));
         verify(this.observationManager, never()).notify(any(DocumentCopyingEvent.class), any(), any());
 
         verify(this.modelBridge, never()).delete(any());
@@ -165,11 +166,11 @@ public class CopyJobTest extends AbstractEntityJobTest
             ((DocumentCopyingEvent) invocation.getArgument(0)).cancel();
             return null;
         }).when(this.observationManager).notify(eq(new DocumentCopyingEvent(aliceReference, copyAliceReference)),
-            any(CopyJob.class), eq(request));
+            any(CopyJob.class), same(request));
 
         Job job = run(request);
 
-        verify(this.observationManager).notify(new EntitiesCopyingEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesCopyingEvent.class), same(job), same(request));
 
         // The copy of the first document is canceled.
         verify(this.observationManager).notify(new DocumentCopyingEvent(aliceReference, copyAliceReference), job,
@@ -183,6 +184,6 @@ public class CopyJobTest extends AbstractEntityJobTest
         verify(this.modelBridge).copy(bobReference, copyBobReference);
         verify(this.observationManager).notify(new DocumentCopiedEvent(bobReference, copyBobReference), job, request);
 
-        verify(this.observationManager).notify(new EntitiesCopiedEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesCopiedEvent.class), same(job), same(request));
     }
 }

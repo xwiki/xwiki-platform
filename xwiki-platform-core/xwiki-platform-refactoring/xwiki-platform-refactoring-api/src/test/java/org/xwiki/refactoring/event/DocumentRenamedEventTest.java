@@ -20,10 +20,9 @@
 package org.xwiki.refactoring.event;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Unit tests for {@link DocumentRenamedEvent}.
@@ -32,26 +31,17 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 public class DocumentRenamedEventTest
 {
-    private DocumentReference alice = new DocumentReference("wiki", "Users", "Alice");
-
-    private DocumentReference bob = new DocumentReference("wiki", "Users", "Bob");
-
-    private DocumentReference carol = new DocumentReference("wiki", "Users", "Carol");
-
     @Test
-    public void equalsAndHashCode()
+    public void cancelThrowsException()
     {
-        assertEquals(new DocumentRenamedEvent(), new DocumentRenamedEvent());
-        assertEquals(new DocumentRenamedEvent().hashCode(), new DocumentRenamedEvent().hashCode());
+        DocumentRenamedEvent event = new DocumentRenamedEvent();
+        assertFalse(event.isCanceled());
 
-        assertEquals(new DocumentRenamedEvent(alice, bob), new DocumentRenamedEvent(alice, bob));
-        assertEquals(new DocumentRenamedEvent(bob, carol).hashCode(), new DocumentRenamedEvent(bob, carol).hashCode());
-
-        assertNotEquals(new DocumentRenamedEvent(), null);
-        assertNotEquals(new DocumentRenamedEvent(), new DocumentRenamingEvent());
-        assertNotEquals(new DocumentRenamedEvent(alice, bob), new DocumentRenamedEvent(alice, carol));
-
-        assertNotEquals(new DocumentRenamedEvent(alice, bob).hashCode(),
-            new DocumentRenamedEvent(alice, carol).hashCode());
+        try {
+            event.cancel();
+            fail();
+        } catch (UnsupportedOperationException e) {
+            // This event can't be canceled.
+        }
     }
 }

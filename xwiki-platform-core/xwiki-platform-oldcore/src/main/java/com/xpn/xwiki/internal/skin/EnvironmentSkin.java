@@ -38,7 +38,6 @@ import org.xwiki.skin.Skin;
 import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Represents a skin stored in the file system.
@@ -121,7 +120,7 @@ public class EnvironmentSkin extends AbstractSkin
     @Override
     public Resource<?> getLocalResource(String resourceName)
     {
-        String resourcePath = getResourcePath(resourceName, false);
+        String resourcePath = getSkinResourcePath(resourceName);
 
         if (this.environment.getResource(resourcePath) != null) {
             return createResource(resourcePath, resourceName);
@@ -136,7 +135,7 @@ public class EnvironmentSkin extends AbstractSkin
             this.urlConfiguration);
     }
 
-    private String getResourcePath(String resource, boolean testExist)
+    private String getSkinResourcePath(String resource)
     {
         String skinFolder = getSkinFolder();
         String resourcePath = skinFolder + resource;
@@ -144,16 +143,9 @@ public class EnvironmentSkin extends AbstractSkin
         // Prevent inclusion of templates from other directories
         Path normalizedResource = Paths.get(resourcePath).normalize();
         if (!normalizedResource.startsWith(skinFolder)) {
-            LOGGER.warn("Direct access to template file [{}] refused. Possible break-in attempt!", normalizedResource);
+            LOGGER.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
 
             return null;
-        }
-
-        if (testExist) {
-            // Check if the resource exist
-            if (this.environment.getResource(resourcePath) == null) {
-                return null;
-            }
         }
 
         return resourcePath;

@@ -19,11 +19,9 @@
  */
 package org.xwiki.refactoring.event;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.event.AbstractFilterableEvent;
 import org.xwiki.observation.event.EndFoldEvent;
+import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -33,75 +31,23 @@ import org.xwiki.stability.Unstable;
  * @since 11.1RC1
  */
 @Unstable
-public class DocumentCopiedEvent extends AbstractFilterableEvent implements EndFoldEvent
+public class DocumentCopiedEvent extends AbstractEntityCopyOrRenameEvent<DocumentReference> implements EndFoldEvent
 {
-    /**
-     * Serialization identifier.
-     */
-    private static final long serialVersionUID = 1L;
-
-    private final DocumentReference sourceReference;
-
-    private final DocumentReference targetReference;
-
     /**
      * Default constructor, used by listeners.
      */
     public DocumentCopiedEvent()
     {
-        this(null, null);
     }
 
     /**
      * Creates a new instance with the given data.
      * 
-     * @param sourceReference the reference of the document that has been copied
-     * @param targetReference the reference of the created copy
+     * @param sourceReference the reference of the source entity
+     * @param targetReference the reference of the target entity
      */
     public DocumentCopiedEvent(DocumentReference sourceReference, DocumentReference targetReference)
     {
-        this.sourceReference = sourceReference;
-        this.targetReference = targetReference;
-    }
-
-    /**
-     * @return the reference of the document that has been copied
-     */
-    public DocumentReference getSourceReference()
-    {
-        return sourceReference;
-    }
-
-    /**
-     * @return the reference of the created copy
-     */
-    public DocumentReference getTargetReference()
-    {
-        return targetReference;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder(17, 59).appendSuper(super.hashCode()).append(this.sourceReference)
-            .append(this.targetReference).toHashCode();
-    }
-
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object == null) {
-            return false;
-        }
-        if (object == this) {
-            return true;
-        }
-        if (object.getClass() != getClass()) {
-            return false;
-        }
-        DocumentCopiedEvent documentCopiedEvent = (DocumentCopiedEvent) object;
-        return new EqualsBuilder().appendSuper(super.equals(object))
-            .append(this.sourceReference, documentCopiedEvent.sourceReference)
-            .append(this.targetReference, documentCopiedEvent.targetReference).isEquals();
+        super(sourceReference, targetReference);
     }
 }

@@ -113,7 +113,7 @@ public class BackLinkUpdaterListener extends AbstractEventListener
     private void updateBackLinks(DocumentRenamedEvent event, Predicate<EntityReference> canEdit,
         boolean updateLinksOnFarm)
     {
-        Collection<String> wikiIds = Collections.singleton(event.getOldReference().getWikiReference().getName());
+        Collection<String> wikiIds = Collections.singleton(event.getSourceReference().getWikiReference().getName());
         if (updateLinksOnFarm) {
             try {
                 wikiIds = this.wikiDescriptorManager.getAllIds();
@@ -142,17 +142,17 @@ public class BackLinkUpdaterListener extends AbstractEventListener
 
     private void updateBackLinks(DocumentRenamedEvent event, Predicate<EntityReference> canEdit, String wikiId)
     {
-        this.logger.info("Updating the back-links for document [{}] in wiki [{}].", event.getOldReference(), wikiId);
+        this.logger.info("Updating the back-links for document [{}] in wiki [{}].", event.getSourceReference(), wikiId);
         List<DocumentReference> backlinkDocumentReferences =
-            this.modelBridge.getBackLinkedReferences(event.getOldReference(), wikiId);
+            this.modelBridge.getBackLinkedReferences(event.getSourceReference(), wikiId);
         this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
 
         try {
             for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
                 this.progressManager.startStep(this);
                 if (canEdit.test(backlinkDocumentReference)) {
-                    this.linkRefactoring.renameLinks(backlinkDocumentReference, event.getOldReference(),
-                        event.getNewReference());
+                    this.linkRefactoring.renameLinks(backlinkDocumentReference, event.getSourceReference(),
+                        event.getTargetReference());
                 }
                 this.progressManager.endStep(this);
             }

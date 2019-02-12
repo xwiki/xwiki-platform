@@ -51,6 +51,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -326,14 +327,14 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setUserReference(userReference);
         Job job = run(request);
 
-        verify(this.observationManager).notify(new EntitiesRenamingEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesRenamingEvent.class), same(job), same(request));
         verify(this.observationManager).notify(new DocumentRenamingEvent(oldReference, newReference), job, request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(oldReference);
 
         verify(this.observationManager).notify(new DocumentRenamedEvent(oldReference, newReference), job, request);
-        verify(this.observationManager).notify(new EntitiesRenamedEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesRenamedEvent.class), same(job), same(request));
     }
 
     @Test
@@ -353,11 +354,11 @@ public class MoveJobTest extends AbstractMoveJobTest
         doAnswer((Answer<Void>) invocation -> {
             ((EntitiesRenamingEvent) invocation.getArgument(0)).cancel();
             return null;
-        }).when(this.observationManager).notify(eq(new EntitiesRenamingEvent()), any(MoveJob.class), eq(request));
+        }).when(this.observationManager).notify(any(EntitiesRenamingEvent.class), any(MoveJob.class), same(request));
 
         Job job = run(request);
 
-        verify(this.observationManager).notify(new EntitiesRenamingEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesRenamingEvent.class), same(job), same(request));
         verify(this.observationManager, never()).notify(any(DocumentRenamingEvent.class), any(), any());
 
         verify(this.modelBridge, never()).delete(any());
@@ -395,11 +396,11 @@ public class MoveJobTest extends AbstractMoveJobTest
             ((DocumentRenamingEvent) invocation.getArgument(0)).cancel();
             return null;
         }).when(this.observationManager).notify(eq(new DocumentRenamingEvent(oldAliceReference, newAliceReference)),
-            any(MoveJob.class), eq(request));
+            any(MoveJob.class), same(request));
 
         Job job = run(request);
 
-        verify(this.observationManager).notify(new EntitiesRenamingEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesRenamingEvent.class), same(job), same(request));
 
         // The rename of the first document is canceled.
         verify(this.observationManager).notify(new DocumentRenamingEvent(oldAliceReference, newAliceReference), job,
@@ -417,7 +418,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(this.observationManager).notify(new DocumentRenamedEvent(oldBobReference, newBobReference), job,
             request);
 
-        verify(this.observationManager).notify(new EntitiesRenamedEvent(), job, request);
+        verify(this.observationManager).notify(any(EntitiesRenamedEvent.class), same(job), same(request));
     }
 
     @Test
@@ -530,6 +531,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setCheckRights(false);
 
         doAnswer((Answer<Void>) invocation -> {
+            @SuppressWarnings("unchecked")
             Map<EntityReference, EntitySelection> concernedEntities =
                 (Map<EntityReference, EntitySelection>) invocation.getArgument(2);
             concernedEntities.get(sourceReference).setSelected(false);

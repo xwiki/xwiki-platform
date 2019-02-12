@@ -193,6 +193,8 @@ import com.xpn.xwiki.internal.WikiInitializerRequest;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
+import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializedEvent;
+import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializingEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
@@ -500,7 +502,8 @@ public class XWiki implements EventListener
         return this.editConfiguration;
     }
 
-    private URLConfiguration getURLConfiguration() {
+    private URLConfiguration getURLConfiguration()
+    {
         if (this.urlConfiguration == null) {
             this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
         }
@@ -1243,8 +1246,19 @@ public class XWiki implements EventListener
 
             // Make sure these classes exists
             if (noupdate) {
-                initializeMandatoryDocuments(context);
-                getStatsService(context);
+                getProgress().pushLevelProgress(2, this);
+
+                try {
+                    getProgress().startStep(this);
+
+                    initializeMandatoryDocuments(context);
+
+                    getProgress().startStep(this);
+
+                    getStatsService(context);
+                } finally {
+                    getProgress().popLevelProgress(this);
+                }
             }
 
             getProgress().endStep(this);
@@ -1324,9 +1338,23 @@ public class XWiki implements EventListener
                 }
             });
 
-            for (MandatoryDocumentInitializer initializer : initializers) {
-                initializeMandatoryDocument(initializer, context);
+            getObservationManager().notify(MandatoryDocumentsInitializingEvent.EVENT, null);
+
+            getProgress().pushLevelProgress(initializers.size(), this);
+
+            try {
+                for (MandatoryDocumentInitializer initializer : initializers) {
+                    getProgress().startStep(this);
+
+                    initializeMandatoryDocument(initializer, context);
+
+                    getProgress().endStep(this);
+                }
+            } finally {
+                getProgress().popLevelProgress(this);
             }
+
+            getObservationManager().notify(MandatoryDocumentsInitializedEvent.EVENT, null);
         }
     }
 
@@ -2422,6 +2450,7 @@ public class XWiki implements EventListener
 
     /**
      * Build and return a skin file url based on the given parameters.
+     * 
      * @param filename the file name of the skin file wanted
      * @param forceSkinAction if true force the usage of directory /skins/ in the URL
      * @param context current context for the request

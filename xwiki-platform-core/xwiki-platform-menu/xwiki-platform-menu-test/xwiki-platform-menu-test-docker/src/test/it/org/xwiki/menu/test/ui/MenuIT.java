@@ -21,10 +21,8 @@ package org.xwiki.menu.test.ui;
 
 import java.util.Arrays;
 
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.application.test.po.ApplicationIndexHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
@@ -54,7 +52,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //@UITest(database = Database.HSQLDB_EMBEDDED, servletEngine = ServletEngine.JETTY_STANDALONE,
 //  browser = Browser.FIREFOX, verbose = true)
 @UITest
-@TestMethodOrder(OrderAnnotation.class)
 public class MenuIT
 {
     @Test

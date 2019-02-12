@@ -36,8 +36,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.refactoring.internal.LinkRefactoring;
-import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.template.TemplateManager;
@@ -46,13 +44,14 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.test.mockito.StringReaderMatcher;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -77,6 +76,7 @@ public class TemplateManagerTest
         // override default ObservationManager to avoid annoying listeners side effects
         this.mocker.registerMockComponent(ObservationManager.class);
 
+        when(this.velocityManagerMock.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
 
         MemoryConfigurationSource configuration = this.mocker.registerMemoryConfigurationSource();

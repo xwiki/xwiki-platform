@@ -49,8 +49,7 @@ help.macroList.id=Id
 help.macroList.name=Name
 help.macroList.category=Category
 help.macroList.description=Description
-help.macroList.visibility=Visibility
-</content>
+help.macroList.visibility=Visibility</content>
   <object>
     <name>Help.Translations</name>
     <number>0</number>

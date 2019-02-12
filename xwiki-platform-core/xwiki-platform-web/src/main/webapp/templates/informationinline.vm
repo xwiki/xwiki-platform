@@ -1,40 +1,55 @@
+$xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
+$xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
 ###
 ### Display document information
 ###
 <div id="informationcontent" class="xwikiintracontent">
-<div id="_information">
-  <div id="informationleft" class="half column">
-    <dl>
-      #if($tdoc.realLocale != $doc.realLocale)
-        <dt>$services.localization.render('core.viewers.information.translationCreation', [$tdoc.realLocale])</dt>
-        <dd>$services.localization.render('core.viewers.information.translationCreationData', [$xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])</dd>
-      #end
-      <dt>$services.localization.render('core.viewers.information.includedPages')</dt>
-      <dd>
-        #set($pages = $tdoc.includedPages)
-        #if ($pages.isEmpty())
+  <div id="_information">
+    <div id="informationleft" class="col-xs-12 col-sm-6">
+      <dl>
+        #if($tdoc.realLocale != $doc.realLocale)
+          <dt>$services.localization.render('core.viewers.information.translationCreation', [$tdoc.realLocale])</dt>
+          <dd>$services.localization.render('core.viewers.information.translationCreationData', [$xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])</dd>
+        #end
+        <dt>$services.localization.render('core.viewers.information.includedPages')</dt>
+        <dd>
+          #set($pages = $tdoc.includedPages)
+          #if ($pages.isEmpty())
           ## We display a "no included pages" message to avoid having a blank information panel when there is nothing
-          <span class="noitems">$services.localization.render('core.viewers.information.noIncludedPages')</span>
-        #else
-          #displayDocumentList($pages true $blacklistedSpaces)
-        #end
-      </dd>
-    </dl>
-  </div>## informationleft
-  <div id="informationright" class="half column">
-    <dl>
-      <dt>$services.localization.render('core.viewers.information.backlinks')</dt>
-      <dd>
-        #set($blinks = $sorttool.sort($doc.getBacklinks()))
-        #if ($blinks.isEmpty())
+            <span class="noitems">$services.localization.render('core.viewers.information.noIncludedPages')</span>
+          #else
+            #displayDocumentList($pages true $blacklistedSpaces)
+          #end
+        </dd>
+        <dt>$services.localization.render('core.viewers.information.pageReference')</dt>
+        <dd id="information-reference">
+          <span class="noitems">$services.localization.render('core.viewers.information.pageReference.tips')</span>
+          <div class="reference-group">
+            <div class="btn btn-default" id="button-inout" title="$services.localization.render('core.viewers.information.pageReference.globalButton')">
+              $services.icon.renderHTML('world')
+            </div>
+            <span class="form-control" id="reference-value">$escapetool.xml($services.model.serialize($doc.getDocumentReference().getLocalDocumentReference(), "local"))</span>
+            <div class="btn btn-default" id="button-paste" title="$services.localization.render('core.viewers.information.pageReference.copyButton')">
+              $services.icon.renderHTML('paste')
+            </div>
+          </div>
+        </dd>
+      </dl>
+    </div>## informationleft
+    <div id="informationright" class="col-xs-12 col-sm-6">
+      <dl>
+        <dt>$services.localization.render('core.viewers.information.backlinks')</dt>
+        <dd>
+          #set($blinks = $sorttool.sort($doc.getBacklinks()))
+          #if ($blinks.isEmpty())
           ## We display a "no backlinks" message to avoid having a blank information panel when there is nothing
-          <span class="noitems">$services.localization.render('core.viewers.information.noBacklinks')</span>
-        #else
-          #displayDocumentList($blinks true $blacklistedSpaces)
-        #end
-      </dd>
-    </dl>
-  </div>## informationright
-  <div class="clearfloats">&nbsp;</div>
-</div>## _information
+            <span class="noitems">$services.localization.render('core.viewers.information.noBacklinks')</span>
+          #else
+            #displayDocumentList($blinks true $blacklistedSpaces)
+          #end
+        </dd>
+      </dl>
+    </div>## informationright
+    <div class="clearfloats">&nbsp;</div>
+  </div>## _information
 </div>## informationcontent

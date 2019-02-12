@@ -181,9 +181,13 @@
       'deprecated': $parameterDescriptor.deprecated,
       'advanced': $parameterDescriptor.advanced,
       'defaultValue': $parameterDescriptor.defaultValue,
-      'type': $parameterDescriptor.parameterType,
+      'type': $parameterDescriptor.displayType,
       'index': $foreach.index
     })
+    #if ("$!translatedParameterDescriptor.type" == '')
+      ## displayType is not available before XWiki 11.0 so we need to fall back on parameterType.
+      #set ($translatedParameterDescriptor.type = $parameterDescriptor.parameterType)
+    #end
     #set ($groupDescriptor = $parameterDescriptor.groupDescriptor)
     #if ($groupDescriptor)
       #handleMacroParameterGroup($groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)

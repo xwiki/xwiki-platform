@@ -679,8 +679,6 @@ define(
     onLoad: function() {
       var modal = this;
       var submitButton = modal.find('.modal-footer .btn-primary');
-      var changeMacroButton = $('<button type="button" class="btn btn-default"/>').text(translations.get('changeMacro'))
-        .insertBefore(submitButton);
       modal.on('show.bs.modal', function(event) {
         submitButton.prop('disabled', true);
       }).on('shown.bs.modal', function(event) {
@@ -722,6 +720,9 @@ define(
           modal.data('output', output).modal('hide');
         }
       });
+      var changeMacroButton = $('<button type="button" class="btn btn-default pull-left"/>')
+        .text(translations.get('changeMacro'))
+        .prependTo(submitButton.parent());
       changeMacroButton.click(function(event) {
         var macroEditorAPI = modal.find('.macro-editor').xwikiMacroEditor();
         var output = modal.data('input');

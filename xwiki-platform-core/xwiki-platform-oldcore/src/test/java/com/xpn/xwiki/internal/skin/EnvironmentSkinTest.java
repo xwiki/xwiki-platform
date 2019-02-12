@@ -82,7 +82,7 @@ public class EnvironmentSkinTest
     public void getLocalResourceWithBreakInAttempt() throws Exception
     {
         assertNull(skin.getLocalResource("one/../../two"));
-        assertEquals("Direct access to template file [/skins/two] refused. Possible break-in attempt!",
+        assertEquals("Direct access to skin file [/skins/two] refused. Possible break-in attempt!",
             allLogRule.getMessage(0));
     }
 }

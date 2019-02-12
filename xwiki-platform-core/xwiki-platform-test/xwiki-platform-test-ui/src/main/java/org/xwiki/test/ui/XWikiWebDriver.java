@@ -529,6 +529,28 @@ public class XWikiWebDriver extends RemoteWebDriver
     }
 
     /**
+     * Waits until the given element contain a certain value for an attribute.
+     * @param locator the element to wait on.
+     * @param attributeName the name of attribute to check.
+     * @param expectedValue the value that should be contained in the attribute.
+     */
+    public void waitUntilElementContainsAttributeValue(final By locator, final String attributeName,
+        final String expectedValue)
+    {
+        waitUntilCondition(driver -> {
+            try {
+                WebElement element = driver.findElement(locator);
+                return element.getAttribute(attributeName).contains(expectedValue);
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
+            }
+        });
+    }
+
+    /**
      * Waits until the given element has a certain value as its inner text.
      *
      * @param locator the element to wait on

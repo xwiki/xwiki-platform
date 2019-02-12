@@ -93,6 +93,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
+        // If the current tests has parents and one of them has the @UITest annotation, it means all containers are
+        // already started and we should not do anything.
+        if (hasParentTestContainingUITestAnnotation(extensionContext)) {
+            return;
+        }
+
         // Note: TestConfiguration is created in evaluateExecutionCondition()à which executes before beforeAll()
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
@@ -154,7 +160,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext) throws Exception
+    public void beforeEach(ExtensionContext extensionContext)
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
@@ -171,7 +177,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     @Override
-    public void afterEach(ExtensionContext extensionContext) throws Exception
+    public void afterEach(ExtensionContext extensionContext)
     {
         LOGGER.info("(*) Stopping test...");
 
@@ -226,6 +232,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public void afterAll(ExtensionContext extensionContext) throws Exception
     {
+        // If the current tests has parents and one of them has the @UITest annotation, it means the containers should
+        // be stopped by the parent having the annotation.
+        if (hasParentTestContainingUITestAnnotation(extensionContext)) {
+            return;
+        }
+
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
         // Shutdown the test context
@@ -246,10 +258,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
     {
-        // This test could be executing as a Nested test and this have no @UITest annotation, in which case we can
-        // skip the check since it has already been checked by the parent test class.
-        UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
-        if (uiTest != null) {
+        // If the tests has parent tests and one of them has the @UITest annotation then it means all containers
+        // have already been started and thus the servlet engine is supported.
+        if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
+            UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
             TestConfiguration testConfiguration = new TestConfiguration(uiTest);
             // Save the test configuration so that we can access it in afterAll()
             saveTestConfiguration(extensionContext, testConfiguration);
@@ -265,6 +277,19 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         } else {
             return ConditionEvaluationResult.enabled("Servlet Engine is supported by parent Test class, continuing");
         }
+    }
+
+    private boolean hasParentTestContainingUITestAnnotation(ExtensionContext extensionContext)
+    {
+        boolean hasUITest = false;
+        ExtensionContext current = extensionContext;
+        // Note: the top level context is the JUnitJupiterExtensionContext one and it doesn't contain any test and
+        // thus calling getRequiredTestClass() throws an exception on it, which is why we skip it.
+        while (current.getParent().get().getParent().isPresent() && !hasUITest) {
+            current = current.getParent().get();
+            hasUITest = current.getRequiredTestClass().isAnnotationPresent(UITest.class);
+        }
+        return hasUITest;
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,

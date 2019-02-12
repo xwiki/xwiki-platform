@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -73,10 +74,8 @@ public class TemplateManagerTest
     @Before
     public void before() throws Exception
     {
-        // avoid dependency issue with refactoring listeners
-        this.mocker.registerMockComponent(ModelBridge.class);
-        this.mocker.registerMockComponent(LinkRefactoring.class);
-        this.mocker.registerMockComponent(WikiDescriptorManager.class);
+        // override default ObservationManager to avoid annoying listeners side effects
+        this.mocker.registerMockComponent(ObservationManager.class);
 
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
 
@@ -136,13 +135,13 @@ public class TemplateManagerTest
     @Test
     public void testTemplateCheatingProtection() throws Exception
     {
-        when(this.environmentMock.getResource("/templates/../secure")).thenReturn(new URL("file://secure"));
-        when(this.environmentMock.getResourceAsStream("/templates/template"))
+        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
+        when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
             .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
 
         mockVelocity("source", "KO");
 
-        assertEquals("", mocker.getComponentUnderTest().render("../secure"));
+        assertEquals("", mocker.getComponentUnderTest().render("../secure[]"));
     }
 
     @Test

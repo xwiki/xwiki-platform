@@ -47,7 +47,6 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -1087,8 +1086,7 @@ public class ModelFactory
     private boolean hasAccess(Property restProperty)
     {
         if (PASSWORD_TYPE.equals(restProperty.getType())) {
-            return authorizationManager.hasAccess(Right.ADMIN,
-                new WikiReference(xcontextProvider.get().getWikiId()));
+            return authorizationManager.hasAccess(Right.ADMIN, xcontextProvider.get().getWikiReference());
         }
 
         return true;

@@ -94,7 +94,8 @@ public class ModelFactoryTest
     {
         dummyUrl = new URI("https://localhost/");
         testDocument = mock(Document.class);
-        SpaceReference spaceRef = new SpaceReference("Space", new WikiReference("wiki"));
+        WikiReference wikiRef = new WikiReference("wiki");
+        SpaceReference spaceRef = new SpaceReference("Space", wikiRef);
         when(testDocument.getPrefixedFullName()).thenReturn("wiki:Space.Page");
         when(testDocument.getWiki()).thenReturn("wiki");
         when(testDocument.getSpace()).thenReturn("Space");
@@ -102,7 +103,7 @@ public class ModelFactoryTest
         when(testDocument.getDocumentReference()).thenReturn(new DocumentReference("Page", spaceRef));
 
         when(xcontextProvider.get()).thenReturn(xcontext);
-        when(xcontext.getWikiId()).thenReturn("wiki");
+        when(xcontext.getWikiReference()).thenReturn(wikiRef);
     }
 
     /**

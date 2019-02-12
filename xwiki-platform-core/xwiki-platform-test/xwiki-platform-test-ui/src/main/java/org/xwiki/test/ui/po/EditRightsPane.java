@@ -71,7 +71,9 @@ public class EditRightsPane extends BaseElement
         static State getButtonState(WebElement button)
         {
             for (State s : values()) {
-                if ((button.getAttribute("src").endsWith(s.imageURL))) {
+                //  The URL may contain query string parameters (e.g. starting with 11.1RC1 the resource URLs can now
+                //  contain a query parameter to avoid cache issue) and we don't care about that to identify the state.
+                if ((button.getAttribute("src").contains(s.imageURL))) {
                     return s;
                 }
             }
@@ -127,7 +129,7 @@ public class EditRightsPane extends BaseElement
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementEndsWithAttributeValue(buttonLocator, "src",
+            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "src",
                 currentState.getNextState().imageURL);
         } finally {
             getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
@@ -154,7 +156,7 @@ public class EditRightsPane extends BaseElement
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementEndsWithAttributeValue(buttonLocator, "src", currentState.imageURL);
+            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "src", currentState.imageURL);
         } finally {
             getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
         }

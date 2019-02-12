@@ -47,6 +47,7 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -336,7 +337,7 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (isPublicType(property)) {
+            if (hasAccess(property)) {
                 try {
                     property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
                 } catch (XWikiException e) {
@@ -1081,12 +1082,13 @@ public class ModelFactory
     /**
      * Check if the given property should be exposed via REST.
      * @param restProperty the property to be read/written
-     * @return true if the property is considered public
+     * @return true if the property is considered accessible
      */
-    private boolean isPublicType(Property restProperty)
+    private boolean hasAccess(Property restProperty)
     {
         if (PASSWORD_TYPE.equals(restProperty.getType())) {
-            return authorizationManager.hasAccess(Right.ADMIN);
+            return authorizationManager.hasAccess(Right.ADMIN,
+                new WikiReference(xcontextProvider.get().getWikiId()));
         }
 
         return true;

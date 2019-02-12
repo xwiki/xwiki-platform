@@ -102,6 +102,7 @@ public class ModelFactoryTest
         when(testDocument.getDocumentReference()).thenReturn(new DocumentReference("Page", spaceRef));
 
         when(xcontextProvider.get()).thenReturn(xcontext);
+        when(xcontext.getWikiId()).thenReturn("wiki");
     }
 
     /**
@@ -142,7 +143,7 @@ public class ModelFactoryTest
     @Test
     void toRestObjectCheckWhichObjectValuesAreAvailableForNonAdmins() throws Exception
     {
-        when(authorizationManager.hasAccess(Right.ADMIN)).thenReturn(false);
+        when(authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(false);
 
         BaseObject xwikiObject = setUpTestObject();
 
@@ -157,7 +158,7 @@ public class ModelFactoryTest
     @Test
     void toRestObjectCheckWhichObjectValuesAreAvailableForAdmins() throws Exception
     {
-        when(authorizationManager.hasAccess(Right.ADMIN)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(true);
 
         BaseObject xwikiObject = setUpTestObject();
 

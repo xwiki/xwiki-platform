@@ -533,6 +533,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      * @param locator the element to wait on.
      * @param attributeName the name of attribute to check.
      * @param expectedValue the value that should be contained in the attribute.
+     * @since 11.1RC1
      */
     public void waitUntilElementContainsAttributeValue(final By locator, final String attributeName,
         final String expectedValue)

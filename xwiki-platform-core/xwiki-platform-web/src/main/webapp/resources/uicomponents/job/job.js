@@ -33,6 +33,13 @@ require.config({
 require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
   'use strict';
   var updateProgress = function(jobUI, job) {
+    jobUI.find('.ui-progress-background').toggle(job.state !== 'NONE');
+    jobUI.find('.ui-progress-message').toggle(job.state === 'NONE');
+
+    if (job.state !== 'NONE') {
+      jobUI.find('#state-none-hint').remove();
+    }
+
     var percent = Math.floor((job.progress.offset || 0) * 100);
     jobUI.find('.ui-progress-bar').css('width', percent + '%');
     var jobLog = job.log.items || [];

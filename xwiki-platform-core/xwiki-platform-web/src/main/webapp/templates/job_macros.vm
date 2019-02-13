@@ -3,31 +3,28 @@
 $services.template.execute('logging_macros.vm')
 
 #macro (displayJobProgressBar $jobStatus)
-  #if ($jobStatus.state == 'NONE')
-    <div class="box info">
-      $services.localization.render("job.state.NONE.hint");
+  <div class="ui-progress">
+    <div class="box info" id="state-none-hint">
+      $services.localization.render("job.state.NONE.hint")
     </div>
-  #else
-    <div class="ui-progress">
-      <div class="ui-progress-background">
-        #set ($percent = $jobStatus.progress.offset)
-        ## There is no progress information if the job was scheduled but hasn't started yet.
-        #if (!$percent)
-          #set ($percent = 0)
-        #end
-        #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
-        <div class="ui-progress-bar green" style="width:${percent}%"></div>
-      </div>
-      #if ($jobStatus && !$jobStatus.log.isEmpty())
-        ## We need the tail of the log queue.
-        #set ($logList = [])
-        #set ($discard = $logList.addAll($jobStatus.log))
-        <p class="ui-progress-message">
-          #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
-        </p>
+    <div class="ui-progress-background">
+      #set ($percent = $jobStatus.progress.offset)
+      ## There is no progress information if the job was scheduled but hasn't started yet.
+      #if (!$percent)
+        #set ($percent = 0)
       #end
+      #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+      <div class="ui-progress-bar green" style="width:${percent}%"></div>
     </div>
-  #end
+    #if ($jobStatus && !$jobStatus.log.isEmpty())
+      ## We need the tail of the log queue.
+      #set ($logList = [])
+      #set ($discard = $logList.addAll($jobStatus.log))
+      <p class="ui-progress-message">
+        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
+      </p>
+    #end
+  </div>
 #end
 
 #macro (displayJobStatusLog $status $collapsed)

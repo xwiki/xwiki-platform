@@ -55,6 +55,16 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
     }
 
     @Override
+    protected void getEntities(Collection<EntityReference> entityReferences)
+    {
+        // Collect the list of concerned entities.
+        super.getEntities(entityReferences);
+
+        // Allow others to exclude concerned entities.
+        this.notifyDocumentsDeleting();
+    }
+
+    @Override
     protected void process(Collection<EntityReference> entityReferences)
     {
         // Wrap the work as a batch operation.

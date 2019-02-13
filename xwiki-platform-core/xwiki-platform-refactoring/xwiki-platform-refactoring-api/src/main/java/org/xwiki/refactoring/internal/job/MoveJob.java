@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import javax.inject.Named;
 
-import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -81,16 +80,11 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     @Override
     protected void getEntities(Collection<EntityReference> entityReferences)
     {
+        // Collect the list of concerned entities.
         super.getEntities(entityReferences);
 
-        // Send the event
-        DocumentsDeletingEvent event = new DocumentsDeletingEvent();
-        this.observationManager.notify(event, this, this.concernedEntities);
-
-        // Stop the job if some listener has canceled the action
-        if (event.isCanceled()) {
-            getStatus().cancel();
-        }
+        // Allow others to exclude concerned entities.
+        this.notifyDocumentsDeleting();
     }
 
     @Override

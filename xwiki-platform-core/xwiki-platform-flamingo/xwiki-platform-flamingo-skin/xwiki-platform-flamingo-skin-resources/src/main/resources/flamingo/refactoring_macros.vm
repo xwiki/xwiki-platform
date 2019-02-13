@@ -67,18 +67,21 @@
 #end
 
 #macro (displayLinksCheckbox $options)
-  #set ($backLinksCount = $doc.backlinks.size())
-  #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
-  #set ($checked = !$request.updateLinks || $request.updateLinks == 'true')
-  <dt>
+  #set ($hidden = !$isAdvancedUser && !$isSuperAdmin)
+  ## We hide this option for simple users (instead of simply removing it) because we want to submit the default value
+  ## (i.e. we want to make sure the links are updated for simple users).
+  <dt#if ($hidden) class="hidden"#end>
     <label>
+      #set ($checked = !$request.updateLinks || $request.updateLinks == 'true')
       <input type="checkbox" name="updateLinks" value="true" #if ($checked)checked="checked"#end />
       $services.localization.render($options.label)
     </label>
     ## The value submitted when the checkbox is not checked, used to preserve the form state.
     <input type="hidden" name="updateLinks" value="false" />
   </dt>
-  <dd>
+  <dd#if ($hidden) class="hidden"#end>
+    #set ($backLinksCount = $doc.backlinks.size())
+    #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
     <span class="xHint">
       $services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
     </span>

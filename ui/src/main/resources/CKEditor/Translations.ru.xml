@@ -52,7 +52,7 @@ CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Некоторые мак
 CKEditor.ConfigClass_advanced=Расширенная настройка
 CKEditor.ConfigClass_advanced.hint=Вы можете написать фрагмент кода на JavaScript для прямого изменения объекта конфигурации. Обратитесь к {0}CKEditor документации{1} для получения списка доступных свойств конфигурации.
 
-### Missing: ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
+ckeditor.admin.saveComment=Изменена конфигурация CKEditor
 ckeditor.admin.reset=Сброс настроек
 ckeditor.admin.reset.hint=Восстановление конфигурации по умолчанию
 ckeditor.admin.reset.confirmation=Вы уверены, что хотите восстановить конфигурацию по умолчанию? Все ваши изменения будут потеряны.

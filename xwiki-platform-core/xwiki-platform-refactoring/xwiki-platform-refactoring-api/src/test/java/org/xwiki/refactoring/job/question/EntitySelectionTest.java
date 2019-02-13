@@ -23,7 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -47,5 +49,30 @@ public class EntitySelectionTest
         assertFalse(selected.equals(entityReference));
         assertFalse(selected.equals(unselected));
         assertTrue(selected.equals(new EntitySelection(entityReference)));
+    }
+
+    @Test
+    public void compareTo()
+    {
+        EntityReference aEntityReference = new EntityReference("A", EntityType.PAGE);
+        EntitySelection aEntitySelection = new EntitySelection(aEntityReference);
+
+        assertThrows(NullPointerException.class, () -> {
+            aEntitySelection.compareTo(null);
+        });
+
+        assertEquals(0, aEntitySelection.compareTo(aEntitySelection));
+
+        EntitySelection aPrimeEntitySelection = new EntitySelection(aEntityReference);
+        assertEquals(0, aEntitySelection.compareTo(aPrimeEntitySelection));
+
+        aEntitySelection.setSelected(true);
+        assertEquals(-2, aEntitySelection.compareTo(aPrimeEntitySelection));
+        aEntitySelection.setSelected(false);
+        assertEquals(-1, aEntitySelection.compareTo(aPrimeEntitySelection));
+
+        EntityReference bEntityReference = new EntityReference("B", EntityType.PAGE);
+        EntitySelection bEntitySelection = new EntitySelection(bEntityReference);
+        assertEquals(-1, aEntitySelection.compareTo(bEntitySelection));
     }
 }

@@ -29,7 +29,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 9.1RC1
  */
-public class EntitySelection
+public class EntitySelection implements Comparable<EntitySelection>
 {
     /**
      * Define the inner state of the EntitySelection.
@@ -129,5 +129,33 @@ public class EntitySelection
         EntitySelection entitySelection = (EntitySelection) object;
         return new EqualsBuilder().append(getEntityReference(), entitySelection.getEntityReference())
             .append(isSelected(), entitySelection.isSelected()).isEquals();
+    }
+
+    @Override
+    public int compareTo(EntitySelection entitySelection)
+    {
+        if (entitySelection == null) {
+            throw new NullPointerException("Provided entitySelection should not be null.");
+        }
+
+        if (entitySelection == this) {
+            return 0;
+        }
+
+        if (entityReference == null) {
+            return -1;
+        }
+
+        if (entitySelection.entityReference == null) {
+            return 1;
+        }
+
+        int result = entityReference.compareTo(entitySelection.entityReference);
+
+        if (result == 0) {
+            return isSelected.compareTo(entitySelection.isSelected);
+        } else {
+            return result;
+        }
     }
 }

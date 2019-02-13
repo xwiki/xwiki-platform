@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.job;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -98,7 +100,10 @@ public class XClassDeletingListener extends AbstractEventListener
         // Check if some pages contain used XClass
         Map<EntityReference, EntitySelection> concernedEntities = (Map<EntityReference, EntitySelection>) data;
         XClassBreakingQuestion question = new XClassBreakingQuestion(concernedEntities);
-        for (EntitySelection entitySelection : concernedEntities.values()) {
+        List<EntitySelection> entitySelectionsList = new ArrayList<>(concernedEntities.values());
+        Collections.sort(entitySelectionsList);
+
+        for (EntitySelection entitySelection : entitySelectionsList) {
             if (entitySelection.getEntityReference() instanceof DocumentReference) {
                 checkIfDeleteIsAllowed(entitySelection, question);
             }

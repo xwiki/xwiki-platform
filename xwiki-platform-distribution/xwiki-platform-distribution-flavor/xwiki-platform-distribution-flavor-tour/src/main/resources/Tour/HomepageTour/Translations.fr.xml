@@ -59,6 +59,5 @@ tour.homepageTour.header.contentA=Ce menu vous permet de faire des recherches da
 tour.homepageTour.header.contentB=Le bouton {0} ouvre un tiroir contenant des actions liées à votre Wiki, comme l''administration ou l''index des pages.
 tour.homepageTour.tourComplete.title=La visite guidée est terminée
 tour.homepageTour.tourComplete.contentA=C'est ainsi que s'achève votre visite guidée de l'interface XWiki et de ses principales fonctionnalités.
-tour.homepageTour.tourComplete.contentB=Pour plus d''informations, nous vous invitons à consulter la {0}documentation{1} officielle.
-</content>
+tour.homepageTour.tourComplete.contentB=Pour plus d''informations, nous vous invitons à consulter la {0}documentation{1} officielle.</content>
 </xwikidoc>

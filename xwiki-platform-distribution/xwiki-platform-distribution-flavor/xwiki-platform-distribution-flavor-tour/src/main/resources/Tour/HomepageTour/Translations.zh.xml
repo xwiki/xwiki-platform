@@ -59,6 +59,5 @@ tour.homepageTour.header.contentA=你可以查找相关内容，查看页面改�
 tour.homepageTour.header.contentB={0} 按钮可以打开抽屉菜单，菜单里有更多与本wiki相关的行为，比如索引和管理。
 tour.homepageTour.tourComplete.title=导游完成
 tour.homepageTour.tourComplete.contentA=XWiki的基本外观和功能探索完毕。
-tour.homepageTour.tourComplete.contentB=每个特色更详细的介绍可以在{0}documentation{1}中查看。
-</content>
+tour.homepageTour.tourComplete.contentB=每个特色更详细的介绍可以在{0}documentation{1}中查看。</content>
 </xwikidoc>

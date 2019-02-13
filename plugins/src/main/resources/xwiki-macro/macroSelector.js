@@ -69,7 +69,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     var categories = {};
     macros.forEach(function(macro) {
       var macroCategory = macro.defaultCategory || '';
-      categories[macroCategory] = 1;
+      categories[macroCategory] = (categories[macroCategory] || 0) + 1;
       var macroListItem = $(macroListItemTemplate).attr({
         'data-macroId': macro.id.id,
         'data-macroCategory': macroCategory
@@ -77,8 +77,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       macroListItem.find('.macro-name').text(macro.name);
       macroListItem.find('.macro-description').text(macro.description);
     });
-    categories = Object.keys(categories).sort();
-    var categoryFilter = createCategoryFilter(categories);
+    var categoryFilter = createCategoryFilter(sortCategories(categories));
     var textFilter = $(document.createElement('input')).attr({
       'type': 'text',
       'class': 'macro-textFilter',
@@ -93,40 +92,68 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     filterMacros.call(this);
   },
 
+  sortCategories = function(categories) {
+    var otherCategoryCount = categories[''];
+    var allCategoryCount = otherCategoryCount || 0;
+    delete categories[''];
+    var categoryList = $.map(categories, function(categoryCount, categoryName) {
+      if (allMacrosExcludedCategories.indexOf(categoryName) < 0) {
+        allCategoryCount += categoryCount;
+      }
+      return {
+        'id': categoryName,
+        'name': categoryName,
+        'count': categoryCount
+      };
+    }).sort(function(alice, bob) {
+      return alice.name.localeCompare(bob.name);
+    });
+    // Put "All Macros" category first.
+    categoryList.splice(0, 0, {
+      name: translations.get('filter.category.all'),
+      count: allCategoryCount
+    });
+    // Put "Other" category last.
+    if (otherCategoryCount) {
+      categoryList.push({
+        id: '',
+        name: translations.get('filter.category.other'),
+        count: otherCategoryCount
+      });
+    }
+    return categoryList;
+  },
+
   createCategoryFilter = function(categories) {
     var categoryFilter = $(
       '<div class="macro-categories input-group-btn">' +
         '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
           'aria-haspopup="true" aria-expanded="false"><span class="caret"/></button>' +
-        '<ul class="dropdown-menu dropdown-menu-right">' +
-          '<li><a href="#"/></li>' +
-        '</ul>' +
+        '<ul class="dropdown-menu dropdown-menu-right"></ul>' +
       '</div>'
     );
-    var allMacrosCategoryName = translations.get('filter.category.all');
-    categoryFilter.find('.caret').before(document.createTextNode(allMacrosCategoryName + ' '));
-    categoryFilter.find('a').text(allMacrosCategoryName);
+    var categoryTemplate = [
+      '<li class="macro-category">',
+        '<a href="#">',
+          '<span class="macro-category-name"/>',
+          '<span class="macro-category-count badge"/>',
+        '</a>',
+      '</li>'].join('');
+    categoryFilter.find('ul.dropdown-menu').append(categories.map(function(category) {
+      var item = $(categoryTemplate).attr('data-category', category.id);
+      item.find('.macro-category-name').text(category.name);
+      item.find('.macro-category-count').text(category.count);
+      return item[0];
+    }));
     var separator = '<li role="separator" class="divider"></li>';
-    var categoryList = categoryFilter.find('ul.dropdown-menu');
-    if (categories.length > 0) {
-      categoryList.append(separator);
+    // Add separator after "All Macros" category.
+    if (categories.length > 1) {
+      categoryFilter.find('.macro-category:not([data-category])').after(separator);
     }
-    var otherCategory;
-    categories.forEach(function(category) {
-      var item = $('<li><a href="#"></a></li>').attr('data-category', category);
-      item.children('a').text(category || translations.get('filter.category.other'));
-      if (category) {
-        categoryList.append(item);
-      } else {
-        otherCategory = item;
-      }
-    });
-    if (otherCategory) {
-      if (categories.length > 1) {
-        categoryList.append(separator);
-      }
-      categoryList.append(otherCategory);
-    }
+    // Add separator before "Other" category.
+    categoryFilter.find('.macro-category[data-category=""]').before(separator);
+    // Select "All Macros" by default.
+    categoryFilter.find('.caret').before(document.createTextNode(categories[0].name + ' '));
     return categoryFilter;
   },
 
@@ -195,7 +222,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     var oldCategoryId = dropDownToggle.attr('data-category');
     if (newCategoryId !== oldCategoryId) {
       var caret = dropDownToggle.children('.caret').remove();
-      dropDownToggle.text(selectedCategory.text() + ' ').append(caret);
+      dropDownToggle.text(selectedCategory.find('.macro-category-name').text() + ' ').append(caret);
       if (typeof newCategoryId === 'string') {
         dropDownToggle.attr('data-category', newCategoryId);
       } else {

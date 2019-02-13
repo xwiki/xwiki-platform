@@ -52,6 +52,18 @@ ul.macro-parameter-group-members > li.more {
   text-transform: capitalize;
 }
 
+.dropdown-menu > li.macro-category > a {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  white-space: normal;
+}
+
+.macro-category-count.badge {
+  min-width: auto;
+  margin-left: 2em;
+}
+
 .macro-editor .macro-name {
   font-size: larger;
 }

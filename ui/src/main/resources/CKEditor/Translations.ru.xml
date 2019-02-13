@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="CKEditor.Translations" locale="ru">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1477319628000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1477570982000</date>
+  <contentUpdateDate>1477570979000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Отключенные плагины
+CKEditor.ConfigClass_removePlugins.hint=Список плагинов, которые были отключены.
+CKEditor.ConfigClass_removeButtons=Отключенные функции панели инструментов
+CKEditor.ConfigClass_removeButtons.hint=Список отключенных функций панели инструментов.
+CKEditor.ConfigClass_linkShowAdvancedTab=Ссылка: Отображать вкладку "Дополнительно"
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Позволяет установить атрибуты ссылки, такие как: ID, имя, класс или стиль.
+CKEditor.ConfigClass_linkShowTargetTab=Ссылка: Отображать вкладку "Цель"
+CKEditor.ConfigClass_linkShowTargetTab.hint=Позволяет установить атрибут "Цель" ссылки (например, открыть ссылку в новой вкладке).
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Загрузка расширений JavaScript Skin
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Некоторые макросы рендеринга отображаются с использованием кода JavaScript. Загрузка кода JavaScript улучшает вид WYSIWYG редактора, но может вызвать проблемы, если код JavaScript мешает коду CKEditor или если он изменяет содержимое вне границ вывода макроса.
+CKEditor.ConfigClass_advanced=Расширенная настройка
+CKEditor.ConfigClass_advanced.hint=Вы можете написать фрагмент кода на JavaScript для прямого изменения объекта конфигурации. Обратитесь к {0}документации CKEditor {1} для получения списка доступных свойств конфигурации.
+
+ckeditor.admin.saveComment=Изменена конфигурация CKEditor
+ckeditor.admin.reset=Сброс настроек
+ckeditor.admin.reset.hint=Восстановление конфигурации по умолчанию
+ckeditor.admin.reset.confirmation=Вы уверены, что хотите восстановить конфигурацию по умолчанию? Все ваши изменения будут потеряны.
+
+ckeditor.plugin.link.options=Опции
+ckeditor.plugin.link.anchor=Якорь
+ckeditor.plugin.link.queryString=Строка запроса
+ckeditor.plugin.link.defaultLabel=введите ярлык ссылки
+ckeditor.plugin.link.openInNewTab=Открыть ссылку в новой вкладке
+
+ckeditor.plugin.macro.placeholder=макрос:{0}
+ckeditor.plugin.macro.buttonHint=XWiki макрос
+ckeditor.plugin.macro.editButtonHint=Редактировать макрос
+ckeditor.plugin.macro.refreshFailed=Не удалось обновить отредактированный контент.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Вставить {0} макрос
+
+ckeditor.plugin.office.importer.title=Импортировать файл Office
+ckeditor.plugin.office.importer.filePath=Путь к файлу
+ckeditor.plugin.office.importer.filePath.hint=Выберите файл для импорта. Файл будет загружен и прикреплен к этой странице, а его содержимое будет вставлено в содержимое страницы.
+ckeditor.plugin.office.importer.filterStyles=Фильтр Стилей
+ckeditor.plugin.office.importer.filterStyles.hint=Фильтруйте стили текста, такие как шрифт, цвет, выравнивание, поля. Структура содержимого, включая уровни заголовков, абзацы, списки и таблицы, сохраняется.
+ckeditor.plugin.office.importer.useOfficeViewer=Использовать Office Viewer
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Выберите эту опцию, если вы не планируете редактировать содержимое файла office после импорта или если вы не хотите смешивать содержимое файла Office с содержимым, которое вы в данный момент редактируете.
+ckeditor.plugin.office.importer.required=Обязательно
+ckeditor.plugin.office.importer.import=Импорт
+ckeditor.plugin.office.importer.inProgress=Импорт файла Office ...
+ckeditor.plugin.office.importer.done=Файл Office успешно импортирован.
+ckeditor.plugin.office.importer.fail=Не удалось импортировать файл Office.
+ckeditor.plugin.office.importer.noUploadURL=URL загрузки файла не настроен.
+ckeditor.plugin.office.importer.failedToLoadForm=Не удалось загрузить форму.
+
+ckeditor.plugin.resource.notSpecified=Не указан {0}.
+ckeditor.plugin.save.leaveConfirmationMessage=Есть несохраненные изменения. Вы хотите отменить их?
+ckeditor.plugin.save.failed=Содержимое не может быть сохранено из-за внутренней ошибки CKEditor. Вы должны попытаться скопировать ваши важные изменения и перезагрузить редактор.
+ckeditor.plugin.source.conversionFailed=Не удалось выполнить преобразование.
+
+modal.ok=ОК
+modal.cancel=Отмена
+modal.close=Закрыть
+
+resource.attach.label=Вложение
+### Missing: resource.attach.placeholder=Path.To.Page@attachment.png
+resource.data.label=URI данных
+resource.doc.label=Страница
+### Missing: resource.doc.placeholder=Path.To.Page
+resource.icon.label=Иконка
+resource.mailto.label=E-Mail адрес
+### Missing: resource.mailto.placeholder=user@example.org
+resource.path.label=Путь
+### Missing: resource.path.placeholder=/path/to/file
+resource.unc.label=UNC путь
+### Missing: resource.unc.placeholder=//server/share/path/to/file
+resource.unknown.label=Неизвестно
+resource.url.label=URL
+### Missing: resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=Пользователь
+### Missing: resource.user.placeholder=alias
+
+entityResourceSuggester.doc.placeholder=Найти страницу ...
+entityResourceSuggester.attach.placeholder=Найти вложение ...
+
+entityResourcePicker.select=Выбрать
+entityResourcePicker.doc.title=Выбрать страницу
+entityResourcePicker.attach.title=Выбрать вложение
+
+macroSelector.title=Выбрать макрос
+macroSelector.filter.text.placeholder=Введите для отбора
+macroSelector.filter.category.all=Все макросы
+macroSelector.filter.category.other=Прочее
+macroSelector.failedToRetrieveMacros=Не удалось получить список доступных макросов.
+macroSelector.select=Выбрать
+
+macroEditor.title=Редактировать макрос
+macroEditor.more=Еще...
+macroEditor.changeMacro=Изменить макрос
+macroEditor.submit=Подтвердить
+macroEditor.content=Контент
+macroEditor.noParameters=Этот макрос не имеет параметров.
+macroEditor.descriptorRequestFailed=Не удалось получить {0} дескриптор макроса.</content>
+  
+  
+</xwikidoc>

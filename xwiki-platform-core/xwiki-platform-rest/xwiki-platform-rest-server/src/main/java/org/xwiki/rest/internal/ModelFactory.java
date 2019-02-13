@@ -341,7 +341,7 @@ public class ModelFactory
                     property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
                 } catch (XWikiException e) {
                     // Should never happen
-                    logger.warn("unexpected exception when accessing property ["+propertyClass.getName()+"]", e);
+                    logger.error("Unexpected exception when accessing property [{}]", propertyClass.getName(), e);
                 }
             }
 

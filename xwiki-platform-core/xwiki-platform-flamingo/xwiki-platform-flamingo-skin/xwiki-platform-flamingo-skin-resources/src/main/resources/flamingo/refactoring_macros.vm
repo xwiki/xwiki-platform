@@ -46,21 +46,23 @@
   #if ($doc.documentReference.name == $defaultDocumentName)
     #set ($spaceReference = $doc.documentReference.parent)
     #countNestedDocuments($spaceReference $childCount)
-    #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children&displayHidden=true')))
-    #set ($checked = !$request.deep || $request.deep == 'true')
-    <dt>
-      <label>
-        <input type="checkbox" name="deep" value="true" #if ($checked)checked="checked"#end />
-        $services.localization.render($options.label)
-      </label>
-      ## The value submitted when the checkbox is not checked, used to preserve the form state.
-      <input type="hidden" name="deep" value="false" />
-    </dt>
-    <dd>
-      <span class="xHint">
-        $services.localization.render($options.hint, ["<a href='$childrenURL'>", $childCount, '</a>'])
-      </span>
-    </dd>
+    #if ($childCount > 0)
+      <dt>
+        <label>
+          #set ($checked = !$request.deep || $request.deep == 'true')
+          <input type="checkbox" name="deep" value="true" #if ($checked)checked="checked"#end />
+          $services.localization.render($options.label)
+        </label>
+        ## The value submitted when the checkbox is not checked, used to preserve the form state.
+        <input type="hidden" name="deep" value="false" />
+      </dt>
+      <dd>
+        #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children&displayHidden=true')))
+        <span class="xHint">
+          $services.localization.render($options.hint, ["<a href='$childrenURL'>", $childCount, '</a>'])
+        </span>
+      </dd>
+    #end
   #end
 #end
 

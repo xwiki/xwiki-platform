@@ -187,6 +187,5 @@ solr.uix.attachmentdoesnotexist.title=Kanskje du ser etter disse vedleggene i st
 ### Missing: solr.field.space=Location
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

@@ -43,14 +43,14 @@
 CKEditor.ConfigClass_removePlugins.hint=Список плагинов, которые были отключены.
 CKEditor.ConfigClass_removeButtons=Отключенные функции панели инструментов
 CKEditor.ConfigClass_removeButtons.hint=Список отключенных функций панели инструментов.
-CKEditor.ConfigClass_linkShowAdvancedTab=Ссылка: Показать вкладку "Дополнительно"
+CKEditor.ConfigClass_linkShowAdvancedTab=Ссылка: Отображать вкладку "Дополнительно"
 CKEditor.ConfigClass_linkShowAdvancedTab.hint=Позволяет установить атрибуты ссылки, такие как: ID, имя, класс или стиль.
-CKEditor.ConfigClass_linkShowTargetTab=Ссылка: Показать вкладку "Цель"
+CKEditor.ConfigClass_linkShowTargetTab=Ссылка: Отображать вкладку "Цель"
 CKEditor.ConfigClass_linkShowTargetTab.hint=Позволяет установить атрибут "Цель" ссылки (например, открыть ссылку в новой вкладке).
 CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Загрузка расширений JavaScript Skin
 CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Некоторые макросы рендеринга отображаются с использованием кода JavaScript. Загрузка кода JavaScript улучшает вид WYSIWYG редактора, но может вызвать проблемы, если код JavaScript мешает коду CKEditor или если он изменяет содержимое вне границ вывода макроса.
 CKEditor.ConfigClass_advanced=Расширенная настройка
-CKEditor.ConfigClass_advanced.hint=Вы можете написать фрагмент кода на JavaScript для прямого изменения объекта конфигурации. Обратитесь к {0}CKEditor документации{1} для получения списка доступных свойств конфигурации.
+CKEditor.ConfigClass_advanced.hint=Вы можете написать фрагмент кода на JavaScript для прямого изменения объекта конфигурации. Обратитесь к {0}документации CKEditor {1} для получения списка доступных свойств конфигурации.
 
 ckeditor.admin.saveComment=Изменена конфигурация CKEditor
 ckeditor.admin.reset=Сброс настроек
@@ -74,7 +74,7 @@ ckeditor.plugin.office.importer.filePath=Путь к файлу
 ckeditor.plugin.office.importer.filePath.hint=Выберите файл для импорта. Файл будет загружен и прикреплен к этой странице, а его содержимое будет вставлено в содержимое страницы.
 ckeditor.plugin.office.importer.filterStyles=Фильтр Стилей
 ckeditor.plugin.office.importer.filterStyles.hint=Фильтруйте стили текста, такие как шрифт, цвет, выравнивание, поля. Структура содержимого, включая уровни заголовков, абзацы, списки и таблицы, сохраняется.
-ckeditor.plugin.office.importer.useOfficeViewer=Используйте Office Viewer
+ckeditor.plugin.office.importer.useOfficeViewer=Использовать Office Viewer
 ckeditor.plugin.office.importer.useOfficeViewer.hint=Выберите эту опцию, если вы не планируете редактировать содержимое файла office после импорта или если вы не хотите смешивать содержимое файла Office с содержимым, которое вы в данный момент редактируете.
 ckeditor.plugin.office.importer.required=Обязательно
 ckeditor.plugin.office.importer.import=Импорт
@@ -119,7 +119,7 @@ entityResourcePicker.doc.title=Выбрать страницу
 entityResourcePicker.attach.title=Выбрать вложение
 
 macroSelector.title=Выбрать макрос
-macroSelector.filter.text.placeholder=Ведите фильтр
+macroSelector.filter.text.placeholder=Введите для отбора
 macroSelector.filter.category.all=Все макросы
 macroSelector.filter.category.other=Прочее
 macroSelector.failedToRetrieveMacros=Не удалось получить список доступных макросов.

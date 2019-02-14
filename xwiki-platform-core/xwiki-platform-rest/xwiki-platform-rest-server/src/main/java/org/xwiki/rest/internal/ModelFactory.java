@@ -37,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.DefaultRequest;
 import org.xwiki.job.Request;
@@ -101,6 +102,8 @@ import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -123,6 +126,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
 @Singleton
 public class ModelFactory
 {
+    private static final String PASSWORD_TYPE = "Password";
+
     private final ObjectFactory objectFactory;
 
     @Inject
@@ -133,6 +138,12 @@ public class ModelFactory
 
     @Inject
     private JAXBConverter jaxbConverter;
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private Logger logger;
 
     public ModelFactory()
     {
@@ -325,10 +336,13 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            try {
-                property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
-            } catch (XWikiException e) {
-                // Should never happen
+            if (hasAccess(property)) {
+                try {
+                    property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
+                } catch (XWikiException e) {
+                    // Should never happen
+                    logger.error("Unexpected exception when accessing property [{}]", propertyClass.getName(), e);
+                }
             }
 
             String propertyUri;
@@ -1062,5 +1076,19 @@ public class ModelFactory
         }
 
         return log;
+    }
+
+    /**
+     * Check if the given property should be exposed via REST.
+     * @param restProperty the property to be read/written
+     * @return true if the property is considered accessible
+     */
+    private boolean hasAccess(Property restProperty)
+    {
+        if (PASSWORD_TYPE.equals(restProperty.getType())) {
+            return authorizationManager.hasAccess(Right.ADMIN, xcontextProvider.get().getWikiReference());
+        }
+
+        return true;
     }
 }

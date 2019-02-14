@@ -304,7 +304,7 @@ public class DeletePageTest extends AbstractTest
         confirmationPage.confirmDeletePage();
 
         // At this point we should have the question job UI
-        JobQuestionPane jobQuestionPane = new JobQuestionPane();
+        JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
         assertFalse(jobQuestionPane.isEmpty());
 
         assertEquals("You are about to delete pages that contain used XClass.", jobQuestionPane.getQuestionTitle());

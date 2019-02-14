@@ -163,7 +163,7 @@ public class RenamePageTest extends AbstractTest
         renamePage.clickRenameButton();
 
         // At this point we should have the question job UI
-        JobQuestionPane jobQuestionPane = new JobQuestionPane();
+        JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
         assertFalse(jobQuestionPane.isEmpty());
 
         assertEquals("You are about to rename pages that contain used XClass.", jobQuestionPane.getQuestionTitle());
@@ -222,11 +222,13 @@ public class RenamePageTest extends AbstractTest
         // current URL with the job ID
         String firstJobUrl = getDriver().getCurrentUrl();
 
+        String newParentName = getTestClassName() + "newParent";
+
         // we'll try to rename the same page
         // the new job will be blocked since we did not cancel or confirm the first one
         parentPage = getUtil().gotoPage(parentReference);
         renamePage = parentPage.rename();
-        renamePage.getDocumentPicker().setParent("Foo");
+        renamePage.getDocumentPicker().setParent(newParentName);
         renamePage.clickRenameButton();
         jobQuestionPane = new JobQuestionPane();
         assertTrue(jobQuestionPane.isBlockedJob());
@@ -235,13 +237,13 @@ public class RenamePageTest extends AbstractTest
         // go back to the first job to cancel it
         getDriver().navigate().to(firstJobUrl);
 
-        jobQuestionPane = new JobQuestionPane();
+        jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
         jobQuestionPane.cancelQuestion();
         assertTrue(jobQuestionPane.isCanceled());
 
         // go back to the second job to only rename the freePage
         getDriver().navigate().to(secondJobUrl);
-        jobQuestionPane = new JobQuestionPane();
+        jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
         assertFalse(jobQuestionPane.isBlockedJob());
         treeElement = jobQuestionPane.getQuestionTree();
         freePages = treeElement.getTopLevelNodes().get(0);
@@ -258,7 +260,8 @@ public class RenamePageTest extends AbstractTest
         ViewPage viewPage = getUtil().gotoPage(freeReference);
         assertFalse(viewPage.exists());
 
-        DocumentReference newFreePage = new DocumentReference("xwiki", Arrays.asList("Foo", getTestMethodName()),
+        DocumentReference newFreePage = new DocumentReference("xwiki",
+            Arrays.asList(newParentName, getTestMethodName()),
             freePageName);
         viewPage = getUtil().gotoPage(newFreePage);
         assertTrue(viewPage.exists());

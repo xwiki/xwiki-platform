@@ -35,9 +35,14 @@ import org.xwiki.tree.test.po.TreeElement;
 public class JobQuestionPane extends BaseElement
 {
     /**
+     * Class name of the main question div.
+     */
+    private static final String UI_QUESTION_CLASSNAME = "ui-question";
+
+    /**
      * The main job question area.
      */
-    @FindBy(className = "ui-question")
+    @FindBy(className = UI_QUESTION_CLASSNAME)
     private WebElement pane;
 
     /**
@@ -45,6 +50,17 @@ public class JobQuestionPane extends BaseElement
      */
     @FindBy(className = "buttons-question")
     private WebElement questionPane;
+
+    /**
+     * Waits for the elements to be visible before returning the question pane.
+     * It shouldn't be used if a blocked job is expected (see {@link #isBlockedJob()}).
+     * @return a job question pane loaded.
+     */
+    public JobQuestionPane waitForQuestionPane()
+    {
+        getDriver().waitUntilElementIsVisible(By.className(UI_QUESTION_CLASSNAME));
+        return new JobQuestionPane();
+    }
 
     /**
      * @return true if the question has been canceled.
@@ -105,5 +121,4 @@ public class JobQuestionPane extends BaseElement
     {
         return this.getDriver().hasElementWithoutWaiting(By.id("state-none-hint"));
     }
-
 }

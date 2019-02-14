@@ -156,21 +156,6 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-environment-standard</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-configuration-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- Dependency to generate XED files by reusing existing code -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

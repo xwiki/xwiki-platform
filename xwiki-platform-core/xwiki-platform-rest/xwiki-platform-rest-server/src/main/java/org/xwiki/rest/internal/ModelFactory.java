@@ -140,7 +140,7 @@ public class ModelFactory
     private JAXBConverter jaxbConverter;
 
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private Provider<ContextualAuthorizationManager> authorizationManagerProvider;
 
     @Inject
     private Logger logger;
@@ -1086,7 +1086,7 @@ public class ModelFactory
     private boolean hasAccess(Property restProperty)
     {
         if (PASSWORD_TYPE.equals(restProperty.getType())) {
-            return authorizationManager.hasAccess(Right.ADMIN, xcontextProvider.get().getWikiReference());
+            return authorizationManagerProvider.get().hasAccess(Right.ADMIN, xcontextProvider.get().getWikiReference());
         }
 
         return true;

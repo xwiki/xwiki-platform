@@ -906,7 +906,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     ##
     &lt;tr&gt;
       ## Application Name and Icon
-      &lt;th style="vertical-align: top;" scope="row"&gt;
+      &lt;th scope="row"&gt;
         $type.applicationIcon $escapetool.xml($type.applicationName)
       &lt;/th&gt;
       ## Alert switch

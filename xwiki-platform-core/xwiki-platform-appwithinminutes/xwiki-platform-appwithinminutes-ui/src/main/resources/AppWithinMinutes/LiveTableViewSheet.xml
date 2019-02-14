@@ -36,108 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass'))
-#if($liveTableObj)
-  #set($discard = $doc.use($liveTableObj))
-  #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
-  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
+  <content>{{velocity output="false"}}
+#macro (displayApp)
+  #set ($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
   #if (!$isReadOnly)
-    ## Determine the user's rights
-    #set($classFullName = $liveTableObj.getProperty('class').value)
-    #set($className = $stringtool.removeEnd($classFullName, 'Class'))
-    #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
-    #set ($templateProvider = $xwiki.getDocument($templateProviderReference))
-    #set ($creationRestrictions = $templateProvider.getValue('creationRestrictions'))
-    #if ($creationRestrictions)
-      #if ($creationRestrictions.size() &gt; 0)
-        #set ($dataSpaceRef = $services.model.resolveSpace($creationRestrictions.get(0)))
-      #else
-        ## There is no data space as the user can create application entries anywhere. Let's use the application space
-        ## when the user clicks on the Add New Entry link from the home page.
-        #set ($dataSpaceRef = $doc.documentReference.parent)
-      #end
-    #else
-      ## The template provider is missing. Fall-back on the old 'dataSpace' property.
-      #set ($dataSpaceRef = $services.model.resolveSpace($liveTableObj.getValue('dataSpace'), 'explicit',
-        $doc.documentReference))
-    #end
-    #set($hasCreateData = $services.security.authorization.hasAccess('edit', $dataSpaceRef))
-    #set($hasDeleteData = $services.security.authorization.hasAccess('admin', $dataSpaceRef))
-    #set($classRef = $services.model.resolveDocument($classFullName))
-    #set($hasEditApplication = $services.security.authorization.hasAccess('edit', $classRef))
-    #set($translationsRef = $services.model.resolveDocument("${className}Translations"))
-    #set($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; $xwiki.exists($translationsRef)
-      &amp;&amp; $services.security.authorization.hasAccess('edit', $translationsRef))
-    #set($hasDeleteApplication = $hasDeleteData
-      &amp;&amp; $services.security.authorization.hasAccess('admin', $doc.documentReference.parent)
-      &amp;&amp; $services.security.authorization.hasAccess('admin', $classRef.parent))
-    ## Display the application actions based on the user's rights
-    #if($hasCreateData || $hasDeleteData || $hasEditApplication || $hasEditTranslations || $hasDeleteApplication)
-      (% id="actionBox" class="floatinginfobox" %)
-      (((
-        = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
-        #if($hasCreateData)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
-            #if ("$!templateProvider.getValue('terminal')" == '1')
-              #set ($entryReference = $services.model.createDocumentReference('__entryName__', $dataSpaceRef))
-            #else
-              #set ($entryReference = $services.model.resolveDocument('', 'default',
-                $services.model.createSpaceReference('__entryName__', $dataSpaceRef)))
-            #end
-            ## We need to set the title if we want to be able to sort or filter the doc.title live table column.
-            #set ($params = {
-              'template': "${className}Template",
-              'title': '__entryName__',
-              'parent': $services.model.serialize($doc.documentReference, 'local')
-            })
-            #if ($xwiki.getDocument($classRef).xWikiClass.properties.size() &gt; 0)
-              ## The entry has properties so go in edit mode to edit them.
-              #set ($action = 'edit')
-              #set ($params.editor = 'inline')
-            #else
-              ## There are no properties to edit so create the new entry and get back to the home page.
-              #set ($action = 'save')
-              #set ($discard = $params.putAll({
-                'xredirect': $doc.getURL(),
-                'form_token': $services.csrf.token
-              }))
-            #end
-            {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryReference, $action, $escapetool.url($params))" /&gt;{{/html}}
-        #end
-        #if($hasEditApplication)
-          #set ($queryString = $escapetool.url({
-            'appName': $doc.space,
-            'resolve': true
-          }))
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
-        #end
-        #if($hasEditTranslations)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$xwiki.getURL($translationsRef, 'edit', 'editor=wiki')||class="action translate"]]
-        #end
-        #if($hasDeleteData)
-          #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
-            'appName': $doc.space,
-            'resolve': true,
-            'scope': 'entries',
-            'xredirect': $doc.getURL()
-          })))
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$deleteDataURL||class="action deleteData"]]
-        #end
-        #if($hasDeleteApplication)
-          #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
-            'appName': $doc.space,
-            'resolve': true,
-            'xredirect': $doc.getURL()
-          })))
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$deleteAppURL||class="action delete"]]
-        #end
-      )))
-    #end
+    #displayAppActions
   #end
   $doc.display('description')
   ## Display the live table only if it was generated.
-  #if($doc.content.length() &gt; 0)
+  #if ($doc.content.length() &gt; 0)
     = $services.localization.render('platform.appwithinminutes.appLiveTableHeading') =
     ## We don't use the Include macro (with empty reference) because we want the content to be executed with the rights
     ## of the current document rather than the rights of the sheet. This is important because the user can modify the
@@ -150,6 +58,113 @@
     {{html clean="false"}}$doc.getRenderedContent($doc.content,
       $doc.syntax.toIdString()).replace('{{', '&amp;amp;#123;&amp;amp;#123;'){{/html}}
   #end
+#end
+
+#macro (displayAppActions)
+  ## Determine the user's rights
+  #set ($className = $stringtool.removeEnd($classFullName, 'Class'))
+  #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
+  #set ($templateProvider = $xwiki.getDocument($templateProviderReference))
+  #set ($creationRestrictions = $templateProvider.getValue('creationRestrictions'))
+  #if ($creationRestrictions)
+    #if ($creationRestrictions.size() &gt; 0)
+      #set ($dataSpaceRef = $services.model.resolveSpace($creationRestrictions.get(0)))
+    #else
+      ## There is no data space as the user can create application entries anywhere. Let's use the application space
+      ## when the user clicks on the Add New Entry link from the home page.
+      #set ($dataSpaceRef = $doc.documentReference.parent)
+    #end
+  #else
+    ## The template provider is missing. Fall-back on the old 'dataSpace' property.
+    #set ($dataSpaceRef = $services.model.resolveSpace($doc.getValue('dataSpace'), 'explicit',
+      $doc.documentReference))
+  #end
+  #set ($hasCreateData = $services.security.authorization.hasAccess('edit', $dataSpaceRef))
+  #set ($hasDeleteData = $services.security.authorization.hasAccess('admin', $dataSpaceRef))
+  #set ($translationsRef = $services.model.resolveDocument("${className}Translations"))
+  #set ($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; $xwiki.exists($translationsRef)
+    &amp;&amp; $services.security.authorization.hasAccess('edit', $translationsRef))
+  #set ($classRef = $services.model.resolveDocument($classFullName))
+  #set ($hasEditApplication = $services.security.authorization.hasAccess('edit', $classRef))
+  #set ($hasDeleteApplication = $hasDeleteData
+    &amp;&amp; $services.security.authorization.hasAccess('admin', $doc.documentReference.parent)
+    &amp;&amp; $services.security.authorization.hasAccess('admin', $classRef.parent))
+  ## Display the application actions based on the user's rights
+  #if ($hasCreateData || $hasDeleteData || $hasEditApplication || $hasEditTranslations || $hasDeleteApplication)
+    (% id="actionBox" class="floatinginfobox" %)
+    (((
+      = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
+      #if ($hasCreateData)
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
+          #if ("$!templateProvider.getValue('terminal')" == '1')
+            #set ($entryReference = $services.model.createDocumentReference('__entryName__', $dataSpaceRef))
+          #else
+            #set ($entryReference = $services.model.resolveDocument('', 'default',
+              $services.model.createSpaceReference('__entryName__', $dataSpaceRef)))
+          #end
+          ## We need to set the title if we want to be able to sort or filter the doc.title live table column.
+          #set ($params = {
+            'template': "${className}Template",
+            'title': '__entryName__',
+            'parent': $services.model.serialize($doc.documentReference, 'local')
+          })
+          #if ($xwiki.getDocument($classRef).xWikiClass.properties.size() &gt; 0)
+            ## The entry has properties so go in edit mode to edit them.
+            #set ($action = 'edit')
+            #set ($params.editor = 'inline')
+          #else
+            ## There are no properties to edit so create the new entry and get back to the home page.
+            #set ($action = 'save')
+            #set ($discard = $params.putAll({
+              'xredirect': $doc.getURL(),
+              'form_token': $services.csrf.token
+            }))
+          #end
+          {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryReference, $action, $escapetool.url($params))" /&gt;{{/html}}
+      #end
+      #if ($hasEditApplication)
+        #set ($queryString = $escapetool.url({
+          'appName': $doc.space,
+          'resolve': true
+        }))
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
+      #end
+      #if ($hasEditTranslations)
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$xwiki.getURL($translationsRef, 'edit', 'editor=wiki')||class="action translate"]]
+      #end
+      #if ($hasDeleteData)
+        #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
+          'appName': $doc.space,
+          'resolve': true,
+          'scope': 'entries',
+          'xredirect': $doc.getURL()
+        })))
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$deleteDataURL||class="action deleteData"]]
+      #end
+      #if ($hasDeleteApplication)
+        #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
+          'appName': $doc.space,
+          'resolve': true,
+          'xredirect': $doc.getURL()
+        })))
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$deleteAppURL||class="action delete"]]
+      #end
+    )))
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass'))
+#if ($liveTableObj)
+  #set ($discard = $doc.use($liveTableObj))
+  #set ($classFullName = $doc.getValue('class'))
+  #if ("$!classFullName" == '' || !$xwiki.exists($classFullName))
+    {{warning}}
+    $services.icon.render('warning') {{translation key="platform.appwithinminutes.appHomePageMovedWarning"/}}
+    {{/warning}}
+  #end
+  #displayApp
 #end
 {{/velocity}}</content>
   <attachment>

@@ -209,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
 platform.appwithinminutes.appHomePageEditAppLabel=Edit application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
+platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?

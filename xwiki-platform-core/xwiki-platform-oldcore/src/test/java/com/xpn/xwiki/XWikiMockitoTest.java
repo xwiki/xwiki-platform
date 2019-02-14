@@ -185,9 +185,11 @@ public class XWikiMockitoTest
     public void copyDocumentPreservesAttachmentsVersion() throws Exception
     {
         DocumentReference targetReference = new DocumentReference("bar", "Space", "Target");
+        DocumentReference targetReferenceWithLocale = new DocumentReference("bar", "Space", "Target", Locale.ROOT);
         XWikiDocument target = mock(XWikiDocument.class);
         when(target.isNew()).thenReturn(true);
         when(target.getDocumentReference()).thenReturn(targetReference);
+        when(target.getDocumentReferenceWithLocale()).thenReturn(targetReferenceWithLocale);
 
         DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
         XWikiDocument source = mock(XWikiDocument.class);
@@ -259,14 +261,17 @@ public class XWikiMockitoTest
         when(oldAttachment.getDate()).thenReturn(date);
 
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        DocumentReference documentReferenceWithLocale = new DocumentReference("wiki", "Space", "Page", Locale.ROOT);
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getDocumentReferenceWithLocale()).thenReturn(documentReferenceWithLocale);
         when(document.getAttachmentList()).thenReturn(Arrays.asList(currentAttachment));
         when(document.getAttachment(fileName)).thenReturn(currentAttachment);
 
         XWikiDocument result = mock(XWikiDocument.class);
         when(result.clone()).thenReturn(result);
         when(result.getDocumentReference()).thenReturn(documentReference);
+        when(result.getDocumentReferenceWithLocale()).thenReturn(documentReferenceWithLocale);
         when(result.getAttachmentList()).thenReturn(Arrays.asList(oldAttachment));
         when(result.getAttachment(fileName)).thenReturn(oldAttachment);
 

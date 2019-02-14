@@ -1824,10 +1824,15 @@ public class XWiki implements EventListener
             // The only case where we have a null original document is supposedly when the document
             // instance has been crafted and passed #saveDocument without using #getDocument
             // (which is not a good practice)
-            if (originalDocument == null) {
-                originalDocument =
-                    getDocument(new DocumentReference(document.getDocumentReference(), document.getLocale()), context);
-                document.setOriginalDocument(originalDocument);
+            // Also for document indicated as new make sure the previous document is accurate.
+            if (originalDocument == null || document.isNew()) {
+                XWikiDocument existing = getDocument(document.getDocumentReferenceWithLocale(), context);
+                // Switch the original document only if we actually find an existing document or if there is no original
+                // document in the first place
+                if (originalDocument == null || !existing.isNew()) {
+                    originalDocument = existing;
+                    document.setOriginalDocument(originalDocument);
+                }
             }
 
             ObservationManager om = getObservationManager();
@@ -1855,12 +1860,19 @@ public class XWiki implements EventListener
                 }
             }
 
-            // Put attachments to remove in recycle bin
-            if (hasAttachmentRecycleBin(context)) {
-                for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
-                    if (attachment.isToRecycleBin()) {
-                        getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(), context.getUser(),
-                            new Date(), context, true);
+            // Delete existing document if we replace with a new one
+            if (document.isNew() && !originalDocument.isNew()) {
+                // We don't want to notify about this delete since from outside world point of view it's an update an
+                // not a delete+create
+                deleteDocument(originalDocument, true, false, context);
+            } else {
+                // Put attachments to remove in recycle bin
+                if (hasAttachmentRecycleBin(context)) {
+                    for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
+                        if (attachment.isToRecycleBin()) {
+                            getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(),
+                                context.getUser(), new Date(), context, true);
+                        }
                     }
                 }
             }
@@ -4282,6 +4294,12 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
+        deleteDocument(doc, totrash, true, context);
+    }
+
+    private void deleteDocument(XWikiDocument doc, boolean totrash, boolean notify, XWikiContext context)
+        throws XWikiException
+    {
         String currentWiki = null;
 
         currentWiki = context.getWikiId();
@@ -4303,7 +4321,7 @@ public class XWiki implements EventListener
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            if (om != null) {
+            if (notify && om != null) {
                 CancelableEvent documentEvent = new DocumentDeletingEvent(doc.getDocumentReference());
                 om.notify(documentEvent, blankDoc, context);
 
@@ -4330,7 +4348,7 @@ public class XWiki implements EventListener
                 // Inform notification mechanisms that a document has been deleted
                 // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
-                if (om != null) {
+                if (notify && om != null) {
                     om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
                 }
             } catch (Exception ex) {
@@ -4466,13 +4484,10 @@ public class XWiki implements EventListener
 
                 // Let's switch to the other database to verify if the document already exists
                 context.setWikiId(targetWiki);
-                XWikiDocument tdoc = getDocument(targetDocumentReference, context);
+                XWikiDocument previoustdoc = getDocument(targetDocumentReference, context);
                 // There is already an existing document
-                if (!tdoc.isNew()) {
-                    if (force) {
-                        // We need to delete the previous document
-                        deleteDocument(tdoc, context);
-                    } else {
+                if (!previoustdoc.isNew()) {
+                    if (!force) {
                         return false;
                     }
                 }
@@ -4481,11 +4496,9 @@ public class XWiki implements EventListener
                 context.setWikiId(sourceWiki);
 
                 if (wikilocale == null) {
-                    tdoc = sdoc.copyDocument(targetDocumentReference, context);
+                    XWikiDocument tdoc = sdoc.copyDocument(targetDocumentReference, context);
 
-                    // We know the target document doesn't exist and we want to save the attachments without
-                    // incrementing their versions.
-                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    // Make sure to replace the existing document if any
                     tdoc.setNew(true);
 
                     // forget past versions
@@ -4539,6 +4552,9 @@ public class XWiki implements EventListener
 
                         ttdoc = stdoc.copyDocument(targetDocumentReference, context);
 
+                        // Make sure to replace the existing document if any
+                        ttdoc.setNew(true);
+
                         // forget past versions
                         if (reset) {
                             ttdoc.setNew(true);
@@ -4574,11 +4590,9 @@ public class XWiki implements EventListener
                     // We want only one language in the end
                     XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilocale, context);
 
-                    tdoc = stdoc.copyDocument(targetDocumentReference, context);
+                    XWikiDocument tdoc = stdoc.copyDocument(targetDocumentReference, context);
 
-                    // We know the target document doesn't exist and we want to save the attachments without
-                    // incrementing their versions.
-                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    // Make sure to replace the existing document if any
                     tdoc.setNew(true);
 
                     // forget language

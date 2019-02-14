@@ -225,8 +225,6 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
                         "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
                         oldReference, newReference);
                     return false;
-                } else if (!this.modelBridge.delete(newReference)) {
-                    return false;
                 }
             }
             this.progressManager.endStep(this);

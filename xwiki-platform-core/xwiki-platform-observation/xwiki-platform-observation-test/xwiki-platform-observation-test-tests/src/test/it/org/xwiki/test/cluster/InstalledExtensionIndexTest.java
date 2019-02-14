@@ -28,26 +28,33 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.job.Request;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rest.internal.JAXBConverter;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.resources.job.JobsResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.cluster.framework.AbstractClusterHttpTest;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Verify the installed extensions are synchronized between members of the cluster.
- * 
+ *
  * @version $Id$
  */
 public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
@@ -59,7 +66,15 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
         List<ComponentDeclaration> componentDeclarations = new ArrayList<>();
         componentDeclarations.add(new ComponentDeclaration(ModelFactory.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(JAXBConverter.class.getName()));
+
         loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
+
+        // Needed to perform the REST call
+        ContextualAuthorizationManager contextualAuthorizationManager = mock(ContextualAuthorizationManager.class);
+        DefaultComponentDescriptor<ContextualAuthorizationManager> descriptor = new DefaultComponentDescriptor();
+        descriptor.setRoleType(ContextualAuthorizationManager.class);
+        AbstractTest.componentManager.registerComponent(descriptor, contextualAuthorizationManager);
+        when(contextualAuthorizationManager.hasAccess(any(Right.class), any(EntityReference.class))).thenReturn(true);
 
         // Make sure extension utils is initialized and set.
         if (getExtensionTestUtils() == null) {
@@ -148,7 +163,6 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
             }
             Thread.sleep(100);
         }
-
     }
 
     private void executeJob(String jobType, Request jobRequest) throws Exception
@@ -157,8 +171,8 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
             AbstractTest.componentManager.<ModelFactory>getInstance(ModelFactory.class).toRestJobRequest(jobRequest);
 
         Map<String, Object[]> queryParameters = new HashMap<>();
-        queryParameters.put("jobType", new Object[] { jobType });
-        queryParameters.put("async", new Object[] { false });
+        queryParameters.put("jobType", new Object[]{ jobType });
+        queryParameters.put("async", new Object[]{ false });
 
         TestUtils.assertStatusCodes(getUtil().rest().executePut(JobsResource.class, request, queryParameters), true,
             TestUtils.STATUS_OK);

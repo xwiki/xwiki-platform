@@ -4462,10 +4462,7 @@ public class XWiki implements EventListener
             context.setWikiId(sourceWiki);
             XWikiDocument sdoc = getDocument(sourceDocumentReference, context);
             if (!sdoc.isNew()) {
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info(
-                        "Copying document [" + sourceDocumentReference + "] to [" + targetDocumentReference + "]");
-                }
+                LOGGER.info("Copying document [{}] to [{}]", sourceDocumentReference, targetDocumentReference);
 
                 // Let's switch to the other database to verify if the document already exists
                 context.setWikiId(targetWiki);
@@ -4526,10 +4523,8 @@ public class XWiki implements EventListener
                     List<String> tlist = sdoc.getTranslationList(context);
                     for (String clanguage : tlist) {
                         XWikiDocument stdoc = sdoc.getTranslatedDocument(clanguage, context);
-                        if (LOGGER.isInfoEnabled()) {
-                            LOGGER.info("Copying document [" + sourceWiki + "], language [" + clanguage + "] to ["
-                                + targetDocumentReference + "]");
-                        }
+                        LOGGER.info("Copying document [{}], language [{}] to [{}]", sourceWiki, clanguage,
+                            targetDocumentReference);
 
                         context.setWikiId(targetWiki);
                         XWikiDocument ttdoc = tdoc.getTranslatedDocument(clanguage, context);

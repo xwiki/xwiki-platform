@@ -21,16 +21,15 @@ package com.xpn.xwiki.store;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -86,8 +85,8 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             // Note: We need to support databases who treats empty strings as NULL like Oracle. For those checking
             // for equality when the string is empty is not going to work and thus we need to handle the special
             // empty case separately.
-            String language = this.document.getLanguage();
-            if (StringUtils.isEmpty(language)) {
+            Locale language = this.document.getLocale();
+            if (language.equals(Locale.ROOT)) {
                 c.add(Restrictions.or(Restrictions.eq(LANGUAGE_PROPERTY_NAME, ""),
                     Restrictions.isNull(LANGUAGE_PROPERTY_NAME)));
             } else {
@@ -256,26 +255,20 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            executeWrite(context, new HibernateCallback<Void>()
-            {
-                @Override
-                public Void doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    XWikiRecycleBinContentStoreInterface contentStore = getDefaultXWikiRecycleBinContentStore();
+            executeWrite(context, session -> {
+                XWikiRecycleBinContentStoreInterface contentStore = getDefaultXWikiRecycleBinContentStore();
 
-                    XWikiDeletedDocument trashdoc =
-                        createXWikiDeletedDocument(doc, deleter, date, contentStore, batchId);
+                XWikiDeletedDocument trashdoc = createXWikiDeletedDocument(doc, deleter, date, contentStore, batchId);
 
-                    // Hibernate store.
-                    long index = ((Number) session.save(trashdoc)).longValue();
+                // Hibernate store.
+                long index = ((Number) session.save(trashdoc)).longValue();
 
-                    // External store
-                    if (contentStore != null) {
-                        contentStore.save(doc, index, bTransaction);
-                    }
-
-                    return null;
+                // External store
+                if (contentStore != null) {
+                    contentStore.save(doc, index, bTransaction);
                 }
+
+                return null;
             });
         } finally {
             restoreExecutionXContext();
@@ -320,20 +313,14 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     private XWikiDeletedDocument getDeletedDocument(final long index, XWikiContext context, boolean resolve,
         boolean bTransaction) throws XWikiException
     {
-        return executeRead(context, new HibernateCallback<XWikiDeletedDocument>()
-        {
-            @Override
-            public XWikiDeletedDocument doInHibernate(Session session) throws HibernateException, XWikiException
-            {
-                XWikiDeletedDocument deletedDocument =
-                    (XWikiDeletedDocument) session.get(XWikiDeletedDocument.class, Long.valueOf(index));
+        return executeRead(context, session -> {
+            XWikiDeletedDocument deletedDocument = session.get(XWikiDeletedDocument.class, Long.valueOf(index));
 
-                if (deletedDocument != null && resolve) {
-                    deletedDocument = resolveDeletedDocumentContent(deletedDocument, false);
-                }
-
-                return deletedDocument;
+            if (deletedDocument != null && resolve) {
+                deletedDocument = resolveDeletedDocumentContent(deletedDocument, false);
             }
+
+            return deletedDocument;
         });
     }
 
@@ -354,40 +341,29 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     @Override
     public Long[] getAllDeletedDocumentsIds(XWikiContext context, int limit) throws XWikiException
     {
-        Long[] deletedDocuments = executeRead(context, new HibernateCallback<Long[]>()
-        {
-            @Override
-            public Long[] doInHibernate(Session session) throws HibernateException
-            {
-                Query query = session.createQuery("SELECT id FROM XWikiDeletedDocument ORDER BY date DESC");
+        return executeRead(context, session -> {
+            org.hibernate.query.Query<Long> query =
+                session.createQuery("SELECT id FROM XWikiDeletedDocument ORDER BY date DESC", Long.class);
 
-                if (limit > 0) {
-                    query.setMaxResults(limit);
-                }
-
-                @SuppressWarnings("unchecked")
-                List<Long> deletedDocIds = query.list();
-                Long[] result = new Long[deletedDocIds.size()];
-                return deletedDocIds.toArray(result);
+            if (limit > 0) {
+                query.setMaxResults(limit);
             }
-        });
 
-        return deletedDocuments;
+            List<Long> deletedDocIds = query.list();
+            Long[] result = new Long[deletedDocIds.size()];
+            return deletedDocIds.toArray(result);
+        });
     }
 
     @Override
     public Long getNumberOfDeletedDocuments(XWikiContext context) throws XWikiException
     {
 
-        return executeRead(context, new HibernateCallback<Long>()
-        {
-            @Override
-            public Long doInHibernate(Session session) throws HibernateException
-            {
-                Query query = session.createQuery("SELECT count(id) FROM XWikiDeletedDocument");
-                Object queryResult = query.list().get(0);
-                return (Long) queryResult;
-            }
+        return executeRead(context, session -> {
+            org.hibernate.query.Query<Long> query =
+                session.createQuery("SELECT count(id) FROM XWikiDeletedDocument", Long.class);
+
+            return query.uniqueResult();
         });
     }
 
@@ -395,9 +371,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        XWikiDeletedDocument[] deletedDocuments = getAllDeletedDocuments(batchId, true, context, bTransaction);
-
-        return deletedDocuments;
+        return getAllDeletedDocuments(batchId, true, context, bTransaction);
     }
 
     @Override
@@ -428,21 +402,16 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     @Override
     public void deleteFromRecycleBin(final long index, XWikiContext context, boolean bTransaction) throws XWikiException
     {
-        executeWrite(context, new HibernateCallback<Void>()
-        {
-            @Override
-            public Void doInHibernate(Session session) throws HibernateException, XWikiException
-            {
-                XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, false, bTransaction);
+        executeWrite(context, session -> {
+            XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, false, bTransaction);
 
-                // Delete metadata
-                session.delete(deletedDocument);
+            // Delete metadata
+            session.delete(deletedDocument);
 
-                // Delete content
-                deleteDeletedDocumentContent(deletedDocument, bTransaction);
+            // Delete content
+            deleteDeletedDocumentContent(deletedDocument, bTransaction);
 
-                return null;
-            }
+            return null;
         });
     }
 }

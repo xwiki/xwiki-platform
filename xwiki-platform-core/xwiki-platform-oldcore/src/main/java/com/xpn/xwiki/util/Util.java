@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -807,19 +808,52 @@ public class Util
             }
         } catch (Exception e) {
             // Probably running under -security, which prevents calling File.exists()
-            LOGGER.debug("Failed load resource [" + resource + "] using a file path");
+            LOGGER.debug("Failed load resource [{}] using a file path", resource);
         }
+
         try {
-            Container container = Utils.getComponent(Container.class);
-            InputStream res = container.getApplicationContext().getResourceAsStream(resource);
+            Environment environment = Utils.getComponent(Environment.class);
+            InputStream res = environment.getResourceAsStream(resource);
             if (res != null) {
                 return res;
             }
         } catch (Exception e) {
-            LOGGER.debug("Failed to load resource [" + resource + "] using the application context");
+            LOGGER.debug("Failed to load resource [{}] using the application context", resource);
         }
 
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+    }
+
+    /**
+     * Load resources from: 1. FileSystem 2. ServletContext 3. ClassPath in this order.
+     *
+     * @param resource resource path to load
+     * @return InputStream of resource or null if not found
+     * @since 11.1RC1
+     */
+    public static URL getResource(String resource)
+    {
+        File file = new File(resource);
+        try {
+            if (file.exists()) {
+                return file.toURI().toURL();
+            }
+        } catch (Exception e) {
+            // Probably running under -security, which prevents calling File.exists()
+            LOGGER.debug("Failed load resource [{}] using a file path", resource);
+        }
+
+        try {
+            Environment environment = Utils.getComponent(Environment.class);
+            URL res = environment.getResource(resource);
+            if (res != null) {
+                return res;
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to load resource [{}] using the application context", resource);
+        }
+
+        return Thread.currentThread().getContextClassLoader().getResource(resource);
     }
 
     /**

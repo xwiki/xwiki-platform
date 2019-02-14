@@ -71,8 +71,8 @@ import static org.mockito.Mockito.when;
 public class HqlQueryExecutorTest
 {
     @Rule
-    public MockitoComponentMockingRule<HqlQueryExecutor> mocker = new MockitoComponentMockingRule<>(
-        HqlQueryExecutor.class);
+    public MockitoComponentMockingRule<HqlQueryExecutor> mocker =
+        new MockitoComponentMockingRule<>(HqlQueryExecutor.class);
 
     private ContextualAuthorizationManager authorization;
 
@@ -162,9 +162,11 @@ public class HqlQueryExecutorTest
     @Test
     public void completeShortStatementStartingWithFrom()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
-            + "and obj.className='XWiki.MyClass'", this.executor.completeShortFormStatement(", BaseObject obj where "
-            + "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
+        assertEquals(
+            "select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
+                + "and obj.className='XWiki.MyClass'",
+            this.executor.completeShortFormStatement(
+                ", BaseObject obj where " + "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
     }
 
     @Test
@@ -177,9 +179,8 @@ public class HqlQueryExecutorTest
     @Test
     public void completeShortStatementPassingAnAlreadyCompleteQuery()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
-            this.executor
-                .completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc", this.executor
+            .completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
     }
 
     @Test
@@ -192,7 +193,7 @@ public class HqlQueryExecutorTest
     @Test
     public void setNamedParameter()
     {
-        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "abc";
         Date value = new Date();
         this.executor.setNamedParameter(query, name, value);
@@ -203,7 +204,7 @@ public class HqlQueryExecutorTest
     @Test
     public void setNamedParameterList()
     {
-        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "foo";
         List<String> value = Arrays.asList("one", "two", "three");
         this.executor.setNamedParameter(query, name, value);
@@ -214,7 +215,7 @@ public class HqlQueryExecutorTest
     @Test
     public void setNamedParameterArray()
     {
-        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "bar";
         Integer[] value = new Integer[] { 1, 2, 3 };
         this.executor.setNamedParameter(query, name, value);
@@ -225,7 +226,7 @@ public class HqlQueryExecutorTest
     @Test
     public void populateParameters()
     {
-        org.hibernate.Query hquery = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query hquery = mock(org.hibernate.query.Query.class);
         Query query = mock(Query.class);
 
         int offset = 13;
@@ -309,10 +310,12 @@ public class HqlQueryExecutorTest
         // We also verify that QueryFilter#filterStatement() is called before QueryFilter#filterQuery()
         QueryFilter filter = mock(QueryFilter.class);
         query.addFilter(filter);
-        when(filter.filterStatement("select doc.fullName from XWikiDocument doc where doc.space='Main'",
-            Query.HQL)).thenReturn("select doc.fullName from XWikiDocument doc where doc.space='Main2'");
-        when(filter.filterQuery(any(Query.class))).thenReturn(new WrappingQuery(query) {
-            @Override public String getStatement()
+        when(filter.filterStatement("select doc.fullName from XWikiDocument doc where doc.space='Main'", Query.HQL))
+            .thenReturn("select doc.fullName from XWikiDocument doc where doc.space='Main2'");
+        when(filter.filterQuery(any(Query.class))).thenReturn(new WrappingQuery(query)
+        {
+            @Override
+            public String getStatement()
             {
                 return "select doc.fullName from XWikiDocument doc where doc.space='Main3'";
             }
@@ -393,8 +396,10 @@ public class HqlQueryExecutorTest
             execute("select notallowed.name from NotAllowedTable notallowed", false);
             fail("Should have thrown an exception here");
         } catch (QueryException expected) {
-            assertEquals("The query requires programming right."
-                + " Query statement = [select notallowed.name from NotAllowedTable notallowed]", expected.getMessage());
+            assertEquals(
+                "The query requires programming right."
+                    + " Query statement = [select notallowed.name from NotAllowedTable notallowed]",
+                expected.getMessage());
         }
     }
 

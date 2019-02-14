@@ -20,7 +20,9 @@
 
 package com.xpn.xwiki.store.migration.hibernate;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,12 +40,10 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.Index;
@@ -51,6 +51,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Table;
+import org.hibernate.query.NativeQuery;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.logging.LoggerManager;
@@ -102,38 +103,20 @@ import com.xpn.xwiki.util.Util;
 public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 {
     /** Document classes to migrate, using the document id in the first column of their key. */
-    private static final Class<?>[] DOC_CLASSES = new Class<?>[] {
-        XWikiDocument.class,
-        XWikiRCSNodeInfo.class,
-        XWikiLink.class
-    };
+    private static final Class<?>[] DOC_CLASSES =
+        new Class<?>[] { XWikiDocument.class, XWikiRCSNodeInfo.class, XWikiLink.class };
 
     /** Document related classes to migrate, using a property docId without FK information. */
-    private static final Class<?>[] DOCLINK_CLASSES = new Class<?>[] {
-        XWikiAttachment.class,
-        DeletedAttachment.class
-    };
+    private static final Class<?>[] DOCLINK_CLASSES = new Class<?>[] { XWikiAttachment.class, DeletedAttachment.class };
 
     /** Property classes to migrate, using the object id in the first column of their key. */
-    private static final Class<?>[] PROPERTY_CLASS = new Class<?>[] {
-        DateProperty.class,
-        DBStringListProperty.class,
-        DoubleProperty.class,
-        FloatProperty.class,
-        IntegerProperty.class,
-        LargeStringProperty.class,
-        LongProperty.class,
-        StringListProperty.class,
-        StringProperty.class,
-        BaseProperty.class
-    };
+    private static final Class<?>[] PROPERTY_CLASS = new Class<?>[] { DateProperty.class, DBStringListProperty.class,
+    DoubleProperty.class, FloatProperty.class, IntegerProperty.class, LargeStringProperty.class, LongProperty.class,
+    StringListProperty.class, StringProperty.class, BaseProperty.class };
 
     /** Statistics classes to migrate. (ID is the stats identifier) */
-    private static final Class<?>[] STATS_CLASSES = new Class<?>[] {
-        DocumentStats.class,
-        RefererStats.class,
-        VisitStats.class
-    };
+    private static final Class<?>[] STATS_CLASSES =
+        new Class<?>[] { DocumentStats.class, RefererStats.class, VisitStats.class };
 
     /** Mark internal mapping. */
     private static final String INTERNAL = "internal";
@@ -230,8 +213,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /**
      * Base implementation of the hibernate callback to convert identifier using individual updates (safe-mode).
      */
-    private abstract static class AbstractIdConversionHibernateCallback
-        extends AbstractUpdateHibernateCallback implements IdConversionHibernateCallback
+    private abstract static class AbstractIdConversionHibernateCallback extends AbstractUpdateHibernateCallback
+        implements IdConversionHibernateCallback
     {
         /** Name for the id column. */
         public static final String ID = "id";
@@ -293,13 +276,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public long executeIdUpdate(String name, String field)
         {
             StringBuilder sb = new StringBuilder(128);
-            sb.append("update ").append(name)
-                .append(" klass set klass.").append(field).append('=').append(':').append(NEWID)
-                .append(" where klass.").append(field).append('=').append(':').append(OLDID);
+            sb.append("update ").append(name).append(" klass set klass.").append(field).append('=').append(':')
+                .append(NEWID).append(" where klass.").append(field).append('=').append(':').append(OLDID);
             long now = System.nanoTime();
-            this.session.createQuery(sb.toString())
-                .setLong(NEWID, this.newId)
-                .setLong(OLDID, this.oldId)
+            this.session.createQuery(sb.toString()).setLong(NEWID, this.newId).setLong(OLDID, this.oldId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }
@@ -314,13 +294,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public long executeSqlIdUpdate(String name, String field)
         {
             StringBuilder sb = new StringBuilder(128);
-            sb.append("UPDATE ").append(name)
-                .append(" SET ").append(field).append('=').append(':').append(NEWID)
+            sb.append("UPDATE ").append(name).append(" SET ").append(field).append('=').append(':').append(NEWID)
                 .append(" WHERE ").append(field).append('=').append(':').append(OLDID);
             long now = System.nanoTime();
-            this.session.createSQLQuery(sb.toString())
-                .setLong(NEWID, this.newId)
-                .setLong(OLDID, this.oldId)
+            this.session.createSQLQuery(sb.toString()).setLong(NEWID, this.newId).setLong(OLDID, this.oldId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }
@@ -329,8 +306,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /**
      * Base implementation of the hibernate callback to convert identifier using bulk updates.
      */
-    private abstract class AbstractBulkIdConversionHibernateCallback
-        extends AbstractUpdateHibernateCallback
+    private abstract class AbstractBulkIdConversionHibernateCallback extends AbstractUpdateHibernateCallback
     {
         /** Name for the temporary entity name. */
         private static final String TEMPENTITY = "XWikiIdMigration";
@@ -359,15 +335,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             dropTemporaryTable();
         }
 
-        /**
-         * @return a Configuration containing the entity for the temporary table.
-         */
-        private Configuration getTempTableMapping()
+        private Metadata getTempTableMapping()
         {
-            Configuration hibconfig = new Configuration();
-            hibconfig.addXML(makeTempTableMapping());
-            hibconfig.buildMappings();
-            return hibconfig;
+            MetadataSources builder = new MetadataSources();
+
+            builder.addInputStream(new ByteArrayInputStream(makeTempTableMapping().getBytes(StandardCharsets.UTF_8)));
+
+            return builder.buildMetadata();
         }
 
         /**
@@ -379,20 +353,17 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
             sb.append("<?xml version=\"1.0\"?>\n" + "<!DOCTYPE hibernate-mapping PUBLIC\n")
                 .append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
-                .append("\t\"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd\">\n")
-                .append("<hibernate-mapping>")
-                .append("<class entity-name=\"").append(TEMPENTITY)
-                .append("\" table=\"").append(TEMPTABLE).append("\">\n")
-                .append(" <id name=\"").append(OLDID).append("\" type=\"long\" unsaved-value=\"any\">\n")
-                .append("   <column name=\"").append(OLDIDCOL).append("\" not-null=\"true\" ")
+                .append("\t\"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
+                .append("<class entity-name=\"").append(TEMPENTITY).append("\" table=\"").append(TEMPTABLE)
+                .append("\">\n").append(" <id name=\"").append(OLDID)
+                .append("\" type=\"long\" unsaved-value=\"any\">\n").append("   <column name=\"").append(OLDIDCOL)
+                .append("\" not-null=\"true\" ")
                 .append((R40000XWIKI6990DataMigration.this.isOracle) ? "sql-type=\"integer\" " : "")
-                .append("/>\n   <generator class=\"assigned\" />\n")
-                .append(" </id>\n")
-                .append("<property name=\"").append(NEWID).append("\" type=\"long\"");
+                .append("/>\n   <generator class=\"assigned\" />\n").append(" </id>\n").append("<property name=\"")
+                .append(NEWID).append("\" type=\"long\"");
 
             if (R40000XWIKI6990DataMigration.this.isOracle) {
-                sb.append(">\n")
-                    .append("<column name=\"").append(NEWIDCOL).append("\" sql-type=\"integer\" />\n")
+                sb.append(">\n").append("<column name=\"").append(NEWIDCOL).append("\" sql-type=\"integer\" />\n")
                     .append("</property>\n");
             } else {
                 sb.append(" column=\"").append(NEWIDCOL).append("\" not-null=\"true\" />\n");
@@ -408,17 +379,15 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
          */
         private void createTemporaryTable()
         {
-            Configuration tempConfig = getTempTableMapping();
-            /*
-            Mapping mapping = tempConfig.buildMapping();
-            PersistentClass pClass = tempConfig.getClassMapping(TEMPENTITY);
+            Metadata metadata = getTempTableMapping();
+            PersistentClass pClass = metadata.getEntityBinding(TEMPENTITY);
             if (!R40000XWIKI6990DataMigration.this.logger.isDebugEnabled()) {
                 R40000XWIKI6990DataMigration.this.loggerManager.pushLogListener(null);
             }
             try {
-                this.session.createSQLQuery(
-                    pClass.getTable().sqlTemporaryTableCreateString(R40000XWIKI6990DataMigration.this.dialect,
-                        mapping))
+                this.session
+                    .createSQLQuery(pClass.getTable()
+                        .sqlTemporaryTableCreateString(R40000XWIKI6990DataMigration.this.dialect, mapping))
                     .executeUpdate();
             } catch (Throwable t) {
                 R40000XWIKI6990DataMigration.this.logger.debug("unable to create temporary id migration table [{}]",
@@ -428,7 +397,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     R40000XWIKI6990DataMigration.this.loggerManager.popLogListener();
                 }
             }
-            */
         }
 
         /**
@@ -437,12 +405,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         private void dropTemporaryTable()
         {
             StringBuilder sb = new StringBuilder(128);
-            sb = new StringBuilder(128);
 
             sb.append("DELETE FROM ").append(TEMPTABLE);
             this.session.createSQLQuery(sb.toString()).executeUpdate();
 
-            /*
             if (R40000XWIKI6990DataMigration.this.dialect.dropTemporaryTableAfterUse()) {
                 sb = new StringBuilder(128);
                 sb.append("DROP TABLE ").append(TEMPTABLE);
@@ -461,7 +427,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 }
             }
-            */
         }
 
         /**
@@ -470,9 +435,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         private void prepareInsertStatement()
         {
             StringBuilder sb = new StringBuilder(128);
-            sb.append("INSERT INTO ").append(TEMPTABLE)
-                .append(" (").append(OLDIDCOL).append(',').append(NEWIDCOL).append(')')
-                .append(" VALUES (:").append(OLDID).append(",:").append(NEWID).append(')');
+            sb.append("INSERT INTO ").append(TEMPTABLE).append(" (").append(OLDIDCOL).append(',').append(NEWIDCOL)
+                .append(')').append(" VALUES (:").append(OLDID).append(",:").append(NEWID).append(')');
 
             this.insertStatement = sb.toString();
         }
@@ -507,9 +471,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         private long executeSqlIdInsert(long oldId, long newId)
         {
             long now = System.nanoTime();
-            this.session.createSQLQuery(this.insertStatement)
-                .setLong(OLDID, oldId)
-                .setLong(NEWID, newId)
+            this.session.createSQLQuery(this.insertStatement).setParameter(OLDID, oldId).setParameter(NEWID, newId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }
@@ -527,23 +489,19 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             if (R40000XWIKI6990DataMigration.this.isMySQL) {
                 // MySQL does not support multiple references to a temporary table in a single statement but support
                 // this non-standard SQL syntax with a single reference to the temporary table
-                sb.append("UPDATE ").append(name).append(" t, ").append(TEMPTABLE).append(" m")
-                    .append(" SET t.").append(field).append('=').append("m.").append(NEWIDCOL)
-                    .append(" WHERE t.").append(field).append('=').append("m.").append(OLDIDCOL);
+                sb.append("UPDATE ").append(name).append(" t, ").append(TEMPTABLE).append(" m").append(" SET t.")
+                    .append(field).append('=').append("m.").append(NEWIDCOL).append(" WHERE t.").append(field)
+                    .append('=').append("m.").append(OLDIDCOL);
             } else if (R40000XWIKI6990DataMigration.this.isMSSQL) {
                 // MS-SQL does not support aliases on updated table, but support inner joins during updates
-                sb.append("UPDATE ").append(name)
-                    .append(" SET ").append(field).append('=').append("m.").append(NEWIDCOL)
-                    .append(" FROM ").append(name).append(" AS [t] INNER JOIN ")
-                    .append(TEMPTABLE).append(" AS [m] ON (t.")
-                    .append(field).append('=').append("m.").append(OLDIDCOL).append(')');
+                sb.append("UPDATE ").append(name).append(" SET ").append(field).append('=').append("m.")
+                    .append(NEWIDCOL).append(" FROM ").append(name).append(" AS [t] INNER JOIN ").append(TEMPTABLE)
+                    .append(" AS [m] ON (t.").append(field).append('=').append("m.").append(OLDIDCOL).append(')');
             } else {
-                sb.append("UPDATE ").append(name)
-                    .append(" t SET ").append(field).append('=')
-                    .append("(SELECT m.").append(NEWIDCOL).append(" FROM ").append(TEMPTABLE)
-                    .append(" m WHERE t.").append(field).append('=').append("m.").append(OLDIDCOL).append(')')
-                    .append(" WHERE t.").append(field).append(" IN (SELECT ").append(OLDIDCOL)
-                    .append(" FROM ").append(TEMPTABLE).append(')');
+                sb.append("UPDATE ").append(name).append(" t SET ").append(field).append('=').append("(SELECT m.")
+                    .append(NEWIDCOL).append(" FROM ").append(TEMPTABLE).append(" m WHERE t.").append(field).append('=')
+                    .append("m.").append(OLDIDCOL).append(')').append(" WHERE t.").append(field).append(" IN (SELECT ")
+                    .append(OLDIDCOL).append(" FROM ").append(TEMPTABLE).append(')');
             }
             long now = System.nanoTime();
             this.session.createSQLQuery(sb.toString()).executeUpdate();
@@ -565,8 +523,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
          * @param hasDynamicMapping true if dynamic mapping is activated
          * @throws com.xpn.xwiki.XWikiException if an error occurs during processing.
          */
-        void processCustomMapping(XWikiHibernateStore store, String name, String mapping,
-            boolean hasDynamicMapping) throws XWikiException;
+        void processCustomMapping(XWikiHibernateStore store, String name, String mapping, boolean hasDynamicMapping)
+            throws XWikiException;
     }
 
     /** Statistics ids computer. */
@@ -608,10 +566,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private boolean isMSSQL;
 
     /** Tables in which update of foreign keys will be cascade from primary keys by a constraints. */
-    private Set<Table> fkTables = new HashSet<Table>();
+    private Set<Table> fkTables = new HashSet<>();
 
     /** Hold the current store configuration. */
-    private Configuration configuration;
+    private Metadata metadata;
 
     /** Hold the current database dialect. */
     private Dialect dialect;
@@ -653,49 +611,41 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * @throws XWikiException when an unexpected error occurs
      */
     private void processCustomMappings(final XWikiHibernateStore store, final CustomMappingCallback callback,
-        final XWikiContext context)
-        throws XWikiException
+        final XWikiContext context) throws XWikiException
     {
-        if (store.executeRead(context, new HibernateCallback<Boolean>()
-        {
-            @Override
-            public Boolean doInHibernate(Session session) throws XWikiException
-            {
-                boolean hasProcessedMapping = false;
-                try {
-                    boolean hasDynamicMapping = context.getWiki().hasDynamicCustomMappings();
-                    SAXReader saxReader = new SAXReader();
-                    @SuppressWarnings("unchecked")
-                    List<Object[]> results = session.createQuery(
-                        "select doc.fullName, doc.xWikiClassXML from " + XWikiDocument.class.getName()
-                        + " as doc where (doc.xWikiClassXML like '<%')").list();
+        if (store.executeRead(context, session -> {
+            boolean hasProcessedMapping = false;
+            try {
+                boolean hasDynamicMapping = context.getWiki().hasDynamicCustomMappings();
+                SAXReader saxReader = new SAXReader();
+                @SuppressWarnings("unchecked")
+                List<Object[]> results = session.createQuery("select doc.fullName, doc.xWikiClassXML from "
+                    + XWikiDocument.class.getName() + " as doc where (doc.xWikiClassXML like '<%')").list();
 
-                    // Inspect all defined classes for custom mapped ones...
-                    for (Object[] result : results) {
-                        String docName = (String) result[0];
-                        String classXML = (String) result[1];
+                // Inspect all defined classes for custom mapped ones...
+                for (Object[] result : results) {
+                    String docName = (String) result[0];
+                    String classXML = (String) result[1];
 
-                        Element el = saxReader.read(new StringReader(classXML)).getRootElement()
-                            .element("customMapping");
+                    Element el = saxReader.read(new StringReader(classXML)).getRootElement().element("customMapping");
 
-                        String mapping = (el != null) ? el.getText() : "";
+                    String mapping = (el != null) ? el.getText() : "";
 
-                        if (StringUtils.isEmpty(mapping) && "XWiki.XWikiPreferences".equals(docName)) {
-                            mapping = INTERNAL;
-                        }
-
-                        if (StringUtils.isNotEmpty(mapping)) {
-                            hasProcessedMapping |= (!INTERNAL.equals(mapping) && hasDynamicMapping
-                                && store.injectCustomMapping(docName, mapping, context));
-                            callback.processCustomMapping(store, docName, mapping, hasDynamicMapping);
-                        }
+                    if (StringUtils.isEmpty(mapping) && "XWiki.XWikiPreferences".equals(docName)) {
+                        mapping = INTERNAL;
                     }
-                } catch (Exception e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
+
+                    if (StringUtils.isNotEmpty(mapping)) {
+                        hasProcessedMapping |= (!INTERNAL.equals(mapping) && hasDynamicMapping
+                            && store.injectCustomMapping(docName, mapping, context));
+                        callback.processCustomMapping(store, docName, mapping, hasDynamicMapping);
+                    }
                 }
-                return hasProcessedMapping;
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                    getName() + " migration failed", e);
             }
+            return hasProcessedMapping;
         })) {
             store.injectUpdatedCustomMappings(context);
         }
@@ -724,9 +674,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         getStore().executeWrite(getXWikiContext(), callback);
                     } catch (Exception e) {
                         throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
-                            + " migration failed while converting ID from [" + entry.getKey()
-                            + "] to [" + entry.getValue() + "]", e);
+                            XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                            getName() + " migration failed while converting ID from [" + entry.getKey() + "] to ["
+                                + entry.getValue() + "]",
+                            e);
                     }
                     it.remove();
                 }
@@ -734,8 +685,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         if (!map.isEmpty()) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                 getName() + " migration failed. Unresolved circular reference during id migration.");
         }
     }
@@ -749,7 +699,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private List<String[]> getCollectionProperties(PersistentClass pClass)
     {
-        List<String[]> list = new ArrayList<String[]>();
+        List<String[]> list = new ArrayList<>();
 
         if (pClass != null) {
             for (org.hibernate.mapping.Collection coll : getCollection(pClass)) {
@@ -764,38 +714,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * Retrieve the list of table that store collections of the provided persisted class.
-     *
-     * @param pClass the persisted class to analyse
-     * @param all if false, return only collection that need manual updates,
-     *            see {@link #getCollectionProperties(PersistentClass pClass)}
-     * @return a list of dual string, the first is the table name, and the second is the key in that table.
-     */
-    private List<String[]> getCollectionProperties(PersistentClass pClass, boolean all)
-    {
-        List<String[]> list = new ArrayList<String[]>();
-
-        if (pClass != null) {
-            for (org.hibernate.mapping.Collection coll : getCollection(pClass)) {
-                Table collTable = coll.getCollectionTable();
-                if (all || !this.fkTables.contains(collTable)) {
-                    list.add(new String[] { collTable.getName(), getKeyColumnName(coll) });
-                }
-            }
-        }
-
-        return list;
-    }
-
-    /**
      * Retrieve the list of collection properties of the provided persisted class.
      *
-     * @param pClass the persisted class to analyse
-     * @return a list of hibernate collections
+     * @param pClass the persisted class to analyze
+     * @return a list of Hibernate collections
      */
     private List<org.hibernate.mapping.Collection> getCollection(PersistentClass pClass)
     {
-        List<org.hibernate.mapping.Collection> list = new ArrayList<org.hibernate.mapping.Collection>();
+        List<org.hibernate.mapping.Collection> list = new ArrayList<>();
 
         if (pClass != null) {
             @SuppressWarnings("unchecked")
@@ -832,8 +758,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private PersistentClass getClassMapping(String className) throws DataMigrationException
     {
-        /*
-        PersistentClass pClass = this.configuration.getClassMapping(className);
+        PersistentClass pClass = this.metadata.getEntityBinding(className);
 
         if (pClass == null) {
             throw new DataMigrationException(
@@ -843,13 +768,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     + "have forgotten to customize the hibernate mapping while using your own internally custom mapped "
                     + "class. In the first and most common case, to fix this issue and migrate your wiki, you should "
                     + "delete the offending and useless class definition or the whole document defining that class "
-                    + "from your original wiki before the migration.",
-                    className));
+                    + "from your original wiki before the migration.", className));
         }
 
         return pClass;
-        */
-        return null;
     }
 
     /**
@@ -874,7 +796,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private List<String[]> getAllTableToProcess(PersistentClass pClass, String propertyName)
     {
-        List<String[]> list = new ArrayList<String[]>();
+        List<String[]> list = new ArrayList<>();
 
         // Add collection table that will not be updated by cascaded updates
         list.addAll(getCollectionProperties(pClass));
@@ -926,10 +848,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        final Map<Long, Long> docs = new HashMap<Long, Long>();
-        final List<String> customMappedClasses = new ArrayList<String>();
-        final Map<Long, Long> objs = new HashMap<Long, Long>();
-        final Queue<Map<Long, Long>> stats = new LinkedList<Map<Long, Long>>();
+        final Map<Long, Long> docs = new HashMap<>();
+        final List<String> customMappedClasses = new ArrayList<>();
+        final Map<Long, Long> objs = new HashMap<>();
+        final Queue<Map<Long, Long>> stats = new LinkedList<>();
 
         // Get ids conversion list
         getStore().executeRead(getXWikiContext(), new HibernateCallback<Object>()
@@ -938,9 +860,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             {
                 String database = getXWikiContext().getWikiId();
                 @SuppressWarnings("unchecked")
-                List<Object[]> results = session.createQuery(
-                    "select doc.id, doc.space, doc.name, doc.defaultLanguage, doc.language from "
-                    + XWikiDocument.class.getName() + " as doc").list();
+                List<Object[]> results =
+                    session.createQuery("select doc.id, doc.space, doc.name, doc.defaultLanguage, doc.language from "
+                        + XWikiDocument.class.getName() + " as doc").list();
 
                 for (Object[] result : results) {
                     long oldId = (Long) result[0];
@@ -968,17 +890,17 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             {
                 @SuppressWarnings("unchecked")
                 List<Object[]> results = session.createQuery(
-                    "select obj.id, obj.name, obj.className, obj.number from " + BaseObject.class.getName()
-                    + " as obj").list();
+                    "select obj.id, obj.name, obj.className, obj.number from " + BaseObject.class.getName() + " as obj")
+                    .list();
                 for (Object[] result : results) {
                     long oldId = (Long) result[0];
                     String docName = (String) result[1];
                     String className = (String) result[2];
                     Integer number = (Integer) result[3];
 
-                    BaseObjectReference objRef = new BaseObjectReference(
-                        R40000XWIKI6990DataMigration.this.resolver.resolve(className), number,
-                        R40000XWIKI6990DataMigration.this.resolver.resolve(docName));
+                    BaseObjectReference objRef =
+                        new BaseObjectReference(R40000XWIKI6990DataMigration.this.resolver.resolve(className), number,
+                            R40000XWIKI6990DataMigration.this.resolver.resolve(docName));
                     long newId = Util.getHash(R40000XWIKI6990DataMigration.this.serializer.serialize(objRef));
 
                     if (oldId != newId) {
@@ -989,8 +911,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 logProgress("Retrieved %d object IDs to be converted.", map.size());
             }
 
-            private void fillCustomMappingMap(XWikiHibernateStore store, XWikiContext context)
-                throws XWikiException
+            private void fillCustomMappingMap(XWikiHibernateStore store, XWikiContext context) throws XWikiException
             {
                 processCustomMappings(store, new CustomMappingCallback()
                 {
@@ -1010,8 +931,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             private void fillStatsConversionMap(Session session, Class<?> klass, Map<Long, Long> map)
             {
                 @SuppressWarnings("unchecked")
-                List<Object[]> results = session.createQuery(
-                    "select stats.id, stats.name, stats.number from " + klass.getName() + " as stats").list();
+                List<Object[]> results = session
+                    .createQuery("select stats.id, stats.name, stats.number from " + klass.getName() + " as stats")
+                    .list();
                 for (Object[] result : results) {
                     long oldId = (Long) result[0];
                     String statsName = (String) result[1];
@@ -1025,8 +947,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                             map.put(oldId, newId);
                         }
                     } else {
-                        R40000XWIKI6990DataMigration.this.logger.debug(
-                            "Skipping invalid statistical entry [{}] with name [{}]", oldId, statsName);
+                        R40000XWIKI6990DataMigration.this.logger
+                            .debug("Skipping invalid statistical entry [{}] with name [{}]", oldId, statsName);
                     }
                 }
 
@@ -1050,7 +972,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
                     // Retrieve statistics ID conversion
                     for (Class<?> statsClass : STATS_CLASSES) {
-                        Map<Long, Long> map = new HashMap<Long, Long>();
+                        Map<Long, Long> map = new HashMap<>();
                         fillStatsConversionMap(session, statsClass, map);
                         stats.add(map);
                     }
@@ -1065,7 +987,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         });
 
         // Cache the configuration and the dialect
-        this.configuration = getStore().getConfiguration();
+        this.metadata = getStore().getMetadata();
         this.dialect = getStore().getDialect();
 
         // Check configuration for safe mode
@@ -1074,13 +996,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             "1".equals(getXWikiContext().getWiki().Param("xwiki.store.migration." + this.getName() + ".safemode", "0"));
 
         // Use safe mode if the database has no temporary table supported by hibernate
-        //useSafeUpdates = useSafeUpdates || !this.dialect.supportsTemporaryTables();
+        useSafeUpdates = useSafeUpdates || !this.dialect.supportsTemporaryTables();
 
         // Proceed to document id conversion
         if (!docs.isEmpty()) {
             if (!useSafeUpdates) {
                 // Pair table,key for table that need manual updates
-                final List<String[]> tableToProcess = new ArrayList<String[]>();
+                final List<String[]> tableToProcess = new ArrayList<>();
 
                 for (Class<?> docClass : DOC_CLASSES) {
                     tableToProcess.addAll(getAllTableToProcess(docClass.getName()));
@@ -1107,8 +1029,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     });
                 } catch (Exception e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
-                        + " migration failed", e);
+                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
                 }
                 if (this.logger.isDebugEnabled()) {
                     int timer = 0;
@@ -1119,7 +1040,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 }
             } else {
-                final List<String[]> docsColl = new ArrayList<String[]>();
+                final List<String[]> docsColl = new ArrayList<>();
                 for (Class<?> docClass : DOC_CLASSES) {
                     docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
@@ -1127,8 +1048,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
 
-                logProgress("Converting %d document IDs in %d tables and %d collection tables...",
-                    docs.size(), DOC_CLASSES.length + DOCLINK_CLASSES.length, docsColl.size());
+                logProgress("Converting %d document IDs in %d tables and %d collection tables...", docs.size(),
+                    DOC_CLASSES.length + DOCLINK_CLASSES.length, docsColl.size());
 
                 final long[] times = new long[DOC_CLASSES.length + DOCLINK_CLASSES.length + docsColl.size()];
                 convertDbId(docs, new AbstractIdConversionHibernateCallback()
@@ -1172,7 +1093,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         if (!objs.isEmpty()) {
             if (!useSafeUpdates) {
                 // Pair table,key for table that need manual updates
-                final List<String[]> tableToProcess = new ArrayList<String[]>();
+                final List<String[]> tableToProcess = new ArrayList<>();
 
                 PersistentClass objklass = getClassMapping(BaseObject.class.getName());
                 tableToProcess.addAll(getCollectionProperties(objklass));
@@ -1203,8 +1124,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     });
                 } catch (Exception e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
-                        + " migration failed", e);
+                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
                 }
                 if (this.logger.isDebugEnabled()) {
                     int timer = 0;
@@ -1216,11 +1136,11 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 }
             } else {
                 // Name of classes that need manual updates
-                final List<String> classToProcess = new ArrayList<String>();
+                final List<String> classToProcess = new ArrayList<>();
                 // Name of custom classes that need manual updates
-                final List<String> customClassToProcess = new ArrayList<String>();
+                final List<String> customClassToProcess = new ArrayList<>();
                 // Pair table,key for collection table that need manual updates
-                final List<String[]> objsColl = new ArrayList<String[]>();
+                final List<String[]> objsColl = new ArrayList<>();
 
                 objsColl.addAll(getCollectionProperties(getClassMapping(BaseObject.class.getName())));
                 for (Class<?> propertyClass : PROPERTY_CLASS) {
@@ -1304,15 +1224,15 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
             if (!map.isEmpty()) {
                 if (!useSafeUpdates) {
-                    final List<String[]> tableToProcess = new ArrayList<String[]>();
+                    final List<String[]> tableToProcess = new ArrayList<>();
                     final Map<Long, Long> statids = map;
 
                     PersistentClass statklass = getClassMapping(statsClass.getName());
                     tableToProcess.addAll(getCollectionProperties(statklass));
                     tableToProcess.add(new String[] { statklass.getTable().getName(), getKeyColumnName(statklass) });
 
-                    logProgress("Converting %d %s statistics IDs in %d tables...",
-                        map.size(), klassName, tableToProcess.size());
+                    logProgress("Converting %d %s statistics IDs in %d tables...", map.size(), klassName,
+                        tableToProcess.size());
 
                     final long[] times = new long[tableToProcess.size() + 1];
                     try {
@@ -1330,25 +1250,22 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         });
                     } catch (Exception e) {
                         throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
-                            + " migration failed", e);
+                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
                     }
                     if (this.logger.isDebugEnabled()) {
                         int timer = 0;
-                        this.logger.debug("Time elapsed for inserts: {} ms",
-                            times[timer++] / 1000000);
+                        this.logger.debug("Time elapsed for inserts: {} ms", times[timer++] / 1000000);
 
                         for (String[] table : tableToProcess) {
-                            this.logger.debug("Time elapsed for {} table: {} ms", table[0],
-                                times[timer++] / 1000000);
+                            this.logger.debug("Time elapsed for {} table: {} ms", table[0], times[timer++] / 1000000);
                         }
                     }
                 } else {
-                    final List<String[]> statsColl = new ArrayList<String[]>();
+                    final List<String[]> statsColl = new ArrayList<>();
                     statsColl.addAll(getCollectionProperties(getClassMapping(statsClass.getName())));
 
-                    logProgress("Converting %d %s statistics IDs in 1 tables and %d collection tables...",
-                        map.size(), klassName, statsColl.size());
+                    logProgress("Converting %d %s statistics IDs in 1 tables and %d collection tables...", map.size(),
+                        klassName, statsColl.size());
 
                     final long[] times = new long[statsColl.size() + 1];
                     convertDbId(map, new AbstractIdConversionHibernateCallback()
@@ -1395,18 +1312,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // database itself. We need to retrieve that name from the schema.
         if (this.isMSSQL) {
             try {
-                pkName = getStore().failSafeExecuteRead(getXWikiContext(), new HibernateCallback<String>()
-                {
-                    @Override
-                    public String doInHibernate(Session session) throws HibernateException
-                    {
-                        // Retrieve the constraint name from the database
-                        return (String) session.createSQLQuery(
-                            "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS"
-                                + " WHERE TABLE_NAME = :tableName AND CONSTRAINT_TYPE = 'PRIMARY KEY'")
-                            .setString("tableName", tableName)
-                            .uniqueResult();
-                    }
+                pkName = getStore().failSafeExecuteRead(getXWikiContext(), session -> {
+                    // Retrieve the constraint name from the database
+                    return (String) session
+                        .createSQLQuery("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS"
+                            + " WHERE TABLE_NAME = :tableName AND CONSTRAINT_TYPE = 'PRIMARY KEY'")
+                        .setParameter("tableName", tableName).uniqueResult();
                 });
             } catch (Exception e) {
                 // ignored since it is really unlikely to happen
@@ -1434,8 +1345,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         PrimaryKey pk = table.getPrimaryKey();
         String pkName = pk.getName();
 
-        sb.append("    <addPrimaryKey tableName=\"").append(table.getName())
-            .append("\"  columnNames=\"");
+        sb.append("    <addPrimaryKey tableName=\"").append(table.getName()).append("\"  columnNames=\"");
 
         @SuppressWarnings("unchecked")
         Iterator<Column> columns = pk.getColumnIterator();
@@ -1462,9 +1372,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private void appendDropIndex(StringBuilder sb, Index index)
     {
-        sb.append("    <dropIndex indexName=\"").append(index.getName())
-            .append("\"  tableName=\"").append(index.getTable().getName())
-            .append("\"/>\n");
+        sb.append("    <dropIndex indexName=\"").append(index.getName()).append("\"  tableName=\"")
+            .append(index.getTable().getName()).append("\"/>\n");
     }
 
     /**
@@ -1475,8 +1384,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private void appendAddIndex(StringBuilder sb, Index index)
     {
-        sb.append("    <createIndex tableName=\"").append(index.getTable().getName())
-            .append("\"  indexName=\"").append(index.getName()).append("\">\n");
+        sb.append("    <createIndex tableName=\"").append(index.getTable().getName()).append("\"  indexName=\"")
+            .append(index.getName()).append("\">\n");
 
         @SuppressWarnings("unchecked")
         Iterator<Column> columns = index.getColumnIterator();
@@ -1497,14 +1406,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private void appendModifyColumn(StringBuilder sb, String table, String column)
     {
-        sb.append("    <modifyDataType tableName=\"").append(table)
-            .append("\"  columnName=\"").append(column)
+        sb.append("    <modifyDataType tableName=\"").append(table).append("\"  columnName=\"").append(column)
             .append("\" newDataType=\"BIGINT\"/>\n");
 
         // MS-SQL drop the NOT NULL constraints while modifying datatype, so we add it back
         if (this.isMSSQL) {
-            sb.append("    <addNotNullConstraint tableName=\"").append(table)
-                .append("\"  columnName=\"").append(column)
+            sb.append("    <addNotNullConstraint tableName=\"").append(table).append("\"  columnName=\"").append(column)
                 .append("\" columnDataType=\"BIGINT\"/>\n");
         }
     }
@@ -1521,9 +1428,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     {
         String tableName = table.getName();
 
-        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append('-').append(Util.getHash(String.format("modifyDataType-%s-%s", table, column)))
-            .append("\" author=\"xwiki\">\n")
+        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion()).append('-')
+            .append(Util.getHash(String.format("modifyDataType-%s-%s", table, column))).append("\" author=\"xwiki\">\n")
             .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(tableName)
             .append("] to BIGINT type</comment >\n");
 
@@ -1535,7 +1441,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
 
             // We drop all index related to the table, this is overkill, but does not hurt
-            for (@SuppressWarnings("unchecked") Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
+            for (@SuppressWarnings("unchecked")
+            Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
                 Index index = it.next();
                 appendDropIndex(sb, index);
             }
@@ -1549,7 +1456,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 appendAddPrimaryKey(sb, table);
             }
 
-            for (@SuppressWarnings("unchecked") Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
+            for (@SuppressWarnings("unchecked")
+            Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
                 Index index = it.next();
                 appendAddIndex(sb, index);
             }
@@ -1607,7 +1515,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private List<Table> getForeignKeyTables(PersistentClass pClass)
     {
-        List<Table> list = new ArrayList<Table>();
+        List<Table> list = new ArrayList<>();
 
         if (pClass != null) {
             Table table = pClass.getTable();
@@ -1645,8 +1553,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Preamble
         String tableName = table.getName();
-        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append('-').append(Util.getHash(String.format("dropForeignKeyConstraint-%s", tableName)))
+        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion()).append('-')
+            .append(Util.getHash(String.format("dropForeignKeyConstraint-%s", tableName)))
             .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\" failOnError=\"false\">\n")
             .append("    <comment>Drop foreign keys on table [").append(tableName).append("]</comment>\n");
 
@@ -1656,8 +1564,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             ForeignKey fk = fki.next();
             // Drop the old constraint
             if (fk.isReferenceToPrimaryKey()) {
-                sb.append("    <dropForeignKeyConstraint baseTableName=\"")
-                    .append(tableName)
+                sb.append("    <dropForeignKeyConstraint baseTableName=\"").append(tableName)
                     .append("\" constraintName=\"").append(fk.getName()).append("\" />\n");
             }
         }
@@ -1679,8 +1586,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Preamble
         String tableName = table.getName();
-        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append('-').append(Util.getHash(String.format("addForeignKeyConstraint-%s", tableName)))
+        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion()).append('-')
+            .append(Util.getHash(String.format("addForeignKeyConstraint-%s", tableName)))
             .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\">\n")
             .append("    <comment>Add foreign keys on table [").append(tableName)
             .append("] to use ON UPDATE CASCADE</comment>\n");
@@ -1692,8 +1599,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
             if (fk.isReferenceToPrimaryKey()) {
                 // Recreate the constraint
-                sb.append("    <addForeignKeyConstraint constraintName=\"").append(fk.getName()).append(
-                    "\" baseTableName=\"").append(tableName).append("\"  baseColumnNames=\"");
+                sb.append("    <addForeignKeyConstraint constraintName=\"").append(fk.getName())
+                    .append("\" baseTableName=\"").append(tableName).append("\"  baseColumnNames=\"");
 
                 // Reuse the data from the old foreign key
                 // Columns in the current table
@@ -1705,8 +1612,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         sb.append(",");
                     }
                 }
-                sb.append("\" referencedTableName=\"").append(fk.getReferencedTable().getName()).append(
-                    "\" referencedColumnNames=\"");
+                sb.append("\" referencedTableName=\"").append(fk.getReferencedTable().getName())
+                    .append("\" referencedColumnNames=\"");
 
                 // Columns in the referenced table
                 columns = fk.getReferencedTable().getPrimaryKey().getColumnIterator();
@@ -1734,9 +1641,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * Detect database products and initialize isMySQLMyISAM and isOracle.
-     * isMySQLMyISAM is true if the xwikidoc table use the MyISAM engine in MySQL, false otherwise or on any failure.
-     * isOracle is true if the we access an Oracle database.
+     * Detect database products and initialize isMySQLMyISAM and isOracle. isMySQLMyISAM is true if the xwikidoc table
+     * use the MyISAM engine in MySQL, false otherwise or on any failure. isOracle is true if the we access an Oracle
+     * database.
      *
      * @param store the store to be checked
      */
@@ -1751,16 +1658,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         this.isMySQL = true;
 
-        String createTable = store.failSafeExecuteRead(getXWikiContext(),
-            new HibernateCallback<String>()
-            {
-                @Override
-                public String doInHibernate(Session session) throws HibernateException
-                {
-                    Query query = session.createSQLQuery("SHOW TABLE STATUS like 'xwikidoc'");
-                    return (String) ((Object[]) query.uniqueResult())[1];
-                }
-            });
+        String createTable = store.failSafeExecuteRead(getXWikiContext(), session -> {
+            NativeQuery<Object[]> query = session.createSQLQuery("SHOW TABLE STATUS like 'xwikidoc'");
+            return (String) query.uniqueResult()[1];
+        });
 
         this.isMySQLMyISAM = (createTable != null && createTable.equals("MyISAM"));
     }
@@ -1769,9 +1670,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     public String getLiquibaseChangeLog() throws DataMigrationException
     {
         final XWikiHibernateBaseStore store = getStore();
-        this.configuration = store.getConfiguration();
+        this.metadata = store.getMetadata();
         final StringBuilder sb = new StringBuilder(12000);
-        final List<PersistentClass> classes = new ArrayList<PersistentClass>();
+        final List<PersistentClass> classes = new ArrayList<>();
 
         detectDatabaseProducts(store);
 
@@ -1791,7 +1692,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             if (this.isMSSQL) {
                 this.logger
                     .debug("Microsoft SQL Server database detected, proceeding to simplified updates with cascaded u"
-                    + "pdates. During data type changes, Primary Key constraints and indexes are temporarily dropped.");
+                        + "pdates. During data type changes, Primary Key constraints and indexes are temporarily dropped.");
             }
         }
 
@@ -1844,8 +1745,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     boolean hasDynamicMapping) throws XWikiException
                 {
                     if (INTERNAL.equals(mapping) || hasDynamicMapping) {
-                        /*
-                        PersistentClass klass = R40000XWIKI6990DataMigration.this.configuration.getClassMapping(name);
+                        PersistentClass klass = R40000XWIKI6990DataMigration.this.metadata.getEntityBinding(name);
                         if (!R40000XWIKI6990DataMigration.this.isMySQLMyISAM) {
                             List<Table> tables = getForeignKeyTables(klass);
                             for (Table table : tables) {
@@ -1859,7 +1759,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
                         // Update key types for custom mapped class
                         appendDataTypeChangeLogs(sb, klass);
-                        */
                     }
                 }
             }, context);

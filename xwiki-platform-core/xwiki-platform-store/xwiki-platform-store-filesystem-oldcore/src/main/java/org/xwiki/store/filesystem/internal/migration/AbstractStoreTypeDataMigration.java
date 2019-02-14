@@ -26,7 +26,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -82,9 +81,11 @@ public abstract class AbstractStoreTypeDataMigration extends AbstractFileStoreDa
 
     private void doWork(Session session)
     {
-        Query selectQuery = session.createQuery("SELECT attachment.id, attachment.filename, document.fullName"
-            + " FROM XWikiAttachment as attachment, XWikiDocument as document"
-            + " WHERE attachment.docId = document.id AND attachment.id NOT IN (SELECT id FROM " + this.tableName + ")");
+        org.hibernate.query.Query selectQuery =
+            session.createQuery("SELECT attachment.id, attachment.filename, document.fullName"
+                + " FROM XWikiAttachment as attachment, XWikiDocument as document"
+                + " WHERE attachment.docId = document.id AND attachment.id NOT IN (SELECT id FROM " + this.tableName
+                + ")");
 
         List<Object[]> attachments = selectQuery.list();
 
@@ -134,7 +135,7 @@ public abstract class AbstractStoreTypeDataMigration extends AbstractFileStoreDa
     protected void setStore(Session session, List<Long> values, String store)
     {
         if (!values.isEmpty()) {
-            Query query = session.createQuery(this.updateQuery);
+            org.hibernate.query.Query query = session.createQuery(this.updateQuery);
             query.setParameter("store", store);
             query.setParameterList("ids", values);
             query.executeUpdate();

@@ -19,10 +19,14 @@
  */
 package com.xpn.xwiki.internal.store.hibernate;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +38,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
@@ -41,17 +47,18 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.jdbc.Work;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.component.annotation.DisposePriority;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Instance shared by all hibernate based stores.
@@ -61,7 +68,8 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
  */
 @Component(roles = HibernateStore.class)
 @Singleton
-public class HibernateStore
+@DisposePriority(10000)
+public class HibernateStore implements Disposable
 {
     /**
      * @see #isInSchemaMode()
@@ -76,9 +84,6 @@ public class HibernateStore
     private Logger logger;
 
     @Inject
-    private HibernateSessionFactory sessionFactory;
-
-    @Inject
     @Named(XWikiHibernateBaseStore.HINT)
     private DataMigrationManager dataMigrationManager;
 
@@ -89,19 +94,79 @@ public class HibernateStore
     private WikiDescriptorManager wikis;
 
     @Inject
-    @Named(XWikiCfgConfigurationSource.ROLEHINT)
-    private ConfigurationSource xwikiConfiguration;
+    private HibernateConfiguration hibernateConfiguration;
+
+    private final MetadataSources metadataSources = new MetadataSources();
+
+    private final Configuration configuration = new Configuration(this.metadataSources);
+
+    private String hibernatePath = "/WEB-INF/hibernate.cfg.xml";
 
     private Dialect dialect;
 
     private DatabaseProduct databaseProductCache = DatabaseProduct.UNKNOWN;
+
+    private SessionFactory sessionFactory;
+
+    private Metadata metadata;
+
+    private Map<String, String[]> validTypesMap = new HashMap<>();
+
+    /**
+     * Allows to get the current Hibernate config file path
+     * 
+     * @since 11.1RC1
+     */
+    public String getPath()
+    {
+        return this.hibernatePath;
+    }
+
+    /**
+     * @since 11.1RC1
+     */
+    public void initHibernate()
+    {
+        this.configuration.configure(Util.getResource(getPath()));
+
+        build();
+    }
+
+    /**
+     * @since 11.1RC1
+     */
+    public void build()
+    {
+        // Get rid of existing session factory
+        disposeInternal();
+
+        // Create a new session factory
+        this.sessionFactory = this.configuration.buildSessionFactory();
+        this.metadata = this.metadataSources.buildMetadata();
+    }
+
+    private void disposeInternal()
+    {
+        Session session = getCurrentSession();
+        closeSession(session);
+
+        if (this.sessionFactory != null) {
+            this.sessionFactory.close();
+        }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        disposeInternal();
+    }
 
     /**
      * @return the Hibernate configuration
      */
     public Configuration getConfiguration()
     {
-        return this.sessionFactory.getConfiguration();
+        return this.configuration;
     }
 
     /**
@@ -133,7 +198,7 @@ public class HibernateStore
 
         String schema;
         if (StringUtils.equalsIgnoreCase(wikiId, mainWikiId)) {
-            schema = this.xwikiConfiguration.getProperty("xwiki.db");
+            schema = this.hibernateConfiguration.getDB();
             if (schema == null) {
                 if (product == DatabaseProduct.DERBY) {
                     schema = "APP";
@@ -157,7 +222,7 @@ public class HibernateStore
         }
 
         // Apply prefix
-        String prefix = this.xwikiConfiguration.getProperty("xwiki.db.prefix", "");
+        String prefix = this.hibernateConfiguration.getDBPrefix();
         schema = prefix + schema;
 
         return schema;
@@ -240,6 +305,61 @@ public class HibernateStore
         }
 
         return null;
+    }
+
+    /**
+     * @since 11.1RC1
+     */
+    public Metadata getMetadata()
+    {
+        return this.metadata;
+    }
+
+    public Metadata getMetadata(String className, String customMapping)
+    {
+        MetadataSources builder = new MetadataSources();
+
+        builder.addInputStream(
+            new ByteArrayInputStream(makeMapping(className, customMapping).getBytes(StandardCharsets.UTF_8)));
+
+        return builder.buildMetadata();
+    }
+
+    /**
+     * Build a new XML string to define the provided mapping. Since 4.0M1, the ids are longs, and a conditional mapping
+     * is made for Oracle.
+     *
+     * @param className the name of the class to map.
+     * @param customMapping the custom mapping
+     * @return a XML definition for the given mapping, using XWO_ID column for the object id.
+     * @since 11.1RC1
+     */
+    public String makeMapping(String className, String customMapping)
+    {
+        DatabaseProduct databaseProduct = getDatabaseProductName();
+
+        return new StringBuilder(2000).append("<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n")
+            .append("<!DOCTYPE hibernate-mapping PUBLIC\n").append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
+            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
+            .append("<class entity-name=\"").append(className).append("\" table=\"")
+            .append(toDynamicMappingTableName(className)).append("\">\n")
+            .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")
+            .append("   <column name=\"XWO_ID\" not-null=\"true\" ")
+            .append((databaseProduct == DatabaseProduct.ORACLE) ? "sql-type=\"integer\" " : "")
+            .append("/>\n   <generator class=\"assigned\" />\n").append(" </id>\n").append(customMapping)
+            .append("</class>\n</hibernate-mapping>").toString();
+    }
+
+    /**
+     * Return the name generated for a dynamic mapped object.
+     *
+     * @param className the classname of the object.
+     * @return a name in the form xwikicustom_space_class
+     * @since 11.1RC1
+     */
+    public String toDynamicMappingTableName(String className)
+    {
+        return "xwikicustom_" + className.replaceAll("\\.", "_");
     }
 
     /**
@@ -465,9 +585,12 @@ public class HibernateStore
         return true;
     }
 
-    private SessionFactory getSessionFactory()
+    /**
+     * @since 11.1RC1
+     */
+    public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory.getSessionFactory();
+        return this.sessionFactory;
     }
 
     /**
@@ -531,18 +654,14 @@ public class HibernateStore
 
     /**
      * Allows to shut down the hibernate configuration Closing all pools and connections.
+     * 
+     * @deprecated automatically done when the component is disposed
      */
+    @Deprecated
     public void shutdownHibernate()
     {
-        Session session = getCurrentSession();
-        closeSession(session);
-
-        /*
-         * // Close all connections if (getSessionFactory() != null) { // Note that we need to do the cast because this
-         * is how Hibernate suggests to get the Connection Provider. // See http://bit.ly/QAJXlr ConnectionProvider
-         * connectionProvider = ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider(); if
-         * (connectionProvider instanceof Stoppable) { ((Stoppable) connectionProvider).stop(); } }
-         */
+        // Close all connections
+        disposeInternal();
     }
 
     /**

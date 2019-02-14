@@ -28,8 +28,10 @@ import org.xwiki.component.annotation.Role;
  *
  * @version $Id$
  * @since 1.6M1
+ * @deprecated since 11.1RC1
  */
 @Role
+@Deprecated
 public interface HibernateSessionFactory
 {
     /**
@@ -42,6 +44,8 @@ public interface HibernateSessionFactory
      */
     SessionFactory getSessionFactory();
 
-    // NOTE: this method will be removed in 3rd step of XWIKI-2332
+    /**
+     * @deprecated do nothing since 11.1RC1
+     */
     void setSessionFactory(SessionFactory sessionFactory);
 }

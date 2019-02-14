@@ -150,16 +150,11 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiContext context = getXWikiContext();
 
         try {
-            getStore().executeWrite(context, new HibernateCallback<Object>()
-            {
-                @Override
-                public Object doInHibernate(Session session) throws HibernateException
-                {
-                    // session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
-                    session.save(version);
+            getStore().executeWrite(context, session -> {
+                session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
+                session.save(version);
 
-                    return null;
-                }
+                return null;
             });
         } catch (Exception e) {
             throw new DataMigrationException(String.format("Unable to store new data version %d into database %s",
@@ -316,8 +311,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      */
     private String getLiquibaseChangeLogHeader()
     {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<databaseChangeLog\n"
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<databaseChangeLog\n"
             + "    xmlns=\"http://www.liquibase.org/xml/ns/dbchangelog\"\n"
             + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
             + "    xmlns:ext=\"http://www.liquibase.org/xml/ns/dbchangelog-ext\"\n"

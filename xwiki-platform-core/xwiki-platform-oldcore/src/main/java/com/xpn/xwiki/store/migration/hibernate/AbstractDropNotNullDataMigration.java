@@ -20,9 +20,8 @@
 
 package com.xpn.xwiki.store.migration.hibernate;
 
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.Metadata;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 
@@ -57,24 +56,19 @@ public abstract class AbstractDropNotNullDataMigration extends AbstractHibernate
     {
         XWikiHibernateBaseStore store = getStore();
         Dialect dialect = store.getDialect();
-        Configuration configuration = store.getConfiguration();
-        /*
-        Mapping mapping = configuration.buildMapping();
-        PersistentClass pClass = configuration.getClassMapping(this.table.getName());
+        Metadata metadata = store.getMetadata();
+        PersistentClass pClass = metadata.getEntityBinding(this.table.getName());
         Column column = ((Column) pClass.getProperty(this.property).getColumnIterator().next());
-        String columnType = column.getSqlType(dialect, mapping);
-        */
+        String columnType = column.getSqlType(dialect, metadata);
 
         StringBuilder builder = new StringBuilder();
 
-        /*
         builder.append("<changeSet author=\"xwiki\" id=\"R").append(this.getVersion().getVersion()).append("\">\n");
         builder.append("    <dropNotNullConstraint\n");
         builder.append("            columnDataType=\"").append(columnType).append('"').append('\n');
         builder.append("            columnName=\"").append(column.getName()).append('"').append('\n');
         builder.append("            tableName=\"").append(pClass.getTable().getName()).append("\"/>\n");
         builder.append("</changeSet>");
-        */
 
         return builder.toString();
     }

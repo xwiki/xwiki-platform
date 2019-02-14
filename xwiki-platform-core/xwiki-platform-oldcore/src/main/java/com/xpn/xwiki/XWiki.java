@@ -207,6 +207,7 @@ import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiSkin;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -429,6 +430,8 @@ public class XWiki implements EventListener
 
     private StoreConfiguration storeConfiguration;
 
+    private HibernateConfiguration hibernateConfiguration;
+
     private ObservationManager observationManager;
 
     private Provider<XWikiContext> xcontextProvider;
@@ -518,6 +521,15 @@ public class XWiki implements EventListener
         }
 
         return this.storeConfiguration;
+    }
+
+    private HibernateConfiguration getHibernateConfiguration()
+    {
+        if (this.hibernateConfiguration == null) {
+            this.hibernateConfiguration = Utils.getComponent(HibernateConfiguration.class);
+        }
+
+        return this.hibernateConfiguration;
     }
 
     private InternalSkinManager getInternalSkinManager()
@@ -6277,12 +6289,12 @@ public class XWiki implements EventListener
 
     public boolean hasCustomMappings()
     {
-        return "1".equals(getConfiguration().getProperty("xwiki.store.hibernate.custommapping", "1"));
+        return getHibernateConfiguration().hasCustomMappings();
     }
 
     public boolean hasDynamicCustomMappings()
     {
-        return "1".equals(getConfiguration().getProperty("xwiki.store.hibernate.custommapping.dynamic", "0"));
+        return getHibernateConfiguration().hasDynamicCustomMappings();
     }
 
     public String getDefaultSpace(XWikiContext context)

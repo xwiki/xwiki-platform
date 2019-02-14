@@ -82,19 +82,19 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-bridge</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-standard</artifactId>
       <version>${commons.version}</version>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

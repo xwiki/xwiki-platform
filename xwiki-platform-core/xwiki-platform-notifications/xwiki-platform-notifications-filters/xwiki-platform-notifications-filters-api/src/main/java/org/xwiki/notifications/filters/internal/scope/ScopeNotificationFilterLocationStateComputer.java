@@ -101,7 +101,8 @@ public class ScopeNotificationFilterLocationStateComputer
             if (match(pref, location)) {
                 // Then it means we watch this location
                 match = true;
-                if (startingDate == null || startingDate.after(pref.getStartingDate())) {
+                if (startingDate == null
+                        || (pref.getStartingDate() != null && startingDate.after(pref.getStartingDate()))) {
                     startingDate = pref.getStartingDate();
                 }
             }

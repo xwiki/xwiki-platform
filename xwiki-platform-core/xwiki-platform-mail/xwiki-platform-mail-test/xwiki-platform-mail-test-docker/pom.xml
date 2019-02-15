@@ -36,7 +36,7 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <selenium.version>3.14.0</selenium.version>
+    <selenium.version>3.141.59</selenium.version>
   </properties>
   <dependencies>
     <!-- ================================

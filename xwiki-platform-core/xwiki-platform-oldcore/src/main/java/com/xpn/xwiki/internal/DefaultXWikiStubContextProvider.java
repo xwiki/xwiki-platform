@@ -73,6 +73,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         newContext.setUserReference(null);
         newContext.setLocale(null);
         newContext.setWikiId(context.getMainXWiki());
+        newContext.setURLFactory(null);
 
         // Cleanup
         newContext.flushClassCache();
@@ -93,15 +94,6 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
             newContext.setResponse(response);
         }
 
-        // Set the URL Factory so that the URL Factory doesn't depend of the mode of the first action that entered
-        // the system (Servlet, PDF, Portlet, etc).
-        // We decide arbitrarily to use the Servlet URL Factory since it's the "standard" factory.
-        if (newContext.getURLFactory() != null) {
-            XWikiURLFactory urlf =
-                newContext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, context);
-            newContext.setURLFactory(urlf);
-        }
-
         this.initialContext = newContext;
 
         this.logger.debug("Stub context initialized.");
@@ -120,6 +112,11 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
                 XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(this.initialContext.getRequest());
                 XWikiServletRequest request = new XWikiServletRequest(stubRequest);
                 stubContext.setRequest(request);
+
+                // Each context is supposed to have a dedicated URL factory
+                XWikiURLFactory urlf =
+                    stubContext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, stubContext);
+                stubContext.setURLFactory(urlf);
             }
 
             // We make sure to not share the same Response instance with several threads

@@ -92,7 +92,7 @@
     </dependency>
     <dependency>
       <groupId>com.icegreen</groupId>
-      <artifactId>greenmail-junit5</artifactId>
+      <artifactId>greenmail</artifactId>
       <version>1.5.9</version>
       <scope>test</scope>
     </dependency>

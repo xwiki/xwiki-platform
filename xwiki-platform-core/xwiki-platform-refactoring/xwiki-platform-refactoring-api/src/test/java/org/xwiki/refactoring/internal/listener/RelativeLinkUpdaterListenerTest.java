@@ -20,16 +20,20 @@
 package org.xwiki.refactoring.internal.listener;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.event.DocumentCopiedEvent;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -47,6 +51,9 @@ public class RelativeLinkUpdaterListenerTest
 
     @MockComponent
     private LinkRefactoring linkRefactoring;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private DocumentReference oldReference = new DocumentReference("wiki", "Users", "Alice");
 
@@ -68,6 +75,8 @@ public class RelativeLinkUpdaterListenerTest
         this.listener.onEvent(documentRenamedEvent, null, renameRequest);
 
         verify(this.linkRefactoring).updateRelativeLinks(oldReference, newReference);
+
+        assertEquals("Updating the relative links from [wiki:Users.Bob].", logCapture.getMessage(0));
     }
 
     @Test
@@ -86,6 +95,8 @@ public class RelativeLinkUpdaterListenerTest
         this.listener.onEvent(documentRenamedEvent, null, null);
 
         verify(this.linkRefactoring).updateRelativeLinks(oldReference, newReference);
+
+        assertEquals("Updating the relative links from [wiki:Users.Bob].", logCapture.getMessage(0));
     }
 
     @Test
@@ -96,6 +107,8 @@ public class RelativeLinkUpdaterListenerTest
         this.listener.onEvent(documentCopiedEvent, null, copyRequest);
 
         verify(this.linkRefactoring).updateRelativeLinks(oldReference, newReference);
+
+        assertEquals("Updating the relative links from [wiki:Users.Bob].", logCapture.getMessage(0));
     }
 
     @Test
@@ -114,6 +127,8 @@ public class RelativeLinkUpdaterListenerTest
         this.listener.onEvent(documentCopiedEvent, null, null);
 
         verify(this.linkRefactoring).updateRelativeLinks(oldReference, newReference);
+
+        assertEquals("Updating the relative links from [wiki:Users.Bob].", logCapture.getMessage(0));
     }
 
     @Test

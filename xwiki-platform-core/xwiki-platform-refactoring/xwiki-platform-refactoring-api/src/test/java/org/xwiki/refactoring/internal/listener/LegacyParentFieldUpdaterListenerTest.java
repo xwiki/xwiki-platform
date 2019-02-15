@@ -20,14 +20,18 @@
 package org.xwiki.refactoring.internal.listener;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -46,6 +50,9 @@ public class LegacyParentFieldUpdaterListenerTest
     @MockComponent
     private ModelBridge modelBridge;
 
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
     private DocumentReference oldReference = new DocumentReference("wiki", "Users", "Alice");
 
     private DocumentReference newReference = new DocumentReference("wiki", "Users", "Bob");
@@ -62,6 +69,9 @@ public class LegacyParentFieldUpdaterListenerTest
         this.listener.onEvent(documentRenamedEvent, null, renameRequest);
 
         verify(this.modelBridge).updateParentField(oldReference, newReference);
+
+        assertEquals("Updating the document parent fields from [wiki:Users.Alice] to [wiki:Users.Bob].",
+            logCapture.getMessage(0));
     }
 
     @Test
@@ -80,6 +90,9 @@ public class LegacyParentFieldUpdaterListenerTest
         this.listener.onEvent(documentRenamedEvent, null, null);
 
         verify(this.modelBridge).updateParentField(oldReference, newReference);
+
+        assertEquals("Updating the document parent fields from [wiki:Users.Alice] to [wiki:Users.Bob].",
+            logCapture.getMessage(0));
     }
 
     @Test

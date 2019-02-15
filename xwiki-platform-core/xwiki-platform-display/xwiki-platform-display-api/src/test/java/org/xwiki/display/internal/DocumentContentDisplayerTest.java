@@ -22,11 +22,7 @@ package org.xwiki.display.internal;
 import java.util.Collections;
 import java.util.HashMap;
 
-import org.junit.Assert;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -35,68 +31,90 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentContentDisplayer}.
- * 
+ *
  * @version $Id$
  */
+@ComponentTest
 public class DocumentContentDisplayerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DocumentDisplayer> mocker =
-        new MockitoComponentMockingRule<DocumentDisplayer>(DocumentContentDisplayer.class);
+    @InjectMockComponents
+    private DocumentContentDisplayer displayer;
+
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    private DocumentModelBridge document;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> serializer;
+
+    @MockComponent
+    private TransformationManager transformationManager;
 
     @Test
-    public void testBaseMetaDataIsSetBeforeExecutingTransformations() throws Exception
+    public void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
     {
         // The execution context is expected to have the "xwikicontext" property set.
-        Execution mockExecution = mocker.getInstance(Execution.class);
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.setProperty("xwikicontext", new HashMap<String, Object>());
-        Mockito.when(mockExecution.getContext()).thenReturn(executionContext);
+        when(execution.getContext()).thenReturn(executionContext);
 
         // The document being displayed.
-        DocumentModelBridge mockDocument = Mockito.mock(DocumentModelBridge.class);
-        XDOM content = new XDOM(Collections.<Block> emptyList());
-        Mockito.when(mockDocument.getXDOM()).thenReturn(content);
+        XDOM content = new XDOM(Collections.emptyList());
+        when(document.getXDOM()).thenReturn(content);
 
         // The reference of the current document musts be set as the value of the BASE meta data.
         DocumentReference currentDocRef = new DocumentReference("wiki", "Space", "Page");
-        DocumentAccessBridge mockDocumentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-        Mockito.when(mockDocumentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocRef);
+        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocRef);
 
-        EntityReferenceSerializer<String> serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        Mockito.when(serializer.serialize(currentDocRef)).thenReturn("foo");
+        when(serializer.serialize(currentDocRef)).thenReturn("foo");
 
         // We can't verify the meta data after the display method is called because we want to make sure the BASE meta
         // data is correctly set before XDOM transformations are executed, not after.
-        TransformationManager mockTransformationManager = mocker.getInstance(TransformationManager.class);
-        Mockito.doAnswer(new Answer<Void>()
+        doAnswer(new Answer<Void>()
         {
             @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
+            public Void answer(InvocationOnMock invocation)
             {
                 XDOM xdom = (XDOM) invocation.getArguments()[0];
-                // We have to assert the meta data before the transformations are executed not at the end!
-                Assert.assertEquals("foo", xdom.getMetaData().getMetaData(MetaData.BASE));
+                // We have to assert the meta data before the transformations are executed, not at the end!
+                assertEquals("foo", xdom.getMetaData().getMetaData(MetaData.BASE));
                 return null;
             }
-        }).when(mockTransformationManager)
-            .performTransformations(Mockito.any(XDOM.class), Mockito.any(TransformationContext.class));
+        }).when(transformationManager).performTransformations(any(XDOM.class), any(TransformationContext.class));
+
+        // Note: we use a non-isolated tx context simply to simplify the test and avoid having to setup a
+        // VelocityManager for the test.
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        parameters.setTransformationContextIsolated(false);
 
         // Execute the display.
-        Assert.assertSame(content,
-            mocker.getComponentUnderTest().display(mockDocument, new DocumentDisplayerParameters()));
+        assertSame(content, displayer.display(document, parameters));
 
         // Make sure the transformations are executed exactly once, and on the right content.
-        Mockito.verify(mockTransformationManager, Mockito.times(1)).performTransformations(Mockito.same(content),
-            Mockito.any(TransformationContext.class));
+        verify(transformationManager, times(1)).performTransformations(same(content), any(TransformationContext.class));
     }
 }

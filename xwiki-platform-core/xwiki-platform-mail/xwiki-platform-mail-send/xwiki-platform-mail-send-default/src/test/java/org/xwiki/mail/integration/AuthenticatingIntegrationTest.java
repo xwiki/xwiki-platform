@@ -36,6 +36,7 @@ import javax.mail.internet.MimeMultipart;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.phase.Disposable;
@@ -64,8 +65,10 @@ import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -114,6 +117,9 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private MailSenderConfiguration configuration;
 
@@ -175,6 +181,8 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
     @AfterEach
     public void cleanUp() throws Exception
     {
+        logCapture.ignoreAllMessages();
+
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
         Disposable listener =

@@ -41,7 +41,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     @FindBy(id = "availableColumns")
     private WebElement availableColumns;
 
-    @FindBy(xpath = "//div[@class = 'columnPicker']/input[@type = 'image' and @alt = 'Add']")
+    @FindBy(xpath = "//div[@class = 'columnPicker']/input[@type = 'image' and @alt = 'Add selected column']")
     private WebElement addColumnButton;
 
     @FindBy(id = "applicationIcon")

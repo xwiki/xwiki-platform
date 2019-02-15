@@ -84,7 +84,10 @@
     border: 0;
     min-width: 0;
     transition: width 0.3s, padding 0.3s;
-    width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
+    width: 115px; // we need to set a width in pixels otherwise the transition is not applied nicely
+    @media (min-width: @screen-sm-min) {
+      width: 200px;
+    }
   }
 
   // When the global search is close

@@ -152,6 +152,10 @@ var XWiki = (function (XWiki) {
         }
       });
       var allResults = allResultsNode.getElement();
+      var suggestWidth = 500;
+      if (window.innerWidth < 768) {
+        suggestWidth =  250;
+      }
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
         parentContainer: $('searchSuggest'),
         className: 'searchSuggest horizontalLayout',
@@ -164,7 +168,7 @@ var XWiki = (function (XWiki) {
         displayValueText: "$escapetool.javascript($services.localization.render('platform.search.suggestResultLocatedIn'))",
         resultInfoHTML: true,
         timeout: 0,
-        width: 500,
+        width: suggestWidth,
         unifiedLoader: true,
         loaderNode: allResults.down("li"),
         shownoresults: false,

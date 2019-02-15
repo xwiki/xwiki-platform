@@ -33,10 +33,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.phase.Disposable;
@@ -67,14 +66,16 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
+import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -84,6 +85,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4M1
  */
+@ComponentTest
 // @formatter:off
 @ComponentList({
     MailSenderInitializerListener.class,
@@ -108,11 +110,10 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
     }
 
-    @Rule
-    public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTPS));
+    private GreenMail greenMail = new GreenMail(getCustomServerSetup(ServerSetupTest.SMTPS));
 
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private MailSenderConfiguration configuration;
 
@@ -123,6 +124,8 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
+        this.greenMail.start();
+
         Properties properties = new Properties();
         properties.setProperty("mail.smtp.starttls.enable", "true");
 
@@ -130,7 +133,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
         this.configuration =
-            new TestMailSenderConfiguration(this.mail.getSmtps().getPort(), "peter", "password", properties);
+            new TestMailSenderConfiguration(this.greenMail.getSmtps().getPort(), "peter", "password", properties);
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
 
         // Set the current wiki in the Context
@@ -152,11 +155,11 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(PERMDIR);
     }
 
-    @Before
+    @BeforeEach
     public void initialize() throws Exception
     {
         // Create a user in the SMTP server.
-        this.mail.setUser("peter@doe.com", "peter", "password");
+        this.greenMail.setUser("peter@doe.com", "peter", "password");
 
         this.defaultBodyPartFactory =
             this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
@@ -169,7 +172,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         listener.onEvent(new ApplicationReadyEvent(), null, null);
     }
 
-    @After
+    @AfterEach
     public void cleanUp() throws Exception
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
@@ -177,6 +180,8 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         Disposable listener =
             this.componentManager.getInstance(EventListener.class, MailSenderInitializerListener.LISTENER_NAME);
         listener.dispose();
+
+        this.greenMail.stop();
     }
 
     @Test
@@ -216,8 +221,8 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
-        this.mail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        this.greenMail.waitForIncomingEmail(30000L, 1);
+        MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals(1, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject", null));

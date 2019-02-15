@@ -114,9 +114,11 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
                 stubContext.setRequest(request);
 
                 // Each context is supposed to have a dedicated URL factory
-                XWikiURLFactory urlf =
-                    stubContext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, stubContext);
-                stubContext.setURLFactory(urlf);
+                if (stubContext.getWiki() != null) {
+                    XWikiURLFactory urlf = stubContext.getWiki().getURLFactoryService()
+                        .createURLFactory(XWikiContext.MODE_SERVLET, stubContext);
+                    stubContext.setURLFactory(urlf);
+                }
             }
 
             // We make sure to not share the same Response instance with several threads

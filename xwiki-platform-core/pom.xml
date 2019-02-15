@@ -151,7 +151,13 @@
                   }
                 },
                 "ignore" : [
-                  // Add more ignores below...
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
+                    "new": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({java.util.List.class, org.xwiki.rendering.block.Block.class})",
+                    "justification": "The annotation has been added in box macro but is used in RSS Macro. It's not an api breakage."
+                  },
                 ]
               }
             }

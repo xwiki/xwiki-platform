@@ -19,74 +19,48 @@
  */
 package com.xpn.xwiki.internal;
 
-import org.jmock.Mock;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.context.internal.DefaultExecutionContextManager;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
- * Validate XWikiStubContextInitializer and DefaultXWikiStubContextProvider.
+ * Validate XWikiStubContextInitializer.
  * 
  * @version $Id$
  */
-public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+public class XWikiStubContextInitializerTest
 {
-    private ExecutionContextManager executionContextManager;
+    @MockComponent
+    private XWikiStubContextProvider stubContextProvider;
 
-    private Mock mockXWiki;
+    @InjectMockComponents
+    private XWikiStubContextInitializer initializer;
 
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        this.executionContextManager = getComponentManager().getInstance(ExecutionContextManager.class);
-    }
-
+    @Test
     public void testWithAndWithoutXWikiContext() throws Exception
     {
-        XWikiContext xcontext = new XWikiContext();
-        xcontext.put("key", "value");
+        XWikiContext stubContext = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("prepareResources");
-
-        xcontext.setWiki((XWiki) this.mockXWiki.proxy());
-
-        ExecutionContext context = new ExecutionContext();
-        xcontext.declareInExecutionContext(context);
-
-        XWikiStubContextProvider stubContextProvider =
-            getComponentManager().getInstance(XWikiStubContextProvider.class);
-        stubContextProvider.initialize(xcontext);
+        when(this.stubContextProvider.createStubContext()).thenReturn(stubContext);
 
         final ExecutionContext daemonContext = new ExecutionContext();
 
-        Thread thread = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    executionContextManager.initialize(daemonContext);
-                } catch (ExecutionContextException e) {
-                    fail("Failed to initialize execution context: " + e.getStackTrace());
-                }
-            }
-        });
-
-        thread.start();
-        thread.join();
+        this.initializer.initialize(daemonContext);
 
         XWikiContext daemonXcontext = (XWikiContext) daemonContext.getProperty("xwikicontext");
         assertNotNull(daemonXcontext);
-        assertNotSame(xcontext, daemonXcontext);
-        assertEquals("value", daemonXcontext.get("key"));
-        assertNotNull(daemonXcontext.getWiki());
     }
 }

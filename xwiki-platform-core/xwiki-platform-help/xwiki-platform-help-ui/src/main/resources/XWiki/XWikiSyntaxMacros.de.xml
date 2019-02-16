@@ -66,7 +66,7 @@ In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} gibt es genau eine Art vo
 |Makro|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
-{{/code}
+{{/code}}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
 

@@ -20,6 +20,7 @@
 package org.xwiki.mail.integration;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.internal.EnvironmentConfiguration;
 import org.xwiki.environment.internal.StandardEnvironment;
+import org.xwiki.mail.MailGeneralConfiguration;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.internal.DefaultMailSender;
@@ -134,6 +136,15 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         MailSenderConfiguration configuration =
             new TestMailSenderConfiguration(this.greenMail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, configuration);
+
+        this.componentManager.registerComponent(MailGeneralConfiguration.class, new MailGeneralConfiguration()
+        {
+            @Override
+            public boolean isObfuscateEmails()
+            {
+                return true;
+            }
+        });
 
         // Register a test Permission Checker that allows sending mails
         ScriptServicePermissionChecker checker = mock(ScriptServicePermissionChecker.class);
@@ -311,6 +322,14 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         BodyPart calendarBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(1);
         assertEquals("text/calendar;method=CANCEL", calendarBodyPart.getHeader("Content-Type")[0]);
         InputStream is = (InputStream) calendarBodyPart.getContent();
-        assertEquals(calendarContent, IOUtils.toString(is));
+        assertEquals(calendarContent, IOUtils.toString(is, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void emailsAreObfuscatedForDisplay()
+    {
+        assertEquals("q...@example.org", this.scriptService.obfuscateForDisplay("qwerty.asdfg@example.org"));
+        assertEquals("not_an_email", this.scriptService.obfuscateForDisplay("not_an_email"));
+        assertNull(this.scriptService.obfuscateForDisplay(null));
     }
 }

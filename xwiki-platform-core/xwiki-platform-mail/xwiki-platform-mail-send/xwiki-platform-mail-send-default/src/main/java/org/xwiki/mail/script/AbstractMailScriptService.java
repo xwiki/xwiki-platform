@@ -30,6 +30,7 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.MailGeneralConfiguration;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -60,6 +61,9 @@ public abstract class AbstractMailScriptService implements ScriptService
 
     @Inject
     protected MailSenderConfiguration senderConfiguration;
+
+    @Inject
+    protected MailGeneralConfiguration generalConfiguration;
 
     /**
      * Send the mail asynchronously.

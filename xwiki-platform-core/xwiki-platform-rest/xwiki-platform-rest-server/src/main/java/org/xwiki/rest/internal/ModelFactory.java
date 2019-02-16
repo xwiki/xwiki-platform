@@ -44,6 +44,7 @@ import org.xwiki.job.Request;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
+import org.xwiki.mail.MailGeneralConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
@@ -128,6 +129,8 @@ public class ModelFactory
 {
     private static final String PASSWORD_TYPE = "Password";
 
+    private static final String EMAIL_TYPE = "Email";
+
     private final ObjectFactory objectFactory;
 
     @Inject
@@ -141,6 +144,9 @@ public class ModelFactory
 
     @Inject
     private Provider<ContextualAuthorizationManager> authorizationManagerProvider;
+
+    @Inject
+    private Provider<MailGeneralConfiguration> mailConfigProvider;
 
     @Inject
     private Logger logger;
@@ -243,6 +249,7 @@ public class ModelFactory
                 objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(propertyNames[0])));
             } catch (XWikiException e) {
                 // Should never happen
+                logger.error("Unexpected exception when accessing property [{}]", propertyNames[0], e);
             }
         }
     }
@@ -336,7 +343,7 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (hasAccess(property)) {
+            if (hasAccess(property, doc)) {
                 try {
                     property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
                 } catch (XWikiException e) {
@@ -1081,12 +1088,18 @@ public class ModelFactory
     /**
      * Check if the given property should be exposed via REST.
      * @param restProperty the property to be read/written
+     * @param the document from which the property comes; for access checks
      * @return true if the property is considered accessible
      */
-    private boolean hasAccess(Property restProperty)
+    private boolean hasAccess(Property restProperty, Document doc)
     {
         if (PASSWORD_TYPE.equals(restProperty.getType())) {
             return authorizationManagerProvider.get().hasAccess(Right.ADMIN, xcontextProvider.get().getWikiReference());
+        }
+
+        if (EMAIL_TYPE.equals(restProperty.getType())) {
+            return !mailConfigProvider.get().isObfuscateEmails() ||
+                authorizationManagerProvider.get().hasAccess(Right.EDIT, doc.getDocumentReference());
         }
 
         return true;

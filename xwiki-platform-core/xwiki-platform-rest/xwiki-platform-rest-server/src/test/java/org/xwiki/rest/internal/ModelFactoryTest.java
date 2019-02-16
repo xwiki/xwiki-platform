@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.mail.MailGeneralConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
@@ -49,6 +50,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -67,6 +69,11 @@ public class ModelFactoryTest
     private static final String TEST_PASSWORD_FIELD = "passwordValue";
     private static final String TEST_PASSWORD_VALUE = "secret";
 
+    private static final String TEST_EMAIL_FIELD = "emailValue";
+    private static final String TEST_EMAIL_VALUE = "fred@example.com";
+    // unused, see below: obfuscation is not possible yet
+    // private static final String TEST_EMAIL_OBFUSCATED = "f...@example.com";
+
     @Mock
     private XWikiContext xcontext;
     
@@ -78,6 +85,9 @@ public class ModelFactoryTest
 
     @MockComponent
     private ContextualAuthorizationManager authorizationManager;
+
+    @MockComponent
+    private MailGeneralConfiguration mailConfiguration;
 
     @MockComponent
     private SpaceReferenceResolver<String> resolver;
@@ -135,8 +145,17 @@ public class ModelFactoryTest
         pwElement.setClassType("Password");
         pwElement.setValue(TEST_PASSWORD_VALUE);
         when(xwikiObject.get(TEST_PASSWORD_FIELD)).thenReturn(pwElement);
-        
-        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField});
+
+        EmailClass emailField = new EmailClass();
+        emailField.setName(TEST_EMAIL_FIELD);
+        StringProperty emailElement = new StringProperty();
+        emailElement.setName(TEST_EMAIL_FIELD);
+        emailElement.setClassType("Email");
+        emailElement.setValue(TEST_EMAIL_VALUE);
+        when(xwikiObject.get(TEST_EMAIL_FIELD)).thenReturn(emailElement);
+
+
+        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField, emailField});
 
         return xwikiObject;
     }
@@ -144,8 +163,6 @@ public class ModelFactoryTest
     @Test
     void toRestObjectCheckWhichObjectValuesAreAvailableForNonAdmins() throws Exception
     {
-        when(authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(false);
-
         BaseObject xwikiObject = setUpTestObject();
 
         Object result = modelFactory.toRestObject(dummyUrl, testDocument, xwikiObject, false, false);
@@ -153,6 +170,7 @@ public class ModelFactoryTest
         Map<String, String> expectedValues = new HashMap<>();
         expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
         expectedValues.put(TEST_PASSWORD_FIELD, null);
+        expectedValues.put(TEST_EMAIL_FIELD, TEST_EMAIL_VALUE);
         assertExpectedPropertyValues(result.getProperties(), expectedValues);
     }
 
@@ -168,8 +186,45 @@ public class ModelFactoryTest
         Map<String, String> expectedValues = new HashMap<>();
         expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
         expectedValues.put(TEST_PASSWORD_FIELD, TEST_PASSWORD_VALUE);
+        expectedValues.put(TEST_EMAIL_FIELD, TEST_EMAIL_VALUE);
         assertExpectedPropertyValues(result.getProperties(), expectedValues);
     }
+
+    @Test
+    void toRestObjectCheckEmailIsObfuscated() throws Exception
+    {
+        when(mailConfiguration.isObfuscateEmails()).thenReturn(true);
+
+        BaseObject xwikiObject = setUpTestObject();
+
+        Object result = modelFactory.toRestObject(dummyUrl, testDocument, xwikiObject, false, false);
+
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
+        expectedValues.put(TEST_PASSWORD_FIELD, null);
+        // here we want to expect the obfuscated value instead
+        // but the implementation cannot get at the obfuscator
+        expectedValues.put(TEST_EMAIL_FIELD, null);
+        assertExpectedPropertyValues(result.getProperties(), expectedValues);
+    }
+
+    @Test
+    void toRestObjectCheckEmailIsNotObfuscatedForOwnProfile() throws Exception
+    {
+        when(authorizationManager.hasAccess(Right.EDIT, testDocument.getDocumentReference())).thenReturn(true);
+        when(mailConfiguration.isObfuscateEmails()).thenReturn(true);
+
+        BaseObject xwikiObject = setUpTestObject();
+
+        Object result = modelFactory.toRestObject(dummyUrl, testDocument, xwikiObject, false, false);
+
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
+        expectedValues.put(TEST_PASSWORD_FIELD, null);
+        expectedValues.put(TEST_EMAIL_FIELD, TEST_EMAIL_VALUE);
+        assertExpectedPropertyValues(result.getProperties(), expectedValues);
+    }
+
 
     private void assertExpectedPropertyValues(List<Property> properties, Map<String, String> expectedValues)
     {

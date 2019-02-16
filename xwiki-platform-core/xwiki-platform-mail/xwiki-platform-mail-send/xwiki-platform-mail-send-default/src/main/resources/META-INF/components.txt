@@ -16,6 +16,7 @@ org.xwiki.mail.internal.thread.context.XWikiRequestCopier
 org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
 org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker
 org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration
+org.xwiki.mail.internal.configuration.GeneralMailConfigClassDocumentConfigurationSource
 org.xwiki.mail.internal.configuration.SendMailConfigClassDocumentConfigurationSource
 org.xwiki.mail.internal.FileSystemMailContentStore
 org.xwiki.mail.internal.DefaultSessionFactory

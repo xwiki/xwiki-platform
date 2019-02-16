@@ -34,6 +34,7 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.mail.MailGeneralConfiguration;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
@@ -275,12 +276,41 @@ public class MailSenderScriptService extends AbstractMailScriptService
     }
 
     /**
+     * Obfuscate the email for display purposes, if configured to do so.
+     * @param emailAddress the email address to be obfuscated
+     * @return the obfuscated address
+     * @since 11.1
+     * @since 10.11.4
+     */
+    public String obfuscateForDisplay(final String emailAddress)
+    {
+        String obfuscatedEmailAddress;
+        if (emailAddress != null && this.generalConfiguration.isObfuscateEmails()) {
+            obfuscatedEmailAddress = emailAddress.replaceAll("^(.).*@", "$1...@");
+        } else {
+            obfuscatedEmailAddress = emailAddress;
+        }
+        return obfuscatedEmailAddress;
+    }
+
+    /**
      * @return the configuration for sending mails (SMTP host, port, etc)
      */
     public MailSenderConfiguration getConfiguration()
     {
         return this.senderConfiguration;
     }
+
+    /**
+     * @return the general configuration about mails; i.e. everything that did not fit elswhere
+     * @since 11.1
+     * @since 10.11.4
+     */
+    public MailGeneralConfiguration getGeneralConfiguration()
+    {
+        return this.generalConfiguration;
+    }
+
 
     @Override
     protected String getErrorKey()

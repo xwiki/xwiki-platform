@@ -48,7 +48,7 @@ notifications.filters.location.hint=Какая часть вики должна 
 ## Advanced filters options
 notifications.settings.filters.advanced=Расширенные возможности фильтрации
 notifications.filters.advanced.toggles.hint=Эти фильтры активированы по умолчанию, вы можете отключить их, используя кнопку рядом с каждым фильтром.
-notifications.filters.advanced.toggles.table.name=Имя фильтра
+notifications.filters.advanced.toggles.table.name=Название Фильтра
 notifications.filters.advanced.toggles.table.description=Описание
 notifications.filters.advanced.toggles.table.toggle=Переключатель
 notifications.filters.advanced.modal.close=Закрыть
@@ -57,18 +57,18 @@ notifications.filters.advanced.modal.close=Закрыть
 notifications.filters.name.systemUserNotificationFilter=Системный фильтр
 notifications.filters.description.systemUserNotificationFilter=Скрыть системные уведомления
 notifications.filters.name.ownEventsNotificationFilter=Фильтр собственных событий
-notifications.filters.description.ownEventsNotificationFilter=Скрыть уведомления о собственной активности
+notifications.filters.description.ownEventsNotificationFilter=Скрыть уведомления о вашей собственной деятельности
 notifications.filters.name.eventReadAlertFilter=Фильтр чтения событий (оповещение)
 notifications.filters.description.eventReadAlertFilter=Скрыть уведомления, помеченные как прочтенные
-notifications.filters.name.eventReadEmailFilter=Фильтр чтения событий (E-mail)
+notifications.filters.name.eventReadEmailFilter=Фильтр событий чтения (электронная почта)
 notifications.filters.description.eventReadEmailFilter=Скрыть уведомления, помеченные как прочтенные
-notifications.filters.name.minorEventAlertNotificationFilter=Незначительное изменение страниц (оповещение)
-notifications.filters.description.minorEventAlertNotificationFilter=Скрыть уведомления о незначительных изменениях страниц
-notifications.filters.name.minorEventEmailNotificationFilter=Незначительное изменение страниц (E-mail)
-notifications.filters.description.minorEventEmailNotificationFilter=Скрыть уведомления о незначительных изменениях страниц
+notifications.filters.name.minorEventAlertNotificationFilter=Незначительное событие (оповещение)
+notifications.filters.description.minorEventAlertNotificationFilter=Скрыть уведомления о незначительных изменениях на страницах
+notifications.filters.name.minorEventEmailNotificationFilter=Незначительное событие (электронная почта)
+notifications.filters.description.minorEventEmailNotificationFilter=Скрыть уведомления о незначительных изменениях на страницах
 
 ## Filter Types
-notifications.filters.type.inclusive=Включительно
+notifications.filters.type.inclusive=Включено
 notifications.filters.type.exclusive=Исключая
 
 ## Translation keys for the scopeNotificationFilter
@@ -95,16 +95,16 @@ notifications.filters.preferences.setEnabled.done=Настройки фильт�
 notifications.filters.preferences.setEnabled.error=Не удалось сохранить настройки фильтра
 
 ## Notifications toggles
-notifications.toggle.disabled.hint=Вам нужно включить уведомления в ваших настройках, если вы хотите наблюдать эти расположения
+notifications.toggle.disabled.hint=Вам нужно включить уведомления в ваших настройках
 
 ## Notifications formats
-notifications.format.alert=Сигнал тревоги
+notifications.format.alert=Alert
 notifications.format.email=E-mail
 
 ## Filter preferences settings
 notifications.settings.filters.preferences.title=Фильтры
-notifications.settings.filters.preferences.hint=Создайте фильтры, чтобы более точно контролировать, когда активные события должны вызывать уведомления.
-notifications.settings.filters.preferences.forGuest=Войдите в систему или зарегистрируйтесь для настройки ваших фильтров уведомлений.
+notifications.settings.filters.preferences.hint=Создайте фильтры, чтобы более точно контролировать, когда события должны создавать уведомления.
+notifications.settings.filters.preferences.forGuest=Войдите в систему или зарегистрируйтесь для настройки ваших уведомлений.
 
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Название
@@ -201,7 +201,7 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Цель
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Цель макроса (может быть "user" для текущего пользователя или "wiki" для текущей Вики)
 
 ## Toggle notification filters labels
-notifications.filters.preferences.label.page=Включить только Уведомления страниц
+notifications.filters.preferences.label.page=Переключить только уведомления на странице
 notifications.filters.preferences.label.space=Включить Уведомления страниц и дочерних страниц
 notifications.filters.preferences.label.wiki=Включить Уведомления Вики
 

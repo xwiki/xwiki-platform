@@ -161,7 +161,7 @@
             </span>
           </div>
         </form>
-      #elseif (!$services.security.authorization.hasRight('edit', $xwiki.exists($targetDocReference)))
+      #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
         #warning($services.localization.render('core.copy.editRightsForbidden',
         [$services.model.serialize($targetDocReference, 'compactwiki')]))
         <div class="buttons">

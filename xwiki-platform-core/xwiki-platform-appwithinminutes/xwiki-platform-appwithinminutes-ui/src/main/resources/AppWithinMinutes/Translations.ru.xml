@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Приложение за несколь
 platform.appwithinminutes.description=Создать веб-приложение для совместной работы на основе мощной системы управления структурированными данными в течение нескольких минут.
 platform.appwithinminutes.createAppButtonLabel=Создать приложение
 platform.appwithinminutes.appsLiveTableHeading=Приложения
-### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
+platform.appwithinminutes.appsLiveTable.doc.title=Приложение
 platform.appwithinminutes.appsLiveTable.doc.author=Последний автор
 platform.appwithinminutes.appsLiveTable.doc.date=Дата изменения
 platform.appwithinminutes.appsLiveTable._actions=Действия
@@ -78,7 +78,7 @@ appWithinMinutes.createApp.location.label=Расположение
 appWithinMinutes.createApp.location.hint=Расположение в иерархии страниц, где будет создано приложение.
 appWithinMinutes.createApp.parent.label=Родитель
 appWithinMinutes.createApp.parent.hint=Родитель нового приложения. Оставьте это поле пустым, если вы хотите создать приложение верхнего уровня.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
 appWithinMinutes.codeSpace.title=Код
 appWithinMinutes.codeSpace.description=Это место, где находится код приложения.
 appWithinMinutes.codeSpace.hiddenPagesInfo=Скрытые страницы также перечислены, даже если ваши текущие настройки профиля пользователя не позволяют этого сделать, иначе ни одна из кодовых страниц приложения не будет видна, поскольку все они по умолчанию скрыты.
@@ -186,13 +186,13 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Изображения
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Специальная колонка для демонстрации изображений, которые прикреплены к странице
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Аватар
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Специальная колонка для вывода аватара пользователя. Работает только в случае связи таблицы с классом XWiki.XWikiUsers
-### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
+platform.appwithinminutes.liveTableEditorTitleHint=Название приложения, которое будет отображаться на домашней странице приложения, на панели приложений, в списке приложений, в строке навигации и т.д.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Описание дает краткую информацию о том, что приложение делает и какие данные использует.
 platform.appwithinminutes.liveTableEditorColumnsHint=Выберите колонки, которые вы хотите включить в интерактивную таблицу LiveTable на домашней странице вашего приложения.
 platform.appwithinminutes.liveTableEditorSaveComment=Обновить интерактивную таблицу LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Для изменения порядка перемещайте мышью
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Удалить
-platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить
+platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить выбранный столбец
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Иконка
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Значок приложения. Вы можете выбрать значок в палитре значков или сослаться на прикрепленное изображение.
@@ -249,6 +249,5 @@ platform.appwithinminutes.wizardStep3Description=Персонализирова�
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Название приложения
 appWithinMinutes.classEditor.title={0} Структура
-appWithinMinutes.templateProviderEditor.title={0} Записей
-</content>
+appWithinMinutes.templateProviderEditor.title={0} Записей</content>
 </xwikidoc>

@@ -41,7 +41,7 @@ office.createForm.type.description=Импорт документов Office на
 office.form.error.noDocument=Вы должны использовать {0} создать {1} для импорта документа Office.
 office.form.append.hint=Документ уже существует! Добавить результат к существующей вики-странице
 
-office.config.serverType.hint=Тип сервера Office. Он может быть внутренним (локальным) или внешним (удаленным).
+office.config.serverType.hint=Тип сервера Office. Может быть внутренним (локальным) или внешним (удаленным).
 office.config.serverPort.hint=Номер порта, используемый для подключения к экземпляру сервера Office
 office.config.autoStart.hint=Укажите, должен ли сервер Office запускаться / подключаться автоматически при запуске XWiki
 office.config.serverPath.hint=Путь к установке Office</content>

@@ -39,7 +39,7 @@
   <content>platform.icon.picker.preview=Предпросмотр:
 platform.icon.picker.loading=Загрузка
 
-### Missing: rendering.macro.iconPicker.name=Icon Picker
+rendering.macro.iconPicker.name=Icon Picker
 rendering.macro.iconPicker.description=Выберите значок в наборе значков XWiki.
 rendering.macro.iconPicker.parameter.id.name=Id
 rendering.macro.iconPicker.parameter.id.description=Идентификатор DOM поля ввода, к которому будет применяться средство выбора

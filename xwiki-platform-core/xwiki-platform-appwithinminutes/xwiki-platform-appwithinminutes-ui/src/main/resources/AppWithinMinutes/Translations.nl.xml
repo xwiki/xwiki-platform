@@ -209,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Alle gegevens verwijdere
 platform.appwithinminutes.appHomePageEditAppLabel=Applicatie wijzigen
 platform.appwithinminutes.appHomePageTranslateAppLabel=Applicatie vertalen
 platform.appwithinminutes.appHomePageDeleteAppLabel=Applicatie verwijderen
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=De applicatie {0} al zijn gegevens worden verwijderd. Weet u zeker dat u wilt doorgaan?
@@ -216,6 +217,20 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE gegevens van applica
 platform.appwithinminutes.deleteAppDoesNotExistError=De opgegeven applicatie bestaat niet.
 platform.appwithinminutes.deleteAppInvalidAppError=De opgegeven naam is geen geldige App Binnen Minuten applicatie.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Er is geen applicatienaam opgegeven.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.newName.label=New Name
+### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+### Missing: appWithinMinutes.renameApp.location.label=New Location
+### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+### Missing: appWithinMinutes.renameApp.parent.label=New Parent
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
+### Missing: appWithinMinutes.renameApp.done=Application renamed
+### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4

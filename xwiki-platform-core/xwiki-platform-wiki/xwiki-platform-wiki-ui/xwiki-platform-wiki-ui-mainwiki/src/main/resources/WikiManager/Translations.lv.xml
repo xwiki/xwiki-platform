@@ -303,6 +303,5 @@ platform.wiki.delete.confirmation.yes=Jā, lūdzu izdzēsiet šo viki!
 platform.wiki.delete.confirmation.no=Nē, vediet mani atpakaļ!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

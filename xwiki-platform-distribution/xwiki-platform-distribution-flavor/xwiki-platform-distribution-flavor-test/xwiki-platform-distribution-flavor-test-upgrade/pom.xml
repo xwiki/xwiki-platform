@@ -48,7 +48,7 @@
     <upgradetest.previousdata.groupId>${upgradetest.previousflavor.groupId}</upgradetest.previousdata.groupId>
     <upgradetest.previousdata.artifactId>xwiki-platform-distribution-flavor-data-hsqldb</upgradetest.previousdata.artifactId>
     <upgradetest.previousdata.version>${upgradetest.previousflavor.version}</upgradetest.previousdata.version>
-    <upgradetest.previousdata.classifier/>
+    <upgradetest.previousdata.classifier />
   </properties>
   <dependencies>
     <dependency>

@@ -19,9 +19,12 @@
  */
 package org.xwiki.test.selenium;
 
-import org.junit.Assert;
 import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verify the table view for AllDocs wiki document.
@@ -130,7 +133,8 @@ public class AllDocsTest extends AbstractXWikiTestCase
         waitForTextPresent("//span[@class='xwiki-livetable-pagination-content']", "1");
         clickLinkWithLocator("//tbody/tr/td/a[text()='delete']");
         clickLinkWithLocator("//button[contains(@class, 'confirm')]");
-        assertTextPresent("Done.");
+        WebElement boxSuccess = getDriver().findElement(By.cssSelector(".box.successmessage"));
+        assertEquals("Done.", boxSuccess.getText());
         open("Main", "AllDocs");
         getSelenium().focus("doc.location");
         getSelenium().typeKeys("doc.location", "actions");
@@ -144,6 +148,6 @@ public class AllDocsTest extends AbstractXWikiTestCase
         getSelenium().typeKeys("doc.location", pageName);
         waitForTextPresent("//span[@class='xwiki-livetable-pagination-content']", "1");
         clickLinkWithLocator("//tbody/tr/td/a[text()='rights']");
-        Assert.assertEquals("Editing access rights for Actions test", getTitle());
+        assertEquals("Editing access rights for Actions test", getTitle());
     }
 }

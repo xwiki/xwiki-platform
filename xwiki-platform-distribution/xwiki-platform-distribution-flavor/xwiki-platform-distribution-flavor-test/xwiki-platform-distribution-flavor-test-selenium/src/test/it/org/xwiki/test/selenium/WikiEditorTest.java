@@ -106,12 +106,12 @@ public class WikiEditorTest extends AbstractXWikiTestCase
     {
         try {
             editInWikiEditor("Test", "EditComment", SYNTAX);
-            assertTrue(getSelenium().isVisible("comment"));
+            assertTrue(getDriver().findElementWithoutWaiting(By.name("comment")).isDisplayed());
 
             // Test for XWIKI-2487: Hiding the edit comment field doesn't work
             setXWikiConfiguration("xwiki.editcomment.hidden=1");
             editInWikiEditor("Test", "EditComment", SYNTAX);
-            assertFalse(getSelenium().isVisible("comment"));
+            assertFalse(getDriver().findElementWithoutWaiting(By.name("comment")).isDisplayed());
         } finally {
             setXWikiConfiguration("xwiki.editcomment.hidden=0");
         }
@@ -138,7 +138,7 @@ public class WikiEditorTest extends AbstractXWikiTestCase
 
             editInWikiEditor("Test", "MinorEdit", SYNTAX);
             setFieldValue("content", "version=2.2");
-            getSelenium().click("minorEdit");
+            getDriver().findElementWithoutWaiting(By.id("minorEdit")).click();
             clickEditSaveAndView();
 
             open("Test", "MinorEdit", "viewrev", "rev=2.2");

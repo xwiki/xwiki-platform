@@ -188,7 +188,7 @@ WikiManager.WikiUserClass_userScope_local_only=Только локальные �
 WikiManager.WikiUserClass_userScope_global_only=Только глобальные пользователи доступны в вики
 WikiManager.WikiUserClass_userScope_local_and_global=Как глобальные, так и локальные пользователи доступны в вики
 platform.wiki.prop.wikiname=Идентификатор вики
-platform.wiki.prop.wikiprettyname=Красивое название
+platform.wiki.prop.wikiprettyname=Название
 platform.wiki.prop.wikialias=Псевдоним
 platform.wiki.prop.description=Описание
 platform.wiki.prop.owner=Владелец
@@ -303,6 +303,5 @@ platform.wiki.delete.confirmation.yes=Да, пожалуйста, удалите
 ### Missing: platform.wiki.delete.confirmation.no=No, take me back!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend 
-</content>
+#@deprecatedend</content>
 </xwikidoc>

@@ -209,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Dzēst visus ierakstus
 platform.appwithinminutes.appHomePageEditAppLabel=Mainīt lietotni
 platform.appwithinminutes.appHomePageTranslateAppLabel=Tulkot lietotni
 platform.appwithinminutes.appHomePageDeleteAppLabel=Dzēst lietotni
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Lietotne {0} un VISI tās ieraksti tiks izdzēsti. Vai tiešām vēlaties turpināt?
@@ -216,6 +217,20 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=VISI lietotnes {0} ieraks
 platform.appwithinminutes.deleteAppDoesNotExistError=Izvēlētā lietotne nepastāv.
 platform.appwithinminutes.deleteAppInvalidAppError=Lietotne ar norādīto nosaukumu nav pareiza "Lietotne dažās minūtēs" lietotne.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Nav norādīts lietotnes nosaukums.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.newName.label=New Name
+### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+### Missing: appWithinMinutes.renameApp.location.label=New Location
+### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+### Missing: appWithinMinutes.renameApp.parent.label=New Parent
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
+### Missing: appWithinMinutes.renameApp.done=Application renamed
+### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
@@ -249,6 +264,5 @@ platform.appwithinminutes.wizardStep3Description=Pielāgojiet lietotnes sākuma 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Lietotnes nosaukums
 appWithinMinutes.classEditor.title={0} struktūra
-appWithinMinutes.templateProviderEditor.title={0} ieraksti
-</content>
+appWithinMinutes.templateProviderEditor.title={0} ieraksti</content>
 </xwikidoc>

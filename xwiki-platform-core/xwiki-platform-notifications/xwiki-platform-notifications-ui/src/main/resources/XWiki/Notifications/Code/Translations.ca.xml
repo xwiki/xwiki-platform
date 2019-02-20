@@ -209,6 +209,5 @@ notifications.menu.header.settings=Preferències
 ### Missing: notifications.switches.tooltip.pageAndChildren=Watch this page and its children
 ### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
 ### Missing: notifications.switches.tooltip.wiki=Watch this wiki
-### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.
-</content>
+### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
 </xwikidoc>

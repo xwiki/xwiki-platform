@@ -112,6 +112,5 @@ AnnotationCode.AnnotationConfig_displayed=Mostra anotações por padrão
 ### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
 AnnotationCode.AnnotationConfig_displayHighlight=Mostra anotações destacadas por padrão
 ### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
-AnnotationCode.AnnotationConfig_annotationClass=Classe XWiki definindo a estrutura das anotações
-</content>
+AnnotationCode.AnnotationConfig_annotationClass=Classe XWiki definindo a estrutura das anotações</content>
 </xwikidoc>

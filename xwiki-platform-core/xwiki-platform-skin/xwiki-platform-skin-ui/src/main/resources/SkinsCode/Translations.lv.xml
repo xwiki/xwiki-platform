@@ -70,6 +70,5 @@ skin.sheet.js.addingDone=Veidne ir pievienota!
 skin.sheet.overridedTemplates=Pārrakstītās veidnes
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

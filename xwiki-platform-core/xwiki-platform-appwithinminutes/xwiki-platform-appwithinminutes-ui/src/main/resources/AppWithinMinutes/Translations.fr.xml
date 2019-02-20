@@ -209,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Supprimer toutes les ent
 platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=L''application {0} et TOUS SES DOCUMENTS vont être détruits. Etes-vous certain de vouloir continuer ?
@@ -216,6 +217,20 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=TOUS LES DOCUMENTS de l''
 platform.appwithinminutes.deleteAppDoesNotExistError=L'application indiquée n'existe pas.
 platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas une application App Within Minutes valide.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a été indiqué.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.newName.label=Nouveau nom
+appWithinMinutes.renameApp.pageExistsError=Une page portant ce nom existe déjà à l'emplacement sélectionné.
+appWithinMinutes.renameApp.locationForbiddenError=Vous n'êtes pas autorisés à déplacer l'application à l'emplacement sélectionné.
+appWithinMinutes.renameApp.location.label=Nouvel emplacement
+appWithinMinutes.renameApp.location.hint=Emplacement, dans la hiérarchie des pages, où déplacer l'application.
+appWithinMinutes.renameApp.parent.label=Nouveau parent
+appWithinMinutes.renameApp.parent.hint=Le nouveau parent de la page. Laissez vide si vous souhaitez déplacer l'application en haut de la hiérarchie.
+appWithinMinutes.renameApp.inProgress=Renommage de l'application en cours...
+appWithinMinutes.renameApp.done=Application renommée
+appWithinMinutes.renameApp.failed=Impossible de renommer l'application
 
 ### Deprecated keys
 ### Since 8.4
@@ -249,6 +264,5 @@ platform.appwithinminutes.wizardStep3Description=Personnalisez la page d'accueil
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Nom de l'application
 appWithinMinutes.classEditor.title={0} Structure
-appWithinMinutes.templateProviderEditor.title={0} éléments
-</content>
+appWithinMinutes.templateProviderEditor.title={0} éléments</content>
 </xwikidoc>

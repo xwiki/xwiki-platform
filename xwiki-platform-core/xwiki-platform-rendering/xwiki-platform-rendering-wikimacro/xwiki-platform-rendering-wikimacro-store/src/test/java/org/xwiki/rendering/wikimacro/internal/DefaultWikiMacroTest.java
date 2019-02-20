@@ -49,7 +49,6 @@ import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
-import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;

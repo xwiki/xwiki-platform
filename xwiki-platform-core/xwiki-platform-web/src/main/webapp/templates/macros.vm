@@ -801,7 +801,7 @@ $fn
 <h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="#if ($isLarge) large #end panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
+(% class="#if ($isLarge)large#{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
 {{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end

@@ -76,9 +76,6 @@ import static org.mockito.Mockito.when;
 @AllComponents
 public class DefaultWikiMacroTest
 {
-    @MockComponent
-    private WikiModel mockWikiModel;
-
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
@@ -227,11 +224,12 @@ public class DefaultWikiMacroTest
     @Test
     public void testExecuteWhenInnerMacro() throws Exception
     {
+        WikiModel wikiModel = this.componentManager.registerMockComponent(WikiModel.class);
         registerWikiMacro("wikimacro1", "{{toc/}}", Syntax.XWIKI_2_0);
 
         DocumentResourceReference reference = new DocumentResourceReference(null);
         reference.setAnchor("Hheading");
-        when(this.mockWikiModel.getDocumentViewURL(reference)).thenReturn("url");
+        when(wikiModel.getDocumentViewURL(reference)).thenReturn("url");
 
         assertXHTML(
             "<h1 id=\"Hheading\" class=\"wikigeneratedid\"><span>heading</span></h1>"

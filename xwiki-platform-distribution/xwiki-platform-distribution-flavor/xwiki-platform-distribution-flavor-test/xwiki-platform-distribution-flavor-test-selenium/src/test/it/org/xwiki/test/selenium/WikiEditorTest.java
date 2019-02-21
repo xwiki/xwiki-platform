@@ -99,25 +99,6 @@ public class WikiEditorTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Test the ability to add edit comments and the ability to disable the edit comments feature.
-     */
-    @Test
-    public void testEditComment() throws IOException
-    {
-        try {
-            editInWikiEditor("Test", "EditComment", SYNTAX);
-            assertTrue(getSelenium().isVisible("comment"));
-
-            // Test for XWIKI-2487: Hiding the edit comment field doesn't work
-            setXWikiConfiguration("xwiki.editcomment.hidden=1");
-            editInWikiEditor("Test", "EditComment", SYNTAX);
-            assertFalse(getSelenium().isVisible("comment"));
-        } finally {
-            setXWikiConfiguration("xwiki.editcomment.hidden=0");
-        }
-    }
-
-    /**
      * Verify minor edit feature is working
      */
     @Test

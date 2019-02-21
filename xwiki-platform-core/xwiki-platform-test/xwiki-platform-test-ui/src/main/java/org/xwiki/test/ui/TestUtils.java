@@ -36,6 +36,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1617,6 +1618,29 @@ public class TestUtils
         } else {
             addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", propertyName, value);
         }
+    }
+
+    /**
+     * Set global xwiki configuration options (as if the xwiki.cfg file had been modified). This is useful for testing
+     * configuration options.
+     *
+     * @param configuration the configuration in {@link Properties} format. For example "param1=value2\nparam2=value2"
+     * @throws IOException if an error occurs while parsing the configuration
+     */
+    public void setPropertyInXWikiCfg(String configuration) throws IOException
+    {
+        Properties properties = new Properties();
+        properties.load(new ByteArrayInputStream(configuration.getBytes()));
+        StringBuilder sb = new StringBuilder();
+
+        // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
+        // with a different xwiki.cfg file for each test that requires a configuration change, we use the following
+        // trick: We create a document and we access the XWiki object with a Velocity script inside that document.
+        for (Map.Entry<Object, Object> param : properties.entrySet()) {
+            sb.append("{{velocity}}$!xwiki.xWiki.config.setProperty('").append(param.getKey()).append("', '")
+                .append(param.getValue()).append("')").append("\n{{/velocity}}");
+        }
+        createPage("Test", "XWikiConfigurationPageForTest", sb.toString(), "Test page to change xwiki.cfg");
     }
 
     /**

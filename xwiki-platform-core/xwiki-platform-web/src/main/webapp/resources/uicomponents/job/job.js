@@ -38,6 +38,8 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 
     if (job.state !== 'NONE') {
       jobUI.find('#state-none-hint').remove();
+    } else {
+      jobUI.find('#state-none-hint').removeClass("hidden");
     }
 
     var percent = Math.floor((job.progress.offset || 0) * 100);

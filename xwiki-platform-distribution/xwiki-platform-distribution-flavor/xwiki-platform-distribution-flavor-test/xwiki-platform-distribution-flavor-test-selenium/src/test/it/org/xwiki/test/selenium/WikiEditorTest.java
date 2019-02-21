@@ -99,37 +99,6 @@ public class WikiEditorTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Verify minor edit feature is working
-     */
-    @Test
-    public void testMinorEdit()
-    {
-        try {
-            editInWikiEditor("Test", "MinorEdit", SYNTAX);
-            // Note: Revision 2.1 is used since starting with 1.9-rc-1 editInWikiEditor creates an initial version to
-            // set the syntax.
-            setFieldValue("content", "version=1.2");
-            // Save & Continue = minor edit.
-            clickEditSaveAndContinue();
-            setFieldValue("content", "version=2.1");
-            clickEditSaveAndView();
-
-            open("Test", "MinorEdit", "viewrev", "rev=2.1");
-            assertTextPresent("version=2.1");
-
-            editInWikiEditor("Test", "MinorEdit", SYNTAX);
-            setFieldValue("content", "version=2.2");
-            getSelenium().click("minorEdit");
-            clickEditSaveAndView();
-
-            open("Test", "MinorEdit", "viewrev", "rev=2.2");
-            assertTextPresent("version=2.2");
-        } finally {
-            deletePage("Test", "MinorEdit");
-        }
-    }
-
-    /**
      * Tests that the specified tool bar button works.
      * 
      * @param buttonTitle the title of a tool bar button

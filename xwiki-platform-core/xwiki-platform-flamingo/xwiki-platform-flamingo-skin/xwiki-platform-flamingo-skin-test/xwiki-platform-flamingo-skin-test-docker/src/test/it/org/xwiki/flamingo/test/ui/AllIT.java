@@ -35,7 +35,7 @@ public class AllIT
 {
     @Nested
     @DisplayName("Save Edit Comments Tests")
-    class NestedEditCommentIT extends EditCommentIT
+    class NestedEditIT extends EditIT
     {
     }
 }

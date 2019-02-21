@@ -49,28 +49,29 @@ public class RenamePageTest extends AbstractTest
     @Test
     public void convertNestedPageToTerminalPage() throws Exception
     {
+        // Note: we use a 3-level-deep nested page  since 2 levels wouldn't show problems such as the regression
+        // we've had with https://jira.xwiki.org/browse/XWIKI-16170
+
         // Clean-up: delete the pages that will be used in this test
-        getUtil().rest().deletePage("1", "2");
-        getUtil().rest().delete(getUtil().resolveDocumentReference("1.2.WebHome"));
+        DocumentReference reference = new DocumentReference("xwiki", Arrays.asList("1", "2", "3"), "WebHome");
+        getUtil().rest().delete(reference);
+        getUtil().rest().delete(new DocumentReference("xwiki", Arrays.asList("1", "2"), "3"));
 
-        // Create 1.2.WebHome
-        getUtil().createPage(Arrays.asList("1", "2"), "WebHome", "", "");
-
-        // Go to 1.2.WebHome to start the test
-        getUtil().gotoPage(Arrays.asList("1", "2"), "WebHome", "", "");
+        // Create 1.2.3.WebHome
+        getUtil().createPage(reference, "", "");
 
         ViewPage vp = new ViewPage();
 
-        // Go to the Rename page view for 1.2.WebHome and check the Terminal checkbox. We also need to uncheck the Auto
-        // Redirect checkbox so the page 1.2.WebHome will not appear as existing after the Rename operation.
+        // Go to the Rename page view for 1.2.3.WebHome and check the Terminal checkbox. We also need to uncheck the
+        // Auto Redirect checkbox so the page 1.2.3.WebHome will not appear as existing after the Rename operation.
         RenamePage renamePage = vp.rename();
         renamePage.setTerminal(true);
         renamePage.setAutoRedirect(false);
         renamePage.clickRenameButton().waitUntilFinished();
 
-        // Test if 1.2.WebHome has been renamed to 1.2 (1.2.WebHome doesn't exist while 1.2 exists)
-        assertTrue("Page 1.2 doesn't exist!", getUtil().pageExists(Arrays.asList("1"), "2"));
-        assertFalse("Page 1.2.WebHome exists!", getUtil().pageExists(Arrays.asList("1", "2"), "WebHome"));
+        // Test if 1.2.3.WebHome has been renamed to 1.2.3 (1.2.3.WebHome doesn't exist while 1.2.3 exists)
+        assertTrue("Page 1.2.3 doesn't exist!", getUtil().pageExists(Arrays.asList("1", "2"), "3"));
+        assertFalse("Page 1.2.3.WebHome exists!", getUtil().pageExists(Arrays.asList("1", "2", "3"), "WebHome"));
     }
 
     // Rename a page with children, update the backlinks and test the Auto Redirect feature

@@ -131,9 +131,12 @@ public class WikiTemplateTest extends AbstractTest
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
         WikiCreationPage wikiCreationPage = createWikiPageStepUser.create();
         assertEquals("Wiki creation", wikiCreationPage.getStepTitle());
-        // Wait for the finalize button to be displayed, with a 1 minute limit
-        // (it's a lot but we often have problems on ci.xwiki.org).
-        wikiCreationPage.waitForFinalizeButton(60);
+
+        // Wait for the finalize button to be displayed.
+        // Note that the whole flavor defined in the pom.xml (i.e. org.xwiki.platform:xwiki-platform-wiki-ui-wiki) will
+        // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
+        // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
+        wikiCreationPage.waitForFinalizeButton(60*3);
         // Ensure there is no error in the log
         assertFalse(wikiCreationPage.hasLogError());
 

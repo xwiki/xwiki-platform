@@ -716,4 +716,14 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals(Locale.FRENCH, this.xwiki.getLocalePreference(getContext()));
     }
+
+    public void testGetLocalePreferenceWithNavigatorLanguagesFallback() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null));
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
+    }
 }

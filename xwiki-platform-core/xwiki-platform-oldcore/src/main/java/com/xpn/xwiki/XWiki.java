@@ -2987,7 +2987,7 @@ public class XWiki implements EventListener
         }
 
         // Then from the navigator language setting
-        if (context.getRequest() != null) {
+        if (context.getRequest() != null && context.getRequest().getLocales() != null) {
             for (Locale acceptedLocale : Collections.list(context.getRequest().getLocales())) {
                 locale = setLocale(acceptedLocale, context, availableLocales, forceSupported);
                 if (LocaleUtils.isAvailableLocale(locale)) {

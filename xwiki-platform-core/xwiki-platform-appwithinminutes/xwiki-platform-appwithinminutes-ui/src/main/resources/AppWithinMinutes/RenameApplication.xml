@@ -52,10 +52,12 @@
     #renameAppCodePages($oldApp $newApp)
     #if (!$oldApp.codeReference.equals($oldApp.reference) &amp;&amp; !$oldApp.codeReference.hasParent($oldApp.reference))
       ## The application code pages are not children of the application page. Rename the remaining code pages.
-      #renameAppPage($oldApp.codeReference $newApp.codeReference)
+      #renameAppPage($oldApp.codeReference $newApp.codeReference true)
+      #maybeFixAppPreferences($oldApp.codePreferencesReference $newApp.codePreferencesReference)
     #end
   #end
-  #renameAppPage($oldAppReference $newAppReference)
+  #renameAppPage($oldAppReference $newAppReference true)
+  #maybeFixAppPreferences($oldApp.preferencesReference $newApp.preferencesReference)
   #updateNavigationPanelConfig($oldApp $newApp)
 #end
 
@@ -83,6 +85,9 @@
 #end
 
 #macro (getAppCodePages $app)
+  #set ($app.homePageReference = $services.model.resolveDocument('', 'default', $app.reference))
+  #set ($app.preferencesReference = $services.model.createDocumentReference('WebPreferences', $app.reference))
+  #set ($app.codePreferencesReference = $services.model.createDocumentReference('WebPreferences', $app.codeReference))
   #set ($app.codePages = {})
   #foreach ($codePage in ['class', 'sheet', 'template', 'templateProvider', 'translations'])
     #set ($discard = $app.codePages.put("${codePage}Reference", $services.model.createDocumentReference(
@@ -94,17 +99,18 @@
   #getAppCodePages($oldApp)
   #getAppCodePages($newApp)
   #foreach ($entry in $oldApp.codePages.entrySet())
-    #renameAppPage($entry.value $newApp.codePages.get($entry.key))
+    #renameAppPage($entry.value $newApp.codePages.get($entry.key) true)
   #end
   #updateAppClass($oldApp $newApp)
   #updateAppTemplateProvider($oldApp $newApp)
   #updateAppTranslations($oldApp $newApp)
 #end
 
-#macro (renameAppPage $oldReference $newReference)
+#macro (renameAppPage $oldReference $newReference $checkRights)
   #set ($renameRequest = $services.refactoring.requestFactory.createRenameRequest($oldReference, $newReference))
   #set ($discard = $renameRequest.setInteractive(false))
   #set ($discard = $renameRequest.setAutoRedirect(false))
+  #set ($discard = $renameRequest.setCheckRights($checkRights))
   #set ($renameJob = $services.refactoring.rename($renameRequest))
   #set ($discard = $renameJob.join())
 #end
@@ -191,17 +197,36 @@
   #set ($discard = $translation.save('Update translations after renaming app'))
 #end
 
+#**
+ * Simple users don't have the right to administer the pages they create so the application wizard creates the
+ * WebPreferences page for them (using programming rights). When renaming the applications they have created, simple
+ * users don't have the right to move the WebPreferences page to the new location so we need to do this for them (again,
+ * relying on programming rights).
+ *#
+#macro (maybeFixAppPreferences $oldPrefsReference $newPrefsReference)
+  ## Fix the preferences page if:
+  ## * the old preferences page exists (wasn't moved / renamed)
+  ## * and the current user has administration right on it
+  ## * the new preferences page doesn't exist
+  ## * and the current user has the right to delete its home page.
+  #set ($newPrefsHomeReference = $services.model.resolveDocument('', 'default', $newPrefsReference.parent))
+  #if ($xwiki.exists($oldPrefsReference) &amp;&amp; $services.security.authorization.hasAccess('admin', $oldPrefsReference)
+      &amp;&amp; !$xwiki.exists($newPrefsReference)
+      &amp;&amp; $services.security.authorization.hasAccess('delete', $newPrefsHomeReference))
+    ## This requires programming rights!
+    #renameAppPage($oldPrefsReference $newPrefsReference false)
+  #end
+#end
+
 #macro (updateNavigationPanelConfig $oldApp $newApp)
   #set ($navigationPanelConfigReference = 'PanelsCode.NavigationConfiguration')
   #if ($services.security.authorization.hasAccess('edit', $navigationPanelConfigReference))
     #set ($navigationPanelConfig = $xwiki.getDocument($navigationPanelConfigReference))
     #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
-    #set ($oldAppHomePage = $services.model.resolveDocument('', 'default', $oldApp.reference))
     #set ($removed = $oldApp.reference.parent.type == 'WIKI' &amp;&amp;
-      $exclusions.remove($services.model.serialize($oldAppHomePage, 'local')))
-    #set ($newAppHomePage = $services.model.resolveDocument('', 'default', $newApp.reference))
+      $exclusions.remove($services.model.serialize($oldApp.homePageReference, 'local')))
     #set ($added = $newApp.reference.parent.type == 'WIKI' &amp;&amp;
-      $exclusions.add($services.model.serialize($newAppHomePage, 'local')))
+      $exclusions.add($services.model.serialize($newApp.homePageReference, 'local')))
     #if ($removed || $added)
       #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
       #set ($discard = $navigationPanelConfig.save("Update exclusions after renaming application"))
@@ -226,4 +251,43 @@
   #end
 #end
 {{/velocity}}</content>
+  <object>
+    <name>AppWithinMinutes.RenameApplication</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>6e85ff10-946b-4fb9-8092-b50ad1933439</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property>
+      <level>programming</level>
+    </property>
+  </object>
 </xwikidoc>

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -140,13 +141,23 @@ public class EnvironmentSkin extends AbstractSkin
         String skinFolder = getSkinFolder();
         String resourcePath = skinFolder + resource;
 
-        // Prevent inclusion of templates from other directories
-        Path normalizedResource = Paths.get(resourcePath).normalize();
-        if (!normalizedResource.startsWith(skinFolder)) {
-            LOGGER.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
+        try {
+            // Prevent inclusion of templates from other directories
+            Path normalizedResource = Paths.get(resourcePath).normalize();
+            if (!normalizedResource.startsWith(skinFolder)) {
+                LOGGER.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
 
+                return null;
+            }
+        // Calling Paths.get() with special characters such as ':' or '<' leads to an InvalidPathException
+        // when it's not supported by the system (i.e. on Windows).
+        // We currently generate such paths in DefaultTemplateHTMLDisplayer#getTemplate by building paths containing
+        // types. This should be removed once XWIKI-16181 is fixed.
+        } catch (InvalidPathException exception) {
+            LOGGER.debug("Error while trying to normalize path of resource file [{}].", resource, exception);
             return null;
         }
+
 
         return resourcePath;
     }

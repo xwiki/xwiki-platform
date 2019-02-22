@@ -47,6 +47,8 @@ public class TestConfiguration
 
     private static final String DATABASE_PROPERTY = "xwiki.test.ui.database";
 
+    private static final String DATABASE_PREFIX_COMMAND = "xwiki.test.ui.database.commands.";
+
     private static final String SERVLETENGINE_PROPERTY = "xwiki.test.ui.servletEngine";
 
     private static final String VERBOSE_PROPERTY = "xwiki.test.ui.verbose";
@@ -107,6 +109,8 @@ public class TestConfiguration
 
     private List<ServletEngine> forbiddenServletEngines;
 
+    private Properties databaseCommands;
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      */
@@ -130,6 +134,7 @@ public class TestConfiguration
         resolveProfiles();
         resolveOffice();
         resolveForbiddenServletEngines();
+        resolveDatabaseCommands();
     }
 
     /**
@@ -251,7 +256,17 @@ public class TestConfiguration
 
     private void resolveProperties()
     {
-        String[] propertiesAsArray = this.uiTestAnnotation.properties();
+        this.properties = resolveGenericProperties(this.uiTestAnnotation.properties(), PROPERTIES_PREFIX_PROPERTY);
+    }
+
+    private void resolveDatabaseCommands()
+    {
+        this.databaseCommands = resolveGenericProperties(this.uiTestAnnotation.databaseCommands(),
+            DATABASE_PREFIX_COMMAND);
+    }
+
+    private Properties resolveGenericProperties(String[] propertiesAsArray, String prefix)
+    {
         Properties newProperties = new Properties();
         for (String propertyAsString : propertiesAsArray) {
             int pos = propertyAsString.indexOf('=');
@@ -260,12 +275,12 @@ public class TestConfiguration
             }
         }
         for (String key : System.getProperties().stringPropertyNames()) {
-            if (key.startsWith(PROPERTIES_PREFIX_PROPERTY)) {
-                String propertyAsString = StringUtils.substringAfter(key, PROPERTIES_PREFIX_PROPERTY);
+            if (key.startsWith(prefix)) {
+                String propertyAsString = StringUtils.substringAfter(key, prefix);
                 newProperties.setProperty(propertyAsString, System.getProperty(key));
             }
         }
-        this.properties = newProperties;
+        return newProperties;
     }
 
     private void resolveExtraJARs()
@@ -421,6 +436,16 @@ public class TestConfiguration
     public Properties getProperties()
     {
         return this.properties;
+    }
+
+    /**
+     * @return the list of database docker commands to use and that will override default commands (example of command
+     *         {@code character-set-server=utf8mb4}
+     * @since 11.2RC1
+     */
+    public Properties getDatabaseCommands()
+    {
+        return this.databaseCommands;
     }
 
     /**

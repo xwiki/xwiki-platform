@@ -163,4 +163,11 @@ public @interface UITest
      * @since 10.11RC1
      */
     ServletEngine[] forbiddenEngines() default {};
+
+    /**
+     * @return the list of database docker commands to use and that will override default commands (example of command
+     *         {@code character-set-server=utf8mb4}
+     * @since 11.2RC1
+     */
+    String[] databaseCommands() default {};
 }

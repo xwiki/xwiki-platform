@@ -206,6 +206,11 @@
     &lt;/span&gt;
   &lt;/div&gt;
   #set ($appName = $doc.pageReference.name)
+  #set ($isNestedPage = $doc.documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($parentReference = $doc.documentReference.parent)
+  #if ($isNestedPage)
+    #set ($parentReference = $parentReference.parent)
+  #end
   #locationPicker({
     'id': 'renameApp',
     'title': {
@@ -223,7 +228,7 @@
       'label': 'appWithinMinutes.renameApp.parent.label',
       'hint': 'appWithinMinutes.renameApp.parent.hint',
       'name': 'newAppParentReference',
-      'reference': $doc.pageReference.parent,
+      'reference': $parentReference,
       'placeholder': 'appWithinMinutes.createApp.parent.placeholder'
     }
   })

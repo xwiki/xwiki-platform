@@ -20,8 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Index.WebHome" locale="">
-  <web>Index</web>
+<xwikidoc version="1.3" reference="Rendering.WebHome" locale="">
+  <web>Rendering</web>
   <name>WebHome</name>
   <language/>
   <defaultLanguage/>
@@ -31,10 +31,10 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Index</title>
+  <title>Rendering</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>This page and children contain technical pages for the Index Application.</content>
+  <content>This page and children contain technical pages for the Rendering Application.</content>
 </xwikidoc>

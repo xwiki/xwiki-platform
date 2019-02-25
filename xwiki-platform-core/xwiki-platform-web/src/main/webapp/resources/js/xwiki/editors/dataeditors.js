@@ -563,28 +563,30 @@ return XWiki;
 
 // Class Switcher
 require(['jquery', 'xwiki-events-bridge'], function($) {
-  $('#switch-xclass input[type="submit"], #switch-xclass .warningmessage').hide();
   $('#switch-xclass').change(function(event) {
     var selectedClass = $(event.target).val();
     if (selectedClass) {
       var selectedClassReference = XWiki.Model.resolve(selectedClass, XWiki.EntityType.DOCUMENT,
         XWiki.currentDocument.documentReference);
       var selectedClassURL = new XWiki.Document(selectedClassReference).getURL('edit', 'editor=class');
+      var switchClass = function() {
+        window.self.location = selectedClassURL;
+      };
       new XWiki.widgets.ConfirmationBox({
         onYes: function() {
+          // Save the current class before switching.
           $(document).trigger('xwiki:actions:save', {
             'continue': true,
             'form': $('#propupdate')[0]
           });
-          $(document).on('xwiki:document:saved', function() {
-            window.self.location = selectedClassURL;
-          });
+          $(document).on('xwiki:document:saved', switchClass);
         },
-        onNo: function() {
-          window.self.location = selectedClassURL;
-        }
+        // Switch without saving the current class.
+        onNo: switchClass
       }, {
-        confirmationText: "$services.localization.render('core.editors.class.switchClass.confirm')"
+        confirmationText: "$services.localization.render('core.editors.class.switchClass.confirm')",
+        // Allow the users to cancel the switch.
+        showCancelButton: true
       });
     }
   });

@@ -19,25 +19,19 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
  * Display the class switcher
  *#
 #macro(classSwitcher)
-<form id="switch-xclass" method="post" action="$doc.getURL('redirect')">
-  <div>
-    #set ($classPickerParameters = {
-      'id': 'classname',
-      'name': 'xredirect',
-      'placeholder': $services.localization.render('core.editors.class.switchClass'),
-      'data-xwiki-selectize': {
-        'dropdownAlignment': 'right',
-        'dropdownParent': $NULL,
-        'takeInputWidth': true
-      }
-    })
-    #classPicker($classPickerParameters)
-    <span class="buttonwrapper">
-      <input class="button" type="submit" value="$services.localization.render('core.editors.class.switchClass.submit')"/>
-    </span>
-  </div>
-  #warning($services.localization.render('core.editors.class.switchClass.warning'))
-</form>
+<div id="switch-xclass">
+  #set ($classPickerParameters = {
+    'id': 'classname',
+    'name': 'xredirect',
+    'placeholder': $services.localization.render('core.editors.class.switchClass'),
+    'data-xwiki-selectize': {
+      'dropdownAlignment': 'right',
+      'dropdownParent': $NULL,
+      'takeInputWidth': true
+    }
+  })
+  #classPicker($classPickerParameters)
+</div>
 #end
 ##
 ##

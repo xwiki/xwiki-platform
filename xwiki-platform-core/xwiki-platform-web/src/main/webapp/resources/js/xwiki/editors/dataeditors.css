@@ -342,6 +342,9 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   margin: 4px 0 -16px;
 }
 
+#switch-xclass .suggest-classes {
+  text-align: left;
+}
 .suggest-classes.selectize-control {
   /* Display on the same line as the Add button */
   display: inline-block;

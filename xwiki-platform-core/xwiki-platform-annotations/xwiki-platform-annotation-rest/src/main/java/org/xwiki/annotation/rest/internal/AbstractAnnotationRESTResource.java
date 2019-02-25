@@ -132,7 +132,6 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         // Block the redirects as they are leading to an unexpected result for the annotations.
         XWikiContext context = this.xcontextProvider.get();
         XWikiResponse contextResponse = context.getResponse();
-        String renderedHTML;
         try {
             context.setResponse(new XWikiServletResponse(contextResponse)
             {
@@ -143,12 +142,11 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
                 }
             });
             // render the document with the filtered annotations on it
-            renderedHTML = renderDocumentWithAnnotations(documentName, null, DEFAULT_ACTION, filteredAnnotations);
+            return renderDocumentWithAnnotations(documentName, null, DEFAULT_ACTION, filteredAnnotations);
         } finally {
             // Reset response to initial
             context.setResponse(contextResponse);
         }
-        return renderedHTML;
     }
 
     /**

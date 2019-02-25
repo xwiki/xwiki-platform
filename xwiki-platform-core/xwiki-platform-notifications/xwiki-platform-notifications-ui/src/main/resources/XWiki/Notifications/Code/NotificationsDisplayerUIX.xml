@@ -285,10 +285,8 @@
   var getUnreadNotificationsCount = function () {
     $.ajax(url, {method: 'GET', cache: false, data: {action: 'getUnreadCount'}}).done(function (data) {
       updateNotificationCount(data.unread);
-      // Display the "nothing!" message if there is no notification
-      if (data.unread == 0) {
-         macro.displayNoNotification();
-      }
+      // Do not display the "nothing!" message if there is no unread notification because there might be read
+      // notifications to display.
     });
   };
 
@@ -316,10 +314,8 @@
      */
     var notificationsMenusHasBeenOpened = false;
     $('#tmNotifications').on('show.bs.dropdown', function () {
-      // Don't load the notifications if the menu has already be opened before, but also if notifications count has
-      // been loaded (!= -1, which is the initial state of the notificationCount variable) but equals to 0 (so we know
-      // there is nothing to load).
-      if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount != 0) {
+      // Don't load the notifications if the menu has already be opened before.
+      if (!notificationsMenusHasBeenOpened) {
         macro.load(0).done(function (notifications) {
           createCleanButton(notifications[0].date);
         });

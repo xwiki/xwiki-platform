@@ -149,31 +149,25 @@
  * Display a control for adding an object from a chosen class
  *#
 #macro(displayAddObjectChooseClass)
-  <div id="add_xobject" class="add_xobject"> <label for="classname" class="add_xobject-title">$services.localization.render('core.editors.object.add.label'):</label>
-  <select id="classname" name="classname" size="1">
-    <option value="-">$services.localization.render('core.editors.object.add.selectClass')</option>
-    ## Existing classes are enumerated, grouped by space name.
-    ## The list is already sorted alphabetically
-#set($prevSpace = '')
-#foreach ($classname in $xwiki.classList)
-  #if ($!xwiki.hasAccessLevel('view', $classname))
-    #set ($classdoc = $xwiki.getDocument($classname))
-    #if ($classdoc.space != $prevSpace)
-      #if ($prevSpace != '')
-        </optgroup>
-      #end
-      <optgroup label="${escapetool.xml($classdoc.space)}">
-      #set ($prevSpace = $classdoc.space)
-    #end
-    <option value="${escapetool.xml($classdoc.fullName)}">${escapetool.xml($classdoc.pageReference.name)}</option>
-  #end
-#end
-#if($prevSpace != '')
-  </optgroup>
-#end
-</select>
-<span class="buttonwrapper"><input type="submit" name="action_objectadd" value="$services.localization.render('core.editors.object.add.submit')" class="button xobject-add-control"/></span>
-  </div> ## add_object
+  <div id="add_xobject" class="add_xobject">
+    <label for="classname" class="add_xobject-title">
+      $services.localization.render('core.editors.object.add.label'):
+    </label>
+    #set ($classPickerParameters = {
+      'id': 'classname',
+      'name': 'classname',
+      'placeholder': $services.localization.render('core.editors.object.add.selectClass'),
+      'data-xwiki-selectize': {
+        'copyClassesToDropdown': true,
+        'takeInputWidth': true
+      }
+    })
+    #classPicker($classPickerParameters)
+    <span class="buttonwrapper">
+      <input type="submit" name="action_objectadd" class="button xobject-add-control"
+        value="$services.localization.render('core.editors.object.add.submit')"/>
+    </span>
+  </div>
 #end
 ##
 ##

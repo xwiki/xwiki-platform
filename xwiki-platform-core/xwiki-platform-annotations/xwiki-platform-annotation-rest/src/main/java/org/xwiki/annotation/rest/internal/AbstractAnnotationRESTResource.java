@@ -112,6 +112,23 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         // filter them according to the request
         Collection<Annotation> filteredAnnotations = filterAnnotations(annotations, request);
 
+        String renderedHTML = renderDocumentWithAnnotationsWithoutRedirects(documentName, filteredAnnotations);
+
+        // prepare the annotated content
+        AnnotatedContent annotatedContentResponse = factory.createAnnotatedContent();
+        annotatedContentResponse.getAnnotations().addAll(
+            prepareAnnotationStubsSet(filteredAnnotations, request.getRequest().getFields()));
+        annotatedContentResponse.setContent(renderedHTML);
+        // set the annotated content along with the return code in the response and return it
+        response.setAnnotatedContent(annotatedContentResponse);
+        response.setResponseCode(0);
+
+        return response;
+    }
+
+    private String renderDocumentWithAnnotationsWithoutRedirects(String documentName,
+        Collection<Annotation> filteredAnnotations) throws XWikiException, AnnotationServiceException
+    {
         // Block the redirects as they are leading to an unexpected result for the annotations.
         XWikiContext context = this.xcontextProvider.get();
         XWikiResponse contextResponse = context.getResponse();
@@ -131,17 +148,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             // Reset response to initial
             context.setResponse(contextResponse);
         }
-
-        // prepare the annotated content
-        AnnotatedContent annotatedContentResponse = factory.createAnnotatedContent();
-        annotatedContentResponse.getAnnotations().addAll(
-            prepareAnnotationStubsSet(filteredAnnotations, request.getRequest().getFields()));
-        annotatedContentResponse.setContent(renderedHTML);
-        // set the annotated content along with the return code in the response and return it
-        response.setAnnotatedContent(annotatedContentResponse);
-        response.setResponseCode(0);
-
-        return response;
+        return renderedHTML;
     }
 
     /**

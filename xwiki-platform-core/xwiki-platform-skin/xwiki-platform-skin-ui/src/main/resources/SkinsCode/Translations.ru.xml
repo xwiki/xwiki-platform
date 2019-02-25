@@ -36,16 +36,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-skin.sheet.title=Скин
+  <content>skin.sheet.title=Скин
 skin.sheet.properties=Свойства скина
 skin.sheet.deprecatedProperties=Устаревшие свойства
 skin.sheet.overriddenTemplates=Переопределенные шаблоны
 skin.sheet.addTemplate=Добавить новый переопределяющий шаблон
 skin.sheet.add=Добавить
 skin.sheet.overrideTemplateWarning=Этот раздел позволяет переопределить шаблон скина. Это технический вопрос, и вы должны знать о последствиях.
-skin.sheet.deprecatedPropertiesWarning=Этот раздел здесь для целей ретро-совместимости. Вы должны использовать механизм «переопределенных шаблонов» выше.
-skin.sheet.nojs=Без JavaScript вы не сможете использовать этот раздел. Но вместо этого вы можете использовать {0} Редактор объектов {1} и вручную добавить {2} объекты.
+skin.sheet.deprecatedPropertiesWarning=Этот раздел здесь для целей обратной совместимости. Вы должны использовать механизм «переопределенных шаблонов» выше.
+skin.sheet.nojs=Без JavaScript вы не сможете использовать этот раздел. Но вместо этого вы можете использовать {0}Редактор объектов{1} и вручную добавить {2} объекты.
 
 skin.sheet.js.deleting=Удаление...
 skin.sheet.js.deletingDone=Шаблон был удален!
@@ -71,6 +70,5 @@ skin.sheet.js.addingDone=Шаблон добавлен!
 ### Missing: skin.sheet.overridedTemplates=Overridden templates
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

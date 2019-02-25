@@ -59,6 +59,5 @@ tour.homepageTour.header.contentA=Você pode Buscar por conteúdo, Monitorar mud
 tour.homepageTour.header.contentB=O botão {0} abre a Gaveta, da qual contem ações relacionadas ao wiki, como Administração e Índices.
 tour.homepageTour.tourComplete.title=Tour Completo
 tour.homepageTour.tourComplete.contentA=Isto completa o seu tour na interface e funcionalidades básicas do XWiki.
-tour.homepageTour.tourComplete.contentB=Para mais detalhes em cada funcionalidade, acesse a {0}documentação{1}.
-</content>
+tour.homepageTour.tourComplete.contentB=Para mais detalhes em cada funcionalidade, acesse a {0}documentação{1}.</content>
 </xwikidoc>

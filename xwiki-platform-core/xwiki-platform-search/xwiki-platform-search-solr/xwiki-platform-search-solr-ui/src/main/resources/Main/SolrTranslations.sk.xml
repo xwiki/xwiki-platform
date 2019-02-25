@@ -187,6 +187,5 @@ solr.result.location=Nachádza sa v {0} » {1} » {2}
 solr.field.space=Priestor
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

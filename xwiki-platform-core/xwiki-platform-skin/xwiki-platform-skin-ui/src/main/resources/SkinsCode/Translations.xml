@@ -70,8 +70,7 @@ skin.sheet.js.addingDone=The template has been added!
 skin.sheet.overridedTemplates=Overridden templates
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
   <object>
     <name>SkinsCode.Translations</name>
     <number>0</number>

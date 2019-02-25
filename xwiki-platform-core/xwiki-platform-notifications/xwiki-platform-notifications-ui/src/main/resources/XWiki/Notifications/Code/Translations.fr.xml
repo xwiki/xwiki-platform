@@ -209,6 +209,5 @@ notifications.switches.tooltip.page=Suivre cette page
 notifications.switches.tooltip.pageAndChildren=Suivre cette page et ses enfants
 notifications.switches.tooltip.space=Suivre la page parente et ses enfants
 notifications.switches.tooltip.wiki=Suivre ce wiki
-notifications.switches.changeStatusError=Échec lors du chargement du status des notifications.
-</content>
+notifications.switches.changeStatusError=Échec lors du chargement du status des notifications.</content>
 </xwikidoc>

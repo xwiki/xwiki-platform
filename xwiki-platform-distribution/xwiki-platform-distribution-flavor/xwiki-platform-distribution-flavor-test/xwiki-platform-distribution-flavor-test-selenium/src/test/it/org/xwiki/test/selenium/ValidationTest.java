@@ -21,6 +21,7 @@ package org.xwiki.test.selenium;
 
 import org.junit.Test;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 /**
  * Verify the data validation feature of XWiki.
@@ -45,8 +46,7 @@ public class ValidationTest extends AbstractXWikiTestCase
         createPage("Main", "ValidatedObject",
             "{{velocity}}value: $doc.display('prop')\n\n#foreach($e in $xcontext.validationStatus.errors)$e #end{{/velocity}}", SYNTAX);
         open("Main", "ValidatedObject", "edit", "editor=object");
-        getSelenium().select("classname", "value=Main.ValidatedClass");
-        clickButtonAndContinue("//input[@name='action_objectadd']");
+        new ObjectEditPage().addObject("Main.ValidatedClass");
         setFieldValue("Main.ValidatedClass_0_prop", "22");
         clickEditSaveAndView();
         open("Main", "ValidatedObject", "save", "xvalidate=1");

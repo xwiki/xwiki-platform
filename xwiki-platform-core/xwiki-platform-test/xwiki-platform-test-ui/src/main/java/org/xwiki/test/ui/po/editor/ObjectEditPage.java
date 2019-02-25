@@ -27,7 +27,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents the common actions possible on all Pages when using the "edit" action with the "object" editor.
@@ -37,16 +37,11 @@ import org.xwiki.test.ui.po.FormElement;
  */
 public class ObjectEditPage extends EditPage
 {
-    @FindBy(id = "update")
-    private WebElement objectForm;
-
     @FindBy(id = "classname")
     private WebElement classNameField;
 
     @FindBy(name = "action_objectadd")
     private WebElement classNameSubmit;
-
-    private FormElement form;
 
     /**
      * Go to the passed page in object edit mode.
@@ -59,7 +54,7 @@ public class ObjectEditPage extends EditPage
 
     public ObjectEditPane addObject(String className)
     {
-        getForm().setFieldValue(this.classNameField, className);
+        new SuggestInputElement(this.classNameField).click().selectByValue(className);
 
         final By objectsLocator = By.cssSelector("[id='xclass_" + className + "'] .xobject");
         final int initialObjectCount = getDriver().findElementsWithoutWaiting(objectsLocator).size();
@@ -160,14 +155,6 @@ public class ObjectEditPage extends EditPage
             return deprecatedPropertiesElements.get(0).findElements(By.xpath(xpath)).size() > 0;
         }
         return false;
-    }
-
-    private FormElement getForm()
-    {
-        if (this.form == null) {
-            this.form = new FormElement(this.objectForm);
-        }
-        return this.form;
     }
 
     public String getURL(String space, String page)

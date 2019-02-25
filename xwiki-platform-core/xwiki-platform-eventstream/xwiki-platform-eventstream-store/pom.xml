@@ -31,6 +31,7 @@
     <name>XWiki Platform - Event Stream - Store</name>
     <description>Store for Event Stream Events</description>
     <properties>
+        <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Event Stream Store</xwiki.extension.name>
     </properties>

@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.junit5.database;
 
+import java.util.Properties;
+
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MySQLContainer;
@@ -111,18 +113,21 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
         // Note: the "explicit-defaults-for-timestamp" parameter has been introduced in MySQL 5.6.6+ only and using it
         // in older versions make MySQL fail to start.
-        StringBuilder command = new StringBuilder("--character-set-server=utf8 --collation-server=utf8_bin");
+        Properties commands = new Properties();
+        commands.setProperty("character-set-server", "utf8");
+        commands.setProperty("collation-server", "utf8_bin");
+
         if (!isMySQL55x(testConfiguration)) {
-            command.append(" --explicit-defaults-for-timestamp=1");
+            commands.setProperty("explicit-defaults-for-timestamp", "1");
         }
         // MySQL 8.x has changed the default authentication plugin value so we need to explicitly configure it to get
         // the native password mechanism.
         // The reason we don't include when the tag is null is because with the TC version we use, MySQLContainer
         // defaults to
         if (isMySQL8xPlus(testConfiguration)) {
-            command.append("  --default-authentication-plugin=mysql_native_password");
+            commands.setProperty("default-authentication-plugin", "mysql_native_password");
         }
-        databaseContainer.withCommand(command.toString());
+        databaseContainer.withCommand(mergeCommands(commands, testConfiguration.getDatabaseCommands()));
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
     }

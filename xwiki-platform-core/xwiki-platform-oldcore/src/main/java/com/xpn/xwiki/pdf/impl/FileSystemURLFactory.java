@@ -141,7 +141,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * @param filename the name of the attachment
      * @param revision an optional attachment version
      * @param context the current request context
-     * @return a {@code file://} URL where the attachment has been stored
+     * @return a {@code file://} URL where the attachment has been stored or null if the attachment wasn't found
      * @throws Exception if the attachment can't be retrieved from the database and stored on the filesystem
      */
     private URL getURL(String wiki, String spaces, String name, String filename, String revision, XWikiContext context)
@@ -155,13 +155,23 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             LOGGER.debug("Temporary PDF export file [{}]", file.toString());
             XWikiDocument doc = context.getWiki().getDocument(new DocumentReference(
                 StringUtils.defaultString(wiki, context.getWikiId()), spaceNames, name), context);
+
             XWikiAttachment attachment = doc.getAttachment(filename);
+            if (attachment == null) {
+                LOGGER.warn("Attachment [{}] doesn't exist in [{}]. Generated content will have invalid content ("
+                    + "empty image or broken link)", filename, doc.getDocumentReference());
+                // By returning null, the generated HTML will have empty IMG SRC or empty A HREF which leads to
+                // good degraded results for the LO office export.
+                return null;
+            }
+
             if (StringUtils.isNotEmpty(revision)) {
                 attachment = attachment.getAttachmentRevision(revision, context);
             }
-            FileOutputStream fos = new FileOutputStream(file);
-            IOUtils.copy(attachment.getContentInputStream(context), fos);
-            fos.close();
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                IOUtils.copy(attachment.getContentInputStream(context), fos);
+            }
             usedFiles.put(key, file);
         }
         return usedFiles.get(key).toURI().toURL();

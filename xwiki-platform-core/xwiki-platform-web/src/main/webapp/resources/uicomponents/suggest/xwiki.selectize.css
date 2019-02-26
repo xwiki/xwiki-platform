@@ -6,6 +6,11 @@
   padding: 6px 12px;
 }
 
+/* The selected value overflows the dropdown caret on single selection. */
+.selectize-control.single > .selectize-input {
+  padding-right: 32px;
+}
+
 /* The selectize widget adds padding around the text input so we need to reduce the height of the text input. */
 .selectize-input > input[type="text"] {
   height: 20px;
@@ -24,6 +29,21 @@
 .selectize-control.single.loading .selectize-input {
   background-position: center right 36px;
   padding-right: 55px;
+}
+
+/* Dropdown styles */
+.selectize-dropdown-left,
+.selectize-dropdown-right {
+  margin-top: -3px;
+}
+.selectize-dropdown-right {
+  left: auto;
+  right: 0;
+}
+
+.selectize-dropdown .option,
+.selectize-dropdown .optgroup-header {
+  padding: 3px 20px;
 }
 
 /* Option styles */

@@ -73,6 +73,8 @@ public class RelativeLinkUpdaterListener extends AbstractEventListener
             @SuppressWarnings("unchecked")
             AbstractEntityCopyOrRenameEvent<DocumentReference> copyOrRenameEvent =
                 (AbstractEntityCopyOrRenameEvent<DocumentReference>) event;
+            // Output at info level since this is executing inside a Job and will be captured in the jib logs that we
+            // show to the users. It's thus important information for the users to see.
             this.logger.info("Updating the relative links from [{}].", copyOrRenameEvent.getTargetReference());
             this.linkRefactoring.updateRelativeLinks(copyOrRenameEvent.getSourceReference(),
                 copyOrRenameEvent.getTargetReference());

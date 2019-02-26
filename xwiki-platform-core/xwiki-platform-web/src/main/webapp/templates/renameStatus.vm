@@ -7,8 +7,10 @@
         #displayLocations('core.rename.source.label' 'core.rename.source.hint' $renameJobRequest.entityReferences)
         #displayBooleanConfigParam('core.rename.children.label', 'core.rename.children.hintWithoutParams'
           $renameJobRequest.isDeep())
-        #displayBooleanConfigParam('core.rename.links.label', 'core.rename.links.hintWithoutParams'
-          $renameJobRequest.isUpdateLinks())
+        #if ($isAdvancedUser || $isSuperAdmin)
+          #displayBooleanConfigParam('core.rename.links.label', 'core.rename.links.hintWithoutParams'
+            $renameJobRequest.isUpdateLinks())
+        #end
         #displayBooleanConfigParam('core.rename.autoRedirect.label', 'core.rename.autoRedirect.hint'
           $renameJobRequest.isAutoRedirect())
       </dl>

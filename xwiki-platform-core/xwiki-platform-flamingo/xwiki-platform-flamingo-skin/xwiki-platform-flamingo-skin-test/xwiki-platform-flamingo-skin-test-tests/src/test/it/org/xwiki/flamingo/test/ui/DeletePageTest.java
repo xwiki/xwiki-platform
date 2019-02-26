@@ -20,10 +20,13 @@
 package org.xwiki.flamingo.test.ui;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.flamingo.sking.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
@@ -33,6 +36,8 @@ import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.tree.test.po.TreeElement;
+import org.xwiki.tree.test.po.TreeNodeElement;
 
 import static org.junit.Assert.*;
 
@@ -254,5 +259,113 @@ public class DeletePageTest extends AbstractTest
             assertFalse(page.exists());
         }
         
+    }
+
+    /**
+     * This test check the behaviour of job questions when deleting a page with a used class
+     *   - check that the question UI is displayed in that case
+     *   - check that we can select some files in the question to be deleted.
+     *
+     *   More behaviour of the questions are checked in RenamePageTest
+     */
+    @Test
+    public void deletePageWithUsedClass()
+    {
+        // Create 4 pages under the same parent
+        // 2 of them are free pages (WebHome and FreePage)
+        // 1 of them is a class (ClassPage)
+        // the last one contains an object property using the class
+
+        List<String> parentSpaceReference = Arrays.asList(getTestClassName(), getTestMethodName());
+        DocumentReference parentReference = new DocumentReference("xwiki",
+            parentSpaceReference,
+            "WebHome");
+        String space = getTestClassName() + "." + getTestMethodName();
+        String classPageName = "ClassPage";
+        String objectPageName = "ObjectPage";
+        String freePageName = "FreePage";
+
+        DocumentReference classReference = new DocumentReference("xwiki", parentSpaceReference, classPageName);
+        DocumentReference objectReference = new DocumentReference("xwiki", parentSpaceReference, objectPageName);
+        DocumentReference freeReference = new DocumentReference("xwiki", parentSpaceReference, freePageName);
+
+        getUtil().createPage(parentReference, "Some content", "Parent");
+        getUtil().createPage(freeReference, "Some content", freePageName);
+        getUtil().createPage(classReference, "Some content", classPageName);
+        getUtil().createPage(objectReference, "Some content", objectPageName);
+
+        getUtil().addClassProperty(space, classPageName, "Foo", "String");
+        getUtil().addObject(objectReference, classReference.toString(), Collections.singletonMap("Foo", "Bar"));
+
+        // Try to delete the parent page
+        ViewPage parentPage = getUtil().gotoPage(parentReference);
+        ConfirmationPage confirmationPage = parentPage.delete();
+        confirmationPage.setAffectChildren(true);
+        confirmationPage.confirmDeletePage();
+
+        // At this point we should have the question job UI
+        JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
+        assertFalse(jobQuestionPane.isEmpty());
+
+        assertEquals("You are about to delete pages that contain used XClass.", jobQuestionPane.getQuestionTitle());
+        TreeElement treeElement = jobQuestionPane.getQuestionTree();
+        List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
+
+        // there is two main nodes:
+        //  1. to represent free pages
+        //  2. to represent classes with associated objects
+        assertEquals(2, topLevelNodes.size());
+        TreeNodeElement freePages = topLevelNodes.get(0);
+        assertEquals("Pages that do not contain any used XClass", freePages.getLabel());
+        assertFalse(freePages.isSelected());
+
+        freePages = freePages.open().waitForIt();
+        List<TreeNodeElement> children = freePages.getChildren();
+
+        // free pages should contain three nodes with alphabetical order:
+        //   1. the FreePage obviously
+        //   2. the ObjectPage since it does not contain a class
+        //   3. the WebHome page
+        assertEquals(3, children.size());
+
+        TreeNodeElement freePage = children.get(0);
+        assertEquals(freePageName, freePage.getLabel());
+        assertEquals(space + "." + freePageName, freePage.getId());
+        assertTrue(freePage.isLeaf());
+
+        TreeNodeElement objectPage = children.get(1);
+        assertEquals(objectPageName, objectPage.getLabel());
+        assertEquals(space + "." + objectPageName, objectPage.getId());
+        assertTrue(objectPage.isLeaf());
+
+        TreeNodeElement webHome = children.get(2);
+
+        // label = page title
+        assertEquals("Parent", webHome.getLabel());
+        assertEquals(space + ".WebHome", webHome.getId());
+        assertTrue(webHome.isLeaf());
+
+        TreeNodeElement classPage = topLevelNodes.get(1);
+        assertEquals(classPageName, classPage.getLabel());
+        assertEquals(space + "." + classPageName, classPage.getId());
+        assertFalse(classPage.isSelected());
+
+        classPage = classPage.open().waitForIt();
+        children = classPage.getChildren();
+        assertEquals(1, children.size());
+
+        assertEquals(objectPageName, children.get(0).getLabel());
+
+        // here it's an object
+        assertEquals("object-" + space + "." + objectPageName, children.get(0).getId());
+        assertTrue(children.get(0).isLeaf());
+
+        freePage.select();
+        CopyOrRenameOrDeleteStatusPage statusPage = jobQuestionPane.confirmQuestion();
+        statusPage.waitUntilFinished();
+
+        // check that the old one doesn't exist anymore
+        ViewPage viewPage = getUtil().gotoPage(freeReference);
+        assertFalse(viewPage.exists());
     }
 }

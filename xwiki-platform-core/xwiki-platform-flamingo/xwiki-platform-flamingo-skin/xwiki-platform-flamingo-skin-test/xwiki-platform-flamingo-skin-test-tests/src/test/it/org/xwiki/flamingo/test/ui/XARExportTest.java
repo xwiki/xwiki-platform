@@ -78,13 +78,14 @@ public class XARExportTest extends AbstractTest
                 getUtil().rest().savePage(documentReference);
             }
         }
-        // change the timeout as it might take time to load all nodes
+
+        // Change the timeout as it might take time to load all nodes
         getDriver().setTimeout(20);
     }
 
-    /*
-       Scenario: export a XAR after opening the export window and selecting "Other Format"
-       Don't change anything in the tree of export.
+    /**
+     * Scenario: export a XAR after opening the export window and selecting "Other Format". Don't change anything in
+     * he tree of export.
      */
     private void exportXARAll() throws Exception
     {
@@ -119,9 +120,10 @@ public class XARExportTest extends AbstractTest
         getUtil().forceGuestUser();
     }
 
-    /*
-        Scenario: Export a XAR after opening every pages in the pagination
-        and selecting everything
+    /**
+     * Scenario: test with lots of selected pages in the XAR expor and spanning several pages to ensure that everything
+     * selected is taken into account (See XWIKI-15444). To achieve this, we open every page in the pagination and
+     * select everything.
      */
     public void exportXARLotOfSelectedFiles()
     {
@@ -145,7 +147,7 @@ public class XARExportTest extends AbstractTest
 
         assertEquals(16, root.getChildren().size());
 
-        TreeNodeElement lastNode = null;
+        TreeNodeElement lastNode;
         int size = 0;
         for (int i = 15; i < 50; i += 15) {
             size = root.getChildren().size();
@@ -162,8 +164,7 @@ public class XARExportTest extends AbstractTest
 
         otherFormatPane.clickExportAsXARButton();
 
-        String postURL = getUtil().getURL("Foo", "WebHome",
-            "export", "format=xar&name=Foo.WebHome");
+        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
         assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();
@@ -177,9 +178,9 @@ public class XARExportTest extends AbstractTest
         getUtil().forceGuestUser();
     }
 
-    /*
-        Scenario: Export a XAR after opening main tree and a subtree and unselecting
-        nodes including the pagination node of the subtree.
+    /**
+     * Scenario: Export a XAR after opening main tree and a subtree and unselecting nodes including the pagination
+     * node of the subtree.
      */
     public void exportXARWithUnselect()
     {
@@ -233,8 +234,7 @@ public class XARExportTest extends AbstractTest
 
         otherFormatPane.clickExportAsXARButton();
 
-        String postURL = getUtil().getURL("Foo", "WebHome",
-            "export", "format=xar&name=Foo.WebHome");
+        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
         assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();

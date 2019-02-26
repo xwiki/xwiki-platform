@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -135,5 +136,13 @@ public class WikiEditPage extends PreviewableEditPage
     {
         this.commentInput.clear();
         this.commentInput.sendKeys(comment);
+    }
+
+    /**
+     * @return true if the edit comment input field is displayed
+     */
+    public boolean isEditCommentDisplayed()
+    {
+        return this.commentInput.isDisplayed();
     }
 }

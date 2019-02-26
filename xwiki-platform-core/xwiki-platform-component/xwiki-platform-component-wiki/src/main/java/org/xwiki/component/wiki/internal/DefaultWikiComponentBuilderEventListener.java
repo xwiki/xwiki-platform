@@ -115,7 +115,7 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
 
         boolean needsUpdate = false;
 
-        needsUpdate |= this.initializeXClassDocumentMetadata(doc, "Wiki Component Implements Interface XWiki Class");
+        needsUpdate |= initializeXClassDocumentMetadata(doc, "Wiki Component Implements Interface XWiki Class");
         needsUpdate |= bclass.addTextField(INTERFACE_NAME_FIELD, "Interface Qualified Name", 30);
 
         if (needsUpdate) {
@@ -164,7 +164,7 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
 
         boolean needsUpdate = false;
 
-        needsUpdate |= this.initializeXClassDocumentMetadata(doc, "Wiki Component Dependency XWiki Class");
+        needsUpdate |= initializeXClassDocumentMetadata(doc, "Wiki Component Dependency XWiki Class");
         needsUpdate |= bclass.addTextField(COMPONENT_ROLE_TYPE_FIELD, "Dependency Role Type", 30);
         needsUpdate |= bclass.addTextField(COMPONENT_ROLE_HINT_FIELD, "Dependency Role Hint", 30);
         needsUpdate |= bclass.addTextField(DEPENDENCY_BINDING_NAME_FIELD, "Binding name", 30);
@@ -189,7 +189,7 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
 
         boolean needsUpdate = false;
 
-        needsUpdate |= this.initializeXClassDocumentMetadata(doc, "Wiki Component Method XWiki Class");
+        needsUpdate |= initializeXClassDocumentMetadata(doc, "Wiki Component Method XWiki Class");
         needsUpdate |= bclass.addTextField(METHOD_NAME_FIELD, "Method name", 30);
 
         // This field contains wiki syntax (usually some scripting macr) but it's technical content that should be
@@ -243,10 +243,10 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
             needsUpdate = true;
             doc.setTitle(title);
         }
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_1.equals(doc.getSyntax())) {
             needsUpdate = true;
             doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
+            doc.setSyntax(Syntax.XWIKI_2_1);
         }
         if (!doc.isHidden()) {
             needsUpdate = true;

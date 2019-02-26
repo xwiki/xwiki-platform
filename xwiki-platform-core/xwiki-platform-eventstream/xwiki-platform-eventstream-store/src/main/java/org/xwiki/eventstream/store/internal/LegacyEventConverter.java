@@ -105,6 +105,7 @@ public class LegacyEventConverter
         result.setWiki(this.serializer.serialize(e.getWiki()));
 
         result.setTarget(e.getTarget());
+        result.setHidden(e.getHidden());
 
         return result;
     }
@@ -156,7 +157,7 @@ public class LegacyEventConverter
         }
         result.setUser(new DocumentReference(this.resolver.resolve(e.getUser(), EntityType.DOCUMENT)));
         result.setDocumentVersion(e.getVersion());
-
+        result.setHidden(e.isHidden());
 
         result.setTarget(e.getTarget());
         return result;

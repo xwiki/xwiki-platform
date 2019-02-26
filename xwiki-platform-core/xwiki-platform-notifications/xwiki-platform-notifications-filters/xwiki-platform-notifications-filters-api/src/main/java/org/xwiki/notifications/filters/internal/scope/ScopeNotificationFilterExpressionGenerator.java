@@ -89,6 +89,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // list (handleTopLevelInclusiveFilters).
         // It is a complex query, for more information see: https://jira.xwiki.org/browse/XWIKI-14713
         topNode = handleExclusiveFilters(topNode, preferences);
+
         topNode = handleTopLevelInclusiveFilters(topNode, preferences);
 
         // At this point, topNode looks like:
@@ -166,7 +167,7 @@ public class ScopeNotificationFilterExpressionGenerator
     private AbstractOperatorNode handleTopLevelInclusiveFilters(AbstractOperatorNode node,
             ScopeNotificationFilterPreferencesHierarchy preferences)
     {
-        AbstractOperatorNode topNode = node;
+        AbstractOperatorNode topNode = null;
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
         while (it.hasNext()) {
@@ -185,7 +186,12 @@ public class ScopeNotificationFilterExpressionGenerator
         }
 
         // At this point, topNode looks like:
-        // topNode OR event.location = D or event.location = E or event.location = F OR...
+        // topNode AND (event.location = D or event.location = E or event.location = F OR...)
+        if (node != null && topNode != null) {
+            topNode = node.and(topNode);
+        } else if (topNode == null && node != null) {
+            topNode = node;
+        }
 
         return topNode;
     }
@@ -210,6 +216,9 @@ public class ScopeNotificationFilterExpressionGenerator
         // If we have an EXCLUSIVE filter, negate the filter node
         if (scopeNotificationFilterPreference.getFilterType().equals(NotificationFilterType.EXCLUSIVE)) {
             filterNode = not(filterNode);
+        } else if (scopeNotificationFilterPreference.getStartingDate() != null) {
+            filterNode = filterNode.and(value(EventProperty.DATE).greaterThan(
+                    value(scopeNotificationFilterPreference.getStartingDate())));
         }
 
         return filterNode;
@@ -270,6 +279,7 @@ public class ScopeNotificationFilterExpressionGenerator
             String exclusion = String.format(subQuery, NotificationFilterType.EXCLUSIVE.ordinal(), formatParameter);
             return not(expression.inSubQuery(exclusion, parameters));
         } else {
+            subQuery += " AND nfp.startingDate <= event.date";
             String inclusion = String.format(subQuery, NotificationFilterType.INCLUSIVE.ordinal(), formatParameter);
             return expression.inSubQuery(inclusion, parameters);
         }

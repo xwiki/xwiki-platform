@@ -40,10 +40,10 @@ import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -72,17 +72,21 @@ import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import com.icegreen.greenmail.junit.GreenMailRule;
+import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -92,6 +96,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M2
  */
+@ComponentTest
+// @formatter:off
 @ComponentList({
     MailSenderInitializerListener.class,
     TextMimeBodyPartFactory.class,
@@ -106,6 +112,7 @@ import static org.mockito.Mockito.when;
     SendMailQueueManager.class,
     FileSystemMailContentStore.class
 })
+// @formatter:on
 public class JavaIntegrationTest extends AbstractMailIntegrationTest
 {
     private static final String PERMDIR = "target/" + JavaIntegrationTest.class.getSimpleName();
@@ -114,11 +121,13 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
 
     private static final String MAILTMPDIR = String.format("%s/mail", TMPDIR);
 
-    @Rule
-    public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTP));
+    private GreenMail greenMail = new GreenMail(getCustomServerSetup(ServerSetupTest.SMTP));
 
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private TestMailSenderConfiguration configuration;
 
@@ -133,8 +142,10 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
+        this.greenMail.start();
+
         this.configuration = new TestMailSenderConfiguration(
-            this.mail.getSmtp().getPort(), null, null, new Properties());
+            this.greenMail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
 
         // Set the current wiki in the Context
@@ -159,7 +170,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(PERMDIR);
     }
 
-    @Before
+    @BeforeEach
     public void initialize() throws Exception
     {
         // Make sure files for temporary attachments are saved in the target directory
@@ -193,14 +204,18 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         listener.onEvent(new ApplicationReadyEvent(), null, null);
     }
 
-    @After
+    @AfterEach
     public void cleanUp() throws Exception
     {
+        logCapture.ignoreAllMessages();
+
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
         Disposable listener =
             this.componentManager.getInstance(EventListener.class, MailSenderInitializerListener.LISTENER_NAME);
         listener.dispose();
+
+        this.greenMail.stop();
     }
 
     @Test
@@ -239,8 +254,8 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         // ScriptingIntegrationTest test class.
 
         // Verify that the mails have been received (wait maximum 30 seconds).
-        this.mail.waitForIncomingEmail(30000L, 3);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        this.greenMail.waitForIncomingEmail(30000L, 3);
+        MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         // Note: we're receiving 9 messages since we sent 3 with 3 recipients (2 BCC and 1 to)!
         assertEquals(9, messages.length);
@@ -311,8 +326,8 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
-        this.mail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        this.greenMail.waitForIncomingEmail(30000L, 1);
+        MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals("john@doe.com", messages[0].getHeader("To", null));
@@ -359,8 +374,8 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
-        this.mail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        this.greenMail.waitForIncomingEmail(30000L, 1);
+        MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals("john@doe.com", messages[0].getHeader("To", null));
@@ -400,8 +415,8 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         this.sender.sendAsynchronously(Arrays.asList(message), session, memoryMailListener);
 
         // Verify that the mails have been received (wait maximum 30 seconds).
-        this.mail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        this.greenMail.waitForIncomingEmail(30000L, 1);
+        MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals("<custom@domain>", messages[0].getMessageID());
     }

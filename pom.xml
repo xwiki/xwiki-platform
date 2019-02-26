@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>11.1-SNAPSHOT</version>
+  <version>11.2-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -52,9 +52,9 @@
     <hsqldb.version>2.4.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.30</ckeditor.version>
+    <ckeditor.version>1.31</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
-    <batik.version>1.10</batik.version>
+    <batik.version>1.11</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.20</tika.version>
     <pdfbox.version>2.0.13</pdfbox.version>
@@ -118,7 +118,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>4.0.16.Final</version>
+        <version>4.0.17.Final</version>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>

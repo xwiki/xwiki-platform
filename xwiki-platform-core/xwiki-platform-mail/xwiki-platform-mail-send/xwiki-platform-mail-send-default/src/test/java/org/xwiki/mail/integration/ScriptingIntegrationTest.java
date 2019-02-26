@@ -31,10 +31,10 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
@@ -68,18 +68,22 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import com.icegreen.greenmail.junit.GreenMailRule;
+import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -89,6 +93,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M2
  */
+@ComponentTest
 // @formatter:off
 @ComponentList({
     MailSenderInitializerListener.class,
@@ -111,19 +116,23 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
 {
     private static final String PERMDIR = "target/" + ScriptingIntegrationTest.class.getSimpleName();
 
-    @Rule
-    public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTP));
-
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
-
     private MailSenderScriptService scriptService;
+
+    private GreenMail greenMail = new GreenMail(getCustomServerSetup(ServerSetupTest.SMTP));
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
+        this.greenMail.start();
+
         MailSenderConfiguration configuration =
-            new TestMailSenderConfiguration(this.mail.getSmtp().getPort(), null, null, new Properties());
+            new TestMailSenderConfiguration(this.greenMail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, configuration);
 
         // Register a test Permission Checker that allows sending mails
@@ -149,7 +158,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         this.componentManager.registerMockComponent(ConverterManager.class);
     }
 
-    @Before
+    @BeforeEach
     public void initialize() throws Exception
     {
         this.scriptService = this.componentManager.getInstance(ScriptService.class, "mailsender");
@@ -173,14 +182,18 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         listener.onEvent(new ApplicationReadyEvent(), null, null);
     }
 
-    @After
+    @AfterEach
     public void cleanUp() throws Exception
     {
+        logCapture.ignoreAllMessages();
+
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
         Disposable listener =
             this.componentManager.getInstance(EventListener.class, MailSenderInitializerListener.LISTENER_NAME);
         listener.dispose();
+
+        this.greenMail.stop();
     }
 
     @Test
@@ -205,16 +218,16 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         assertTrue(result.getStatusResult().isProcessed());
 
         // Verify that all mails have been sent properly
-        assertFalse("There should not be any failed result!", result.getStatusResult().getByState(MailState.SEND_ERROR)
-            .hasNext());
-        assertFalse("There should not be any failed result!", result.getStatusResult().getByState(MailState.PREPARE_ERROR)
-            .hasNext());
-        assertFalse("There should not be any mails in the ready state!",
-            result.getStatusResult().getByState(MailState.PREPARE_SUCCESS).hasNext());
+        assertFalse(result.getStatusResult().getByState(MailState.SEND_ERROR).hasNext(),
+            "There should not be any failed result!");
+        assertFalse(result.getStatusResult().getByState(MailState.PREPARE_ERROR).hasNext(),
+            "There should not be any failed result!");
+        assertFalse(result.getStatusResult().getByState(MailState.PREPARE_SUCCESS).hasNext(),
+            "There should not be any mails in the ready state!");
 
         // Verify that the mails have been received (wait maximum 30 seconds).
-        this.mail.waitForIncomingEmail(30000L, 3);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        this.greenMail.waitForIncomingEmail(30000L, 3);
+        MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals(3, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject", null));
@@ -263,7 +276,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         message.addPart(
             "text/calendar;method=CANCEL",
             calendarContent,
-            Collections.<String, Object>singletonMap("headers",
+            Collections.singletonMap("headers",
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
         ScriptMailResult result = this.scriptService.send(Arrays.asList(message));
@@ -274,17 +287,16 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         assertEquals(1, result.getStatusResult().getProcessedMailCount());
 
         // Verify that all mails have been sent properly
-        assertFalse("There should not be any failed result!", result.getStatusResult().getByState(MailState.SEND_ERROR)
-            .hasNext());
-        assertFalse("There should not be any failed result!",
-            result.getStatusResult().getByState(MailState.PREPARE_ERROR)
-                .hasNext());
-        assertFalse("There should not be any mails in the ready state!",
-            result.getStatusResult().getByState(MailState.PREPARE_SUCCESS).hasNext());
+        assertFalse(result.getStatusResult().getByState(MailState.SEND_ERROR).hasNext(),
+            "There should not be any failed result!");
+        assertFalse(result.getStatusResult().getByState(MailState.PREPARE_ERROR).hasNext(),
+            "There should not be any failed result!");
+        assertFalse(result.getStatusResult().getByState(MailState.PREPARE_SUCCESS).hasNext(),
+            "There should not be any mails in the ready state!");
 
         // Verify that the mail has been received (wait maximum 30 seconds).
-        this.mail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        this.greenMail.waitForIncomingEmail(30000L, 1);
+        MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals(1, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject", null));

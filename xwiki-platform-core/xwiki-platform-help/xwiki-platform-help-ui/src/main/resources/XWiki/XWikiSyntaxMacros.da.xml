@@ -68,7 +68,7 @@ Der er kun en slags makroer i XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}
 |Vise Makro med indhold|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
-{{/code}
+{{/code}}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
 |Vise macro uden indhold|(((

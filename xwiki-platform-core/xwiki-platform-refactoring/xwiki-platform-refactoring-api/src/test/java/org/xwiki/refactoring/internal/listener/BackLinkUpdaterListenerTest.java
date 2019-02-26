@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
@@ -32,11 +33,14 @@ import org.xwiki.refactoring.internal.job.RenameJob;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -66,6 +70,12 @@ public class BackLinkUpdaterListenerTest
     @MockComponent
     private ContextualAuthorizationManager authorization;
 
+    @Mock
+    private RenameJob renameJob;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
     private DocumentReference aliceReference = new DocumentReference("foo", "Users", "Alice");
 
     private DocumentReference bobReference = new DocumentReference("foo", "Users", "Bob");
@@ -75,9 +85,6 @@ public class BackLinkUpdaterListenerTest
     private DocumentReference denisReference = new DocumentReference("bar", "Users", "Denis");
 
     private DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(aliceReference, bobReference);
-
-    @Mock
-    private RenameJob renameJob;
 
     private MoveRequest renameRequest = new MoveRequest();
 
@@ -102,6 +109,9 @@ public class BackLinkUpdaterListenerTest
 
         verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
         verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
     }
 
     @Test
@@ -117,6 +127,9 @@ public class BackLinkUpdaterListenerTest
 
         verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
         verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(), any());
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
     }
 
     @Test
@@ -131,6 +144,8 @@ public class BackLinkUpdaterListenerTest
 
         verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
         verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(), any());
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
     }
 
     @Test
@@ -154,6 +169,9 @@ public class BackLinkUpdaterListenerTest
 
         verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
         verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
     }
 
     @Test
@@ -166,6 +184,9 @@ public class BackLinkUpdaterListenerTest
 
         verify(this.linkRefactoring, never()).renameLinks(eq(carolReference), any(), any());
         verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
     }
 
     @Test

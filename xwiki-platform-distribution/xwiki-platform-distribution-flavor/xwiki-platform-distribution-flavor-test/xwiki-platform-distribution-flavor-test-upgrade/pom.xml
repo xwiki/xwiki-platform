@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade</name>
@@ -48,7 +48,7 @@
     <upgradetest.previousdata.groupId>${upgradetest.previousflavor.groupId}</upgradetest.previousdata.groupId>
     <upgradetest.previousdata.artifactId>xwiki-platform-distribution-flavor-data-hsqldb</upgradetest.previousdata.artifactId>
     <upgradetest.previousdata.version>${upgradetest.previousflavor.version}</upgradetest.previousdata.version>
-    <upgradetest.previousdata.classifier/>
+    <upgradetest.previousdata.classifier />
   </properties>
   <dependencies>
     <dependency>

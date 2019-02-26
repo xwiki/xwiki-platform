@@ -80,6 +80,19 @@
             <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a></span>
           </div>
         </form>
+      #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
+        #warning($services.localization.render('core.copy.editRightsForbidden',
+        [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        <div class="buttons">
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">
+                $services.localization.render('core.copy.changeTarget')
+              </a>
+            </span>
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a>
+            </span>
+        </div>
       #else
         #set ($success = false)
         #set ($copyAsJob = $services.refactoring.copyAs($sourceDocReference, $targetDocReference))

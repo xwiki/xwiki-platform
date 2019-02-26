@@ -79,7 +79,6 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -117,6 +116,7 @@ import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -1836,10 +1836,15 @@ public class XWiki implements EventListener
             // The only case where we have a null original document is supposedly when the document
             // instance has been crafted and passed #saveDocument without using #getDocument
             // (which is not a good practice)
-            if (originalDocument == null) {
-                originalDocument =
-                    getDocument(new DocumentReference(document.getDocumentReference(), document.getLocale()), context);
-                document.setOriginalDocument(originalDocument);
+            // Also for document indicated as new make sure the previous document is accurate.
+            if (originalDocument == null || document.isNew()) {
+                XWikiDocument existing = getDocument(document.getDocumentReferenceWithLocale(), context);
+                // Switch the original document only if we actually find an existing document or if there is no original
+                // document in the first place
+                if (originalDocument == null || !existing.isNew()) {
+                    originalDocument = existing;
+                    document.setOriginalDocument(originalDocument);
+                }
             }
 
             ObservationManager om = getObservationManager();
@@ -1867,12 +1872,19 @@ public class XWiki implements EventListener
                 }
             }
 
-            // Put attachments to remove in recycle bin
-            if (hasAttachmentRecycleBin(context)) {
-                for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
-                    if (attachment.isToRecycleBin()) {
-                        getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(), context.getUser(),
-                            new Date(), context, true);
+            // Delete existing document if we replace with a new one
+            if (document.isNew() && !originalDocument.isNew()) {
+                // We don't want to notify about this delete since from outside world point of view it's an update an
+                // not a delete+create
+                deleteDocument(originalDocument, true, false, context);
+            } else {
+                // Put attachments to remove in recycle bin
+                if (hasAttachmentRecycleBin(context)) {
+                    for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
+                        if (attachment.isToRecycleBin()) {
+                            getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(),
+                                context.getUser(), new Date(), context, true);
+                        }
                     }
                 }
             }
@@ -2861,6 +2873,31 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Set the locale in the given context.
+     * <p>
+     * If {@code forceSupported} is true, then the locale will be set only if it is in the {@see availableLocales}. Note
+     * that all the parent locales are checked.
+     *
+     * @param locale the locale to use
+     * @param context the context
+     * @param availableLocales the accepted locales. Used only if {@see forceSupported} is true
+     * @param forceSupported determine if the {@see locale} should be checked against the {@see availableLocales}
+     * @return the locale that has been set or null
+     */
+    private Locale setLocale(Locale locale, XWikiContext context, Set<Locale> availableLocales, boolean forceSupported)
+    {
+        while (locale != null) {
+            if (!forceSupported || availableLocales.contains(locale)) {
+                context.setLocale(locale);
+                break;
+            }
+            locale = LocaleUtils.getParentLocale(locale);
+        }
+
+        return locale;
+    }
+
+    /**
      * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
      * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get the
      * locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists then use
@@ -2872,9 +2909,110 @@ public class XWiki implements EventListener
      */
     public Locale getLocalePreference(XWikiContext context)
     {
-        String language = getLanguagePreference(context);
+        Locale defaultLocale = this.getDefaultLocale(context);
+        Set<Locale> availableLocales = new HashSet<>(this.getAvailableLocales(context));
+        boolean forceSupported = getConfiguration().getProperty("xwiki.language.forceSupported", "0").equals("1");
 
-        return LocaleUtils.toLocale(language);
+        // First we try to get the language from the XWiki Context. This is the current language
+        // being used.
+        Locale locale = context.getLocale();
+        if (locale != null) {
+            return locale;
+        }
+
+        // If the wiki is non multilingual then the language is the default language.
+        if (!context.getWiki().isMultiLingual(context)) {
+            locale = defaultLocale;
+            context.setLocale(locale);
+            return locale;
+        }
+
+        // As the wiki is multilingual try to find the language to use from the request by looking
+        // for a language parameter. If the language value is "default" use the default language
+        // from the XWiki preferences settings. Otherwise set a cookie to remember the language
+        // in use.
+        try {
+            String language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
+            if (StringUtils.isNotEmpty(language)) {
+                if ("default".equals(language)) {
+                    // forgetting language cookie
+                    Cookie cookie = new Cookie("language", "");
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/");
+                    context.getResponse().addCookie(cookie);
+                    context.setLocale(defaultLocale);
+                    return defaultLocale;
+                } else {
+                    locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
+                    if (LocaleUtils.isAvailableLocale(locale)) {
+                        // setting language cookie
+                        Cookie cookie = new Cookie("language", context.getLocale().toString());
+                        cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+                        cookie.setPath("/");
+                        context.getResponse().addCookie(cookie);
+                        return locale;
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        // As no language parameter was passed in the request, try to get the language to use from a cookie.
+        try {
+            // First we get the language from the cookie
+            String language = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
+            if (StringUtils.isNotEmpty(language)) {
+                locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
+                if (LocaleUtils.isAvailableLocale(locale)) {
+                    return locale;
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        // Next from the default user preference
+        try {
+            String user = context.getUser();
+            XWikiDocument userdoc;
+            userdoc = getDocument(user, context);
+            if (userdoc != null) {
+                String language =
+                        Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
+                if (StringUtils.isNotEmpty(language)) {
+                    locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
+                    if (LocaleUtils.isAvailableLocale(locale)) {
+                        return locale;
+                    }
+                }
+            }
+        } catch (XWikiException e) {
+        }
+
+        // If the default language is preferred, and since the user didn't explicitly ask for a
+        // language already, then use the default wiki language.
+        if (getConfiguration().getProperty("xwiki.language.preferDefault", "0").equals("1")
+                || getSpacePreference("preferDefaultLanguage", "0", context).equals("1"))
+        {
+            locale = defaultLocale;
+            context.setLocale(locale);
+            return locale;
+        }
+
+        // Then from the navigator language setting
+        if (context.getRequest() != null && context.getRequest().getLocales() != null) {
+            for (Locale acceptedLocale : Collections.list(context.getRequest().getLocales())) {
+                locale = setLocale(acceptedLocale, context, availableLocales, forceSupported);
+                if (LocaleUtils.isAvailableLocale(locale)) {
+                    return locale;
+                }
+            }
+            // If none of the languages requested by the client is acceptable, skip to next
+            // phase (use default language).
+        }
+
+        // Finally, use the default language from the global preferences.
+        context.setLocale(defaultLocale);
+        return defaultLocale;
     }
 
     /**
@@ -2888,113 +3026,9 @@ public class XWiki implements EventListener
      * @deprecated since 8.0M1, use {@link #getLocalePreference(XWikiContext)} instead
      */
     @Deprecated
-    // TODO: move implementation to #getLocalePreference
     public String getLanguagePreference(XWikiContext context)
     {
-        // First we try to get the language from the XWiki Context. This is the current language
-        // being used.
-        String language = context.getLanguage();
-        if (language != null) {
-            return language;
-        }
-
-        String defaultLanguage = getDefaultLanguage(context);
-
-        // If the wiki is non multilingual then the language is the default language.
-        if (!context.getWiki().isMultiLingual(context)) {
-            language = defaultLanguage;
-            context.setLanguage(language);
-            return language;
-        }
-
-        // As the wiki is multilingual try to find the language to use from the request by looking
-        // for a language parameter. If the language value is "default" use the default language
-        // from the XWiki preferences settings. Otherwise set a cookie to remember the language
-        // in use.
-        try {
-            language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
-            if ((language != null) && (!language.equals(""))) {
-                if (language.equals("default")) {
-                    // forgetting language cookie
-                    Cookie cookie = new Cookie("language", "");
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    context.getResponse().addCookie(cookie);
-                    language = defaultLanguage;
-                } else {
-                    // setting language cookie
-                    Cookie cookie = new Cookie("language", language);
-                    cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                    cookie.setPath("/");
-                    context.getResponse().addCookie(cookie);
-                }
-                context.setLanguage(language);
-                return language;
-            }
-        } catch (Exception e) {
-        }
-
-        // As no language parameter was passed in the request, try to get the language to use
-        // from a cookie.
-        try {
-            // First we get the language from the cookie
-            language = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
-            if ((language != null) && (!language.equals(""))) {
-                context.setLanguage(language);
-                return language;
-            }
-        } catch (Exception e) {
-        }
-
-        // Next from the default user preference
-        try {
-            String user = context.getUser();
-            XWikiDocument userdoc = null;
-            userdoc = getDocument(user, context);
-            if (userdoc != null) {
-                language = Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
-                if (!language.equals("")) {
-                    context.setLanguage(language);
-                    return language;
-                }
-            }
-        } catch (XWikiException e) {
-        }
-
-        // If the default language is preferred, and since the user didn't explicitly ask for a
-        // language already, then use the default wiki language.
-        if (getConfiguration().getProperty("xwiki.language.preferDefault", "0").equals("1")
-            || getSpacePreference("preferDefaultLanguage", "0", context).equals("1")) {
-            language = defaultLanguage;
-            context.setLanguage(language);
-            return language;
-        }
-
-        // Then from the navigator language setting
-        if (context.getRequest() != null) {
-            String acceptHeader = context.getRequest().getHeader("Accept-Language");
-            // If the client didn't specify some languages, skip this phase
-            if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
-                List<String> acceptedLanguages = getAcceptedLanguages(context.getRequest());
-                // We can force one of the configured languages to be accepted
-                if (getConfiguration().getProperty("xwiki.language.forceSupported", "0").equals("1")) {
-                    List<String> available = Arrays.asList(getXWikiPreference("languages", context).split("[, |]"));
-                    // Filter only configured languages
-                    acceptedLanguages.retainAll(available);
-                }
-                if (acceptedLanguages.size() > 0) {
-                    // Use the "most-preferred" language, as requested by the client.
-                    context.setLanguage(acceptedLanguages.get(0));
-                    return acceptedLanguages.get(0);
-                }
-                // If none of the languages requested by the client is acceptable, skip to next
-                // phase (use default language).
-            }
-        }
-
-        // Finally, use the default language from the global preferences.
-        context.setLanguage(defaultLanguage);
-        return defaultLanguage;
+        return getLocalePreference(context).toString();
     }
 
     /**
@@ -4294,6 +4328,12 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
+        deleteDocument(doc, totrash, true, context);
+    }
+
+    private void deleteDocument(XWikiDocument doc, boolean totrash, boolean notify, XWikiContext context)
+        throws XWikiException
+    {
         String currentWiki = null;
 
         currentWiki = context.getWikiId();
@@ -4315,7 +4355,7 @@ public class XWiki implements EventListener
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            if (om != null) {
+            if (notify && om != null) {
                 CancelableEvent documentEvent = new DocumentDeletingEvent(doc.getDocumentReference());
                 om.notify(documentEvent, blankDoc, context);
 
@@ -4342,7 +4382,7 @@ public class XWiki implements EventListener
                 // Inform notification mechanisms that a document has been deleted
                 // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
-                if (om != null) {
+                if (notify && om != null) {
                     om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
                 }
             } catch (Exception ex) {
@@ -4474,20 +4514,14 @@ public class XWiki implements EventListener
             context.setWikiId(sourceWiki);
             XWikiDocument sdoc = getDocument(sourceDocumentReference, context);
             if (!sdoc.isNew()) {
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info(
-                        "Copying document [" + sourceDocumentReference + "] to [" + targetDocumentReference + "]");
-                }
+                LOGGER.info("Copying document [{}] to [{}]", sourceDocumentReference, targetDocumentReference);
 
                 // Let's switch to the other database to verify if the document already exists
                 context.setWikiId(targetWiki);
-                XWikiDocument tdoc = getDocument(targetDocumentReference, context);
+                XWikiDocument previoustdoc = getDocument(targetDocumentReference, context);
                 // There is already an existing document
-                if (!tdoc.isNew()) {
-                    if (force) {
-                        // We need to delete the previous document
-                        deleteDocument(tdoc, context);
-                    } else {
+                if (!previoustdoc.isNew()) {
+                    if (!force) {
                         return false;
                     }
                 }
@@ -4496,11 +4530,9 @@ public class XWiki implements EventListener
                 context.setWikiId(sourceWiki);
 
                 if (wikilocale == null) {
-                    tdoc = sdoc.copyDocument(targetDocumentReference, context);
+                    XWikiDocument tdoc = sdoc.copyDocument(targetDocumentReference, context);
 
-                    // We know the target document doesn't exist and we want to save the attachments without
-                    // incrementing their versions.
-                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    // Make sure to replace the existing document if any
                     tdoc.setNew(true);
 
                     // forget past versions
@@ -4538,10 +4570,8 @@ public class XWiki implements EventListener
                     List<String> tlist = sdoc.getTranslationList(context);
                     for (String clanguage : tlist) {
                         XWikiDocument stdoc = sdoc.getTranslatedDocument(clanguage, context);
-                        if (LOGGER.isInfoEnabled()) {
-                            LOGGER.info("Copying document [" + sourceWiki + "], language [" + clanguage + "] to ["
-                                + targetDocumentReference + "]");
-                        }
+                        LOGGER.info("Copying document [{}], language [{}] to [{}]", sourceWiki, clanguage,
+                            targetDocumentReference);
 
                         context.setWikiId(targetWiki);
                         XWikiDocument ttdoc = tdoc.getTranslatedDocument(clanguage, context);
@@ -4555,6 +4585,9 @@ public class XWiki implements EventListener
                         context.setWikiId(sourceWiki);
 
                         ttdoc = stdoc.copyDocument(targetDocumentReference, context);
+
+                        // Make sure to replace the existing document if any
+                        ttdoc.setNew(true);
 
                         // forget past versions
                         if (reset) {
@@ -4591,11 +4624,9 @@ public class XWiki implements EventListener
                     // We want only one language in the end
                     XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilocale, context);
 
-                    tdoc = stdoc.copyDocument(targetDocumentReference, context);
+                    XWikiDocument tdoc = stdoc.copyDocument(targetDocumentReference, context);
 
-                    // We know the target document doesn't exist and we want to save the attachments without
-                    // incrementing their versions.
-                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    // Make sure to replace the existing document if any
                     tdoc.setNew(true);
 
                     // forget language

@@ -77,7 +77,7 @@ Pour accéder à la liste de toutes les macros disponibles, allez à la [[page d
 |Macro|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
-{{/code}
+{{/code}}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
 

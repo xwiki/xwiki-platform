@@ -173,9 +173,20 @@ public class OfficeImporterIT
         resultPage = wikiEditPage.clickCancel();
         attachmentsPane = resultPage.openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
-
         // the \ before the @ needs to be removed as it's not in the filename
         assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replaceAll("\\\\@", "@")));
+        deletePage(testName);
+
+        // Test power point file with accents
+        resultPage = importFile(testName, "msoffice.97-2003/Test_accents & é$ù <!-_.+*();?:@=.ppt");
+        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide0.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide1.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide2.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide3.jpg"));
+        wikiEditPage = resultPage.editWiki();
+        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & e$u <!-_.+*();?:\\@=-slide0.jpg]]"));
+        resultPage = wikiEditPage.clickCancel();
         deletePage(testName);
     }
 

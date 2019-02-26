@@ -20,9 +20,11 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.job.Job;
@@ -33,11 +35,13 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
 import org.xwiki.refactoring.job.EntityRequest;
+import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -88,6 +92,8 @@ public class DeleteJobTest extends AbstractEntityJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
+        verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
+            eq(Collections.singletonMap(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(documentReference);
     }

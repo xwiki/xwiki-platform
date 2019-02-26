@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Parent POM</name>
@@ -38,7 +38,16 @@
     <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-flamingo-skin-test-tests</module>
+    <!-- Sorted alphabetically -->
     <module>xwiki-platform-flamingo-skin-test-pageobjects</module>
+    <module>xwiki-platform-flamingo-skin-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-flamingo-skin-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

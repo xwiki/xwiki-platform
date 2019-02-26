@@ -71,7 +71,7 @@ Anche nella Sintassi XWiki 2.0 ci sono due tipi di macro:
 |Macro XWiki|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
-{{/code}
+{{/code}}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
 

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -35,12 +36,11 @@ import org.xwiki.refactoring.job.question.EntitySelection;
  *
  * @param <R> the request type
  * @param <S> the job status type
- *
  * @version $Id$
  * @since 9.1RC1
  */
 public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S extends EntityJobStatus<? super R>>
-        extends AbstractEntityJob<R, S>
+    extends AbstractEntityJob<R, S>
 {
     /**
      * Map that will contain all entities that are concerned by the refactoring.
@@ -67,7 +67,6 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
             progressManager.popLevelProgress(this);
         }
     }
-
 
     protected void getEntities(Collection<EntityReference> entityReferences)
     {
@@ -114,7 +113,19 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
 
     private void getEntities(SpaceReference spaceReference)
     {
-        visitDocuments(spaceReference, documentReference ->
-                concernedEntities.put(documentReference, new EntitySelection(documentReference)));
+        visitDocuments(spaceReference,
+            documentReference -> concernedEntities.put(documentReference, new EntitySelection(documentReference)));
+    }
+
+    protected void notifyDocumentsDeleting()
+    {
+        // Allow others to exclude documents from being deleted.
+        DocumentsDeletingEvent event = new DocumentsDeletingEvent();
+        this.observationManager.notify(event, this, this.concernedEntities);
+
+        // Stop the job if some listener has canceled the action.
+        if (event.isCanceled()) {
+            getStatus().cancel();
+        }
     }
 }

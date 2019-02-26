@@ -123,8 +123,8 @@ public class DefaultTemplateHTMLDisplayerTest
     {
         this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, List.class, Block.class), null);
         verify(this.templateManager)
-            .getTemplate("html_displayer/java.util.list..org.xwiki.rendering.block.block../view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/java.util.list..org.xwiki.rendering.block.block...vm");
+            .getTemplate("html_displayer/java.util.list.org.xwiki.rendering.block.block./view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/java.util.list.org.xwiki.rendering.block.block..vm");
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/default.vm");
     }

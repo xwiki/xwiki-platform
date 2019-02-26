@@ -50,6 +50,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -74,7 +75,6 @@ public class DefaultParametrizedNotificationManagerTest
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
-    private Date startDate;
 
     @Before
     public void setUp() throws Exception
@@ -82,10 +82,10 @@ public class DefaultParametrizedNotificationManagerTest
         eventStream = mocker.getInstance(EventStream.class);
         queryGenerator = mocker.getInstance(QueryGenerator.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        startDate = new Date(10);
         recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
 
         query = mock(Query.class);
+        when(query.setLimit(anyInt())).thenReturn(query);
         when(queryGenerator.generateQuery(any(NotificationParameters.class))).thenReturn(query);
 
         NotificationPreference pref1 = mock(NotificationPreference.class);

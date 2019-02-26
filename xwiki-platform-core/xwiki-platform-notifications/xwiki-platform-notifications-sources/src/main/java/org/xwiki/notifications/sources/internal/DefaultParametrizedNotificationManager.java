@@ -56,6 +56,11 @@ import org.xwiki.security.authorization.Right;
 @Singleton
 public class DefaultParametrizedNotificationManager implements ParametrizedNotificationManager
 {
+    /**
+     * the maximal size of events to fetch in a single batch.
+     */
+    private static final int MAX_BATCH_SIZE = 1280;
+
     @Inject
     private EventStream eventStream;
 
@@ -103,49 +108,71 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     {
         // Because the user might not be able to see all notifications because of the rights, we take from the database
         // more events than expected and we will filter afterwards.
-        final int batchSize = parameters.expectedCount * 2;
+        int batchSize = parameters.expectedCount * 2;
+        int offset = 0;
         try {
-            // Create the query
-            Query query = queryGenerator.generateQuery(parameters);
-            if (query == null) {
-                return Collections.emptyList();
-            }
-            query.setLimit(batchSize);
 
-            // Get a batch of events
-            List<Event> batch = eventStream.searchEvents(query);
-
-            // Add to the results the events the user has the right to see
-            for (Event event : batch) {
-                DocumentReference document = event.getDocument();
-                // Don't record events concerning a doc the user cannot see
-                if (document != null && !authorizationManager.hasAccess(Right.VIEW, parameters.user,
-                        document)) {
-                    continue;
+            boolean done = false;
+            while (!done) {
+                // Create the query
+                Query query = queryGenerator.generateQuery(parameters);
+                if (query == null) {
+                    return Collections.emptyList();
                 }
+                query.setLimit(batchSize).setOffset(offset);
 
-                if (filterEvent(event, parameters)) {
-                    continue;
+                // Get a batch of events
+                List<Event> batch = eventStream.searchEvents(query);
+
+                done = addMatchingEventsToResults(batch, parameters, results);
+                if (!done) {
+                    if (batch.size() < batchSize) {
+                        // there are no more results to expect. stop.
+                        done = true;
+                    } else {
+                        // grab a larger batch size next time to get more possible results
+                        offset += batchSize;
+                        if (batchSize < MAX_BATCH_SIZE) {
+                            batchSize <<= 1;
+                        }
+                    }
                 }
-
-                // Record this event
-                recordEvent(results, event);
-                // If the expected count is reached, stop now
-                if (results.size() >= parameters.expectedCount) {
-                    return results;
-                }
-            }
-
-            // If we haven't get the expected number of events, perform a new batch
-            if (results.size() < parameters.expectedCount && batch.size() == batchSize) {
-                parameters.blackList.addAll(getEventsIds(batch));
-                getEvents(results, parameters);
             }
 
             return results;
         } catch (Exception e) {
             throw new NotificationException("Fail to get the list of notifications.", e);
         }
+    }
+
+    private boolean addMatchingEventsToResults(List<Event> batch, NotificationParameters parameters,
+        List<CompositeEvent> results) throws EventStreamException, NotificationException
+    {
+        boolean done = false;
+        // Add to the results the events the user has the right to see
+        for (Event event : batch) {
+            DocumentReference document = event.getDocument();
+            // Don't record events concerning a doc the user cannot see
+            if (document != null && !authorizationManager.hasAccess(Right.VIEW, parameters.user,
+                document)) {
+                //System.err.println("skip entry "+ event +" : non viewable");
+                continue;
+            }
+
+            if (filterEvent(event, parameters)) {
+                //System.err.println("skip entry "+ event +" : is filtered");
+                continue;
+            }
+
+            // Record this event
+            recordEvent(results, event);
+            // If the expected count is reached, stop now
+            if (results.size() >= parameters.expectedCount) {
+                done = true;
+                break;
+            }
+        }
+        return done;
     }
 
     private boolean filterEvent(Event event, NotificationParameters parameters) throws EventStreamException

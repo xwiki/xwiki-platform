@@ -64,6 +64,16 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
      */
     public static final String TEMPLATE_EXTENSION = ".vm";
 
+    /**
+     * A regular expression specifying what are the special characters that have to be replaced in created paths.
+     */
+    private static final String SPECIAL_CHARACTERS_TO_REPLACE = "[<>? ]";
+
+    /**
+     * The replacement character used to clean paths from special characters.
+     */
+    private static final String REPLACEMENT_CHARACTER = ".";
+
     @Inject
     protected TemplateManager templateManager;
 
@@ -126,7 +136,8 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
      * <li>html_displayer/[mode].vm
      * <li>html_displayer/default.vm
      * </ul>
-     * 
+     * Please note that the following special characters: &gt;, &lt;, ? and spaces will be replaced by "." in the path.
+     *
      * @return the template name used to make the rendering
      */
     private Template getTemplate(Type type, Object value, String mode)
@@ -151,17 +162,22 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
         return template;
     }
 
+    private String cleanPath(String path)
+    {
+        return path.replaceAll(SPECIAL_CHARACTERS_TO_REPLACE, REPLACEMENT_CHARACTER);
+    }
+
     private List<String> getTemplatePaths(Type type, String mode)
     {
         List<String> paths = new ArrayList<>();
         for (String typeName : getTypeNames(type)) {
             if (mode != null) {
-                paths.add(typeName + '/' + mode);
+                paths.add(cleanPath(typeName + '/' + mode));
             }
-            paths.add(typeName);
+            paths.add(cleanPath(typeName));
         }
         if (mode != null) {
-            paths.add(mode);
+            paths.add(cleanPath(mode));
         }
         paths.add("default");
         return paths;

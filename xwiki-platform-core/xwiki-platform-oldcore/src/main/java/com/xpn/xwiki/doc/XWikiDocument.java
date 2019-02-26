@@ -5023,6 +5023,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         Set<XWikiLink> links;
 
+        // We don't handle the links the same way in 1.0 syntax for retro-compatibility reason
+        // So here we explicitely get the link from the DB instead of looking inside the document.
         if (is10Syntax()) {
             links = new LinkedHashSet<>(getStore(context).loadLinks(getId(), context, true));
         } else {
@@ -5047,16 +5049,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * xwiki/1.0 document's content to others documents.
      *
      * @param context the XWiki context.
-     * @return the document names for linked pages, if null an error append.
+     * @return the document references for linked pages, if null an error append.
      * @since 1.9M2
      */
-    private Set<String> getUniqueLinkedPages10(XWikiContext context)
+    private Set<DocumentReference> getUniqueLinkedPages10(XWikiContext context)
     {
-        Set<String> pageNames;
+        Set<DocumentReference> pageNames;
 
         try {
             List<String> list = context.getUtil().getUniqueMatches(getContent(), "\\[(.*?)\\]", 1);
-            pageNames = new HashSet<String>(list.size());
+            pageNames = new HashSet<DocumentReference>(list.size());
 
             DocumentReference currentDocumentReference = getDocumentReference();
             for (String name : list) {
@@ -5109,7 +5111,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                     // Verify that the link is not an autolink (i.e. a link to the current document)
                     if (!documentReference.equals(currentDocumentReference)) {
-                        pageNames.add(getCompactEntityReferenceSerializer().serialize(documentReference));
+                        pageNames.add(documentReference);
                     }
                 }
             }
@@ -5128,12 +5130,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * document's content to others documents.
      *
      * @param context the XWiki context.
-     * @return the document names for linked pages, if null an error append.
-     * @since 1.9M2
+     * @return the document references for linked pages, if null an error append.
+     * @since 11.2RC1
      */
-    public Set<String> getUniqueLinkedPages(XWikiContext context)
+    private Set<DocumentReference> getUniqueLinkedPageReferences(XWikiContext context)
     {
-        Set<String> pageNames;
+        Set<DocumentReference> pageNames;
 
         XWikiDocument contextDoc = context.getDoc();
         String contextWiki = context.getWikiId();
@@ -5142,7 +5144,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Make sure the right document is used as context document
             context.setDoc(this);
             // Make sure the right wiki is used as context document
-            context.setWikiId(getDatabase());
+            context.setWikiId(getDocumentReference().getWikiReference().getName());
 
             if (is10Syntax()) {
                 pageNames = getUniqueLinkedPages10(context);
@@ -5152,7 +5154,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 // TODO: Add support for macro as well.
                 List<LinkBlock> linkBlocks =
                     dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
-                pageNames = new LinkedHashSet<String>(linkBlocks.size());
+                pageNames = new LinkedHashSet<DocumentReference>(linkBlocks.size());
 
                 DocumentReference currentDocumentReference = getDocumentReference();
 
@@ -5175,8 +5177,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                     // FIXME?: pass this.getDocumentReference as parameter to the resolve so that relative references
                     // get resolved relative to this and not to the context document.
-                    EntityReference documentReference =
-                        getResourceReferenceEntityReferenceResolver().resolve(reference, EntityType.DOCUMENT);
+                    DocumentReference documentReference =
+                        (DocumentReference) getResourceReferenceEntityReferenceResolver()
+                            .resolve(reference, EntityType.DOCUMENT);
 
                     // Verify after resolving it that the link is not an autolink(i.e. a link to the current document)
                     if (!documentReference.equals(currentDocumentReference)) {
@@ -5185,9 +5188,51 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                         // part before serializing.
                         // This is a bit of a hack since the default serializer should theoretically fail
                         // if it's passed an invalid reference.
-                        pageNames.add(getCompactWikiEntityReferenceSerializer().serialize(documentReference));
+                        pageNames.add(documentReference);
                     }
                 }
+            }
+        } finally {
+            context.setDoc(contextDoc);
+            context.setWikiId(contextWiki);
+        }
+
+        return pageNames;
+    }
+
+    /**
+     * Extract all the unique static (i.e. not generated by macros) wiki links (pointing to wiki page) from this
+     * document's content to others documents.
+     *
+     * @param context the XWiki context.
+     * @return the document names for linked pages, if null an error append.
+     * @since 1.9M2
+     */
+    public Set<String> getUniqueLinkedPages(XWikiContext context)
+    {
+        Set<DocumentReference> pageReferences = this.getUniqueLinkedPageReferences(context);
+        Set<String> pageNames = new LinkedHashSet<>(pageReferences.size());
+        XWikiDocument contextDoc = context.getDoc();
+        String contextWiki = context.getWikiId();
+        EntityReferenceSerializer<String> serializer;
+
+        try {
+            // Specify the right context information for using the compact wiki serializer properly
+            // Make sure the right document is used as context document
+            context.setDoc(this);
+            // Make sure the right wiki is used as context document
+            context.setWikiId(getDocumentReference().getWikiReference().getName());
+
+            // for retro-compatibility reason we don't use the same serializer for 1.0 syntax.
+            if (is10Syntax()) {
+                serializer = getCompactEntityReferenceSerializer();
+            } else {
+                serializer = getCompactWikiEntityReferenceSerializer();
+            }
+
+
+            for (DocumentReference pageReference : pageReferences) {
+                pageNames.add(serializer.serialize(pageReference));
             }
         } finally {
             context.setDoc(contextDoc);

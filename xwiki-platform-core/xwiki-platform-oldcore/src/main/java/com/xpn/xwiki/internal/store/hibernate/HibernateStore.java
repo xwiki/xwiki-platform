@@ -26,8 +26,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -112,8 +110,6 @@ public class HibernateStore implements Disposable
     private SessionFactory sessionFactory;
 
     private Metadata metadata;
-
-    private Map<String, String[]> validTypesMap = new HashMap<>();
 
     /**
      * Allows to get the current Hibernate config file path

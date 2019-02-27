@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.store.hibernate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -34,6 +35,7 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * @since 11.1RC
  */
 @Component(roles = HibernateConfiguration.class)
+@Singleton
 public class HibernateConfiguration
 {
     @Inject

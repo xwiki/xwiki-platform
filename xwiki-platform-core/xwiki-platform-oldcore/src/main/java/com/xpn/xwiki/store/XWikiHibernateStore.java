@@ -1644,7 +1644,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             final Session session = this.getSession(context);
 
             org.hibernate.query.Query<String> query = session.createQuery(
-                "select prop.classType from BaseProperty as prop " + "where prop.id.id = :id and prop.id.name= :name",
+                "select prop.classType from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name",
                 String.class);
             query.setParameter("id", property.getId());
             query.setParameter("name", property.getName());

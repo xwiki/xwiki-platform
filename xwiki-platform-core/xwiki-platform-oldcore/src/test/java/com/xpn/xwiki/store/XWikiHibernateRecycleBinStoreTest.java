@@ -21,6 +21,7 @@ package com.xpn.xwiki.store;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.hamcrest.object.HasToString;
 import org.hibernate.Criteria;
@@ -65,7 +66,7 @@ public class XWikiHibernateRecycleBinStoreTest extends AbstractXWikiHibernateSto
     {
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getFullName()).thenReturn("Space.Page");
-        when(document.getLanguage()).thenReturn("ro");
+        when(document.getLocale()).thenReturn(Locale.FRENCH);
 
         List<XWikiDeletedDocument> deletedVersions =
             Arrays.asList(mock(XWikiDeletedDocument.class, "v1"), mock(XWikiDeletedDocument.class, "v2"));
@@ -79,17 +80,20 @@ public class XWikiHibernateRecycleBinStoreTest extends AbstractXWikiHibernateSto
 
         // Too bad the restrictions don't implement equals..
         verify(criteria).add(argThat(new HasToString<SimpleExpression>(equalTo("fullName=Space.Page"))));
-        verify(criteria).add(argThat(new HasToString<SimpleExpression>(equalTo("language=ro"))));
+        verify(criteria).add(argThat(new HasToString<SimpleExpression>(equalTo("language=fr"))));
         verify(criteria).addOrder(argThat(new HasToString<Order>(equalTo("date desc"))));
     }
 
     @Test
     public void getAllDeletedDocumentsWhenLanguageIsEmpty() throws Exception
     {
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getLocale()).thenReturn(Locale.ROOT);
+
         Criteria criteria = mock(Criteria.class);
         when(session.createCriteria(XWikiDeletedDocument.class)).thenReturn(criteria);
 
-        mocker.getComponentUnderTest().getAllDeletedDocuments(mock(XWikiDocument.class), xcontext, true);
+        mocker.getComponentUnderTest().getAllDeletedDocuments(document, xcontext, true);
 
         // Too bad the restrictions don't implement equals..
         verify(criteria).add(argThat(new HasToString<SimpleExpression>(equalTo("fullName=null"))));

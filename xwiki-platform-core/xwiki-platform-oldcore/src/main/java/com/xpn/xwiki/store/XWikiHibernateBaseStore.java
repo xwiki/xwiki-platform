@@ -96,6 +96,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
         String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
         LOGGER.debug("Hibernate configuration file: [{}]", path);
 
+        this.hibernateConfiguration = new HibernateConfiguration();
+
         setPath(path);
     }
 
@@ -108,6 +110,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     @Deprecated
     public XWikiHibernateBaseStore(String hibpath)
     {
+        this.hibernateConfiguration = new HibernateConfiguration();
+
         setPath(hibpath);
     }
 
@@ -359,7 +363,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     {
         // There's no issue when in database mode, only in schema mode.
         if (isInSchemaMode()) {
-            Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
+            Dialect dialect = this.store.getDialect();
             if (dialect.getNativeIdentifierGeneratorStrategy().equals("sequence")) {
                 // We create the sequence only if it's not already in the SQL to execute as otherwise we would get an
                 // error that the sequence already exists ("relation "hibernate_sequence" already exists").

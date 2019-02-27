@@ -76,6 +76,12 @@
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
       <version>0.42</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->
@@ -162,6 +168,12 @@
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
         </exclusion>
+        <!--  Let's hope Hibernate is fine with Dom4J 2.1.0.
+              Remove when https://jira.xwiki.org/browse/XCOMMONS-1585 is fixed. -->
+        <exclusion>
+          <groupId>org.dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- Hibernate use an older id -->
@@ -212,10 +224,6 @@
     </dependency>
 
     <!-- XML processing -->
-    <dependency>
-      <groupId>org.dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-    </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
@@ -351,6 +359,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-velocity-webapp</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -597,6 +611,12 @@
       <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

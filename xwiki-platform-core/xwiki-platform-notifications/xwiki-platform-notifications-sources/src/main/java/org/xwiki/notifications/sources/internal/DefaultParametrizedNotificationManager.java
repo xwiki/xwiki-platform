@@ -61,6 +61,11 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
      */
     private static final int MAX_BATCH_SIZE = 1280;
 
+    /**
+     * the maximal time in milliseconds to spend fetching a single batch.
+     */
+    private static final long MAX_EVENT_FETCHING_TIME_MILLIS = 10000L;
+
     @Inject
     private EventStream eventStream;
 
@@ -100,16 +105,17 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadEmailFilter)) {
             parameters.filters.add(eventReadEmailFilter);
         }
-        return getEvents(new ArrayList<>(), parameters);
+        return getEventsInternal(parameters);
     }
 
-    private List<CompositeEvent> getEvents(List<CompositeEvent> results, NotificationParameters parameters)
-            throws NotificationException
+    private List<CompositeEvent> getEventsInternal(NotificationParameters parameters) throws NotificationException
     {
         // Because the user might not be able to see all notifications because of the rights, we take from the database
         // more events than expected and we will filter afterwards.
         int batchSize = parameters.expectedCount * 2;
         int offset = 0;
+        long deadline = System.currentTimeMillis() + MAX_EVENT_FETCHING_TIME_MILLIS;
+        List<CompositeEvent> results = new ArrayList<>();
         try {
 
             boolean done = false;
@@ -126,8 +132,8 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
 
                 done = addMatchingEventsToResults(batch, parameters, results);
                 if (!done) {
-                    if (batch.size() < batchSize) {
-                        // there are no more results to expect. stop.
+                    if (batch.size() < batchSize || System.currentTimeMillis() >= deadline) {
+                        // there are no more results to expect, or we needed too much time. stop.
                         done = true;
                     } else {
                         // grab a larger batch size next time to get more possible results

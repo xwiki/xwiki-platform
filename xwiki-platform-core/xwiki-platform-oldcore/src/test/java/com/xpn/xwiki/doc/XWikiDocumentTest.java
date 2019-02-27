@@ -236,6 +236,41 @@ public class XWikiDocumentTest
     }
 
     @Test
+    public void getUniqueWikiLinkedPages() throws XWikiException
+    {
+        XWikiDocument contextDocument =
+            new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));
+        this.oldcore.getXWikiContext().setDoc(contextDocument);
+
+        this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
+            + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
+            + "[[]][[#anchor]][[?param=value]][[targetwiki:TargetSpace.TargetPage]]");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        Set<XWikiLink> linkedPages = this.document.getUniqueWikiLinkedPages(this.oldcore.getXWikiContext());
+        Set<XWikiLink> expectedLinkedPages = new LinkedHashSet<>();
+        XWikiLink xWikiLink = new XWikiLink();
+        xWikiLink.setDocId(this.document.getId());
+        xWikiLink.setFullName(DOCSPACE + "." + DOCNAME);
+        xWikiLink.setLink("Space.TargetPage.WebHome");
+        expectedLinkedPages.add(xWikiLink);
+
+        xWikiLink = new XWikiLink();
+        xWikiLink.setDocId(this.document.getId());
+        xWikiLink.setFullName(DOCSPACE + "." + DOCNAME);
+        xWikiLink.setLink("TargetSpace.TargetPage.WebHome");
+        expectedLinkedPages.add(xWikiLink);
+
+        xWikiLink = new XWikiLink();
+        xWikiLink.setDocId(this.document.getId());
+        xWikiLink.setFullName(DOCSPACE + "." + DOCNAME);
+        xWikiLink.setLink("targetwiki:TargetSpace.TargetPage.WebHome");
+        expectedLinkedPages.add(xWikiLink);
+
+        assertEquals(expectedLinkedPages, linkedPages);
+    }
+
+    @Test
     public void getSections10() throws XWikiException
     {
         this.document.setContent(

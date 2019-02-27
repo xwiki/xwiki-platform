@@ -132,6 +132,4 @@ macroEditor.submit=Подтвердить
 macroEditor.content=Контент
 macroEditor.noParameters=Этот макрос не имеет параметров.
 macroEditor.descriptorRequestFailed=Не удалось получить {0} дескриптор макроса.</content>
-  
-  
 </xwikidoc>

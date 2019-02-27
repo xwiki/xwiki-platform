@@ -58,7 +58,6 @@
   #end
   #renameAppPage($oldAppReference $newAppReference true)
   #maybeFixAppPreferences($oldApp.preferencesReference $newApp.preferencesReference)
-  #updateNavigationPanelConfig($oldApp $newApp)
 #end
 
 #macro (getAppCodeReference $oldApp $newApp)
@@ -215,22 +214,6 @@
       &amp;&amp; $services.security.authorization.hasAccess('delete', $newPrefsHomeReference))
     ## This requires programming rights!
     #renameAppPage($oldPrefsReference $newPrefsReference false)
-  #end
-#end
-
-#macro (updateNavigationPanelConfig $oldApp $newApp)
-  #set ($navigationPanelConfigReference = 'PanelsCode.NavigationConfiguration')
-  #if ($services.security.authorization.hasAccess('edit', $navigationPanelConfigReference))
-    #set ($navigationPanelConfig = $xwiki.getDocument($navigationPanelConfigReference))
-    #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
-    #set ($removed = $oldApp.reference.parent.type == 'WIKI' &amp;&amp;
-      $exclusions.remove($services.model.serialize($oldApp.homePageReference, 'local')))
-    #set ($added = $newApp.reference.parent.type == 'WIKI' &amp;&amp;
-      $exclusions.add($services.model.serialize($newApp.homePageReference, 'local')))
-    #if ($removed || $added)
-      #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
-      #set ($discard = $navigationPanelConfig.save("Update exclusions after renaming application"))
-    #end
   #end
 #end
 {{/velocity}}

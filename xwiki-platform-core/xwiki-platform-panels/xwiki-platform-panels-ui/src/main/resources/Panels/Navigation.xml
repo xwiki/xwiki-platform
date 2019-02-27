@@ -177,10 +177,11 @@
 ## Apply the configured page exclusions.
 #set ($config = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
 #set ($exclusions = $collectionstool.set)
+#set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+## Exclude top level extension pages.
 #if ($config.getValue('excludeTopLevelExtensionPages') == 1)
   #set ($query = $services.query.hql('select space.name from XWikiSpace space where space.parent is null'))
   #set ($discard = $query.addFilter('hidden/space'))
-  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
   #foreach ($result in $query.execute())
     #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
     #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
@@ -189,11 +190,26 @@
       #set ($discard = $exclusions.add("document:$documentReference"))
     #end
   #end
+#end
+## Exclude top level application pages.
+#if ($config.getValue('excludeTopLevelApplicationPages') == 1)
+  #set ($statement = 'select space.name '
+    + 'from XWikiSpace as space, Document as doc, doc.object(AppWithinMinutes.LiveTableClass) as app '
+    + 'where space.parent is null and doc.space = space.reference')
+  #set ($query = $services.query.xwql($statement).addFilter('hidden/space'))
+  #foreach ($result in $query.execute())
+    #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
+    #set ($discard = $exclusions.add("document:$documentReference"))
+  #end
+#end
+## Inclusions are treated as exceptions to the dynamic exclusion filters.
+#if ($config.getValue('excludeTopLevelExtensionPages') == 1 || $config.getValue('excludeTopLevelApplicationPages') == 1)
   #foreach ($inclusion in $config.getValue('inclusions'))
     #set ($documentReference = $services.model.resolveDocument($inclusion))
     #set ($discard = $exclusions.remove("document:$documentReference"))
   #end
 #end
+## Other page exclusions.
 #foreach ($exclusion in $config.getValue('exclusions'))
   #set ($documentReference = $services.model.resolveDocument($exclusion))
   #set ($discard = $exclusions.add("document:$documentReference"))

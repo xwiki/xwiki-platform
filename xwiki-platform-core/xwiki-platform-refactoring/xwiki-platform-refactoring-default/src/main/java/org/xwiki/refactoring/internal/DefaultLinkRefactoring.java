@@ -107,8 +107,10 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         DocumentReference newLinkTarget)
     {
         boolean popLevelProgress = false;
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String previousWikiId = xcontext.getWikiId();
         try {
-            XWikiContext xcontext = this.xcontextProvider.get();
+            xcontext.setWikiId(documentReference.getWikiReference().getName());
             XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
             List<Locale> locales = document.getTranslationLocales(xcontext);
 
@@ -133,6 +135,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
             if (popLevelProgress) {
                 this.progressManager.popLevelProgress(this);
             }
+            xcontext.setWikiId(previousWikiId);
         }
     }
 

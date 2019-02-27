@@ -2069,17 +2069,34 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // case. This should be changed once the refactoring to support backlinks properly has been done.
             // See: XWIKI-16192
             Query query = session
-                .createQuery("select backlink.fullName from XWikiLink as backlink where "
+                .createQuery("select backlink.fullName, backlink.link from XWikiLink as backlink where "
                     + "backlink.id.link in (:backlink, :backlinkwithwiki)");
             query.setString("backlink", this.localEntityReferenceSerializer.serialize(documentReference));
             query.setString("backlinkwithwiki", this.defaultEntityReferenceSerializer.serialize(documentReference));
 
             @SuppressWarnings("unchecked")
-            List<String> backlinkNames = query.list();
+            List<Object[]> backlinkObjects = query.list();
+
+            WikiReference wikiReference = documentReference.getWikiReference();
+            boolean sameWikiContext = (wikiReference == null || wikiReference.equals(context.getWikiReference()));
 
             // Convert strings into references
-            for (String backlinkName : backlinkNames) {
-                backlinkReferences.add(this.currentMixedDocumentReferenceResolver.resolve(backlinkName));
+            for (Object[] backlink : backlinkObjects) {
+                String backlinkName = (String) backlink[0];
+                String backlinkLink = (String) backlink[1];
+                DocumentReference backlinkreference = this.currentMixedDocumentReferenceResolver.resolve(backlinkName);
+
+                // if the backlink contains a wiki name, we're sure that the right one is retrieved
+                // we cannot rely on the backlink reference, since it's resolved based on the current context.
+                if (backlinkLink.contains(":")) {
+                    backlinkReferences.add(backlinkreference);
+
+                // if it does not, we have to check that we are in the same wiki context.
+                } else {
+                    if (sameWikiContext) {
+                        backlinkReferences.add(backlinkreference);
+                    }
+                }
             }
 
             if (bTransaction) {

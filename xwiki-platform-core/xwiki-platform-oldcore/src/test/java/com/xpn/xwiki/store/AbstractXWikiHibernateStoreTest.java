@@ -28,6 +28,7 @@ import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
@@ -63,6 +64,8 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
 
     protected HibernateStore hibernateStore;
 
+    protected DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
     @Before
     public void setUp() throws Exception
     {
@@ -78,6 +81,9 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
         when(xcontextProvider.get()).thenReturn(this.xcontext);
         xcontextProvider = getMocker().registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
         when(xcontextProvider.get()).thenReturn(this.xcontext);
+
+        currentMixedDocumentReferenceResolver = getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING
+            , "currentmixed");
 
         XWiki wiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(wiki);

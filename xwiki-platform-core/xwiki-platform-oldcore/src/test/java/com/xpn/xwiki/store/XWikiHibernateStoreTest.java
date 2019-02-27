@@ -20,12 +20,12 @@
 package com.xpn.xwiki.store;
 
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -39,6 +39,7 @@ import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
@@ -49,16 +50,13 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.store.migration.DataMigrationManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -329,5 +327,57 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         verify(query).setWiki(documentReference.getWikiReference().getName());
         verify(query).bindValue("space", "Path.To");
         verify(query).bindValue("name", documentReference.getName());
+    }
+
+    @Test
+    public void loadBacklinksFromSameWiki() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("B"), "WebHome");
+        // We are currently in the context of "xwiki"
+        WikiReference currentWikiReference = new WikiReference("xwiki");
+        when(this.xcontext.getWikiReference()).thenReturn(currentWikiReference);
+        String[] result0 = new String[]{ "A.WebHome", "B.WebHome" };
+        List<Object[]> resultList = new ArrayList<>();
+        resultList.add(result0);
+
+        Query query = mock(Query.class);
+        when(this.session.createQuery(any())).thenReturn(query);
+        when(query.list()).thenReturn(resultList);
+        DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("A"), "WebHome");
+        when(this.currentMixedDocumentReferenceResolver.resolve("A.WebHome")).thenReturn(expectedBacklink);
+
+        List<DocumentReference> obtainedReferences = this.store.loadBacklinks(documentReference, true, this.xcontext);
+        assertEquals(1, obtainedReferences.size());
+        assertEquals(expectedBacklink, obtainedReferences.get(0));
+    }
+
+    @Test
+    public void loadBacklinksFromSubwiki() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("subwiki", Arrays.asList("B"), "WebHome");
+        // We are currently in the context of "xwiki"
+        WikiReference currentWikiReference = new WikiReference("xwiki");
+        when(this.xcontext.getWikiReference()).thenReturn(currentWikiReference);
+
+        // This link is not right: it's about xwiki:A.WebHome -> xwiki:B.WebHome, it doesn't concern subxwiki:B.WebHome
+        String[] result0 = new String[]{ "A.WebHome", "B.WebHome" };
+
+        // This one is right
+        String[] result1 = new String[] { "Foo.WebHome", "subwiki:B.WebHome "};
+        List<Object[]> resultList = new ArrayList<>();
+        resultList.add(result0);
+        resultList.add(result1);
+
+        Query query = mock(Query.class);
+        when(this.session.createQuery(any())).thenReturn(query);
+        when(query.list()).thenReturn(resultList);
+        DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("Foo"), "WebHome");
+        when(this.currentMixedDocumentReferenceResolver.resolve("Foo.WebHome")).thenReturn(expectedBacklink);
+        DocumentReference wrongBackLink = new DocumentReference("xwiki", Arrays.asList("A"), "WebHome");
+        when(this.currentMixedDocumentReferenceResolver.resolve("A.WebHome")).thenReturn(wrongBackLink);
+
+        List<DocumentReference> obtainedReferences = this.store.loadBacklinks(documentReference, true, this.xcontext);
+        assertEquals(1, obtainedReferences.size());
+        assertEquals(expectedBacklink, obtainedReferences.get(0));
     }
 }

@@ -119,12 +119,12 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       '<!--startmacro:info|-|-->',
       '<div class="box infomessage">',
         'Info',
-        '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+        '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
           '<p>before</p>',
           '<!--startmacro:error|-|-->',
           '<div class="box errormessage">',
             'Error',
-            '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+            '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
               '<p>test</p>',
             '</div>',
           '</div>',
@@ -143,7 +143,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         expect(wikiMacroWidgets[0].editables.content.getData()).toBe([
           '<p>before</p>',
           '<!--startmacro:error|-|-->',
-          '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
             '<p>test</p>',
           '</div>',
           '<!--stopmacro-->',
@@ -152,10 +152,10 @@ describe('XWiki Macro Plugin for CKEditor', function() {
 
         expect(editor.getData()).toBe([
           '<!--startmacro:info|-|-->',
-          '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
             '<p>before</p>',
             '<!--startmacro:error|-|-->',
-            '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+            '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
               '<p>test</p>',
             '</div>',
             '<!--stopmacro-->',
@@ -174,7 +174,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       '<!--startmacro:outer|-|-->',
         '<!--startmacro:inner|-|-->',
           // The nested editable that shouldn't be initialized.
-          '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
             '<p>test</p>',
           '</div>',
         '<!--stopmacro-->',
@@ -200,7 +200,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         '<!--startmacro:outer|-|-->',
           '<em>',
             '<!--startmacro:inner|-|-->',
-              '<span data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+              '<span data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
                 'test',
               '</span>',
             '<!--stopmacro-->',
@@ -224,11 +224,11 @@ describe('XWiki Macro Plugin for CKEditor', function() {
   it("doesn't save nested editables that don't match the parameter type", function(done) {
     editor.setData([
       '<!--startmacro:test|-|-->',
-        '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;"',
+        '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;"',
             ' data-xwiki-parameter-name="title">',
           '<p>Title</p>',
         '</div>',
-        '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
+        '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
           '<p>Content</p>',
         '</div>',
       '<!--stopmacro-->'

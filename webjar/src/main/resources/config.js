@@ -116,7 +116,7 @@ CKEDITOR.editorConfig = function(config) {
       // See also https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_plugins_widget_nestedEditable_definition.html
       // on how to configure a nested editable.
       nestedEditableTypes: {
-        'java.util.List< org.xwiki.rendering.block.Block >': {}
+        'java.util.List<org.xwiki.rendering.block.Block>': {}
       }
     },
     'xwiki-save': {

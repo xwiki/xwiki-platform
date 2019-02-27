@@ -163,10 +163,11 @@
       'deprecated': $macroDescriptor.contentDescriptor.deprecated,
       'advanced': $macroDescriptor.contentDescriptor.advanced,
       'defaultValue': $macroDescriptor.contentDescriptor.defaultValue,
-      'type': "$!macroDescriptor.contentDescriptor.type",
+      'type': $macroDescriptor.contentDescriptor.type,
       'editTemplate': '&lt;textarea name="$content" rows="7"&gt;&lt;/textarea&gt;',
       'index': $macroDescriptor.parameterDescriptorMap.size()
     })
+    #fixDescriptorType($data.contentDescriptor)
   #end
   #set ($groupDescriptorTree = {})
   #foreach ($entry in $macroDescriptor.parameterDescriptorMap.entrySet())
@@ -206,6 +207,7 @@
         $translatedParameterDescriptor)")
     #end
     #set ($translatedParameterDescriptor.editTemplate = $translatedParameterDescriptor.editTemplate.trim())
+    #fixDescriptorType($translatedParameterDescriptor)
     ## Make sure the key is lowercase (for XWiki &lt;9.0).
     ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
     ## descriptor map keys
@@ -215,6 +217,24 @@
     #set ($data.groupDescriptorTree = $groupDescriptorTree.groups)
   #end
   #set ($data.requiredSkinExtensions = "#getRequiredSkinExtensions")
+#end
+
+#macro (fixDescriptorType $descriptor)
+  ## The goal of this code is to obtain a normalized string representation of the type specified in the descriptor.
+  ## See XCOMMONS-1583: Define a stable way to serialize types
+  ##
+  ## The type specified in the descriptor can be any implementation of java.lang.reflect.Type, not necessarily a
+  ## java.lang.Class. We can't use toString() because the return of Class#toString() is different than Class#getName().
+  ## We can't use Type#getTypeName() either because the access to this method is restricted from Velocity. The only
+  ## option for now is to try #getName() first and fall back on #toString() for types that are not instances of
+  ## java.lang.Class.
+  #set ($typeName = $descriptor.type.getName())
+  #if ("$!typeName" == '')
+    ## Probably not a java.lang.Class. Fall back on #toString().
+    #set ($typeName = "$!descriptor.type")
+  #end
+  ## Remove whitespace from the type name in order to have a single string representation.
+  #set ($descriptor.type = $typeName.replaceAll('\s+', ''))
 #end
 
 ## Builds the group tree with the following structure:

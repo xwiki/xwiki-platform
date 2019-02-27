@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.displayer.HTMLDisplayer;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.script.ScriptContextManager;
@@ -183,7 +184,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
                 typeNames.add("enum");
             }
         } else if (type != null) {
-            typeNames.add(type.getTypeName().toLowerCase());
+            typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
         }
         return typeNames;
     }

@@ -64,16 +64,6 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
      */
     public static final String TEMPLATE_EXTENSION = ".vm";
 
-    /**
-     * A regular expression specifying what are the special characters that have to be replaced in created paths.
-     */
-    private static final String SPECIAL_CHARACTERS_TO_REPLACE = "[<>? ]";
-
-    /**
-     * The replacement character used to clean paths from special characters.
-     */
-    private static final String REPLACEMENT_CHARACTER = ".";
-
     @Inject
     protected TemplateManager templateManager;
 
@@ -164,7 +154,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
 
     private String cleanPath(String path)
     {
-        return path.replaceAll(SPECIAL_CHARACTERS_TO_REPLACE, REPLACEMENT_CHARACTER);
+        return path.replaceAll("<", "(").replaceAll(">", ")").replaceAll("\\?", "_").replaceAll(" ", "");
     }
 
     private List<String> getTemplatePaths(Type type, String mode)

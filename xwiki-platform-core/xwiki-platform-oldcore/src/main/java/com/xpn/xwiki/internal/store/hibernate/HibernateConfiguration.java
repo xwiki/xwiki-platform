@@ -77,4 +77,9 @@ public class HibernateConfiguration
     {
         return this.xwikiConfiguration.getProperty("xwiki.db.prefix", "");
     }
+
+    public boolean isUpdateSchema()
+    {
+        return this.xwikiConfiguration.getProperty("xwiki.store.hibernate.updateschema", 1) != 0;
+    }
 }

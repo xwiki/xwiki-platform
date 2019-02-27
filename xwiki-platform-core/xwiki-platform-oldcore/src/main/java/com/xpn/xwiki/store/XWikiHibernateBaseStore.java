@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.DatabaseMetaData;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -35,11 +34,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.mapping.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
@@ -267,26 +263,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param force defines wether or not to force the update despite the xwiki.cfg settings
      * @throws HibernateException
      */
-    public synchronized void updateSchema(XWikiContext inputxcontext, boolean force) throws HibernateException
+    public void updateSchema(XWikiContext inputxcontext, boolean force) throws HibernateException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            // We don't update the schema if the XWiki hibernate config parameter says not to update
-            if ((!force) && (context.getWiki() != null)
-                && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-                LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
-                return;
-            }
-
-            LOGGER.info("Updating schema for wiki [{}]...", context.getWikiId());
-
-            try {
-                String[] sql = getSchemaUpdateScript(this.store.getConfiguration(), context);
-                updateSchema(sql, context);
-            } finally {
-                LOGGER.info("Schema update for wiki [{}] done", context.getWikiId());
-            }
+            this.store.updateSchema(context.getWikiId(), force);
         } finally {
             restoreExecutionXContext();
         }
@@ -345,65 +327,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param config
      * @param inputxcontext
      * @throws HibernateException
+     * @deprecated do nothing since 11.2RC1
      */
+    @Deprecated
     public String[] getSchemaUpdateScript(Configuration config, XWikiContext inputxcontext) throws HibernateException
     {
-        XWikiContext context = getExecutionXContext(inputxcontext, true);
-
-        String[] schemaSQL = null;
-
-        Session session;
-        Metadata meta;
-        boolean bTransaction = true;
-        String dschema = null;
-
-        try {
-            bTransaction = beginTransaction(false, context);
-            session = this.store.getCurrentSession();
-            setDatabase(session, context);
-
-            String contextSchema = this.store.getSchemaFromWikiName();
-
-            DatabaseProduct databaseProduct = this.store.getDatabaseProductName();
-            if (databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.HSQLDB
-                || databaseProduct == DatabaseProduct.H2 || databaseProduct == DatabaseProduct.DERBY
-                || databaseProduct == DatabaseProduct.DB2
-                || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode())) {
-                dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
-                config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
-                Iterator iter = config.getTableMappings();
-                while (iter.hasNext()) {
-                    Table table = (Table) iter.next();
-                    table.setSchema(contextSchema);
-                }
-            }
-
-            meta = new DatabaseMetadata(connection, this.store.getDialect());
-            schemaSQL = config.generateSchemaUpdateScript(this.store.getDialect(), meta);
-
-            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired for
-            // details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
-            createHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
-
-        } catch (Exception e) {
-            throw new HibernateException("Failed creating schema update script", e);
-        } finally {
-            try {
-                if (bTransaction) {
-                    // Use "true" so that the hibernate sequence that was possibly created above can be committed
-                    // properly (and not be rolled back!).
-                    endTransaction(context, true);
-                }
-                if (dschema != null) {
-                    config.setProperty(Environment.DEFAULT_SCHEMA, dschema);
-                }
-            } catch (Exception e) {
-            }
-
-            restoreExecutionXContext();
-        }
-
-        return schemaSQL;
+        return null;
     }
 
     /**
@@ -423,7 +352,9 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param schemaName the schema name corresponding to the subwiki being updated
      * @param session the Hibernate session, used to get the Dialect object
      * @since 5.2RC1
+     * @deprecated since 11.2RC1
      */
+    @Deprecated
     protected void createHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
     {
         // There's no issue when in database mode, only in schema mode.
@@ -467,7 +398,9 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      *
      * @param createSQL
      * @param inputxcontext
+     * @deprecated since 11.2RC1
      */
+    @Deprecated
     public void updateSchema(String[] createSQL, XWikiContext inputxcontext) throws HibernateException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
@@ -487,9 +420,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
             }
             for (String element : createSQL) {
                 sql = element;
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Update Schema sql: [" + sql + "]");
-                }
+                LOGGER.debug("Update Schema sql: [{}]", sql);
                 session.createSQLQuery(sql).executeUpdate();
             }
             session.getTransaction().commit();
@@ -529,10 +460,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                 return;
             }
 
-            Configuration config = getMapping(bclass.getName(), custommapping);
-
-            String[] sql = getSchemaUpdateScript(config, context);
-            updateSchema(sql, context);
+            Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping);
+            this.store.updateSchema(metadata, context.getWikiId());
         } finally {
             restoreExecutionXContext();
         }

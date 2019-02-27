@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +46,8 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.jdbc.Work;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.hibernate.tool.schema.TargetType;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
@@ -695,5 +698,50 @@ public class HibernateStore implements Disposable
                 }
             }
         });
+    }
+
+    /**
+     * Automatically update the current database schema to contains what's defined in standard metadata.
+     * 
+     * @since 11.2RC1
+     */
+    public void updateSchema(String wikiId)
+    {
+        updateSchema(getMetadata(), wikiId);
+    }
+
+    /**
+     * Automatically update the current database schema to contains what's defined in standard metadata.
+     * 
+     * @param metadata the metadata we want the current database to follow
+     * @since 11.2RC1
+     */
+    public void updateSchema(Metadata metadata, String wikiId)
+    {
+        new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadata);
+    }
+
+    /**
+     * Allows to update the schema to match the hibernate mapping
+     *
+     * @param wikiId the identifier of the wiki to update
+     * @param force defines whether or not to force the update despite the xwiki.cfg settings
+     * @since 11.2RC1
+     */
+    public synchronized void updateSchema(String wikiId, boolean force)
+    {
+        // We don't update the schema if the XWiki hibernate config parameter says not to update
+        if (!force && !this.hibernateConfiguration.isUpdateSchema()) {
+            this.logger.debug("Schema update deactivated for wiki [{}]", wikiId);
+            return;
+        }
+
+        this.logger.info("Updating schema for wiki [{}]...", wikiId);
+
+        try {
+            updateSchema(wikiId);
+        } finally {
+            this.logger.info("Schema update for wiki [{}] done", wikiId);
+        }
     }
 }

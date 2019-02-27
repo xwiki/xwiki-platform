@@ -24,8 +24,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -58,6 +60,9 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 // TODO: could be optimized a bit by listening to XClassUpdatedEvent and redoing the comparison between the two
 // classes in case there is several changes to the class
+@Component
+@Singleton
+@Named("XClassMigratorListener")
 public class XClassMigratorListener extends AbstractEventListener
 {
     @Inject

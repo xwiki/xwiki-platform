@@ -2063,6 +2063,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // the select clause is compulsory to reach the fullName i.e. the page pointed
+            // here we check both the backlink serialized with AND without the wiki part
+            // the reason is in case of a farm of wiki, if the link points to a page from another wiki
+            // its reference is saved with the wiki part, so using only the local serialization won't be enough in that
+            // case. This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
             Query query = session
                 .createQuery("select backlink.fullName from XWikiLink as backlink where "
                     + "backlink.id.link in (:backlink, :backlinkwithwiki)");

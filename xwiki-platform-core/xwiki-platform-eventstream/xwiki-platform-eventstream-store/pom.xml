@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+a<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -32,6 +32,7 @@
     <description>Store for Event Stream Events</description>
     <properties>
         <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
+        <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Event Stream Store</xwiki.extension.name>
     </properties>

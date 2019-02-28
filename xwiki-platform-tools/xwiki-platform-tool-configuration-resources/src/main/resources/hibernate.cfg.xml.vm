@@ -38,20 +38,20 @@
 
     <!-- Generic parameters common to all Databases -->
 
-    <property name="show_sql">false</property>
-    <property name="use_outer_join">true</property>
+    <property name="hibernate.show_sql">false</property>
+    <property name="hibernate.use_outer_join">true</property>
 
     <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
-    <property name="jdbc.use_scrollable_resultset">false</property>
+    <property name="hibernate.jdbc.use_scrollable_resultset">false</property>
 
     <!-- DBCP Connection Pooling configuration. Only some properties are shown. All available properties can be found
          at http://commons.apache.org/proper/commons-dbcp/configuration.html
     -->
-    <property name="dbcp.defaultAutoCommit">false</property>
-    <property name="dbcp.maxTotal">50</property>
-    <property name="dbcp.maxIdle">5</property>
-    <property name="dbcp.maxWaitMillis">30000</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="hibernate.dbcp.defaultAutoCommit">false</property>
+    <property name="hibernate.dbcp.maxTotal">50</property>
+    <property name="hibernate.dbcp.maxIdle">5</property>
+    <property name="hibernate.dbcp.maxWaitMillis">30000</property>
+    <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 
     <!--
       Keep the old behavior. The new version of hibernate tries to delete and recreate unique
@@ -62,10 +62,10 @@
     -->
     <property name="hibernate.schema_update.unique_constraint_strategy">skip</property>
 
-    <!-- Setting "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" will tell DBCP to cache
-         Prepared Statements (it's off by default). Note that for backward compatibility the "dbcp.ps.maxActive" is also
-         supported and when set it'll set "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" to
-         value of "dbcp.ps.maxActive".
+    <!-- Setting "hibernate.dbcp.poolPreparedStatements" to true and "hibernate.dbcp.maxOpenPreparedStatements" will tell DBCP to cache
+         Prepared Statements (it's off by default). Note that for backward compatibility the "hibernate.dbcp.ps.maxActive" is also
+         supported and when set it'll set "hibernate.dbcp.poolPreparedStatements" to true and "hibernate.dbcp.maxOpenPreparedStatements" to
+         value of "hibernate.dbcp.ps.maxActive".
 
          Note 1: When using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
          Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
@@ -78,15 +78,15 @@
     -->
 
     <!-- BoneCP Connection Pooling configuration.
-    <property name="bonecp.idleMaxAgeInMinutes">240</property>
-    <property name="bonecp.idleConnectionTestPeriodInMinutes">60</property>
-    <property name="bonecp.partitionCount">3</property>
-    <property name="bonecp.acquireIncrement">10</property>
-    <property name="bonecp.maxConnectionsPerPartition">60</property>
-    <property name="bonecp.minConnectionsPerPartition">20</property>
-    <property name="bonecp.statementsCacheSize">50</property>
-    <property name="bonecp.releaseHelperThreads">3</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="hibernate.bonecp.idleMaxAgeInMinutes">240</property>
+    <property name="hibernate.bonecp.idleConnectionTestPeriodInMinutes">60</property>
+    <property name="hibernate.bonecp.partitionCount">3</property>
+    <property name="hibernate.bonecp.acquireIncrement">10</property>
+    <property name="hibernate.bonecp.maxConnectionsPerPartition">60</property>
+    <property name="hibernate.bonecp.minConnectionsPerPartition">20</property>
+    <property name="hibernate.bonecp.statementsCacheSize">50</property>
+    <property name="hibernate.bonecp.releaseHelperThreads">3</property>
+    <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     -->
 
 ## DO NOT USE XML COMMENT IN BETWEEN DB SPECIFIC CONFIGURATION, IT RENDER COMMENTING/UNCOMMENTING THE RIGHT
@@ -102,15 +102,15 @@
 ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
 ## have preferred to use an empty value but I couldn't make that work with Maven.
 #if ($xwikiDbConnectionUrl != "none")
-    <property name="connection.url">$xwikiDbConnectionUrl</property>
-    <property name="connection.username">$!xwikiDbConnectionUsername</property>
-    <property name="connection.password">$!xwikiDbConnectionPassword</property>
-    <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
-    <property name="dialect">$xwikiDbDialect</property>
+    <property name="hibernate.connection.url">$xwikiDbConnectionUrl</property>
+    <property name="hibernate.connection.username">$!xwikiDbConnectionUsername</property>
+    <property name="hibernate.connection.password">$!xwikiDbConnectionPassword</property>
+    <property name="hibernate.connection.driver_class">$xwikiDbConnectionDriverClass</property>
+    <property name="hibernate.dialect">$xwikiDbDialect</property>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDb == 'mysql' || $xwikiDb == 'oracle')
-    <property name="dbcp.poolPreparedStatements">true</property>
-    <property name="dbcp.maxOpenPreparedStatements">20</property>
+    <property name="hibernate.dbcp.poolPreparedStatements">true</property>
+    <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDbVirtualMode)
@@ -118,12 +118,12 @@
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDb == 'pgsql' || $xwikiDb == 'oracle')
-    <property name="jdbc.use_streams_for_binary">false</property>
+    <property name="hibernate.jdbc.use_streams_for_binary">false</property>
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDb == 'oracle')
-    <property name="connection.SetBigStringTryClob">true</property>
-    <property name="jdbc.batch_size">0</property>
+    <property name="hibernate.connection.SetBigStringTryClob">true</property>
+    <property name="hibernate.jdbc.batch_size">0</property>
 #end
 
     <property name="hibernate.connection.charSet">UTF-8</property>
@@ -148,13 +148,13 @@
            - if you want the main wiki database to be different than "xwiki"
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:mysql://localhost/xwiki?useSSL=false</property>
-    <property name="connection.username">xwiki</property>
-    <property name="connection.password">xwiki</property>
-    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-    <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
-    <property name="dbcp.poolPreparedStatements">true</property>
-    <property name="dbcp.maxOpenPreparedStatements">20</property>
+    <property name="hibernate.connection.url">jdbc:mysql://localhost/xwiki?useSSL=false</property>
+    <property name="hibernate.connection.username">xwiki</property>
+    <property name="hibernate.connection.password">xwiki</property>
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+    <property name="hibernate.dbcp.poolPreparedStatements">true</property>
+    <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
@@ -178,11 +178,11 @@
            - if you want the main wiki schema to be different than "PUBLIC" (the default HSQLDB schema)
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</property>
-    <property name="connection.username">sa</property>
-    <property name="connection.password"></property>
-    <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
-    <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+    <property name="hibernate.connection.url">jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</property>
+    <property name="hibernate.connection.username">sa</property>
+    <property name="hibernate.connection.password"></property>
+    <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
@@ -203,19 +203,19 @@
     <!-- PostgreSQL configuration.
          Uncomment if you want to use PostgreSQL and comment out other database configurations.
          Notes:
-           - "jdbc.use_streams_for_binary" needs to be set to "false",
+           - "hibernate.jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
            - "xwiki.virtual_mode" can be set to either "schema" or "database". Note that currently the database mode
              doesn't support database creation (see https://jira.xwiki.org/browse/XWIKI-8753)
            - if you want the main wiki database to be different than "xwiki" (or "public" in schema mode)
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:postgresql://localhost:5432/xwiki</property>
-    <property name="connection.username">xwiki</property>
-    <property name="connection.password">xwiki</property>
-    <property name="connection.driver_class">org.postgresql.Driver</property>
-    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
-    <property name="jdbc.use_streams_for_binary">false</property>
+    <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/xwiki</property>
+    <property name="hibernate.connection.username">xwiki</property>
+    <property name="hibernate.connection.password">xwiki</property>
+    <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    <property name="hibernate.jdbc.use_streams_for_binary">false</property>
     <property name="xwiki.virtual_mode">schema</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
@@ -237,23 +237,23 @@
     <!-- Oracle configuration.
          Uncomment if you want to use Oracle and comment out other database configurations.
          Notes:
-           - the 2 properties named "connection.SetBigStringTryClob" and
-             "jdbc.batch_size" are required to tell Oracle to allow CLOBs larger than 32K.
-           - "jdbc.use_streams_for_binary" needs to be set to "false",
+           - the 2 properties named "hibernate.connection.SetBigStringTryClob" and
+             "hibernate.jdbc.batch_size" are required to tell Oracle to allow CLOBs larger than 32K.
+           - "hibernate.jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
            - if you want the main wiki schema to be different than "xwiki"
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
-    <property name="connection.username">xwiki</property>
-    <property name="connection.password">xwiki</property>
-    <property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
-    <property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
-    <property name="connection.SetBigStringTryClob">true</property>
-    <property name="jdbc.batch_size">0</property>
-    <property name="jdbc.use_streams_for_binary">false</property>
-    <property name="dbcp.poolPreparedStatements">true</property>
-    <property name="dbcp.maxOpenPreparedStatements">20</property>
+    <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
+    <property name="hibernate.connection.username">xwiki</property>
+    <property name="hibernate.connection.password">xwiki</property>
+    <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+    <property name="hibernate.connection.SetBigStringTryClob">true</property>
+    <property name="hibernate.jdbc.batch_size">0</property>
+    <property name="hibernate.jdbc.use_streams_for_binary">false</property>
+    <property name="hibernate.dbcp.poolPreparedStatements">true</property>
+    <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
@@ -277,11 +277,11 @@
            - if you want the main wiki schema to be different than "APP" (the default Derby schema)
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
-    <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
-    <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
-    <property name="dbcp.poolPreparedStatements">true</property>
-    <property name="dbcp.maxOpenPreparedStatements">20</property>
+    <property name="hibernate.connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
+    <property name="hibernate.connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.DerbyDialect</property>
+    <property name="hibernate.dbcp.poolPreparedStatements">true</property>
+    <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
@@ -305,11 +305,11 @@
            - if you want the main wiki schema to be different than "PUBLIC" (the default H2 schema)
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:h2:${environment.permanentDirectory}/database/xwiki</property>
-    <property name="connection.username">sa</property>
-    <property name="connection.password"></property>
-    <property name="connection.driver_class">org.h2.Driver</property>
-    <property name="dialect">org.hibernate.dialect.H2Dialect</property>
+    <property name="hibernate.connection.url">jdbc:h2:${environment.permanentDirectory}/database/xwiki</property>
+    <property name="hibernate.connection.username">sa</property>
+    <property name="hibernate.connection.password"></property>
+    <property name="hibernate.connection.driver_class">org.h2.Driver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>

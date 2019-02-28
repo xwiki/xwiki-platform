@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -54,6 +55,7 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.environment.Environment;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
@@ -82,6 +84,11 @@ public class HibernateStore implements Disposable
 
     private static final String CONTEXT_TRANSACTION = "hibtransaction";
 
+    /**
+     * The name of the property for configuring the environment permanent directory.
+     */
+    private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
+
     @Inject
     private Logger logger;
 
@@ -101,13 +108,14 @@ public class HibernateStore implements Disposable
     @Inject
     private HibernateConfiguration hibernateConfiguration;
 
+    @Inject
+    private Environment environment;
+
     private DataMigrationManager dataMigrationManager;
 
     private final MetadataSources metadataSources = new MetadataSources();
 
     private final Configuration configuration = new Configuration(this.metadataSources);
-
-    private String hibernatePath = "/WEB-INF/hibernate.cfg.xml";
 
     private Dialect dialect;
 
@@ -127,23 +135,47 @@ public class HibernateStore implements Disposable
     }
 
     /**
-     * Allows to get the current Hibernate config file path
-     * 
-     * @since 11.1RC1
-     */
-    public String getPath()
-    {
-        return this.hibernatePath;
-    }
-
-    /**
-     * @since 11.1RC1
+     * @since 11.2RC1
      */
     public void initHibernate()
     {
-        this.configuration.configure(Util.getResource(getPath()));
+        String path = this.hibernateConfiguration.getPath();
+        URL url = Util.getResource(path);
+        if (url == null) {
+            this.logger.error("Failed to find hibernate configuration file corresponding to path [{}]", path);
+        } else {
+            this.configuration.configure(url);
+
+            // Resolve some variables
+            replaceVariables(this.configuration);
+        }
 
         build();
+    }
+
+    /**
+     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
+     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
+     * from the XWiki configuration.
+     *
+     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
+     */
+    private void replaceVariables(Configuration hibernateConfiguration)
+    {
+        String url = hibernateConfiguration.getProperty(org.hibernate.cfg.Environment.URL);
+        if (StringUtils.isEmpty(url)) {
+            return;
+        }
+
+        // Replace variables
+        if (url.matches(".*\\$\\{.*\\}.*")) {
+            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
+                this.environment.getPermanentDirectory().getAbsolutePath());
+
+            // Set the new URL
+            hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);
+            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+        }
     }
 
     /**
@@ -388,7 +420,7 @@ public class HibernateStore implements Disposable
 
         // - Oracle converts user names in uppercase when no quotes is used.
         // For example: "create user xwiki identified by xwiki;" creates a user named XWIKI (uppercase)
-        // - In Hibernate.cfg.xml we just specify: <property name="connection.username">xwiki</property> and Hibernate
+        // - In Hibernate.cfg.xml we just specify: <property name="hibernate.connection.username">xwiki</property> and Hibernate
         // seems to be passing this username as is to Oracle which converts it to uppercase.
         //
         // Thus for Oracle we don't escape the schema.

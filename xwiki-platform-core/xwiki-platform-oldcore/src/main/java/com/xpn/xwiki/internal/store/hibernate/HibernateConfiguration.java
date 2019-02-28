@@ -69,8 +69,11 @@ public class HibernateConfiguration
      */
     public String getPath()
     {
-        return this.path != null ? this.path
-            : this.xwikiConfiguration.getProperty("xwiki.store.hibernate.path", getPath());
+        if (this.path == null) {
+            this.path = this.xwikiConfiguration.getProperty("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
+        }
+
+        return this.path;
     }
 
     /**

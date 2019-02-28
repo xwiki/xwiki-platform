@@ -132,7 +132,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     public String getPath()
     {
-        return this.store.getPath();
+        return this.hibernateConfiguration.getPath();
     }
 
     /**

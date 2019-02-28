@@ -101,15 +101,6 @@
     $escapetool.xml($cancelURL) $services.localization.render('yes') $services.localization.render('no'))
   {{/html}}
 #end
-
-#macro (removeExcludeFromNavigationPanel $appHomeReference)
-  #set ($navigationPanelConfig = $xwiki.getDocument($navigationPanelConfigReference))
-  #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
-  #if ($exclusions.remove($services.model.serialize($appHomeReference, 'local')))
-    #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
-    #set ($discard = $navigationPanelConfig.save("Remove exclude for $appHomeReference.parent.name application"))
-  #end
-#end
 {{/velocity}}
 
 {{velocity}}
@@ -137,20 +128,11 @@
       #set ($classReference = $services.model.resolveDocument($classLocalReference, 'explicit', $appHomeReference))
       ##
       #set ($pageReferences = [])
-      #set ($shouldRemoveExcludeFromNavigationPanel = false)
-      #set ($navigationPanelConfigReference = 'PanelsCode.NavigationConfiguration')
       #getApplicationDataPages($classReference $pageReferences)
       #if ($scope != 'entries')
         #getApplicationCodePages($appReference $classReference $pageReferences)
-        ## Remove the exclude from the Navigation Panel if the deleted application is at the top level and the current
-        ## user has the right to edit the Navigation Panel configuration.
-        #set ($shouldRemoveExcludeFromNavigationPanel = $appReference.parent.type == 'WIKI'
-          &amp;&amp; $services.security.authorization.hasAccess('edit', $navigationPanelConfigReference))
       #end
       #bulkDelete($pageReferences)
-      #if ($shouldRemoveExcludeFromNavigationPanel)
-        #removeExcludeFromNavigationPanel($appHomeReference)
-      #end
       ##
       #if ($errors.size() &gt; 0)
         {{error}}$errors.get(0){{/error}}

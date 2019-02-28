@@ -323,27 +323,10 @@
   #set ($discard = $doc.save('Updated application icon', true))
 #end
 
-#macro (excludeFromNavigationPanel)
-  #set ($navigationPanelConfig = $xwiki.getDocument($navigationPanelConfigReference))
-  #set ($exclusions = $navigationPanelConfig.getValue('exclusions'))
-  #if ($exclusions.add($doc.fullName))
-    #set ($discard = $navigationPanelConfig.set('exclusions', $exclusions))
-    #set ($discard = $navigationPanelConfig.save("Exclude the $doc.pageReference.name application"))
-  #end
-#end
-
 #macro (doSave)
-  ## Exclude the application home page from the Navigation panel if the application is created at the top level by an
-  ## user that has edit right on the Navigation panel configuration.
-  #set ($navigationPanelConfigReference = 'PanelsCode.NavigationConfiguration')
-  #set ($shouldExcludeFromNavigationPanel = $doc.isNew() &amp;&amp; $doc.pageReference.parent.type == 'WIKI'
-    &amp;&amp; $services.security.authorization.hasAccess('edit', $navigationPanelConfigReference))
   #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
   #updateAndSaveIcon()
-  #if ($shouldExcludeFromNavigationPanel)
-    #excludeFromNavigationPanel
-  #end
   #if ($action == 'save')
     #if ($errorMessage)
       {{html clean="false"}}

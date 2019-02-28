@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.internal.DefaultBeanManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -92,6 +93,9 @@ public class RssMacroTest
 
     @MockComponent
     private MacroContentParser contentParser;
+
+    @MockComponent
+    private ConverterManager converterManager;
 
     @Mock
     private RomeFeedFactory romeFeedFactory;

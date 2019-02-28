@@ -67,9 +67,7 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
 
     protected DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
-    protected EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
-
-    protected EntityReferenceSerializer<String> localEntityReferenceSerializer;
+    protected EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @Before
     public void setUp() throws Exception
@@ -90,9 +88,8 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
         currentMixedDocumentReferenceResolver = getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING
             , "currentmixed");
 
-        defaultEntityReferenceSerializer = getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        localEntityReferenceSerializer = getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING,
-            "local");
+        compactWikiEntityReferenceSerializer = getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING,
+            "compactwiki");
 
         XWiki wiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(wiki);

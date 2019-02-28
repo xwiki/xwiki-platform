@@ -337,9 +337,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         // We are currently in the context of "xwiki"
         WikiReference currentWikiReference = new WikiReference("xwiki");
         when(this.xcontext.getWikiReference()).thenReturn(currentWikiReference);
-
-        // we are in the same wiki context, so the localEntityReferenceSerializer should be used
-        when(this.localEntityReferenceSerializer.serialize(documentReference)).thenReturn("B.WebHome");
+        when(this.compactWikiEntityReferenceSerializer.serialize(documentReference)).thenReturn("B.WebHome");
         List<String> resultList = new ArrayList<>();
         resultList.add("A.WebHome");
 
@@ -354,7 +352,6 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         assertEquals(1, obtainedReferences.size());
         assertEquals(expectedBacklink, obtainedReferences.get(0));
         verify(query).setString("backlink", "B.WebHome");
-        verify(this.defaultEntityReferenceSerializer, never()).serialize(any());
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(false);
     }
@@ -367,9 +364,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         // We are currently in the context of "xwiki"
         WikiReference currentWikiReference = new WikiReference("xwiki");
         when(this.xcontext.getWikiReference()).thenReturn(currentWikiReference);
-
-        // we are in a different wiki context, so the defaultEntityReferenceSerializer should be used
-        when(this.defaultEntityReferenceSerializer.serialize(documentReference)).thenReturn("subwiki:B.WebHome");
+        when(this.compactWikiEntityReferenceSerializer.serialize(documentReference)).thenReturn("subwiki:B.WebHome");
         List<String> resultList = new ArrayList<>();
         resultList.add("Foo.WebHome");
 
@@ -384,7 +379,6 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         assertEquals(1, obtainedReferences.size());
         assertEquals(expectedBacklink, obtainedReferences.get(0));
         verify(query).setString("backlink", "subwiki:B.WebHome");
-        verify(this.localEntityReferenceSerializer, never()).serialize(any());
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(false);
     }

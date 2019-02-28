@@ -2065,18 +2065,21 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // the select clause is compulsory to reach the fullName i.e. the page pointed
             Query query = session
                 .createQuery("select backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink");
-            query.setString("backlink", this.localEntityReferenceSerializer.serialize(documentReference));
+
+            // if we are in the same wiki context, we should only get the local reference
+            // but if we are not, then we have to check the full reference, containing the wiki part since
+            // it's how the link are recorded.
+            // This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
+            query.setString("backlink", this.compactWikiEntityReferenceSerializer.serialize(documentReference));
 
             @SuppressWarnings("unchecked")
             List<String> backlinkNames = query.list();
 
             // Convert strings into references
             for (String backlinkName : backlinkNames) {
-                backlinkReferences.add(this.currentMixedDocumentReferenceResolver.resolve(backlinkName));
-            }
-
-            if (bTransaction) {
-                endTransaction(context, false, false);
+                DocumentReference backlinkreference = this.currentMixedDocumentReferenceResolver.resolve(backlinkName);
+                backlinkReferences.add(backlinkreference);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

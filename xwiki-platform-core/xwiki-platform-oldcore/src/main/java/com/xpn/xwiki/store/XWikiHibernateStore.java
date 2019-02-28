@@ -2063,44 +2063,34 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // the select clause is compulsory to reach the fullName i.e. the page pointed
-            // here we check both the backlink serialized with AND without the wiki part
-            // the reason is in case of a farm of wiki, if the link points to a page from another wiki
-            // its reference is saved with the wiki part, so using only the local serialization won't be enough in that
-            // case. This should be changed once the refactoring to support backlinks properly has been done.
-            // See: XWIKI-16192
             Query query = session
-                .createQuery("select backlink.fullName, backlink.link from XWikiLink as backlink where "
-                    + "backlink.id.link in (:backlink, :backlinkwithwiki)");
-            query.setString("backlink", this.localEntityReferenceSerializer.serialize(documentReference));
-            query.setString("backlinkwithwiki", this.defaultEntityReferenceSerializer.serialize(documentReference));
-
-            @SuppressWarnings("unchecked")
-            List<Object[]> backlinkObjects = query.list();
+                .createQuery("select backlink.fullName from XWikiLink as backlink where "
+                    + "backlink.id.link = :backlink");
 
             WikiReference wikiReference = documentReference.getWikiReference();
             boolean sameWikiContext = (wikiReference == null || wikiReference.equals(context.getWikiReference()));
 
-            // Convert strings into references
-            for (Object[] backlink : backlinkObjects) {
-                String backlinkName = (String) backlink[0];
-                String backlinkLink = (String) backlink[1];
-                DocumentReference backlinkreference = this.currentMixedDocumentReferenceResolver.resolve(backlinkName);
+            String serializedBacklink;
 
-                // if the backlink contains a wiki name, we're sure that the right one is retrieved
-                // we cannot rely on the backlink reference, since it's resolved based on the current context.
-                if (backlinkLink.contains(":")) {
-                    backlinkReferences.add(backlinkreference);
-
-                // if it does not, we have to check that we are in the same wiki context.
-                } else {
-                    if (sameWikiContext) {
-                        backlinkReferences.add(backlinkreference);
-                    }
-                }
+            // if we are in the same wiki context, we should only get the local reference
+            // but if we are not, then we have to check the full reference, containing the wiki part since
+            // it's how the link are recorded.
+            // This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
+            if (sameWikiContext) {
+                serializedBacklink = this.localEntityReferenceSerializer.serialize(documentReference);
+            } else {
+                serializedBacklink = this.defaultEntityReferenceSerializer.serialize(documentReference);
             }
+            query.setString("backlink", serializedBacklink);
 
-            if (bTransaction) {
-                endTransaction(context, false, false);
+            @SuppressWarnings("unchecked")
+            List<String> backlinkNames = query.list();
+
+            // Convert strings into references
+            for (String backlinkName : backlinkNames) {
+                DocumentReference backlinkreference = this.currentMixedDocumentReferenceResolver.resolve(backlinkName);
+                backlinkReferences.add(backlinkreference);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

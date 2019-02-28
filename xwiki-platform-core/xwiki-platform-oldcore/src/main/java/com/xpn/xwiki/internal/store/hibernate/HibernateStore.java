@@ -93,7 +93,7 @@ public class HibernateStore implements Disposable
     private Logger logger;
 
     /**
-     * Initialize migration only when needed to lower constraints on backward dependencies.
+     * Initialize migration manager lazily to avoid cross dependency issue.
      */
     @Inject
     @Named(XWikiHibernateBaseStore.HINT)
@@ -127,7 +127,7 @@ public class HibernateStore implements Disposable
 
     private DataMigrationManager getDataMigrationManager()
     {
-        if (this.dataMigrationManager != null) {
+        if (this.dataMigrationManager == null) {
             this.dataMigrationManager = this.dataMigrationManagerProvider.get();
         }
 

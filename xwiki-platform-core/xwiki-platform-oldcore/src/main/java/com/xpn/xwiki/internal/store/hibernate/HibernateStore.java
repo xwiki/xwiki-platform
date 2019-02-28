@@ -29,6 +29,7 @@ import java.util.EnumSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -84,9 +85,12 @@ public class HibernateStore implements Disposable
     @Inject
     private Logger logger;
 
+    /**
+     * Initialize migration only when needed to lower constraints on backward dependencies.
+     */
     @Inject
     @Named(XWikiHibernateBaseStore.HINT)
-    private DataMigrationManager dataMigrationManager;
+    private Provider<DataMigrationManager> dataMigrationManagerProvider;
 
     @Inject
     private Execution execution;
@@ -96,6 +100,8 @@ public class HibernateStore implements Disposable
 
     @Inject
     private HibernateConfiguration hibernateConfiguration;
+
+    private DataMigrationManager dataMigrationManager;
 
     private final MetadataSources metadataSources = new MetadataSources();
 
@@ -110,6 +116,15 @@ public class HibernateStore implements Disposable
     private SessionFactory sessionFactory;
 
     private Metadata metadata;
+
+    private DataMigrationManager getDataMigrationManager()
+    {
+        if (this.dataMigrationManager != null) {
+            this.dataMigrationManager = this.dataMigrationManagerProvider.get();
+        }
+
+        return this.dataMigrationManager;
+    }
 
     /**
      * Allows to get the current Hibernate config file path
@@ -446,7 +461,7 @@ public class HibernateStore implements Disposable
                 }
             }
 
-            this.dataMigrationManager.checkDatabase();
+            getDataMigrationManager().checkDatabase();
         } catch (Exception e) {
             // close session with rollback to avoid further usage
             endTransaction(false);

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Session;
+import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.query.NativeQuery;
@@ -49,9 +50,9 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -88,8 +89,10 @@ public class HqlQueryExecutorTest
     @Before
     public void before() throws Exception
     {
-        HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
-        when(sessionFactory.getConfiguration()).thenReturn(new Configuration());
+        HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
+        when(hibernateStore.getConfiguration()).thenReturn(new Configuration());
+        Metadata metadata = mock(Metadata.class);
+        when(hibernateStore.getMetadata()).thenReturn(metadata);
 
         this.executor = this.mocker.getComponentUnderTest();
         this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
@@ -269,7 +272,6 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void createNamedNativeHibernateQuery() throws Exception
     {
         DefaultQuery query = new DefaultQuery("queryName", this.executor);
@@ -290,9 +292,10 @@ public class HqlQueryExecutorTest
 
         NamedSQLQueryDefinition definition = mock(NamedSQLQueryDefinition.class);
         when(definition.getResultSetRef()).thenReturn("someResultSet");
+        when(definition.getName()).thenReturn(query.getStatement());
 
-        HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
-        sessionFactory.getConfiguration().getNamedSQLQueries().put(query.getStatement(), definition);
+        HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
+        when(hibernateStore.getMetadata().getNamedQueryDefinition(query.getStatement())).thenReturn(definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
 

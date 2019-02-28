@@ -133,9 +133,6 @@ xwiki.tags=1
 #-# The path to the hibernate configuration file.
 # xwiki.store.hibernate.path=/WEB-INF/hibernate.cfg.xml
 
-#-# [Since 3.3M1] Deprecated, use xwiki.store.migration
-# xwiki.store.hibernate.updateschema=1
-
 #-# Allow or disable custom mapping for particular XClasses. Custom mapping may increase the performance of certain
 #-# queries when large number of objects from particular classes are used in the wiki.
 # xwiki.store.hibernate.custommapping=1

@@ -57,9 +57,9 @@ import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -80,11 +80,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
 
     private static final String ESCAPE_LIKE_PARAMETERS_FILTER = "escapeLikeParameters";
 
-    /**
-     * Session factory needed for register named queries mapping.
-     */
     @Inject
-    private HibernateSessionFactory sessionFactory;
+    private HibernateStore hibernate;
 
     /**
      * Used for access to XWikiContext.
@@ -107,7 +104,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        Configuration configuration = this.sessionFactory.getConfiguration();
+        Configuration configuration = this.hibernate.getConfiguration();
 
         configuration.addInputStream(Util.getResourceAsStream(MAPPING_PATH));
     }
@@ -119,13 +116,12 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 if (this.allowedNamedQueries == null) {
                     this.allowedNamedQueries = new HashSet<>();
 
-                    Configuration configuration = this.sessionFactory.getConfiguration();
-
                     // Gather the list of allowed named queries
-                    Map<String, NamedQueryDefinition> namedQueries = configuration.getNamedQueries();
-                    for (Map.Entry<String, NamedQueryDefinition> query : namedQueries.entrySet()) {
-                        if (HqlQueryUtils.isSafe(query.getValue().getQuery())) {
-                            this.allowedNamedQueries.add(query.getKey());
+                    Collection<NamedQueryDefinition> namedQueries =
+                        this.hibernate.getMetadata().getNamedQueryDefinitions();
+                    for (NamedQueryDefinition definition : namedQueries) {
+                        if (HqlQueryUtils.isSafe(definition.getQuery())) {
+                            this.allowedNamedQueries.add(definition.getName());
                         }
                     }
                 }
@@ -350,8 +346,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             if (isNative) {
                 hQuery = session.createSQLQuery(filteredQuery.getStatement());
                 // Copy the information about the return column types, if possible.
-                NamedSQLQueryDefinition definition = (NamedSQLQueryDefinition) this.sessionFactory.getConfiguration()
-                    .getNamedSQLQueries().get(query.getStatement());
+                NamedSQLQueryDefinition definition = (NamedSQLQueryDefinition) this.hibernate.getMetadata()
+                    .getNamedQueryDefinition(query.getStatement());
                 if (!StringUtils.isEmpty(definition.getResultSetRef())) {
                     ((NativeQuery) hQuery).setResultSetMapping(definition.getResultSetRef());
                 }

@@ -35,7 +35,6 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
@@ -615,7 +614,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
             Session session = this.store.getCurrentSession();
             if (session != null) {
                 if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Cleanup of session was needed: " + session);
+                    LOGGER.warn("Cleanup of session was needed: {}", session.toString());
                 }
 
                 this.store.endTransaction(false);

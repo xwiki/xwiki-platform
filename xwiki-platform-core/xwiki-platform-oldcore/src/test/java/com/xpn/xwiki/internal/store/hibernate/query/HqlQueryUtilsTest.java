@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.query;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link HqlQueryUtils}.
@@ -60,5 +61,28 @@ public class HqlQueryUtilsTest
         assertFalse(HqlQueryUtils
             .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
         assertFalse(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
+    }
+
+    @Test
+    public void replaceLegacyQueryParameters()
+    {
+        assertEquals("select column from table where table.column = ?1",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column = ?"));
+        assertEquals("select column from table where table.column =?1",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column =?"));
+        assertEquals("select column from table where table.column =?1 ",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column =? "));
+        assertEquals("select column from table where table.column in (?1)",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column in (?)"));
+        assertEquals("select column from table where table.column in (?1,?2)",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column in (?,?)"));
+        assertEquals("select column from table where table.column in (?1,?2 )",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column in (?,? )"));
+        assertEquals("select column from table where table.column in ( ?1 , ?2 )",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column in ( ? , ? )"));
+        assertEquals("select column from table where table.column >?1",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column >?"));
+        assertEquals("select column from table where table.column <?1",
+            HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column <?"));
     }
 }

@@ -41,11 +41,16 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
+import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
 import org.slf4j.Logger;
@@ -59,6 +64,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
@@ -73,7 +79,7 @@ import com.xpn.xwiki.util.Util;
 @Component(roles = HibernateStore.class)
 @Singleton
 @DisposePriority(10000)
-public class HibernateStore implements Disposable
+public class HibernateStore implements Disposable, Integrator
 {
     /**
      * @see #isInSchemaMode()
@@ -113,7 +119,10 @@ public class HibernateStore implements Disposable
 
     private DataMigrationManager dataMigrationManager;
 
-    private final MetadataSources metadataSources = new MetadataSources();
+    private final BootstrapServiceRegistry bootstrapServiceRegistry =
+        new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+
+    private final MetadataSources metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
 
     private final Configuration configuration = new Configuration(this.metadataSources);
 
@@ -153,6 +162,19 @@ public class HibernateStore implements Disposable
         build();
     }
 
+    @Override
+    public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
+        SessionFactoryServiceRegistry serviceRegistry)
+    {
+        this.metadata = metadata;
+    }
+
+    @Override
+    public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
+    {
+        this.metadata = null;
+    }
+
     /**
      * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
      * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
@@ -188,7 +210,6 @@ public class HibernateStore implements Disposable
 
         // Create a new session factory
         this.sessionFactory = this.configuration.buildSessionFactory();
-        this.metadata = this.metadataSources.buildMetadata();
     }
 
     private void disposeInternal()
@@ -420,7 +441,8 @@ public class HibernateStore implements Disposable
 
         // - Oracle converts user names in uppercase when no quotes is used.
         // For example: "create user xwiki identified by xwiki;" creates a user named XWIKI (uppercase)
-        // - In Hibernate.cfg.xml we just specify: <property name="hibernate.connection.username">xwiki</property> and Hibernate
+        // - In Hibernate.cfg.xml we just specify: <property name="hibernate.connection.username">xwiki</property> and
+        // Hibernate
         // seems to be passing this username as is to Oracle which converts it to uppercase.
         //
         // Thus for Oracle we don't escape the schema.
@@ -616,6 +638,11 @@ public class HibernateStore implements Disposable
         }
 
         this.logger.debug("Taken session from pool [{}]", session);
+
+        // Put back legacy feature to the Hibernate session
+        if (session instanceof SessionImplementor) {
+            session = new LegacySessionImplementor((SessionImplementor) session);
+        }
 
         setCurrentSession(session);
 

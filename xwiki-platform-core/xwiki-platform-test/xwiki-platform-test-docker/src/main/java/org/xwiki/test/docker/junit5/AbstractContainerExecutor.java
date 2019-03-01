@@ -83,9 +83,10 @@ public abstract class AbstractContainerExecutor
         // Thus we need to map the source and target to the same path and we simulate this by creating a symlink
         // on the HOST to the target location.
         if (IN_A_CONTAINER) {
-            Path target = Paths.get(sourceDirectory);
+            Path existing = Paths.get(sourceDirectory);
             Path link = Paths.get(targetDirectory);
-            Files.createSymbolicLink(link, target);
+            Files.createDirectories(link.getParent());
+            Files.createSymbolicLink(link, existing);
             container.withFileSystemBind(targetDirectory, targetDirectory);
         } else {
             // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes

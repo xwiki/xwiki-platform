@@ -19,6 +19,11 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -39,6 +44,8 @@ import org.xwiki.text.StringUtils;
 public abstract class AbstractContainerExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerExecutor.class);
+
+    private static final boolean IN_A_CONTAINER = new File("/.dockerenv").exists();
 
     protected void start(GenericContainer container, TestConfiguration testConfiguration)
     {
@@ -64,19 +71,32 @@ public abstract class AbstractContainerExecutor
      * @param container the container on which to mount the directory.
      * @param sourceDirectory the path of the directory on the host to mount in the container.
      * @param targetDirectory the target where to mount the directory in the container.
+     * @throws IOException if the symlink creation fails
      * @since 10.11RC1
      */
     protected void mountFromHostToContainer(GenericContainer container, String sourceDirectory,
-        String targetDirectory)
+        String targetDirectory) throws IOException
     {
-        // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
-        // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
-        String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.startsWith("mac os x")) {
-            MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory);
-            container.withCopyFileToContainer(mountableDirectory, targetDirectory);
+        // If we're inside a docker container already (docker on docker pattern), then the Docker daemon will be the
+        // one from the HOST and hence, any volumes that are mounted is still referenced from the HOST, and not from
+        // the Container.
+        // Thus we need to map the source and target to the same path and we simulate this by creating a symlink
+        // on the HOST to the target location.
+        if (IN_A_CONTAINER) {
+            Path target = Paths.get(sourceDirectory);
+            Path link = Paths.get(targetDirectory);
+            Files.createSymbolicLink(link, target);
+            container.withFileSystemBind(targetDirectory, targetDirectory);
         } else {
-            container.withFileSystemBind(sourceDirectory, targetDirectory);
+            // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
+            // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
+            String osName = System.getProperty("os.name").toLowerCase();
+            if (osName.startsWith("mac os x")) {
+                MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory);
+                container.withCopyFileToContainer(mountableDirectory, targetDirectory);
+            } else {
+                container.withFileSystemBind(sourceDirectory, targetDirectory);
+            }
         }
     }
 

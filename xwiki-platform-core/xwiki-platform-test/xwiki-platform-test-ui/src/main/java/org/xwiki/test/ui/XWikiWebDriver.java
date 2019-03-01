@@ -104,7 +104,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         // Trying to use another unit in case there is a conflict when calling implicitlyWait both here
         // and in waitUntilCondition.
-        manage().timeouts().implicitlyWait(0, TimeUnit.MILLISECONDS);
+        manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
         try {
             return findElementWithoutScrolling(by);
         } finally {

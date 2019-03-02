@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -38,6 +39,8 @@ import org.xwiki.text.StringUtils;
  */
 public abstract class AbstractContainerExecutor
 {
+    private static final boolean IN_A_CONTAINER = new File("/.dockerenv").exists();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerExecutor.class);
 
     protected void start(GenericContainer container, TestConfiguration testConfiguration)
@@ -72,7 +75,7 @@ public abstract class AbstractContainerExecutor
         // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
         // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
         String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.startsWith("mac os x")) {
+        if (IN_A_CONTAINER || osName.startsWith("mac os x")) {
             MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory);
             container.withCopyFileToContainer(mountableDirectory, targetDirectory);
         } else {

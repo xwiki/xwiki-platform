@@ -64,11 +64,11 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             .withCapabilities(browser.getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
-            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null)
+            .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
 
-            // In case some test-resources are provided, they need to be available from the browser
-            // for example in order to upload some files on the wiki.
-            .withFileSystemBind(getTestResourcePathOnHost(), browser.getTestResourcesPath());
+        // In case some test-resources are provided, they need to be available from the browser
+        // for example in order to upload some files on the wiki.
+        mountFromHostToContainer(webDriverContainer, getTestResourcePathOnHost(), browser.getTestResourcesPath());
 
         if (this.testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Test resource path mapped: On Host [%s], in Docker: [%s]",

@@ -1,4 +1,4 @@
-                  GNU LESSER GENERAL PUBLIC LICENSE
+GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
 
  Copyright (C) 1991, 1999 Free Software Foundation, Inc.
@@ -73,7 +73,7 @@ libraries into non-free programs.
   When a program is linked with a library, whether statically or using
 a shared library, the combination of the two is legally speaking a
 combined work, a derivative of the original library.  The ordinary
-General Public License therefore permits such linking only if the
+General Public License, therefore, permits such linking only if the
 entire combination fits its criteria of freedom.  The Lesser General
 Public License permits more lax criteria for linking other code with
 the library.
@@ -95,9 +95,9 @@ case, there is little to gain by limiting the free library to free
 software only, so we use the Lesser General Public License.
 
   In other cases, permission to use a particular library in non-free
-programs enables a greater number of people to use a large body of
+programs enable a greater number of people to use a large body of
 free software.  For example, permission to use the GNU C Library in
-non-free programs enables many more people to use the whole GNU
+non-free programs enable many more people to use the whole GNU
 operating system, as well as its variant, the GNU/Linux operating
 system.
 
@@ -106,7 +106,7 @@ users' freedom, it does ensure that the user of a program that is
 linked with the Library has the freedom and the wherewithal to run
 that program using a modified version of the Library.
 
-  The precise terms and conditions for copying, distribution and
+  The precise terms and conditions for copying, distribution, and
 modification follow.  Pay close attention to the difference between a
 "work based on the library" and a "work that uses the library".  The
 former contains code derived from the library, whereas the latter must
@@ -139,7 +139,7 @@ all the source code for all modules it contains, plus any associated
 interface definition files, plus the scripts used to control compilation
 and installation of the library.
 
-  Activities other than copying, distribution and modification are not
+  Activities other than copying, distribution, and modification are not
 covered by this License; they are outside its scope.  The act of
 running a program using the Library is not restricted, and output from
 such a program is covered only if its contents constitute a work based
@@ -176,7 +176,7 @@ above, provided that you also meet all of these conditions:
     table of data to be supplied by an application program that uses
     the facility, other than as an argument passed when the facility
     is invoked, then you must make a good faith effort to ensure that,
-    in the event an application does not supply such function or
+    in the event, an application does not supply such function or
     table, the facility still operates, and performs whatever part of
     its purpose remains meaningful.
 
@@ -389,7 +389,7 @@ particular circumstance, the balance of the section is intended to apply,
 and the section as a whole is intended to apply in other circumstances.
 
 It is not the purpose of this section to induce you to infringe any
-patents or other property right claims or to contest validity of any
+patents or other property right claims or to contest the validity of any
 such claims; this section has the sole purpose of protecting the
 integrity of the free software distribution system which is
 implemented by public license practices.  Many people have made
@@ -488,7 +488,7 @@ convey the exclusion of warranty; and each file should have at least the
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
     USA
 
-Also add information on how to contact you by electronic and paper mail.
+Also, add information on how to contact you by electronic and paper mail.
 
 You should also get your employer (if you work as a programmer) or your
 school, if any, to sign a "copyright disclaimer" for the library, if
@@ -502,4 +502,3 @@ necessary.  Here is a sample; alter the names:
   Ty Coon, President of Vice
 
 That's all there is to it!
-

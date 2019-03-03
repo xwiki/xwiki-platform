@@ -1,3 +1,6 @@
+#if($xcontext.getAction() != 'edit' && $xcontext.getAction() != 'inline')
+  $response.sendRedirect($doc.getURL('edit','editor=wiki'))
+#end
 #set($formname = "edit")
 #set($saveaction = "save")
 #set($previewenabled = true)

@@ -2,6 +2,9 @@
 ### Object editor
 ###
 ###
+#if($xcontext.getAction() != 'edit')
+  $response.sendRedirect($doc.getURL('edit',"editor=object"))
+#end
 ## Macros
 ##
 #*

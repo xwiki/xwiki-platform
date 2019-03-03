@@ -1,3 +1,6 @@
+#if($xcontext.getAction() != 'edit' && $xcontext.getAction() != 'inline')
+  $response.sendRedirect($doc.getURL('edit', 'editor=inline'))
+#end
 ## Insert JS and CSS needed for the fullscreen edit feature
 $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})##
 $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##

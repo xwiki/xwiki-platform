@@ -52,6 +52,8 @@ admin.panels.applications=Panel aplikácií
 ### Missing: admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
 ### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
 ### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Exclude Top Level Application Pages
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.
 ### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
 ### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
 ### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
@@ -60,7 +62,7 @@ admin.panels.applications=Panel aplikácií
 ### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
 ### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
 ### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
 ### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
-</content>
+### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration</content>
 </xwikidoc>

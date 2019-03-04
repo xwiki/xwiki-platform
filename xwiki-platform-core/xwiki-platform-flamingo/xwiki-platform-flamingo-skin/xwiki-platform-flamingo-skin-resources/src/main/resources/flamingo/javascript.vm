@@ -160,7 +160,7 @@ XWiki.mainWiki = "$!{escapetool.javascript(${xcontext.mainWikiName})}";
 // Deprecated: replaced by meta data in the HTML element
 XWiki.currentWiki = "$!{escapetool.javascript(${xcontext.database})}";
 XWiki.currentSpace = "$!{escapetool.javascript($doc.space)}";
-XWiki.currentPage = "$!{escapetool.javascript($doc.name)}";
+XWiki.currentPage = "$!{escapetool.javascript($doc.documentReference.name)}";
 XWiki.editor = "$!{escapetool.javascript($editor)}";
 XWiki.viewer = "$!{escapetool.javascript($viewer)}";
 XWiki.contextaction = "${xcontext.getAction()}";

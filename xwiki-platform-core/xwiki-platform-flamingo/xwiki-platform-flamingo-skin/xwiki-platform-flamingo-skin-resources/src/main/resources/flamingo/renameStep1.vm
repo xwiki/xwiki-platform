@@ -7,7 +7,7 @@
 #template('contentheader.vm')
 #template('refactoring_macros.vm')
 #template('locationPicker_macros.vm')
-#set ($sourcePageIsTerminal = $doc.name != $services.model.getEntityReference('DOCUMENT', 'default').name)
+#set ($sourcePageIsTerminal = $doc.documentReference.name != $services.model.getEntityReference('DOCUMENT', 'default').name)
 <form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
   <div class="hidden">
     ## CSRF prevention
@@ -72,7 +72,7 @@
       ## Target Page
       ##------------
       #set ($parentReference = $doc.documentReference.parent)
-      #set ($name = $doc.name)
+      #set ($name = $doc.documentReference.name)
       #if (!$sourcePageIsTerminal)
         #set ($name = $parentReference.name)
         #set ($parentReference = $parentReference.parent)

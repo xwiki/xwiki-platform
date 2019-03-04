@@ -25,7 +25,6 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BootstrapSwitch;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**

@@ -38,6 +38,8 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.MavenResolver;
 
 /**
  * Finds all the XARs in the current pom (i.e. in the {@code ./pom.xml} in the current directory) and installs each of

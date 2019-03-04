@@ -29,6 +29,7 @@ import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.Assert.*;
 
@@ -230,8 +231,7 @@ public class AdministrationTest extends AbstractXWikiTestCase
         createConfigurableApplication(space, page, "TestSection1", true);
         open(space, page, "edit", "editor=object");
         // Add a second configurable object.
-        getSelenium().select("classname", "value=XWiki.ConfigurableClass");
-        clickButtonAndContinue("//input[@name='action_objectadd']");
+        new ObjectEditPage().addObject("XWiki.ConfigurableClass");
         setFieldValue("XWiki.ConfigurableClass_1_displayInSection", "TestSection2");
         setFieldValue("XWiki.ConfigurableClass_1_heading", "Some Other Heading");
         SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
@@ -486,9 +486,8 @@ public class AdministrationTest extends AbstractXWikiTestCase
         expandObject("XWiki.ConfigurableClass", 0);
         setFieldValue("XWiki.ConfigurableClass_0_codeToExecute", test);
         setFieldValue("XWiki.ConfigurableClass_0_propertiesToShow", "String, Boolean");
-        
-        getSelenium().select("classname", "value=XWiki.ConfigurableClass");
-        clickButtonAndContinue("//input[@name='action_objectadd']");
+
+        new ObjectEditPage().addObject("XWiki.ConfigurableClass");
         setFieldValue("XWiki.ConfigurableClass_1_displayInSection", "TestSection1");
         SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
             .findElementById("XWiki.ConfigurableClass_1_configurationClass"));
@@ -634,8 +633,7 @@ public class AdministrationTest extends AbstractXWikiTestCase
             open(space, page, "edit", "editor=object");
 
             // Add a configurable object which points to the new class as the configuration class.
-            getSelenium().select("classname", "value=XWiki.ConfigurableClass");
-            clickButtonAndContinue("//input[@name='action_objectadd']");
+            new ObjectEditPage().addObject("XWiki.ConfigurableClass");
             clickEditSaveAndView();
 
             // Try to place it in the storage area.
@@ -646,11 +644,7 @@ public class AdministrationTest extends AbstractXWikiTestCase
         open(space, page, "edit", "editor=object");
 
         // Add an object of the new class.
-        waitForElement("classname");
-        getSelenium().select("classname", "value=" + space + "." + page);
-        // Scroll the page to the top because the edit menu can be activated when we hover over the add button.
-        getSelenium().runScript("window.scrollTo(0, 0)");
-        clickButtonAndContinue("//input[@name='action_objectadd']");
+        new ObjectEditPage().addObject(space + "." + page);
 
         setFieldValue("XWiki.ConfigurableClass_0_displayInSection", section);
         setFieldValue("XWiki.ConfigurableClass_0_heading", "Some Heading");

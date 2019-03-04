@@ -97,12 +97,8 @@ In XWiki sono supportati i seguenti stili di base:
 1. Voce 5
 
 = Tabelle =
-Si possono creare delle semplici tabelle direttamente nelle pagine del wiki:
 
-== Tabella semplice ==
-| cella 1 | cella 2 | cella 3
-| cella 4 | cella 5 | cella 6
-| cella 7 | cella 8 | cella 9
+Si possono creare delle semplici tabelle direttamente nelle pagine del wiki:
 
 == Tabella con riga d'intestazione ==
 |= intestazione |= intestazione |= intestazione 

@@ -120,3 +120,15 @@
   padding: 0 1%;
   float: left;
 }
+
+/* Hide some page elements when the wizard is shown. */
+.document-menu,
+#contentmenu,
+.xdocLastModification,
+.document-header + hr,
+#xdocFooter {
+  display: none;
+}
+.document-header {
+  margin-bottom: 0;
+}

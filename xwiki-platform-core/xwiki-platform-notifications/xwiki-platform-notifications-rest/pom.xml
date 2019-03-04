@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-rest</artifactId>
   <name>XWiki Platform - Notifications - REST</name>
@@ -63,6 +63,10 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-filters-default</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.rometools</groupId>
+      <artifactId>rome</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

@@ -191,6 +191,14 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             } catch (UnsupportedEncodingException e) {
                 // This should never happen.
             }
+
+            // We do not want to encode the spaces in '+' since '+' will be then reencoded in
+            // ImageFilter to keep it and not consider it as a space when decoding it.
+            // This is link to a bug in libreoffice that does not convert properly the '+', so we cannot distinguish
+            // them from spaces in filenames. This should be removed once
+            // https://github.com/sbraconnier/jodconverter/issues/125 is fixed.
+            slideImageURL = slideImageURL.replace('+', ' ');
+
             presentationHTML.append(String.format("<p><img src=\"%s\"/></p>", slideImageURL));
 
             // Move to the next slide.

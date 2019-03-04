@@ -306,7 +306,7 @@ public class JobRequestContext implements Serializable
     /**
      * @return the requestContextPath
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public String getRequestContextPath()
     {
@@ -316,7 +316,7 @@ public class JobRequestContext implements Serializable
     /**
      * @param requestContextPath the requestContextPath to set
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public void setRequestContextPath(String requestContextPath)
     {

@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.template.TemplateManager;
@@ -43,12 +44,14 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.test.mockito.StringReaderMatcher;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -70,12 +73,18 @@ public class TemplateManagerTest
     @Before
     public void before() throws Exception
     {
+        // override default ObservationManager to avoid annoying listeners side effects
+        this.mocker.registerMockComponent(ObservationManager.class);
+
+        when(this.velocityManagerMock.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
 
         MemoryConfigurationSource configuration = this.mocker.registerMemoryConfigurationSource();
         this.mocker.registerComponent(MockConfigurationSource.getDescriptor("all"), configuration);
 
         this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
+
+        when(this.environmentMock.getResource("/templates/")).thenReturn(new URL("file://templates/"));
     }
 
     @AfterComponent
@@ -91,13 +100,13 @@ public class TemplateManagerTest
     {
         when(this.environmentMock.getResourceAsStream("/templates/template"))
             .thenReturn(new ByteArrayInputStream(content.getBytes("UTF8")));
-        when(this.environmentMock.getResource("/templates/template")).thenReturn(new URL("http://url"));
+        when(this.environmentMock.getResource("/templates/template")).thenReturn(new URL("file://templates/template"));
     }
 
     private void mockVelocity(String source, String result) throws XWikiVelocityException
     {
-        when(this.velocityManagerMock.evaluate(any(Writer.class), any(),
-            argThat(new StringReaderMatcher(source)))).then(new Answer<Boolean>()
+        when(this.velocityManagerMock.evaluate(any(Writer.class), any(), argThat(new StringReaderMatcher(source))))
+            .then(new Answer<Boolean>()
             {
                 @Override
                 public Boolean answer(InvocationOnMock invocation) throws Throwable
@@ -121,6 +130,18 @@ public class TemplateManagerTest
         setTemplateContent("source");
 
         assertEquals("OK", mocker.getComponentUnderTest().render("template"));
+    }
+
+    @Test
+    public void testTemplateCheatingProtection() throws Exception
+    {
+        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
+        when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
+            .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
+
+        mockVelocity("source", "KO");
+
+        assertEquals("", mocker.getComponentUnderTest().render("../secure[]"));
     }
 
     @Test

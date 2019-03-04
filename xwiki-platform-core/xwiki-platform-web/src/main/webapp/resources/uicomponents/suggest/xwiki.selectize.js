@@ -62,10 +62,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     }
     var url = option && option.url;
     if (typeof url === 'string') {
-      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url).click(function(event) {
-        // Clicking on the label should select the option not follow the link.
-        event.preventDefault();
-      });
+      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url);
       output.find('.xwiki-selectize-option-label').replaceWith(anchor);
     }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
@@ -131,10 +128,17 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     },
     searchField: ['value', 'label'],
     onType: function(value) {
-      if (!this.loadedSearches.hasOwnProperty(value)) {
+      if (!this.loadedSearches.hasOwnProperty(value) && typeof this.settings.load === 'function') {
         var wrapper = this.$wrapper;
         wrapper.addClass(this.settings.loadingClass);
       }
+    },
+    onInitialize: function() {
+      var control = this.$control;
+      control.on('click', 'a.xwiki-selectize-option-label', function(event) {
+        // Clicking on the label should select the option not follow the link.
+        event.preventDefault();
+      });
     }
   };
 
@@ -185,37 +189,56 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     return deferred.promise();
   };
 
-  var handleDropdownWidth = function() {
-    if (getDropdownWidthSetting(this) === 'auto') {
-      var oldPositionDropdown = this.selectize.positionDropdown;
-      this.selectize.positionDropdown = function() {
+  var customize = function() {
+    var oldPositionDropdown = this.selectize.positionDropdown;
+    this.selectize.positionDropdown = function() {
+      // We don't need to recompute the position if the dropdown is a child of the selectize widget.
+      if (this.settings.dropdownParent === 'body') {
         oldPositionDropdown.call(this);
-        var dropdown = this.$dropdown;
-        dropdown.css({
+      }
+      // 'auto' means the dropdown width should be variable based on its content, but no less than the width of the
+      // specified form field, otherwise the dropdown should have the same width as the form field.
+      if (this.settings.dropdownWidth === 'auto') {
+        this['$dropdown'].css({
           width: '',
-          'min-width': dropdown.css('width')
+          'min-width': this['$control'][0].getBoundingClientRect().width
         });
-      };
+      }
+    }
+    setDropDownAlignment(this.selectize);
+    if (this.selectize.settings.takeInputWidth) {
+      this.selectize['$control'].width($(this).data('initialWidth'));
     }
   };
 
-  /**
-   * @param input the form field that was enhanced with the Selectize widget
-   * @return 'auto' if the dropdown width should be variable based on its content, but no less than the width of the
-   *         specified form field, otherwise the dropdown should have the same width as the form field
-   */
-  var getDropdownWidthSetting = function(input) {
-    if (input.selectize.settings.hasOwnProperty('dropdownWidth')) {
-      return this.selectize.settings.dropdownWidth;
-    } else if ($(input).closest('.xform').length === 0) {
-      return 'auto';
+  var setDropDownAlignment = function(selectize) {
+    var dropdownAlignment = selectize.settings.dropdownAlignment;
+    if (!dropdownAlignment && selectize.settings.dropdownParent !== 'body') {
+      dropdownAlignment = 'left';
     }
+    if (dropdownAlignment) {
+      selectize['$dropdown'].addClass('selectize-dropdown-' + dropdownAlignment);
+    }
+  };
+
+  var getDefaultSettings = function(input) {
+    var defaultSettings = {};
+    if (input.closest('.xform').length === 0) {
+      defaultSettings.dropdownWidth = 'auto';
+    }
+    return defaultSettings;
+  };
+
+  var getSettings = function(input, settings) {
+    return $.extend({}, defaultSettings, getDefaultSettings(input), settings, input.data('xwiki-selectize'));
   };
 
   $.fn.xwikiSelectize = function(settings) {
+    // Save the width before the input is hidden.
+    this.data('initialWidth', this.width());
     return this.not('.selectized, .selectize-control')
-      .selectize($.extend({}, defaultSettings, settings))
-      .each(loadSelectedValues).each(handleDropdownWidth)
+      .selectize(getSettings(this, settings))
+      .each(customize).each(loadSelectedValues)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.
         var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
@@ -223,4 +246,14 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
         liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
       });
   };
+});
+
+require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
+  var init = function(event, data) {
+    var container = $((data && data.elements) || document);
+    container.find('.xwiki-selectize').xwikiSelectize();
+  };
+
+  $(document).on('xwiki:dom:updated', init);
+  XWiki.domIsLoaded && init();
 });

@@ -187,6 +187,5 @@ solr.facet.date.today=Avui
 ### Missing: solr.field.space=Location
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

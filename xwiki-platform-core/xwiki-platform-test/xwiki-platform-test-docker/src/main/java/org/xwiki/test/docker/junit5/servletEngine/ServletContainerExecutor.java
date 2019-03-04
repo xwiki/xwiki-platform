@@ -33,10 +33,10 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
-import org.xwiki.test.docker.junit5.ArtifactResolver;
-import org.xwiki.test.docker.junit5.MavenResolver;
-import org.xwiki.test.docker.junit5.RepositoryResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.MavenResolver;
+import org.xwiki.test.integration.maven.RepositoryResolver;
 
 import com.github.dockerjava.api.model.Image;
 
@@ -144,7 +144,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.testConfiguration.getServletEngine().setPort(xwikiPort);
     }
 
-    private void startContainer() throws Exception
+    private void startContainer()
     {
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
         // start listening.
@@ -159,6 +159,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         if (this.testConfiguration.isOffline()) {
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
+        }
+
+        // If the Clover database system property is setup, the map the clover database location on the FS to a path
+        // inside the container
+        String cloverDatabase = System.getProperty("maven.clover.cloverDatabase");
+        if (cloverDatabase != null) {
+            // Note: The Clover instrumentation puts the full path to the clover database location inside the java
+            // source files which execute inside the docker container. Thus we need to make that exact same full path
+            // available inside the container...
+            this.servletContainer.withFileSystemBind(cloverDatabase, cloverDatabase);
         }
 
         start(this.servletContainer, this.testConfiguration);

@@ -1110,7 +1110,7 @@
       </showinformation>
       <skin>
         <cache>0</cache>
-        <classname>XWiki.XWikiSkins</classname>
+        <classname/>
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
@@ -1127,7 +1127,7 @@
         <separator> </separator>
         <separators/>
         <sort>none</sort>
-        <sql/>
+        <sql>, BaseObject obj where doc.fullName = obj.name and obj.className = 'XWiki.XWikiSkins'</sql>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>

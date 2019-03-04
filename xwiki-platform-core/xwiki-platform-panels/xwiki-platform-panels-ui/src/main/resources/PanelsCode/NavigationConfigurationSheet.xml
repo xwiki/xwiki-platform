@@ -82,47 +82,13 @@
       &lt;p class="xHint"&gt;
         $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.hint'))
       &lt;/p&gt;
-      &lt;div class="exclusion-filter topLevelExtensionPages"&gt;
-        #set ($excludeTopLevelExtensionPages = $configObj.getValue('excludeTopLevelExtensionPages') == 1)
-        &lt;p class="exclusion-filter-label"&gt;
-          &lt;label title="$escapetool.xml($services.localization.render("PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint"))"&gt;
-            &lt;input type="checkbox" name="PanelsCode.NavigationConfigurationClass_0_excludeTopLevelExtensionPages"
-              value="1"#if ($excludeTopLevelExtensionPages) checked="checked"#end /&gt;
-            &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_excludeTopLevelExtensionPages" value="0" /&gt;
-            $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.topLevelExtensionPages'))
-          &lt;/label&gt;
-        &lt;/p&gt;
-        &lt;ul class="exclusion-filter-pages#if (!$excludeTopLevelExtensionPages) hidden#end"&gt;
-          #set ($inclusions = {})
-          #foreach ($inclusion in $configObj.getValue('inclusions'))
-            #set ($discard = $inclusions.put($services.model.resolveDocument($inclusion), $inclusion))
-          #end
-          #set ($query = $services.query.hql('select space.name from XWikiSpace space where space.parent is null'))
-          #set ($discard = $query.addFilter('hidden/space'))
-          #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
-          #foreach ($result in $query.execute())
-            #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
-            #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
-            #if ($installedExtensions &amp;&amp; $installedExtensions.size() &gt; 0
-                &amp;&amp; !$services.extension.xar.isEditAllowed($documentReference))
-              #set ($excludedDoc = $xwiki.getDocument($documentReference))
-              #set ($included = $inclusions.containsKey($documentReference))
-              &lt;li class="page#if ($included) included#end"
-                  data-reference="$escapetool.xml($services.model.serialize($documentReference, 'default'))"&gt;
-                &lt;a href="$excludedDoc.getURL()"&gt;$escapetool.xml($excludedDoc.plainTitle)&lt;/a&gt;
-                #if ($included)
-                  &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_inclusions"
-                    value="$escapetool.xml($inclusions.get($documentReference))" /&gt;
-                #end
-              &lt;/li&gt;##
-            #end
-          #end
-          &lt;li class="empty"&gt;
-            $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.empty'))
-            &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_inclusions" value="" /&gt;
-          &lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/div&gt;
+      #set ($inclusions = {})
+      #foreach ($inclusion in $configObj.getValue('inclusions'))
+        #set ($discard = $inclusions.put($services.model.resolveDocument($inclusion), $inclusion))
+      #end
+      #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+      #topLevelExtensionPagesFilter($configObj $inclusions)
+      #topLevelApplicationPagesFilter($configObj $inclusions)
       &lt;div class="exclusion-filter otherPages"&gt;
         &lt;p class="exclusion-filter-label"&gt;
           $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.otherPages'))
@@ -146,6 +112,79 @@
     &lt;/div&gt;
   &lt;/div&gt;
   {{/html}}
+#end
+
+#macro (topLevelExtensionPagesFilter $configObj $inclusions)
+  &lt;div class="exclusion-filter exclusion-filter-dynamic topLevelExtensionPages"&gt;
+    #exclusionFilterToggle($configObj 'excludeTopLevelExtensionPages')
+    &lt;ul class="exclusion-filter-pages#if (!$isFilterActive) hidden#end"&gt;
+      #set ($query = $services.query.hql('select space.name from XWikiSpace space where space.parent is null'))
+      #set ($discard = $query.addFilter('hidden/space'))
+      #foreach ($result in $query.execute())
+        #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
+        #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
+        #if ($installedExtensions &amp;&amp; $installedExtensions.size() &gt; 0
+            &amp;&amp; !$services.extension.xar.isEditAllowed($documentReference))
+          #exclusionFilterPage($documentReference $inclusions)
+        #end
+      #end
+      #exclusionFilterEmpty
+    &lt;/ul&gt;
+  &lt;/div&gt;
+#end
+
+#macro (topLevelApplicationPagesFilter $configObj $inclusions)
+  &lt;div class="exclusion-filter exclusion-filter-dynamic topLevelApplicationPages"&gt;
+    #exclusionFilterToggle($configObj 'excludeTopLevelApplicationPages')
+    &lt;ul class="exclusion-filter-pages#if (!$isFilterActive) hidden#end"&gt;
+      #set ($statement = 'select space.name '
+        + 'from XWikiSpace as space, Document as doc, doc.object(AppWithinMinutes.LiveTableClass) as app '
+        + 'where space.parent is null and doc.space = space.reference')
+      #set ($query = $services.query.xwql($statement).addFilter('hidden/space'))
+      #foreach ($result in $query.execute())
+        #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
+        ## Don't list application pages that come from installed extensions because we have another filter for this.
+        #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
+        #if (!$installedExtensions || $installedExtensions.isEmpty())
+          #exclusionFilterPage($documentReference $inclusions)
+        #end
+      #end
+      #exclusionFilterEmpty
+    &lt;/ul&gt;
+  &lt;/div&gt;
+#end
+
+#macro (exclusionFilterToggle $configObj $filterName)
+  #set ($isFilterActive = $configObj.getValue($filterName) == 1)
+  &lt;p class="exclusion-filter-label"&gt;
+    &lt;label title="$escapetool.xml($services.localization.render("PanelsCode.NavigationConfigurationClass_${filterName}.hint"))"&gt;
+      &lt;input type="checkbox" name="PanelsCode.NavigationConfigurationClass_0_$filterName"
+        value="1"#if ($isFilterActive) checked="checked"#end /&gt;
+      &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_$filterName" value="0" /&gt;
+      #set ($suffix = $stringtool.uncapitalize($stringtool.removeStart($filterName, 'exclude')))
+      $escapetool.xml($services.localization.render("platform.panels.navigation.configuration.$suffix"))
+    &lt;/label&gt;
+  &lt;/p&gt;
+#end
+
+#macro (exclusionFilterPage $documentReference $inclusions)
+  #set ($excludedDoc = $xwiki.getDocument($documentReference))
+  #set ($included = $inclusions.containsKey($documentReference))
+  &lt;li class="page#if ($included) included#end"
+      data-reference="$escapetool.xml($services.model.serialize($documentReference, 'default'))"&gt;
+    &lt;a href="$excludedDoc.getURL()"&gt;$escapetool.xml($excludedDoc.plainTitle)&lt;/a&gt;
+    #if ($included)
+      &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_inclusions"
+        value="$escapetool.xml($inclusions.get($documentReference))" /&gt;
+    #end
+  &lt;/li&gt;##
+#end
+
+#macro (exclusionFilterEmpty)
+  &lt;li class="empty"&gt;
+    $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.empty'))
+    &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_inclusions" value="" /&gt;
+  &lt;/li&gt;
 #end
 {{/velocity}}
 
@@ -179,6 +218,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -286,8 +326,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
       return $('&lt;span/&gt;').text(selectedPages.length + ' pages')[0];
     } else {
       selectedPages.removeClass('selected');
-      var isTopLevelExtensionPage = draggedPage.closest('.topLevelExtensionPages').size() &gt; 0;
-      return (isTopLevelExtensionPage ? draggedPage.clone() : draggedPage)[0];
+      var isFromDynamicFilter = draggedPage.closest('.exclusion-filter-dynamic').size() &gt; 0;
+      return (isFromDynamicFilter ? draggedPage.clone() : draggedPage)[0];
     }
   };
 
@@ -323,8 +363,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     };
   };
 
-  var includeTopLevelExtensionPage = function(reference) {
-    $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
+  var includePageFromDynamicFilter = function(reference) {
+    $('.exclusion-filter-dynamic .page').not('.included').each(function() {
       var page = $(this);
       // Verify that the page is a draggable instance in order to avoid processing the drag helper (when the helper is a
       // clone of the page element).
@@ -367,7 +407,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     var reference = page.data('reference');
     // We don't act directly on the given page element because the corresponding page might be excluded by multiple
     // filters.
-    includeTopLevelExtensionPage(reference);
+    includePageFromDynamicFilter(reference);
     includeOtherPage(reference);
     // Add the corresponding node to the navigation tree.
     tree &amp;&amp; showOrCreateNode(tree, page);
@@ -414,17 +454,17 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   });
 
   //
-  // Toggle top level extension pages filter
+  // Toggle dynamic filters
   //
 
-  var excludeTopLevelExtensionPages = function(tree) {
-    tree &amp;&amp; $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
+  var excludePagesFromDynamicFilter = function(pages, tree) {
+    tree &amp;&amp; pages.find('.page').not('.included').each(function() {
       tree.hide_node('document:' + $(this).data('reference'));
     });
   };
 
-  var includeTopLevelExtensionPages = function(tree) {
-    tree &amp;&amp; $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
+  var includePagesFromDynamicFilter = function(pages, tree) {
+    tree &amp;&amp; pages.find('.page').not('.included').each(function() {
       var page = $(this);
       var otherExclusionsForThisPage = $('.exclusion-filter.otherPages .page').filter(function() {
         return $(this).data('reference') === page.data('reference');
@@ -435,14 +475,13 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     });
   };
 
-  var topLevelExtensionPagesFilterToggle = $('.exclusion-filter.topLevelExtensionPages input[type="checkbox"]');
-  topLevelExtensionPagesFilterToggle.click(function() {
-    $('.exclusion-filter.topLevelExtensionPages .exclusion-filter-pages').toggleClass('hidden');
+  $('.exclusion-filter-dynamic input[type="checkbox"]').click(function() {
+    var pages = $(this).closest('.exclusion-filter').find('.exclusion-filter-pages').toggleClass('hidden');
     var tree = $('.navigationPanelConfiguration .jstree').jstree(true);
     if ($(this).prop('checked')) {
-      excludeTopLevelExtensionPages(tree);
+      excludePagesFromDynamicFilter(pages, tree);
     } else {
-      includeTopLevelExtensionPages(tree);
+      includePagesFromDynamicFilter(pages, tree);
     }
     maybeToggleEmptyNode(tree);
   });
@@ -451,17 +490,15 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   // Drag from the Navigation Panel and drop over the Excluded Pages.
   //
 
-  var excludeTopLevelExtensionPage = function(tree, node) {
+  var excludePageFromDynamicFilter = function(tree, node) {
     var excluded = false;
-    if (topLevelExtensionPagesFilterToggle.prop('checked')) {
-      $('.exclusion-filter.topLevelExtensionPages .page.included').each(function() {
-        var page = $(this);
-        if (page.data('reference') === node.data.id) {
-          page.removeClass('included').draggable('enable').find('input').remove();
-          excluded = true;
-        }
-      });
-    }
+    $('.exclusion-filter-dynamic .exclusion-filter-pages').not('.hidden').find('.page.included').each(function() {
+      var page = $(this);
+      if (page.data('reference') === node.data.id) {
+        page.removeClass('included').draggable('enable').find('input').remove();
+        excluded = true;
+      }
+    });
     return excluded;
   };
 
@@ -477,7 +514,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   var excludeNode = function(tree, nodeId) {
     var node = tree.get_node(nodeId);
     if (node &amp;&amp; node.data &amp;&amp; node.data.type === 'document') {
-      excludeTopLevelExtensionPage(tree, node) || excludeOtherPage(tree, node);
+      excludePageFromDynamicFilter(tree, node) || excludeOtherPage(tree, node);
       tree.hide_node(nodeId);
     }
   };
@@ -546,6 +583,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>

@@ -40,9 +40,9 @@
 
 {{velocity output="false"}}
 #macro (initializeTemplateProvider)
-  #if ($doc.name.endsWith('Provider'))
+  #if ($doc.documentReference.name.endsWith('Provider'))
     #set ($discard = $doc.set('template', $stringtool.removeEnd($doc.fullName, 'Provider').trim()))
-    #set ($templateName = $stringtool.removeEnd($doc.name, 'Provider').trim())
+    #set ($templateName = $stringtool.removeEnd($doc.documentReference.name, 'Provider').trim())
     #set ($templateName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($templateName), ' '))
     #set ($templateName = $templateName.replaceAll('\s+', ' '))
     #set ($discard = $doc.set('name', $templateName))

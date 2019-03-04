@@ -86,7 +86,7 @@ public class ConflictQuestion
         CURRENT_EXIST(GlobalAction.ASK, GlobalAction.CURRENT, GlobalAction.NEXT),
 
         /**
-         * Already existing different document.
+         * Already deleted current document.
          */
         CURRENT_DELETED(GlobalAction.ASK, GlobalAction.CURRENT, GlobalAction.PREVIOUS, GlobalAction.NEXT);
 

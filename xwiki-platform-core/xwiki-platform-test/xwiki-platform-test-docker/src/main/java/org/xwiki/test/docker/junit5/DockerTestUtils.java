@@ -39,6 +39,8 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
 
+import ch.qos.logback.classic.Level;
+
 import static org.testcontainers.containers.output.OutputFrame.OutputType.STDERR;
 import static org.testcontainers.containers.output.OutputFrame.OutputType.STDOUT;
 
@@ -155,5 +157,24 @@ public final class DockerTestUtils
         } catch (Exception e) {
             LOGGER.error("Failed to take screenshot for failing test [{}].", testName, e);
         }
+    }
+
+    /**
+     * @param container the container to start
+     */
+    public static void startContainer(GenericContainer container)
+    {
+        container.start();
+    }
+
+    /**
+     * @param loggingContextName the logger's context (i.e. name) for which to set the level
+     * @param loggingLevel the level to set
+     */
+    public static void setLogbackLoggerLevel(String loggingContextName, Level loggingLevel)
+    {
+        ch.qos.logback.classic.Logger logger =
+            (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggingContextName);
+        logger.setLevel(loggingLevel);
     }
 }

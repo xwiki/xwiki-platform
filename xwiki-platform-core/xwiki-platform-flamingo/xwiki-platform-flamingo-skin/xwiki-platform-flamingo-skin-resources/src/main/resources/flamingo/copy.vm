@@ -42,8 +42,8 @@
         ##------------
         #template('locationPicker_macros.vm')
         #set ($parentReference = $doc.documentReference.parent)
-        #set ($name = $doc.name)
-        #if ($doc.name == $defaultDocumentName)
+        #set ($name = $doc.documentReference.name)
+        #if ($doc.documentReference.name == $defaultDocumentName)
           #set ($name = $parentReference.name)
           #set ($parentReference = $parentReference.parent)
         #end
@@ -165,6 +165,19 @@
             </span>
           </div>
         </form>
+      #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
+        #warning($services.localization.render('core.copy.editRightsForbidden',
+        [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        <div class="buttons">
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">
+                $services.localization.render('core.copy.changeTarget')
+              </a>
+            </span>
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a>
+            </span>
+        </div>
       #else
         #set ($copyAsRequest = $services.refactoring.requestFactory.createCopyAsRequest($sourceDocReference,
           $targetDocReference))

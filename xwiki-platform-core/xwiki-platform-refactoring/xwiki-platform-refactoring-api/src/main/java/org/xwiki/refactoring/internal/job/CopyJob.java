@@ -23,6 +23,10 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.event.DocumentCopiedEvent;
+import org.xwiki.refactoring.event.DocumentCopyingEvent;
+import org.xwiki.refactoring.event.EntitiesCopiedEvent;
+import org.xwiki.refactoring.event.EntitiesCopyingEvent;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
@@ -43,27 +47,63 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     }
 
     @Override
-    protected boolean isDeleteSources()
+    protected void runInternal() throws Exception
     {
-        // copy never deletes sources
-        return false;
+        this.progressManager.pushLevelProgress(3, this);
+
+        try {
+            this.progressManager.startStep(this);
+            EntitiesCopyingEvent entitiesCopyingEvent = new EntitiesCopyingEvent();
+            this.observationManager.notify(entitiesCopyingEvent, this, this.getRequest());
+            if (entitiesCopyingEvent.isCanceled()) {
+                return;
+            }
+            this.progressManager.endStep(this);
+
+            this.progressManager.startStep(this);
+            super.runInternal();
+            this.progressManager.endStep(this);
+
+            this.progressManager.startStep(this);
+            EntitiesCopiedEvent entitiesCopiedEvent = new EntitiesCopiedEvent();
+            this.observationManager.notify(entitiesCopiedEvent, this, this.getRequest());
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
     }
 
     @Override
-    protected void postMove(DocumentReference oldReference, DocumentReference newReference)
+    protected boolean copyOrMove(DocumentReference sourceReference, DocumentReference targetReference)
     {
-        // do nothing
-    }
+        this.progressManager.pushLevelProgress(3, this);
 
-    @Override
-    protected void postUpdateDocuments(DocumentReference oldReference, DocumentReference newReference)
-    {
-        // do nothing
-    }
+        try {
+            // Step 1: Send before event.
+            this.progressManager.startStep(this);
+            DocumentCopyingEvent documentCopyingEvent = new DocumentCopyingEvent(sourceReference, targetReference);
+            this.observationManager.notify(documentCopyingEvent, this, this.getRequest());
+            if (documentCopyingEvent.isCanceled()) {
+                return false;
+            }
+            this.progressManager.endStep(this);
 
-    @Override
-    protected boolean processOnlySameSourceDestinationTypes()
-    {
-        return false;
+            // Step 2: Copy the source document.
+            this.progressManager.startStep(this);
+            if (!super.copyOrMove(sourceReference, targetReference)) {
+                return false;
+            }
+            this.progressManager.endStep(this);
+
+            // Step 3: Send after event.
+            this.progressManager.startStep(this);
+            DocumentCopiedEvent documentCopiedEvent = new DocumentCopiedEvent(sourceReference, targetReference);
+            this.observationManager.notify(documentCopiedEvent, this, this.getRequest());
+            this.progressManager.endStep(this);
+
+            return true;
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
     }
 }

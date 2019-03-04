@@ -100,6 +100,8 @@ public class DefaultEvent implements Event
 
     /** @see #getTarget() */
     private Set<String> target;
+
+    private boolean hidden;
     
     @Override
     public String getId()
@@ -358,5 +360,17 @@ public class DefaultEvent implements Event
     public String toString()
     {
         return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument()});
+    }
+
+    @Override
+    public boolean getHidden()
+    {
+        return this.hidden;
+    }
+
+    @Override
+    public void setHidden(boolean isHidden)
+    {
+        this.hidden = isHidden;
     }
 }

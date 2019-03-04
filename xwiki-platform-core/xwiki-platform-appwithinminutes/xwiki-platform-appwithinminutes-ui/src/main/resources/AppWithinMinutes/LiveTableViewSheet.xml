@@ -36,108 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass'))
-#if($liveTableObj)
-  #set($discard = $doc.use($liveTableObj))
-  #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
-  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
+  <content>{{template name="locationPicker_macros.vm" /}}
+
+{{velocity output="false"}}
+#macro (displayApp)
+  #set ($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
   #if (!$isReadOnly)
-    ## Determine the user's rights
-    #set($classFullName = $liveTableObj.getProperty('class').value)
-    #set($className = $stringtool.removeEnd($classFullName, 'Class'))
-    #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
-    #set ($templateProvider = $xwiki.getDocument($templateProviderReference))
-    #set ($creationRestrictions = $templateProvider.getValue('creationRestrictions'))
-    #if ($creationRestrictions)
-      #if ($creationRestrictions.size() &gt; 0)
-        #set ($dataSpaceRef = $services.model.resolveSpace($creationRestrictions.get(0)))
-      #else
-        ## There is no data space as the user can create application entries anywhere. Let's use the application space
-        ## when the user clicks on the Add New Entry link from the home page.
-        #set ($dataSpaceRef = $doc.documentReference.parent)
-      #end
-    #else
-      ## The template provider is missing. Fall-back on the old 'dataSpace' property.
-      #set ($dataSpaceRef = $services.model.resolveSpace($liveTableObj.getValue('dataSpace'), 'explicit',
-        $doc.documentReference))
-    #end
-    #set($hasCreateData = $services.security.authorization.hasAccess('edit', $dataSpaceRef))
-    #set($hasDeleteData = $services.security.authorization.hasAccess('admin', $dataSpaceRef))
-    #set($classRef = $services.model.resolveDocument($classFullName))
-    #set($hasEditApplication = $services.security.authorization.hasAccess('edit', $classRef))
-    #set($translationsRef = $services.model.resolveDocument("${className}Translations"))
-    #set($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; $xwiki.exists($translationsRef)
-      &amp;&amp; $services.security.authorization.hasAccess('edit', $translationsRef))
-    #set($hasDeleteApplication = $hasDeleteData
-      &amp;&amp; $services.security.authorization.hasAccess('admin', $doc.documentReference.parent)
-      &amp;&amp; $services.security.authorization.hasAccess('admin', $classRef.parent))
-    ## Display the application actions based on the user's rights
-    #if($hasCreateData || $hasDeleteData || $hasEditApplication || $hasEditTranslations || $hasDeleteApplication)
-      (% id="actionBox" class="floatinginfobox" %)
-      (((
-        = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
-        #if($hasCreateData)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
-            #if ("$!templateProvider.getValue('terminal')" == '1')
-              #set ($entryReference = $services.model.createDocumentReference('__entryName__', $dataSpaceRef))
-            #else
-              #set ($entryReference = $services.model.resolveDocument('', 'default',
-                $services.model.createSpaceReference('__entryName__', $dataSpaceRef)))
-            #end
-            ## We need to set the title if we want to be able to sort or filter the doc.title live table column.
-            #set ($params = {
-              'template': "${className}Template",
-              'title': '__entryName__',
-              'parent': $services.model.serialize($doc.documentReference, 'local')
-            })
-            #if ($xwiki.getDocument($classRef).xWikiClass.properties.size() &gt; 0)
-              ## The entry has properties so go in edit mode to edit them.
-              #set ($action = 'edit')
-              #set ($params.editor = 'inline')
-            #else
-              ## There are no properties to edit so create the new entry and get back to the home page.
-              #set ($action = 'save')
-              #set ($discard = $params.putAll({
-                'xredirect': $doc.getURL(),
-                'form_token': $services.csrf.token
-              }))
-            #end
-            {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryReference, $action, $escapetool.url($params))" /&gt;{{/html}}
-        #end
-        #if($hasEditApplication)
-          #set ($queryString = $escapetool.url({
-            'appName': $doc.space,
-            'resolve': true
-          }))
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
-        #end
-        #if($hasEditTranslations)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$xwiki.getURL($translationsRef, 'edit', 'editor=wiki')||class="action translate"]]
-        #end
-        #if($hasDeleteData)
-          #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
-            'appName': $doc.space,
-            'resolve': true,
-            'scope': 'entries',
-            'xredirect': $doc.getURL()
-          })))
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$deleteDataURL||class="action deleteData"]]
-        #end
-        #if($hasDeleteApplication)
-          #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
-            'appName': $doc.space,
-            'resolve': true,
-            'xredirect': $doc.getURL()
-          })))
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$deleteAppURL||class="action delete"]]
-        #end
-      )))
-    #end
+    #displayAppActions
   #end
   $doc.display('description')
   ## Display the live table only if it was generated.
-  #if($doc.content.length() &gt; 0)
+  #if ($doc.content.length() &gt; 0)
     = $services.localization.render('platform.appwithinminutes.appLiveTableHeading') =
     ## We don't use the Include macro (with empty reference) because we want the content to be executed with the rights
     ## of the current document rather than the rights of the sheet. This is important because the user can modify the
@@ -150,6 +60,196 @@
     {{html clean="false"}}$doc.getRenderedContent($doc.content,
       $doc.syntax.toIdString()).replace('{{', '&amp;amp;#123;&amp;amp;#123;'){{/html}}
   #end
+#end
+
+#macro (displayAppActions)
+  ## Determine the user's rights
+  #set ($className = $stringtool.removeEnd($classFullName, 'Class'))
+  #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
+  #set ($templateProvider = $xwiki.getDocument($templateProviderReference))
+  #set ($creationRestrictions = $templateProvider.getValue('creationRestrictions'))
+  #if ($creationRestrictions)
+    #if ($creationRestrictions.size() &gt; 0)
+      #set ($dataSpaceRef = $services.model.resolveSpace($creationRestrictions.get(0)))
+    #else
+      ## There is no data space as the user can create application entries anywhere. Let's use the application space
+      ## when the user clicks on the Add New Entry link from the home page.
+      #set ($dataSpaceRef = $doc.documentReference.parent)
+    #end
+  #else
+    ## The template provider is missing. Fall-back on the old 'dataSpace' property.
+    #set ($dataSpaceRef = $services.model.resolveSpace($doc.getValue('dataSpace'), 'explicit',
+      $doc.documentReference))
+  #end
+  #set ($hasCreateData = $services.security.authorization.hasAccess('edit', $dataSpaceRef))
+  #set ($hasDeleteData = $services.security.authorization.hasAccess('admin', $dataSpaceRef))
+  #set ($translationsRef = $services.model.resolveDocument("${className}Translations"))
+  #set ($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; $xwiki.exists($translationsRef)
+    &amp;&amp; $services.security.authorization.hasAccess('edit', $translationsRef))
+  #set ($classRef = $services.model.resolveDocument($classFullName))
+  #set ($hasEditApplication = $services.security.authorization.hasAccess('edit', $classRef))
+  #set ($hasDeleteApplication = $hasDeleteData
+    &amp;&amp; $services.security.authorization.hasAccess('admin', $doc.documentReference.parent)
+    &amp;&amp; $services.security.authorization.hasAccess('admin', $classRef.parent))
+  ## Display the application actions based on the user's rights
+  #if ($hasCreateData || $hasDeleteData || $hasEditApplication || $hasEditTranslations || $hasDeleteApplication)
+    (% id="actionBox" class="floatinginfobox" %)
+    (((
+      = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
+      #if ($hasCreateData)
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
+          #if ("$!templateProvider.getValue('terminal')" == '1')
+            #set ($entryReference = $services.model.createDocumentReference('__entryName__', $dataSpaceRef))
+          #else
+            #set ($entryReference = $services.model.resolveDocument('', 'default',
+              $services.model.createSpaceReference('__entryName__', $dataSpaceRef)))
+          #end
+          ## We need to set the title if we want to be able to sort or filter the doc.title live table column.
+          #set ($params = {
+            'template': "${className}Template",
+            'title': '__entryName__',
+            'parent': $services.model.serialize($doc.documentReference, 'local')
+          })
+          #if ($xwiki.getDocument($classRef).xWikiClass.properties.size() &gt; 0)
+            ## The entry has properties so go in edit mode to edit them.
+            #set ($action = 'edit')
+            #set ($params.editor = 'inline')
+          #else
+            ## There are no properties to edit so create the new entry and get back to the home page.
+            #set ($action = 'save')
+            #set ($discard = $params.putAll({
+              'xredirect': $doc.getURL(),
+              'form_token': $services.csrf.token
+            }))
+          #end
+          {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryReference, $action, $escapetool.url($params))" /&gt;{{/html}}
+      #end
+      #if ($hasEditApplication)
+        #set ($queryString = $escapetool.url({
+          'appName': $doc.space,
+          'resolve': true
+        }))
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
+      #end
+      #if ($hasEditTranslations)
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$xwiki.getURL($translationsRef, 'edit', 'editor=wiki')||class="action translate"]]
+      #end
+      #if ($hasDeleteData)
+        #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
+          'appName': $doc.space,
+          'resolve': true,
+          'scope': 'entries',
+          'xredirect': $doc.getURL()
+        })))
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$deleteDataURL||class="action deleteData"]]
+      #end
+      #if ($hasDeleteApplication)
+        #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
+          'appName': $doc.space,
+          'resolve': true,
+          'xredirect': $doc.getURL()
+        })))
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$deleteAppURL||class="action delete"]]
+      #end
+    )))
+  #end
+#end
+
+#macro (renameAppModal)
+  &lt;div class="modal" id="renameAppModal" tabindex="-1" role="dialog" aria-labelledby="renameAppModal-label"
+      data-backdrop="static" data-keyboard="false"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;form class="modal-content xform"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;h4 class="modal-title" id="renameAppModal-label"&gt;Rename Application&lt;/h4&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          #renameAppModalBody
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="submit" class="btn btn-primary" disabled="disabled"&gt;
+            $escapetool.xml($services.localization.render('core.rename.submit'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (renameAppModalBody)
+  &lt;div class="box infomessage"&gt;
+    $services.icon.renderHTML('info')
+    $services.localization.render('appWithinMinutes.renameApp.changeAppTitleInfo')
+  &lt;/div&gt;
+  &lt;div class="box warningmessage"&gt;
+    $services.icon.renderHTML('warning')
+    $services.localization.render('appWithinMinutes.renameApp.regenerateAppCodeWarning')
+  &lt;/div&gt;
+  &lt;div class="hidden"&gt;
+    &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)" /&gt;
+    &lt;input type="hidden" name="oldAppReference" value="$escapetool.xml(
+      $services.model.serialize($doc.documentReference.parent, 'local'))"/&gt;
+    &lt;span class="appNameEmptyError xErrorMsg"&gt;
+      $services.localization.render("platform.appwithinminutes.appNameEmptyError")
+    &lt;/span&gt;
+    &lt;span class="pageExistsError xErrorMsg"&gt;
+      $services.localization.render("appWithinMinutes.renameApp.pageExistsError")
+    &lt;/span&gt;
+    &lt;span class="locationForbiddenError xErrorMsg"&gt;
+      $services.localization.render("appWithinMinutes.renameApp.locationForbiddenError")
+    &lt;/span&gt;
+  &lt;/div&gt;
+  #set ($appName = $doc.pageReference.name)
+  #set ($isNestedPage = $doc.documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($parentReference = $doc.documentReference.parent)
+  #if ($isNestedPage)
+    #set ($parentReference = $parentReference.parent)
+  #end
+  #locationPicker({
+    'id': 'renameApp',
+    'title': {
+      'label': 'appWithinMinutes.renameApp.newName.label',
+      'hint': 'platform.appwithinminutes.appNameHint',
+      'name': 'newAppName',
+      'value': $appName,
+      'placeholder': 'appWithinMinutes.renameApp.newName.label'
+    },
+    'preview': {
+      'label': 'appWithinMinutes.renameApp.location.label',
+      'hint': 'appWithinMinutes.renameApp.location.hint'
+    },
+    'parent': {
+      'label': 'appWithinMinutes.renameApp.parent.label',
+      'hint': 'appWithinMinutes.renameApp.parent.hint',
+      'name': 'newAppParentReference',
+      'reference': $parentReference,
+      'placeholder': 'appWithinMinutes.createApp.parent.placeholder'
+    }
+  })
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass'))
+#if ($liveTableObj)
+  #set ($discard = $doc.use($liveTableObj))
+  #set ($classFullName = $doc.getValue('class'))
+  #if ("$!classFullName" == '' || !$xwiki.exists($classFullName))
+    {{warning}}
+    $services.icon.render('warning') {{translation key="platform.appwithinminutes.appHomePageMovedWarning"/}}
+    {{/warning}}
+
+  #end
+  #displayApp
+  {{html clean="false"}}
+  #renameAppModal
+  {{/html}}
 #end
 {{/velocity}}</content>
   <attachment>
@@ -251,7 +351,11 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
     this.urlTemplate = trigger.up().next('input[type=hidden]').value;
 
     this.input = new Element('input', {type: 'text'});
-    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryLabel'))'});
+    this.addButton = new Element('input', {
+      type: 'image',
+      src: '$xwiki.getSkinFile('icons/silk/add.png')',
+      alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryLabel'))'
+    });
 
     var container = new Element('div', {id: 'entryNamePopup'});
     container.insert(this.input);
@@ -294,7 +398,185 @@ function init() {
 (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 
 return XWiki;
-}(XWiki || {}));</code>
+}(XWiki || {}));
+
+/**
+ * Rename Application
+ */
+require(['jquery', 'bootstrap'], function($) {
+  // Hijack the rename page action.
+  var renameAppModal = $('#renameAppModal');
+  $('#tmActionRename').click(function(event) {
+    event.preventDefault();
+    renameAppModal.modal();
+  });
+
+  // Form validation.
+  var appNameInput = $('#renameAppTitle');
+  var appParentInput = $('#renameAppParentReference');
+  var submitButton = renameAppModal.find('.btn-primary[type="submit"]');
+
+  var appNameEmptyError = renameAppModal.find('.appNameEmptyError');
+  var pageExistsError = renameAppModal.find('.pageExistsError');
+  var locationForbiddenError = renameAppModal.find('.locationForbiddenError');
+  appNameEmptyError.add(pageExistsError).add(locationForbiddenError).hide().insertAfter(appNameInput);
+
+  var getNewAppReference = function(local) {
+    var appParentReference = local ? null : new XWiki.WikiReference(XWiki.currentWiki);
+    if (appParentInput.val() !== '') {
+      appParentReference = XWiki.Model.resolve(appParentInput.val(), XWiki.EntityType.SPACE, appParentReference);
+    }
+    return new XWiki.EntityReference(appNameInput.val(), XWiki.EntityType.SPACE, appParentReference);
+  };
+
+  var getNewAppHomePage = function() {
+    var newAppReference = getNewAppReference();
+    var newAppHomePageReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, newAppReference);
+    return new XWiki.Document(newAppHomePageReference);
+  };
+
+  var startValidation = function() {
+    if (appNameInput.val() === '') {
+      endValidation(appNameEmptyError);
+    } else {
+      var newAppHomePage = getNewAppHomePage();
+      if (newAppHomePage.documentReference.equals(XWiki.currentDocument.documentReference)) {
+        endValidation(pageExistsError);
+      } else {
+        $.ajax({
+          type: 'HEAD',
+          url: newAppHomePage.getURL()
+        }).done(function() {
+          endValidation(pageExistsError);
+        }).fail(function(response) {
+          if (response.status === 404) {
+            $.ajax({
+              type: 'HEAD',
+              url: newAppHomePage.getURL('edit')
+            }).done(function() {
+              endValidation();
+            }).fail(function() {
+              endValidation(locationForbiddenError);
+            });
+          } else if (response.status === 403) {
+            endValidation(locationForbiddenError);
+          } else {
+            endValidation();
+          }
+        });
+      }
+    }
+  };
+
+  var endValidation = function(error) {
+    if (error) {
+      error.show();
+    }
+    appNameInput.removeClass('loading');
+    submitButton.prop('disabled', !!error);
+  };
+
+  var validationTimeout;
+  var scheduleValidation = function() {
+    clearTimeout(validationTimeout);
+    renameAppModal.find('.xErrorMsg').hide();
+    appNameInput.addClass('loading');
+    submitButton.prop('disabled', true);
+    validationTimeout = setTimeout(startValidation, 500);
+  };
+
+  appNameInput.add(appParentInput).on('input', scheduleValidation);
+
+  var locationPickerModal = renameAppModal.find('.location-picker .modal');
+  renameAppModal.on('shown.bs.modal', function(event) {
+    // Nested modals are not supported so we have to move the location picker modal outside, but we shouldn't do this
+    // before the location picker has been initialized. That's why we wait for the rename application modal to be shown
+    // first.
+    renameAppModal.after(locationPickerModal);
+    appNameInput.focus();
+  });
+
+  // Hide the rename application modal when the location picker modal is shown.
+  locationPickerModal.removeClass('fade').on('show.bs.modal', function(event) {
+    renameAppModal.modal('hide');
+  // Show the rename application modal when the location picker modal is hidden.
+  }).on('hidden.bs.modal', function(event) {
+    renameAppModal.modal('show');
+  });
+
+  renameAppModal.find('form').submit(function(event) {
+    event.preventDefault();
+    renameApp(getRenameData($(this)));
+  });
+
+  var getRenameData = function(form) {
+    var data = getFormData(form);
+    data.newAppReference = XWiki.Model.serialize(getNewAppReference(true));
+    delete data.newAppName;
+    delete data.newAppParentReference;
+    data.outputSyntax = 'plain';
+    return data;
+  };
+
+  var getFormData = function(form) {
+    var data = {};
+    form.serializeArray().forEach(function(parameter) {
+      // Keep the first value;
+      if (!data.hasOwnProperty(parameter.name)) {
+        data[parameter.name] = parameter.value;
+      }
+    });
+    return data;
+  };
+
+  var renameApp = function(data) {
+    // Disable the form to prevent it from being submitted twice.
+    renameAppModal.find(':input').prop('disabled', true);
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('appWithinMinutes.renameApp.inProgress')),
+      'inprogress'
+    );
+    var renameAppURL = new XWiki.Document('RenameApplication', 'AppWithinMinutes').getURL('get');
+    $.post(renameAppURL, data).then(updateAppHomePage).done(function() {
+      renameAppModal.modal('hide');
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('appWithinMinutes.renameApp.done')),
+        'done'
+      ));
+      // Delay a bit the redirect so that the user notices the success message.
+      setTimeout(function() {
+        window.location.href = getNewAppHomePage().getURL();
+      }, 0);
+    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('appWithinMinutes.renameApp.failed')),
+        'error'
+      ));
+    }).always(function() {
+      // Re-enable the form.
+      renameAppModal.find(':input').prop('disabled', false);
+    });
+  };
+
+  var updateAppHomePage = function() {
+    var deferred = $.Deferred();
+    var newAppHomePageEditURL = getNewAppHomePage().getURL('edit');
+    $('&lt;div/&gt;').load(newAppHomePageEditURL + ' #inline', function() {
+      var formData = $(this).children('form#inline').serializeArray();
+      if (formData.length &gt; 0) {
+        formData.push({name: 'xaction_save', value: true});
+        $.post(newAppHomePageEditURL, formData).done(function() {
+          deferred.resolve();
+        }).fail(function() {
+          deferred.reject();
+        });
+      } else {
+        deferred.reject();
+      }
+    });
+    return deferred.promise();
+  }
+});</code>
     </property>
     <property>
       <name>Code</name>
@@ -463,6 +745,15 @@ return XWiki;
 .xwiki-livetable-container {
   /* Make sure the live table doesn't overflow the action panel. */
   clear: right;
+}
+
+/**
+ * Rename Application
+ */
+#renameAppTitle.loading {
+  background-position: right .3em center;
+  padding-left: 12px;
+  padding-right: 2em;
 }</code>
     </property>
     <property>

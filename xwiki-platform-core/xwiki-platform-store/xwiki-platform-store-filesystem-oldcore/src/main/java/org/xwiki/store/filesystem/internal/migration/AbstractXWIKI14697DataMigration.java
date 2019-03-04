@@ -81,16 +81,16 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractStoreTypeD
 
     protected File getDocumentDir(final DocumentReference docRef)
     {
-        final File path = new File(this.fstools.getStorageLocationFile(), this.pathSerializer.serialize(docRef, false));
-        File docDir = new File(path, FilesystemStoreTools.DOCUMENT_DIR_NAME);
+        final File path = new File(getPre11StoreRootDirectory(), this.pathSerializer.serialize(docRef, false));
+        File docDir = new File(path, THIS_DIR_NAME);
 
         // Add the locale
         Locale docLocale = docRef.getLocale();
         if (docLocale != null) {
             final File docLocalesDir = new File(docDir, FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
             final File docLocaleDir = new File(docLocalesDir,
-                docLocale.equals(Locale.ROOT) ? FilesystemStoreTools.DOCUMENT_LOCALES_ROOT_NAME : docLocale.toString());
-            docDir = new File(docLocaleDir, FilesystemStoreTools.DOCUMENTLOCALE_DIR_NAME);
+                docLocale.equals(Locale.ROOT) ? DOCUMENT_LOCALE_ROOT_NAME : docLocale.toString());
+            docDir = new File(docLocaleDir, THIS_DIR_NAME);
         }
 
         return docDir;
@@ -99,7 +99,7 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractStoreTypeD
     protected File getAttachmentDir(final AttachmentReference attachmentReference)
     {
         final File docDir = getDocumentDir(attachmentReference.getDocumentReference());
-        final File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENT_DIR_NAME);
+        final File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
 
         try {
             return new File(attachmentsDir, URLEncoder.encode(attachmentReference.getName(), "UTF8"));

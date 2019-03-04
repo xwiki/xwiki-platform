@@ -383,16 +383,17 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
             setNamedParameter(hquery, e.getKey(), e.getValue());
         }
-        if (query.getPositionalParameters().size() > 0) {
-            int start = Collections.min(query.getPositionalParameters().keySet());
+        Map<Integer, Object> positionalParameters = query.getPositionalParameters();
+        if (positionalParameters.size() > 0) {
+            int start = Collections.min(positionalParameters.keySet());
             if (start == 0) {
                 // jdbc-style positional parameters. "?"
-                for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
+                for (Entry<Integer, Object> e : positionalParameters.entrySet()) {
                     hquery.setParameter(e.getKey(), e.getValue());
                 }
             } else {
                 // jpql-style. "?index"
-                for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
+                for (Entry<Integer, Object> e : positionalParameters.entrySet()) {
                     // hack. hibernate assume "?1" is named parameter, so use string "1".
                     setNamedParameter(hquery, String.valueOf(e.getKey()), e.getValue());
                 }

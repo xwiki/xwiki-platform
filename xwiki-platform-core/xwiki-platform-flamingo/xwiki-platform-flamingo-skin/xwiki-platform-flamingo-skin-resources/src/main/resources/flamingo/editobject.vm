@@ -139,7 +139,7 @@
 #macro(displayAddObject $class)
   <div id="add_xobject_${escapetool.xml($class.name)}" class="add_xobject">
     <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
-      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;classname=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
     </div>
   </div>
 #end
@@ -149,31 +149,25 @@
  * Display a control for adding an object from a chosen class
  *#
 #macro(displayAddObjectChooseClass)
-  <div id="add_xobject" class="add_xobject"> <label for="classname" class="add_xobject-title">$services.localization.render('core.editors.object.add.label'):</label>
-  <select id="classname" name="classname" size="1">
-    <option value="-">$services.localization.render('core.editors.object.add.selectClass')</option>
-    ## Existing classes are enumerated, grouped by space name.
-    ## The list is already sorted alphabetically
-#set($prevSpace = '')
-#foreach ($classname in $xwiki.classList)
-  #if ($!xwiki.hasAccessLevel('view', $classname))
-    #set ($classdoc = $xwiki.getDocument($classname))
-    #if ($classdoc.space != $prevSpace)
-      #if ($prevSpace != '')
-        </optgroup>
-      #end
-      <optgroup label="${escapetool.xml($classdoc.space)}">
-      #set ($prevSpace = $classdoc.space)
-    #end
-    <option value="${escapetool.xml($classdoc.fullName)}">${escapetool.xml($classdoc.name)}</option>
-  #end
-#end
-#if($prevSpace != '')
-  </optgroup>
-#end
-</select>
-<span class="buttonwrapper"><input type="submit" name="action_objectadd" value="$services.localization.render('core.editors.object.add.submit')" class="button xobject-add-control"/></span>
-  </div> ## add_object
+  <div id="add_xobject" class="add_xobject">
+    <label for="classname" class="add_xobject-title">
+      $services.localization.render('core.editors.object.add.label'):
+    </label>
+    #set ($classPickerParameters = {
+      'id': 'classname',
+      'name': 'classname',
+      'placeholder': $services.localization.render('core.editors.object.add.selectClass'),
+      'data-xwiki-selectize': {
+        'copyClassesToDropdown': true,
+        'takeInputWidth': true
+      }
+    })
+    #classPicker($classPickerParameters)
+    <span class="buttonwrapper">
+      <input type="submit" name="action_objectadd" class="button xobject-add-control"
+        value="$services.localization.render('core.editors.object.add.submit')"/>
+    </span>
+  </div>
 #end
 ##
 ##
@@ -208,14 +202,19 @@
 ##
 ## Ajax object add:
 #if ("$!{request.xaction}" == 'addObject')
-  #set ($class = $xwiki.getClass(${request.className}))
+  ## We keep 'className' for backward compatibility and use 'classname' to be consistent with other actions.
+  #set ($classname = ${request.classname})
+  #if ("$!classname" == '')
+    #set ($classname = ${request.className})
+  #end
+  #set ($class = $xwiki.getClass($classname))
   #set ($props = $class.getProperties())
   #if ($props.isEmpty())
     $response.setStatus(404)
-    #error($services.localization.render('core.editors.object.add.invalidClassName', [$request.className]))
+    #error($services.localization.render('core.editors.object.add.invalidClassName', [$classname]))
   #else
-    #set ($isNewClass = $doc.getObjects(${request.className}).isEmpty())
-    #set ($newobj = $doc.newObject(${request.className}))
+    #set ($isNewClass = $doc.getObjects($classname).isEmpty())
+    #set ($newobj = $doc.newObject($classname))
     #set ($discard = $doc.save())
     #if ("$!{request.xredirect}" != '')
       $response.sendRedirect($request.xredirect)

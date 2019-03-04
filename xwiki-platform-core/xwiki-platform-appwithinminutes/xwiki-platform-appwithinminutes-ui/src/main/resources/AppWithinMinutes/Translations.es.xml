@@ -41,7 +41,7 @@
 ### Missing: platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
 platform.appwithinminutes.createAppButtonLabel=Crear Aplicación
 platform.appwithinminutes.appsLiveTableHeading=Aplicaciones
-platform.appwithinminutes.appsLiveTable.doc.space=Nombre de aplicación
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Ultimo autor
 platform.appwithinminutes.appsLiveTable.doc.date=Fecha de actualización
 platform.appwithinminutes.appsLiveTable._actions=Acciones
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameLabel=Nombre de la Aplicación
 ### Missing: platform.appwithinminutes.appNameEmptyError=Please enter the application name.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 ### Missing: platform.appwithinminutes.classEditorPaletteTitle=Field Palette
 ### Missing: platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
 ### Missing: platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Valor
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Añadir
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Borrar
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Imágenes
 ### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
 ### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 ### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 ### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
 ### Missing: platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
 ### Missing: platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
@@ -210,6 +209,7 @@ platform.appwithinminutes.appHomePageEntryNameLabel=Nombre de entrada:
 platform.appwithinminutes.appHomePageEditAppLabel=Editar aplicación
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traducir aplicación
 ### Missing: platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
@@ -217,6 +217,20 @@ platform.appwithinminutes.appHomePageTranslateAppLabel=Traducir aplicación
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 ### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 ### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.newName.label=New Name
+### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+### Missing: appWithinMinutes.renameApp.location.label=New Location
+### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+### Missing: appWithinMinutes.renameApp.parent.label=New Parent
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
+### Missing: appWithinMinutes.renameApp.done=Application renamed
+### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
@@ -246,5 +260,9 @@ platform.appwithinminutes.wizardStep3Name=Presentación
 ### Missing: platform.appwithinminutes.wizardStep3Title=Customize your application homepage
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 ### Missing: platform.appwithinminutes.wizardStep3Description=Customize the application homepage
-</content>
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Nombre de aplicación
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
 </xwikidoc>

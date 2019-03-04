@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="AppWithinMinutes.Translations" locale="">
+<xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="">
   <web>AppWithinMinutes</web>
   <name>Translations</name>
   <language/>
@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
 platform.appwithinminutes.createAppButtonLabel=Create Application
 platform.appwithinminutes.appsLiveTableHeading=Applications
-platform.appwithinminutes.appsLiveTable.doc.space=Application name
+platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Last author
 platform.appwithinminutes.appsLiveTable.doc.date=Update date
 platform.appwithinminutes.appsLiveTable._actions=Actions
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=This application already exists. 
 platform.appwithinminutes.appNameEmptyError=Please enter the application name.
 
 ### Wizard Step 2: Application Structure
-appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Field Palette
 platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
 platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Add
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Delete
 
-appWithinMinutes.templateProviderEditor.title={0} Entries
 appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,12 +186,13 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Images
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
+platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
 platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
 platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
-platform.appwithinminutes.liveTableEditorAddColumnHint=Add
+platform.appwithinminutes.liveTableEditorAddColumnHint=Add selected column
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Icon
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
@@ -210,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
 platform.appwithinminutes.appHomePageEditAppLabel=Edit application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
+platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
@@ -217,6 +217,20 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the ap
 platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Rename Application
+appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.newName.label=New Name
+appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+appWithinMinutes.renameApp.location.label=New Location
+appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+appWithinMinutes.renameApp.parent.label=New Parent
+appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+appWithinMinutes.renameApp.inProgress=Renaming application...
+appWithinMinutes.renameApp.done=Application renamed
+appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
@@ -245,7 +259,12 @@ platform.appwithinminutes.wizardStep3Name=Presentation
 #@deprecated appWithinMinutes.wizardStep.presentation.title
 platform.appwithinminutes.wizardStep3Title=Customize your application homepage
 #@deprecated appWithinMinutes.wizardStep.presentation.description
-platform.appwithinminutes.wizardStep3Description=Customize the application homepage</content>
+platform.appwithinminutes.wizardStep3Description=Customize the application homepage
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Application name
+appWithinMinutes.classEditor.title={0} Structure
+appWithinMinutes.templateProviderEditor.title={0} Entries</content>
   <object>
     <name>AppWithinMinutes.Translations</name>
     <number>0</number>

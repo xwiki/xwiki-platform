@@ -36,19 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-help.tipsPanel.title=Подсказки
+  <content>help.tipsPanel.title=Подсказки
 help.tipsPanel.noTipMessage=Нет подсказок!
 help.tipsPanel.gettingStartedTip=Если вы новый пользователь XWiki, ознакомьтесь с [[Руководством по началу работы&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Перейти на любую страницу в вики с помощью Ctrl+G или Meta+G.\nСмотрите [[больше ярлыков&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+help.tipsPanel.jumpToPageTip=Переход на любую страницу в вики с помощью Ctrl+G или Meta+G.\nСмотрите [[больше ярлыков&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
 help.tipsPanel.improveXWikiTip=Знаете ли вы, что вы можете улучшить XWiki? Потратьте 5 минут, чтобы [[заполнить этот опрос&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] и помочь этому проекту с открытым исходным кодом!
-help.tipsPanel.breadcrumbsTip=Вы можете нажать на стрелки рядом с элементами хлебной крошки, чтобы быстро перейти к родственным и дочерним страницам.
+help.tipsPanel.breadcrumbsTip=Вы можете нажать на стрелки в строке навигации, чтобы быстро перейти к родственным и дочерним страницам.
 help.tipsPanel.advancedHiddenShortcutTip=Нажмите сочетание клавиш x+x+x+a, чтобы переключить [[Расширенный режим&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] и x+x+x+h для переключения отображения [[скрытых страниц&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+help.tipsPanel.linkAutocompleteWYSIWYGTip=При редактировании в WYSIWYG редакторе введите ## [##, а затем начните вводить буквы, чтобы получить рекомендации по созданию ссылки.
 help.macroList.title=Доступные макросы
 help.macroList.id=ID
 help.macroList.name=Название
 help.macroList.category=Категория
 help.macroList.description=Описание
-help.macroList.visibility=Видимость
-</content>
+help.macroList.visibility=Видимость</content>
 </xwikidoc>

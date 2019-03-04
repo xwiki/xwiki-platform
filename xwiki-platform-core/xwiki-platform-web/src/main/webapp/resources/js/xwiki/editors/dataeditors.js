@@ -30,7 +30,6 @@ editors.XDataEditors = Class.create({
     this.ajaxObjectAdd($('add_xobject'));
     this.ajaxPropertyAdd();
     this.makeSortable($('xwikiclassproperties'));
-    this.classSwitcherBehavior();
     this.ajaxRemoveDeprecatedProperties($("body"), ".syncAllProperties");
   },
   enhanceClassUX : function(xclass) {
@@ -74,7 +73,7 @@ editors.XDataEditors = Class.create({
           url = this.editedDocument.getURL('edit', Object.toQueryString({
             xpage: 'editobject',
             xaction: 'addObject',
-            className: classNameVal
+            classname: classNameVal
           }));
         }
         if (!item.disabled && validClassName) {
@@ -487,36 +486,6 @@ editors.XDataEditors = Class.create({
     });
   },
   //---------------------------------------------------
-  // Class switcher: no submit
-  classSwitcherBehavior : function() {
-    var switcher = $$('#switch-xclass #classname');
-    if(switcher.size() > 0) {
-      switcher = switcher[0];
-      switcher.observe('change', function() {
-        var value = this.options[this.selectedIndex].value;
-        if (value != '-') {
-          new XWiki.widgets.ConfirmationBox(
-            {
-              onYes : function() {
-                  document.fire('xwiki:actions:save', {'continue' : true, 'form' : $('propupdate')});
-                  document.observe('xwiki:document:saved', function () {
-                    window.self.location = value;
-                  });
-              },
-              onNo : function() {
-                  window.self.location = value;
-              }
-            },
-            /* Interaction parameters */
-            { confirmationText: "$services.localization.render('core.editors.class.switchClass.confirm')" }
-          );
-        }
-      }.bindAsEventListener(switcher));
-      switcher.up('form').down("input[type='submit']").hide();
-      switcher.up('form').down(".warningmessage").hide();
-    }
-  },
-  //---------------------------------------------------
   /* Class editor: xproperty ordering */
   makeSortable : function(element) {
     if (!element) {
@@ -591,3 +560,34 @@ function init() {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
+
+// Class Switcher
+require(['jquery', 'xwiki-events-bridge'], function($) {
+  $('#switch-xclass').change(function(event) {
+    var selectedClass = $(event.target).val();
+    if (selectedClass) {
+      var selectedClassReference = XWiki.Model.resolve(selectedClass, XWiki.EntityType.DOCUMENT,
+        XWiki.currentDocument.documentReference);
+      var selectedClassURL = new XWiki.Document(selectedClassReference).getURL('edit', 'editor=class');
+      var switchClass = function() {
+        window.self.location = selectedClassURL;
+      };
+      new XWiki.widgets.ConfirmationBox({
+        onYes: function() {
+          // Save the current class before switching.
+          $(document).trigger('xwiki:actions:save', {
+            'continue': true,
+            'form': $('#propupdate')[0]
+          });
+          $(document).on('xwiki:document:saved', switchClass);
+        },
+        // Switch without saving the current class.
+        onNo: switchClass
+      }, {
+        confirmationText: "$services.localization.render('core.editors.class.switchClass.confirm')",
+        // Allow the users to cancel the switch.
+        showCancelButton: true
+      });
+    }
+  });
+});

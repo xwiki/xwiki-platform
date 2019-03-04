@@ -150,7 +150,7 @@
   #set ($userDoc = $xwiki.getDocument($user))
   #getUserAvatarURL($userDoc.documentReference, $avatarURL, 40)
   #set ($userName = $xwiki.getUserName($user))
-  <span class="notification-event-user"><img src="$avatarURL.url" alt="$escapetool.xml($userDoc.name)"/>#if(!$onlyAvatar) <a href="$userDoc.getURL()">$userName</a>#end</span>##
+  <span class="notification-event-user"><img src="$avatarURL.url" alt="$escapetool.xml($userDoc.pageReference.name)"/>#if(!$onlyAvatar) <a href="$userDoc.getURL()">$userName</a>#end</span>##
 #end
 #**
  * Display a line with the name of all users

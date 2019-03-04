@@ -795,14 +795,14 @@ $fn
 ## For instance: "xwiki:A.B.WebHome" will become "AB"
 #set ($specialClassAttribute = $stringtool.toAlphaNumeric("$!serializedDocument"))
 ## We keep this class for compatibility purpose but the previous one should be used instead.
-#set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.name"))
+#set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.documentReference.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="#if ($isLarge) large #end panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
-<h1 class="xwikipaneltitle #if ($isHeaderHidden) hidden #end">$title</h1>
+<div class="#if ($isLarge)large #{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
+<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="#if ($isLarge) large #end panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
-{{html}}<h1 class="xwikipaneltitle #if ($isHeaderHidden) hidden #end">$title</h1>{{/html}}
+(% class="#if ($isLarge)large#{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
+{{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
@@ -2586,7 +2586,7 @@ Recursive title display detected!##
  *
  * @param $parameters the parameters (most of them are treated as HTML attributes)
  *#
-#macro (suggestInput $parameters)
+#macro (suggestInput $parameters $optionsDisplayerMacroName)
   #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
     {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
@@ -2595,7 +2595,13 @@ Recursive title display detected!##
   #set ($nonAttributes = ['value', 'separators'])
   #foreach ($entry in $parameters.entrySet())
     #if (!$nonAttributes.contains($entry.key))
-      #set ($discard = $attributes.add("$escapetool.xml($entry.key)='$!escapetool.xml($entry.value)'"))
+      #if ($entry.value.equals($entry.value.toString()))
+        #set ($stringValue = $entry.value)
+      #else
+        ## Serialize non-string values as JSON.
+        #set ($stringValue = $jsontool.serialize($entry.value))
+      #end
+      #set ($discard = $attributes.add("$escapetool.xml($entry.key)='$!escapetool.xml($stringValue)'"))
     #end
   #end
   #if ("$!parameters.value.size()" != '')
@@ -2608,8 +2614,12 @@ Recursive title display detected!##
     #set ($values = [])
   #end
   <select $stringtool.join($attributes, ' ')>
-    #foreach ($selectedValue in $values)
-      <option value="$!escapetool.xml($selectedValue)" selected="selected">$!escapetool.xml($selectedValue)</option>
+    #if ("$!optionsDisplayerMacroName" != '')
+      #evaluate("${escapetool.h}${optionsDisplayerMacroName}(${escapetool.d}values)")
+    #else
+      #foreach ($selectedValue in $values)
+        <option value="$!escapetool.xml($selectedValue)" selected="selected">$!escapetool.xml($selectedValue)</option>
+      #end
     #end
   </select>
   #if ($parameters.multiple)
@@ -2641,4 +2651,93 @@ Recursive title display detected!##
   #set ($discard = $response.flushBuffer())
   ## Make sure XWiki doesn't write any more content to the response.
   #set ($discard = $xcontext.setFinished(true))
+#end
+
+#macro (classPicker $parameters)
+  #classPicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') xwiki-selectize suggest-classes"))
+  #suggestInput($parameters 'classPicker_displayOptions')
+#end
+
+#macro (classPicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/xwiki.selectize.js', true))
+#end
+
+#macro (classPicker_displayOptions $selectedValues)
+  #if ("$!parameters.placeholder" != '')
+    <option value="">$escapetool.xml($parameters.placeholder)</option>
+  #end
+  #set ($selectedClassReferences = $collectionstool.set)
+  #foreach ($selectedValue in $selectedValues)
+    #set ($discard = $selectedClassReferences.add($services.model.resolveDocument($selectedValue)))
+  #end
+  #set ($optionGroups = $collectionstool.orderedMap)
+  #classPicker_getOptionGroups($optionGroups $selectedClassReferences)
+  #classPicker_displayOptionGroups($optionGroups $selectedClassReferences)
+#end
+
+#macro (classPicker_getOptionGroups $optionGroups $selectedClassReferences)
+  #set ($classReferences = $collectionstool.set)
+  ## Make sure the selected classes are listed as options.
+  #set ($discard = $classReferences.addAll($selectedClassReferences))
+  #foreach ($className in $xwiki.classList)
+    #set ($classReference = $services.model.resolveDocument($className))
+    #if ($services.security.authorization.hasAccess('view', $classReference))
+      #set ($discard = $classReferences.add($classReference))
+    #end
+  #end
+  #set ($classReferenceTree = $services.model.toTree($classReferences))
+  #classPicker_addOptionGroups($classReferenceTree $optionGroups)
+#end
+
+#**
+ * Flatten the class reference tree into a list of class reference groups.
+ *#
+#macro (classPicker_addOptionGroups $parentNode $optionGroups)
+  ## Look for direct child class nodes and create an option group.
+  #set ($classNodes = $parentNode.getChildren($doc.documentReference.type))
+  #if ($classNodes.size() > 0)
+    #set ($classReferences = [])
+    #foreach ($classNode in $classNodes)
+      #set ($discard = $classReferences.add($classNode.reference))
+    #end
+    #set ($discard = $optionGroups.put($parentNode.reference, $classReferences))
+  #end
+  #foreach ($childNode in $parentNode.children)
+    #if ($childNode.children.size() > 0)
+      #classPicker_addOptionGroups($childNode $optionGroups)
+    #end
+  #end
+#end
+
+#macro (classPicker_displayOptionGroups $optionGroups $selectedClassReferences)
+  #foreach ($entry in $optionGroups.entrySet())
+    ## Use the location as group label.
+    #set ($path = [])
+    #set ($referenceChain = $entry.key.reversedReferenceChain)
+    ## Skip the wiki reference because classes are local.
+    #foreach ($reference in $referenceChain.subList(1, $referenceChain.size()))
+      #set ($discard = $path.add($reference.name))
+    #end
+    <optgroup label="$escapetool.xml($stringtool.join($path, ' / '))">
+      #foreach ($classReference in $entry.value)
+        #set ($optionData = {
+          'url': $xwiki.getURL($classReference)
+        })
+        <option value="$escapetool.xml($services.model.serialize($classReference, 'local'))"
+            #if ($selectedClassReferences.contains($classReference))selected="selected"#end
+            data-data="$escapetool.xml($jsontool.serialize($optionData))">
+          ## We display the class title instead of the class name because classes can be defined in nested (WebHome)
+          ## documents. We could also display the last space name but then we would need an option group for the top
+          ## level classes and a label for this group that doesn't confuse the users.
+          #set ($classDoc = $xwiki.getDocument($classReference))
+          $escapetool.xml($classDoc.plainTitle)
+        </option>
+      #end
+    </optgroup>
+  #end
 #end

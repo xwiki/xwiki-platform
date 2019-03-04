@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if($doc.getObject('XWiki.XWikiServerClass'))$services.localization.render('platform.wiki.sheet.title', [$doc.name.replaceAll('XWikiServer', '').toLowerCase()])#{else}Sheet for XWikiServerClass#end</title>
+  <title>#if($doc.getObject('XWiki.XWikiServerClass'))$services.localization.render('platform.wiki.sheet.title', [$doc.documentReference.name.replaceAll('XWikiServer', '').toLowerCase()])#{else}Sheet for XWikiServerClass#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -40,7 +40,7 @@
 #############################
 ##        GLOBALS
 #############################
-#set ($wikiId = $doc.name.replaceAll('XWikiServer', '').toLowerCase())
+#set ($wikiId = $doc.documentReference.name.replaceAll('XWikiServer', '').toLowerCase())
 #set ($wiki = $services.wiki.getById($wikiId))
 #set ($descriptorObj = $doc.getObject('XWiki.XWikiServerClass'))
 #set ($templateObj = $doc.getObject('WikiManager.WikiTemplateClass'))
@@ -51,7 +51,7 @@
 #controller()
 #macro(controller)
   #if ($doc.fullName == "XWiki.XWikiServerClassSheet" || $doc.fullName == "XWiki.XWikiServerClassTemplate")
-    = Document "$doc.name" =
+    = Document "$doc.documentReference.name" =
   #elseif ($request.action == 'create' &amp;&amp; "$!request.domain" != '' &amp;&amp; $request.domain.trim().length() &gt; 0)
     #createAlias()
   #elseif ($request.action == 'delete' &amp;&amp; "$!request.domain" != '' &amp;&amp; $request.domain.trim().length() &gt; 0)

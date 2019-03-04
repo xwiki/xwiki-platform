@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-async</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-async-default</artifactId>
   <name>XWiki Platform - Rendering - Async - Default</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - Async - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.47</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>30</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>

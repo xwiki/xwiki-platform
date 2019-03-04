@@ -45,6 +45,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
+import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -88,6 +89,9 @@ public class InternalSkinManager implements Initializable
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private URLConfiguration urlConfiguration;
 
     private Cache<Skin> cache;
 
@@ -143,7 +147,7 @@ public class InternalSkinManager implements Initializable
             skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils, this.logger);
         } else {
             skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.environment,
-                this.xcontextProvider);
+                this.xcontextProvider, this.urlConfiguration);
         }
 
         return skin;

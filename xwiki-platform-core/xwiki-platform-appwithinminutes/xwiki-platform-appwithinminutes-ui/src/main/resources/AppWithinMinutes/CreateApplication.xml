@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="AppWithinMinutes.CreateApplication" locale="">
   <web>AppWithinMinutes</web>
   <name>CreateApplication</name>
   <language/>
@@ -34,25 +34,36 @@
   <title>$services.localization.render('platform.appwithinminutes.appNamePageTitle')</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="AppWithinMinutes.WizardStep"/}}
+  <content>{{include reference="AppWithinMinutes.VelocityMacros"/}}
+
+{{velocity}}
+#if ($request.wizard == 'true')
+  {{include reference="AppWithinMinutes.WizardStep"/}}
+#end
+{{/velocity}}
 
 {{template name="locationPicker_macros.vm" /}}
 
 {{velocity output="false"}}
-#macro(showStep)
-  {{html wiki="true"}}
+#macro (showStep)
   #appWizardHeader('name')
-  (% class="wizard-help" %)
-  (((
-    **$services.localization.render('platform.appwithinminutes.wizardStepHelpTitle')** $services.localization.render('platform.appwithinminutes.wizardStepHelpDescription')
-    (% class="steps vertical" %)
-    #foreach($step in $awmSteps)
-      * (% class="number" %)$mathtool.add($foreach.index, 1)(%%) (% class="name" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.name")(%%)
-        (% class="description" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.description")
-    #end
-  )))
+  &lt;div class="wizard-help"&gt;
+    &lt;p&gt;
+      &lt;strong&gt;$services.localization.render('platform.appwithinminutes.wizardStepHelpTitle')&lt;/strong&gt;
+      $services.localization.render('platform.appwithinminutes.wizardStepHelpDescription')
+    &lt;/p&gt;
+    &lt;ul class="steps vertical"&gt;
+      #foreach($step in $awmSteps)
+        &lt;li&gt;
+          &lt;span class="number"&gt;$mathtool.add($foreach.index, 1)&lt;/span&gt;
+          &lt;span class="name"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.name")&lt;/span&gt;
+          &lt;span class="description"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.description")&lt;/span&gt;
+        &lt;/li&gt;
+      #end
+    &lt;/ul&gt;
+  &lt;/div&gt;
   &lt;form action="$doc.getURL()" method="post" class="xform wizard-body"&gt;
     #locationPicker({
       'id': 'app',
@@ -76,7 +87,6 @@
     &lt;div class="appName-preview"&gt;&lt;/div&gt;
     #appWizardFooter(1)
   &lt;/form&gt;
-  {{/html}}
 #end
 
 #macro (processStep)
@@ -84,10 +94,9 @@
   #getAppReference
   #getAppDescriptor($appReference)
   #if ($appDescriptor)
-    ## Edit an existing application. Use the configured class name.
-    #set ($appClassRef = $appDescriptor.getObject($appDescriptorClassName).getValue('class'))
-    ## The class reference is relative to the document holding the application descriptor.
-    #set ($appClassRef = $services.model.resolveDocument($appClassRef, 'explicit', $appDescriptor.documentReference))
+    ## Edit an existing application.
+    #getAppClassReference($appDescriptor)
+    #set ($appClassRef = $classReference)
   #else
     ## Create a new application. Use the default class name.
     #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
@@ -108,28 +117,29 @@
 #macro (validateAppName)
   #getAppReference
   #if (!$appReference)
-    (% class="xErrorMsg" %)$services.localization.render('platform.appwithinminutes.appNameEmptyError')
+    &lt;span class="xErrorMsg"&gt;$services.localization.render('platform.appwithinminutes.appNameEmptyError')&lt;/span&gt;
   #else
     #getAppDescriptor($appReference)
     #if ($appDescriptor)
       ## Edit an existing application.
-      #set ($appDescriptorObj = $appDescriptor.getObject($appDescriptorClassName))
-      #set ($appClassRef = $appDescriptorObj.getValue('class'))
-      ## The class reference is relative to the document holding the application descriptor.
-      #set ($appClassRef = $services.model.resolveDocument($appClassRef, 'explicit', $appDescriptor.documentReference))
+      #getAppClassReference($appDescriptor)
+      #set ($appClassRef = $classReference)
     #else
       ## Create a new application.
       #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
       #set ($appClassRef = $services.model.createDocumentReference("$!{appReference.name}Class", $appCodeRef))
     #end
-    ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
-    : {{{$!xwiki.getDocument($appReference).externalURL}}}
-    ; $services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')
-    : {{html clean="false"}}#hierarchy($appClassRef.parent){{/html}}
+    &lt;dl&gt;
+      &lt;dt&gt;$services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')&lt;/dt&gt;
+      &lt;dd&gt;&lt;pre&gt;$!escapetool.xml($xwiki.getDocument($appReference).externalURL)&lt;/pre&gt;&lt;/dd&gt;
+      &lt;dt&gt;$services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')&lt;/dt&gt;
+      &lt;dd&gt;#hierarchy($appClassRef.parent)&lt;/dd&gt;
+    &lt;/dl&gt;
     #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
     #if ($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
-
-      {{warning}}$services.localization.render('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
+      &lt;div class="box warningmessage"&gt;
+        $services.localization.render('platform.appwithinminutes.appNameIsUsedWarning')
+      &lt;/div&gt;
     #end
   #end
 #end
@@ -155,11 +165,14 @@
   #set ($appDescriptors = $services.query.xwql($appDescriptorStatement).bindValue('space', $localSpaceReference).execute())
   #if ($appDescriptors.size() &gt; 0)
     #set ($appDescriptor = $xwiki.getDocument($appDescriptors.get(0)))
+  #else
+    #set ($appDescriptor = $NULL)
   #end
 #end
 {{/velocity}}
 
 {{velocity}}
+{{html clean="false"}}
 #if ("$!request.appName" != '')
   #if ($xcontext.action == 'get')
     #validateAppName
@@ -167,10 +180,11 @@
     ## CSRF protection is not needed because this step only redirects to the next one passing data in the query string.
     #processStep
   #end
-#else
+#elseif ($request.wizard == 'true')
   #showStep
+  #set ($displayDocExtra = false)
 #end
-#set ($displayDocExtra = false)
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>AppWithinMinutes.CreateApplication</name>
@@ -188,6 +202,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -196,14 +211,16 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -241,7 +258,7 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -332,6 +349,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -340,14 +358,16 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -366,7 +386,7 @@
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -401,7 +421,7 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>

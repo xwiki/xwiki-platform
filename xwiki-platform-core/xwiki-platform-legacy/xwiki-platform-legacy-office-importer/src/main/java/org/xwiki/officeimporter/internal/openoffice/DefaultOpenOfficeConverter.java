@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.internal.converter.DefaultOfficeConverter;
@@ -42,17 +41,6 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
      * The office document converter.
      */
     private final OfficeConverter converter;
-
-    /**
-     * Creates a new {@link DefaultOfficeConverter} instance.
-     * 
-     * @param converter provided by JODConverter library
-     * @param workDir space for holding temporary file
-     */
-    public DefaultOpenOfficeConverter(OfficeDocumentConverter converter, File workDir)
-    {
-        this(new DefaultOfficeConverter(converter, workDir));
-    }
 
     /**
      * Creates a new instance that wraps the given converter.

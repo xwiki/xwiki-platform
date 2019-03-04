@@ -21,7 +21,6 @@ package org.xwiki.rendering.macro.display;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.display.DisplayMacro} Macro.
@@ -50,7 +49,6 @@ public class DisplayMacroParameters
      * @param reference the reference to display
      * @since 3.4M1
      */
-    @PropertyMandatory
     @PropertyDescription("the reference of the resource to display")
     public void setReference(String reference)
     {

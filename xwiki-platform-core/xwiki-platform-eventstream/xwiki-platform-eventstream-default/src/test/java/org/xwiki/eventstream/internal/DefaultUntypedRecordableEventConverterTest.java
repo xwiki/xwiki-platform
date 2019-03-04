@@ -23,10 +23,15 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEvent;
+import org.xwiki.eventstream.UntypedRecordableEvent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.jgroups.util.Util.assertEquals;
 import static org.jgroups.util.Util.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultUntypedRecordableEventConverter}.
@@ -47,4 +52,14 @@ public class DefaultUntypedRecordableEventConverterTest
 
         assertTrue(supportedEvents.get(0).matches(new DefaultUntypedRecordableEvent()));
     }
+
+    @Test
+    public void convert() throws Exception
+    {
+        UntypedRecordableEvent event = mock(UntypedRecordableEvent.class);
+        when(event.getEventType()).thenReturn("some type");
+        Event result = mocker.getComponentUnderTest().convert(event, "source", "data");
+        assertEquals("some type", result.getType());
+    }
+
 }

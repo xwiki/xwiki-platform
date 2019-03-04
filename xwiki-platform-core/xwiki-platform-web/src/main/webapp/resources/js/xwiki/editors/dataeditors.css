@@ -294,9 +294,11 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   color: $theme.linkColor;
 }
 
-#xwikiclassproperties #add_xproperty input, #xwikiclassproperties #add_xproperty select,
-#xwikiobjects #add_xobject input, #xwikiobjects #add_xobject select {
-  width: auto !important;
+#xwikiclassproperties #add_xproperty input,
+#xwikiclassproperties #add_xproperty select,
+#xwikiobjects #add_xobject input,
+#xwikiobjects #add_xobject select {
+  width: auto;
 }
 
 #add_xobject {
@@ -338,4 +340,20 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 #switch-xclass {
   text-align: right;
   margin: 4px 0 -16px;
+}
+
+#switch-xclass .suggest-classes {
+  text-align: left;
+}
+.suggest-classes.selectize-control {
+  /* Display on the same line as the Add button */
+  display: inline-block;
+  /* Align with the Add button */
+  margin-top: 2px;
+  vertical-align: middle;
+}
+.suggest-classes > .selectize-dropdown > .selectize-dropdown-content,
+.suggest-classes.selectize-dropdown > .selectize-dropdown-content {
+  /* Increase the max height because the drop down includes all the classes. */
+  max-height: 400px;
 }

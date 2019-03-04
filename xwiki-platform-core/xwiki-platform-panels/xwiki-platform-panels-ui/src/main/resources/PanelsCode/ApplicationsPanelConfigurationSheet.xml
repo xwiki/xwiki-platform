@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if($doc.name == 'ApplicationsPanelConfigurationSheet')ApplicationsPanelConfiguration Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
+  <title>#if($doc.documentReference.name == 'ApplicationsPanelConfigurationSheet')ApplicationsPanelConfiguration Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>

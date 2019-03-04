@@ -87,7 +87,7 @@ public class ApplicationNameTest extends AbstractTest
         // Fix the application name and move to the next step.
         appCreatePage.setApplicationName(getTestMethodName());
         appCreatePage.waitForApplicationNamePreview();
-        Assert.assertEquals(getTestMethodName() + " Structure", appCreatePage.clickNextStep().getDocumentTitle());
+        Assert.assertEquals(getTestMethodName(), appCreatePage.clickNextStep().getDocumentTitle());
     }
 
     /**
@@ -126,7 +126,7 @@ public class ApplicationNameTest extends AbstractTest
         appCreatePage.setApplicationName(getTestMethodName());
         appCreatePage.waitForApplicationNamePreview();
         appCreatePage.getApplicationNameInput().sendKeys(Keys.RETURN);
-        Assert.assertEquals(getTestMethodName() + " Structure", new ViewPage().getDocumentTitle());
+        Assert.assertEquals(getTestMethodName(), new ViewPage().getDocumentTitle());
     }
 
     /**
@@ -148,6 +148,6 @@ public class ApplicationNameTest extends AbstractTest
         Assert.assertTrue(appCreatePage.getContent().contains(APP_NAME_USED_WARNING_MESSAGE));
 
         // Proceed to the next step.
-        Assert.assertEquals("/Help/Code/Help Structure", appCreatePage.clickNextStep().getBreadcrumbContent());
+        Assert.assertEquals("/Help/Code/HelpClass", appCreatePage.clickNextStep().getBreadcrumbContent());
     }
 }

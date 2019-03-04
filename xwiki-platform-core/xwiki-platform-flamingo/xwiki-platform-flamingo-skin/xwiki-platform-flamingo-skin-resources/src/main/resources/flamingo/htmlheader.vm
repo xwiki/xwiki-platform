@@ -17,7 +17,7 @@
   #xwikiDataAttribute('document', $doc.fullName)##deprecated, use 'reference' instead
   #xwikiDataAttribute('wiki', $doc.wiki)##deprecated, use 'reference' instead
   #xwikiDataAttribute('space', $doc.space)##deprecated, use 'reference' instead
-  #xwikiDataAttribute('page', $doc.name)##deprecated, use 'reference' instead
+  #xwikiDataAttribute('page', $doc.documentReference.name)##deprecated, use 'reference' instead
   #xwikiDataAttribute('version', $tdoc.version)
   #xwikiDataAttribute('rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")

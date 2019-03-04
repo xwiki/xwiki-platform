@@ -40,6 +40,8 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.text.StringUtils;
 
 /**

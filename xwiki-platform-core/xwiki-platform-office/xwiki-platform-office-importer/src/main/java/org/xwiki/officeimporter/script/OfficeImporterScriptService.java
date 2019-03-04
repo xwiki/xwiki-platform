@@ -26,8 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.artofsolving.jodconverter.document.DocumentFamily;
-import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -39,16 +37,18 @@ import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
-import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
+import org.xwiki.officeimporter.internal.converter.OfficeImporterRecognizer;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the office importer APIs to server-side scripts.
@@ -126,6 +126,12 @@ public class OfficeImporterScriptService implements ScriptService
      */
     @Inject
     private XDOMOfficeDocumentSplitter xdomSplitter;
+
+    @Inject
+    private ExtendedRenderingConfiguration extendedRenderingConfiguration;
+
+    @Inject
+    private OfficeImporterRecognizer officeImporterRecognizer;
 
     /**
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
@@ -211,7 +217,7 @@ public class OfficeImporterScriptService implements ScriptService
     {
         try {
             assertConnected();
-            if (isPresentation(officeFileName)) {
+            if (this.officeImporterRecognizer.isPresentation(officeFileName)) {
                 return this.presentationBuilder.build(officeFileStream, officeFileName, targetDocumentReference);
             } else {
                 return this.xdomBuilder.build(officeFileStream, officeFileName, targetDocumentReference, filterStyles);
@@ -248,7 +254,7 @@ public class OfficeImporterScriptService implements ScriptService
      * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
      * specified criterion. This method is useful when a single office document has to be imported and split into
      * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
-     * {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor} entry.
+     * {@link TargetDocumentDescriptor} entry.
      * 
      * @param xdomDocument {@link XDOMOfficeDocument} to be split
      * @param headingLevels heading levels defining the split points on the original document
@@ -280,7 +286,7 @@ public class OfficeImporterScriptService implements ScriptService
      * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
      * specified criterion. This method is useful when a single office document has to be imported and split into
      * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
-     * {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor} entry.
+     * {@link TargetDocumentDescriptor} entry.
      * 
      * @param xdomDocument {@link XDOMOfficeDocument} to be split
      * @param headingLevels heading levels defining the split points on the original document
@@ -297,6 +303,26 @@ public class OfficeImporterScriptService implements ScriptService
     {
         return split(xdomDocument, headingLevels, namingCriterionHint,
             this.currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
+    }
+
+    /**
+     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments (using
+     * the default content syntax, see {@link ExtendedRenderingConfiguration#getDefaultContentSyntax()}).
+     *
+     * @param doc {@link XDOMOfficeDocument} to be saved
+     * @param documentReference the reference of the target wiki page
+     * @param parentReference the reference of the parent wiki page or {@code null}
+     * @param title title of the target wiki page or {@code null}
+     * @param append whether to append content if the target wiki page exists
+     * @return true if the operation completes successfully, false otherwise
+     * @since 11.0
+     */
+    @Unstable
+    public boolean save(XDOMOfficeDocument doc, DocumentReference documentReference, DocumentReference parentReference,
+        String title, boolean append)
+    {
+        return save(doc, documentReference, this.extendedRenderingConfiguration.getDefaultContentSyntax().toIdString(),
+            parentReference, title, append);
     }
 
     /**
@@ -433,23 +459,6 @@ public class OfficeImporterScriptService implements ScriptService
                 throw new OfficeImporterException("Office server unavailable.");
             }
         }
-    }
-
-    /**
-     * Utility method for checking if a file name corresponds to an office presentation.
-     * 
-     * @param officeFileName office file name
-     * @return true if the file name / extension represents an office presentation format
-     */
-    private boolean isPresentation(String officeFileName)
-    {
-        String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
-        OfficeConverter officeConverter = officeServer.getConverter();
-        if (officeConverter != null) {
-            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
-        }
-        return false;
     }
 
     /**

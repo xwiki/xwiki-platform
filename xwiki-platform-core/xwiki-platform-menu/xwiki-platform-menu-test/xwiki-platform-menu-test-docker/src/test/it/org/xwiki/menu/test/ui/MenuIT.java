@@ -21,6 +21,7 @@ package org.xwiki.menu.test.ui;
 
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.application.test.po.ApplicationIndexHomePage;
@@ -54,14 +55,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MenuIT
 {
     @Test
-    public void verifyMenu(TestUtils setup) throws Exception
-    {
-        verifyMenuInApplicationsIndex(setup);
-        verifyMenuCreationInLeftPanelWithCurrentWikiVisibility(setup);
-        verifyMenuIsAvailableInAdministration(setup);
-    }
-
-    private void verifyMenuInApplicationsIndex(TestUtils setup)
+    @Order(1)
+    public void verifyMenuInApplicationsIndex(TestUtils setup)
     {
         // Log in as superadmin
         setup.loginAsSuperAdmin();
@@ -82,7 +77,9 @@ public class MenuIT
         assertFalse(applicationIndexHomePage.containsApplication("Menu"));
     }
 
-    private void verifyMenuCreationInLeftPanelWithCurrentWikiVisibility(TestUtils setup)
+    @Test
+    @Order(2)
+    public void verifyMenuCreationInLeftPanelWithCurrentWikiVisibility(TestUtils setup)
     {
         // Log in as superadmin again
         setup.loginAsSuperAdmin();
@@ -113,7 +110,9 @@ public class MenuIT
         assertTrue(mhp.hasLeftPanel("menu1"));
     }
 
-    private void verifyMenuIsAvailableInAdministration(TestUtils setup) throws Exception
+    @Test
+    @Order(3)
+    public void verifyMenuIsAvailableInAdministration(TestUtils setup) throws Exception
     {
         // Log in as superadmin
         setup.loginAsSuperAdmin();

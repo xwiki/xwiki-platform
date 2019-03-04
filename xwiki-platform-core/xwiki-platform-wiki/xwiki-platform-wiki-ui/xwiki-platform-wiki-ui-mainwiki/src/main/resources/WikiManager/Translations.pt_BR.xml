@@ -303,6 +303,5 @@ platform.wiki.dependencies.applicationmanager.missing=O plugin {0}Gerenciador de
 ### Missing: platform.wiki.delete.confirmation.no=No, take me back!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

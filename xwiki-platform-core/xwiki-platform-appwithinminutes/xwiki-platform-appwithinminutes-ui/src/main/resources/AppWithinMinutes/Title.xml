@@ -48,7 +48,7 @@
     #set ($name = 'title')
     #set ($value = $tdoc.title)
     #if ("$!value" == '')
-      #set ($value = $tdoc.name)
+      #set ($value = $tdoc.documentReference.name)
     #end
   #end
   {{html clean="false"}}

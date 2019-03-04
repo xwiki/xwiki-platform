@@ -19,35 +19,28 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.OverwriteQuestion;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Defines the common methods for both copy and move jobs since they are both related to moving entities.
+ * 
  * @param <T> the type of the request associated to the job
- *
  * @since 10.11RC1
  * @version $Id$
  */
-public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest> extends
-    AbstractEntityJobWithChecks<T, EntityJobStatus<T>>
+public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
+    extends AbstractEntityJobWithChecks<T, EntityJobStatus<T>>
 {
     /**
      * Specifies whether all entities with the same name are to be overwritten on not. When {@code true} all entities
@@ -55,15 +48,6 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
      * {@code null} then a question is asked for each entity.
      */
     private Boolean overwriteAll;
-
-    /**
-     * The component used to refactor document links after a document is rename or moved.
-     */
-    @Inject
-    private LinkRefactoring linkRefactoring;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     protected void runInternal() throws Exception
@@ -74,8 +58,9 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     }
 
     /**
-     * If true, we check that the source and destination entityReference are of the same type.
-     * And we process them using that information.
+     * If true, we check that the source and destination entityReference are of the same type. And we process them using
+     * that information.
+     * 
      * @return false by default.
      */
     protected boolean processOnlySameSourceDestinationTypes()
@@ -141,10 +126,11 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             if (this.request.isDeep() && isSpaceHomeReference(source)) {
                 process(source.getLastSpaceReference(), destination);
             } else if (destination.getType() == EntityType.SPACE) {
-                maybeMove(source, new DocumentReference(source.getName(), new SpaceReference(destination)));
+                maybeCopyOrMove(source, new DocumentReference(source.getName(), new SpaceReference(destination)));
             } else if (destination.getType() == EntityType.DOCUMENT
                 && isSpaceHomeReference(new DocumentReference(destination))) {
-                maybeMove(source, new DocumentReference(source.getName(), new SpaceReference(destination.getParent())));
+                maybeCopyOrMove(source,
+                    new DocumentReference(source.getName(), new SpaceReference(destination.getParent())));
             } else {
                 this.logger.error("Unsupported destination entity type [{}] for a document.", destination.getType());
             }
@@ -162,7 +148,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
                     + " and preserve its child documents at the same time.", source, destination);
             }
         } else {
-            maybeMove(source, destination);
+            maybeCopyOrMove(source, destination);
         }
     }
 
@@ -191,24 +177,18 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             public void visit(DocumentReference oldChildReference)
             {
                 DocumentReference newChildReference = oldChildReference.replaceParent(source, destination);
-                maybeMove(oldChildReference, newChildReference);
+                maybeCopyOrMove(oldChildReference, newChildReference);
             }
         });
     }
 
-    private boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference)
+    protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference)
     {
-        if (isDeleteSources() && !hasAccess(Right.DELETE, oldReference)) {
-            // The move operation is implemented as Copy + Delete.
-            this.logger.error("You are not allowed to delete [{}].", oldReference);
-            return false;
-        } else if (!hasAccess(Right.VIEW, oldReference)) {
-            this.logger.error("You don't have sufficient permissions over the source document [{}].",
-                oldReference);
+        if (!hasAccess(Right.VIEW, oldReference)) {
+            this.logger.error("You don't have sufficient permissions over the source document [{}].", oldReference);
             return false;
         } else if (!hasAccess(Right.EDIT, newReference)
-            || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference)))
-        {
+            || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
             this.logger.error("You don't have sufficient permissions over the destination document [{}].",
                 newReference);
             return false;
@@ -216,7 +196,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         return true;
     }
 
-    protected void maybeMove(DocumentReference oldReference, DocumentReference newReference)
+    protected void maybeCopyOrMove(DocumentReference oldReference, DocumentReference newReference)
     {
         // Perform checks that are specific to the document source/destination type.
 
@@ -227,13 +207,13 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         } else if (!this.modelBridge.exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
         } else if (this.checkAllRights(oldReference, newReference)) {
-            move(oldReference, newReference);
+            copyOrMove(oldReference, newReference);
         }
     }
 
-    private void move(DocumentReference oldReference, DocumentReference newReference)
+    protected boolean copyOrMove(DocumentReference oldReference, DocumentReference newReference)
     {
-        this.progressManager.pushLevelProgress(7, this);
+        this.progressManager.pushLevelProgress(3, this);
 
         try {
             // Step 1: Delete the destination document if needed.
@@ -244,9 +224,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
                     this.logger.warn(
                         "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
                         oldReference, newReference);
-                    return;
-                } else if (!this.modelBridge.delete(newReference)) {
-                    return;
+                    return false;
                 }
             }
             this.progressManager.endStep(this);
@@ -254,7 +232,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             // Step 2: Copy the source document to the destination.
             this.progressManager.startStep(this);
             if (!this.modelBridge.copy(oldReference, newReference)) {
-                return;
+                return false;
             }
             this.progressManager.endStep(this);
 
@@ -263,38 +241,11 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             this.modelBridge.update(newReference, this.request.getEntityParameters(oldReference));
             this.progressManager.endStep(this);
 
-            // Step 4 + 5: Update other documents that might be affected by this move.
-            updateDocuments(oldReference, newReference);
-
-            // Step 6: Delete the source document.
-            this.progressManager.startStep(this);
-            if (isDeleteSources()) {
-                this.modelBridge.delete(oldReference);
-            }
-            this.progressManager.endStep(this);
-
-            this.postMove(oldReference, newReference);
+            return true;
         } finally {
             this.progressManager.popLevelProgress(this);
         }
     }
-
-    protected abstract void postMove(DocumentReference oldReference, DocumentReference newReference);
-
-    private void updateDocuments(DocumentReference oldReference, DocumentReference newReference)
-    {
-        // Step 3: Update the links.
-        this.progressManager.startStep(this);
-        if (this.request.isUpdateLinks()) {
-            updateLinks(oldReference, newReference);
-        }
-        this.progressManager.endStep(this);
-
-
-        this.postUpdateDocuments(oldReference, newReference);
-    }
-
-    protected abstract void postUpdateDocuments(DocumentReference oldReference, DocumentReference newReference);
 
     private boolean confirmOverwrite(EntityReference source, EntityReference destination)
     {
@@ -315,74 +266,6 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             }
         } else {
             return this.overwriteAll;
-        }
-    }
-
-    private void updateLinks(DocumentReference oldReference, DocumentReference newReference)
-    {
-        this.progressManager.pushLevelProgress(2, this);
-
-        try {
-            // Step 1: Update the links that target the old reference to point to the new reference.
-            this.progressManager.startStep(this);
-            if (this.isDeleteSources()) {
-                updateBackLinks(oldReference, newReference);
-            }
-            this.progressManager.endStep(this);
-
-            // Step 2: Update the relative links from the document content.
-            this.progressManager.startStep(this);
-            this.linkRefactoring.updateRelativeLinks(oldReference, newReference);
-        } finally {
-            this.progressManager.popLevelProgress(this);
-        }
-    }
-
-    private void updateBackLinks(DocumentReference oldReference, DocumentReference newReference)
-    {
-        Collection<String> wikiIds = Collections.singleton(oldReference.getWikiReference().getName());
-        if (this.request.isUpdateLinksOnFarm()) {
-            try {
-                wikiIds = this.wikiDescriptorManager.getAllIds();
-            } catch (WikiManagerException e) {
-                this.logger.error("Failed to retrieve the list of wikis.", e);
-            }
-        }
-        boolean popLevelProgress = false;
-        try {
-            if (wikiIds.size() > 0) {
-                this.progressManager.pushLevelProgress(wikiIds.size(), this);
-                popLevelProgress = true;
-            }
-            for (String wikiId : wikiIds) {
-                this.progressManager.startStep(this);
-                updateBackLinks(oldReference, newReference, wikiId);
-                this.progressManager.endStep(this);
-            }
-        } finally {
-            if (popLevelProgress) {
-                this.progressManager.popLevelProgress(this);
-            }
-        }
-    }
-
-    private void updateBackLinks(DocumentReference oldReference, DocumentReference newReference, String wikiId)
-    {
-        this.logger.info("Updating the back-links for document [{}] in wiki [{}].", oldReference, wikiId);
-        List<DocumentReference> backlinkDocumentReferences =
-            this.modelBridge.getBackLinkedReferences(oldReference, wikiId);
-        this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
-
-        try {
-            for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
-                this.progressManager.startStep(this);
-                if (hasAccess(Right.EDIT, backlinkDocumentReference)) {
-                    this.linkRefactoring.renameLinks(backlinkDocumentReference, oldReference, newReference);
-                }
-                this.progressManager.endStep(this);
-            }
-        } finally {
-            this.progressManager.popLevelProgress(this);
         }
     }
 

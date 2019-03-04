@@ -33,7 +33,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
@@ -79,7 +78,15 @@ public class XWikiContextContextStore extends AbstractContextStore
     /**
      * Name of the entry containing the author.
      */
-    public static final String PROP_AUTHOR = "author";
+    public static final String PROP_SECURE_AUTHOR = "author";
+
+    /**
+     * Name of the entry containing the secure document.
+     * 
+     * @since 10.11.1
+     * @since 11.0
+     */
+    public static final String PROP_SECURE_DOCUMENT = "secureDocument";
 
     /**
      * Name of the entry containing the locale.
@@ -107,7 +114,7 @@ public class XWikiContextContextStore extends AbstractContextStore
      * The suffix of the entry containing the request context path (usually the first element of the URL path.
      * 
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String SUFFIX_PROP_REQUEST_CONTEXTPATH = "contextpath";
 
@@ -137,7 +144,7 @@ public class XWikiContextContextStore extends AbstractContextStore
      * Name the entry containing the request context path (usually the first element of the URL path.
      * 
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public static final String PROP_REQUEST_CONTEXTPATH = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_CONTEXTPATH;
 
@@ -200,8 +207,8 @@ public class XWikiContextContextStore extends AbstractContextStore
      */
     public XWikiContextContextStore()
     {
-        super(PROP_WIKI, PROP_USER, PROP_AUTHOR, PROP_LOCALE, PROP_REQUEST_BASE, PROP_REQUEST_URL,
-            PROP_REQUEST_PARAMETERS, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_REQUEST_BASE, PROP_REQUEST_URL, PROP_REQUEST_PARAMETERS,
+            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -212,18 +219,13 @@ public class XWikiContextContextStore extends AbstractContextStore
         if (xcontext != null) {
             save(contextStore, PROP_WIKI, xcontext.getWikiId(), entries);
 
-            // No need to save the request wiki if it's the same as the current wiki
-            if (!StringUtils.equals((String) contextStore.get(PROP_WIKI), xcontext.getOriginalWikiId())) {
-                save(contextStore, PROP_REQUEST_WIKI, xcontext.getOriginalWikiId(), entries);
-            }
-
             save(contextStore, PROP_USER, xcontext.getUserReference(), entries);
-            save(contextStore, PROP_AUTHOR, xcontext.getAuthorReference(), entries);
+            save(contextStore, PROP_SECURE_AUTHOR, xcontext.getAuthorReference(), entries);
             save(contextStore, PROP_LOCALE, xcontext.getLocale(), entries);
 
             save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
 
-            save(contextStore, PREFIX_PROP_REQUEST, xcontext.getRequest(), entries);
+            save(contextStore, PREFIX_PROP_REQUEST, xcontext.getRequest(), entries, xcontext);
         }
     }
 
@@ -247,7 +249,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     }
 
     private void save(Map<String, Serializable> contextStore, String prefix, XWikiRequest request,
-        Collection<String> entries)
+        Collection<String> entries, XWikiContext xcontext)
     {
         if (request != null) {
             save((key, subkey) -> {
@@ -265,7 +267,7 @@ public class XWikiContextContextStore extends AbstractContextStore
                         break;
 
                     case SUFFIX_PROP_REQUEST_WIKI:
-                        // Handled in a different place
+                        contextStore.put(key, xcontext.getOriginalWikiId());
                         break;
 
                     // TODO: add support for request input stream
@@ -329,8 +331,13 @@ public class XWikiContextContextStore extends AbstractContextStore
         // User
         if (contextStore.containsKey(PROP_USER)) {
             xcontext.setUserReference((DocumentReference) contextStore.get(PROP_USER));
-        } else {
+
             // If the current user is not a criteria set one which will always have all the required rights
+        } else if (contextStore.containsKey(PROP_SECURE_AUTHOR)) {
+            // If the author is provided use it to be as close as possible to the expected behavior
+            xcontext.setUserReference((DocumentReference) contextStore.get(PROP_SECURE_AUTHOR));
+        } else {
+            // Fallback on superadmin when no author is provided
             xcontext.setUserReference(SUPERADMIN_REFERENCE);
         }
 
@@ -351,27 +358,72 @@ public class XWikiContextContextStore extends AbstractContextStore
 
     private void restoreAuthor(Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
-        if (contextStore.containsKey(PROP_AUTHOR)) {
-            DocumentReference authorReference = (DocumentReference) contextStore.get(PROP_AUTHOR);
+        if (contextStore.containsKey(PROP_SECURE_AUTHOR)) {
+            DocumentReference authorReference = (DocumentReference) contextStore.get(PROP_SECURE_AUTHOR);
 
-            if (!Objects.equals(xcontext.getAuthorReference(), authorReference)) {
-                XWikiDocument secureDocument = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
+            restoreAuthor(contextStore, authorReference, xcontext);
+        }
+    }
 
-                if (secureDocument != null) {
+    private void restoreAuthor(Map<String, Serializable> contextStore, DocumentReference authorReference,
+        XWikiContext xcontext)
+    {
+        DocumentReference secureDocumentReference = (DocumentReference) contextStore.get(PROP_SECURE_DOCUMENT);
+
+        XWikiDocument secureDocument = null;
+
+        if (secureDocumentReference != null) {
+            secureDocument = getSecureDocument(secureDocumentReference, authorReference, xcontext);
+        }
+
+        // If there is no requested secure document (which is usually a bad practice), invent one
+        if (secureDocument == null) {
+            secureDocument = new XWikiDocument(new DocumentReference(
+                authorReference != null ? authorReference.getWikiReference().getName() : xcontext.getMainXWiki(),
+                "SUSpace", "SUPage"));
+            secureDocument.setAuthorReference(authorReference);
+            secureDocument.setCreatorReference(authorReference);
+        }
+
+        // Set the context author
+        secureDocument.setContentAuthorReference(authorReference);
+
+        xcontext.put(XWikiDocument.CKEY_SDOC, secureDocument);
+    }
+
+    private XWikiDocument getSecureDocument(DocumentReference secureDocumentReference,
+        DocumentReference authorReference, XWikiContext xcontext)
+    {
+        XWikiDocument secureDocument = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
+
+        if (secureDocument != null && secureDocument.getDocumentReference().equals(secureDocumentReference)) {
+            // If the document does not have the right content author clone it to avoid messing with the
+            // cache
+            if (!Objects.equals(secureDocument.getContentAuthorReference(), authorReference)) {
+                // Clone the document to avoid messing with the cache
+                secureDocument = secureDocument.clone();
+            }
+        } else {
+            try {
+                // Get the requested secure document
+                secureDocument = xcontext.getWiki().getDocument(secureDocumentReference, xcontext);
+
+                // If the document does not have the right content author clone it to avoid messing with the
+                // cache
+                if (!Objects.equals(secureDocument.getContentAuthorReference(), authorReference)) {
                     secureDocument = secureDocument.clone();
-                } else {
-                    secureDocument = new XWikiDocument(new DocumentReference(authorReference != null
-                        ? authorReference.getWikiReference().getName() : xcontext.getMainXWiki(), "SUSpace", "SUPage"));
-                    secureDocument.setAuthorReference(authorReference);
-                    secureDocument.setCreatorReference(authorReference);
                 }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to load secure document [{}]", secureDocumentReference, e);
 
-                // Set the context author
-                secureDocument.setContentAuthorReference(authorReference);
-
-                xcontext.put(XWikiDocument.CKEY_SDOC, secureDocument);
+                // Fallback on a new empty XWikiDocument instance
+                secureDocument = new XWikiDocument(secureDocumentReference);
+                secureDocument.setAuthorReference(authorReference);
+                secureDocument.setCreatorReference(authorReference);
             }
         }
+
+        return secureDocument;
     }
 
     private void restoreDocument(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
@@ -408,7 +460,7 @@ public class XWikiContextContextStore extends AbstractContextStore
         xcontext.setDoc(document);
     }
 
-    private void restoreRequest(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
+    private URL restoreURL(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         // Find and set the wiki corresponding to the request
         String requestWiki = (String) contextStore.get(PROP_REQUEST_WIKI);
@@ -423,7 +475,6 @@ public class XWikiContextContextStore extends AbstractContextStore
         if (url == null) {
             url = (URL) contextStore.get(PROP_REQUEST_BASE);
         }
-        Map<String, String[]> parameters = (Map<String, String[]>) contextStore.get(PROP_REQUEST_PARAMETERS);
 
         // Try to deduce missing URL from the request wiki (if provided)
         if (url == null && requestWiki != null) {
@@ -432,7 +483,21 @@ public class XWikiContextContextStore extends AbstractContextStore
             } catch (MalformedURLException e) {
                 this.logger.warn("Failed to get the URL for stored context wiki [{}]", requestWiki);
             }
+
+            // Assume we always want to behave as a HTTP request when the wiki request is provided
+            if (url == null) {
+                url = HttpServletUtils.getSourceURL(xcontext.getRequest());
+            }
         }
+
+        return url;
+    }
+
+    private void restoreRequest(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
+    {
+        URL url = restoreURL(storedWikiId, contextStore, xcontext);
+
+        Map<String, String[]> parameters = (Map<String, String[]>) contextStore.get(PROP_REQUEST_PARAMETERS);
 
         boolean daemon;
 

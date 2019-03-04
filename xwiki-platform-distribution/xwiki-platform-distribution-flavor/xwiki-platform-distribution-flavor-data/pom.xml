@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data</name>
@@ -69,11 +69,11 @@
             </hibernateConfig>
           </configuration>
           <dependencies>
-            <!-- Since we're building XWiki Standard, we need to add the ActivityStream plugin as a dependency,
+            <!-- Since we're building XWiki Standard, we need to add the Event Stream Store as a dependency,
                  which has its own mapping and migrators. -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-activitystream-api</artifactId>
+              <artifactId>xwiki-platform-eventstream-store</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- Annotation has it own migrator that we need to execute to set the rigth version to the DB. -->
@@ -122,12 +122,6 @@
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-mail-send-storage</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-            <!-- Watchlist API has a migrator to change property types from StaticList to DBList -->
-            <dependency>
-              <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-watchlist-api</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- Notification Filters Default module has a migrator to handle scope filter preferences -->

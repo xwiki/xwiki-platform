@@ -31,7 +31,6 @@ import org.xwiki.platform.notifications.test.po.preferences.AbstractNotification
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
 import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.ViewPage;
 

@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if($doc.name == 'UserDirectoryConfigurationSheet')$services.localization.render('platform.userdirectory.configSheetTitle')#{else}$services.localization.render('platform.userdirectory.configTitle')#end</title>
+  <title>#if($doc.documentReference.name == 'UserDirectoryConfigurationSheet')$services.localization.render('platform.userdirectory.configSheetTitle')#{else}$services.localization.render('platform.userdirectory.configTitle')#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -39,7 +39,7 @@
   <content>{{include reference='XWiki.UserDirectoryMacros' /}}
 
 {{velocity}}
-#if ($doc.name == 'UserDirectoryConfigurationSheet')
+#if ($doc.documentReference.name == 'UserDirectoryConfigurationSheet')
   {{warning}}$services.localization.render('platform.userdirectory.configSheetApplyOnConfiguration'){{/warning}}
 #else
   #displayUserDirectoryCustomizationForm(true)

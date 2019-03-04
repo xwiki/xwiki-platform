@@ -393,7 +393,6 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private Block transform(Block block, XDOM xdom, Map<String, Object> macroBinding, boolean async)
         throws TransformationException
     {
-
         TransformationContext transformationContext = new TransformationContext(xdom, this.wikimacro.getSyntax());
         transformationContext.setTargetSyntax(this.targetSyntax);
         if (!async) {
@@ -401,8 +400,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             transformationContext.setId(this.syncContext.getTransformationContext().getId());
         }
 
-        transform(block, transformationContext, this.wikimacro.getAuthorReference(),
-            this.wikimacro.getDocumentReference());
+        transform(block, transformationContext);
 
         return extractResult(block, macroBinding, async);
     }

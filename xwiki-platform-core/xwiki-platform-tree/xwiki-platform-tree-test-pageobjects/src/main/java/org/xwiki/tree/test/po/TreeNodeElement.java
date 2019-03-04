@@ -43,6 +43,11 @@ public class TreeNodeElement extends BaseElement
     private static final String CLASS = "class";
 
     /**
+     * The id HTML attribute.
+     */
+    private static final String ID = "id";
+
+    /**
      * The tree that contains this node.
      */
     private WebElement treeElement;
@@ -75,6 +80,14 @@ public class TreeNodeElement extends BaseElement
     }
 
     /**
+     * @return the node id
+     */
+    public String getId()
+    {
+        return getElement().getAttribute(ID);
+    }
+
+    /**
      * @return the node label (as plain text)
      */
     public String getLabel()
@@ -95,7 +108,7 @@ public class TreeNodeElement extends BaseElement
     {
         List<TreeNodeElement> children = new ArrayList<>();
         for (WebElement childElement : getElement().findElements(By.xpath("./ul/li"))) {
-            children.add(new TreeNodeElement(this.treeElement, By.id(childElement.getAttribute("id"))));
+            children.add(new TreeNodeElement(this.treeElement, By.id(childElement.getAttribute(ID))));
         }
         return children;
     }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade</name>
@@ -48,6 +48,7 @@
     <upgradetest.previousdata.groupId>${upgradetest.previousflavor.groupId}</upgradetest.previousdata.groupId>
     <upgradetest.previousdata.artifactId>xwiki-platform-distribution-flavor-data-hsqldb</upgradetest.previousdata.artifactId>
     <upgradetest.previousdata.version>${upgradetest.previousflavor.version}</upgradetest.previousdata.version>
+    <upgradetest.previousdata.classifier />
   </properties>
   <dependencies>
     <dependency>
@@ -66,8 +67,10 @@
     </dependency>
   </dependencies>
   <modules>
+    <module>xwiki-platform-distribution-flavor-test-upgrade-1011</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-911</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-84</module>
+    <module>xwiki-platform-distribution-flavor-test-upgrade-84-filestore</module>
   </modules>
   <build>
     <pluginManagement>
@@ -98,28 +101,8 @@
                 <skip>${xwiki.test.skipUnpack}</skip>
               </configuration>
             </execution>
-            <!-- Unpack old version of the application data -->
-            <execution>
-              <id>unzip-data</id>
-              <phase>pre-integration-test</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>${upgradetest.previousdata.groupId}</groupId>
-                    <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
-                    <version>${upgradetest.previousdata.version}</version>
-                    <type>zip</type>
-                  </artifactItem>
-                </artifactItems>
-                <outputDirectory>${xwikiExecutionDirectory}/data/</outputDirectory>
-                <!-- Allow skipping the unpack -->
-                <skip>${xwiki.test.skipUnpack}</skip>
-              </configuration>
-            </execution>
             <!-- Unpack new flavor extensions -->
+            <!-- Unpack it first to not break previous version data -->
             <execution>
               <id>unzip-flavor</id>
               <phase>pre-integration-test</phase>
@@ -140,6 +123,28 @@
                 <skip>${xwiki.test.skipUnpack}</skip>
               </configuration>
             </execution>
+            <!-- Unpack old version of the application data -->
+            <execution>
+              <id>unzip-data</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${upgradetest.previousdata.groupId}</groupId>
+                    <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
+                    <classifier>${upgradetest.previousdata.classifier}</classifier>
+                    <version>${upgradetest.previousdata.version}</version>
+                    <type>zip</type>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${xwikiExecutionDirectory}/data/</outputDirectory>
+                <!-- Allow skipping the unpack -->
+                <skip>${xwiki.test.skipUnpack}</skip>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
         <!-- Register information about the previous version as system properties -->
@@ -147,6 +152,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
+            <includes>
+              <include>**/Upgrade*Test.java</include>
+            </includes>
             <systemProperties combine.children="append">
               <property>
                 <name>previousFlavorName</name>

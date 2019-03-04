@@ -531,7 +531,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
  * Notification Container
  ***********************************************/
 .notifications-macro {
-  float: left;
+  display: inline-block;
   max-width: 500px;
   min-height: 50px;
   width: 100%;

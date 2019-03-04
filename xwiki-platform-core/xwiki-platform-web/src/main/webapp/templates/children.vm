@@ -35,7 +35,7 @@
     </div>
   #end
   
-  #if ($doc.name != 'WebHome')
+  #if ($doc.documentReference.name != 'WebHome')
     <p>$services.localization.render('core.children.terminalPage')</p>
   #else
     ##
@@ -70,7 +70,7 @@
 #macro(displayParentChildChildren)
   #set ($childrenStatement = 'WHERE doc.fullName <> :parentFullName AND (doc.parent = :parentFullName OR (doc.parent = :parentName AND doc.space = :parentSpace))')
   #set ($childrenQuery = $services.query.xwql($childrenStatement))
-  #set ($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.name).bindValue('parentSpace', $doc.space))
+  #set ($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.documentReference.name).bindValue('parentSpace', $doc.space))
   #set ($children = $childrenQuery.addFilter('unique').execute())
   #if ($children && $children.size() > 0)
     <p>$services.localization.render('core.children.parentChildDescription')</p>

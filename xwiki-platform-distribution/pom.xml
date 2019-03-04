@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -69,7 +69,7 @@
 
     <!-- Hibernate configuration -->
     <xwiki.db.common.extraMappings>
-      activitystream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
+      eventstream.hbm.xml,instance.hbm.xml,notification-filter-preferences.hbm.xml
     </xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
@@ -104,14 +104,11 @@
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
   com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
-  com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin,\
   com.xpn.xwiki.plugin.tag.TagPlugin,\
   com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
     </platform.xwiki.cfg.plugins.default>
     <!-- Legacy plugin list -->
-    <platform.xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.default},\
-  com.xpn.xwiki.plugin.watchlist.WatchListPlugin
-    </platform.xwiki.cfg.plugins.legacy>
+    <platform.xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.default}</platform.xwiki.cfg.plugins.legacy>
     <xwiki.cfg.plugins.default>${platform.xwiki.cfg.plugins.default}</xwiki.cfg.plugins.default>
     <xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.legacy}</xwiki.cfg.plugins.legacy>
     <!-- Indicate the default list. -->
@@ -177,28 +174,28 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -209,29 +206,29 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -243,13 +240,13 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.2-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>

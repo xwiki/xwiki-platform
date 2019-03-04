@@ -30,7 +30,10 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link RenameJob}.
@@ -138,6 +141,5 @@ public class RenameJobTest extends AbstractMoveJobTest
 
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(oldReference);
-        verify(this.modelBridge).createRedirect(oldReference, newReference);
     }
 }

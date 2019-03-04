@@ -59,6 +59,5 @@ tour.homepageTour.header.contentA=Možete pretraživati sadržaj, motriti promje
 tour.homepageTour.header.contentB=Gumb {0} otvara ladicu koja sadrži akcije vezane uz wiki, poput administracije i imenika.
 tour.homepageTour.tourComplete.title=Obilazak završen
 tour.homepageTour.tourComplete.contentA=Ovim je završen vaš obilazak kroz sučelje i osnovne funkcionalnosti XWikija.
-tour.homepageTour.tourComplete.contentB=Za više detalja o pojedinoj značajki, pristupite {0}dokumentaciji{1}.
-</content>
+tour.homepageTour.tourComplete.contentB=Za više detalja o pojedinoj značajki, pristupite {0}dokumentaciji{1}.</content>
 </xwikidoc>

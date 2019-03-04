@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -124,6 +124,15 @@
               </mapper>
             </data>
             <data>
+              <src>${war.path}/WEB-INF/classes</src>
+              <type>directory</type>
+              <excludes>logback.xml</excludes>
+              <mapper>
+                <type>perm</type>
+                <prefix>/usr/lib/xwiki/WEB-INF/classes</prefix>
+              </mapper>
+            </data>
+            <data>
               <src>${project.build.outputDirectory}/META-INF</src>
               <type>directory</type>
               <mapper>
@@ -136,7 +145,16 @@
             <data>
               <src>${war.path}/WEB-INF</src>
               <type>directory</type>
-              <excludes>**/lib,**/lib/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
+              <excludes>**/lib,**/lib/*,**/classes,**/classes/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
+              <mapper>
+                <type>perm</type>
+                <prefix>/etc/xwiki</prefix>
+              </mapper>
+              <conffile>true</conffile>
+            </data>
+            <data>
+              <src>${war.path}/WEB-INF/classes/logback.xml</src>
+              <type>file</type>
               <mapper>
                 <type>perm</type>
                 <prefix>/etc/xwiki</prefix>
@@ -174,8 +192,8 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/classes</linkName>
-              <linkTarget>/etc/xwiki/classes</linkTarget>
+              <linkName>/usr/lib/xwiki/WEB-INF/classes/logback.xml</linkName>
+              <linkTarget>/etc/xwiki/logback.xml</linkTarget>
             </data>
             <data>
               <type>link</type>

@@ -41,7 +41,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     @FindBy(id = "availableColumns")
     private WebElement availableColumns;
 
-    @FindBy(xpath = "//div[@class = 'columnPicker']/input[@type = 'image' and @alt = 'Add']")
+    @FindBy(css = ".columnPicker a.addColumn")
     private WebElement addColumnButton;
 
     @FindBy(id = "applicationIcon")
@@ -52,6 +52,12 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
      */
     @FindBy(id = "AppWithinMinutes.LiveTableClass_0_description")
     private WebElement descriptionTextArea;
+
+    /**
+     * The field used to input the application title.
+     */
+    @FindBy(id = "xwikidoctitleinput")
+    private WebElement titleInput;
 
     /**
      * Clicks on the Previous Step button.
@@ -80,6 +86,25 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     protected <T extends ViewPage> T createViewPage()
     {
         return (T) new ApplicationHomePage();
+    }
+
+    /**
+     * Sets the application title.
+     * 
+     * @param title the new application title
+     */
+    public void setTitle(String title)
+    {
+        this.titleInput.clear();
+        this.titleInput.sendKeys(title);
+    }
+
+    /**
+     * @return the value of the application title input
+     */
+    public String getTitle()
+    {
+        return this.titleInput.getAttribute("value");
     }
 
     /**

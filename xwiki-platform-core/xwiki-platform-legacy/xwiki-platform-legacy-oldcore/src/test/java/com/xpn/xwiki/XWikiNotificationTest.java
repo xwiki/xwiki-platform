@@ -72,7 +72,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
 
         Mock mockStore = mock(XWikiStoreInterface.class);
         mockStore.expects(atLeastOnce()).method("saveXWikiDoc");
-        mockStore.stubs().method("loadXWikiDoc").will(new CustomStub("Implements XWiki.getDocument")
+        mockStore.stubs().method("loadXWikiDoc").will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
         {
             public Object invoke(Invocation invocation) throws Throwable
             {
@@ -121,7 +121,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         XWikiDocument original = new XWikiDocument(new DocumentReference("WikiDescriptor", "Space", "Page"));
         original.setNew(false);
         original.setContent("Old content");
-        XWikiDocument document = new XWikiDocument(new DocumentReference("WikiDescriptor", "Space", "Page"));
+        XWikiDocument document = original.clone();
         document.setContent("New content");
         document.setOriginalDocument(original);
 

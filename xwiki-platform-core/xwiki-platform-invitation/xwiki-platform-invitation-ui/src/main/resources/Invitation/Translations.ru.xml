@@ -36,13 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: invitation.applicationsPanelEntryLabel=Invitation
+  <content>invitation.applicationsPanelEntryLabel=Приглашение
 
 # Invitation Administration Section
-### Missing: Invitation.WebHome_from_address.hint=The email address used to send the invitation emails from.
-### Missing: Invitation.WebHome_smtp_server_password.hint=The password to connect to the SMTP server, only when authentication is required.
-### Missing: Invitation.WebHome_smtp_server_username.hint=The username to connect to the SMTP server, only when authentication is required.
-### Missing: Invitation.WebHome_smtp_port.hint=The port of the SMTP server to use.
-### Missing: Invitation.WebHome_smtp_server.hint=The SMTP server to send to.
-### Missing: Invitation.WebHome_javamail_extra_props.hint=The list of additional JavaMail properties to use.</content>
+Invitation.WebHome_from_address.hint=Адрес электронной почты, используемый для отправки электронных писем с приглашением.
+Invitation.WebHome_smtp_server_password.hint=Пароль для подключения к SMTP-серверу, только если требуется аутентификация.
+Invitation.WebHome_smtp_server_username.hint=Имя пользователя для подключения к SMTP-серверу, только когда требуется аутентификация.
+Invitation.WebHome_smtp_port.hint=Порт SMTP-сервера для использования.
+Invitation.WebHome_smtp_server.hint=SMTP-сервер для отправки.
+Invitation.WebHome_javamail_extra_props.hint=Список дополнительных свойств JavaMail для использования.</content>
 </xwikidoc>

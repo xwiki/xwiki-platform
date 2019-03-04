@@ -119,9 +119,9 @@ $response.setContentType("application/json")
     #set ($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
     #if ($isTranslation)
       ## Display the language after the document name so that not all translated documents have the same name displayed
-      #set ($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+      #set ($discard = $row.put('doc_name', "$itemDoc.documentReference.name ($docLanguage)"))
     #else
-      #set ($discard = $row.put('doc_name', $itemDoc.name))
+      #set ($discard = $row.put('doc_name', $itemDoc.documentReference.name))
     #end
     #set ($discard = $row.put('doc_fullName', $fullname))
     #set ($location = "#hierarchy($itemDoc.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
@@ -141,7 +141,7 @@ $response.setContentType("application/json")
     #set ($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
     #set ($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&step=1')))
     ## Compute the 'edit rights' URL
-    #if($itemDoc.name == 'WebHome')
+    #if($itemDoc.documentReference.name == 'WebHome')
       ## For nested pages, use the page administration
       #set($webPreferencesReference = $services.model.createEntityReference('WebPreferences', 'DOCUMENT', $itemDoc.documentReference.lastSpaceReference))
       #set($editRightsURL = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&section=PageRights'))

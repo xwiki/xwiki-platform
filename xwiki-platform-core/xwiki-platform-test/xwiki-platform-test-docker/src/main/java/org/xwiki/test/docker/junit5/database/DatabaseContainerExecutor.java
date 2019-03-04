@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.junit5.database;
 
+import java.util.Properties;
+
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MySQLContainer;
@@ -27,6 +29,7 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.text.StringUtils;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -108,10 +111,41 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
         }
 
-        databaseContainer.withCommand(
-            "--character-set-server=utf8 --collation-server=utf8_bin --explicit-defaults-for-timestamp=1");
+        // Note: the "explicit-defaults-for-timestamp" parameter has been introduced in MySQL 5.6.6+ only and using it
+        // in older versions make MySQL fail to start.
+        Properties commands = new Properties();
+        commands.setProperty("character-set-server", "utf8");
+        commands.setProperty("collation-server", "utf8_bin");
+
+        if (!isMySQL55x(testConfiguration)) {
+            commands.setProperty("explicit-defaults-for-timestamp", "1");
+        }
+        // MySQL 8.x has changed the default authentication plugin value so we need to explicitly configure it to get
+        // the native password mechanism.
+        // The reason we don't include when the tag is null is because with the TC version we use, MySQLContainer
+        // defaults to
+        if (isMySQL8xPlus(testConfiguration)) {
+            commands.setProperty("default-authentication-plugin", "mysql_native_password");
+        }
+        databaseContainer.withCommand(mergeCommands(commands, testConfiguration.getDatabaseCommands()));
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
+    }
+
+    private boolean isMySQL55x(TestConfiguration testConfiguration)
+    {
+        return testConfiguration.getDatabaseTag() != null && testConfiguration.getDatabaseTag().startsWith("5.5");
+    }
+
+    private boolean isMySQL8xPlus(TestConfiguration testConfiguration)
+    {
+        return (testConfiguration.getDatabaseTag() != null && extractMajor(testConfiguration.getDatabaseTag()) >= 8)
+            || (extractMajor(MySQLContainer.DEFAULT_TAG) >= 8 && testConfiguration.getDatabaseTag() == null);
+    }
+
+    private int extractMajor(String version)
+    {
+        return Integer.valueOf(StringUtils.substringBefore(version, "."));
     }
 
     private void startMariaDBContainer(TestConfiguration testConfiguration)

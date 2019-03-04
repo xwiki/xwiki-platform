@@ -111,7 +111,7 @@
 #if ($hasSpaceAdmin &amp;&amp; $isAdminAppInstalled)
   #template('menus_macros.vm')
   #set ($adminspaceaction = $xwiki.getURL($spacePreferencesDocumentReference, 'admin'))
-  #if ($doc.name == 'WebHome')
+  #if ($doc.documentReference.name == 'WebHome')
     #set ($title = $services.localization.render('core.menu.admin.page'))
   #else
     #set ($title = $services.localization.render('core.menu.admin.parent'))

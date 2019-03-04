@@ -31,10 +31,11 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   var webHome = "$!services.model.getEntityReference('DOCUMENT', 'default').name" || 'WebHome';
 
   var getSelectizeOptions = function(select) {
+    var space = select.data('suggest-space');
     return {
       create: true,
       load: function(text, callback) {
-        loadPages(text).done(function(data) {
+        loadPages(text, space).done(function(data) {
           var pages = [];
           data.searchResults.forEach(function (element) {
             var hierarchy = element.hierarchy.items;
@@ -62,9 +63,9 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
     }
   };
 
-  var loadPages = function(text) {
+  var loadPages = function(text, space) {
     var scopes = ['name', 'title'];
-    return $.getJSON(XWiki.Document.getRestSearchURL(), $.param({
+    return $.getJSON(XWiki.Document.getRestSearchURL("", space), $.param({
       'q': text,
       'scope': scopes,
       'number': 10,

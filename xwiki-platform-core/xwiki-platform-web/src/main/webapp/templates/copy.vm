@@ -80,6 +80,19 @@
             <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a></span>
           </div>
         </form>
+      #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
+        #warning($services.localization.render('core.copy.editRightsForbidden',
+        [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        <div class="buttons">
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">
+                $services.localization.render('core.copy.changeTarget')
+              </a>
+            </span>
+          <span class="buttonwrapper">
+              <a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a>
+            </span>
+        </div>
       #else
         #set ($success = false)
         #set ($copyAsJob = $services.refactoring.copyAs($sourceDocReference, $targetDocReference))
@@ -137,7 +150,7 @@
         <label for="sourcePageName">$services.localization.render('core.copy.sourcepage')</label>
         <span class="xHint">$services.localization.render('core.copy.sourcepage.hint')</span>
       </dt>
-      <dd>$!{escapetool.xml($doc.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.name)}" size="60"/></dd>
+      <dd>$!{escapetool.xml($doc.documentReference.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.documentReference.name)}" size="60"/></dd>
       ##------------------
       ## Translation field
       ##------------------
@@ -192,7 +205,7 @@
         <label for="targetPageName">$services.localization.render('core.copy.targetpage')</label>
         <span class="xHint">$services.localization.render('core.copy.targetpage.hint')</span>
       </dt>
-      <dd><input type="text" id="targetPageName" name="targetPageName" value="$!{escapetool.xml($doc.name)}" size="60" /></dd>
+      <dd><input type="text" id="targetPageName" name="targetPageName" value="$!{escapetool.xml($doc.documentReference.name)}" size="60" /></dd>
     </dl>
     <div class="buttons">
       <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/></span>

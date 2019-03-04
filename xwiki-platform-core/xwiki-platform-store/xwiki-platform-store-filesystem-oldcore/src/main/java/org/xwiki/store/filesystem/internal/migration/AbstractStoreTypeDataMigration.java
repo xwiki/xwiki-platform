@@ -28,18 +28,15 @@ import javax.inject.Inject;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.slf4j.Logger;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
-import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Base class used by migrations on store type field.
@@ -47,16 +44,10 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @version $Id$
  * @since 10.4RC1
  */
-public abstract class AbstractStoreTypeDataMigration extends AbstractHibernateDataMigration
+public abstract class AbstractStoreTypeDataMigration extends AbstractFileStoreDataMigration
 {
     @Inject
-    protected FilesystemStoreTools fstools;
-
-    @Inject
     protected DocumentReferenceResolver<String> resolver;
-
-    @Inject
-    protected Logger logger;
 
     protected final String tableName;
 

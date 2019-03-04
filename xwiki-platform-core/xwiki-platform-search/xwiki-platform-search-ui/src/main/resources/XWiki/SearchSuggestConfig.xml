@@ -551,7 +551,7 @@
       <icon>icon:page_white_text</icon>
     </property>
     <property>
-      <name>platform.search.suggestSourceDocumentName</name>
+      <name>platform.search.suggestSourceDocumentTitle</name>
     </property>
     <property>
       <query>fq=type:DOCUMENT

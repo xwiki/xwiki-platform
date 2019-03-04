@@ -32,6 +32,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
+import com.xpn.xwiki.store.migration.DataMigrationException;
+
 /**
  * Migrations for XWIKI-15249. Make sure all attachments have the right content and archive store id.
  *
@@ -53,20 +55,33 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
         super(tableName, fieldName);
     }
 
+    @Override
+    public void migrate() throws DataMigrationException
+    {
+        // This migration should only be executed if upgrading from > 10.1
+        int version = getCurrentDBVersion().getVersion();
+        if (version < 1001000 && version < 1004001) {
+            super.migrate();
+        } else {
+            this.logger
+                .info("Skipping the migration (it's only needed when migrating from a version greater than 10.1)");
+        }
+    }
+
     protected File getDocumentContentDir(final DocumentReference documentReference)
     {
-        File documentDir = new File(this.fstools.getStorageLocationFile(),
-            this.fileEntitySerializer.serialize(documentReference, true));
-        File documentContentDir = new File(documentDir, FilesystemStoreTools.DOCUMENT_DIR_NAME);
+        File documentDir =
+            new File(getPre11StoreRootDirectory(), this.fileEntitySerializer.serialize(documentReference, true));
+        File documentContentDir = new File(documentDir, THIS_DIR_NAME);
 
         // Add the locale
         Locale documentLocale = documentReference.getLocale();
         if (documentLocale != null) {
             final File documentLocalesDir =
                 new File(documentContentDir, FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
-            final File documentLocaleDir = new File(documentLocalesDir, documentLocale.equals(Locale.ROOT)
-                ? FilesystemStoreTools.DOCUMENT_LOCALES_ROOT_NAME : documentLocale.toString());
-            documentContentDir = new File(documentLocaleDir, FilesystemStoreTools.DOCUMENTLOCALE_DIR_NAME);
+            final File documentLocaleDir = new File(documentLocalesDir,
+                documentLocale.equals(Locale.ROOT) ? DOCUMENT_LOCALE_ROOT_NAME : documentLocale.toString());
+            documentContentDir = new File(documentLocaleDir, THIS_DIR_NAME);
         }
 
         return documentContentDir;
@@ -75,7 +90,7 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
     protected File getAttachmentDir(final AttachmentReference attachmentReference)
     {
         File docDir = getDocumentContentDir(attachmentReference.getDocumentReference());
-        File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENT_DIR_NAME);
+        File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
 
         return new File(attachmentsDir, FileSystemStoreUtils.encode(attachmentReference.getName(), true));
     }

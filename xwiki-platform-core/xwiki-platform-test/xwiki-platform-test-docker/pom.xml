@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
@@ -33,11 +33,12 @@
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
-    <testcontainers.version>1.10.2</testcontainers.version>
+    <xwiki.pitest.mutationThreshold>7</xwiki.pitest.mutationThreshold>
+    <testcontainers.version>1.10.6</testcontainers.version>
 
     <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
     <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
-    <selenium.version>3.14.0</selenium.version>
+    <selenium.version>3.141.59</selenium.version>
 
     <!-- selenium requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
          details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
@@ -79,7 +80,16 @@
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <!-- Replace the version triggered by testcontainers by a more accurate one -->
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -108,10 +118,6 @@
       <version>5.1.24</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
@@ -149,26 +155,6 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-http</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-file</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-connector-basic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-resolver-provider</artifactId>
     </dependency>
     <!-- Dependency to generate XED files by reusing existing code -->
     <dependency>

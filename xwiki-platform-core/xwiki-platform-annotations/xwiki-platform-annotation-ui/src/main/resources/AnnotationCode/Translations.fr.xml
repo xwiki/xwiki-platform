@@ -76,7 +76,7 @@ annotations.action.create.error.unauthorized=Vous n'êtes pas autorisé à annot
 annotations.action.create.error.unauthorizedguest=Vous n'êtes pas autorisé à annoter ce document. Commencez par vous identifier.
 annotations.action.create.helpmessage=Pour annoter un texte, sélectionnez-le puis appuyez sur {0}.
 annotations.action.create.error.wrongsyntax=Les annotations ne sont pas disponibles pour les documents rédigés en syntaxe XWiki 1.0.
-annotations.action.create.error.notarget=Pas de cible (page) spécifiée pour créer une annotation.
+annotations.action.create.error.notarget=Aucune cible (page) spécifiée pour créer une annotation.
 
 annotations.action.view.hide.text=masquer
 annotations.action.view.form.loaderror=Échec :
@@ -112,6 +112,5 @@ AnnotationCode.AnnotationConfig_displayed=Par défaut, afficher les annotations
 AnnotationCode.AnnotationConfig_displayed.hint=Indique si les annotations sont affichées par défaut ou seulement en utilisant l'option "Afficher les annotations" de la page
 AnnotationCode.AnnotationConfig_displayHighlight=Par défaut, surligner le texte annoté
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Indique si le surlignement des annotations doit toujours être actif ou uniquement au survol
-AnnotationCode.AnnotationConfig_annotationClass=Classe XWiki définissant la structure des annotations
-</content>
+AnnotationCode.AnnotationConfig_annotationClass=Classe XWiki définissant la structure des annotations</content>
 </xwikidoc>

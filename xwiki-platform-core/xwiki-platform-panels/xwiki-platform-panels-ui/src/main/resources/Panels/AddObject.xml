@@ -145,7 +145,7 @@
     &lt;optgroup label="$classdoc.space"&gt;
     #set($prevSpace = $classdoc.space)
   #end
-  &lt;option value="$classdoc.fullName"&gt;$classdoc.name&lt;/option&gt;
+  &lt;option value="$classdoc.fullName"&gt;$classdoc.documentReference.name&lt;/option&gt;
 #end
 #if($optGroupOpen)
   &lt;/optgroup&gt;

@@ -14,7 +14,7 @@
   #if ($editor == '')
     #if ($doc.fullName == 'XWiki.XWikiPreferences')
       #set ($editor = 'globaladmin')
-    #elseif ($doc.name == 'WebPreferences')
+    #elseif ($doc.documentReference.name == 'WebPreferences')
       #set ($editor = 'spaceadmin')
     #else
       #set ($editor = 'globaladmin')## default editor
@@ -42,7 +42,7 @@
 ## Include XWikiPreferences object
 ##-------------------------------------------------
 #set ($prefsClassName = 'XWiki.XWikiPreferences')
-#if ($doc.fullName == $prefsClassName || $doc.name == 'WebPreferences')
+#if ($doc.fullName == $prefsClassName || $doc.documentReference.name == 'WebPreferences')
   #if (!$doc.getObject($prefsClassName))
     #set ($discard = $doc.newObject($prefsClassName))
     #set ($discard = $!doc.setParent("${doc.space}.WebHome"))

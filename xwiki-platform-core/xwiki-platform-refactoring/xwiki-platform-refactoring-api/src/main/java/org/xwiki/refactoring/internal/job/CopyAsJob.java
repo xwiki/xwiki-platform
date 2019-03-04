@@ -22,8 +22,6 @@ package org.xwiki.refactoring.internal.job;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
@@ -34,7 +32,7 @@ import org.xwiki.refactoring.job.RefactoringJobs;
  */
 @Component
 @Named(RefactoringJobs.COPY_AS)
-public class CopyAsJob extends AbstractCopyOrMoveJob<CopyRequest>
+public class CopyAsJob extends CopyJob
 {
     @Override
     public String getType()
@@ -43,28 +41,9 @@ public class CopyAsJob extends AbstractCopyOrMoveJob<CopyRequest>
     }
 
     @Override
-    protected boolean isDeleteSources()
-    {
-        // copy never deletes sources
-        return false;
-    }
-
-    @Override
-    protected void postMove(DocumentReference oldReference, DocumentReference newReference)
-    {
-        // do nothing
-    }
-
-    @Override
-    protected void postUpdateDocuments(DocumentReference oldReference, DocumentReference newReference)
-    {
-        // do nothing
-    }
-
-    @Override
     protected boolean processOnlySameSourceDestinationTypes()
     {
-        // copyas only process same destination types
+        // Copy As only process same destination types.
         return true;
     }
 }

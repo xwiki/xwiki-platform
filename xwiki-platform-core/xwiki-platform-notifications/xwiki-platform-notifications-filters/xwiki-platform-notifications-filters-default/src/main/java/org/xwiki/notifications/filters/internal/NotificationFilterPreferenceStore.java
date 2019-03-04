@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
@@ -40,7 +41,6 @@ import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
@@ -55,7 +55,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 public class NotificationFilterPreferenceStore
 {
     @Inject
-    private ActivityStreamConfiguration activityStreamConfiguration;
+    private LegacyEventStreamStoreConfiguration legacyEventStreamStoreConfiguration;
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -107,7 +107,7 @@ public class NotificationFilterPreferenceStore
                     "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner "
                             + "order by nfp.id", Query.HQL);
             query.bindValue("owner", serializedUser);
-            if (activityStreamConfiguration.useMainStore()) {
+            if (legacyEventStreamStoreConfiguration.useMainStore()) {
                 query.setWiki(context.getMainXWiki());
             }
             List<DefaultNotificationFilterPreference> results = query.execute();
@@ -142,7 +142,7 @@ public class NotificationFilterPreferenceStore
         // store event in the main database
         String oriDatabase = context.getWikiId();
 
-        if (activityStreamConfiguration.useMainStore()) {
+        if (legacyEventStreamStoreConfiguration.useMainStore()) {
             context.setWikiId(context.getMainXWiki());
         }
 
@@ -185,7 +185,7 @@ public class NotificationFilterPreferenceStore
         XWikiHibernateStore hibernateStore = null;
 
         try {
-            if (activityStreamConfiguration.useMainStore()) {
+            if (legacyEventStreamStoreConfiguration.useMainStore()) {
                 // store event in the main database
                 context.setWikiId(context.getMainXWiki());
             }

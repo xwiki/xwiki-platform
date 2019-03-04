@@ -56,6 +56,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
+import org.xwiki.refactoring.internal.LinkRefactoring;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
@@ -64,6 +66,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -368,6 +371,22 @@ public class MockitoOldcore
             componentManagerDescriptor.setRoleHint("context");
             componentManagerDescriptor.setRoleType(ComponentManager.class);
             this.componentManager.registerComponent(componentManagerDescriptor, this.componentManager);
+        }
+
+        // Register mock components for refactoring listener components
+        if (!this.componentManager.hasComponent(ModelBridge.class)) {
+            this.componentManager.registerMockComponent(ModelBridge.class);
+        }
+
+        if (!this.componentManager.hasComponent(LinkRefactoring.class)) {
+            this.componentManager.registerMockComponent(LinkRefactoring.class);
+        }
+
+        // Make sure to a have an URLConfiguration component.
+        if (!this.componentManager.hasComponent(URLConfiguration.class)) {
+            URLConfiguration mockUrlConfigComponent =
+                this.componentManager.registerMockComponent(URLConfiguration.class);
+            when(mockUrlConfigComponent.getURLFormatId()).thenReturn("standard");
         }
 
         // XWiki

@@ -20,6 +20,7 @@
         #if ($xwiki.isEditCommentFieldHidden())
           <input type="hidden" name="comment" id="comment" value="$!{escapetool.xml($request.comment)}" />
         #else
+          <label class="hidden" for="commentinput">$services.localization.render('core.comment')</label>
           <input type="text" name="comment" id="commentinput" value="$!{escapetool.xml($request.comment)}" size="40"
             title="$services.localization.render('core.comment.tooltip')" placeholder="$services.localization.render('core.comment.hint')" />
         #end

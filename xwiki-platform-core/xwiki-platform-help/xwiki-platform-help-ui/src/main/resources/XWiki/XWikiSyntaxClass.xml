@@ -40,7 +40,7 @@
 ## Replace Main with the Space where you want your documents to be created.
 ## Replace the default parent with the one of your choice and save the document.
 ##
-#set($className = $doc.name.substring(0, $doc.name.indexOf("Class")))
+#set($className = $doc.documentReference.name.substring(0, $doc.documentReference.name.indexOf("Class")))
 #set($defaultParent = "${doc.space}.${className}Class")
 #set($defaultSpace = 'XWiki')
 {{/velocity}}

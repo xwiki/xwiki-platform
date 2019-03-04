@@ -238,12 +238,21 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
      */
     protected abstract void process(EntityReference entityReference);
 
-    protected boolean hasAccess(Right right, EntityReference reference)
+    /**
+     * Check access rights taking into account the job request. We made this method public so that job event listeners
+     * can check access rights in the context of the running job.
+     * 
+     * @param right the access right to check
+     * @param reference the target entity reference
+     * @return return {@code true} if the current user or the entity author have the specified access right on the
+     *         specified entity, depending on the job request
+     */
+    public boolean hasAccess(Right right, EntityReference reference)
     {
         return ((!this.request.isCheckRights()
             || this.authorization.hasAccess(right, this.request.getUserReference(), reference))
             && (!this.request.isCheckAuthorRights()
-            || this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)));
+                || this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)));
     }
 
     protected boolean isSpaceHomeReference(DocumentReference documentReference)

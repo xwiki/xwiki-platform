@@ -22,10 +22,10 @@ package org.xwiki.extension.xar.internal.script;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 /**
  * Provide a safe {@link DiffXarJobStatus}.
@@ -44,12 +44,13 @@ public class DiffXarJobStatusScriptSafeProvider implements ScriptSafeProvider<Di
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider defaultSafeProvider;
 
-    private DocumentAccessBridge documentAccessBridge;
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Override
     @SuppressWarnings("unchecked")
     public <S> S get(DiffXarJobStatus unsafe)
     {
-        return (S) new SafeDiffXarJobStatus(unsafe, this.defaultSafeProvider, this.documentAccessBridge);
+        return (S) new SafeDiffXarJobStatus(unsafe, this.defaultSafeProvider, this.authorization);
     }
 }

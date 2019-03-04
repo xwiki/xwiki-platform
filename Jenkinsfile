@@ -28,14 +28,14 @@ def builds = [
   'Main' : {
     build(
       name: 'Main',
-      profiles: 'legacy,integration-tests,office-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshotModules',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
     )
   },
   'Distribution' : {
     build(
       name: 'Distribution',
-      profiles: 'legacy,integration-tests,office-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshotModules',
       pom: 'xwiki-platform-distribution/pom.xml'
     )
   },
@@ -107,6 +107,11 @@ def builds = [
   'Quality' : {
     build(
       name: 'Quality',
+      // TODO call sonar:sonar when we fix the memory issue of executing that goal on platform. Right now we don't have
+      // enough memory on Jenkins Master for that.
+      //   goals: 'clean install jacoco:report',
+      // Note: When we do so, also add:
+      //   sonar: true
       goals: 'clean install jacoco:report',
       profiles: 'quality,legacy',
       xvnc: false
@@ -202,22 +207,30 @@ def buildAll(builds)
 def build(map)
 {
   node(map.node ?: '') {
+    // Make sure the memory dump directory exists (see below)
+    // Note that the user used to run the job on the agent must have the permission to create these directories
+    def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
+    sh "mkdir -p \"${oomPath}\""
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
-      if (map.goals != null) {
+      // Note: we want to get a memory dump on OOM errors.
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
+      if (map.goals) {
         goals = map.goals
       }
-      if (map.profiles != null) {
+      if (map.profiles) {
         profiles = map.profiles
       }
-      if (map.properties != null) {
+      if (map.properties) {
         properties = map.properties
       }
-      if (map.pom != null) {
+      if (map.pom) {
         pom = map.pom
       }
-      if (map.mavenFlags != null) {
+      if (map.mavenFlags) {
         mavenFlags = map.mavenFlags
+      }
+      if (map.sonar) {
+        sonar = map.sonar
       }
     }
   }

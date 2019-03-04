@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Приложение за несколь
 platform.appwithinminutes.description=Создать веб-приложение для совместной работы на основе мощной системы управления структурированными данными в течение нескольких минут.
 platform.appwithinminutes.createAppButtonLabel=Создать приложение
 platform.appwithinminutes.appsLiveTableHeading=Приложения
-platform.appwithinminutes.appsLiveTable.doc.space=Название приложения
+platform.appwithinminutes.appsLiveTable.doc.title=Приложение
 platform.appwithinminutes.appsLiveTable.doc.author=Последний автор
 platform.appwithinminutes.appsLiveTable.doc.date=Дата изменения
 platform.appwithinminutes.appsLiveTable._actions=Действия
@@ -78,7 +78,7 @@ appWithinMinutes.createApp.location.label=Расположение
 appWithinMinutes.createApp.location.hint=Расположение в иерархии страниц, где будет создано приложение.
 appWithinMinutes.createApp.parent.label=Родитель
 appWithinMinutes.createApp.parent.hint=Родитель нового приложения. Оставьте это поле пустым, если вы хотите создать приложение верхнего уровня.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
 appWithinMinutes.codeSpace.title=Код
 appWithinMinutes.codeSpace.description=Это место, где находится код приложения.
 appWithinMinutes.codeSpace.hiddenPagesInfo=Скрытые страницы также перечислены, даже если ваши текущие настройки профиля пользователя не позволяют этого сделать, иначе ни одна из кодовых страниц приложения не будет видна, поскольку все они по умолчанию скрыты.
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Такое приложение �
 platform.appwithinminutes.appNameEmptyError=Пожалуйста, введите название приложения.
 
 ### Wizard Step 2: Application Structure
-appWithinMinutes.classEditor.title={0} Структура
 platform.appwithinminutes.classEditorPaletteTitle=Палитра полей
 platform.appwithinminutes.classEditorPaletteHint=Перетяните поля из палитры для создание формы.
 platform.appwithinminutes.classEditorCanvasHint=Перетяните поля из палитры в эту область.
@@ -112,7 +111,7 @@ platform.appwithinminutes.classEditorTranslationsSaveComment=Обновить п
 
 platform.appwithinminutes.classEditorStandardCategoryName=Стандартное
 platform.appwithinminutes.classEditorPickersCategoryName=Инструмент для выбора
-platform.appwithinminutes.classEditorDocumentCategoryName=Документ
+platform.appwithinminutes.classEditorDocumentCategoryName=Страница
 platform.appwithinminutes.classEditorAdvancedCategoryName=Расширенные
 
 platform.appwithinminutes.classEditorDBListFieldName=Список базы данных
@@ -125,7 +124,7 @@ platform.appwithinminutes.classEditorNumberFieldName=Число
 platform.appwithinminutes.classEditorTextAreaFieldName=Длинный текст
 platform.appwithinminutes.classEditorStringFieldName=Короткий текст
 platform.appwithinminutes.classEditorContentFieldName=Содержимое
-platform.appwithinminutes.classEditorTitleFieldName=Заголовок
+platform.appwithinminutes.classEditorTitleFieldName=Название
 platform.appwithinminutes.classEditorPageFieldName=Страница
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Удалить
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Идентиф�
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Добавить
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Удалить
 
-appWithinMinutes.templateProviderEditor.title={0} Записей
 appWithinMinutes.templateProviderEditor.hint=Записи приложения - это вики-страницы, которые содержат структурированные данные.
 appWithinMinutes.templateProviderEditor.icon.hint=Значок, связанный с приложением.
 appWithinMinutes.templateProviderEditor.description.hint=Короткое описание приложения.
@@ -176,7 +174,7 @@ platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Последний 
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Пользователь, который последний раз изменял страницу приложения
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Создатель
 platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Пользователь, который создал страницу приложения
-platform.appwithinminutes.liveTableEditorDocDateColumnName=Дата обновления
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Дата
 platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Дата, когда страница приложения последний раз редактировалась
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Дата создания
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Дата создания страницы приложения
@@ -188,12 +186,13 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Изображения
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Специальная колонка для демонстрации изображений, которые прикреплены к странице
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Аватар
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Специальная колонка для вывода аватара пользователя. Работает только в случае связи таблицы с классом XWiki.XWikiUsers
+platform.appwithinminutes.liveTableEditorTitleHint=Название приложения, которое будет отображаться на домашней странице приложения, на панели приложений, в списке приложений, в строке навигации и т.д.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Описание дает краткую информацию о том, что приложение делает и какие данные использует.
 platform.appwithinminutes.liveTableEditorColumnsHint=Выберите колонки, которые вы хотите включить в интерактивную таблицу LiveTable на домашней странице вашего приложения.
 platform.appwithinminutes.liveTableEditorSaveComment=Обновить интерактивную таблицу LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Для изменения порядка перемещайте мышью
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Удалить
-platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить
+platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить выбранный столбец
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Иконка
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Значок приложения. Вы можете выбрать значок в палитре значков или сослаться на прикрепленное изображение.
@@ -210,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Удалить все з
 platform.appwithinminutes.appHomePageEditAppLabel=Редактировать приложение
 platform.appwithinminutes.appHomePageTranslateAppLabel=Перевести приложение
 platform.appwithinminutes.appHomePageDeleteAppLabel=Удалить приложение
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Приложение {0} и ВСЕ его записи будут удалены. Вы уверены что хотите продолжить?
@@ -218,12 +218,26 @@ platform.appwithinminutes.deleteAppDoesNotExistError=Указанное прил
 platform.appwithinminutes.deleteAppInvalidAppError=Указанное имя не является действительным приложением.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Имя приложения не указано.
 
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.newName.label=New Name
+### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+### Missing: appWithinMinutes.renameApp.location.label=New Location
+### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+### Missing: appWithinMinutes.renameApp.parent.label=New Parent
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
+### Missing: appWithinMinutes.renameApp.done=Application renamed
+### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+
 ### Deprecated keys
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Класс приложения
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Раздел данных приложения
 
-platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Раздел
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Пространство
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Название раздела, которая содержит страницу приложения
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Полное имя страницы
 platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Название страницы, которая содержит страницу приложения (в формате НазваниеРаздела.НазваниеСтраницы)
@@ -246,5 +260,9 @@ platform.appwithinminutes.wizardStep3Name=Внешний вид
 platform.appwithinminutes.wizardStep3Title=Настройка домашней страницы приложения
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Персонализировать домашнюю страницу приложения
-</content>
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Название приложения
+appWithinMinutes.classEditor.title={0} Структура
+appWithinMinutes.templateProviderEditor.title={0} Записей</content>
 </xwikidoc>

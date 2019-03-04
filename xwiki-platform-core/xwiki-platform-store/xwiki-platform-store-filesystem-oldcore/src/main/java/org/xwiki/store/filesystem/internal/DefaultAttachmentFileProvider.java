@@ -21,8 +21,6 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
 
-import org.xwiki.store.internal.FileSystemStoreUtils;
-
 /**
  * A means of getting files for storing information about a given attachment.
  *
@@ -76,58 +74,21 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
         return this.attachmentFileName;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Get a File for loading or storing this attachment's content. This file is derived from the name of the document
-     * which the attachment resides in and the attachment filename. The file will be placed in the storage area in a
-     * directory structure called
-     * {@code <storage dir>/<wiki>/<space>/<document name>/~this/attachments/<attachment file name>/} So an attachment
-     * called file.txt in a document called Sandbox.Test in a the main wiki ("xwiki") would go in the following file:
-     * <br/>
-     * {@code <storage dir>/xwiki/Sandbox/Test/~this/attachments/file.txt/file.txt}
-     * </p>
-     *
-     * @see AttachmentFileProvider#getAttachmentContentFile()
-     */
     @Override
     public File getAttachmentContentFile()
     {
-        // storage/xwiki/Main/WebHome/~this/attachments/some.file/some.file
-        return new File(this.attachmentDir, FileSystemStoreUtils.encode(this.attachmentFileName, false));
+        return new File(this.attachmentDir, StoreFileUtils.getStoredFilename(this.attachmentFileName, null));
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This will be a file named ~METADATA.xml which will reside in the attachment directory.
-     * </p>
-     *
-     * @see AttachmentFileProvider#getAttachmentVersioningMetaFile()
-     */
     @Override
     public File getAttachmentVersioningMetaFile()
     {
         return new File(this.attachmentDir, ATTACH_ARCHIVE_META_FILENAME);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Get a file corresponding to this version of this attachment. If the file has one or more dots ('.') in it then
-     * the version number is inserted before the last dot. Otherwise it is appended to the end. Version numbers always
-     * have "~v" prepended to prevent collision.
-     * <ul>
-     * <li>version 1.1 of an attachment called file.txt will be stored as file~v1.1.txt</li>
-     * <li>version 1.2 of an attachment called noExtension will be stored as noExtension~v1.2</li>
-     * </ul>
-     *
-     * @see AttachmentFileProvider#getAttachmentVersioningMetaFile()
-     */
     @Override
     public File getAttachmentVersionContentFile(final String versionName)
     {
-        return new File(this.attachmentDir,
-            GenericFileUtils.getVersionedFilename(this.attachmentFileName, versionName));
+        return new File(this.attachmentDir, StoreFileUtils.getStoredFilename(this.attachmentFileName, versionName));
     }
 }

@@ -468,7 +468,7 @@ position: relative;
   #set($excludedPages  = $stringtool.split($configurationObj.getProperty('excludedPages').value, ','))
   #set($excludedPages  = $stringtool.stripAll($excludedPages))
   ##
-  #if($displayRatings &amp;&amp; !$excludedPages.contains($doc.name))
+  #if($displayRatings &amp;&amp; !$excludedPages.contains($doc.documentReference.name))
     #displayFullRating($doc.getDocumentReference() '')
   #end
 #end

@@ -47,7 +47,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Verify the installed extensions are synchronized between members of the cluster.
- * 
+ *
  * @version $Id$
  */
 public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
@@ -148,7 +148,6 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
             }
             Thread.sleep(100);
         }
-
     }
 
     private void executeJob(String jobType, Request jobRequest) throws Exception
@@ -157,8 +156,8 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
             AbstractTest.componentManager.<ModelFactory>getInstance(ModelFactory.class).toRestJobRequest(jobRequest);
 
         Map<String, Object[]> queryParameters = new HashMap<>();
-        queryParameters.put("jobType", new Object[] { jobType });
-        queryParameters.put("async", new Object[] { false });
+        queryParameters.put("jobType", new Object[]{ jobType });
+        queryParameters.put("async", new Object[]{ false });
 
         TestUtils.assertStatusCodes(getUtil().rest().executePut(JobsResource.class, request, queryParameters), true,
             TestUtils.STATUS_OK);

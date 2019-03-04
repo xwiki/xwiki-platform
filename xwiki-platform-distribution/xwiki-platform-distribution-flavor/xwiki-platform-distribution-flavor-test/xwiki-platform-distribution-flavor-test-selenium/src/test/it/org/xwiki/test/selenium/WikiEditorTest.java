@@ -99,56 +99,6 @@ public class WikiEditorTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Test the ability to add edit comments and the ability to disable the edit comments feature.
-     */
-    @Test
-    public void testEditComment() throws IOException
-    {
-        try {
-            editInWikiEditor("Test", "EditComment", SYNTAX);
-            assertTrue(getSelenium().isVisible("comment"));
-
-            // Test for XWIKI-2487: Hiding the edit comment field doesn't work
-            setXWikiConfiguration("xwiki.editcomment.hidden=1");
-            editInWikiEditor("Test", "EditComment", SYNTAX);
-            assertFalse(getSelenium().isVisible("comment"));
-        } finally {
-            setXWikiConfiguration("xwiki.editcomment.hidden=0");
-        }
-    }
-
-    /**
-     * Verify minor edit feature is working
-     */
-    @Test
-    public void testMinorEdit()
-    {
-        try {
-            editInWikiEditor("Test", "MinorEdit", SYNTAX);
-            // Note: Revision 2.1 is used since starting with 1.9-rc-1 editInWikiEditor creates an initial version to
-            // set the syntax.
-            setFieldValue("content", "version=1.2");
-            // Save & Continue = minor edit.
-            clickEditSaveAndContinue();
-            setFieldValue("content", "version=2.1");
-            clickEditSaveAndView();
-
-            open("Test", "MinorEdit", "viewrev", "rev=2.1");
-            assertTextPresent("version=2.1");
-
-            editInWikiEditor("Test", "MinorEdit", SYNTAX);
-            setFieldValue("content", "version=2.2");
-            getSelenium().click("minorEdit");
-            clickEditSaveAndView();
-
-            open("Test", "MinorEdit", "viewrev", "rev=2.2");
-            assertTextPresent("version=2.2");
-        } finally {
-            deletePage("Test", "MinorEdit");
-        }
-    }
-
-    /**
      * Tests that the specified tool bar button works.
      * 
      * @param buttonTitle the title of a tool bar button

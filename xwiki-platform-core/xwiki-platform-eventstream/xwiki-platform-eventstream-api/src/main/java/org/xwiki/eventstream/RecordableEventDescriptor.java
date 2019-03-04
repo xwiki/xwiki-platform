@@ -22,7 +22,7 @@ package org.xwiki.eventstream;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Provide a description for a specific implementation of RecordableEvent so that users can knows what the event is
+ * Provide a description for a specific implementation of RecordableEvent so that users can know what the event is
  * about.
  *
  * @version $Id$

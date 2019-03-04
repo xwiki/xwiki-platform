@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>$services.localization.render("administration.title#if ($doc.name == 'WebPreferences').page#elseif ($doc.fullName == 'XWiki.XWikiPreferences')#if ($xcontext.isMainWiki()).global#{else}.wiki#end#end")</title>
+  <title>$services.localization.render("administration.title#if ($doc.documentReference.name == 'WebPreferences').page#elseif ($doc.fullName == 'XWiki.XWikiPreferences')#if ($xcontext.isMainWiki()).global#{else}.wiki#end#end")</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -355,7 +355,7 @@
 
 ## Determine the administration level.
 #set ($level = '')
-#if ($doc.name == 'WebPreferences')
+#if ($doc.documentReference.name == 'WebPreferences')
   #set ($level = '.page')
 #elseif ($doc.fullName == 'XWiki.XWikiPreferences')
   #if ($xcontext.isMainWiki())

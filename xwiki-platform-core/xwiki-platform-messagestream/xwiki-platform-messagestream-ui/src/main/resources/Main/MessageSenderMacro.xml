@@ -331,7 +331,9 @@ return XWiki;
       <cache>long</cache>
     </property>
     <property>
-      <code>.messagestream-tools {
+      <code>#template('colorThemeInit.vm')
+
+.messagestream-tools {
   display: flex;
   position: relative;
   margin: .5em 0 1em;
@@ -342,6 +344,40 @@ return XWiki;
 .messagestream .message-target {
   flex-grow: 1;
   margin-left: .3em;
+}
+
+.messagestream .message-content {
+  padding: .5em 0 .5em 75px;
+}
+
+.messagestream .activitySnapshot {
+  height: 30px;
+  margin: 5px 0 0 -50px;
+  position: absolute;
+}
+
+.messagestream .activitySnapshot img {
+  border-radius: 10px 10px 0 10px;
+  box-shadow: -1px 1px 1px rgba(128,128,128,0.6);
+}
+
+/* User's avatar */
+.messagestream .activitySnapshot .avatar {
+  border-radius: 4px;
+  box-shadow: 0 0 2px 1px rgba(128,128,128,0.6);
+}
+
+.messagestream .activitySnapshot .activityActionAvatar {
+  background: $theme.pageContentBackgroundColor;
+  border-color: $theme.pageContentBackgroundColor;
+  border-style: solid;
+  border-width: 4px 1px 1px 3px;
+  box-sizing: content-box;
+  bottom: -5px;
+  height: 16px;
+  position: absolute;
+  right: -10px;
+  width: 16px;
 }</code>
     </property>
     <property>
@@ -351,7 +387,7 @@ return XWiki;
       <name>Message stream form styling</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -511,7 +547,6 @@ return XWiki;
 ##
 ## Skin Extensions
 ##--------------------------------------------------------------
-#set ($discard = $xwiki.ssx.use('Main.Activity'))
 #set ($discard = $xwiki.ssx.use('Main.MessageSenderMacro'))
 #set ($discard = $xwiki.jsx.use('Main.MessageSenderMacro'))
 {{/velocity}}
@@ -590,11 +625,11 @@ return XWiki;
     #set ($actionQueryString = "xredirect=$escapetool.url($xredirect)")
     {{html}}
     ## Wrap the form in a div so that the layout is preserved in inline mode (where the form is stripped by the rendering).
-    &lt;div class='messagestream activityUser xform'&gt;
+    &lt;div class='messagestream xform'&gt;
     #if (!$inEditMode)
     &lt;form action="${xwiki.getURL('Main.MessageSenderMacro', 'view', $!{actionQueryString})}" method='post'&gt;
     #end
-      &lt;div class='activityContent'&gt;
+      &lt;div class='message-content'&gt;
         #if(!$inEditMode)
           ## CSRF prevention
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;

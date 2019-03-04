@@ -19,11 +19,14 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -444,23 +447,97 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return this.createURL(spaces, name, action, querystring, anchor, xwikidb, context);
     }
 
+    private void appendQueryParameter(String key, Object paramValue, StringBuilder stringBuilder)
+        throws UnsupportedEncodingException
+    {
+        if (paramValue instanceof String) {
+            stringBuilder.append(URLEncoder.encode(key, "UTF-8"));
+            stringBuilder.append('=');
+            stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
+        } else if (paramValue.getClass().isArray()) {
+            Class ofArray = paramValue.getClass().getComponentType();
+            if (ofArray.isPrimitive()) {
+                int length = Array.getLength(paramValue);
+                for (int i = 0; i < length; i++) {
+                    appendQueryParameter(key, Array.get(paramValue, i).toString(), stringBuilder);
+                    if (i < length - 1) {
+                        stringBuilder.append('&');
+                    }
+                }
+            } else {
+                Object[] zeArray = (Object[]) paramValue;
+                for (int i = 0; i < zeArray.length; i++) {
+                    appendQueryParameter(key, zeArray[i].toString(), stringBuilder);
+
+                    if (i < zeArray.length - 1) {
+                        stringBuilder.append('&');
+                    }
+                }
+            }
+        } else if (paramValue instanceof Collection) {
+            Collection zeCollection = (Collection) paramValue;
+            int index = 0;
+            for (Object paramValueElement : zeCollection) {
+                appendQueryParameter(key, paramValueElement.toString(), stringBuilder);
+
+                if (index < zeCollection.size() - 1) {
+                    stringBuilder.append('&');
+                }
+                index++;
+            }
+        } else {
+            appendQueryParameter(key, paramValue.toString(), stringBuilder);
+        }
+    }
+
+    private URL buildURL(URL serverUrl, String path, Map<String, Object> queryParameters, XWikiContext context)
+    {
+        try {
+            URL resultUrl = new URL(serverUrl, path);
+
+            if (!queryParameters.isEmpty()) {
+                StringBuilder stringBuilder = new StringBuilder(resultUrl.toExternalForm());
+                stringBuilder.append('?');
+                int parametersSize = queryParameters.size();
+                int currentIndex = 0;
+                for (Map.Entry<String, Object> queryParameter : queryParameters.entrySet()) {
+                    String key = queryParameter.getKey();
+                    Object paramValue = queryParameter.getValue();
+                    appendQueryParameter(key, paramValue, stringBuilder);
+
+                    if (currentIndex < parametersSize - 1) {
+                        stringBuilder.append("&");
+                    }
+
+                    currentIndex++;
+                }
+                resultUrl = new URL(stringBuilder.toString());
+            }
+            return normalizeURL(resultUrl, context);
+        } catch (MalformedURLException|UnsupportedEncodingException e) {
+            // should not happen
+            return null;
+        }
+    }
+
     @Override
-    public URL createSkinURL(String filename, String skin, XWikiContext context)
+    public URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, Object> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         path.append("skins/");
         path.append(skin);
         addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
+            return buildURL(getServerURL(context), path.toString(), queryParameters, context);
         } catch (MalformedURLException e) {
-            // This should not happen
+            // should not happen
             return null;
         }
     }
 
     @Override
-    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
+    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context,
+        Map<String, Object> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         addServletPath(path, xwikidb, context);
@@ -473,7 +550,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addName(path, name, "skin", context);
         addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
+            return buildURL(getServerURL(xwikidb, context), path.toString(), queryParameters, context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -481,7 +558,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
+        Map<String, Object> queryParameters)
     {
         StringBuilder path = new StringBuilder(this.contextPath);
         if (forceSkinAction) {
@@ -491,7 +569,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         path.append("resources");
         addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
+            return buildURL(getServerURL(context), path.toString(), queryParameters, context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;

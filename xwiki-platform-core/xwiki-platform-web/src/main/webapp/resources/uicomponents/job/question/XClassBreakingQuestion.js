@@ -86,6 +86,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
       var deleteTree = questionForm.find('.deleteTree');
 
       if (deleteTree.length) {
+        deleteTree.addClass('jstree-no-links');
         // Register data callback
         questionForm.data('job-answer-properties-extra', getAnswerProperties);
 
@@ -97,23 +98,12 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
             var node = nodes[i];
             if (typeof node.data != "undefined" && node.data.type == "object") {
               var nodeDom = treeReference.get_node(node.id, true);
-              nodeDom.find('.jstree-checkbox').hide();
-              deleteTree.jstree().uncheck_node(node.id);
+              nodeDom.find('.jstree-checkbox').remove();
             }
           }
         };
 
         deleteTree.on('create_node.jstree', hideObjectsCheckbox);
-
-        var followLinks = function (e, data) {
-          var data = data.node.data;
-
-          if (data && data.link) {
-            window.open( data.link, '_blank' );
-          }
-        };
-
-        deleteTree.on('activate_node.jstree', followLinks);
 
         /**
          * Represent the selected pages & extensions the user can chose to delete

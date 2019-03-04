@@ -19,11 +19,16 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.MountableFile;
+import org.xwiki.text.StringUtils;
 
 /**
  * Common code for container execution.
@@ -47,7 +52,7 @@ public abstract class AbstractContainerExecutor
             container.getDockerClient().pullImageCmd(container.getDockerImageName());
         }
 
-        container.start();
+        DockerTestUtils.startContainer(container);
 
         // Display logs after the container has been started so that we can see problems happening in the containers
         DockerTestUtils.followOutput(container, getClass());
@@ -55,6 +60,7 @@ public abstract class AbstractContainerExecutor
 
     /**
      * Utility method to mount a directory from the host to the container with some optimization for different OS.
+     *
      * @param container the container on which to mount the directory.
      * @param sourceDirectory the path of the directory on the host to mount in the container.
      * @param targetDirectory the target where to mount the directory in the container.
@@ -72,5 +78,28 @@ public abstract class AbstractContainerExecutor
         } else {
             container.withFileSystemBind(sourceDirectory, targetDirectory);
         }
+    }
+
+    /**
+     * Merge two set of properties and generate a String in the Docker command format.
+     *
+     * @param defaultCommands the default command that can be overridden
+     * @param overrideCommands the command overrides
+     * @return the string in the format {@code --key=value}
+     */
+    protected String mergeCommands(Properties defaultCommands, Properties overrideCommands)
+    {
+        Properties mergedCommands = new Properties();
+        mergedCommands.putAll(defaultCommands);
+        mergedCommands.putAll(overrideCommands);
+
+        List<String> commands = new ArrayList<>();
+        for (String key : mergedCommands.stringPropertyNames()) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("--").append(key).append('=').append(mergedCommands.getProperty(key));
+            commands.add(builder.toString());
+        }
+
+        return StringUtils.join(commands, ' ');
     }
 }

@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Aplicações em Minutos
 platform.appwithinminutes.description=Criar aplicações web colaborativas em minutos, baseado no poderoso sistema de gerenciamento de dados estruturados da XWiki.
 platform.appwithinminutes.createAppButtonLabel=Criar Aplicação
 platform.appwithinminutes.appsLiveTableHeading=Aplicações
-platform.appwithinminutes.appsLiveTable.doc.space=Nome da Aplicação
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Último Autor
 platform.appwithinminutes.appsLiveTable.doc.date=Data da Atualização
 platform.appwithinminutes.appsLiveTable._actions=Ações
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Essa aplicação já existe. Se v
 platform.appwithinminutes.appNameEmptyError=Por favor entre o nome da aplicação.
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Lista de Campos
 platform.appwithinminutes.classEditorPaletteHint=Arraste e solte os campos da lista para criar seu formulário.
 platform.appwithinminutes.classEditorCanvasHint=Arraste os campos da lista e solte nessa área.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Adicionar
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Remover
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Imagens
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Uma coluna especial que exibe imagens anexadas na página
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Uma coluna especial para mostrar o avatar. Funciona somente se a tabela estiver conectada com uma classe XWiki.XWikiUsers
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=A descrição contém um curto resumo do que a aplicação faz e que tipos de dados ela vai manipular.
 platform.appwithinminutes.liveTableEditorColumnsHint=Selecione as colunas que você deseja incluir na tabela dinâmica mostrada na página inicial da aplicação.
 platform.appwithinminutes.liveTableEditorSaveComment=Atualizar Tabela Dinâmica
@@ -210,6 +209,7 @@ platform.appwithinminutes.appHomePageEntryNameLabel=Nome da entrada\:
 platform.appwithinminutes.appHomePageEditAppLabel=Editar aplicação
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traduzir aplicação
 platform.appwithinminutes.appHomePageDeleteAppLabel=Remover aplicação
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
@@ -217,6 +217,20 @@ platform.appwithinminutes.appHomePageDeleteAppLabel=Remover aplicação
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 ### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 ### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.newName.label=New Name
+### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+### Missing: appWithinMinutes.renameApp.location.label=New Location
+### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+### Missing: appWithinMinutes.renameApp.parent.label=New Parent
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
+### Missing: appWithinMinutes.renameApp.done=Application renamed
+### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
@@ -246,5 +260,9 @@ platform.appwithinminutes.wizardStep3Name=Apresentação
 platform.appwithinminutes.wizardStep3Title=Personalize a página inicial da sua aplicação
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Personalize a página inicial da sua aplicação.
-</content>
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Nome da Aplicação
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
 </xwikidoc>

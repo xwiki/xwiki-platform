@@ -221,7 +221,7 @@
     ## administration is still combined with the space administration).
     ## TODO: create a proprer 'page administration' and stop adding a right editor in this menu
     #define ($rightsEditor)
-      #if ($doc.name != 'WebHome' || !$hasSpaceAdmin || !$isAdminAppInstalled)
+      #if ($doc.documentReference.name != 'WebHome' || !$hasSpaceAdmin || !$isAdminAppInstalled)
         #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock', $extraAttributes)
       #end
     #end

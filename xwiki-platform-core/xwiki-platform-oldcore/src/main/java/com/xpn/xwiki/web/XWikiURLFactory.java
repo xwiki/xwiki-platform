@@ -21,6 +21,9 @@ package com.xpn.xwiki.web;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
+
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -97,13 +100,98 @@ public interface XWikiURLFactory
     URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context);
 
+    /**
+     * Create a skin URL for the given filename and skin directory.
+     * @param filename the file to reach.
+     * @param skin the skin where the file should be loaded
+     * @param context current context
+     * @return a URL to load the given file.
+     */
     URL createSkinURL(String filename, String skin, XWikiContext context);
 
+    /**
+     * Create an URL for the given filename in the given skin directory.
+     * @param filename the file to reach.
+     * @param skin the skin where the file should be loaded
+     * @param context current context
+     * @param queryParameters the parameters to put at the end of the URL
+     * @return a URL to load the given file with the given query parameters.
+     * @since 11.1RC1
+     */
+    @Unstable
+    URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, Object> queryParameters);
+
+    /**
+     * Create an URL for the filename located in the spaces and with given repository.
+     * @param filename the path of the file to reach.
+     * @param spaces the spaces where the file is located.
+     * @param name the directory where the file is located.
+     * @param context current context.
+     * @return an URL to load the given file.
+     */
     URL createSkinURL(String filename, String spaces, String name, XWikiContext context);
 
+    /**
+     * Create an URL for the filename located in the spaces and with given repository.
+     * @param filename the path of the file to reach.
+     * @param spaces the spaces where the file is located.
+     * @param name the directory where the file is located.
+     * @param context current context.
+     * @param queryParameters parameters to put at the end of the URL
+     * @return an URL to load the given file.
+     * @since 11.1RC1
+     */
+    @Unstable
+    URL createSkinURL(String filename, String spaces, String name, XWikiContext context,
+        Map<String, Object> queryParameters);
+
+    /**
+     * Create an URL for the filename located in the spaces and with given repository.
+     * @param filename the path of the file to reach.
+     * @param spaces the spaces where the file is located.
+     * @param name the directory where the file is located.
+     * @param xwikidb the wiki in which the file is located.
+     * @param context current context.
+     * @return an URL to load the given file.
+     */
     URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context);
 
+    /**
+     * Create an URL for the filename located in the spaces and with given repository.
+     * @param filename the path of the file to reach.
+     * @param spaces the spaces where the file is located.
+     * @param name the directory where the file is located.
+     * @param xwikidb the wiki in which the file is located.
+     * @param context current context.
+     * @param queryParameters parameters to put at the end of the URL.
+     * @return an URL to load the given file.
+     * @since 11.1RC1
+     */
+    @Unstable
+    URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context,
+        Map<String, Object> queryParameters);
+
+    /**
+     * Create an URL for the file resource.
+     * @param filename the path of the file to load.
+     * @param forceSkinAction if true specify the skin directory in the URL.
+     * @param context the current context.
+     * @return an URL to load the given file
+     */
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
+
+    /**
+     * Create an URL for the file resource.
+     * @param filename the path of the file to load.
+     * @param forceSkinAction if true specify the skin directory in the URL.
+     * @param context the current context.
+     * @param queryParameters the parameters to put at the end of the URL.
+     * @return an URL to load the given file
+     * @since 11.1RC1
+     */
+    @Unstable
+    URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
+        Map<String, Object> queryParameters);
 
     /**
      * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If

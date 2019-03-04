@@ -41,8 +41,6 @@ import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceReferenceHandlerManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
-import org.xwiki.resource.resources.ResourcesResourceReference;
-import org.xwiki.resource.skins.SkinsResourceReference;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -116,7 +114,7 @@ public class RoutingFilter implements Filter
         // Note: This step is a performance optimization only as it would also work to go directly at step 4 since there
         // would be no handler found for static resources and thus the Servlet Container would continue processing the
         // content of web.xml and would serve static files using its File Servlet.
-        if (resourceType.equals(ResourcesResourceReference.TYPE) || resourceType.equals(SkinsResourceReference.TYPE)) {
+        if (resourceType.isStatic()) {
             chain.doFilter(request, response);
             return;
         }

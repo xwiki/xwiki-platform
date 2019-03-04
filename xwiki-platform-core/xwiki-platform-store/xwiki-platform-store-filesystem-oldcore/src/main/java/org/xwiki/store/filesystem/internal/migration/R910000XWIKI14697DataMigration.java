@@ -20,12 +20,14 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
+import java.io.File;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.store.filesystem.internal.DefaultAttachmentFileProvider;
+import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -63,7 +65,8 @@ public class R910000XWIKI14697DataMigration extends AbstractXWIKI14697DataMigrat
     @Override
     protected boolean isFile(AttachmentReference attachmentReference)
     {
-        return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName())
-            .getAttachmentContentFile().exists();
+        File attachmentFolder = getAttachmentDir(attachmentReference);
+
+        return new File(attachmentFolder, FileSystemStoreUtils.encode(attachmentReference.getName(), false)).exists();
     }
 }

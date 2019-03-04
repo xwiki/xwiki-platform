@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Aplikacija u nekoliko minuta
 platform.appwithinminutes.description=U nekoliko minuta izradite kolaboracijske mrežne aplikacije temeljene na XWikijevom moćnom sustavu upravljanja strukturiranim podatcima.
 platform.appwithinminutes.createAppButtonLabel=Izradi aplikaciju
 platform.appwithinminutes.appsLiveTableHeading=Aplikacije
-platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Posljednji autor
 platform.appwithinminutes.appsLiveTable.doc.date=Datum ažuriranja
 platform.appwithinminutes.appsLiveTable._actions=Akcije
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Ova aplikacija već postoji. Ako 
 platform.appwithinminutes.appNameEmptyError=Molim unesite ime aplikacije.
 
 ### Wizard Step 2: Application Structure
-appWithinMinutes.classEditor.title=Struktura aplikacije {0}
 platform.appwithinminutes.classEditorPaletteTitle=Paleta polja
 platform.appwithinminutes.classEditorPaletteHint=Povucite i ispustite polja iz palete kako biste izradili formu koja će biti korištena za unos vaših podataka.
 platform.appwithinminutes.classEditorCanvasHint=Povucite polja iz palete te ih ispustite u ovaj okvir.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Identifikator
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Dodaj
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Obriši
 
-appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}
 appWithinMinutes.templateProviderEditor.hint=Aplikacijski zapisi su wiki stranice koje sadrže strukturirane podatke.
 appWithinMinutes.templateProviderEditor.icon.hint=Ikona pridružena aplikacijskom zapisu.
 appWithinMinutes.templateProviderEditor.description.hint=Kratki opis aplikacijskog zapisa.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Slike
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Poseban stupac za prikaz slika pridruženih podatkovnoj stranici
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Poseban stupac za prikaz korisnikovog avatara. Radi samo za tablicu povezanu s klasom XWiki.XWikiUsers.
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Sadržaj koji će biti prikazan na početnoj stranici iznad tablice s podacima aplikacije. Upotrijebite ga za opis aplikacije.
 platform.appwithinminutes.liveTableEditorColumnsHint=Odaberite stupce koje biste željeli uključiti u tablicu koja se prikazuje na početnoj stranici aplikacije.
 platform.appwithinminutes.liveTableEditorSaveComment=Ažuriraj tablicu
@@ -210,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Obriši sve zapise
 platform.appwithinminutes.appHomePageEditAppLabel=Uredi aplikaciju
 platform.appwithinminutes.appHomePageTranslateAppLabel=Prevedi aplikaciju
 platform.appwithinminutes.appHomePageDeleteAppLabel=Obriši aplikaciju
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Aplikacija {0} i SVI njeni zapisi bit će obrisani. Jeste li sigurni da želite nastaviti?
@@ -217,6 +217,20 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=SVI zapisi aplikacije {0}
 platform.appwithinminutes.deleteAppDoesNotExistError=Naznačena aplikacija ne postoji.
 platform.appwithinminutes.deleteAppInvalidAppError=Naznačeno ime nije valjana aplikacija u nekoliko minuta.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Nije naznačeno nikakvo ime aplikacije.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.newName.label=New Name
+### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+### Missing: appWithinMinutes.renameApp.location.label=New Location
+### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+### Missing: appWithinMinutes.renameApp.parent.label=New Parent
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
+### Missing: appWithinMinutes.renameApp.done=Application renamed
+### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
@@ -246,5 +260,9 @@ platform.appwithinminutes.wizardStep3Name=Prezentacija
 platform.appwithinminutes.wizardStep3Title=Prilagodite početnu stranicu vaše aplikacije
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Prilagodite početnu stranicu aplikacije
-</content>
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
+appWithinMinutes.classEditor.title=Struktura aplikacije {0}
+appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}</content>
 </xwikidoc>

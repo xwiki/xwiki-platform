@@ -152,12 +152,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
         transformationContext.setTargetSyntax(this.configuration.getTargetSyntax());
         transformationContext.setId(this.configuration.getTransformationId());
 
-        if (this.configuration.isAuthorReferenceSet()) {
-            transform(block, transformationContext, this.configuration.getAuthorReference(),
-                this.configuration.getSourceReference());
-        } else {
-            transform(block, transformationContext);
-        }
+        transform(block, transformationContext);
 
         // The result is often inserted in a bigger content so we remove the XDOM around it
         if (block instanceof XDOM) {

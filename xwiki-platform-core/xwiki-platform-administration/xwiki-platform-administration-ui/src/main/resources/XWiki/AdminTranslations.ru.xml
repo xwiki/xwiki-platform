@@ -85,7 +85,7 @@ XWiki.XWikiPreferences_colorTheme.hint=Укажите цветовую тему 
 # Editing Sections
 admin.edit=Редактирование
 admin.edit.description=Настройте режим редактирования, редактор WYSIWYG и доступные синтаксисы.
-admin.title=Заголовок
+admin.title=Название
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Запретить пользователям создавать вики-страницы с пустым заголовком.
 XWiki.XWikiPreferences_editor.hint=Выберите тип редактора, который будет использоваться по умолчанию для редактирования содержимого страницы.
 XWiki.XWikiPreferences_editcomment.hint=Разрешить ввод сообщения при создании новой версии страницы.

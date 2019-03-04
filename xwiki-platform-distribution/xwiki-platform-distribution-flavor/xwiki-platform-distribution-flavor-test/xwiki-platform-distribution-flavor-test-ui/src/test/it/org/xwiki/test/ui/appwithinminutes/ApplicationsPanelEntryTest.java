@@ -22,7 +22,6 @@ package org.xwiki.test.ui.appwithinminutes;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +30,8 @@ import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.AdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the applications panel entry. This test needs its own class because it needs to be in a separated space in the
@@ -69,16 +70,21 @@ public class ApplicationsPanelEntryTest extends AbstractTest
     @Test
     public void testApplicationPanelEntry()
     {
-        // Test the icon remains the same between edits
+        String appTitle = "Applications Panel Entry Test";
+
+        // Test the title and the icon remain the same between edits
+        editPage.setTitle(appTitle);
         editPage.setIcon("icon:bell");
         editPage.clickSaveAndView();
+
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit");
-        Assert.assertEquals("icon:bell", editPage.getIcon());
+        assertEquals(appTitle, editPage.getTitle());
+        assertEquals("icon:bell", editPage.getIcon());
 
         ApplicationsPanel panel = ApplicationsPanel.gotoPage();
-        ViewPage page = panel.clickApplication(getTestClassName());
+        ViewPage page = panel.clickApplication(appTitle);
         // Verify we're on the right page!
-        Assert.assertEquals(getTestClassName(), page.getMetaDataValue("space"));
-        Assert.assertEquals(getTestMethodName(), page.getMetaDataValue("page"));
+        assertEquals(getTestClassName(), page.getMetaDataValue("space"));
+        assertEquals(getTestMethodName(), page.getMetaDataValue("page"));
     }
 }

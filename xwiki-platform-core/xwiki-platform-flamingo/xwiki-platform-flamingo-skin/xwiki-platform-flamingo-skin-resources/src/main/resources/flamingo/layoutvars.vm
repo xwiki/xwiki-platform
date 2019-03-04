@@ -4,7 +4,7 @@
 #set($spaceprefs = "")
 #set($globalprefs = false)
 
-#if($doc.name == "WebPreferences" && "$!{request.space}" != "") ## space administration
+#if($doc.documentReference.name == "WebPreferences" && "$!{request.space}" != "") ## space administration
   #set($spaceprefs = $request.space)
   #set($showLeftPanels =  $xwiki.getSpacePreferenceFor("showLeftPanels", $request.space))
   #set($showRightPanels = $xwiki.getSpacePreferenceFor("showRightPanels", $request.space))

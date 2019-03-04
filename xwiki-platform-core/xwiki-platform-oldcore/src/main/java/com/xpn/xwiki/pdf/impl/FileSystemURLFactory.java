@@ -29,7 +29,6 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -142,7 +141,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * @param filename the name of the attachment
      * @param revision an optional attachment version
      * @param context the current request context
-     * @return a {@code file://} URL where the attachment has been stored
+     * @return a {@code file://} URL where the attachment has been stored or null if the attachment wasn't found
      * @throws Exception if the attachment can't be retrieved from the database and stored on the filesystem
      */
     private URL getURL(String wiki, String spaces, String name, String filename, String revision, XWikiContext context)
@@ -156,13 +155,23 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             LOGGER.debug("Temporary PDF export file [{}]", file.toString());
             XWikiDocument doc = context.getWiki().getDocument(new DocumentReference(
                 StringUtils.defaultString(wiki, context.getWikiId()), spaceNames, name), context);
+
             XWikiAttachment attachment = doc.getAttachment(filename);
+            if (attachment == null) {
+                LOGGER.warn("Attachment [{}] doesn't exist in [{}]. Generated content will have invalid content ("
+                    + "empty image or broken link)", filename, doc.getDocumentReference());
+                // By returning null, the generated HTML will have empty IMG SRC or empty A HREF which leads to
+                // good degraded results for the LO office export.
+                return null;
+            }
+
             if (StringUtils.isNotEmpty(revision)) {
                 attachment = attachment.getAttachmentRevision(revision, context);
             }
-            FileOutputStream fos = new FileOutputStream(file);
-            IOUtils.copy(attachment.getContentInputStream(context), fos);
-            fos.close();
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                IOUtils.copy(attachment.getContentInputStream(context), fos);
+            }
             usedFiles.put(key, file);
         }
         return usedFiles.get(key).toURI().toURL();
@@ -218,8 +227,11 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
                 builder.append(SEPARATOR);
             }
             builder.append(URLEncoder.encode(name, XWiki.DEFAULT_ENCODING)).append(SEPARATOR);
-            builder.append(URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING)).append(SEPARATOR);
-            builder.append(URLEncoder.encode(StringUtils.defaultString(revision), XWiki.DEFAULT_ENCODING));
+            builder.append(URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING));
+            if (!StringUtils.isEmpty(revision)) {
+                builder.append(SEPARATOR);
+                builder.append(URLEncoder.encode(revision, XWiki.DEFAULT_ENCODING));
+            }
             return builder.toString();
         } catch (UnsupportedEncodingException e) {
             // This should never happen, UTF-8 is always available
@@ -288,12 +300,11 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     {
         File tempdir = (File) context.get("pdfexportdir");
         String prefix = "pdf";
-        String suffix = "." + FilenameUtils.getExtension(key);
         try {
-            return File.createTempFile(prefix, suffix, tempdir);
+            return File.createTempFile(prefix, null, tempdir);
         } catch (IOException e) {
-            throw new IOException("Failed to create temporary PDF export file with prefix [" + prefix + "], suffix ["
-                + suffix + "] in directory [" + tempdir + "]", e);
+            throw new IOException(String.format("Failed to create temporary file during PDF export, for key [%s], "
+                + "prefix [%s], in directory [%s] (exist: [%s])", key, prefix, tempdir, tempdir.exists()), e);
         }
     }
 }

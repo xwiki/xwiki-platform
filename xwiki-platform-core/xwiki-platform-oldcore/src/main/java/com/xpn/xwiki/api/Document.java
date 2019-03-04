@@ -281,11 +281,13 @@ public class Document extends Api
      *         {@code getDocumentReference().getParent().getName()}.
      * @see #getPageReference()
      * @see #getDocumentReference()
+     * @deprecated since 11.0, use {@link #getDocumentReference()} instead
      */
+    @Deprecated
     public String getName()
-    {
-        return this.doc.getDocumentReference().getName();
-    }
+{
+    return this.doc.getDocumentReference().getName();
+}
 
     /**
      * Return the full local space reference of the Document. For example a document located in sub-space

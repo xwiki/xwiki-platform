@@ -42,6 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -120,6 +121,13 @@ public class DefaultModelBridgeTest
 
         when(documentReferenceFromDocumentXObjects.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
 
+        DocumentReference resolvedType2 = mock(DocumentReference.class);
+        LocalDocumentReference localDocumentReferenceType2 = mock(LocalDocumentReference.class);
+
+        when(resolvedType2.getLocalDocumentReference()).thenReturn(localDocumentReferenceType2);
+        when(this.documentReferenceResolver.resolve(eq("type2"))).thenReturn(resolvedType2);
+
         assertTrue(this.mocker.getComponentUnderTest().checkXObjectPresence(xObjectTypes, document));
+        assertFalse(this.mocker.getComponentUnderTest().checkXObjectPresence(Arrays.asList("type2"), document));
     }
 }

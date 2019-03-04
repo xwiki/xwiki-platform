@@ -40,11 +40,16 @@ import org.xwiki.test.docker.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.junit5.servletEngine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.integration.maven.ArtifactResolver;
+import org.xwiki.test.integration.maven.MavenResolver;
+import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 import com.google.common.primitives.Ints;
+
+import ch.qos.logback.classic.Level;
 
 /**
  * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that peforms the
@@ -88,17 +93,32 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
+        // If the current tests has parents and one of them has the @UITest annotation, it means all containers are
+        // already started and we should not do anything.
+        if (hasParentTestContainingUITestAnnotation(extensionContext)) {
+            return;
+        }
+
         // Note: TestConfiguration is created in evaluateExecutionCondition()à which executes before beforeAll()
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+
+        // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
+        // of debugging information.
+        if (testConfiguration.isDebug()) {
+            DockerTestUtils.setLogbackLoggerLevel("org.testcontainers", Level.DEBUG);
+            DockerTestUtils.setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
+        }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
         // "host.testcontainers.internal" host name.
         Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
 
         // Initialize resolvers.
-        RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration);
-        ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration, repositoryResolver);
-        MavenResolver mavenResolver = new MavenResolver(testConfiguration, artifactResolver, repositoryResolver);
+        RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
+        ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration.isOffline(),
+            testConfiguration.isDebug(), repositoryResolver);
+        MavenResolver mavenResolver =
+            new MavenResolver(testConfiguration.getProfiles(), artifactResolver, repositoryResolver);
 
         // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
@@ -140,7 +160,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext) throws Exception
+    public void beforeEach(ExtensionContext extensionContext)
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
@@ -150,14 +170,14 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
             VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
             saveVNC(extensionContext, vnc);
-            vnc.start();
+            DockerTestUtils.startContainer(vnc);
         }
 
         LOGGER.info("(*) Starting test...");
     }
 
     @Override
-    public void afterEach(ExtensionContext extensionContext) throws Exception
+    public void afterEach(ExtensionContext extensionContext)
     {
         LOGGER.info("(*) Stopping test...");
 
@@ -212,6 +232,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public void afterAll(ExtensionContext extensionContext) throws Exception
     {
+        // If the current tests has parents and one of them has the @UITest annotation, it means the containers should
+        // be stopped by the parent having the annotation.
+        if (hasParentTestContainingUITestAnnotation(extensionContext)) {
+            return;
+        }
+
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
         // Shutdown the test context
@@ -232,25 +258,45 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
     {
-        TestConfiguration testConfiguration = new TestConfiguration(
-            extensionContext.getRequiredTestClass().getAnnotation(UITest.class));
-        // Save the test configuration so that we can access it in afterAll()
-        saveTestConfiguration(extensionContext, testConfiguration);
+        // If the tests has parent tests and one of them has the @UITest annotation then it means all containers
+        // have already been started and thus the servlet engine is supported.
+        if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
+            UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
+            TestConfiguration testConfiguration = new TestConfiguration(uiTest);
+            // Save the test configuration so that we can access it in afterAll()
+            saveTestConfiguration(extensionContext, testConfiguration);
 
-        // Skip the test if the Servlet Engine selected is in the forbidden list
-        if (isServletEngineForbidden(testConfiguration)) {
-            return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
-                testConfiguration.getServletEngine()));
+            // Skip the test if the Servlet Engine selected is in the forbidden list
+            if (isServletEngineForbidden(testConfiguration)) {
+                return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
+                    testConfiguration.getServletEngine()));
+            } else {
+                return ConditionEvaluationResult.enabled(String.format("Servlet Engine [%s] is supported, continuing",
+                    testConfiguration.getServletEngine()));
+            }
         } else {
-            return ConditionEvaluationResult.enabled("Servlet Engine [%s] is supported, continuing");
+            return ConditionEvaluationResult.enabled("Servlet Engine is supported by parent Test class, continuing");
         }
+    }
+
+    private boolean hasParentTestContainingUITestAnnotation(ExtensionContext extensionContext)
+    {
+        boolean hasUITest = false;
+        ExtensionContext current = extensionContext;
+        // Note: the top level context is the JUnitJupiterExtensionContext one and it doesn't contain any test and
+        // thus calling getRequiredTestClass() throws an exception on it, which is why we skip it.
+        while (current.getParent().get().getParent().isPresent() && !hasUITest) {
+            current = current.getParent().get();
+            hasUITest = current.getRequiredTestClass().isAnnotationPresent(UITest.class);
+        }
+        return hasUITest;
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext)
     {
-        BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor();
-        BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start(testConfiguration);
+        BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor(testConfiguration);
+        BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start();
 
         // Store it so that we can retrieve it later on.
         // Note that we don't need to stop it as this is taken care of by TestContainers

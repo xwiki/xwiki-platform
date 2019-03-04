@@ -249,7 +249,7 @@
         #if ($doc.isNew())
           ## Encourage the user to create the current document.
           #set ($parentReference = $doc.documentReference.parent)
-          #if ($doc.name == 'WebHome')
+          #if ($doc.documentReference.name == 'WebHome')
             #set ($parentReference = $parentReference.parent)
           #end
         #else

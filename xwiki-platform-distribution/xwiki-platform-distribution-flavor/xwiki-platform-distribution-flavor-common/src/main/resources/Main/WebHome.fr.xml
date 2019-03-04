@@ -36,7 +36,17 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>{{box cssClass="floatinginfobox"}}
-{{html clean="false"}}&lt;iframe src="https://www.youtube.com/embed/0x_UkBOoLSk" allowfullscreen&gt;&lt;/iframe&gt;{{/html}}
+{{velocity}}
+{{html clean="false"}}
+## Chrome's XSS Auditor blocks the preview action if:
+## * the submitted content has an iframe with an external URL
+## * the preview action displays the submitted iframe
+## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
+## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
+#set ($iframe = 'iframe')
+&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" allowfullscreen&gt;&lt;/$iframe&gt;
+{{/html}}
+{{/velocity}}
 {{/box}}
 
 = Bienvenue sur votre Wiki =

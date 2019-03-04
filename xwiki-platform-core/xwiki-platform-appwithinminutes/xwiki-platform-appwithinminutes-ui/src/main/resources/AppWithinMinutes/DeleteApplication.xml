@@ -75,13 +75,13 @@
 
 #macro (askForDeleteConfirmation $appReference $scope)
   ## Confirmation dialog
-  #set ($appName = $appReference.name)
+  #set ($appTitle = $xwiki.getDocument($appReference).plainTitle)
   #if ($scope == 'entries')
     #set ($confirmationMessage = $services.localization.render(
-      'platform.appwithinminutes.deleteAppEntriesConfirmation', $escapetool.xml($appName)))
+      'platform.appwithinminutes.deleteAppEntriesConfirmation', [$escapetool.xml($appTitle)]))
   #else
     #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppConfirmation',
-      $escapetool.xml($appName)))
+      [$escapetool.xml($appTitle)]))
   #end
   #set ($cancelURL = $doc.getURL())
   #set ($confirmParams = {
@@ -105,6 +105,7 @@
 
 {{velocity}}
 #if ("$!request.appName" != '')
+  #set ($displayDocExtra = false)
   #if ($request.resolve == 'true')
     #set ($appReference = $services.model.resolveSpace($request.appName))
   #else

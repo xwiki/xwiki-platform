@@ -24,7 +24,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -47,6 +46,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.filter.input.InputSource;
@@ -99,7 +100,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 @Component(roles = InternalTemplateManager.class)
 @Singleton
-public class InternalTemplateManager
+public class InternalTemplateManager implements Initializable
 {
     private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 
@@ -108,6 +109,8 @@ public class InternalTemplateManager
      */
     private static final DocumentReference SUPERADMIN_REFERENCE =
         new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
+
+    private static final String TEMPLATE_RESOURCE_SUFFIX = "/templates/";
 
     @Inject
     private Environment environment;
@@ -164,6 +167,8 @@ public class InternalTemplateManager
 
     @Inject
     private Logger logger;
+
+    private String templateRootURL;
 
     private static abstract class AbtractTemplate<T extends TemplateContent, R extends Resource<?>> implements Template
     {
@@ -479,22 +484,44 @@ public class InternalTemplateManager
         }
     }
 
-    private String getResourcePath(String suffixPath, String templateName, boolean testExist)
+    @Override
+    public void initialize() throws InitializationException
     {
-        String templatePath = suffixPath + templateName;
+        getTemplateRootPath();
+    }
 
-        // Prevent inclusion of templates from other directories
-        String normalizedTemplate = URI.create(templatePath).normalize().toString();
-        if (!normalizedTemplate.startsWith(suffixPath)) {
-            this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
-                normalizedTemplate);
+    private String getTemplateRootPath()
+    {
+        if (this.templateRootURL == null) {
+            URL url = this.environment.getResource(TEMPLATE_RESOURCE_SUFFIX);
 
+            if (url != null) {
+                this.templateRootURL = url.toString();
+            }
+        }
+
+        return this.templateRootURL;
+    }
+
+    private String getTemplateResourcePath(String templateName)
+    {
+        String templatePath = TEMPLATE_RESOURCE_SUFFIX + templateName;
+
+        URL templateURL = this.environment.getResource(templatePath);
+
+        // Check if the resource exist
+        if (templateURL == null) {
             return null;
         }
 
-        if (testExist) {
-            // Check if the resource exist
-            if (this.environment.getResource(templatePath) == null) {
+        // Prevent inclusion of templates from other directories
+        String rootTemplate = getTemplateRootPath();
+        if (rootTemplate != null) {
+            String templateURLString = templateURL.toString();
+            if (!templateURLString.startsWith(getTemplateRootPath())) {
+                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
+                    templateURLString);
+
                 return null;
             }
         }
@@ -862,9 +889,9 @@ public class InternalTemplateManager
         return targetSyntax != null ? targetSyntax : Syntax.PLAIN_1_0;
     }
 
-    private EnvironmentTemplate getFileSystemTemplate(String suffixPath, String templateName)
+    private EnvironmentTemplate getFileSystemTemplate(String templateName)
     {
-        String path = getResourcePath(suffixPath, templateName, true);
+        String path = getTemplateResourcePath(templateName);
 
         return path != null
             ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName, this.environment)) : null;
@@ -937,7 +964,7 @@ public class InternalTemplateManager
 
         // Try from /templates/ environment resources
         if (template == null) {
-            template = getFileSystemTemplate("/templates/", templateName);
+            template = getFileSystemTemplate(templateName);
         }
 
         // Try from current Thread classloader

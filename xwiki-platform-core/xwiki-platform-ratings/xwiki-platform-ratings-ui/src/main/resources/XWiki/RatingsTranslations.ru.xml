@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>RatingsTranslations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Ratings</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.ratings=Рейтинги
+admin.ratings.activateratings=Активируйте рейтинги в этой вики
+admin.ratings.activateratingsinfo=Активация рейтингов в этой вики будет отображать визуальный средний рейтинг (составленный из звездочек) в верхнем правом углу каждого документа этой вики (кроме тех, что находятся в пространстве *XWiki*). Авторизованные пользователи смогут оценивать документы, нажимая на звездочки. Альтернативой этому является использование *панели рейтингов*, например, чтобы включить рейтинги только в желаемых местах. Чтобы использовать панель рейтингов, посетите раздел администрирования.
+admin.ratings.resetratings=Сбросить все оценки на этой вики.  Имейте в виду, что эта операция необратима, кроме того, для каждого отката на основе документа. Сброс всех оценок может занять некоторое время, если в вики уже есть большое количество документов, уже оцененных.
+admin.ratings.uninstallratings=Удаление приложения рейтингов приведет к удалению документов, составляющих приложение, но * все голоса по рейтинговому документу будут сохранены *. Если вы переустановите приложение позже, документы начнутся заново с сохраненным средним рейтингом, который они имели до удаления приложения. Наконец, удаление приложения оценок * удалит категорию оценок * из администрации вики.
+admin.ratings.ratingsactivated=Рейтинги активированы
+admin.ratings.ratingsdeactivated=Рейтинги деактивированы
+admin.ratings.illegalrequest=Некорректный запрос
+rating.rate=Оценить!
+rating.yourvote=Ваш голос
+rating.logintorate=Авторизуйтесь для оценки
+rating.novotes=Пока нет оценок</content>
+</xwikidoc>

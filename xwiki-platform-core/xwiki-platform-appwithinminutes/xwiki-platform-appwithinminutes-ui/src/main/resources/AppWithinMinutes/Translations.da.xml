@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Minut-app
 platform.appwithinminutes.description=Skab en fælles anvendelse på få minutter med XWikis avancerede håndtering af datastrukturer (AppWithinMinutes).
 platform.appwithinminutes.createAppButtonLabel=Opret Minut-app
 platform.appwithinminutes.appsLiveTableHeading=Minut-apps
-platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn
+### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Senest ændret af
 platform.appwithinminutes.appsLiveTable.doc.date=Ændringsdato
 platform.appwithinminutes.appsLiveTable._actions=Handlinger
@@ -91,7 +91,6 @@ platform.appwithinminutes.appNameIsUsedWarning=Minut-app findes allerede. Hvis d
 platform.appwithinminutes.appNameEmptyError=Giv Minut-app'en et navn
 
 ### Wizard Step 2: Application Structure
-### Missing: appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Felt-palette
 platform.appwithinminutes.classEditorPaletteHint=Træk og slip felter fra paletten til data feltet.
 platform.appwithinminutes.classEditorCanvasHint=Træk felter fra paletten og slip dem i dette område.
@@ -149,7 +148,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Tilføj
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Fjern
 
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
@@ -188,6 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Billeder
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Særlig kolonne med henvisninger til billeder for funktionen.
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Logo
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Særlig kolonne til at vise brugerlogo (avatar). Virker kun for klasser bundet til XWiki.Xwikiusers
+### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Beskrivelsen indeholder en kort introduktion til hvade Minut-app'en kan og hvilke data den kan arbejde på.
 platform.appwithinminutes.liveTableEditorColumnsHint=Vælg de kolonner du kunne tænke dig at se på Minut-app'ens startside.
 platform.appwithinminutes.liveTableEditorSaveComment=Opdatér Live-tabeller
@@ -210,6 +209,7 @@ platform.appwithinminutes.appHomePageEntryNameLabel=Elementnavn\:
 platform.appwithinminutes.appHomePageEditAppLabel=Ret elementets navn
 platform.appwithinminutes.appHomePageTranslateAppLabel=Oversæt minut-app
 platform.appwithinminutes.appHomePageDeleteAppLabel=Slet anvendelse
+### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
@@ -217,6 +217,20 @@ platform.appwithinminutes.appHomePageDeleteAppLabel=Slet anvendelse
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 ### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 ### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+### Missing: appWithinMinutes.renameApp.newName.label=New Name
+### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+### Missing: appWithinMinutes.renameApp.location.label=New Location
+### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+### Missing: appWithinMinutes.renameApp.parent.label=New Parent
+### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
+### Missing: appWithinMinutes.renameApp.done=Application renamed
+### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
@@ -246,5 +260,9 @@ platform.appwithinminutes.wizardStep3Name=Præsentation
 platform.appwithinminutes.wizardStep3Title=Design din Minut-apps startside
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=Gør startsiden for din Minut-app personlig.
-</content>
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn
+### Missing: appWithinMinutes.classEditor.title={0} Structure
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
 </xwikidoc>

@@ -99,7 +99,7 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     /**
      * @since 10.11.1
-     * @since 11.0RC1
+     * @since 11.0
      */
     public XWikiServletRequestStub(URL requestURL, String contextPath, Map<String, String[]> requestParameters)
     {

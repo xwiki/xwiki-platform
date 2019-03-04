@@ -82,7 +82,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     @Inject
     @Named("macro")
-    private EntityReferenceResolver<String> macoEntityReferenceResolver;
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
@@ -104,7 +104,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     /**
      * A stack of all currently executing include macros with context=new for catching recursive inclusion.
      */
-    private ThreadLocal<Stack<Object>> inclusionsBeingExecuted = new ThreadLocal<Stack<Object>>();
+    private ThreadLocal<Stack<Object>> inclusionsBeingExecuted = new ThreadLocal<>();
 
     /**
      * Default constructor.
@@ -196,7 +196,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         Stack<Object> references = this.inclusionsBeingExecuted.get();
         if (parametersContext == Context.NEW) {
             if (references == null) {
-                references = new Stack<Object>();
+                references = new Stack<>();
                 this.inclusionsBeingExecuted.set(references);
             }
             references.push(includedReference);
@@ -222,7 +222,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             metadata.getMetaData().addMetaData(MetaData.BASE, source);
         }
 
-        return Arrays.<Block>asList(metadata);
+        return Arrays.asList(metadata);
     }
 
     /**
@@ -269,7 +269,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         if (parentMacro.getId().equals("include")) {
             IncludeMacroParameters macroParameters = getParameters(parentMacro.getParameters());
 
-            return completeReference.equals(this.macoEntityReferenceResolver.resolve(macroParameters.getReference(),
+            return completeReference.equals(this.macroEntityReferenceResolver.resolve(macroParameters.getReference(),
                 macroParameters.getType(), parentMacro));
         }
 
@@ -298,6 +298,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 "You must specify a 'reference' parameter pointing to the entity to include.");
         }
 
-        return this.macoEntityReferenceResolver.resolve(reference, parameters.getType(), block);
+        return this.macroEntityReferenceResolver.resolve(reference, parameters.getType(), block);
     }
 }

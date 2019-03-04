@@ -461,31 +461,6 @@ xwiki.plugins=$!xwikiCfgPlugins
 xwiki.plugin.image.cache.capacity=30
 
 #---------------------------------------
-# Activity Stream Plugin
-#
-
-#-# [Since 2.0RC1]
-#-# Activity Stream plugin.
-#-# The Activity Stream plugin stores data in a dedicated table in the database. Each wiki has its own database.
-#-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
-#-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
-#-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
-#-# Moreover, disabling the main store makes impossible for global users to watch pages from subwikis. It is not
-#-# recommended.
-#-#
-#-# Default: 1
-# xwiki.plugin.activitystream.uselocalstore=1
-#-#
-#-# Default: 1
-# xwiki.plugin.activitystream.usemainstore=1
-#-#
-#-# Number of days the events should be kept (0 or any negative value: infinite duration)
-#-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
-#-# delete events older than the configured value.
-#-# Default: 0
-# xwiki.plugin.activitystream.daystokeepevents=0
-
-#---------------------------------------
 # Watchlist Plugin
 #
 

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -152,102 +152,19 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
-<<<<<<< HEAD
                   {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionException",
-                    "package": "org.xwiki.extension.xar",
-                    "classQualifiedName": "org.xwiki.extension.xar.XWikiDocumentMerger",
-                    "classSimpleName": "XWikiDocumentMerger",
-                    "methodName": "merge",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Young API."
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
+                    "new": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({java.util.List.class, org.xwiki.rendering.block.Block.class})",
+                    "justification": "The annotation has been added in box macro but is used in Code Macro. It's not an api breakage."
                   },
                   {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.doc.XWikiDocument org.xwiki.extension.xar.XWikiDocumentMerger::merge(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, org.xwiki.extension.xar.XWikiDocumentMergerConfiguration) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
-                    "package": "org.xwiki.extension.xar",
-                    "classQualifiedName": "org.xwiki.extension.xar.XWikiDocumentMerger",
-                    "classSimpleName": "XWikiDocumentMerger",
-                    "methodName": "merge",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Young API."
-                  },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionException",
-                    "package": "org.xwiki.extension.xar.script",
-                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
-                    "classSimpleName": "XarExtensionScriptService",
-                    "methodName": "getInstalledExtensionDocument",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
-                    "package": "org.xwiki.extension.xar.script",
-                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
-                    "classSimpleName": "XarExtensionScriptService",
-                    "methodName": "getInstalledExtensionDocument",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionException",
-                    "package": "org.xwiki.extension.xar.script",
-                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
-                    "classSimpleName": "XarExtensionScriptService",
-                    "methodName": "getInstalledExtensionDocument",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.ExtensionId) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
-                    "package": "org.xwiki.extension.xar.script",
-                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
-                    "classSimpleName": "XarExtensionScriptService",
-                    "methodName": "getInstalledExtensionDocument",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionException",
-                    "package": "org.xwiki.extension.xar.script",
-                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
-                    "classSimpleName": "XarExtensionScriptService",
-                    "methodName": "getInstalledExtensionDocument",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionExtension",
-                    "new": "method com.xpn.xwiki.api.Document org.xwiki.extension.xar.script.XarExtensionScriptService::getInstalledExtensionDocument(org.xwiki.model.reference.DocumentReference, org.xwiki.extension.xar.internal.repository.XarInstalledExtension) throws org.xwiki.extension.xar.XarExtensionException",
-                    "exception": "org.xwiki.extension.xar.XarExtensionExtension",
-                    "package": "org.xwiki.extension.xar.script",
-                    "classQualifiedName": "org.xwiki.extension.xar.script.XarExtensionScriptService",
-                    "classSimpleName": "XarExtensionScriptService",
-                    "methodName": "getInstalledExtensionDocument",
-                    "elementKind": "method",
-                    "justification": "Fixed a typo. Should not have any impact on scripts"
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.rss.RssMacroParameters",
+                    "new": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.rss.RssMacroParameters",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({java.util.List.class, org.xwiki.rendering.block.Block.class})",
+                    "justification": "The annotation has been added in box macro but is used in RSS Macro. It's not an api breakage."
                   },
                   // Velocity 2.0 upgrade
                   {
@@ -261,7 +178,7 @@
                     "classSimpleName": "XWikiWebappResourceLoader",
                     "fieldName": "log",
                     "elementKind": "field",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {
                     "code": "java.field.visibilityReduced",
@@ -274,7 +191,7 @@
                     "classSimpleName": "XWikiWebappResourceLoader",
                     "fieldName": "paths",
                     "elementKind": "field",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {
                     "code": "java.field.removed",
@@ -284,7 +201,7 @@
                     "classSimpleName": "XWikiWebappResourceLoader",
                     "fieldName": "servletContext",
                     "elementKind": "field",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {
                     "code": "java.field.removed",
@@ -294,7 +211,7 @@
                     "classSimpleName": "XWikiWebappResourceLoader",
                     "fieldName": "templatePaths",
                     "elementKind": "field",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {
                     "code": "java.method.parameterTypeChanged",
@@ -308,7 +225,7 @@
                     "methodName": "commonInit",
                     "parameterIndex": "1",
                     "elementKind": "parameter",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {
                     "code": "java.method.removed",
@@ -318,7 +235,7 @@
                     "classSimpleName": "XWikiWebappResourceLoader",
                     "methodName": "getResourceStream",
                     "elementKind": "method",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {
                     "code": "java.method.parameterTypeChanged",
@@ -332,7 +249,7 @@
                     "methodName": "init",
                     "parameterIndex": "0",
                     "elementKind": "parameter",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {
                     "code": "java.class.noLongerInheritsFromClass",
@@ -343,7 +260,7 @@
                     "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
                     "classSimpleName": "XWikiWebappResourceLoader",
                     "elementKind": "class",
-                    "justification": "Velocuty 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                    "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   }
                 ]
               }

@@ -52,7 +52,7 @@ public class ApplicationCreatePage extends ViewPage
      */
     public static ApplicationCreatePage gotoPage()
     {
-        getUtil().gotoPage("AppWithinMinutes", "CreateApplication");
+        getUtil().gotoPage("AppWithinMinutes", "CreateApplication", "view", "wizard=true");
         return new ApplicationCreatePage();
     }
 

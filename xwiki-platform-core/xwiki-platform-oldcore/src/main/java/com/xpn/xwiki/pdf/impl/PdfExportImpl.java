@@ -135,7 +135,13 @@ public class PdfExportImpl implements PdfExport
         File dir = this.environment.getTemporaryDirectory();
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         try {
-            tempdir.mkdirs();
+            FileUtils.forceMkdir(tempdir);
+        } catch (IOException e) {
+            throw new XWikiException(String.format("Failed to create PDF export temporary directory [%s]",
+                tempdir), e);
+        }
+
+        try {
             context.put("pdfexportdir", tempdir);
             context.put("pdfexport-file-mapping", new HashMap<String, File>());
             boolean useLocalPlaceholders = !Utils.arePlaceholdersEnabled(context);

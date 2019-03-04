@@ -46,7 +46,7 @@
     &lt;div id="allAnnotations"&gt;
     #foreach($ann in $annotationsList)
     &lt;div&gt;  ## anonymous annotation container
-      #displayAnnotation($ann, 'list', $doc.wiki, $doc.space, $doc.name)
+      #displayAnnotation($ann, 'list', $doc.wiki, $doc.space, $doc.documentReference.name)
     &lt;/div&gt;
     #end
     &lt;/div&gt;

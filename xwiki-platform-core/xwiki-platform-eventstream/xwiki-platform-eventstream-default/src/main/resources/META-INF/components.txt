@@ -1,4 +1,5 @@
 org.xwiki.eventstream.internal.DefaultModelBridge
+org.xwiki.eventstream.internal.DefaultRecordableEventConverter
 org.xwiki.eventstream.internal.DefaultUntypedRecordableEventConverter
 org.xwiki.eventstream.internal.EventClassDocumentInitializer
 org.xwiki.eventstream.internal.UntypedEventListener

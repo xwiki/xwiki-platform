@@ -22,6 +22,8 @@ package com.xpn.xwiki.doc;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.text.XWikiToStringBuilder;
 
 public class XWikiLink implements Serializable
 {
@@ -113,5 +115,14 @@ public class XWikiLink implements Serializable
     public int hashCode()
     {
         return ("" + getDocId() + this.link).hashCode();
+    }
+
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("DocId", getDocId())
+                .append("FullName", getFullName())
+                .append("Link", getLink());
+        return builder.toString();
     }
 }

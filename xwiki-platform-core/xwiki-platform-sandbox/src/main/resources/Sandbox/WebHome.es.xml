@@ -91,13 +91,7 @@ Puede crear varios tipos de lista en las páginas de su wiki:
 
 = Tablas =
 
-Puede crear tablas sencillas dentro de sus páginas wiki:
-
-== Tabla sencilla ==
-
-| celda 1 | celda 2 | celda 3
-| celda 4 | celda 5 | celda 6
-| celda 7 | celda 8 | celda 9
+Puede crear tablas dentro de sus páginas wiki:
 
 == Tabla con cabecera en la fila superior ==
 

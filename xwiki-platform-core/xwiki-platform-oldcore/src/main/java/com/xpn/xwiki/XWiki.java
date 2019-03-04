@@ -7056,7 +7056,8 @@ public class XWiki implements EventListener
         // Special treatment for deleted objects
         rolledbackDoc.addXObjectsToRemoveFromVersion(tdoc);
 
-        // now we save the final document..
+        // Prepare the XWikiDocument before save
+        rolledbackDoc.setNew(false);
         rolledbackDoc.setOriginalDocument(tdoc);
         rolledbackDoc.setAuthorReference(context.getUserReference());
         rolledbackDoc.setContentAuthorReference(context.getUserReference());

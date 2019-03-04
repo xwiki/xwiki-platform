@@ -20,229 +20,232 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-distribution</artifactId>
-    <version>11.2-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-distribution-war</artifactId>
-  <name>XWiki Platform - Distribution - War</name>
-  <packaging>war</packaging>
-  <description>The XWiki WAR package. It contains everything needed to run XWiki in production and then choose a flavor.</description>
-  <properties>
-    <!-- Put the name of the distribution which will be displayed in the footer -->
-    <xwiki.extension.name>XWiki</xwiki.extension.name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-distribution</artifactId>
+        <version>11.2-SNAPSHOT</version>
+    </parent>
+    <artifactId>xwiki-platform-distribution-war</artifactId>
+    <name>XWiki Platform - Distribution - War</name>
+    <packaging>war</packaging>
+    <description>The XWiki WAR package. It contains everything needed to run XWiki in production and then choose a
+        flavor.
+    </description>
+    <properties>
+        <!-- Put the name of the distribution which will be displayed in the footer -->
+        <xwiki.extension.name>XWiki</xwiki.extension.name>
 
-    <xwiki.extension.features>${platform.distribution.features}</xwiki.extension.features>
-  </properties>
-  <dependencies>
-   <dependency>
-     <groupId>org.xwiki.platform</groupId>
-     <artifactId>${war.dependencies.artifactId}</artifactId>
-     <version>${project.version}</version>
-     <type>pom</type>
-   </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <!-- Generate XWiki's configuration files -->
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
-        <version>${commons.version}</version>
-        <executions>
-          <execution>
-            <id>xwiki-platform-tool-configuration-resources</id>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Unpack the Skins (they're packaged as zips) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-dependencies</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <!-- Unpack the Flamingo skin -->
-                <artifactItem>
-                  <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                  <outputDirectory>${project.build.directory}/skin</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Generate extension descriptor for each artifact of the WAR -->
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>war</id>
-            <goals>
-              <goal>war</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <webResources>
-            <!-- Include License resources -->
-            <resource>
-              <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
-              <targetPath>META-INF</targetPath>
-            </resource>
-            <!-- Include Configuration files that were generated -->
-            <resource>
-              <directory>${project.build.directory}/maven-shared-archive-resources</directory>
-              <targetPath>WEB-INF</targetPath>
-              <includes>
-                <include>hibernate.cfg.xml</include>
-                <include>xwiki.cfg</include>
-                <include>xwiki.properties</include>
-              </includes>
-            </resource>
-            <!-- Add the skins -->
-            <resource>
-              <directory>${project.build.directory}/skin</directory>
-              <targetPath>skins</targetPath>
-              <filtering>false</filtering>
-            </resource>
-          </webResources>
-          <!-- - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
-                 log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
-               - Exclude legacy modules if the legacy profile is not enabled so that we don't have both aspectified JAR
-                 and non aspectified ones
-               - Exclude STAX API since it's included in Java SE 6
-               - Exclude all XAR files from being placed in WEB-INF/lib. This is done by the WAR plugin which supports
-                 XAR files (not our format, some other format! See https://jira.codehaus.org/browse/MWAR-281). The
-                 reason we have XAR files in our dependencies is because we've added them in order to automatically
-                 bundle all JAR files which are dependencies of XAR modules!
-               - Exclude all META-INF directories not at the top level of the WAR. The Servlet spec mentions that
-                 META-INF needs to be placed at the top and some Servlet Containers such as WildFly check this and
-                 report an error if it's not the case (see https://jira.xwiki.org/browse/XWIKI-15567).
-          -->
-          <packagingExcludes>
-            WEB-INF/lib/commons-logging-*.jar,
-            %regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar],
-            WEB-INF/lib/stax-api-*.jar,
-            WEB-INF/extensions/*.xar,
-            */**/META-INF/**
-          </packagingExcludes>
-        </configuration>
-      </plugin>
-      <!-- Ensure that some modules are not added as dependencies. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-banned-dependencies</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <excludes>
-                    <exclude>org.jmock:*</exclude>
-                    <exclude>junit:*</exclude>
-                    <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
-                  </excludes>
-                  <includes>
-                    <!-- Allow only JUnit and JMock with scope test because -->
-                    <include>org.jmock:*:*:*:test</include>
-                    <include>junit:*:*:*:test</include>
-                  </includes>
-                </bannedDependencies>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Ensure we don't have duplicates in WEB-INF/lib -->
-      <plugin>
-        <groupId>org.basepom.maven</groupId>
-        <artifactId>duplicate-finder-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>war-check-duplicates</id>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  <profiles>
-    <profile>
-      <id>clover</id>
-      <!-- Add the Clover JAR to the WAR so that it's available at runtime. It's needed because instrumented jars in
-           the WAR will call Clover APIs at runtime when they execute. -->
-      <dependencies>
+        <xwiki.extension.features>${platform.distribution.features}</xwiki.extension.features>
+    </properties>
+    <dependencies>
         <dependency>
-          <groupId>org.openclover</groupId>
-          <artifactId>clover</artifactId>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>${war.dependencies.artifactId}</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
         </dependency>
-      </dependencies>
-      <build>
+    </dependencies>
+    <build>
         <plugins>
-          <!-- Skip Duplicate class finder since it's causing duplicate problems with Clovered jars containing dups and
-               we don't need it -->
-          <plugin>
-            <groupId>org.basepom.maven</groupId>
-            <artifactId>duplicate-finder-maven-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.xwiki.commons</groupId>
-            <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
-            <dependencies>
-              <dependency>
-                <groupId>org.openclover</groupId>
-                <artifactId>clover</artifactId>
-                <version>${clover.version}</version>
-              </dependency>
-            </dependencies>
-          </plugin>
+            <!-- Generate XWiki's configuration files -->
+            <plugin>
+                <groupId>org.xwiki.commons</groupId>
+                <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+                <version>${commons.version}</version>
+                <executions>
+                    <execution>
+                        <id>xwiki-platform-tool-configuration-resources</id>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Unpack the Skins (they're packaged as zips) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- Unpack the Flamingo skin -->
+                                <artifactItem>
+                                    <groupId>org.xwiki.platform</groupId>
+                                    <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}/skin</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Generate extension descriptor for each artifact of the WAR -->
+            <plugin>
+                <groupId>org.xwiki.commons</groupId>
+                <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>war</id>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <!-- Include License resources -->
+                        <resource>
+                            <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
+                            <targetPath>META-INF</targetPath>
+                        </resource>
+                        <!-- Include Configuration files that were generated -->
+                        <resource>
+                            <directory>${project.build.directory}/maven-shared-archive-resources</directory>
+                            <targetPath>WEB-INF</targetPath>
+                            <includes>
+                                <include>hibernate.cfg.xml</include>
+                                <include>xwiki.cfg</include>
+                                <include>xwiki.properties</include>
+                            </includes>
+                        </resource>
+                        <!-- Add the skins -->
+                        <resource>
+                            <directory>${project.build.directory}/skin</directory>
+                            <targetPath>skins</targetPath>
+                            <filtering>false</filtering>
+                        </resource>
+                    </webResources>
+                    <!-- - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
+                           log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
+                         - Exclude legacy modules if the legacy profile is not enabled so that we don't have both aspectified JAR
+                           and non aspectified ones
+                         - Exclude STAX API since it's included in Java SE 6
+                         - Exclude all XAR files from being placed in WEB-INF/lib. This is done by the WAR plugin which supports
+                           XAR files (not our format, some other format! See https://jira.codehaus.org/browse/MWAR-281). The
+                           reason we have XAR files in our dependencies is because we've added them in order to automatically
+                           bundle all JAR files which are dependencies of XAR modules!
+                         - Exclude all META-INF directories not at the top level of the WAR. The Servlet spec mentions that
+                           META-INF needs to be placed at the top and some Servlet Containers such as WildFly check this and
+                           report an error if it's not the case (see https://jira.xwiki.org/browse/XWIKI-15567).
+                    -->
+                    <packagingExcludes>
+                        WEB-INF/lib/commons-logging-*.jar,
+                        %regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar],
+                        WEB-INF/lib/stax-api-*.jar,
+                        WEB-INF/extensions/*.xar,
+                        */**/META-INF/**
+                    </packagingExcludes>
+                </configuration>
+            </plugin>
+            <!-- Ensure that some modules are not added as dependencies. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-banned-dependencies</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>org.jmock:*</exclude>
+                                        <exclude>junit:*</exclude>
+                                        <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <!-- Allow only JUnit and JMock with scope test because -->
+                                        <include>org.jmock:*:*:*:test</include>
+                                        <include>junit:*:*:*:test</include>
+                                    </includes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Ensure we don't have duplicates in WEB-INF/lib -->
+            <plugin>
+                <groupId>org.basepom.maven</groupId>
+                <artifactId>duplicate-finder-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>war-check-duplicates</id>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>snapshotModules</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
-          <version>${commons.version}</version>
-          <!-- Avoid mess with legacy profile -->
-          <exclusions>
-            <exclusion>
-              <groupId>org.xwiki.commons</groupId>
-              <artifactId>xwiki-commons-extension-api</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>org.xwiki.commons</groupId>
-              <artifactId>xwiki-commons-extension-repository-maven</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
+    </build>
+    <profiles>
+        <profile>
+            <id>clover</id>
+            <!-- Add the Clover JAR to the WAR so that it's available at runtime. It's needed because instrumented jars in
+                 the WAR will call Clover APIs at runtime when they execute. -->
+            <dependencies>
+                <dependency>
+                    <groupId>org.openclover</groupId>
+                    <artifactId>clover</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <!-- Skip Duplicate class finder since it's causing duplicate problems with Clovered jars containing dups and
+                         we don't need it -->
+                    <plugin>
+                        <groupId>org.basepom.maven</groupId>
+                        <artifactId>duplicate-finder-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.xwiki.commons</groupId>
+                        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.openclover</groupId>
+                                <artifactId>clover</artifactId>
+                                <version>${clover.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>snapshotModules</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.xwiki.commons</groupId>
+                    <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
+                    <version>${commons.version}</version>
+                    <!-- Avoid mess with legacy profile -->
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.xwiki.commons</groupId>
+                            <artifactId>xwiki-commons-extension-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.xwiki.commons</groupId>
+                            <artifactId>xwiki-commons-extension-repository-maven</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

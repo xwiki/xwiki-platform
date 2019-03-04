@@ -426,7 +426,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             {
                 ArrayList<Locale> locales = new ArrayList<Locale>();
                 locales.add(new Locale("*"));
-                locales.add(new Locale("en_US"));
+                locales.add(new Locale("en", "US"));
                 locales.add(new Locale("fr"));
                 locales.add(new Locale("de"));
                 return IteratorUtils.asEnumeration(locales.iterator());
@@ -451,7 +451,45 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // Set the wiki to multilingual mode.
         getConfigurationSource().setProperty("multilingual", "1");
 
-        assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
+        assertEquals("en", this.xwiki.getLanguagePreference(getContext()));
+    }
+
+    public void testLanguageSelectionWithSupportedLanguages() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @SuppressWarnings("unchecked")
+            @Override
+            public Enumeration getLocales()
+            {
+                ArrayList<Locale> locales = new ArrayList<Locale>();
+                locales.add(new Locale("*"));
+                locales.add(new Locale("fr", "FR"));
+                locales.add(new Locale("de"));
+                return IteratorUtils.asEnumeration(locales.iterator());
+            }
+
+            @Override
+            public String getHeader(String s)
+            {
+                if ("language".equals(s)) {
+                    return null;
+                }
+                return "en";
+            }
+
+            @Override
+            public Cookie getCookie(String cookieName)
+            {
+                return null;
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+        getConfigurationSource().setProperty("languages", "en, |fr_FR, |en_US, |fr_CA");
+
+        assertEquals("fr_FR", this.xwiki.getLanguagePreference(getContext()));
     }
 
     /**
@@ -638,6 +676,29 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
     }
 
+    public void testGetLocalePreferenceWithParameterForcingUnset() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public String getParameter(String s)
+            {
+                if ("language".equals(s)) {
+                    return "fr_CA";
+                }
+                return null;
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        // we do not force supported languages
+        getConfigurationSource().setProperty("xwiki.language.forceSupported", "0");
+
+        assertEquals(Locale.CANADA_FRENCH, this.xwiki.getLocalePreference(getContext()));
+    }
+
     public void testGetLocalePreferenceWithParameter() throws Exception
     {
         getContext().setRequest(new XWikiServletRequest(null)
@@ -655,6 +716,29 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // Set the wiki to multilingual mode.
         getConfigurationSource().setProperty("multilingual", "1");
 
+        // only the default language is supported by default
+        assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithParameterWithSupportedLanguages() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public String getParameter(String s)
+            {
+                if ("language".equals(s)) {
+                    return "fr_CA";
+                }
+                return null;
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+        getConfigurationSource().setProperty("languages", "en, |fr_FR, |en_US, |fr_CA");
+
+        // only the default language is supported by default
         assertEquals(Locale.CANADA_FRENCH, this.xwiki.getLocalePreference(getContext()));
     }
 
@@ -678,6 +762,26 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
     }
 
+    public void testGetLocalePreferenceWithCookieForcingUnset() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public Cookie[] getCookies()
+            {
+                return new Cookie[]{ new Cookie("language", "fr_CA") };
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        // we do not force supported languages
+        getConfigurationSource().setProperty("xwiki.language.forceSupported", "0");
+
+        assertEquals(Locale.CANADA_FRENCH, this.xwiki.getLocalePreference(getContext()));
+    }
+
     public void testGetLocalePreferenceWithCookie() throws Exception
     {
         getContext().setRequest(new XWikiServletRequest(null)
@@ -692,7 +796,70 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // Set the wiki to multilingual mode.
         getConfigurationSource().setProperty("multilingual", "1");
 
+        // By default we force only supported languages
+        assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithCookieDefaultNotSet() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public Cookie[] getCookies()
+            {
+                return new Cookie[]{ new Cookie("language", "fr_CA") };
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        // By default we force only supported languages
+        assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithCookieDefaultSet() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public Cookie[] getCookies()
+            {
+                return new Cookie[]{ new Cookie("language", "fr_CA") };
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+        getConfigurationSource().setProperty("languages", "en, |fr_FR, |en_US, |fr_CA");
+
+        // By default we force only supported languages
         assertEquals(Locale.CANADA_FRENCH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithNavigatorLanguagesForcingUnset() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public Enumeration<Locale> getLocales()
+            {
+                ArrayList<Locale> locales = new ArrayList<>();
+                locales.add(new Locale("*"));
+                locales.add(new Locale("en", "US"));
+                locales.add(new Locale("fr"));
+                locales.add(new Locale("de"));
+                return IteratorUtils.asEnumeration(locales.iterator());
+            }
+        });
+
+        // we do not force supported languages
+        getConfigurationSource().setProperty("xwiki.language.forceSupported", "0");
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+
+        assertEquals(Locale.US, this.xwiki.getLocalePreference(getContext()));
     }
 
     public void testGetLocalePreferenceWithNavigatorLanguages() throws Exception
@@ -704,7 +871,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             {
                 ArrayList<Locale> locales = new ArrayList<>();
                 locales.add(new Locale("*"));
-                locales.add(new Locale("en_US"));
+                locales.add(new Locale("en", "US"));
                 locales.add(new Locale("fr"));
                 locales.add(new Locale("de"));
                 return IteratorUtils.asEnumeration(locales.iterator());
@@ -714,7 +881,32 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // Set the wiki to multilingual mode.
         getConfigurationSource().setProperty("multilingual", "1");
 
-        assertEquals(Locale.FRENCH, this.xwiki.getLocalePreference(getContext()));
+        // it's forced to "en" since it's the only supported language by default
+        assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(getContext()));
+    }
+
+    public void testGetLocalePreferenceWithNavigatorLanguagesDefaultSet() throws Exception
+    {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @Override
+            public Enumeration<Locale> getLocales()
+            {
+                ArrayList<Locale> locales = new ArrayList<>();
+                locales.add(new Locale("*"));
+                locales.add(new Locale("en", "US"));
+                locales.add(new Locale("fr"));
+                locales.add(new Locale("de"));
+                return IteratorUtils.asEnumeration(locales.iterator());
+            }
+        });
+
+        // Set the wiki to multilingual mode.
+        getConfigurationSource().setProperty("multilingual", "1");
+        getConfigurationSource().setProperty("languages", "en, |fr_FR, |en_US, |fr_CA");
+
+        // en_US is the first common language between supported and browser supported.
+        assertEquals(Locale.US, this.xwiki.getLocalePreference(getContext()));
     }
 
     public void testGetLocalePreferenceWithNavigatorLanguagesFallback() throws Exception

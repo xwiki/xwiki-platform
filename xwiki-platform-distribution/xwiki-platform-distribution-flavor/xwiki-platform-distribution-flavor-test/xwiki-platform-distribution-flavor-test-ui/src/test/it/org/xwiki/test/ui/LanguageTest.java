@@ -118,7 +118,7 @@ public class LanguageTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146")
     public void testChangeLanguageInMultilingualModeUsingTheLanguageRequestParameter()
     {
-        setLanguageSettings(true, "en");
+        setLanguageSettings(true, "en", Arrays.asList("en", "fr"));
 
         getUtil().gotoPage("Main", "WebHome", "view", "language=fr");
         Assert.assertTrue("Page not in French!", isPageInFrench());
@@ -128,7 +128,7 @@ public class LanguageTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146")
     public void testHeaderCorrectLanguage()
     {
-        setLanguageSettings(true, "en");
+        setLanguageSettings(true, "en", Arrays.asList("en", "fr"));
 
         getUtil().gotoPage("Main", "Test", "view");
         checkLanguageTagsArePresent("en");

@@ -2899,7 +2899,7 @@ public class XWiki implements EventListener
     {
         Locale defaultLocale = this.getDefaultLocale(context);
         Set<Locale> availableLocales = new HashSet<>(this.getAvailableLocales(context));
-        boolean forceSupported = getConfiguration().getProperty("xwiki.language.forceSupported", "0").equals("1");
+        boolean forceSupported = getConfiguration().getProperty("xwiki.language.forceSupported", "1").equals("1");
 
         // First we try to get the language from the XWiki Context. This is the current language
         // being used.

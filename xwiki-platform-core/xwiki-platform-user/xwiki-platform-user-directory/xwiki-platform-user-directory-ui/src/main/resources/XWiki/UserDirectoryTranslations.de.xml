@@ -43,6 +43,5 @@ userdirectory.userScopeFilter.global=Globale Benutzer, welche in diesem Wiki Mit
 platform.userdirectory.customizeNotAllowed=Sie sind nicht berechtigt, dieses Benutzerverzeichnis anzupassen.
 platform.userdirectory.configTitle=Benutzerverzeichnis Konfiguration
 ### Missing: platform.userdirectory.configSheetTitle=User Directory Configuration Sheet
-### Missing: platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.
-</content>
+### Missing: platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.</content>
 </xwikidoc>

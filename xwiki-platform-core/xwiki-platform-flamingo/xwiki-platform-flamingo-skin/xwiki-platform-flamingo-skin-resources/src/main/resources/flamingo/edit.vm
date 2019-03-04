@@ -4,10 +4,12 @@
 ### General wrapper for edit actions
 ###
 ##
+## Check if actually in edit action
 ##
 #if($xcontext.getAction() != 'edit' && $xcontext.getAction() != 'inline')
   $response.sendRedirect($doc.getURL('edit', "editor=$!{request.getParameter('editor')}"))
 #end
+##
 ## Check if edit is forced
 ##
 #set ($session = $request.session)

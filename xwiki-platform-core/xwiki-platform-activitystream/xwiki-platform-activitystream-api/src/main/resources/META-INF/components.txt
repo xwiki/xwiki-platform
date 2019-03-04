@@ -1,5 +1,4 @@
 com.xpn.xwiki.plugin.activitystream.eventstreambridge.BridgeEventStream
-com.xpn.xwiki.plugin.activitystream.internal.ActivityStreamMappingInitializer
 com.xpn.xwiki.plugin.activitystream.internal.DefaultEventStatusManager
 com.xpn.xwiki.plugin.activitystream.eventstreambridge.EventConverter
 com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration

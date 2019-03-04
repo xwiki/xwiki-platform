@@ -37,6 +37,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Mapping needed by the EventStream migrator since Notification is a dependency of the User Directory -->
+    <xwikiDbHbmCommonExtraMappings>eventstream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>

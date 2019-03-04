@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.selenium;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -40,6 +41,12 @@ import static org.junit.Assert.*;
 public class AdministrationTest extends AbstractXWikiTestCase
 {
     private AdministrationMenu administrationMenu = new AdministrationMenu();
+
+    @Before
+    public void setup()
+    {
+        getSelenium().windowMaximize();
+    }
 
     /**
      * Test to see an application page is included only if that application exists

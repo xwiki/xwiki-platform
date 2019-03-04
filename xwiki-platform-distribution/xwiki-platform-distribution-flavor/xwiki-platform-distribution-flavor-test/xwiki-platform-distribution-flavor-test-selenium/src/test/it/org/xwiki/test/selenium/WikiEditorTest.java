@@ -21,6 +21,7 @@ package org.xwiki.test.selenium;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -37,6 +38,12 @@ import static org.junit.Assert.*;
 public class WikiEditorTest extends AbstractXWikiTestCase
 {
     private static final String SYNTAX = "xwiki/2.1";
+
+    @Before
+    public void setup()
+    {
+        getSelenium().windowMaximize();
+    }
 
     @Test
     public void testEmptyLineAndSpaceCharactersBeforeSectionTitleIsNotRemoved()

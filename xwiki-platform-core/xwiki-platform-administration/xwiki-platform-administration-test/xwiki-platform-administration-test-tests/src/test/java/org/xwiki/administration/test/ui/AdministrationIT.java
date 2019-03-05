@@ -71,7 +71,7 @@ public class AdministrationIT extends AbstractTest
                 @Override
                 public void accept(String sectionId)
                 {
-                    assertTrue(String.format("Seection %s is missing.", sectionId),
+                    assertTrue(String.format("Section %s is missing.", sectionId),
                         administrationPage.hasSection(sectionId));
                 }
             });
@@ -99,7 +99,7 @@ public class AdministrationIT extends AbstractTest
                 @Override
                 public void accept(String sectionId)
                 {
-                    assertTrue(String.format("Seection %s is present.", sectionId),
+                    assertTrue(String.format("Section %s is present.", sectionId),
                         administrationPage.hasNotSection(sectionId));
                 }
             });

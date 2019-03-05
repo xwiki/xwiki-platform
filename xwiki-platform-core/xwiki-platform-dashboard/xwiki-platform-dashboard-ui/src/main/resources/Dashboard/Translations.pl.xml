@@ -42,6 +42,5 @@ dashboard.gadgetSelector.title=Wybierz gadżet
 dashboard.gadgetEditor.title=Edytuj gadżet
 dashboard.gadgetEditor.changeGadget.label=Zmień gadżet
 dashboard.gadgetEditor.gadgetTitle.label=Tytuł gadżetu
-dashboard.gadgetEditor.gadgetTitle.hint=Tytuł tego gadżetu pojawia się w górnej części panelu gadżetów.
-</content>
+dashboard.gadgetEditor.gadgetTitle.hint=Tytuł tego gadżetu pojawia się w górnej części panelu gadżetów.</content>
 </xwikidoc>

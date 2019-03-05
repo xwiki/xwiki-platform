@@ -117,6 +117,5 @@ administration.section.export.backupPack.hint=Naznačite hoće li paket biti kor
 admin.other=Ostalo
 admin.other.description=Razna podešenja za ekstenzije.
 administration.section.analytics.status=Status
-administration.section.analytics.status.hint=Odredite je li Google Analytics™ praćenje aktivno ili ne
-</content>
+administration.section.analytics.status.hint=Odredite je li Google Analytics™ praćenje aktivno ili ne</content>
 </xwikidoc>

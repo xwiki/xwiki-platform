@@ -37,8 +37,6 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- Mapping required by the Event Stream API implementation that we're using during tests. -->
-    <xwikiDbHbmCommonExtraMappings>eventstream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>

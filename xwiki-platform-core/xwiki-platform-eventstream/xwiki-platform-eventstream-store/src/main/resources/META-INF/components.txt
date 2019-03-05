@@ -3,6 +3,7 @@ org.xwiki.eventstream.store.internal.DocumentEventRecorder
 org.xwiki.eventstream.store.internal.EventStreamCleaner
 org.xwiki.eventstream.store.internal.EventStreamCleanerJob
 org.xwiki.eventstream.store.internal.EventStreamCleanerJobDocumentInitializer
+org.xwiki.eventstream.store.internal.EventStreamStoreInitializer
 org.xwiki.eventstream.store.internal.LegacyEventConverter
 org.xwiki.eventstream.store.internal.LegacyEventDeleter
 org.xwiki.eventstream.store.internal.LegacyEventLoader

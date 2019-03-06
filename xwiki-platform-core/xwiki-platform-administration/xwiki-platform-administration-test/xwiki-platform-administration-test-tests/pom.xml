@@ -78,10 +78,11 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-  <!-- We currently need to depend on mail-ui in the test because it contains the Mail.SendMailConfigClass. We can not have
-    administration-ui depend on mail-ui, because mail-ui already depends on administration-ui which would create a loop. mail-ui
-    just needs the configurable class stuff from administration-ui, so when that gets refactored out, we can fix the dependency
-    directly in administration-ui and not have anything here specific to mail. -->
+    <!-- We currently need to depend on mail-ui in the test because it contains the Mail.SendMailConfigClass. We can
+         not have administration-ui depend on mail-ui, because mail-ui already depends on administration-ui which would
+         create a loop. mail-ui ust needs the configurable class stuff from administration-ui, so when that gets
+         refactored out, we can fix the dependency directly in administration-ui and not have anything here specific to
+         mail. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-ui</artifactId>

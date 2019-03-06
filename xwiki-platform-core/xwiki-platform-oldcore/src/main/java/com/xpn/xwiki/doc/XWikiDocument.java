@@ -1946,16 +1946,33 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return this.isContentDirty;
     }
 
+    /**
+     * Increment the current document version.
+     * This method will use {@link #getNextVersion(Version, boolean)} to compute the new version.
+     */
     public void incrementVersion()
     {
-        if (this.version == null) {
-            this.version = new Version("1.1");
+        this.version = getNextVersion(this.version, isMinorEdit());
+    }
+
+    /**
+     * This method computes the next version and returns it, but won't change the current version.
+     * In order to change the current version, see {@link #incrementVersion()}.
+     *
+     * @param version the based version from which to compute the next one.
+     * @param minorEdit true means it's a minor edition.
+     * @return the new version computed based on the current one.
+     * @since 11.2RC1
+     */
+    public static Version getNextVersion(Version version, boolean minorEdit)
+    {
+        if (version == null) {
+            return new Version("1.1");
+        }
+        if (minorEdit) {
+            return version.next();
         } else {
-            if (isMinorEdit()) {
-                this.version = this.version.next();
-            } else {
-                this.version = this.version.getBranchPoint().next().newBranch(1);
-            }
+            return version.getBranchPoint().next().newBranch(1);
         }
     }
 

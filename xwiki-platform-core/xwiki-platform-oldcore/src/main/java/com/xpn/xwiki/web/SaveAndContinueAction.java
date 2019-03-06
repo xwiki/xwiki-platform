@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,9 @@ import org.xwiki.csrf.CSRFToken;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+
+import net.sf.json.JSONObject;
 
 /**
  * Action used for saving and returning to the edit page rather than viewing changes.
@@ -96,17 +100,17 @@ public class SaveAndContinueAction extends XWikiAction
         } else {
             SaveAction sa = new SaveAction();
             if (sa.save(context)) {
-                if (isAjaxRequest) {
+                // if it's a 409 we managed the conflict directly inside SaveAction, which explains the return true
+                if (isAjaxRequest && context.getResponse().getStatus() != HttpStatus.SC_CONFLICT) {
                     String errorMessage =
                         localizePlainOrKey("core.editors.saveandcontinue.theDocumentWasNotSaved");
                     // This should not happen. SaveAction.save(context) should normally throw an
                     // exception when failing during save and continue.
                     LOGGER.error("SaveAction.save(context) returned true while using save & continue");
                     writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
-                } else {
+                } else if (context.getResponse().getStatus() != HttpStatus.SC_CONFLICT) {
                     context.put(WRAPPED_ACTION_CONTEXT_KEY, sa);
                 }
-
                 failure = true;
             } else {
                 // Lock back the document
@@ -202,7 +206,20 @@ public class SaveAndContinueAction extends XWikiAction
 
         // If this is an ajax request, no need to redirect.
         if (isAjaxRequest) {
-            context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
+            EditForm form = (EditForm) context.getForm();
+            JSONObject jsonAnswer = new JSONObject();
+            jsonAnswer.element("newVersion",
+                XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit()).toString());
+
+            String jsonAnswerAsString = jsonAnswer.toString();
+            try {
+                context.getResponse().setContentType("application/json");
+                context.getResponse().setContentLength(jsonAnswerAsString.length());
+                context.getResponse().getWriter().print(jsonAnswerAsString);
+                context.getResponse().setStatus(HttpStatus.SC_OK);
+            } catch (IOException e) {
+                throw new XWikiException("Error while sending JSON answer.", e);
+            }
             return false;
         }
 

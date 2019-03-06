@@ -19,14 +19,16 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import javax.script.ScriptContext;
-import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
@@ -41,6 +43,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+
+import net.sf.json.JSONObject;
 
 /**
  * Action used for saving and proceeding to view the saved page.
@@ -185,6 +189,25 @@ public class SaveAction extends PreviewAction
             tdoc.removeXObjects(REDIRECT_CLASS);
         }
 
+        // We only proceed on the check between versions in case of AJAX request, so we currently stay in the edit form
+        // This can be improved later by displaying a nice UI with some merge options in a sync request.
+        // For now we don't want our user to loose their changes.
+        if (Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null) {
+            // TODO The check of the previousVersion should be done at a lower level or with a semaphore since
+            // another job might have saved a different version of the document
+            Version previousVersion = new Version(request.getParameter("previousVersion"));
+
+            // we ensure that nobody edited the document between the moment the user started to edit and now
+            if (!doc.getRCSVersion().equals(previousVersion)) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.element("previousVersion", previousVersion.toString());
+                jsonObject.element("latestVersion", doc.getRCSVersion().toString());
+                this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
+                return true;
+            }
+        }
+
+
         // We get the comment to be used from the document
         // It was read using readFromForm
         xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
@@ -221,6 +244,20 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
+    private void answerJSON(XWikiContext context, int status, JSONObject json) throws XWikiException
+    {
+        try {
+            String jsonAnswerAsString = json.toString();
+            context.getResponse().setContentType("application/json");
+            context.getResponse().setContentLength(jsonAnswerAsString.length());
+            context.getResponse().setStatus(status);
+            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+            context.getResponse().getWriter().print(jsonAnswerAsString);
+        } catch (IOException e) {
+            throw new XWikiException("Error while sending JSON answer.", e);
+        }
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -232,9 +269,14 @@ public class SaveAction extends PreviewAction
         if (save(context)) {
             return true;
         }
+
         // forward to view
         if (Utils.isAjaxRequest(context)) {
-            context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
+            EditForm form = (EditForm) context.getForm();
+            JSONObject jsonAnswer = new JSONObject();
+            jsonAnswer.element("newVersion",
+                XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit()).toString());
+            answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
         } else {
             sendRedirect(context.getResponse(), Utils.getRedirect("view", context));
         }

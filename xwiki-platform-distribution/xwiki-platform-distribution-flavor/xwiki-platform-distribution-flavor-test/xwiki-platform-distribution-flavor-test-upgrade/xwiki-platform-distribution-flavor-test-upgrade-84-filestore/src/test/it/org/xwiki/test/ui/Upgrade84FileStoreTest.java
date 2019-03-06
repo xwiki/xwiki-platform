@@ -41,18 +41,27 @@ public class Upgrade84FileStoreTest extends UpgradeTest
         assertEquals(expected, content);
     }
 
-    @Override
-    protected void postUpdateValidate() throws Exception
+    private void assertAttachments(String wiki) throws IOException
     {
         // Check migrated attachment
-        URL attachmentURL = new URL(getUtil().getBaseBinURL() + "download/Attachments/WebHome/attachment.txt");
+        URL attachmentURL = new URL(getUtil().getBaseBinURL(wiki) + "download/Attachments/WebHome/attachment.txt");
 
         assertURLContent("attachment", attachmentURL);
 
         // Check migrated deleted attachment
         URL deletedAttachmentURL =
-            new URL(getUtil().getBaseBinURL() + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
+            new URL(getUtil().getBaseBinURL(wiki) + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
 
         assertURLContent("deletedattachment", deletedAttachmentURL);
+    }
+
+    @Override
+    protected void postUpdateValidate() throws Exception
+    {
+        // Main wiki
+        assertAttachments(null);
+
+        // wiki1
+        assertAttachments("wiki1");
     }
 }

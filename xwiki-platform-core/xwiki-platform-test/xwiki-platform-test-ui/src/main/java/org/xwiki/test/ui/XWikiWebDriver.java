@@ -82,8 +82,7 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     public WebElement findElementWithoutWaiting(By by)
     {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        removeImplicitWait();
         try {
             return findElement(by);
         } finally {

@@ -992,7 +992,7 @@ public class TestUtils
      */
     public String getBaseBinURL(String wiki)
     {
-        return getBaseURL() + ((StringUtils.isEmpty(wiki) || wiki.equals("xwiki")) ? "bin/" : wiki + '/');
+        return getBaseURL() + ((StringUtils.isEmpty(wiki) || wiki.equals("xwiki")) ? "bin/" : "wiki/" + wiki + '/');
     }
 
     /**

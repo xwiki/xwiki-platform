@@ -99,6 +99,13 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     {
         // Previous wiki store location
         File oldDirectory = this.getPre11WikiDir(wikiId);
+
+        if (!oldDirectory.exists()) {
+            this.logger.info("The wiki [{}] does not have any filesystem store", wikiId);
+
+            return;
+        }
+
         // New wiki store location
         File newDirectory = this.fstools.getWikiDir(wikiId);
 

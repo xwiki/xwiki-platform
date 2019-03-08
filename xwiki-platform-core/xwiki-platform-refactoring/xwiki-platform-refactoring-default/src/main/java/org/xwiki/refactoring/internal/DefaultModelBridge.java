@@ -131,9 +131,6 @@ public class DefaultModelBridge implements ModelBridge
     private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
 
     @Inject
-    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
-
-    @Inject
     private JobProgressManager progressManager;
 
     @Inject
@@ -276,7 +273,8 @@ public class DefaultModelBridge implements ModelBridge
         String previousWikiId = xcontext.getWikiId();
         try {
             xcontext.setWikiId(wikiId);
-            return xcontext.getWiki().getDocument(documentReference, xcontext).getBackLinkedReferences(xcontext);
+
+            return xcontext.getWiki().getStore().loadBacklinks(documentReference, true, xcontext);
         } catch (XWikiException e) {
             this.logger.error("Failed to retrieve the back-links for document [{}] on wiki [{}].", documentReference,
                 wikiId, e);
@@ -494,8 +492,8 @@ public class DefaultModelBridge implements ModelBridge
                 && !canRestoreDeletedDocument(deletedDocument, context.getAuthorReference())) {
                 logger.error("The author [{}] of this script is not allowed to restore document [{}] with ID [{}]",
                     context.getAuthorReference(), deletedDocumentReference, deletedDocumentId);
-            } else if (request.isCheckRights() &&
-                !canRestoreDeletedDocument(deletedDocument, context.getUserReference())) {
+            } else if (request.isCheckRights()
+                && !canRestoreDeletedDocument(deletedDocument, context.getUserReference())) {
                 logger.error("You are not allowed to restore document [{}] with ID [{}]", deletedDocumentReference,
                     deletedDocumentId);
             } else {
@@ -566,12 +564,12 @@ public class DefaultModelBridge implements ModelBridge
         return result;
     }
 
-    protected boolean canPermanentlyDeleteDocument(XWikiDeletedDocument deletedDocument, DocumentReference userReference)
+    protected boolean canPermanentlyDeleteDocument(XWikiDeletedDocument deletedDocument,
+        DocumentReference userReference)
     {
         boolean result = false;
 
         XWikiContext context = this.xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
 
         // Remember the context user.
         DocumentReference currentUserReference = context.getUserReference();

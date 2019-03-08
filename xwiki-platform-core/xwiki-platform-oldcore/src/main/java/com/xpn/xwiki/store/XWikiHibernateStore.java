@@ -2136,9 +2136,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Extract the links.
             Set<XWikiLink> links = new LinkedHashSet<>();
 
+            String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
+
             // Add wiki syntax links.
-            // FIXME: replace with doc.getUniqueWikiLinkedPages(context) when OldRendering is dropped.
-            links.addAll(this.oldRenderingProvider.get().extractLinks(doc, context));
+            Set<String> linkedPages = doc.getUniqueLinkedPages(context);
+            for (String linkedPage : linkedPages) {
+                XWikiLink wikiLink = new XWikiLink();
+
+                wikiLink.setDocId(doc.getId());
+                wikiLink.setFullName(fullName);
+                wikiLink.setLink(linkedPage);
+
+                links.add(wikiLink);
+            }
 
             // Add included pages.
             List<String> includedPages = doc.getIncludedPages(context);
@@ -2146,7 +2156,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 XWikiLink wikiLink = new XWikiLink();
 
                 wikiLink.setDocId(doc.getId());
-                wikiLink.setFullName(this.localEntityReferenceSerializer.serialize(doc.getDocumentReference()));
+                wikiLink.setFullName(fullName);
                 wikiLink.setLink(includedPage);
 
                 links.add(wikiLink);

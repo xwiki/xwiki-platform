@@ -33,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -40,11 +41,13 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -239,6 +242,81 @@ public class DefaultLinkRefactoringTest
 
         assertEquals("X.Y", linkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
+        verifyDocumentSave(document, "Renamed back-links.", false);
+    }
+
+    @Test
+    public void renameImage() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        this.mocker.registerMockComponent(BlockRenderer.class, Syntax.XWIKI_2_1.toIdString());
+
+        // From a terminal document to another terminal document.
+        DocumentReference oldImageTarget = new DocumentReference("wiki", "A", "B");
+        AttachmentReference oldImageTargetAttachment = new AttachmentReference("attachment.txt", oldImageTarget);
+        DocumentReference newImageTarget = new DocumentReference("wiki", "X", "Y");
+        AttachmentReference newImageTargetAttachment = new AttachmentReference("attachment.txt", newImageTarget);
+
+        XDOM xdom = mock(XDOM.class);
+        when(document.getXDOM()).thenReturn(xdom);
+
+        ResourceReference imageReference = new AttachmentResourceReference("A.B@attachment.txt");
+        ImageBlock imageBlock = new ImageBlock(imageReference, false);
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.<Block>asList(imageBlock));
+
+        when(this.resourceReferenceResolver.resolve(imageReference, null, documentReference))
+            .thenReturn(oldImageTargetAttachment);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldImageTargetAttachment))
+            .thenReturn(oldImageTarget);
+
+        when(this.compactEntityReferenceSerializer.serialize(newImageTargetAttachment, documentReference))
+            .thenReturn("X.Y@attachment.txt");
+
+        this.mocker.getComponentUnderTest().renameLinks(documentReference, oldImageTarget, newImageTarget);
+
+        assertEquals("X.Y@attachment.txt", imageBlock.getReference().getReference());
+        assertEquals(ResourceType.ATTACHMENT, imageBlock.getReference().getType());
+        verifyDocumentSave(document, "Renamed back-links.", false);
+    }
+
+    @Test
+    public void renameAttachment() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        this.mocker.registerMockComponent(BlockRenderer.class, Syntax.XWIKI_2_1.toIdString());
+
+        // From a terminal document to another terminal document.
+        DocumentReference oldLinkTarget = new DocumentReference("wiki", "A", "B");
+        AttachmentReference oldLinkTargetAttachment = new AttachmentReference("attachment.txt", oldLinkTarget);
+        DocumentReference newLinkTarget = new DocumentReference("wiki", "X", "Y");
+        AttachmentReference newLinkTargetAttachment = new AttachmentReference("attachment.txt", newLinkTarget);
+
+        XDOM xdom = mock(XDOM.class);
+        when(document.getXDOM()).thenReturn(xdom);
+
+        ResourceReference linkReference = new AttachmentResourceReference("A.B@attachment.txt");
+        LinkBlock linkBlock = new LinkBlock(Collections.<Block>emptyList(), linkReference, false);
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.<Block>asList(linkBlock));
+
+        when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference))
+            .thenReturn(oldLinkTargetAttachment);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTargetAttachment)).thenReturn(oldLinkTarget);
+
+        when(this.compactEntityReferenceSerializer.serialize(newLinkTargetAttachment, documentReference))
+            .thenReturn("X.Y@attachment.txt");
+
+        this.mocker.getComponentUnderTest().renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+
+        assertEquals("X.Y@attachment.txt", linkBlock.getReference().getReference());
+        assertEquals(ResourceType.ATTACHMENT, linkBlock.getReference().getType());
         verifyDocumentSave(document, "Renamed back-links.", false);
     }
 

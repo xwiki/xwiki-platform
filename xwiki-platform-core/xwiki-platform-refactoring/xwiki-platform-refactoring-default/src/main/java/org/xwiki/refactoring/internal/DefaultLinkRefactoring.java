@@ -19,8 +19,11 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,11 +36,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -60,6 +65,9 @@ import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 @Singleton
 public class DefaultLinkRefactoring implements LinkRefactoring
 {
+    private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES = new HashSet<>(
+        Arrays.asList(ResourceType.DOCUMENT, ResourceType.SPACE, ResourceType.PAGE, ResourceType.ATTACHMENT));
+
     @Inject
     private Logger logger;
 
@@ -86,6 +94,9 @@ public class DefaultLinkRefactoring implements LinkRefactoring
 
     @Inject
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
+
+    @Inject
+    private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
 
     @Inject
     private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
@@ -158,11 +169,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
 
         boolean modified = false;
         for (Block block : blocks) {
-            try {
-                modified |= renameLink(block, currentDocumentReference, oldTarget, newTarget);
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
+            modified |= renameLink(block, currentDocumentReference, oldTarget, newTarget);
         }
 
         if (modified) {
@@ -176,7 +183,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
     }
 
     private boolean renameLink(Block block, DocumentReference currentDocumentReference, DocumentReference oldTarget,
-        DocumentReference newTarget) throws IllegalArgumentException
+        DocumentReference newTarget)
     {
         boolean modified = false;
 
@@ -188,44 +195,55 @@ public class DefaultLinkRefactoring implements LinkRefactoring
 
         ResourceType resourceType = resourceReference.getType();
 
-        // TODO: support ATTACHMENT as well.
-        if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
+        if (!SUPPORTED_RESOURCE_TYPES.contains(resourceType)) {
             // We are currently only interested in Document or Space references.
-            throw new IllegalArgumentException();
+            return false;
         }
 
         // Resolve the resource reference.
         EntityReference linkEntityReference =
-            resourceReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
+            this.resourceReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
         // Resolve the document of the reference.
         DocumentReference linkTargetDocumentReference =
-            defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
+            this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference newTargetReference = newTarget;
         ResourceType newResourceType = resourceType;
 
-        // If the link was resolved to a space...
-        if (EntityType.SPACE.equals(linkEntityReference.getType())) {
-            if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(newTarget.getName())) {
-                // If the new document reference is also a space (non-terminal doc), be careful to keep it
-                // serialized as a space still (i.e. without ".WebHome") and not serialize it as a doc by mistake
-                // (i.e. with ".WebHome").
-                newTargetReference = newTarget.getLastSpaceReference();
-            } else {
-                // If the new target is a non-terminal document, we can not use a "space:" resource type to access
-                // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
-                newResourceType = ResourceType.DOCUMENT;
-            }
-        }
-
         // If the link targets the old (renamed) document reference, we must update it.
         if (linkTargetDocumentReference.equals(oldTarget)) {
+            // If the link was resolved to a space...
+            if (EntityType.SPACE.equals(linkEntityReference.getType())) {
+                if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(newTarget.getName())) {
+                    // If the new document reference is also a space (non-terminal doc), be careful to keep it
+                    // serialized as a space still (i.e. without ".WebHome") and not serialize it as a doc by mistake
+                    // (i.e. with ".WebHome").
+                    newTargetReference = newTarget.getLastSpaceReference();
+                } else {
+                    // If the new target is a non-terminal document, we can not use a "space:" resource type to access
+                    // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
+                    newResourceType = ResourceType.DOCUMENT;
+                }
+            }
+
+            // If the link was resolved to a page...
+            if (EntityType.PAGE.equals(linkEntityReference.getType())) {
+                // Be careful to keep it serialized as a page still and not serialize it as a doc by mistake
+                newTargetReference = this.defaultReferencePageReferenceResolver.resolve(newTarget);
+            }
+
+            // If the link was resolved as an attachment
+            if (EntityType.ATTACHMENT.equals(linkEntityReference.getType())) {
+                // Make sure to serialize an attachment reference and not just the document
+                newTargetReference = new AttachmentReference(linkEntityReference.getName(), newTarget);
+            }
+
             modified = true;
             String newReferenceString =
                 this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
 
             // Update the reference in the XDOM.
-            linkedResourceHelper.setResourceReferenceString(block, newReferenceString);
-            linkedResourceHelper.setResourceType(block, newResourceType);
+            this.linkedResourceHelper.setResourceReferenceString(block, newReferenceString);
+            this.linkedResourceHelper.setResourceType(block, newResourceType);
         }
 
         return modified;

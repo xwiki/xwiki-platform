@@ -148,7 +148,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         if (!this.contextComponentManagerProvider.get().hasComponent(BlockRenderer.class,
             document.getSyntax().toIdString())) {
             this.logger.warn(
-                "We can't rename the links from [{}] " + "because there is no renderer available for its syntax [{}].",
+                "We can't rename the links from [{}] because there is no renderer available for its syntax [{}].",
                 currentDocumentReference, document.getSyntax());
             return;
         }

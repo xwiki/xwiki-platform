@@ -789,7 +789,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private <E extends EntityReference> E intern(E reference)
     {
-        EntityReferenceFactory factory =  getEntityReferenceFactory();
+        EntityReferenceFactory factory = getEntityReferenceFactory();
 
         return factory != null ? factory.getReference(reference) : reference;
     }
@@ -2514,7 +2514,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public List<BaseObject> getXObjects(DocumentReference classReference)
     {
-        List<BaseObject> xobjects= null;
+        List<BaseObject> xobjects = null;
 
         if (classReference != null) {
             xobjects = getXObjects().get(classReference);

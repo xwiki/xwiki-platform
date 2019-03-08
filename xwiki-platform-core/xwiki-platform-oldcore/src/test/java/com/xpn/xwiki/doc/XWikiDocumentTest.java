@@ -121,11 +121,13 @@ public class XWikiDocumentTest
     @BeforeEach
     protected void setUp() throws Exception
     {
-        XWikiVersioningStoreInterface mockXWikiVersioningStore = this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);
+        XWikiVersioningStoreInterface mockXWikiVersioningStore =
+            this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);
         this.xWikiStoreInterface = this.componentManager.registerMockComponent(XWikiStoreInterface.class);
         this.velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
         VelocityEngine mockVelocityEngine = this.componentManager.registerMockComponent(VelocityEngine.class);
-        ExtendedRenderingConfiguration extendedRenderingConfiguration = this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
+        ExtendedRenderingConfiguration extendedRenderingConfiguration =
+            this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
 
         when(velocityManager.getVelocityEngine()).thenReturn(mockVelocityEngine);
 
@@ -611,9 +613,8 @@ public class XWikiDocumentTest
         this.translatedDocument.setNew(false);
 
         when(this.xWiki.getLanguagePreference(any())).thenReturn(Locale.FRENCH.toString());
-        when(this.xWiki.getDocument(
-            eq(new DocumentReference(this.translatedDocument.getDocumentReference(),
-                this.translatedDocument.getLocale())),
+        when(this.xWiki.getDocument(eq(
+            new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())),
             any())).thenReturn(this.translatedDocument);
 
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
@@ -713,7 +714,8 @@ public class XWikiDocumentTest
         when(this.xWiki.getDocument(eq(targetReference), any())).thenReturn(targetDocument);
 
         this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
-            Collections.<DocumentReference>emptyList(), Collections.<DocumentReference>emptyList(), this.oldcore.getXWikiContext());
+            Collections.<DocumentReference>emptyList(), Collections.<DocumentReference>emptyList(),
+            this.oldcore.getXWikiContext());
 
         // Test links
         assertEquals("[pageinsamespace]", this.document.getContent());

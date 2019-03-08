@@ -399,8 +399,8 @@ public class DefaultModelBridge implements ModelBridge
                 DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
 
                 // we compute a relative reference for the hierarchical parent
-                String hierarchicalParentSerialized = this.compactEntityReferenceSerializer
-                    .serialize(hierarchicalParent, documentReference);
+                String hierarchicalParentSerialized =
+                    this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference);
                 EntityReference relativeHierarchicalReference = this.relativeStringEntityReferenceResolver
                     .resolve(hierarchicalParentSerialized, EntityType.DOCUMENT);
 

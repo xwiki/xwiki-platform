@@ -60,7 +60,6 @@ import com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,8 +73,8 @@ import static org.mockito.Mockito.when;
 public class DefaultLinkRefactoringTest
 {
     @Rule
-    public MockitoComponentMockingRule<LinkRefactoring> mocker = new MockitoComponentMockingRule<LinkRefactoring>(
-        DefaultLinkRefactoring.class);
+    public MockitoComponentMockingRule<LinkRefactoring> mocker =
+        new MockitoComponentMockingRule<LinkRefactoring>(DefaultLinkRefactoring.class);
 
     private XWikiContext xcontext = mock(XWikiContext.class);
 
@@ -101,9 +100,8 @@ public class DefaultLinkRefactoringTest
         this.compactEntityReferenceSerializer =
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
 
-        Provider<ComponentManager> contextComponentManagerProvider =
-            this.mocker.registerMockComponent(
-                new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        Provider<ComponentManager> contextComponentManagerProvider = this.mocker.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(contextComponentManagerProvider.get()).thenReturn(this.mocker);
     }
 
@@ -132,17 +130,17 @@ public class DefaultLinkRefactoringTest
             .thenReturn(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference)).thenReturn(
-            originalDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
+            .thenReturn(originalDocLinkReference);
         DocumentReference newDocLinkReference = new DocumentReference("C", newReference.getLastSpaceReference());
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null, newReference)).thenReturn(
-            newDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(docLinkReference, null, newReference))
+            .thenReturn(newDocLinkReference);
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki", "Z");
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference)).thenReturn(
-            originalSpaceReference);
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, newReference)).thenReturn(
-            originalSpaceReference);
+        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
+            .thenReturn(originalSpaceReference);
+        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, newReference))
+            .thenReturn(originalSpaceReference);
 
         when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference)).thenReturn("A.C");
 
@@ -182,23 +180,23 @@ public class DefaultLinkRefactoringTest
             .thenReturn(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference)).thenReturn(
-            originalDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
+            .thenReturn(originalDocLinkReference);
         DocumentReference newDocLinkReference = new DocumentReference("C", newReference.getLastSpaceReference());
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null, newReference)).thenReturn(
-            newDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(docLinkReference, null, newReference))
+            .thenReturn(newDocLinkReference);
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki1", "Z");
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference)).thenReturn(
-            originalSpaceReference);
+        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
+            .thenReturn(originalSpaceReference);
         SpaceReference newSpaceReference = new SpaceReference("wiki2", "Z");
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, newReference)).thenReturn(
-            newSpaceReference);
+        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, newReference))
+            .thenReturn(newSpaceReference);
 
-        when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference)).thenReturn(
-            "wiki1:A.C");
-        when(this.compactEntityReferenceSerializer.serialize(originalSpaceReference, newReference)).thenReturn(
-            "wiki1:Z");
+        when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference))
+            .thenReturn("wiki1:A.C");
+        when(this.compactEntityReferenceSerializer.serialize(originalSpaceReference, newReference))
+            .thenReturn("wiki1:Z");
 
         this.mocker.getComponentUnderTest().updateRelativeLinks(oldReference, newReference);
 
@@ -271,15 +269,15 @@ public class DefaultLinkRefactoringTest
             .thenReturn(Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference)).thenReturn(
-            oldLinkTarget);
+        when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference))
+            .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.WebHome");
 
         // Space link
         SpaceReference spaceReference = oldLinkTarget.getLastSpaceReference();
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, documentReference)).thenReturn(
-            spaceReference);
+        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, documentReference))
+            .thenReturn(spaceReference);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
             .thenReturn("X");
@@ -320,15 +318,15 @@ public class DefaultLinkRefactoringTest
             .thenReturn(Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference)).thenReturn(
-            oldLinkTarget);
+        when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference))
+            .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
 
         // Space link
         SpaceReference spaceReference = oldLinkTarget.getLastSpaceReference();
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, documentReference)).thenReturn(
-            spaceReference);
+        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, documentReference))
+            .thenReturn(spaceReference);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
             .thenReturn("X");
@@ -378,8 +376,8 @@ public class DefaultLinkRefactoringTest
 
         ResourceReference macroResourceReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
 
-        when(this.resourceReferenceResolver.resolve(macroResourceReference, null, documentReference)).thenReturn(
-            oldLinkTarget);
+        when(this.resourceReferenceResolver.resolve(macroResourceReference, null, documentReference))
+            .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
 
@@ -418,8 +416,8 @@ public class DefaultLinkRefactoringTest
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
             .thenReturn(Arrays.<Block>asList(includeMacroBlock, documentLinkBlock));
 
-        when(this.resourceReferenceResolver.resolve(resourceReference, null, documentReference)).thenReturn(
-            oldLinkTarget);
+        when(this.resourceReferenceResolver.resolve(resourceReference, null, documentReference))
+            .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
 
@@ -476,7 +474,8 @@ public class DefaultLinkRefactoringTest
             LinkBlock linkBlock = new LinkBlock(Collections.<Block>emptyList(), linkReference, false);
             when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.<Block>asList(linkBlock));
 
-            when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference)).thenReturn(oldLinkTarget);
+            when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference))
+                .thenReturn(oldLinkTarget);
             when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
 
             when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
@@ -485,8 +484,8 @@ public class DefaultLinkRefactoringTest
 
         for (XWikiDocument xWikiDocument : documentsToUpdate) {
             verifyDocumentSave(xWikiDocument, "Renamed back-links.", false);
-            LinkBlock linkBlock = (LinkBlock) xWikiDocument.getXDOM().
-                getBlocks(mock(BlockMatcher.class), Block.Axes.DESCENDANT).get(0);
+            LinkBlock linkBlock =
+                (LinkBlock) xWikiDocument.getXDOM().getBlocks(mock(BlockMatcher.class), Block.Axes.DESCENDANT).get(0);
             assertEquals("X.Y", linkBlock.getReference().getReference());
             assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
         }

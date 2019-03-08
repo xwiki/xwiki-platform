@@ -85,6 +85,8 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
+import net.sf.json.JSONObject;
+
 /**
  * <p>
  * Root class for most XWiki actions. It provides a common framework that allows actions to execute just the specific
@@ -943,5 +945,26 @@ public abstract class XWikiAction extends Action
         }
 
         return false;
+    }
+
+    /**
+     * Answer to a request with a JSON content.
+     * @param context the current context of the request.
+     * @param status the status code to send back.
+     * @param json the JSON to serialize in the content of the answer.
+     * @throws XWikiException in case of error during the serialization of the JSON.
+     */
+    protected void answerJSON(XWikiContext context, int status, JSONObject json) throws XWikiException
+    {
+        try {
+            String jsonAnswerAsString = json.toString();
+            context.getResponse().setContentType("application/json");
+            context.getResponse().setContentLength(jsonAnswerAsString.length());
+            context.getResponse().setStatus(status);
+            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+            context.getResponse().getWriter().print(jsonAnswerAsString);
+        } catch (IOException e) {
+            throw new XWikiException("Error while sending JSON answer.", e);
+        }
     }
 }

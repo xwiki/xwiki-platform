@@ -30,21 +30,38 @@ define(['jquery'], function($) {
     var documentReference = XWiki.Model.resolve(html.data('xwiki-reference'), XWiki.EntityType.DOCUMENT);
     var wikiReference     = documentReference.extractReference(XWiki.EntityType.WIKI);
     var spaceReference    = documentReference.extractReference(XWiki.EntityType.SPACE);
+
     return {
       'documentReference': documentReference,
-       // deprecated, use 'documentReference' instead
+      // deprecated, use 'documentReference' instead
       'document':          XWiki.Model.serialize(documentReference.relativeTo(wikiReference)),
-       // deprecated, use 'documentReference' instead
+      // deprecated, use 'documentReference' instead
       'wiki':              wikiReference.getName(),
-       // deprecated, use 'documentReference' instead
+      // deprecated, use 'documentReference' instead
       'space':             XWiki.Model.serialize(spaceReference.relativeTo(wikiReference)),
-       // deprecated, use 'documentReference' instead
+      // deprecated, use 'documentReference' instead
       'page':              documentReference.getName(),
       'version':           html.data('xwiki-version'),
       'restURL':           html.data('xwiki-rest-url'),
       'form_token':        html.data('xwiki-form-token'),
       // Since 10.4RC1
-      'userReference':     XWiki.Model.resolve(html.data('xwiki-user-reference'), XWiki.EntityType.DOCUMENT)
+      'userReference':     XWiki.Model.resolve(html.data('xwiki-user-reference'), XWiki.EntityType.DOCUMENT),
+      // Since 11.2RC1
+      'bumpVersion': function (isMinor) {
+        var version = html.data('xwiki-version');
+        if (isMinor) {
+          version += 0.1;
+        } else {
+          version += 1;
+        }
+
+        html.data("xwiki-version", version);
+        document.fire('xwiki:document:changeVersion', {'version': version});
+      },
+      'setVersion': function (version) {
+        html.data("xwiki-version", version);
+        document.fire('xwiki:document:changeVersion', {'version': version});
+      }
     };
   }
   // Case 2: meta information are stored in deprecated <meta> tags

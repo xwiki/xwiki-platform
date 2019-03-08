@@ -210,16 +210,7 @@ public class SaveAndContinueAction extends XWikiAction
             JSONObject jsonAnswer = new JSONObject();
             jsonAnswer.element("newVersion",
                 XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit()).toString());
-
-            String jsonAnswerAsString = jsonAnswer.toString();
-            try {
-                context.getResponse().setContentType("application/json");
-                context.getResponse().setContentLength(jsonAnswerAsString.length());
-                context.getResponse().getWriter().print(jsonAnswerAsString);
-                context.getResponse().setStatus(HttpStatus.SC_OK);
-            } catch (IOException e) {
-                throw new XWikiException("Error while sending JSON answer.", e);
-            }
+            answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
             return false;
         }
 

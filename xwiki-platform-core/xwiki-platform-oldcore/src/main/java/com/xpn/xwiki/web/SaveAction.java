@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +27,8 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.suigeneris.jrcs.diff.DifferentiationFailedException;
+import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
@@ -41,8 +42,10 @@ import org.xwiki.script.service.ScriptService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.objects.ObjectDiff;
 
 import net.sf.json.JSONObject;
 
@@ -59,6 +62,8 @@ public class SaveAction extends PreviewAction
     public static final String ACTION_NAME = "save";
 
     protected static final String ASYNC_PARAM = "async";
+
+    private DocumentRevisionProvider documentRevisionProvider;
 
     /**
      * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
@@ -193,16 +198,7 @@ public class SaveAction extends PreviewAction
         // This can be improved later by displaying a nice UI with some merge options in a sync request.
         // For now we don't want our user to loose their changes.
         if (Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null) {
-            // TODO The check of the previousVersion should be done at a lower level or with a semaphore since
-            // another job might have saved a different version of the document
-            Version previousVersion = new Version(request.getParameter("previousVersion"));
-
-            // we ensure that nobody edited the document between the moment the user started to edit and now
-            if (!doc.getRCSVersion().equals(previousVersion)) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.element("previousVersion", previousVersion.toString());
-                jsonObject.element("latestVersion", doc.getRCSVersion().toString());
-                this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
+            if (isConflictingWithVersion(context, tdoc)) {
                 return true;
             }
         }
@@ -244,18 +240,59 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
-    private void answerJSON(XWikiContext context, int status, JSONObject json) throws XWikiException
+    private DocumentRevisionProvider getDocumentRevisionProvider()
     {
-        try {
-            String jsonAnswerAsString = json.toString();
-            context.getResponse().setContentType("application/json");
-            context.getResponse().setContentLength(jsonAnswerAsString.length());
-            context.getResponse().setStatus(status);
-            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
-            context.getResponse().getWriter().print(jsonAnswerAsString);
-        } catch (IOException e) {
-            throw new XWikiException("Error while sending JSON answer.", e);
+        if (this.documentRevisionProvider == null) {
+            this.documentRevisionProvider = Utils.getComponent(DocumentRevisionProvider.class);
         }
+
+        return this.documentRevisionProvider;
+    }
+
+    /**
+     * Check if the version of the document being saved is conflicting with another version.
+     * This check is done by getting the "previousVersion" parameter from the request and comparing it with
+     * latest version of the document. If the current version of the document is not the same as the previous one,
+     * a diff is computed on the document content: a conflict is detected only if the contents are different.
+     * @param context the current context of the request.
+     * @return true in case of conflict. If it's true, the answer is immediately sent to the client.
+     */
+    private boolean isConflictingWithVersion(XWikiContext context, XWikiDocument newDoc) throws XWikiException
+    {
+        XWikiRequest request = context.getRequest();
+        XWikiDocument doc = context.getDoc();
+        // TODO The check of the previousVersion should be done at a lower level or with a semaphore since
+        // another job might have saved a different version of the document
+        Version previousVersion = new Version(request.getParameter("previousVersion"));
+        Version latestVersion = doc.getRCSVersion();
+
+        // we ensure that nobody edited the document between the moment the user started to edit and now
+        if (latestVersion.isGreaterThan(previousVersion)) {
+            try {
+                // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
+                // to save the current changes.
+                List<Delta> contentDiff = doc.getContentDiff(previousVersion.toString(), latestVersion.toString(),
+                    context);
+
+                // we also need to check the object diff, to be sure there's no conflict with the inline form.
+                List<List<ObjectDiff>> objectDiff =
+                    doc.getObjectDiff(previousVersion.toString(), latestVersion.toString(),
+                        context);
+                if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
+                    return false;
+                } else {
+                    // TODO: Improve it to return the diff between the current version and the latest recorder
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.element("previousVersion", request.getParameter("previousVersion"));
+                    jsonObject.element("latestVersion", latestVersion.toString());
+                    this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
+                    return true;
+                }
+            } catch (DifferentiationFailedException e) {
+                throw new XWikiException("Error while loading the diff", e);
+            }
+        }
+        return false;
     }
 
     @Override

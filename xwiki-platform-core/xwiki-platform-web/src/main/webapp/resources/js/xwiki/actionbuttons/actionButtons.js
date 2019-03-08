@@ -26,9 +26,17 @@ var XWiki = (function(XWiki) {
   var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
   var currentVersion;
+
   require(['xwiki-meta'], function (xm) {
     currentVersion = xm.version;
   });
+
+  var getCurrentVersion = function (event) {
+    currentVersion = event.memo.version;
+  };
+
+  // in object editor the version is updated when an object is added.
+  document.observe('xwiki:document:changeVersion', getCurrentVersion);
 
   actionButtons.EditActions = Class.create({
     initialize : function() {
@@ -283,7 +291,20 @@ var XWiki = (function(XWiki) {
       // Save & View with no template specified needs no special handling.
       // Same for Save & Continue with no template specified in preview mode.
       if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
-        window.location.href=XWiki.currentDocument.getURL('view');
+        // Disable the form while waiting for the save&view operation to finish.
+        this.form.disable();
+        // prevent the page to display a warning for leaving page.
+        if (window.CKEDITOR) {
+          try {
+            CKEDITOR.instances.content.resetDirty();
+          } catch (e) {}
+        }
+        // we are on preview mode, we need to go back to the editor.
+        if ($('backtoedit') && isContinue) {
+          window.location.href=$('backtoedit').readAttribute('action');
+        } else {
+          window.location.href=XWiki.currentDocument.getURL('view');
+        }
       }
 
       if (isCreateFromTemplate) {
@@ -297,7 +318,10 @@ var XWiki = (function(XWiki) {
         this.savingBox.replace(this.savedBox);
       }
 
-      currentVersion = response.responseJSON.newVersion;
+      // update the version
+      require(['xwiki-meta'], function (xm) {
+        xm.setVersion(response.responseJSON.newVersion);
+      });
 
       // Announce that the document has been saved
       // TODO: We should send the new version as a memo field
@@ -379,11 +403,15 @@ var XWiki = (function(XWiki) {
       } else {
         displayConflictModal();
       }
-      this.form.disable();
+
       // CkEditor tries to block the user from leaving the page with unsaved content.
       // Our save mechanism doesn't update the flag about unsaved content, so we have
       // to do it manually
-      if (CKEDITOR) {
+      if ($$('.CodeMirror')[0]) {
+        try {
+          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', true);
+        } catch (e) {}
+      } else if (window.CKEDITOR) {
         try {
 
           // FIXME: This still allows to switch CKEditor from source mode to WYSIWYG and back
@@ -392,7 +420,7 @@ var XWiki = (function(XWiki) {
           CKEDITOR.instances.content.setReadOnly();
         } catch (e) {}
       }
-
+      this.form.disable();
       // Announce that a document save attempt has failed
       document.fire("xwiki:document:saveFailed", {'response' : response});
     },

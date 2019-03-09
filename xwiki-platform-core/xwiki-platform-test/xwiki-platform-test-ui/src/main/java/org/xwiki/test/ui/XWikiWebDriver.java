@@ -92,20 +92,6 @@ public class XWikiWebDriver extends RemoteWebDriver
     }
 
     /**
-     * Remove the driver implicit wait when we are using our own wait.
-     * The method {@link #setDriverImplicitWait()} should be called afterwards to set it back.
-     */
-    public void removeImplicitWait()
-    {
-        // We're doing our own wait so we should remove the implicit wait.
-        // However some weird bug might happen if we put a 0 value when using it in waitUntilCondition
-        // like we do in waitUntilPageIsReloaded. This might be related to interaction between the waits.
-        // So instead of putting 0, we indicate 1 milliseconds of wait here to avoid those bugs.
-        // This should be fixed when we understand better what is causing those interaction bugs.
-        manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
-    }
-
-    /**
      * Same as {@link #findElementWithoutWaiting(By)} but don't scroll to make the element visible. Useful for example
      * whenverifying that the page has finished loading (and thus there's no element visible and we cannot scroll to
      * it).
@@ -115,7 +101,10 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public WebElement findElementWithoutWaitingWithoutScrolling(By by)
     {
-        removeImplicitWait();
+        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
+        // Trying to use another unit in case there is a conflict when calling implicitlyWait both here
+        // and in waitUntilCondition.
+        manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
         try {
             return findElementWithoutScrolling(by);
         } finally {
@@ -125,7 +114,8 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     public List<WebElement> findElementsWithoutWaiting(By by)
     {
-        removeImplicitWait();
+        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
+        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         try {
             return findElements(by);
         } finally {
@@ -135,7 +125,8 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     public WebElement findElementWithoutWaiting(WebElement element, By by)
     {
-        removeImplicitWait();
+        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
+        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         try {
             return element.findElement(by);
         } finally {
@@ -145,7 +136,8 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     public List<WebElement> findElementsWithoutWaiting(WebElement element, By by)
     {
-        removeImplicitWait();
+        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
+        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         try {
             return element.findElements(by);
         } finally {
@@ -220,7 +212,8 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     public <T> void waitUntilCondition(ExpectedCondition<T> condition)
     {
-        removeImplicitWait();
+        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
+        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         Wait<WebDriver> wait = new WebDriverWait(this, getTimeout());
         try {
             // Handle both Selenium 2 and Selenium 3

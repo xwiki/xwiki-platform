@@ -321,14 +321,13 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = resource.loader = xwiki
 #-#   velocity.properties = xwiki.resource.loader.class = org.xwiki.velocity.XWikiWebappResourceLoader
 #-#   velocity.properties = velocimacro.library = "/templates/macros.vm"
-#-#   velocity.properties = velocimacro.messages.on = false
 #-#   velocity.properties = velocimacro.max_depth = 100
 #-#   velocity.properties = resource.manager.log_when_found = false
 #-#   velocity.properties = velocimacro.inline.local_scope = true
 #-#   velocity.properties = velocimacro.inline.replace_global = true
 #-#   velocity.properties = directive.if.empty_check = false
 #-#   velocity.properties = parser.space_gobbling = bc
-#-#   velocity.properties = parserdash = true
+#-#   velocity.properties = parser.allow_hyphen_in_identifiers = true
 #-#   velocity.properties = velocimacro.arguments.preserve_literals = true
 #-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 

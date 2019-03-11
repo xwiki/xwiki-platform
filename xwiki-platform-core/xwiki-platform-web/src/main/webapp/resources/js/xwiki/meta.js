@@ -47,20 +47,25 @@ define(['jquery'], function($) {
       // Since 10.4RC1
       'userReference':     XWiki.Model.resolve(html.data('xwiki-user-reference'), XWiki.EntityType.DOCUMENT),
       // Since 11.2RC1
+      'isNew': html.data('xwiki-isnew'),
       'bumpVersion': function (isMinor) {
         var version = html.data('xwiki-version');
-        if (isMinor) {
-          version += 0.1;
-        } else {
-          version += 1;
+        if (typeof version === "number") {
+          version = version.toString();
         }
-
+        var parts = version.split('\.');
+        if (isMinor) {
+          parts[1] = parseInt(parts[1]) + 1;
+        } else {
+          parts[0] = parseInt(parts[0]) + 1;
+        }
+        version = parts[0] + "." + parts[1];
         html.data("xwiki-version", version);
-        document.fire('xwiki:document:changeVersion', {'version': version});
+        document.fire('xwiki:document:changeVersion', {'version': version, 'documentReference': documentReference});
       },
       'setVersion': function (version) {
         html.data("xwiki-version", version);
-        document.fire('xwiki:document:changeVersion', {'version': version});
+        document.fire('xwiki:document:changeVersion', {'version': version, 'documentReference': documentReference});
       }
     };
   }

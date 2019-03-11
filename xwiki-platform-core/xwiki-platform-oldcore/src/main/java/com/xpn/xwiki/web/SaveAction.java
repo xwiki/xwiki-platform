@@ -27,6 +27,7 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
@@ -261,33 +262,52 @@ public class SaveAction extends PreviewAction
     {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
+
+        // the document is new we don't have to check the version date or anything
+        if ("true".equals(request.getParameter("isNew")) && doc.isNew()) {
+            return false;
+        }
+
         // TODO The check of the previousVersion should be done at a lower level or with a semaphore since
         // another job might have saved a different version of the document
         Version previousVersion = new Version(request.getParameter("previousVersion"));
         Version latestVersion = doc.getRCSVersion();
 
-        // we ensure that nobody edited the document between the moment the user started to edit and now
-        if (latestVersion.isGreaterThan(previousVersion)) {
-            try {
-                // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
-                // to save the current changes.
-                List<Delta> contentDiff = doc.getContentDiff(previousVersion.toString(), latestVersion.toString(),
-                    context);
+        DateTime editingVersionDate = new DateTime(request.getParameter("editingVersionDate"));
+        DateTime latestVersionDate = new DateTime(doc.getDate());
 
-                // we also need to check the object diff, to be sure there's no conflict with the inline form.
-                List<List<ObjectDiff>> objectDiff =
-                    doc.getObjectDiff(previousVersion.toString(), latestVersion.toString(),
+        // we ensure that nobody edited the document between the moment the user started to edit and now
+        if (!latestVersion.equals(previousVersion) || latestVersionDate.isAfter(editingVersionDate)) {
+            try {
+                XWikiDocument previousDoc = getDocumentRevisionProvider().getRevision(doc, previousVersion.toString());
+
+                // if doc is new and we're here: it's a conflict, we can skip the diff check
+                // we also check that the previousDoc revision exists to avoid an exception if it has been deleted
+                if (!doc.isNew() && previousDoc != null) {
+                    // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
+                    // to save the current changes.
+                    List<Delta> contentDiff = doc.getContentDiff(previousVersion.toString(), latestVersion.toString(),
                         context);
-                if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
-                    return false;
-                } else {
-                    // TODO: Improve it to return the diff between the current version and the latest recorder
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.element("previousVersion", request.getParameter("previousVersion"));
-                    jsonObject.element("latestVersion", latestVersion.toString());
-                    this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
-                    return true;
+
+                    // we also need to check the object diff, to be sure there's no conflict with the inline form.
+                    List<List<ObjectDiff>> objectDiff =
+                        doc.getObjectDiff(previousVersion.toString(), latestVersion.toString(),
+                            context);
+                    if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
+                        return false;
+                    }
                 }
+
+                // if the revision has been deleted or if the content/object diff is not empty
+                // we have a conflict.
+                // TODO: Improve it to return the diff between the current version and the latest recorder
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.element("previousVersion", previousVersion.toString());
+                jsonObject.element("previousVersionDate", editingVersionDate.toString());
+                jsonObject.element("latestVersion", latestVersion.toString());
+                jsonObject.element("latestVersionDate", latestVersionDate.toString());
+                this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
+                return true;
             } catch (DifferentiationFailedException e) {
                 throw new XWikiException("Error while loading the diff", e);
             }
@@ -311,8 +331,14 @@ public class SaveAction extends PreviewAction
         if (Utils.isAjaxRequest(context)) {
             EditForm form = (EditForm) context.getForm();
             JSONObject jsonAnswer = new JSONObject();
-            jsonAnswer.element("newVersion",
-                XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit()).toString());
+            Version newVersion;
+
+            if (context.getDoc().isNew()) {
+                newVersion = context.getDoc().getRCSVersion();
+            } else {
+                newVersion = XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit());
+            }
+            jsonAnswer.element("newVersion", newVersion.toString());
             answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
         } else {
             sendRedirect(context.getResponse(), Utils.getRedirect("view", context));

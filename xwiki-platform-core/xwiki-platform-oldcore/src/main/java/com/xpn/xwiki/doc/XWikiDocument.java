@@ -6323,6 +6323,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
         XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
+        if (fromDoc == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
+                String.format("The revision [%s] cannot be found in [%s] for making diff.", fromRev,
+                    this.getDocumentReference()));
+        }
+        if (toRev == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
+                String.format("The revision [%s] cannot be found in [%s] for making diff.", toRev,
+                    this.getDocumentReference()));
+        }
         return getContentDiff(fromDoc, toDoc, context);
     }
 

@@ -27,6 +27,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.csrf.CSRFToken;
 
 import com.xpn.xwiki.XWikiContext;
@@ -208,8 +209,14 @@ public class SaveAndContinueAction extends XWikiAction
         if (isAjaxRequest) {
             EditForm form = (EditForm) context.getForm();
             JSONObject jsonAnswer = new JSONObject();
-            jsonAnswer.element("newVersion",
-                XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit()).toString());
+            Version newVersion;
+
+            if (context.getDoc().isNew()) {
+                newVersion = context.getDoc().getRCSVersion();
+            } else {
+                newVersion = XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit());
+            }
+            jsonAnswer.element("newVersion", newVersion.toString());
             answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
             return false;
         }

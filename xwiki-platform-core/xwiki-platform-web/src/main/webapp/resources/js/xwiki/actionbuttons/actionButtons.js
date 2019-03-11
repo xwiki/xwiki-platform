@@ -25,14 +25,22 @@ var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
   var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
-  var currentVersion;
+  // we need to handle the creation of document
+  var currentDocument, currentVersion, isNew;
+  var editingVersionDate = new Date();
 
   require(['xwiki-meta'], function (xm) {
+    currentDocument = xm.documentReference;
     currentVersion = xm.version;
+    isNew = xm.isNew;
   });
 
   var getCurrentVersion = function (event) {
-    currentVersion = event.memo.version;
+    if (currentDocument == event.memo.documentReference) {
+      currentVersion = event.memo.version;
+      editingVersionDate = new Date();
+      isNew = "false";
+    }
   };
 
   // in object editor the version is updated when an object is added.
@@ -212,12 +220,26 @@ var XWiki = (function(XWiki) {
 
       if ($('previousVersion')) {
         $('previousVersion').setValue(currentVersion);
+        $('editingVersionDate').setValue(editingVersionDate.toISOString());
+        $('isNew').setValue(isNew);
       } else {
         this.form.insert(new Element("input", {
           type: "hidden",
           name: "previousVersion",
           id: "previousVersion",
           value: currentVersion
+        }));
+        this.form.insert(new Element("input", {
+          type: "hidden",
+          name: "editingVersionDate",
+          id: "editingVersionDate",
+          value: editingVersionDate.toISOString()
+        }));
+        this.form.insert(new Element("input", {
+          type: "hidden",
+          name: "isNew",
+          id: "isNew",
+          value: isNew.toString()
         }));
       }
 
@@ -334,7 +356,7 @@ var XWiki = (function(XWiki) {
       this.savedBox.hide();
       this.failedBox.hide();
 
-      var displayConflictModal = function (oldVersion, latestVersion) {
+      var displayConflictModal = function (jsonAnswer) {
         XWiki.widgets.EditModalPopup = Class.create(XWiki.widgets.ModalPopup, {
           /** Default parameters can be added to the custom class. */
           defaultInteractionParameters : {},
@@ -364,19 +386,24 @@ var XWiki = (function(XWiki) {
 
             content.insert("$services.localization.render('core.editors.save.conflictversion.rollbackmessage')");
 
-            if (oldVersion && latestVersion) {
-              content.insert(new Element('br'));
-              content.insert(new Element('br'));
-              content.insert("$services.localization.render('core.editors.save.conflictversion.previousVersion') " + oldVersion);
-              content.insert(new Element('br'));
-              content.insert("$services.localization.render('core.editors.save.conflictversion.latestVersion') " + latestVersion);
-              content.insert(new Element('br'));
-              content.insert(new Element('br'));
+            content.insert(new Element('br'));
+            content.insert(new Element('br'));
+            content.insert("$services.localization.render('core.editors.save.conflictversion.previousVersion')");
+            content.insert(" " + jsonAnswer.previousVersion);
+            content.insert(" (" + new Date(jsonAnswer.previousVersionDate).toLocaleString() + ")");
+            content.insert(new Element('br'));
+            content.insert("$services.localization.render('core.editors.save.conflictversion.latestVersion')");
+            content.insert(" " + jsonAnswer.latestVersion);
+            content.insert(" (" + new Date(jsonAnswer.latestVersionDate).toLocaleString() + ")");
+            content.insert(new Element('br'));
+            content.insert(new Element('br'));
 
+            // versions are different so we can output a link for a diff
+            if (jsonAnswer.previousVersion < jsonAnswer.latestVersion) {
               var docVariant = XWiki.docvariant;
               var diffURL = XWiki.currentDocument.getURL('view', "viewer=changes&rev1=__rev1__&rev2=__rev2__&" + docVariant)
-                .replace('__rev1__', oldVersion)
-                .replace('__rev2__', latestVersion);
+                .replace('__rev1__', jsonAnswer.previousVersion)
+                .replace('__rev2__', jsonAnswer.latestVersion);
               var link = new Element('a', {'href': diffURL, 'target': '_new'});
               link.insert("$services.localization.render('core.editors.save.conflictversion.diffLink')");
               content.insert(link);
@@ -398,11 +425,7 @@ var XWiki = (function(XWiki) {
         return new XWiki.widgets.EditModalPopup();
       };
 
-      if (response.responseJSON) {
-        displayConflictModal(response.responseJSON.previousVersion, response.responseJSON.latestVersion);
-      } else {
-        displayConflictModal();
-      }
+      displayConflictModal(response.responseJSON);
 
       // CkEditor tries to block the user from leaving the page with unsaved content.
       // Our save mechanism doesn't update the flag about unsaved content, so we have

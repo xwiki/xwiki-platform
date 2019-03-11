@@ -200,12 +200,12 @@ public class ScopeNotificationFilterTest
         ExpressionNode result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference);
         assertNotNull(result);
         assertEquals("(((NOT (WIKI = \"wikiA\") OR ((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\")" +
-                " AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\")) "+
+                " AND DATE >= \""+ new Date(0).toString() + "\")) "+
                 "OR ((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\") " +
-                "AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\")) "+
+                "AND DATE >= \""+ new Date(0).toString() + "\")) "+
                 "AND (NOT ((WIKI = \"wikiA\" " +
                 "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC\")) OR ((WIKI = \"wikiA\" " +
-                "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\") AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\")))",
+                "AND SPACE STARTS WITH \"wikiA:SpaceB.SpaceC.SpaceD\") AND DATE >= \""+ new Date(0).toString() + "\")))",
                 result.toString());
 
         // Test with wikiA:SpaceE (filtered by β)
@@ -280,7 +280,7 @@ public class ScopeNotificationFilterTest
         // Test 1
         String result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference).toString();
         assertEquals("((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") "
-                + "AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\")", result);
+                + "AND DATE >= \""+ new Date(0).toString() + "\")", result);
 
         // Test with wikiA:SpaceE (filtered by γ & ζ)
         Event event1 = mock(Event.class);

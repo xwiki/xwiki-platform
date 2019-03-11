@@ -37,9 +37,8 @@
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
       com.xpn.xwiki.plugin.scheduler.SchedulerPlugin
     </xwikiCfgPlugins>
-    <!-- Mapping needed by the EventStream migrator since AS is a dependency of the User Directory -->
     <!-- Mapping needed by the Mail Sender -->
-    <xwikiDbHbmCommonExtraMappings>eventstream.hbm.xml,mailsender.hbm.xml,notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml,notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
   </properties>

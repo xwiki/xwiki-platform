@@ -40,7 +40,7 @@ public class BaseClassTest
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     @Test
-    public void setDocumentReference() throws Exception
+    public void setDocumentReference()
     {
         BaseClass baseClass = new BaseClass();
 
@@ -51,7 +51,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void setNameSetWiki() throws Exception
+    public void setNameSetWiki()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
@@ -64,7 +64,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void setNameAloneWithChangingContext() throws Exception
+    public void setNameAloneWithChangingContext()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
@@ -107,7 +107,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void addTextAreaFieldWhenNullContentType() throws Exception
+    public void addTextAreaFieldWhenNullContentType()
     {
         BaseClass baseClass = new BaseClass();
 
@@ -122,7 +122,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void addTextAreaFieldWhenExistingNumberField() throws Exception
+    public void addTextAreaFieldWhenExistingNumberField()
     {
         BaseClass baseClass = new BaseClass();
 

@@ -105,11 +105,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             .withUsername(DBUSERNAME)
             .withPassword(DBPASSWORD);
 
-        if (testConfiguration.isDatabaseDataSaved()) {
-            // This allows re-running the test with the database already provisioned without having to redo
-            // the provisioning. Running "mvn clean" will remove the database data.
-            databaseContainer.withFileSystemBind("./target/mysql", "/var/lib/mysql");
-        }
+        mountDatabaseDataIfNeeded(databaseContainer, "./target/mysql", "/var/lib/mysql", testConfiguration);
 
         // Note: the "explicit-defaults-for-timestamp" parameter has been introduced in MySQL 5.6.6+ only and using it
         // in older versions make MySQL fail to start.
@@ -176,16 +172,26 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             .withUsername(DBUSERNAME)
             .withPassword(DBPASSWORD);
 
-        if (testConfiguration.isDatabaseDataSaved()) {
-            // This allows re-running the test with the database already provisioned without having to redo
-            // the provisioning. Running "mvn clean" will remove the database data.
-            databaseContainer.withFileSystemBind("./target/postgres", "/var/lib/postgresql/data");
-        }
+        mountDatabaseDataIfNeeded(databaseContainer, "./target/postgres", "/var/lib/postgresql/data",
+            testConfiguration);
 
         databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
         databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
 
         startDatabaseContainer(databaseContainer, 5432, testConfiguration);
+    }
+
+    private void mountDatabaseDataIfNeeded(JdbcDatabaseContainer databaseContainer, String hostPath,
+        String containerPath, TestConfiguration testConfiguration)
+    {
+        if (testConfiguration.isDatabaseDataSaved()) {
+            // Note 1: This allows re-running the test with the database already provisioned without having to redo
+            // the provisioning. Running "mvn clean" will remove the database data.
+            // Note 2: This won't work in the DOOD use case. For that to work we would need to copy the data instead
+            // of mounting the volume but the time to do that would be counter productive and cost in execution time
+            // when the goal is to win time...
+            databaseContainer.withFileSystemBind(hostPath, containerPath);
+        }
     }
 
     private void startOracleContainer(TestConfiguration testConfiguration)

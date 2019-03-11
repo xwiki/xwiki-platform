@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -38,6 +39,8 @@ import org.xwiki.text.StringUtils;
  */
 public abstract class AbstractContainerExecutor
 {
+    private static final boolean IN_A_CONTAINER = new File("/.dockerenv").exists();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerExecutor.class);
 
     protected void start(GenericContainer container, TestConfiguration testConfiguration)
@@ -69,10 +72,14 @@ public abstract class AbstractContainerExecutor
     protected void mountFromHostToContainer(GenericContainer container, String sourceDirectory,
         String targetDirectory)
     {
-        // File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
+        // Note 1: File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
         // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
+        // Note 2: For the DOOD use case, we also do the copy instead of the volume mounting since that would require
+        // to have the sourceDirectory path mounted from the host and this would put and leave files on the host which
+        // would not work with parallel executions (think about multiple CI jobs executing in parallel on the same host)
+        // and would also not be clean.
         String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.startsWith("mac os x")) {
+        if (IN_A_CONTAINER || osName.startsWith("mac os x")) {
             MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory);
             container.withCopyFileToContainer(mountableDirectory, targetDirectory);
         } else {

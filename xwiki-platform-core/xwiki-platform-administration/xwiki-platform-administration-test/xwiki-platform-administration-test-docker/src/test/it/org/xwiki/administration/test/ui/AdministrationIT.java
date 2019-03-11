@@ -22,14 +22,14 @@ package org.xwiki.administration.test.ui;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Verify the overall Administration application features.
@@ -37,11 +37,9 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 4.3M1
  */
-public class AdministrationIT extends AbstractTest
+@UITest
+public class AdministrationIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     /**
      * This method makes the following tests :
      *
@@ -51,10 +49,12 @@ public class AdministrationIT extends AbstractTest
      * </ul>
      */
     @Test
-    public void verifyGlobalAndSpaceSections()
+    public void verifyGlobalAndSpaceSections(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
+
         // Navigate to a (non existent for test performance reasons) page in view mode.
-        getUtil().gotoPage("NonExistentSpace", "NonExistentPage");
+        setup.gotoPage("NonExistentSpace", "NonExistentPage");
 
         // Verify that pages have an Admin menu and navigate to the admin UI.
         AdministrablePage page = new AdministrablePage();
@@ -67,14 +67,14 @@ public class AdministrationIT extends AbstractTest
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
             "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
             .stream().forEach(new Consumer<String>()
+        {
+            @Override
+            public void accept(String sectionId)
             {
-                @Override
-                public void accept(String sectionId)
-                {
-                    assertTrue(String.format("Seection %s is missing.", sectionId),
-                        administrationPage.hasSection(sectionId));
-                }
-            });
+                assertTrue(administrationPage.hasSection(sectionId),
+                    String.format("Menu section [%s] is missing.", sectionId));
+            }
+        });
 
         // These are page-only sections.
         assertTrue(administrationPage.hasNotSection("PageAndChildrenRights"));
@@ -93,15 +93,15 @@ public class AdministrationIT extends AbstractTest
 
         // All these sections should not be present (they provide global configuration).
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
-                "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
+            "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
             .stream().forEach(new Consumer<String>()
+        {
+            @Override
+            public void accept(String sectionId)
             {
-                @Override
-                public void accept(String sectionId)
-                {
-                    assertTrue(String.format("Seection %s is present.", sectionId),
-                        administrationPage.hasNotSection(sectionId));
-                }
-            });
+                assertTrue(administrationPage.hasNotSection(sectionId),
+                    String.format("Menu section [%s] shouldn't be present.", sectionId));
+            }
+        });
     }
 }

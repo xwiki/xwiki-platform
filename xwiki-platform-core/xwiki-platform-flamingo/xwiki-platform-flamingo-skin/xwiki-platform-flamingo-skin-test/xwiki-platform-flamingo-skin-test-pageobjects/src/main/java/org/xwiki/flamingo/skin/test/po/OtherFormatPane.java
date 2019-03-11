@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.sking.test.po;
+package org.xwiki.flamingo.skin.test.po;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,7 +67,28 @@ public class OtherFormatPane extends BaseElement
      */
     public boolean isExportAsXARButtonAvailable()
     {
-        return getDriver().findElementByLinkText(XAR_EXPORT_LINK_TEXT) != null;
+        return isExportButtonAvailable(XAR_EXPORT_LINK_TEXT);
+    }
+
+    /**
+     * @param buttonText the text of the button to assert
+     * @return true if the export button exists.
+     * @since 11.2RC1
+     */
+    public boolean isExportButtonAvailable(String buttonText)
+    {
+        return getDriver().findElementByLinkText(buttonText) != null;
+    }
+
+    /**
+     * Click on an export button.
+     *
+     * @param buttonText the text of the button to click
+     * @since 11.2RC1
+     */
+    public void clickExportButton(String buttonText)
+    {
+        getDriver().findElementByLinkText(buttonText).click();
     }
 
     /**
@@ -75,7 +96,7 @@ public class OtherFormatPane extends BaseElement
      */
     public void clickExportAsXARButton()
     {
-        getDriver().findElementByLinkText(XAR_EXPORT_LINK_TEXT).click();
+        clickExportButton(XAR_EXPORT_LINK_TEXT);
     }
 
     /**

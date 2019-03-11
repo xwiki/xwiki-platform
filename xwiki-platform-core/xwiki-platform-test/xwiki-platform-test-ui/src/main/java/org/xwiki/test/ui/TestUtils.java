@@ -988,6 +988,14 @@ public class TestUtils
     }
 
     /**
+     * @since 11.2RC1
+     */
+    public String getBaseBinURL(String wiki)
+    {
+        return getBaseURL() + ((StringUtils.isEmpty(wiki) || wiki.equals("xwiki")) ? "bin/" : "wiki/" + wiki + '/');
+    }
+
+    /**
      * @since 7.2M1
      */
     public String getURL(String action, String[] path, String queryString)

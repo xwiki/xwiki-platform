@@ -52,6 +52,8 @@ admin.panels.navigation=Панель навигации
 admin.panels.navigation.description=Управляйте отображением страниц в Панели навигации.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Исключить страницы расширения верхнего уровня
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Этот динамический фильтр удаляет из дерева навигации страницы верхнего уровня, которые принадлежат установленному расширению, если они не предназначены для изменения.
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Exclude Top Level Application Pages
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.
 PanelsCode.NavigationConfigurationClass_exclusions=Исключения
 PanelsCode.NavigationConfigurationClass_exclusions.hint=Список страниц для исключения из дерева навигации.
 PanelsCode.NavigationConfigurationClass_inclusions=Включения
@@ -60,6 +62,7 @@ platform.panels.navigation.configuration.excludedPages=Исключенные с
 platform.panels.navigation.configuration.excludedPages.hint=Используйте перетаскивание, чтобы переместить страницы из дерева навигации или вернуть их обратно.
 platform.panels.navigation.configuration.excludedPages.empty=Ничего
 platform.panels.navigation.configuration.topLevelExtensionPages=Страницы расширения верхнего уровня
+### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
 platform.panels.navigation.configuration.otherPages=Другие страницы
 platform.panels.navigation.configuration.saveComment=Конфигурация панели навигации обновлена администратором</content>
 </xwikidoc>

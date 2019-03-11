@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -34,6 +35,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
@@ -42,8 +44,9 @@ import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 
 /**
- * Finds all the XARs in the current pom (i.e. in the {@code ./pom.xml} in the current directory) and installs each of
- * them as an extension inside a running XWiki.
+ * Finds all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are not
+ * part of the distribution and installs each of them as an extension inside a running XWiki. Also installs XAR
+ * extensions found in the distribution and install them (since they have not been installed in {@code WEB-INF/lib}).
  *
  * @version $Id$
  * @since 10.9
@@ -82,10 +85,12 @@ public class ExtensionInstaller
     }
 
     /**
-     * Install all XAR extensions found in the {@code pom.xml} located in the current directory (ie the POM of the test
-     * module).
+     * Install all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are
+     * not part of the distribution and installs each of them as an extension inside a running XWiki. Also installs
+     * XAR extensions found in the distribution and install them (since they have not been installed in {@code
+     * WEB-INF/lib}).
      *
-     * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhsot:8080/xwiki/rest})
+     * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhost:8080/xwiki/rest})
      * @param username the xwiki user to use to connect for the REST endpoint (e.g. {@code superadmin})
      * @param password the xwiki password to connect for the REST endpoint
      * @param installUserReference the reference to the user who will the user under which pages are installed (e.g.
@@ -100,10 +105,12 @@ public class ExtensionInstaller
     }
 
     /**
-     * Install all XAR extensions found in the {@code pom.xml} located in the current directory (ie the POM of the test
-     * module).
+     * Install all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are
+     * not part of the distribution and installs each of them as an extension inside a running XWiki. Also installs
+     * XAR extensions found in the distribution and install them (since they have not been installed in {@code
+     * WEB-INF/lib}).
      *
-     * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhsot:8080/xwiki/rest})
+     * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhost:8080/xwiki/rest})
      * @param credentials the xwiki user and password to use to connect for the REST endpoint
      * @param installUserReference the reference to the user who will the user under which pages are installed (e.g.
      * {@code superadmin})
@@ -114,31 +121,55 @@ public class ExtensionInstaller
     public void installExtensions(String xwikiRESTURL, UsernamePasswordCredentials credentials,
         String installUserReference, List<String> namespaces) throws Exception
     {
-        Set<Artifact> extensions = new LinkedHashSet<>();
+        Set<ExtensionId> extensions = new LinkedHashSet<>();
         String xwikiVersion = this.mavenResolver.getPlatformVersion();
 
-        // Step 1: Get XAR extensions from the distribution (ie the mandatory ones)
-        Collection<ArtifactResult> artifactResults =
+        // Step 1: Get XAR extensions from the distribution (ie the mandatory ones), since they're not been installed
+        // in WEB-INF/lib.
+        Collection<ArtifactResult> distributionArtifactResults =
             this.artifactResolver.getDistributionDependencies(xwikiVersion, Collections.emptyList());
-        for (ArtifactResult artifactResult : artifactResults) {
+        List<ExtensionId> distributionExtensionIds = new ArrayList<>();
+        for (ArtifactResult artifactResult : distributionArtifactResults) {
             Artifact artifact = artifactResult.getArtifact();
+            ExtensionId extensionId = convertToExtensionId(artifact);
+            distributionExtensionIds.add(extensionId);
             if (artifact.getExtension().equalsIgnoreCase(XAR)) {
-                extensions.add(artifact);
+                extensions.add(extensionId);
             }
         }
 
-        // Step 2: Get extensions from the current POM
+        // Step 2: Get extensions from the current POM and install all that are not part of the distribution already
         Model model = this.mavenResolver.getModelFromCurrentPOM();
         for (Dependency dependency : model.getDependencies()) {
-            if (dependency.getType().equalsIgnoreCase(XAR)) {
-                extensions.add(this.mavenResolver.convertToArtifact(dependency));
+            Artifact artifact = this.mavenResolver.convertToArtifact(dependency);
+            if (!"test".equals(dependency.getScope()) && isSupportedExtensionType(dependency.getType())) {
+                ExtensionId extensionId = convertToExtensionId(artifact);
+                if (!distributionExtensionIds.contains(extensionId)) {
+                    extensions.add(extensionId);
+                }
             }
         }
 
         installExtensions(extensions, xwikiRESTURL, credentials, installUserReference, namespaces);
     }
 
-    private void installExtensions(Collection<Artifact> extensions, String xwikiRESTURL,
+    private ExtensionId convertToExtensionId(Artifact artifact)
+    {
+        // Convert XXX-<DATE>.<HOUR>-<ID> into XXX-SNAPSHOT to avoid EM resolution conflicts such as:
+        // Caused by: java.lang.Exception: Job execution failed. Response status code [500], reason
+        // [The job failed with error [InstallException: Extension feature
+        // [org.xwiki.platform:xwiki-platform-tree-macro/10.11-20181128.193513-21] is incompatible with existing
+        // constraint [[10.11-SNAPSHOT]]]]
+        return new ExtensionId(String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId()),
+            this.mavenVersionConverter.convert(artifact.getVersion()));
+    }
+
+    private boolean isSupportedExtensionType(String type)
+    {
+        return XAR.equals(type) || "jar".equals(type);
+    }
+
+    private void installExtensions(Collection<ExtensionId> extensions, String xwikiRESTURL,
         UsernamePasswordCredentials credentials, String installUserReference, List<String> namespaces) throws Exception
     {
         try {
@@ -148,7 +179,7 @@ public class ExtensionInstaller
         }
     }
 
-    private void installExtensions(Collection<Artifact> extensions, String xwikiRESTURL, String installUserReference,
+    private void installExtensions(Collection<ExtensionId> extensions, String xwikiRESTURL, String installUserReference,
         List<String> namespaces, UsernamePasswordCredentials credentials) throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
@@ -159,17 +190,10 @@ public class ExtensionInstaller
         installRequest.setInteractive(false);
 
         // Set the extension list to install
-        for (Artifact artifact : extensions) {
-            // Convert XXX-<DATE>.<HOUR>-<ID> into XXX-SNAPSHOT to avoid EM resolution conflicts such as:
-            // Caused by: java.lang.Exception: Job execution failed. Response status code [500], reason
-            // [The job failed with error [InstallException: Extension feature
-            // [org.xwiki.platform:xwiki-platform-tree-macro/10.11-20181128.193513-21] is incompatible with existing
-            // constraint [[10.11-SNAPSHOT]]]]
-            org.xwiki.extension.ExtensionId extId = new org.xwiki.extension.ExtensionId(
-                String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId()),
-                    this.mavenVersionConverter.convert(artifact.getVersion()));
-            LOGGER.info(String.format("...Adding extension [%s] to the list of extensions to provision...", extId));
-            installRequest.addExtension(extId);
+        for (ExtensionId extensionId : extensions) {
+            LOGGER.info(String.format("...Adding extension [%s] to the list of extensions to provision...",
+                extensionId));
+            installRequest.addExtension(extensionId);
         }
 
         // Set the namespaces into which to install the extensions

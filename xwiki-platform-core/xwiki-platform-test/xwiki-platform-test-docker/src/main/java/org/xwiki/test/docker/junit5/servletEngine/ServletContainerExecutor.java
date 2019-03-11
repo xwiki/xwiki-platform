@@ -157,6 +157,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
         if (this.testConfiguration.isOffline()) {
+            // Note: This won't work in the DOOD use case. For that to work we would need to copy the data instead
+            // of mounting the volume but the time it would take would be too costly.
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
         }
@@ -165,9 +167,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // inside the container
         String cloverDatabase = System.getProperty("maven.clover.cloverDatabase");
         if (cloverDatabase != null) {
-            // Note: The Clover instrumentation puts the full path to the clover database location inside the java
+            // Note 1: The Clover instrumentation puts the full path to the clover database location inside the java
             // source files which execute inside the docker container. Thus we need to make that exact same full path
             // available inside the container...
+            // Note 2: For this to work in DOOD (Docker Outside Of Docker), the container in which this code is
+            // running will need to have mapped the volume pointed to by the "maven.clover.cloverDatabase" system
+            // property. It'll also need to make sure that it's removed before the build executes so that it doesn't
+            // execute with Clover data from a previous run.
             this.servletContainer.withFileSystemBind(cloverDatabase, cloverDatabase);
         }
 

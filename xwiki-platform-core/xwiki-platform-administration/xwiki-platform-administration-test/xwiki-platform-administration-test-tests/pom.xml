@@ -44,13 +44,7 @@
       com.xpn.xwiki.plugin.packaging.PackagePlugin,\
       com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
     </xwikiCfgPlugins>
-    <!-- We need to use the mail module in some tests (e.g. ResetPasswordTest) -->
-    <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- XWiki.ResetPassword uses the saveAsAuthor() API which performs a check on whether permissions have been dropped
-         and since the PR checker works by dropping permissions, it causes the user to become guest and thus the doc
-         save fails. Thus we need to exclude the page from the PR checker -->
-    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.ResetPassword|.*:XWiki\.ResetPasswordComplete</xwikiPropertiesAdditionalProperties>
   </properties>
   <dependencies>
     <dependency>
@@ -78,10 +72,11 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-  <!-- We currently need to depend on mail-ui in the test because it contains the Mail.SendMailConfigClass. We can not have
-    administration-ui depend on mail-ui, because mail-ui already depends on administration-ui which would create a loop. mail-ui
-    just needs the configurable class stuff from administration-ui, so when that gets refactored out, we can fix the dependency
-    directly in administration-ui and not have anything here specific to mail. -->
+    <!-- We currently need to depend on mail-ui in the test because it contains the Mail.SendMailConfigClass. We can
+         not have administration-ui depend on mail-ui, because mail-ui already depends on administration-ui which would
+         create a loop. mail-ui ust needs the configurable class stuff from administration-ui, so when that gets
+         refactored out, we can fix the dependency directly in administration-ui and not have anything here specific to
+         mail. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-ui</artifactId>

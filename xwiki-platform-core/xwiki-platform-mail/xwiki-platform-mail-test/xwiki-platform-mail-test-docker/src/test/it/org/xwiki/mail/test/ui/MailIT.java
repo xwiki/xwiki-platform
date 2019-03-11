@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     3025
 },
     properties = {
-        // The Mail module contribures a Hibernate mapping that needs to be added to hibernate.cfg.xml
+        // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.

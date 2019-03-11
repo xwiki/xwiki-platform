@@ -37,7 +37,7 @@
     <upgradetest.previousflavor.artifactId>xwiki-enterprise-ui-mainwiki</upgradetest.previousflavor.artifactId>
     <upgradetest.previousflavor.version>8.4.6</upgradetest.previousflavor.version>
     <upgradetest.previousdata.artifactId>xwiki-enterprise-data-hsqldb</upgradetest.previousdata.artifactId>
-    <upgradetest.previousdata.classifier>custom-filestore-1</upgradetest.previousdata.classifier>
+    <upgradetest.previousdata.classifier>custom-filestore-2</upgradetest.previousdata.classifier>
   </properties>
   <dependencies>
     <dependency>

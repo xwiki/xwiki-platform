@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -54,15 +55,14 @@ public class DefaultLinkedResourceHelper implements LinkedResourceHelper
     public List<Block> getBlocks(XDOM xdom)
     {
         // @formatter:off
-        List<Block> blocks = xdom.getBlocks(
+        return xdom.getBlocks(
             new OrBlockMatcher(
                 new ClassBlockMatcher(LinkBlock.class),
+                new ClassBlockMatcher(ImageBlock.class),
                 new MacroBlockMatcher("include"),
                 new MacroBlockMatcher("display")
             ), Block.Axes.DESCENDANT);
         // @formatter:on
-
-        return blocks;
     }
 
     @Override
@@ -75,6 +75,11 @@ public class DefaultLinkedResourceHelper implements LinkedResourceHelper
             ResourceReference linkReference = linkBlock.getReference();
 
             referenceString = linkReference.getReference();
+        } else if (block instanceof ImageBlock) {
+            ImageBlock imageBlock = (ImageBlock) block;
+            ResourceReference imageReference = imageBlock.getReference();
+
+            referenceString = imageReference.getReference();
         } else if (block instanceof MacroBlock) {
             referenceString = block.getParameter(REFERENCE_MACRO_PARAMETER);
             if (StringUtils.isBlank(referenceString)) {
@@ -101,6 +106,11 @@ public class DefaultLinkedResourceHelper implements LinkedResourceHelper
             ResourceReference linkReference = linkBlock.getReference();
 
             resourceType = linkReference.getType();
+        } else if (block instanceof ImageBlock) {
+            ImageBlock imageBlock = (ImageBlock) block;
+            ResourceReference imageReference = imageBlock.getReference();
+
+            resourceType = imageReference.getType();
         } else if (block instanceof MacroBlock) {
             // We still have to look at the reference string to see if it is a valid include (i.e. non-recursive).
             String referenceString = block.getParameter(REFERENCE_MACRO_PARAMETER);
@@ -129,6 +139,11 @@ public class DefaultLinkedResourceHelper implements LinkedResourceHelper
             ResourceReference linkReference = linkBlock.getReference();
 
             linkReference.setReference(newReferenceString);
+        } else if (block instanceof ImageBlock) {
+            ImageBlock imageBlock = (ImageBlock) block;
+            ResourceReference imageReference = imageBlock.getReference();
+
+            imageReference.setReference(newReferenceString);
         } else if (block instanceof MacroBlock) {
             if (StringUtils.isNotBlank(block.getParameter(DOCUMENT_MACRO_PARAMETER))) {
                 // Backwards compatibility check.
@@ -147,6 +162,11 @@ public class DefaultLinkedResourceHelper implements LinkedResourceHelper
             ResourceReference linkReference = linkBlock.getReference();
 
             linkReference.setType(newResourceType);
+        } else if (block instanceof ImageBlock) {
+            ImageBlock imageBlock = (ImageBlock) block;
+            ResourceReference imageReference = imageBlock.getReference();
+
+            imageReference.setType(newResourceType);
         } else if (block instanceof MacroBlock) {
             // N/A yet.
         }
@@ -159,6 +179,8 @@ public class DefaultLinkedResourceHelper implements LinkedResourceHelper
 
         if (block instanceof LinkBlock) {
             result = ((LinkBlock) block).getReference();
+        } else if (block instanceof ImageBlock) {
+            result = ((ImageBlock) block).getReference();
         } else if (block instanceof MacroBlock) {
             // Wrap it up as a ResourceReference.
             String referenceString = getResourceReferenceString(block);

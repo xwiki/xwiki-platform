@@ -41,4 +41,12 @@
     <module>xwiki-platform-administration-test-pageobjects</module>
     <module>xwiki-platform-administration-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-administration-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

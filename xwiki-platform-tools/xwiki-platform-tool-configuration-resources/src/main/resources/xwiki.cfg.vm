@@ -195,8 +195,8 @@ xwiki.store.migration=1
 #-# allows to use the default language of the wiki when the user didn't manually choose a language.
 # xwiki.language.preferDefault=0
 
-#-# Force only one of the supported languages to be accepted.
-# xwiki.language.forceSupported=0
+#-# Force only one of the supported languages to be accepted. Default to true.
+# xwiki.language.forceSupported=1
 
 
 #---------------------------------------

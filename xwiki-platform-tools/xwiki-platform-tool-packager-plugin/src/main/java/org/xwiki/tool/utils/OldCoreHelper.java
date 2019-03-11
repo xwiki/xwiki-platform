@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.hibernate.cfg.Environment;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -38,6 +37,8 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ApplicationStartedEvent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -130,6 +131,15 @@ public class OldCoreHelper implements AutoCloseable
         } catch (ComponentLookupException e) {
             throw new MojoExecutionException("Failed to get OldCoreHelper component", e);
         }
+
+        // Give a chance to various listeners to register Hibernate mapping and other pre XWiki instance init actions
+        ObservationManager observation;
+        try {
+            observation = componentManager.getInstance(ObservationManager.class);
+        } catch (ComponentLookupException e) {
+            throw new MojoExecutionException("Failed to get lookup ObservationManager component", e);
+        }
+        observation.notify(new ApplicationStartedEvent(), null);
 
         // Initialize OldCoreHelper
         try {

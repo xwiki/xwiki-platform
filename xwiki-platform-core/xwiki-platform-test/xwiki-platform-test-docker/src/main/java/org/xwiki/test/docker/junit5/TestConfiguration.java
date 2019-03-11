@@ -39,7 +39,7 @@ import org.xwiki.text.StringUtils;
  */
 public class TestConfiguration
 {
-    private static final Pattern ARTIFACT_COORD_PATTERN = Pattern.compile("([^: ]+):([^: ]+)");
+    private static final Pattern ARTIFACT_COORD_PATTERN = Pattern.compile("([^: ]+):([^: ]+)(?::([^: ]+))?");
 
     private static final String DEFAULT = "default";
 
@@ -294,6 +294,7 @@ public class TestConfiguration
             List<String> jarCoordinates = new ArrayList<>();
             jarCoordinates.add(matcher.group(1));
             jarCoordinates.add(matcher.group(2));
+            jarCoordinates.add(matcher.group(3));
             newExtraJARs.add(jarCoordinates);
         }
         this.extraJARs = newExtraJARs;

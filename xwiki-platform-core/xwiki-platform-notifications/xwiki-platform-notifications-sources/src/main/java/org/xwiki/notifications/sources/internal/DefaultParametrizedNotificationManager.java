@@ -155,12 +155,10 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
             // Don't record events concerning a doc the user cannot see
             if (document != null && !authorizationManager.hasAccess(Right.VIEW, parameters.user,
                 document)) {
-                //System.err.println("skip entry "+ event +" : non viewable");
                 continue;
             }
 
             if (filterEvent(event, parameters)) {
-                //System.err.println("skip entry "+ event +" : is filtered");
                 continue;
             }
 

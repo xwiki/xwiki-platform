@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.xwiki.flamingo.sking.test.po.ExportModal;
-import org.xwiki.flamingo.sking.test.po.OtherFormatPane;
+import org.xwiki.flamingo.skin.test.po.ExportModal;
+import org.xwiki.flamingo.skin.test.po.OtherFormatPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;

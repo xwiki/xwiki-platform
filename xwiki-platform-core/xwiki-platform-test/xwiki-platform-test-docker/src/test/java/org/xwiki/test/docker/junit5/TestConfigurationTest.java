@@ -40,6 +40,16 @@ public class TestConfigurationTest
     {
     }
 
+    @UITest(extraJARs = { "a:b:c" })
+    public class AnnotationWithExtraJARAndVersion
+    {
+    }
+
+    @UITest(extraJARs = { "a:b" })
+    public class AnnotationWithExtraJARWithoutVersion
+    {
+    }
+
     @BeforeEach
     public void setUp()
     {
@@ -97,5 +107,27 @@ public class TestConfigurationTest
         assertEquals(ServletEngine.JETTY, configuration.getServletEngine());
         assertTrue(configuration.isVerbose());
         assertEquals("otherversion", configuration.getDatabaseTag());
+    }
+
+    @Test
+    public void getConfigurationWhenExtraJARWithVersion()
+    {
+        UITest uiTest = AnnotationWithExtraJARAndVersion.class.getAnnotation(UITest.class);
+        TestConfiguration configuration = new TestConfiguration(uiTest);
+
+        assertEquals("a", configuration.getExtraJARs().get(0).get(0));
+        assertEquals("b", configuration.getExtraJARs().get(0).get(1));
+        assertEquals("c", configuration.getExtraJARs().get(0).get(2));
+    }
+
+    @Test
+    public void getConfigurationWhenExtraJARWithoutVersion()
+    {
+        UITest uiTest = AnnotationWithExtraJARWithoutVersion.class.getAnnotation(UITest.class);
+        TestConfiguration configuration = new TestConfiguration(uiTest);
+
+        assertEquals("a", configuration.getExtraJARs().get(0).get(0));
+        assertEquals("b", configuration.getExtraJARs().get(0).get(1));
+        assertNull(configuration.getExtraJARs().get(0).get(2));
     }
 }

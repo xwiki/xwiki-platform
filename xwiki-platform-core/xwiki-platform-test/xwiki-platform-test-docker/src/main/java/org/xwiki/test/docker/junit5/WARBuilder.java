@@ -181,9 +181,15 @@ public class WARBuilder
         List<Artifact> artifacts = new ArrayList<>();
         if (!testConfiguration.getExtraJARs().isEmpty()) {
             for (List<String> jarData : testConfiguration.getExtraJARs()) {
-                LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}:{}]", jarData.get(0), jarData.get(1));
-                Artifact artifact = new DefaultArtifact(jarData.get(0), jarData.get(1), JAR,
-                    this.mavenResolver.getPlatformVersion());
+                // When no version is specified, we use the version from the current pom.xml since that's the most
+                // common obvious use case.
+                String version = jarData.get(2);
+                if (version == null) {
+                    version = this.mavenResolver.getModelFromCurrentPOM().getVersion();
+                }
+                LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}:{}], version [{}]", jarData.get(0), jarData.get(1),
+                    version);
+                Artifact artifact = new DefaultArtifact(jarData.get(0), jarData.get(1), JAR, version);
                 artifacts.add(artifact);
             }
         }

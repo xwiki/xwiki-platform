@@ -44,13 +44,7 @@
       com.xpn.xwiki.plugin.packaging.PackagePlugin,\
       com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
     </xwikiCfgPlugins>
-    <!-- We need to use the mail module in some tests (e.g. ResetPasswordTest) -->
-    <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- XWiki.ResetPassword uses the saveAsAuthor() API which performs a check on whether permissions have been dropped
-         and since the PR checker works by dropping permissions, it causes the user to become guest and thus the doc
-         save fails. Thus we need to exclude the page from the PR checker -->
-    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.ResetPassword|.*:XWiki\.ResetPasswordComplete</xwikiPropertiesAdditionalProperties>
   </properties>
   <dependencies>
     <dependency>

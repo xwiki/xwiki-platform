@@ -58,6 +58,7 @@ define(['jquery'], function($) {
           parts[1] = parseInt(parts[1]) + 1;
         } else {
           parts[0] = parseInt(parts[0]) + 1;
+          parts[1] = 1;
         }
         version = parts[0] + "." + parts[1];
         html.data("xwiki-version", version);

@@ -145,7 +145,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
                 repositoryResolver, extensionContext);
 
             // Provision XWiki by installing all required extensions.
-            LOGGER.info("(*) Provision XAR extensions for test...");
+            LOGGER.info("(*) Provision extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
             LOGGER.info("XWiki is already started, using running instance at [%s] to execute the tests...",

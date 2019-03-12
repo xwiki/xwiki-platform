@@ -87,8 +87,6 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
-import net.sf.json.JSONObject;
-
 /**
  * <p>
  * Root class for most XWiki actions. It provides a common framework that allows actions to execute just the specific

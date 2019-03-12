@@ -20,8 +20,10 @@
 package com.xpn.xwiki.web;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.script.ScriptContext;
 
@@ -39,7 +41,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -47,8 +48,6 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.ObjectDiff;
-
-import net.sf.json.JSONObject;
 
 /**
  * Action used for saving and proceeding to view the saved page.
@@ -61,6 +60,11 @@ public class SaveAction extends PreviewAction
 {
     /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";
+
+    /**
+     * The key to retrieve the saved object version from the context.
+     */
+    public static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
 
     protected static final String ASYNC_PARAM = "async";
 
@@ -209,6 +213,8 @@ public class SaveAction extends PreviewAction
         // It was read using readFromForm
         xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
 
+        context.put(SAVED_OBJECT_VERSION_KEY, tdoc.getRCSVersion());
+
         Job createJob = startCreateJob(tdoc.getDocumentReference(), form);
         if (createJob != null) {
             if (isAsync(request)) {
@@ -256,42 +262,43 @@ public class SaveAction extends PreviewAction
      * latest version of the document. If the current version of the document is not the same as the previous one,
      * a diff is computed on the document content: a conflict is detected only if the contents are different.
      * @param context the current context of the request.
+     * @param modifiedDoc the document being modified that will be saved.
      * @return true in case of conflict. If it's true, the answer is immediately sent to the client.
      */
-    private boolean isConflictingWithVersion(XWikiContext context, XWikiDocument newDoc) throws XWikiException
+    private boolean isConflictingWithVersion(XWikiContext context, XWikiDocument modifiedDoc) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        XWikiDocument doc = context.getDoc();
 
         // the document is new we don't have to check the version date or anything
-        if ("true".equals(request.getParameter("isNew")) && doc.isNew()) {
+        if ("true".equals(request.getParameter("isNew")) && modifiedDoc.isNew()) {
             return false;
         }
 
         // TODO The check of the previousVersion should be done at a lower level or with a semaphore since
         // another job might have saved a different version of the document
         Version previousVersion = new Version(request.getParameter("previousVersion"));
-        Version latestVersion = doc.getRCSVersion();
+        Version latestVersion = modifiedDoc.getRCSVersion();
 
         DateTime editingVersionDate = new DateTime(request.getParameter("editingVersionDate"));
-        DateTime latestVersionDate = new DateTime(doc.getDate());
+        DateTime latestVersionDate = new DateTime(modifiedDoc.getDate());
 
         // we ensure that nobody edited the document between the moment the user started to edit and now
         if (!latestVersion.equals(previousVersion) || latestVersionDate.isAfter(editingVersionDate)) {
             try {
-                XWikiDocument previousDoc = getDocumentRevisionProvider().getRevision(doc, previousVersion.toString());
+                XWikiDocument previousDoc = getDocumentRevisionProvider().getRevision(modifiedDoc,
+                    previousVersion.toString());
 
                 // if doc is new and we're here: it's a conflict, we can skip the diff check
                 // we also check that the previousDoc revision exists to avoid an exception if it has been deleted
-                if (!doc.isNew() && previousDoc != null) {
+                if (!modifiedDoc.isNew() && previousDoc != null) {
                     // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
                     // to save the current changes.
-                    List<Delta> contentDiff = doc.getContentDiff(previousVersion.toString(), latestVersion.toString(),
-                        context);
+                    List<Delta> contentDiff = modifiedDoc.getContentDiff(previousVersion.toString(),
+                        latestVersion.toString(), context);
 
                     // we also need to check the object diff, to be sure there's no conflict with the inline form.
                     List<List<ObjectDiff>> objectDiff =
-                        doc.getObjectDiff(previousVersion.toString(), latestVersion.toString(),
+                        modifiedDoc.getObjectDiff(previousVersion.toString(), latestVersion.toString(),
                             context);
                     if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
                         return false;
@@ -301,11 +308,11 @@ public class SaveAction extends PreviewAction
                 // if the revision has been deleted or if the content/object diff is not empty
                 // we have a conflict.
                 // TODO: Improve it to return the diff between the current version and the latest recorder
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.element("previousVersion", previousVersion.toString());
-                jsonObject.element("previousVersionDate", editingVersionDate.toString());
-                jsonObject.element("latestVersion", latestVersion.toString());
-                jsonObject.element("latestVersionDate", latestVersionDate.toString());
+                Map<String, String> jsonObject = new LinkedHashMap<>();
+                jsonObject.put("previousVersion", previousVersion.toString());
+                jsonObject.put("previousVersionDate", editingVersionDate.toString());
+                jsonObject.put("latestVersion", latestVersion.toString());
+                jsonObject.put("latestVersionDate", latestVersionDate.toString());
                 this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
                 return true;
             } catch (DifferentiationFailedException e) {
@@ -329,16 +336,9 @@ public class SaveAction extends PreviewAction
 
         // forward to view
         if (Utils.isAjaxRequest(context)) {
-            EditForm form = (EditForm) context.getForm();
-            JSONObject jsonAnswer = new JSONObject();
-            Version newVersion;
-
-            if (context.getDoc().isNew()) {
-                newVersion = context.getDoc().getRCSVersion();
-            } else {
-                newVersion = XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit());
-            }
-            jsonAnswer.element("newVersion", newVersion.toString());
+            Map<String, String> jsonAnswer = new LinkedHashMap<>();
+            Version newVersion = (Version) context.get(SAVED_OBJECT_VERSION_KEY);
+            jsonAnswer.put("newVersion", newVersion.toString());
             answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
         } else {
             sendRedirect(context.getResponse(), Utils.getRedirect("view", context));

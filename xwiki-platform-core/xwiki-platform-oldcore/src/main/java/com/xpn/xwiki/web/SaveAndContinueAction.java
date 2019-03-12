@@ -20,6 +20,8 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,9 +34,6 @@ import org.xwiki.csrf.CSRFToken;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import net.sf.json.JSONObject;
 
 /**
  * Action used for saving and returning to the edit page rather than viewing changes.
@@ -207,17 +206,16 @@ public class SaveAndContinueAction extends XWikiAction
 
         // If this is an ajax request, no need to redirect.
         if (isAjaxRequest) {
-            EditForm form = (EditForm) context.getForm();
-            JSONObject jsonAnswer = new JSONObject();
-            Version newVersion;
+            Version newVersion = (Version) context.get(SaveAction.SAVED_OBJECT_VERSION_KEY);
 
-            if (context.getDoc().isNew()) {
-                newVersion = context.getDoc().getRCSVersion();
+            // in case of property update, SaveAction has not been called, so we don't get the new version.
+            if (newVersion != null) {
+                Map<String, String> jsonAnswer = new LinkedHashMap<>();
+                jsonAnswer.put("newVersion", newVersion.toString());
+                answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
             } else {
-                newVersion = XWikiDocument.getNextVersion(context.getDoc().getRCSVersion(), form.isMinorEdit());
+                context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
-            jsonAnswer.element("newVersion", newVersion.toString());
-            answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
             return false;
         }
 

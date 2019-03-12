@@ -50,17 +50,24 @@ define(['jquery'], function($) {
       'isNew': html.data('xwiki-isnew'),
       'bumpVersion': function (isMinor) {
         var version = html.data('xwiki-version');
-        if (typeof version === "number") {
-          version = version.toString();
-        }
-        var parts = version.split('\.');
-        if (isMinor) {
-          parts[1] = parseInt(parts[1]) + 1;
+        var isNew = html.data('xwiki-isnew');
+
+        if (isNew.toString() === "true") {
+          version = "1.1";
+          html.data('xwiki-isnew', "false");
         } else {
-          parts[0] = parseInt(parts[0]) + 1;
-          parts[1] = 1;
+          if (typeof version === "number") {
+            version = version.toString();
+          }
+          var parts = version.split('\.');
+          if (isMinor) {
+            parts[1] = parseInt(parts[1]) + 1;
+          } else {
+            parts[0] = parseInt(parts[0]) + 1;
+            parts[1] = 1;
+          }
+          version = parts[0] + "." + parts[1];
         }
-        version = parts[0] + "." + parts[1];
         html.data("xwiki-version", version);
         document.fire('xwiki:document:changeVersion', {'version': version, 'documentReference': documentReference});
       },

@@ -5155,25 +5155,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (is10Syntax()) {
                 references = (Set) getUniqueLinkedPages10(context);
             } else {
+                references = new LinkedHashSet<>();
+
+                // Document content
                 XDOM dom = getXDOM();
+                getUniqueLinkedEntityReferences(dom, entityType, references);
 
-                // TODO: Add support for macro as well.
-
-                List<LinkBlock> linkBlocks =
-                    dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
-                List<ImageBlock> imageBlocks =
-                    dom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
-
-                references = new LinkedHashSet<>(linkBlocks.size() + imageBlocks.size());
-
-                // Links
-                for (LinkBlock linkBlock : linkBlocks) {
-                    addReference(linkBlock.getReference(), entityType, references);
-                }
-
-                // Images
-                for (ImageBlock imageBlock : imageBlocks) {
-                    addReference(imageBlock.getReference(), entityType, references);
+                // XObjects
+                for (List<BaseObject> xobjects : getXObjects().values()) {
+                    xobjects.stream()
+                        .forEach(xobject -> getUniqueLinkedEntityReferences(xobject, entityType, references, context));
                 }
             }
         } finally {
@@ -5182,6 +5173,53 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return references;
+    }
+
+    private void getUniqueLinkedEntityReferences(BaseObject xobject, EntityType entityType,
+        Set<EntityReference> references, XWikiContext xcontext)
+    {
+        if (xobject == null) {
+            return;
+        }
+
+        BaseClass xclass = xobject.getXClass(xcontext);
+
+        for (Object fieldClass : xclass.getProperties()) {
+            // Wiki content stored in xobjects
+            if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
+                TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+                LargeStringProperty field = (LargeStringProperty) xobject.getField(textAreaClass.getName());
+
+                if (field != null) {
+                    try {
+                        XDOM dom = parseContent(getSyntax(), field.getValue(), getDocumentReference());
+                        getUniqueLinkedEntityReferences(dom, entityType, references);
+                    } catch (XWikiException e) {
+                        LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: {}",
+                            field.getReference(), ExceptionUtils.getRootCauseMessage(e));
+                    }
+                }
+            }
+        }
+    }
+
+    // TODO: Move that in a generic rendering tool
+    private void getUniqueLinkedEntityReferences(XDOM dom, EntityType entityType, Set<EntityReference> references)
+    {
+        // TODO: Add support for macro as well.
+
+        List<LinkBlock> linkBlocks = dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
+        List<ImageBlock> imageBlocks = dom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
+
+        // Links
+        for (LinkBlock linkBlock : linkBlocks) {
+            addReference(linkBlock.getReference(), entityType, references);
+        }
+
+        // Images
+        for (ImageBlock imageBlock : imageBlocks) {
+            addReference(imageBlock.getReference(), entityType, references);
+        }
     }
 
     private void addReference(ResourceReference reference, EntityType entityType, Set<EntityReference> references)
@@ -8578,7 +8616,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Render privided XDOM into content of the provided syntax identifier.
+     * Render provided XDOM into content of the provided syntax identifier.
      *
      * @param content the XDOM content to render
      * @param targetSyntax the syntax identifier of the rendered content

@@ -46,6 +46,11 @@ public class SaveAndContinueAction extends XWikiAction
     /** Key for storing the wrapped action in the context. */
     private static final String WRAPPED_ACTION_CONTEXT_KEY = "SaveAndContinueAction.wrappedAction";
 
+    /**
+     * The key to retrieve the saved object version from the context.
+     */
+    private static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
+
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
 
@@ -206,7 +211,7 @@ public class SaveAndContinueAction extends XWikiAction
 
         // If this is an ajax request, no need to redirect.
         if (isAjaxRequest) {
-            Version newVersion = (Version) context.get(SaveAction.SAVED_OBJECT_VERSION_KEY);
+            Version newVersion = (Version) context.get(SAVED_OBJECT_VERSION_KEY);
 
             // in case of property update, SaveAction has not been called, so we don't get the new version.
             if (newVersion != null) {

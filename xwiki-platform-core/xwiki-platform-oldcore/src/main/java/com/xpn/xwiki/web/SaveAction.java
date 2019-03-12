@@ -61,12 +61,12 @@ public class SaveAction extends PreviewAction
     /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";
 
+    protected static final String ASYNC_PARAM = "async";
+
     /**
      * The key to retrieve the saved object version from the context.
      */
-    public static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
-
-    protected static final String ASYNC_PARAM = "async";
+    private static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
 
     private DocumentRevisionProvider documentRevisionProvider;
 

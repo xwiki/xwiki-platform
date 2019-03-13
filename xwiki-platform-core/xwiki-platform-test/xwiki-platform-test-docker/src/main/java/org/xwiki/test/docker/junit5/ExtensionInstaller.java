@@ -57,6 +57,10 @@ public class ExtensionInstaller
 
     private static final String XAR = "xar";
 
+    private static final String JAR = "jar";
+
+    private static final String DEPENDENCIES_SYSTEM_PROPERTY = System.getProperty("xwiki.test.ui.dependencies");
+
     private EmbeddableComponentManager ecm;
 
     private ArtifactResolver artifactResolver;
@@ -86,8 +90,8 @@ public class ExtensionInstaller
 
     /**
      * Install all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are
-     * not part of the distribution and installs each of them as an extension inside a running XWiki. Also installs
-     * XAR extensions found in the distribution and install them (since they have not been installed in {@code
+     * not part of the distribution and installs each of them as an extension inside a running XWiki. Also installs XAR
+     * extensions found in the distribution and install them (since they have not been installed in {@code
      * WEB-INF/lib}).
      *
      * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhost:8080/xwiki/rest})
@@ -106,8 +110,8 @@ public class ExtensionInstaller
 
     /**
      * Install all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are
-     * not part of the distribution and installs each of them as an extension inside a running XWiki. Also installs
-     * XAR extensions found in the distribution and install them (since they have not been installed in {@code
+     * not part of the distribution and installs each of them as an extension inside a running XWiki. Also installs XAR
+     * extensions found in the distribution and install them (since they have not been installed in {@code
      * WEB-INF/lib}).
      *
      * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhost:8080/xwiki/rest})
@@ -138,19 +142,43 @@ public class ExtensionInstaller
             }
         }
 
-        // Step 2: Get extensions from the current POM and install all that are not part of the distribution already
-        Model model = this.mavenResolver.getModelFromCurrentPOM();
-        for (Dependency dependency : model.getDependencies()) {
-            Artifact artifact = this.mavenResolver.convertToArtifact(dependency);
-            if (!"test".equals(dependency.getScope()) && isSupportedExtensionType(dependency.getType())) {
+        // Step 2: Get the project extensions to provision either from the DEPENDENCIES_SYSTEM_PROPERTY passed as
+        // System properties by the Maven Surefire or Failsafe plugins. If not defined, then read the dependencies from
+        // the current POM and only take the ones not having a "test" scope and being of type "xar" or "jar".
+        // Note that the use case for defining the system property is for the cases when you don't want to draw
+        // dependencies in your POM (can be useful when you want to test your extension on a vesion of XWiki for which
+        // it wasn't developed for).
+        extensions.addAll(getProjectExtensionIds(distributionExtensionIds));
+
+        installExtensions(extensions, xwikiRESTURL, credentials, installUserReference, namespaces);
+    }
+
+    private Collection<ExtensionId> getProjectExtensionIds(List<ExtensionId> distributionExtensionIds) throws Exception
+    {
+        Set<ExtensionId> extensions = new LinkedHashSet<>();
+        if (DEPENDENCIES_SYSTEM_PROPERTY != null) {
+            for (String coordinate : DEPENDENCIES_SYSTEM_PROPERTY.split(",")) {
+                ArtifactCoordinate artifactCoordinate = ArtifactCoordinate.parseArtifacts(coordinate);
+                Artifact artifact = artifactCoordinate.toArtifact(
+                    this.mavenResolver.getModelFromCurrentPOM().getVersion());
                 ExtensionId extensionId = convertToExtensionId(artifact);
                 if (!distributionExtensionIds.contains(extensionId)) {
                     extensions.add(extensionId);
                 }
             }
+        } else {
+            Model model = this.mavenResolver.getModelFromCurrentPOM();
+            for (Dependency dependency : model.getDependencies()) {
+                Artifact artifact = this.mavenResolver.convertToArtifact(dependency);
+                if (!"test".equals(dependency.getScope()) && isSupportedExtensionType(dependency.getType())) {
+                    ExtensionId extensionId = convertToExtensionId(artifact);
+                    if (!distributionExtensionIds.contains(extensionId)) {
+                        extensions.add(extensionId);
+                    }
+                }
+            }
         }
-
-        installExtensions(extensions, xwikiRESTURL, credentials, installUserReference, namespaces);
+        return extensions;
     }
 
     private ExtensionId convertToExtensionId(Artifact artifact)
@@ -166,7 +194,7 @@ public class ExtensionInstaller
 
     private boolean isSupportedExtensionType(String type)
     {
-        return XAR.equals(type) || "jar".equals(type);
+        return XAR.equals(type) || JAR.equals(type);
     }
 
     private void installExtensions(Collection<ExtensionId> extensions, String xwikiRESTURL,

@@ -245,12 +245,15 @@ var XWiki = (function(XWiki) {
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
       var isCustomForm = (this.form.action.indexOf("/preview/") == -1);
+      if (isCustomForm) {
+        return;
+      }
 
       // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
       var isAsync = (this.form.async && this.form.async.value === 'true');
 
       // Avoid template asynchronous handling of templates for synchronous or custom forms.
-      if (!isAsync || isCustomForm) {
+      if (!isAsync) {
         // A synchronous create from template operation should behave as a regular save operation,
         // waiting for the Save(AndContinue)Action to finish its work.
         isCreateFromTemplate = false;

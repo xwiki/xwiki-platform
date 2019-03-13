@@ -114,12 +114,6 @@
         <artifactId>jython-standalone</artifactId>
         <version>2.7.1-xwiki-2</version>
       </dependency>
-      <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
-      <dependency>
-        <groupId>org.jgroups</groupId>
-        <artifactId>jgroups</artifactId>
-        <version>4.0.17.Final</version>
-      </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
         <groupId>org.apache.tika</groupId>

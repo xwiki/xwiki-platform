@@ -156,7 +156,17 @@
           <groupId>dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
+        <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
+        <exclusion>
+          <groupId>javax.transaction</groupId>
+          <artifactId>jta</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>javax.transaction-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>

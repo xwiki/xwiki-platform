@@ -44,7 +44,7 @@ tour.app.name=Тур
 
 # Class fields
 TourCode.TourClass_description=Описание
-TourCode.TourClass_isActive=Активно
+TourCode.TourClass_isActive=Активный
 TourCode.TourClass_targetPage=Целевая страница
 
 # Live table generic keys
@@ -81,7 +81,7 @@ TourCode.StepClass_queryString=Строка запроса
 tour.steps=Шаги
 tour.steps.new_step=Новый шаг
 tour.steps.add_step=Добавить шаг
-tour.steps.edit_step=Изменить шаг
+tour.steps.edit_step=Править шаг
 tour.steps.save_step=Сохранить
 tour.steps.delete_confirm=Вы уверены, что хотите удалить шаг?
 tour.steps.delete_done=Шаг удалён!

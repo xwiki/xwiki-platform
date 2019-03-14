@@ -128,7 +128,8 @@ public class AbstractValidationTest extends TestCase
         try {
             int statusCode = this.client.executeMethod(method);
 
-            assertEquals("Method failed: " + method.getStatusLine(), HttpStatus.SC_OK, statusCode);
+            assertEquals(String.format("Method [%s] failed with status [%s]", method.getURI(), method.getStatusLine()),
+                HttpStatus.SC_OK, statusCode);
 
             // Read the response body.
             return method;

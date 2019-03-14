@@ -36,7 +36,7 @@ var XWiki = (function(XWiki) {
   });
 
   var getCurrentVersion = function (event) {
-    if (currentDocument == event.memo.documentReference) {
+    if (currentDocument.equals(event.memo.documentReference)) {
       currentVersion = event.memo.version;
       editingVersionDate = new Date();
       isNew = "false";
@@ -244,7 +244,7 @@ var XWiki = (function(XWiki) {
       }
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-      var isCustomForm = (this.form.action.indexOf("/preview/") == -1);
+      var isCustomForm = (this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1);
       if (isCustomForm) {
         return;
       }

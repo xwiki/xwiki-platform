@@ -134,7 +134,7 @@ editors.XDataEditors = Class.create({
               onComplete : function() {
                 item.disabled = false;
                 require(['xwiki-meta'], function (xm) {
-                  xm.bumpVersion(false);
+                  xm.refreshVersion();
                 });
                 document.fire('xwiki:dom:refresh');
               },
@@ -212,7 +212,7 @@ editors.XDataEditors = Class.create({
                   onComplete : function() {
                     item.disabled = false;
                     require(['xwiki-meta'], function (xm) {
-                      xm.bumpVersion(true);
+                      xm.refreshVersion();
                     });
                     document.fire('xwiki:dom:refresh');
                   }

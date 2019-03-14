@@ -150,8 +150,10 @@ public class AbstractValidationTest extends TestCase
                 uriMessage = String.format("[%s]", method.getURI());
             }
 
-            assertEquals(String.format("Method %s failed with status [%s]", uriMessage, method.getStatusLine()),
-                HttpStatus.SC_OK, statusCode);
+            // We accept status codes 200 and 423 as valid. HTTP code 423 is sent when trying to perform an action on
+            // a protected page and thus it's valid.
+            assertTrue(String.format("Method %s failed with status [%s]", uriMessage, method.getStatusLine()),
+                statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_LOCKED);
 
             // Read the response body.
             return method;

@@ -25,6 +25,7 @@ import org.xwiki.validator.HTML5Validator;
 import org.xwiki.validator.RSSValidator;
 import org.xwiki.validator.XWikiValidator;
 
+import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -49,7 +50,7 @@ public class AllTests extends TestCase
         // think the tests are all running fine. I haven't found a simple solution to this yet
         // (there are complex solutions like searching for all tests by parsing the source tree).
         // I think there are TestSuite that do this out there but I haven't looked for them yet.
-
+/*
         HTML5Validator html5Validator = new HTML5Validator();
         addTest(suite, DefaultValidationTest.suite(DefaultValidationTest.class, html5Validator),
             DefaultValidationTest.class);
@@ -60,11 +61,11 @@ public class AllTests extends TestCase
 
         RSSValidator rssValidator = new RSSValidator();
         addTest(suite, RSSValidationTest.suite(RSSValidationTest.class, rssValidator), RSSValidationTest.class);
-
+*/
         XWikiValidator xwikiValidator = new XWikiValidator();
         addTest(suite, DefaultValidationTest.suite(DefaultValidationTest.class, xwikiValidator),
             DefaultValidationTest.class);
-        
+
         return new XWikiTestSetup(suite);
     }
 

@@ -218,35 +218,40 @@ var XWiki = (function(XWiki) {
 
       var isCreateFromTemplate = (this.form.template && this.form.template.value);
 
-      if ($('previousVersion')) {
-        $('previousVersion').setValue(currentVersion);
-        $('editingVersionDate').setValue(editingVersionDate.toISOString());
-        $('isNew').setValue(isNew);
-      } else {
-        this.form.insert(new Element("input", {
-          type: "hidden",
-          name: "previousVersion",
-          id: "previousVersion",
-          value: currentVersion
-        }));
-        this.form.insert(new Element("input", {
-          type: "hidden",
-          name: "editingVersionDate",
-          id: "editingVersionDate",
-          value: editingVersionDate.toISOString()
-        }));
-        this.form.insert(new Element("input", {
-          type: "hidden",
-          name: "isNew",
-          id: "isNew",
-          value: isNew.toString()
-        }));
-      }
-
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
       var isCustomForm = (this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1);
       if (isCustomForm) {
         return;
+      }
+
+      // We only send the version info if we are on a standard edit.
+      var isFromStandardEditor = window.location.href.indexOf("/edit/") != -1;
+
+      if (isFromStandardEditor) {
+        if ($('previousVersion')) {
+          $('previousVersion').setValue(currentVersion);
+          $('editingVersionDate').setValue(editingVersionDate.toISOString());
+          $('isNew').setValue(isNew);
+        } else {
+          this.form.insert(new Element("input", {
+            type: "hidden",
+            name: "previousVersion",
+            id: "previousVersion",
+            value: currentVersion
+          }));
+          this.form.insert(new Element("input", {
+            type: "hidden",
+            name: "editingVersionDate",
+            id: "editingVersionDate",
+            value: editingVersionDate.toISOString()
+          }));
+          this.form.insert(new Element("input", {
+            type: "hidden",
+            name: "isNew",
+            id: "isNew",
+            value: isNew.toString()
+          }));
+        }
       }
 
       // Handle explicitly requested synchronous operations (mainly for backwards compatibility).

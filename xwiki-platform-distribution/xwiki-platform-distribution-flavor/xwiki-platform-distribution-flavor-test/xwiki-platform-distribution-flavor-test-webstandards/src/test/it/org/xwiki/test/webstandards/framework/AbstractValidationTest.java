@@ -126,9 +126,18 @@ public class AbstractValidationTest extends TestCase
 
         // Execute the method.
         try {
+            String originalURI = method.getURI().toString();
+
             int statusCode = this.client.executeMethod(method);
 
-            assertEquals(String.format("Method [%s] failed with status [%s]", method.getURI(), method.getStatusLine()),
+            String uriMessage;
+            if (!originalURI.equals(method.getURI().toString())) {
+                uriMessage = String.format("[%s] (redirected to [%s])", originalURI, method.getURI());
+            } else {
+                uriMessage = String.format("[%s]", method.getURI());
+            }
+
+            assertEquals(String.format("Method %s failed with status [%s]", uriMessage, method.getStatusLine()),
                 HttpStatus.SC_OK, statusCode);
 
             // Read the response body.

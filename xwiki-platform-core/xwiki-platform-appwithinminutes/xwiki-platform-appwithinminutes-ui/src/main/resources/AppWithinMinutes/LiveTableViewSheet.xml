@@ -41,7 +41,7 @@
 {{velocity output="false"}}
 #macro (displayApp)
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
-  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet', {'currentApp': $doc.getDocumentReference()}))
   #if (!$isReadOnly)
     #displayAppActions
   #end
@@ -404,6 +404,14 @@ return XWiki;
  * Rename Application
  */
 require(['jquery', 'bootstrap'], function($) {
+  #set ($currentDocReference = $xwiki.getDocument($request.currentApp).getDocumentReference())
+  // if we cannot find any extension related to this page app, it's not part of an extension.
+  var isNotAnExtension = $services.extension.xar.getInstalledExtensions($currentDocReference).isEmpty();
+
+  // double negation! if it's an extension, we stop there: we don't want to add custom AWM rename capabilities
+  if (!isNotAnExtension) {
+        return;
+  }
   // Hijack the rename page action.
   var renameAppModal = $('#renameAppModal');
   $('#tmActionRename').click(function(event) {

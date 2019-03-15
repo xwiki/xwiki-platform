@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.LoginPage;
 
 /**
  * Represents the common actions possible on all Pages when using the "edit" action with "wiki" editor
@@ -51,6 +52,9 @@ public class WikiEditPage extends PreviewableEditPage
 
     @FindBy(name = "comment")
     private WebElement commentInput;
+
+    @FindBy(className = "modal-popup")
+    private WebElement modal;
 
     /**
      * Go to the passed page in wiki edit mode.
@@ -144,5 +148,32 @@ public class WikiEditPage extends PreviewableEditPage
     public boolean isEditCommentDisplayed()
     {
         return this.commentInput.isDisplayed();
+    }
+
+    public boolean loginModalDisplayed() {
+        if (!this.modal.isDisplayed()) {
+            return false;
+        }
+
+        return this.modal.findElement(By.cssSelector("a[title=login]")).isDisplayed();
+    }
+
+    public void closeLoginModal()
+    {
+        this.modal.findElement(By.cssSelector("button.btn-primary")).click();
+    }
+
+    public LoginPage clickModalLoginLink()
+    {
+        String currentWindow = getDriver().getWindowHandle();
+        this.modal.findElement(By.cssSelector("a[title=login]")).click();
+        for (String handle : getDriver().getWindowHandles()) {
+            if (!handle.equals(currentWindow)) {
+                getDriver().switchTo().window(handle);
+            }
+        }
+
+        getDriver().waitUntilElementIsVisible(By.id("j_username"));
+        return new LoginPage();
     }
 }

@@ -367,13 +367,64 @@ var XWiki = (function(XWiki) {
       document.fire("xwiki:document:saved");
     },
     on401 : function (response) {
-      if (window.CKEDITOR) {
-        try {
-          // Deactivate the warning about leaving the current page
-          CKEDITOR.instances.content.resetDirty();
-        } catch (e) {}
-      }
-      this.form.submit();
+      this.progressBox.hide();
+      this.savingBox.hide();
+      this.savedBox.hide();
+      this.failedBox.hide();
+
+      var displayAuthorizationErrorModal = function (jsonAnswer) {
+        XWiki.widgets.EditModalPopup = Class.create(XWiki.widgets.ModalPopup, {
+          /** Default parameters can be added to the custom class. */
+          defaultInteractionParameters : {},
+          /** Constructor. Registers the key listener that pops up the dialog. */
+          initialize : function($super, interactionParameters) {
+            this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
+            // call constructor from ModalPopup with params content, shortcuts, options
+            $super(
+              this.createContent(this.interactionParameters, this),
+              {
+                "show"  : { method : this.showDialog,  keys : [] },
+                //"close" : { method : this.closeDialog, keys : ['Esc'] }
+              },
+              {
+                displayCloseButton : false,
+                verticalPosition : "center",
+                backgroundColor : "#FFF",
+                removeOnClose : true
+              }
+            );
+            this.showDialog();
+          },
+          /** Get the content of the modal dialog using ajax */
+          createContent : function (data, modal) {
+            var content =  new Element('div', {'class': 'modal-popup'});
+            var buttonsDiv =  new Element('div');
+
+            content.insert("$services.localization.render('core.editors.save.authorizationError.message')");
+            content.insert(new Element('br'));
+            content.insert(new Element('br'));
+            var loginUrl = XWiki.currentDocument.getURL("login");
+
+            var link = new Element('a', {'title': 'login', 'href': loginUrl, 'target': '_new'});
+            link.insert("$services.localization.render('core.editors.save.authorizationError.followLink')");
+            content.insert(link);
+            content.insert(buttonsDiv);
+
+            var br = new Element('br');
+            var buttonCreate = new Element('button', {'class': 'btn btn-primary'});
+            buttonCreate.insert("OK");
+            buttonsDiv.insert(br);
+            buttonsDiv.insert(buttonCreate);
+            buttonCreate.on("click", function () {
+              modal.closeDialog();
+            });
+            return content;
+          }
+        });
+        return new XWiki.widgets.EditModalPopup();
+      };
+
+      displayAuthorizationErrorModal(response.responseJSON);
     },
     // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
     on409 : function(response) {
@@ -408,7 +459,7 @@ var XWiki = (function(XWiki) {
           /** Get the content of the modal dialog using ajax */
           createContent : function (data, modal) {
             var content =  new Element('div', {'class': 'modal-popup'});
-            var buttonsDiv =  new Element('div', {'class': 'realtime-buttons'});
+            var buttonsDiv =  new Element('div');
 
             content.insert("$services.localization.render('core.editors.save.conflictversion.rollbackmessage')");
 

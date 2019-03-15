@@ -76,16 +76,16 @@ platform.wiki.menu.deletewiki=Удалить
 platform.wiki.menu.userwikis=Вики
 
 ## Dependencies
-### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.wiki.missing=Java-компонент "Wiki" не установлен. Эта страница не будет работать должным образом. Убедитесь, что установлены расширения "Wiki API" и "Wiki Script" (используйте Менеджер Расширений) или что файлы 'xwiki-platform-wiki-api-&lt;version&gt;.jar' и 'xwiki-platform-wiki-script-&lt;version&gt;.jar' присутствуют в папке web-приложения 'WEB-INF/lib/' (в случае установки вручную).
+platform.wiki.dependencies.template.missing=Java-компонент "Wiki Template" не установлен. Эта страница не будет работать должным образом. Убедитесь, что установлены расширения "Wiki Template API" и "Wiki Template Script" (используйте Менеджер Расширений) или что файлы 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' и 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' присутствуют в папке web-приложения 'WEB-INF/lib/' (в случае установки вручную).
+platform.wiki.dependencies.user.missing=Java-компонент "Wiki User" не установлен. Эта страница не будет работать должным образом. Убедитесь, что установлены расширения "Wiki User API" и "Wiki User Script" (используйте Менеджер Расширений) или что файлы 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' и 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' присутствуют в папке web-приложения 'WEB-INF/lib/' (в случае установки вручную).
 
 ## Create
 platform.wiki.create.button=Создать Вики
 platform.wiki.create.title=Создать новую Вики
 platform.wiki.create.members=УЧАСТНИКИ
 platform.wiki.create.prettyname.empty=Краткое название не может быть пустым
-### Missing: platform.wiki.create.error=Wiki \"{0}\" creation failed: {1}.
+platform.wiki.create.error=Ошибка создания wiki "{0}": {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=База данных с таким идентификатором уже есть
 platform.wiki.create.error.wikiname.wikialreadyexists=Такой идентификатор уже есть
 platform.wiki.create.error.wikiname.empty=Идентификатор не может быть пустым
@@ -230,7 +230,7 @@ platform.wiki.create.wizard.step.create=Создать
 platform.wiki.create.wizard.step.creation=Создание вики
 platform.wiki.create.wizard.step.creation.wait=Пожалуйста, подождите, пока создается вики.
 platform.wiki.create.wizard.step.creation.complete=Вики {0} успешно создана. Теперь вы можете войти.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However error(s) have been generated during that process and you might want to review them.
+platform.wiki.create.wizard.step.creation.errorlog=Во ходе этого процесса возникли ошибки, вы можете их просмотреть.
 platform.wiki.create.wizard.step.creation.error=Вики {0} была создана, но некоторые страницы не были установлены. Следовательно, вики может вести себя ошибочно, и вам, вероятно, следует удалить его.
 platform.wiki.create.wizard.step.creation.go=Перейти к вики
 
@@ -242,7 +242,7 @@ admin.wikis.templates.hint=Шаблон - это вики, которая буд
 admin.wikis.rights=Право на создание
 
 ## XWikiServer Sheet
-### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
+platform.wiki.sheet.title=Дескриптор wiki "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=Псевдоним вики "{0}" уже существует.
 platform.wiki.sheet.erroraliasdoesnotexists=Псевдоним вики "{0}" не существует.
 platform.wiki.sheet.title.settings=Свойства Wiki

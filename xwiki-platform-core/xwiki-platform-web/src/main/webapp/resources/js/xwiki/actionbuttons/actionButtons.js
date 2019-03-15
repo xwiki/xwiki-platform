@@ -220,7 +220,7 @@ var XWiki = (function(XWiki) {
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
       var isCustomForm = (this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1);
-      if (isCustomForm) {
+      if (isCustomForm && !isContinue) {
         return;
       }
 
@@ -300,6 +300,7 @@ var XWiki = (function(XWiki) {
         on1223 : this.on1223.bindAsEventListener(this),
         on0 : this.on0.bindAsEventListener(this),
         on409 : this.on409.bindAsEventListener(this),
+        on401 : this.on401.bindAsEventListener(this),
         onFailure : this.onFailure.bind(this)
       });
     },
@@ -342,20 +343,37 @@ var XWiki = (function(XWiki) {
           // Disable the form while waiting for the save&view operation to finish.
           this.form.disable();
         }
-        // Start the progress display.
-        this.getStatus(response.responseJSON.links[0].href, isContinue);
-      } else if (isContinue) {
+        if (response.responseJSON) {
+          // Start the progress display.
+          this.getStatus(response.responseJSON.links[0].href, isContinue);
+        } else {
+          this.progressBox.hide();
+          this.savingBox.replace(this.savedBox);
+        }
+      } else {
+        this.progressBox.hide();
         this.savingBox.replace(this.savedBox);
       }
 
-      // update the version
-      require(['xwiki-meta'], function (xm) {
-        xm.setVersion(response.responseJSON.newVersion);
-      });
+      if (response.responseJSON && response.responseJSON.newVersion) {
+        // update the version
+        require(['xwiki-meta'], function (xm) {
+          xm.setVersion(response.responseJSON.newVersion);
+        });
+      }
 
       // Announce that the document has been saved
       // TODO: We should send the new version as a memo field
       document.fire("xwiki:document:saved");
+    },
+    on401 : function (response) {
+      if (window.CKEDITOR) {
+        try {
+          // Deactivate the warning about leaving the current page
+          CKEDITOR.instances.content.resetDirty();
+        } catch (e) {}
+      }
+      this.form.submit();
     },
     // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
     on409 : function(response) {

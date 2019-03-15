@@ -5205,15 +5205,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Wiki content stored in xobjects
             if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
                 TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
-                LargeStringProperty field = (LargeStringProperty) xobject.getField(textAreaClass.getName());
+                PropertyInterface field = xobject.getField(textAreaClass.getName());
 
-                if (field != null) {
+                // Make sure the field is the right type (might happen while a document is being migrated)
+                if (field instanceof LargeStringProperty) {
+                    LargeStringProperty largeField = (LargeStringProperty) field;
+
                     try {
-                        XDOM dom = parseContent(getSyntax(), field.getValue(), getDocumentReference());
+                        XDOM dom = parseContent(getSyntax(), largeField.getValue(), getDocumentReference());
                         getUniqueLinkedEntityReferences(dom, entityType, references);
                     } catch (XWikiException e) {
                         LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: {}",
-                            field.getReference(), ExceptionUtils.getRootCauseMessage(e));
+                            largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
             }
@@ -8481,11 +8484,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     for (Object fieldClass : bclass.getProperties()) {
                         if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
                             TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
-                            LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
+                            PropertyInterface field = bobject.getField(textAreaClass.getName());
 
-                            if (field != null) {
-                                field.setValue(performSyntaxConversion(field.getValue(), getDocumentReference(),
-                                    getSyntax(), targetSyntax));
+                            // Make sure the field is the right type (might happen while a document is being migrated)
+                            if (field instanceof LargeStringProperty) {
+                                LargeStringProperty largeField = (LargeStringProperty) field;
+
+                                largeField.setValue(performSyntaxConversion(largeField.getValue(),
+                                    getDocumentReference(), getSyntax(), targetSyntax));
                             }
                         }
                     }

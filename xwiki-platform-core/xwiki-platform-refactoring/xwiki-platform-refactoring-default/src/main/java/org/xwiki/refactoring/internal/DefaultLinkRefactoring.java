@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -46,6 +45,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
@@ -73,15 +73,6 @@ public class DefaultLinkRefactoring implements LinkRefactoring
      */
     @Inject
     private JobProgressManager progressManager;
-
-    /**
-     * Used to serialize link references.
-     *
-     * @see #updateRelativeLinks(XWikiDocument, DocumentReference)
-     */
-    @Inject
-    @Named("compact")
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     /**
      * Used to get a {@link BlockRenderer} dynamically.
@@ -173,7 +164,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
                 modified |= renameLinks(xobject, document, oldTarget, newTarget, renderer, xcontext, relative);
             }
         }
-        
+
         if (modified) {
             if (relative) {
                 saveDocumentPreservingContentAuthor(document, "Updated the relative links.", true);
@@ -229,24 +220,27 @@ public class DefaultLinkRefactoring implements LinkRefactoring
             // Wiki content stored in xobjects
             if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
                 TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
-                LargeStringProperty field = (LargeStringProperty) xobject.getField(textAreaClass.getName());
+                PropertyInterface field = xobject.getField(textAreaClass.getName());
 
-                if (field != null) {
+                // Make sure the field is the right type (might happen while a document is being migrated)
+                if (field instanceof LargeStringProperty) {
+                    LargeStringProperty largeField = (LargeStringProperty) field;
+
                     try {
                         // Parse property content
-                        XDOM xdom = this.contentParser.parse(field.getValue(), document.getSyntax(),
+                        XDOM xdom = this.contentParser.parse(largeField.getValue(), document.getSyntax(),
                             document.getDocumentReference());
 
                         // Rename references
                         if (renameLinks(xdom, document.getDocumentReference(), oldTarget, newTarget, relative)) {
                             // Serialize property content
-                            field.setValue(renderXDOM(xdom, renderer));
+                            largeField.setValue(renderXDOM(xdom, renderer));
 
                             modified = true;
                         }
                     } catch (Exception e) {
                         this.logger.warn("Failed to rename links from xobject property [{}], skipping it. Error: {}",
-                            field.getReference(), ExceptionUtils.getRootCauseMessage(e));
+                            largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
             }

@@ -98,7 +98,7 @@ notifications.filters.preferences.setEnabled.error=Не удалось сохр�
 notifications.toggle.disabled.hint=Вам нужно включить уведомления в ваших настройках
 
 ## Notifications formats
-notifications.format.alert=Alert
+notifications.format.alert=Оповещение
 notifications.format.email=E-mail
 
 ## Filter preferences settings

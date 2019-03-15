@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>annotations.title=Аннотировать
 annotations.menu.loading=Загрузка настроек аннотаций
-annotations.menu.loaderror=Ошибка:
+annotations.menu.loaderror=Не удалось:
 annotations.tab.info.noannotations=Нет аннотаций на странице
 
 annotations.settings.display=Показать аннотации

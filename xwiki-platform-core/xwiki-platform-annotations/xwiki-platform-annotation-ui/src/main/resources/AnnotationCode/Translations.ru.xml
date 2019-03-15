@@ -46,7 +46,7 @@ annotations.settings.error.wrongsyntax=Аннотации недоступны �
 annotations.settings.error.notarget=Не указана страница для получения настроек аннотаций.
 
 annotations.annotated.loading=Загрузка аннотированной страницы
-annotations.annotated.loaderror=Не удалось:
+annotations.annotated.loaderror=Ошибка:
 annotations.annotated.loaderror.wrongresponse=Неправильно отформатированный ответ сервера
 annotations.annotated.error.noannotatedelement=Не удалось загрузить аннотации, поскольку контент недоступен.
 annotations.annotated.error.wrongsyntax=Аннотации недоступны для страниц, написанных в синтаксисе XWiki / 1.0.

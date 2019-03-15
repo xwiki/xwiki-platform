@@ -319,25 +319,6 @@ var XWiki = (function(XWiki) {
         this.form.template.value = "";
       }
 
-      // Save & View with no template specified needs no special handling.
-      // Same for Save & Continue with no template specified in preview mode.
-      if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
-        // Disable the form while waiting for the save&view operation to finish.
-        this.form.disable();
-        // prevent the page to display a warning for leaving page.
-        if (window.CKEDITOR) {
-          try {
-            CKEDITOR.instances.content.resetDirty();
-          } catch (e) {}
-        }
-        // we are on preview mode, we need to go back to the editor.
-        if ($('backtoedit') && isContinue) {
-          window.location.href=$('backtoedit').readAttribute('action');
-        } else {
-          window.location.href=XWiki.currentDocument.getURL('view');
-        }
-      }
-
       if (isCreateFromTemplate) {
         if (!isContinue) {
           // Disable the form while waiting for the save&view operation to finish.
@@ -350,6 +331,18 @@ var XWiki = (function(XWiki) {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
         }
+        // Save & View with no template specified needs no special handling.
+        // Same for Save & Continue with no template specified in preview mode.
+      } else if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
+        // Disable the form while waiting for the save&view operation to finish.
+        this.form.disable();
+        // prevent the page to display a warning for leaving page.
+        if (window.CKEDITOR) {
+          try {
+            CKEDITOR.instances.content.resetDirty();
+          } catch (e) {}
+        }
+        this.maybeRedirect(isContinue);
       } else {
         this.progressBox.hide();
         this.savingBox.replace(this.savedBox);

@@ -313,6 +313,48 @@ public class DefaultWikiMacroTest
         assertEquals("default_value default_value", printer.toString());
     }
 
+    @Test
+    public void testContext() throws Exception
+    {
+        // Override default velocity manager with a mock
+        VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
+
+        // Initialize velocity engine.
+        final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
+        Properties properties = new Properties();
+        properties.setProperty("resource.loader", "file");
+        vEngine.initialize(properties);
+
+        // Hack into velocity context.
+        final VelocityContext vContext = new VelocityContext();
+        vContext.put("xcontext", this.oldcore.getXWikiContext());
+
+        when(mockVelocityManager.getCurrentVelocityContext()).thenReturn(vContext);
+        when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
+            .thenAnswer(new Answer<Boolean>()
+            {
+                @Override
+                public Boolean answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
+                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
+                }
+            });
+
+        List<WikiMacroParameterDescriptor> parameterDescriptors =
+            Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, "default_value"));
+
+        registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.sdoc{{/velocity}}", Syntax.XWIKI_2_0,
+            parameterDescriptors);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0, printer);
+
+        assertEquals("space.macroPage", printer.toString());
+    }
+
     /**
      * Makes sure getParameterNames return parameters with source case.
      */

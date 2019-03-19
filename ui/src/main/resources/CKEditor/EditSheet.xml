@@ -240,18 +240,6 @@ define('xwiki-ckeditor', [
     });
   }
 
-  var isMacroOutput = function(element) {
-    return element.getAscendant &amp;&amp; element.getAscendant(function(ancestor) {
-      var previousSibling = ancestor.previous;
-      // Look for the first (closest) sibling macro marker comment, knowing that macro markers cannot be nested.
-      while (previousSibling &amp;&amp; (previousSibling.type !== ckeditor.NODE_COMMENT ||
-        (previousSibling.value !== 'stopmacro' &amp;&amp; previousSibling.value.substr(0, 11) !== 'startmacro:'))) {
-        previousSibling = previousSibling.previous;
-      }
-      return previousSibling &amp;&amp; previousSibling.value !== 'stopmacro';
-    });
-  };
-
   var loadJavaScriptSkinExtensions = $jsontool.serialize($xwiki.getDocument('CKEditor.Config'
     ).getValue('loadJavaScriptSkinExtensions')) === 1;
 
@@ -284,7 +272,7 @@ define('xwiki-ckeditor', [
       },
       '$3': {
         // Wiki syntax macros can output any HTML.
-        match: isMacroOutput,
+        match: CKEDITOR.plugins.xwikiMacro.isMacroOutput,
         attributes: '*',
         styles: '*',
         classes: '*'

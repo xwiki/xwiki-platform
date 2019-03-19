@@ -143,10 +143,7 @@
       editor.widgets.add('xwiki-macro', {
         requiredContent: 'div(macro,macro-placeholder)[data-macro];span(macro,macro-placeholder)[data-macro]',
         pathName: 'macro',
-        upcast: function(element) {
-          return (element.name == 'div' || element.name == 'span') &&
-            element.hasClass('macro') && element.attributes['data-macro'];
-        },
+        upcast: CKEDITOR.plugins.xwikiMacro.isMacroElement,
         // The passed widgetElement is actually a clone of the widget element, of type CKEDITOR.htmlParser.element
         downcast: function(widgetElementClone) {
           var startMacroComment = new CKEDITOR.htmlParser.comment(widgetElementClone.attributes['data-macro']);
@@ -478,4 +475,39 @@
       return CKEDITOR.tools.escapeComment(output.join(''));
     }
   });
+
+  CKEDITOR.plugins.xwikiMacro = {
+    // The passed element is of type CKEDITOR.htmlParser.element
+    isMacroElement: function(element) {
+      return (element.name == 'div' || element.name == 'span') &&
+        element.hasClass('macro') && element.attributes['data-macro'];
+    },
+
+    // The passed element is of type CKEDITOR.htmlParser.element
+    isMacroOutput: function(element) {
+      return element.getAscendant && element.getAscendant(function(ancestor) {
+        // The macro marker comments might have been already processed (e.g. in the case of nested editables) so we need
+        // to look for a macro output wrapper also.
+        if (CKEDITOR.plugins.xwikiMacro.isMacroElement(ancestor)) {
+          return true;
+        }
+        // Look for macro marker comments otherwise, taking into account that macro markers can be "nested".
+        var nestingLevel = 0;
+        var previousSibling = ancestor;
+        while (previousSibling.previous && nestingLevel <= 0) {
+          previousSibling = previousSibling.previous;
+          if (previousSibling.type === CKEDITOR.NODE_COMMENT) {
+            if (previousSibling.value === 'stopmacro') {
+              // Macro output end.
+              nestingLevel--;
+            } else if (previousSibling.value.substr(0, 11) === 'startmacro:') {
+              // Macro output start.
+              nestingLevel++;
+            }
+          }
+        }
+        return nestingLevel > 0;
+      });
+    }
+  };
 })();

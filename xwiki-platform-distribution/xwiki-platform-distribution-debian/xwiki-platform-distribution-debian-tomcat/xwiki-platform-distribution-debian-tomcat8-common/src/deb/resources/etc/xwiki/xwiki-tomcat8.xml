@@ -25,9 +25,11 @@
 <!-- Context configuration file for the XWiki Web App -->
 
 <Context path="/xwiki" docBase="/usr/lib/xwiki" privileged="true" crossContext="true">
-  <!-- Make symlinks work in Tomcat -->
-  <Resources allowLinking="true" />
+  <!-- Make symlinks work in Tomcat, and fix problem described in XWIKI-16236
+       causing catalina.out warnings on "evicting expired cache entries", which
+       is solved by increasing the cache size. -->
+  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="30720" cacheObjectMaxSize="1536" />
 
   <!-- Disable JAR scanning since Xwiki does not need that -->
-  <JarScanner scanClassPath="false"/>
+  <JarScanner scanClassPath="false"> <JarScanFilter defaultTldScan="false"/> </JarScanner>
 </Context>

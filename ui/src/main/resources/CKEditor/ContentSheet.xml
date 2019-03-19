@@ -185,7 +185,9 @@
       <code>#body[contenteditable="true"] {
   /* We use margin instead of padding because of https://github.com/ckeditor/ckeditor-dev/issues/2655 (Nested editable
     can't be focused under certain circumstances) */
-  margin: 1em;
+  /* We need more space at the bottom in order to be sure that the magic line is visible all the time (see CKEDITOR-283:
+    Cannot add content after a DIV located at the end of the document) */
+  margin: 1em 1em 30px;
   padding: 0;
 }
 

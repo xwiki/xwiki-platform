@@ -125,21 +125,6 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
-           https://jira.xwiki.org/browse/XWIKI-7683 -->
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!-- We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension to
        install on a subwiki by default (which is something we test)
        Otherwise the wiki creation form will display the flavor picker and the functional tests do not handle it. -->
@@ -214,6 +199,8 @@
             <version>${project.version}</version>
           </dependency>
         </dependencies>
+        <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
+                   https://jira.xwiki.org/browse/XWIKI-7683 -->
         <executions>
           <execution>
             <phase>generate-test-resources</phase>

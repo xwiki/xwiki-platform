@@ -79,7 +79,7 @@ public abstract class AbstractContainerExecutor
         // would not work with parallel executions (think about multiple CI jobs executing in parallel on the same host)
         // and would also not be clean.
         String osName = System.getProperty("os.name").toLowerCase();
-        if (IN_A_CONTAINER || osName.startsWith("mac os x")) {
+        if (isInAContainer() || osName.startsWith("mac os x")) {
             MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory);
             container.withCopyFileToContainer(mountableDirectory, targetDirectory);
         } else {
@@ -108,5 +108,14 @@ public abstract class AbstractContainerExecutor
         }
 
         return StringUtils.join(commands, ' ');
+    }
+
+    /**
+     * @return true if the test framework is running inside a Docker container (DOOD pattern)
+     * @since 11.3RC1
+     */
+    protected boolean isInAContainer()
+    {
+        return IN_A_CONTAINER;
     }
 }

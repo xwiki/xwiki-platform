@@ -54,6 +54,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String LATEST = "latest";
 
+    private static final String CLOVER_DATABASE = System.getProperty("maven.clover.cloverDatabase");
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -163,10 +165,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
         }
 
-        // If the Clover database system property is setup, the map the clover database location on the FS to a path
-        // inside the container
-        String cloverDatabase = System.getProperty("maven.clover.cloverDatabase");
-        if (cloverDatabase != null) {
+        // If the Clover database system property is setup, then copy or map the clover database location on the FS to
+        // a path inside the container
+        if (CLOVER_DATABASE != null && !this.testConfiguration.getServletEngine().isOutsideDocker()) {
             // Note 1: The Clover instrumentation puts the full path to the clover database location inside the java
             // source files which execute inside the docker container. Thus we need to make that exact same full path
             // available inside the container...
@@ -174,7 +175,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             // running will need to have mapped the volume pointed to by the "maven.clover.cloverDatabase" system
             // property. It'll also need to make sure that it's removed before the build executes so that it doesn't
             // execute with Clover data from a previous run.
-            this.servletContainer.withFileSystemBind(cloverDatabase, cloverDatabase);
+            // Note 3: The copy is done the other way around when the container is stopped so that the new added
+            // Clover data is available from the Maven container for computing the Clover report.
+            mountFromHostToContainer(this.servletContainer, CLOVER_DATABASE, CLOVER_DATABASE);
         }
 
         start(this.servletContainer, this.testConfiguration);
@@ -239,6 +242,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
             default:
                 // Nothing else to do, TestContainers automatically stops the container
+        }
+
+        // If the Clover database system property is setup, then copy back the data to the parent container if need be.
+        if (CLOVER_DATABASE != null && !this.testConfiguration.getServletEngine().isOutsideDocker()
+            && isInAContainer())
+        {
+            this.servletContainer.copyFileFromContainer(CLOVER_DATABASE, CLOVER_DATABASE);
         }
     }
 }

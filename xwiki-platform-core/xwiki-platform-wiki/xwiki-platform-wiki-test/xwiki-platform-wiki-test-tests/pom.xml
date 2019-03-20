@@ -125,6 +125,37 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
+        <dependencies>
+          <!-- TODO: remove the need for this dependency in the future. The reason we need it right now is because
+               the Packager Mojo will use the Import Mojo to import XARs but since we've defined the
+               xwikiDbHbmCommonExtraMappings property up there, it's using it and thus we need the mapping file to be
+               in the classpath. -->
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-eventstream-store</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-notifications-filters-default</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
+        <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
+                   https://jira.xwiki.org/browse/XWIKI-7683 -->
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension to
        install on a subwiki by default (which is something we test)
        Otherwise the wiki creation form will display the flavor picker and the functional tests do not handle it. -->
@@ -178,37 +209,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <dependencies>
-          <!-- TODO: remove the need for this dependency in the future. The reason we need it right now is because
-               the Packager Mojo will use the Import Mojo to import XARs but since we've defined the
-               xwikiDbHbmCommonExtraMappings property up there, it's using it and thus we need the mapping file to be
-               in the classpath. -->
-          <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-eventstream-store</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-notifications-filters-default</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
-        <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
-                   https://jira.xwiki.org/browse/XWIKI-7683 -->
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
            browser several times -->

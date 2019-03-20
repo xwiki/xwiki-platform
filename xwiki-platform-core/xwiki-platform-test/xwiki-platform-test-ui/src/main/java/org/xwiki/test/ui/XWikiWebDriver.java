@@ -997,4 +997,13 @@ public class XWikiWebDriver extends RemoteWebDriver
     {
         return this.wrappedDriver.findElement(by);
     }
+
+    /**
+     * @return the original {@link RemoteWebDriver} created for selenium tests.
+     *          The original driver should be used for custom {@link org.openqa.selenium.interactions.Actions}.
+     */
+    public RemoteWebDriver getWrappedDriver()
+    {
+        return this.wrappedDriver;
+    }
 }

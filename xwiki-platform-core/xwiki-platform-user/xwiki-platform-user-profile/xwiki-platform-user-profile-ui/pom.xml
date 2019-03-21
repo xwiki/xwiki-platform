@@ -84,6 +84,14 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed for the user's dashboard tab -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-dashboard-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed for membership tab -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

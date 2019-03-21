@@ -38,6 +38,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.CommandExecutor;
@@ -1001,9 +1002,22 @@ public class XWikiWebDriver extends RemoteWebDriver
     /**
      * @return the original {@link RemoteWebDriver} created for selenium tests.
      *          The original driver should be used for custom {@link org.openqa.selenium.interactions.Actions}.
+     * @since 11.2RC1
      */
     public RemoteWebDriver getWrappedDriver()
     {
         return this.wrappedDriver;
+    }
+
+    /**
+     * Utility method to perform a drag&drop by using the appropriate WebDriver.
+     * @param source the element to drag
+     * @param target the element where to drop
+     *
+     * @since 11.2RC1
+     */
+    public void dragAndDrop(WebElement source, WebElement target)
+    {
+        new Actions(this.getWrappedDriver()).dragAndDrop(source, target).perform();
     }
 }

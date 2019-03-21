@@ -74,12 +74,12 @@ public class NavigationPanelAdministrationPage extends ViewPage
                 By.xpath(".//*[@class = 'jstree-anchor' and . = '" + page + "']"));
             // If there is more than one page to include we need to select all of them first.
             if (pages.length > 1) {
-                new Actions(getDriver()).keyDown(Keys.LEFT_CONTROL).click(source).keyUp(Keys.LEFT_CONTROL).build()
-                    .perform();
+                new Actions(getDriver().getWrappedDriver()).keyDown(Keys.LEFT_CONTROL).click(source)
+                    .keyUp(Keys.LEFT_CONTROL).build().perform();
             }
         }
         if (source != null) {
-            new Actions(getDriver()).dragAndDrop(source, this.excludedPagesPane).build().perform();
+            getDriver().dragAndDrop(source, this.excludedPagesPane);
         }
     }
 
@@ -103,7 +103,7 @@ public class NavigationPanelAdministrationPage extends ViewPage
             }
         }
         if (source != null) {
-            new Actions(getDriver()).dragAndDrop(source, this.treeElement).build().perform();
+            getDriver().dragAndDrop(source, this.treeElement);
         }
     }
 

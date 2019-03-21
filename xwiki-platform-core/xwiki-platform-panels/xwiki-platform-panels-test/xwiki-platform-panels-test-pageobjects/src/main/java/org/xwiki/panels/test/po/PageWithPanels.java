@@ -39,4 +39,26 @@ public class PageWithPanels extends BasePage
         String xpath = String.format("//h1[@class = 'xwikipaneltitle' and . = '%s']", panelTitle);
         return getDriver().findElementsWithoutWaiting(By.xpath(xpath)).size() > 0;
     }
+
+    public boolean hasRightPanels()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("rightPanels"));
+    }
+
+    public boolean hasLeftPanels()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("leftPanels"));
+    }
+
+    public boolean hasPanelInRightColumn(String panelName)
+    {
+        return getDriver().hasElementWithoutWaiting(
+            By.xpath("//div[@id = 'rightPanels']/div[contains(@class, '"+panelName+"')]"));
+    }
+
+    public boolean hasPanelInLeftColumn(String panelName)
+    {
+        return getDriver().hasElementWithoutWaiting(
+            By.xpath("//div[@id = 'leftPanels']/div[contains(@class, '"+panelName+"')]"));
+    }
 }

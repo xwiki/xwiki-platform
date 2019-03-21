@@ -26,7 +26,7 @@ import java.util.Properties;
 
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.text.StringUtils;
 
 /**

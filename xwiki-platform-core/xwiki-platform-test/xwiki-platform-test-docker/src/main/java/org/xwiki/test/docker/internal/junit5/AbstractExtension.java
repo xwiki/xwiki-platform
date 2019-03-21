@@ -17,14 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.internal.junit5;
 
 import java.util.Arrays;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
-import org.xwiki.test.docker.junit5.servletEngine.ServletContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;

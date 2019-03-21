@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.internal.junit5;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +40,7 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
+import org.xwiki.test.docker.junit5.ArtifactCoordinate;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 

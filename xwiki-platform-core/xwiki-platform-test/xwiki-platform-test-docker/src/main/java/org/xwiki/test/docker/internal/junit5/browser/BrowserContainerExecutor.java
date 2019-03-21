@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5.browser;
+package org.xwiki.test.docker.internal.junit5.browser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +25,10 @@ import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.SeleniumUtils;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
-import org.xwiki.test.docker.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.browser.Browser;
 
 /**
  * Create and execute the browser docker container for driving the tests.

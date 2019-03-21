@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5.servletEngine;
+package org.xwiki.test.docker.junit5.servletengine;
 
 /**
  * The Servlet Engine to use for the UI tests.

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +36,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
 

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5.servletEngine;
+package org.xwiki.test.docker.internal.junit5.servletengine;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -32,7 +32,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5.database;
+package org.xwiki.test.docker.internal.junit5.database;
 
 import java.util.Properties;
 
@@ -27,7 +27,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.xwiki.test.docker.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.text.StringUtils;
 

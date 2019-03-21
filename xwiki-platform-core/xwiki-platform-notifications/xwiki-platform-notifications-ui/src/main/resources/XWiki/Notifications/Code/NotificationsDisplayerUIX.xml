@@ -282,11 +282,26 @@
   /**
    * Get the number of unread notifications.
    */
-  var getUnreadNotificationsCount = function () {
-    $.ajax(url, {method: 'GET', cache: false, data: {action: 'getUnreadCount'}}).done(function (data) {
-      updateNotificationCount(data.unread);
-      // Do not display the "nothing!" message if there is no unread notification because there might be read
-      // notifications to display.
+  var getUnreadNotificationsCount = function (asyncId) {
+    var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications/count?media=json';
+    var params = {
+      'userId':              XWiki.Model.serialize(xm.userReference),
+      'useUserPreferences':  true,
+      'currentWiki':         xm.documentReference.extractReferenceValue(XWiki.EntityType.WIKI),
+      'async':               true
+    };
+    if (asyncId) {
+      params.asyncId = asyncId;
+    }
+    $.ajax(restURL, {cache: false, data: params}).done(function (data, textStatus, jqXHR) {
+      switch (jqXHR.status) {
+          case 200:
+            updateNotificationCount(data.unread);
+            break;
+          case 202:
+            setTimeout(getUnreadNotificationsCount, 1000, {asyncId: data.asyncId});
+            break;
+      }
     });
   };
 

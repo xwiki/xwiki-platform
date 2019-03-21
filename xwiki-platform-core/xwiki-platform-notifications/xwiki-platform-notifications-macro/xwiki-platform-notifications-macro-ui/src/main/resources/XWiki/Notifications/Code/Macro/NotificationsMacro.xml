@@ -293,46 +293,62 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         'users':               self.users,
         'displayReadStatus':   self.displayReadStatus,
         'tags':                self.tags,
-        'currentWiki':         xm.documentReference.extractReferenceValue(XWiki.EntityType.WIKI)
+        'currentWiki':         xm.documentReference.extractReferenceValue(XWiki.EntityType.WIKI),
+        'async':               true
       };
       if (untilDate) {
         params.untilDate = untilDate;
         params.blackList = self.blackList.join(',');
       }
       var promise = $.Deferred();
-      var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
-      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data) {
-        // Display the "nothing!" message if there is no notification
-        if (data.notifications.length == 0 &amp;&amp; !untilDate) {
-          self.displayNoNotification();
-        }
-        // Display each entry
-        for (var i = 0; i &lt; data.notifications.length; ++i) {
-          self.displayEntry(data.notifications[i]);
-        }
-        self.macro.find('.notifications-macro-load-more').remove();
-        // If there is other notifications to load
-        if (data.notifications.length == self.notificationsLimit) {
-          var loadMore = $('&lt;div&gt;').addClass('text-center').addClass('notifications-macro-load-more');
-          var btn = $('&lt;button&gt;');
-          btn.text("$escapetool.javascript($services.localization.render('notifications.menu.more'))");
-          btn.addClass('btn').addClass('btn-default').addClass('btn-block');
-          loadMore.append(btn);
-          self.insertElementInMacroContainer(loadMore);
-          btn.click(function(event) {
-            loadMore.text('').addClass('loading').css('height', '50px');
-            // We use the date of the last displayed event as an offset to display those that come next
-            var lastCompositeEvent = data.notifications[data.notifications.length - 1];
-            var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
-            self.load(lastEventDate);
-          });
-        }
-        // Remove loading items
-        self.macro.removeClass('loading');
-        // Call the listeners
-        promise.resolve(data.notifications);
-      });
+      self.doLoad(params);
       return promise;
+    };
+    
+    self.doLoad = function(params) {
+      var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
+      $.ajax(restURL, {cache: false, data: params}).done(function (data, textStatus, jqXHR) {
+        switch (jqXHR.status) {
+            case 200:
+              self.showNotifications(data);
+              break;
+            case 202:
+              setTimeout(self.doLoad, 1000, {asyncId: data.asyncId});
+              break;
+        }
+      });
+    };
+    
+    self.showNotifications = function(data) {
+      // Display the "nothing!" message if there is no notification
+      if (data.notifications.length == 0 &amp;&amp; !untilDate) {
+        self.displayNoNotification();
+      }
+      // Display each entry
+      for (var i = 0; i &lt; data.notifications.length; ++i) {
+        self.displayEntry(data.notifications[i]);
+      }
+      self.macro.find('.notifications-macro-load-more').remove();
+      // If there is other notifications to load
+      if (data.notifications.length == self.notificationsLimit) {
+        var loadMore = $('&lt;div&gt;').addClass('text-center').addClass('notifications-macro-load-more');
+        var btn = $('&lt;button&gt;');
+        btn.text("$escapetool.javascript($services.localization.render('notifications.menu.more'))");
+        btn.addClass('btn').addClass('btn-default').addClass('btn-block');
+        loadMore.append(btn);
+        self.insertElementInMacroContainer(loadMore);
+        btn.click(function(event) {
+          loadMore.text('').addClass('loading').css('height', '50px');
+          // We use the date of the last displayed event as an offset to display those that come next
+          var lastCompositeEvent = data.notifications[data.notifications.length - 1];
+          var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
+          self.load(lastEventDate);
+        });
+      }
+      // Remove loading items
+      self.macro.removeClass('loading');
+      // Call the listeners
+      promise.resolve(data.notifications);
     };
     
     /**

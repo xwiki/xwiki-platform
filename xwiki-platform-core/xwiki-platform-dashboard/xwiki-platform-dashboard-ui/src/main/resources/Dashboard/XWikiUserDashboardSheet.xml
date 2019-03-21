@@ -52,6 +52,8 @@
     #set($ok = $dashboardPrefs.set('displayOnMainPage', $defaultValue ))
     #if ($xcontext.action == 'edit')
       #set($ok = $doc.save($services.localization.render('dashboard.initialization.saveMessage'))
+      ## Send the proper event when saving the profile
+      #set ($discard = $xwiki.jsx.use('Dashboard.XWikiUserDashboardSheet'))
     #end
   #end
   {{html clean="false" wiki="true"}}

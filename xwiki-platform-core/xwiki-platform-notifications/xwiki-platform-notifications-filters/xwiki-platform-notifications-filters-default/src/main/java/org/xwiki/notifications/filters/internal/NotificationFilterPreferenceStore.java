@@ -33,6 +33,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
+import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -65,6 +68,9 @@ public class NotificationFilterPreferenceStore
 
     @Inject
     private QueryManager queryManager;
+
+    @Inject
+    private ObservationManager observation;
 
     /**
      * Get the notification preference that corresponds to the given id and user.
@@ -160,6 +166,8 @@ public class NotificationFilterPreferenceStore
                 context.setWikiId(oriDatabase);
             }
         }
+
+        this.observation.notify(new NotificationFilterPreferenceDeletedEvent(), null);
     }
 
     /**
@@ -204,6 +212,10 @@ public class NotificationFilterPreferenceStore
             }
 
             hibernateStore.endTransaction(context, true);
+
+            for (int i = 0; i < filterPreferences.size(); ++i) {
+                this.observation.notify(new NotificationFilterPreferenceAddOrUpdatedEvent(), null);
+            }
         } catch (Exception e) {
             if (hibernateStore != null) {
                 hibernateStore.endTransaction(context, false);

@@ -158,6 +158,17 @@
                     "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyMandatory",
                     "justification": "Not a breackage in this context"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "justification": "Add URL parameters. Not a breakage in this context."
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotificationsCount(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
+                    "justification": "Add new API to get the number of notifications. Not a breakage in this context."
                   }
                 ]
               }

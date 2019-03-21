@@ -21,17 +21,20 @@ package org.xwiki.notifications.rest.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
@@ -112,55 +115,115 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private NotificationEventExecutor executor;
+
     @Override
-    public Response getNotifications(
-            String useUserPreferences,
-            String userId,
-            String untilDate,
-            String blackList,
-            String pages,
-            String spaces,
-            String wikis,
-            String users,
-            String count,
-            String displayOwnEvents,
-            String displayMinorEvents,
-            String displaySystemEvents,
-            String displayReadEvents,
-            String displayReadStatus,
-            String tags,
-            String currentWiki
-    ) throws Exception
+    public Response getNotifications(String useUserPreferences, String userId, String untilDate, String blackList,
+        String pages, String spaces, String wikis, String users, String maxCount, String displayOwnEvents,
+        String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String displayReadStatus,
+        String tags, String currentWiki, String async, String asyncId) throws Exception
     {
-        // 1. Get the events and render them as notifications.
-        List<CompositeEvent> events =
-                getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
-                        users, count,
-                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
-                        currentWiki);
+        Object result = getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
+            users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
+            displayReadEvents, tags, currentWiki, async, asyncId, false, false);
 
-        Notifications notifications = new Notifications(
-                notificationsRenderer.renderNotifications(events, userId, TRUE.equals(displayReadStatus)));
+        // Build the response
+        Response.ResponseBuilder response;
+        if (result instanceof String) {
+            response = Response.status(Status.ACCEPTED);
+            response.entity(Collections.singletonMap("asyncId", result));
+        } else {
+            Notifications notifications = new Notifications(this.notificationsRenderer
+                .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
 
-        // 2: Build the response to add the "cache control" header.
-        Response.ResponseBuilder response = Response.ok(notifications);
+            response = Response.ok(notifications);
+        }
+
+        // Add the "cache control" header.
         CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
         response.cacheControl(cacheControl);
+
+        return response.build();
+    }
+
+    private int toMaxCount(String maxCount, int defaultMaxCount)
+    {
+        return NumberUtils.toInt(maxCount, defaultMaxCount);
+    }
+
+    private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate, String blackList,
+        String pages, String spaces, String wikis, String users, int maxCount, String displayOwnEvents,
+        String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String tags,
+        String currentWiki, String async, String asyncId, boolean onlyUnread, boolean count) throws Exception
+    {
+        Object result = null;
+
+        // 1. Check current asynchronous execution
+        if (asyncId != null) {
+            result = this.executor.popAsync(asyncId);
+
+            if (result == null) {
+                // Another round
+                result = asyncId;
+            }
+        }
+
+        if (result == null) {
+            // 2. Generate the cache key
+            String cacheKey = createCacheKey(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
+                users, maxCount, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
+                currentWiki, onlyUnread);
+
+            // 3. Search events
+            result = this.executor.submit(cacheKey,
+                () -> getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis, users,
+                    maxCount, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
+                    currentWiki, onlyUnread),
+                Boolean.parseBoolean(async), count);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Response getNotificationsCount(String useUserPreferences, String userId, String pages, String spaces,
+        String wikis, String users, String maxCount, String displayOwnEvents, String displayMinorEvents,
+        String displaySystemEvents, String displayReadEvents, String displayReadStatus, String tags, String currentWiki,
+        String async, String asyncId) throws Exception
+    {
+        Object result = getCompositeEvents(useUserPreferences, userId, null, null, pages, spaces, wikis, users,
+            toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents,
+            tags, currentWiki, async, asyncId, true, true);
+
+        // Build the response
+        Response.ResponseBuilder response;
+        if (result instanceof String) {
+            response = Response.status(Status.ACCEPTED);
+            response.entity(Collections.singletonMap("asyncId", result));
+        } else {
+            response = Response.ok(Collections.singletonMap("unread", result));
+        }
+
+        // Add the "cache control" header.
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+        response.cacheControl(cacheControl);
+
         return response.build();
     }
 
     @Override
-    public String getNotificationsRSS(String useUserPreferences, String userId, String untilDate,
-            String blackList, String pages, String spaces, String wikis, String users, String count,
-            String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
-            String displayReadStatus, String tags, String currentWiki) throws Exception
+    public String getNotificationsRSS(String useUserPreferences, String userId, String untilDate, String blackList,
+        String pages, String spaces, String wikis, String users, String maxCount, String displayOwnEvents,
+        String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String displayReadStatus,
+        String tags, String currentWiki) throws Exception
     {
-        List<CompositeEvent> events =
-                getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
-                        users, count,
-                        displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
-                        currentWiki);
+        List<CompositeEvent> events = (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate,
+            blackList, pages, spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents, displayMinorEvents,
+            displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
+
         SyndFeedOutput output = new SyndFeedOutput();
         return output.outputString(notificationRSSManager.renderFeed(events));
     }
@@ -172,39 +235,74 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         // See: https://github.com/restlet/restlet-framework-java/issues/1120
         // That's why we need to use this workaround: manually getting the POST params in the request object.
         XWikiRequest request = getXWikiContext().getRequest();
-        return getNotifications(
-                request.get("useUserPreferences"),
-                request.get("userId"),
-                request.get("untilDate"),
-                request.get("blackList"),
-                request.get("pages"),
-                request.get("spaces"),
-                request.get("wikis"),
-                request.get("users"),
-                request.get("count"),
-                request.get("displayOwnEvents"),
-                request.get("displayMinorEvents"),
-                request.get("displaySystemEvents"),
-                request.get("displayReadEvents"),
-                request.get("displayReadStatus"),
-                request.get("tags"),
-                request.get("currentWiki")
-        );
+        return getNotifications(request.get("useUserPreferences"), request.get("userId"), request.get("untilDate"),
+            request.get("blackList"), request.get("pages"), request.get("spaces"), request.get("wikis"),
+            request.get("users"), request.get("count"), request.get("displayOwnEvents"),
+            request.get("displayMinorEvents"), request.get("displaySystemEvents"), request.get("displayReadEvents"),
+            request.get("displayReadStatus"), request.get("tags"), request.get("currentWiki"), request.get("async"),
+            request.get("asyncId"));
     }
 
-    private List<CompositeEvent> getCompositeEvents(String useUserPreferences, String userId,
-            String untilDate, String blackList, String pages, String spaces, String wikis, String users, String count,
-            String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
-            String tags, String currentWiki)
-            throws NotificationException, EventStreamException
+    private String createCacheKey(String useUserPreferences, String userId, String untilDate, String blackList,
+        String pages, String spaces, String wikis, String users, int maxCount, String displayOwnEvents,
+        String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String tags,
+        String currentWiki, boolean onlyUnread)
+    {
+        StringBuilder cacheKeyBuilder = new StringBuilder();
+
+        addCacheKeyElement(cacheKeyBuilder, useUserPreferences);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, userId);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, untilDate);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, blackList);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, pages);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, spaces);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, wikis);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, users);
+        cacheKeyBuilder.append('/');
+        cacheKeyBuilder.append(maxCount);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, displayOwnEvents);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, displayMinorEvents);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, displaySystemEvents);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, displayReadEvents);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, tags);
+        cacheKeyBuilder.append('/');
+        addCacheKeyElement(cacheKeyBuilder, currentWiki);
+        cacheKeyBuilder.append('/');
+        cacheKeyBuilder.append(onlyUnread);
+
+        return cacheKeyBuilder.toString();
+    }
+
+    private void addCacheKeyElement(StringBuilder cacheKeyBuilder, String value)
+    {
+        if (value != null) {
+            cacheKeyBuilder.append(value.length());
+            cacheKeyBuilder.append(value);
+        }
+    }
+
+    private List<CompositeEvent> getCompositeEvents(String useUserPreferences, String userId, String untilDate,
+        String blackList, String pages, String spaces, String wikis, String users, int maxCount,
+        String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
+        String tags, String currentWiki, boolean onlyUnread) throws NotificationException, EventStreamException
     {
         NotificationParameters parameters = new NotificationParameters();
         parameters.format = NotificationFormat.ALERT;
-        parameters.expectedCount = 10;
+        parameters.expectedCount = maxCount;
+        parameters.onlyUnread = onlyUnread;
 
-        if (StringUtils.isNotBlank(count)) {
-            parameters.expectedCount = Integer.parseInt(count);
-        }
         if (StringUtils.isNotBlank(userId)) {
             parameters.user = documentReferenceResolver.resolve(userId);
         }
@@ -218,16 +316,16 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             useUserPreferences(parameters);
         } else {
             dontUseUserPreferences(pages, spaces, wikis, users, parameters, displayOwnEvents, displayMinorEvents,
-                    displaySystemEvents, displayReadEvents, tags, currentWiki);
+                displaySystemEvents, displayReadEvents, tags, currentWiki);
         }
 
         return getCompositeEvents(parameters);
     }
 
     private void dontUseUserPreferences(String pages, String spaces, String wikis, String users,
-            NotificationParameters parameters, String displayOwnEvents, String displayMinorEvents,
-            String displaySystemEvents, String displayReadEvents, String tags, String currentWiki)
-            throws NotificationException, EventStreamException
+        NotificationParameters parameters, String displayOwnEvents, String displayMinorEvents,
+        String displaySystemEvents, String displayReadEvents, String tags, String currentWiki)
+        throws NotificationException, EventStreamException
     {
         List<String> excludedFilters = new ArrayList<>();
         if (TRUE.equals(displayOwnEvents)) {
@@ -242,9 +340,8 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         if (TRUE.equals(displayReadEvents)) {
             excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
         }
-        parameters.filters = notificationFilterManager.getAllFilters(true).stream().filter(
-                filter -> !excludedFilters.contains(filter.getName())
-        ).collect(Collectors.toList());
+        parameters.filters = notificationFilterManager.getAllFilters(true).stream()
+            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toList());
 
         parameters.filterPreferences = new ArrayList<>(parameters.filterPreferences);
         enableAllEventTypes(parameters);
@@ -259,8 +356,8 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private void useUserPreferences(NotificationParameters parameters) throws NotificationException
     {
         if (parameters.user != null) {
-            parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
-                    parameters.format);
+            parameters.preferences =
+                notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
             parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
             parameters.filterPreferences = notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
         }
@@ -268,7 +365,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     private List<CompositeEvent> getCompositeEvents(NotificationParameters parameters) throws NotificationException
     {
-        return newNotificationManager.getEvents(parameters);
+        return this.newNotificationManager.getEvents(parameters);
     }
 
     private void handlePagesParameter(String pages, NotificationParameters parameters)
@@ -298,7 +395,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     private void handleLocationParameter(String locations, NotificationParameters parameters,
-            NotificationFilterProperty property)
+        NotificationFilterProperty property)
     {
         if (StringUtils.isNotBlank(locations)) {
             Set<NotificationFormat> formats = new HashSet<>();
@@ -326,8 +423,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                     default:
                         break;
                 }
-                parameters.filterPreferences.add(
-                        new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
+                parameters.filterPreferences.add(new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
             }
         }
     }
@@ -335,8 +431,8 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private void enableAllEventTypes(NotificationParameters parameters) throws EventStreamException
     {
         parameters.preferences = new ArrayList<>();
-        for (RecordableEventDescriptor descriptor
-                : recordableEventDescriptorManager.getRecordableEventDescriptors(true)) {
+        for (RecordableEventDescriptor descriptor : recordableEventDescriptorManager
+            .getRecordableEventDescriptors(true)) {
             parameters.preferences.add(new InternalNotificationPreference(descriptor));
         }
     }

@@ -38,6 +38,16 @@ import org.xwiki.test.docker.junit5.browser.Browser;
  */
 public class BrowserContainerExecutor extends AbstractContainerExecutor
 {
+    /**
+     * Default width resolution used by the browser container.
+     */
+    private static final String DEFAULT_WIDTH_RESOLUTION = "1280";
+
+    /**
+     * Default height resolution used by the browser container.
+     */
+    private static final String DEFAULT_HEIGHT_RESOLUTION = "960";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserContainerExecutor.class);
 
     private TestConfiguration testConfiguration;
@@ -62,6 +72,8 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
+            .withEnv("SCREEN_WIDTH", DEFAULT_WIDTH_RESOLUTION)
+            .withEnv("SCREEN_HEIGHT", DEFAULT_HEIGHT_RESOLUTION)
             .withCapabilities(browser.getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")

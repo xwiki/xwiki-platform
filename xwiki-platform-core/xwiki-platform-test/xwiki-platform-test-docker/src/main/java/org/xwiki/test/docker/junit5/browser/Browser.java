@@ -19,7 +19,9 @@
  */
 package org.xwiki.test.docker.junit5.browser;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 /**
  * The browser to use for the UI tests.
@@ -32,26 +34,26 @@ public enum Browser
     /**
      * the Firefox Browser.
      */
-    FIREFOX(DesiredCapabilities.firefox()),
+    FIREFOX(new FirefoxOptions()),
 
     /**
      * the Chrome Browser.
      */
-    CHROME(DesiredCapabilities.chrome());
+    CHROME(new ChromeOptions());
 
     /**
      * The path where to store the test-resources on the browser container.
      */
     private static final String TEST_RESOURCES_PATH = "/tmp/test-resources";
 
-    private DesiredCapabilities capabilities;
+    private Capabilities capabilities;
 
     Browser()
     {
         // Capability will be resolved at runtime
     }
 
-    Browser(DesiredCapabilities capabilities)
+    Browser(Capabilities capabilities)
     {
         this.capabilities = capabilities;
     }
@@ -59,7 +61,7 @@ public enum Browser
     /**
      * @return the Selenium capability object for the selected browser.
      */
-    public DesiredCapabilities getCapabilities()
+    public Capabilities getCapabilities()
     {
         return this.capabilities;
     }

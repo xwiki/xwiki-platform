@@ -32,7 +32,7 @@
   </parent>
   <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-ckeditor-test</artifactId>
-  <version>1.33-SNAPSHOT</version>
+  <version>1.32-SNAPSHOT</version>
   <name>CKEditor Integration Test Modules</name>
   <packaging>pom</packaging>
   <description>Functional tests for the CKEditor Integration</description>

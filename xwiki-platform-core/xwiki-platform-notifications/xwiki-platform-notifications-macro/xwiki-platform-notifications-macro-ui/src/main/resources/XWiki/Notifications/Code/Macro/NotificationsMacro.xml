@@ -301,27 +301,27 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         params.blackList = self.blackList.join(',');
       }
       var promise = $.Deferred();
-      self.doLoad(params, promise);
+      self.doLoad(params, untilDate, promise);
       return promise;
     };
     
-    self.doLoad = function(params, promise) {
+    self.doLoad = function(params, untilDate, promise) {
       var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
       $.ajax(restURL, {cache: false, data: params}).done(function (data, textStatus, jqXHR) {
         switch (jqXHR.status) {
             case 200:
               // 200 means that the search is done, we displayer the received notifications
-              self.showNotifications(data, promise);
+              self.showNotifications(data, untilDate, promise);
               break;
             case 202:
               // 202 means that the background search is still running, we wait 1 second and ask again if it's done this time
-              setTimeout(self.doLoad, 1000, {asyncId: data.asyncId});
+              setTimeout(self.doLoad, 1000, {asyncId: data.asyncId}, untilDate, promise);
               break;
         }
       });
     };
     
-    self.showNotifications = function(data, promise) {
+    self.showNotifications = function(data, untilDate, promise) {
       // Display the "nothing!" message if there is no notification
       if (data.notifications.length == 0 &amp;&amp; !untilDate) {
         self.displayNoNotification();

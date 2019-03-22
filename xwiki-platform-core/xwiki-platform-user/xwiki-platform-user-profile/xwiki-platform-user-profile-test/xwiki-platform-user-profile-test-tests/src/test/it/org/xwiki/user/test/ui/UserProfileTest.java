@@ -90,6 +90,11 @@ public class UserProfileTest extends AbstractTest
         getUtil().createUserAndLogin(this.userName, DEFAULT_PASSWORD);
 
         this.customProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+
+        // The first edition of the profile might introduce new objects: those might lead to a conflict window
+        // if the edit is performed too quickly (the version needs to be refreshed). To avoid this, we edit and cancel
+        // the edition, so the objects are created and we don't have any conflict in the further editions.
+        this.customProfilePage.editProfile().clickCancel();
     }
 
     /** Functionality check: changing profile information. */

@@ -1010,7 +1010,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     }
 
     /**
-     * Utility method to perform a drag&drop by using the appropriate WebDriver.
+     * Utility method to perform a drag &amp; drop by using the appropriate WebDriver.
      * @param source the element to drag
      * @param target the element where to drop
      *

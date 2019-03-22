@@ -42,14 +42,14 @@ annotations.menu.loaderror=Ошибка:
 annotations.tab.info.noannotations=Нет аннотаций на странице
 
 annotations.settings.display=Показать аннотации
-annotations.settings.error.wrongsyntax=Аннотации недоступны для страниц, написанных в синтаксисе XWiki/1.0.
+annotations.settings.error.wrongsyntax=Аннотации недоступны для страниц, написанных с использованием синтаксиса XWiki/1.0.
 annotations.settings.error.notarget=Не указана страница для получения настроек аннотаций.
 
 annotations.annotated.loading=Загрузка аннотированной страницы
 annotations.annotated.loaderror=Ошибка:
 annotations.annotated.loaderror.wrongresponse=Неправильно отформатированный ответ сервера
 annotations.annotated.error.noannotatedelement=Не удалось загрузить аннотации, поскольку контент недоступен.
-annotations.annotated.error.wrongsyntax=Аннотации недоступны для страниц, написанных в синтаксисе XWiki / 1.0.
+annotations.annotated.error.wrongsyntax=Аннотации недоступны для страниц, написанных с использованием синтаксиса XWiki / 1.0.
 
 annotations.action.edit.text=[Изменить]
 annotations.action.edit.tooltip=Изменить аннотацию
@@ -75,7 +75,7 @@ annotations.action.create.loaderror=Ошибка:
 annotations.action.create.error.unauthorized=У вас нет прав на добавление аннотаций на этой странице.
 annotations.action.create.error.unauthorizedguest=У вас нет прав на добавление аннотаций на этой странице. Войдите в систему.
 annotations.action.create.helpmessage=Чтобы комментировать фрагмент текста, выделите его и нажмите {0}.
-annotations.action.create.error.wrongsyntax=Аннотации недоступны для страниц, написанных в синтаксисе XWiki / 1.0.
+annotations.action.create.error.wrongsyntax=Аннотации недоступны для страниц, написанных с использованием синтаксиса XWiki / 1.0.
 annotations.action.create.error.notarget=Не указана цель (страница) для создания аннотаций.
 
 annotations.action.view.hide.text=скрыть

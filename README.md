@@ -17,7 +17,9 @@ Starting with XWiki 8.2 this is the default WYSIWYG content editor. On older ver
 
 ## Building
 
-You need Maven 3.1+ in order to build this extension.
+You need the following in order to build this extension:
+* Maven 3.1+
+* An X Display (needed by CKBuilder)
 
 ## Release Steps
 

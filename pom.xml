@@ -142,45 +142,6 @@
             <overwrite>true</overwrite>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <executions>
-            <!-- Remove the Byte Order Mark from the start of build.sh -->
-            <execution>
-              <id>remove-bom</id>
-              <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
-              <phase>process-classes</phase>
-              <goals>
-                <goal>exec</goal>
-              </goals>
-              <configuration>
-                <executable>sed</executable>
-                <arguments>
-                  <argument>-i</argument>
-                  <argument>1s/^\xEF\xBB\xBF//</argument>
-                  <argument>${ckeditor.builder.path}/build.sh</argument>
-                </arguments>
-              </configuration>
-            </execution>
-            <!-- Build the CKEditor. -->
-            <execution>
-              <id>build-ckeditor</id>
-              <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
-              <phase>process-classes</phase>
-              <goals>
-                <goal>exec</goal>
-              </goals>
-              <configuration>
-                <executable>${ckeditor.builder.path}/build.sh</executable>
-                <arguments>
-                  <!-- Exclude from release all plugins/skins that are not specified in build-config. -->
-                  <argument>--skip-omitted-in-build-config</argument>
-                </arguments>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -191,4 +152,114 @@
     <module>ui</module>
     <module>webjar</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <executions>
+                <!-- Remove the Byte Order Mark from the start of build.sh -->
+                <execution>
+                  <id>remove-bom</id>
+                  <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
+                  <phase>process-classes</phase>
+                  <goals>
+                    <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                    <executable>sed</executable>
+                    <arguments>
+                      <argument>-i</argument>
+                      <argument>1s/^\xEF\xBB\xBF//</argument>
+                      <argument>${ckeditor.builder.path}/build.sh</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+                <!-- Build the CKEditor. -->
+                <execution>
+                  <id>build-ckeditor</id>
+                  <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
+                  <phase>process-classes</phase>
+                  <goals>
+                    <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                    <executable>${ckeditor.builder.path}/build.sh</executable>
+                    <arguments>
+                      <!-- Exclude from release all plugins/skins that are not specified in build-config. -->
+                      <argument>--skip-omitted-in-build-config</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <executions>
+                <!-- Remove the Byte Order Mark from the start of build.sh -->
+                <execution>
+                  <id>remove-bom</id>
+                  <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
+                  <phase>process-classes</phase>
+                  <goals>
+                    <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                    <executable>sed</executable>
+                    <arguments>
+                      <argument>-i</argument>
+                      <argument>''</argument>
+                      <argument>-e</argument>
+                      <argument>1s/^\xEF\xBB\xBF//</argument>
+                      <argument>${ckeditor.builder.path}/build.sh</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+                <!-- Build the CKEditor. -->
+                <execution>
+                  <id>build-ckeditor</id>
+                  <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
+                  <phase>process-classes</phase>
+                  <goals>
+                    <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                    <executable>${ckeditor.builder.path}/build.sh</executable>
+                    <arguments>
+                      <!-- Exclude from release all plugins/skins that are not specified in build-config. -->
+                      <argument>--skip-omitted-in-build-config</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>

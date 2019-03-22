@@ -39,12 +39,12 @@ import org.xwiki.test.docker.junit5.browser.Browser;
 public class BrowserContainerExecutor extends AbstractContainerExecutor
 {
     /**
-     * Default width resolution used by the browser container.
+     * Width resolution to be used by the browser container.
      */
     private static final String DEFAULT_WIDTH_RESOLUTION = "1280";
 
     /**
-     * Default height resolution used by the browser container.
+     * Height resolution to be used by the browser container.
      */
     private static final String DEFAULT_HEIGHT_RESOLUTION = "960";
 
@@ -72,8 +72,10 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
-            // Beware when changing the resolution: this might have side effects if the tests are not properly scrolling
-            // or if some elements are hidden in smaller/bigger viewports.
+            // We set the width and height to one of the most used resolution by users so that we can reproduce issues
+            // for the larger use case and also we use a relatively large resolution to display the maximum number of
+            // elements on screen and reduce the risk of false positives in tests that could be due to elements not
+            // visible or missing elements (on small screens we don't display all elements).
             .withEnv("SCREEN_WIDTH", DEFAULT_WIDTH_RESOLUTION)
             .withEnv("SCREEN_HEIGHT", DEFAULT_HEIGHT_RESOLUTION)
             .withCapabilities(browser.getCapabilities())

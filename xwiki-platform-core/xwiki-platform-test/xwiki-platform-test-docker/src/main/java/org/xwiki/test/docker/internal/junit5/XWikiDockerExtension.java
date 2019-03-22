@@ -170,7 +170,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
             BrowserWebDriverContainer webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
 
-            // We want to use the maximum resolution available, so we can control the resolution for our tests.
+            // Use the maximum resolution available so that we have the maximum number of UI elements visible and
+            // reduce the risks of false positives due to not visible elements.
             webDriverContainer.getWebDriver().manage().window().maximize();
             VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
             saveVNC(extensionContext, vnc);

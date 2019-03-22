@@ -90,4 +90,17 @@ public class ObjectEditPane extends FormElement
     {
         return By.id(this.className + "_" + this.objectNumber + "_" + propertyName);
     }
+
+    /**
+     * Helper to fill property values quickly.
+     *
+     * @param propertyName the name of the property to set
+     * @param propertyValue the value of the property
+     * @return the current instance.
+     */
+    public ObjectEditPane setPropertyValue(String propertyName, String propertyValue)
+    {
+        this.setFieldValue(byPropertyName(propertyName), propertyValue);
+        return this;
+    }
 }

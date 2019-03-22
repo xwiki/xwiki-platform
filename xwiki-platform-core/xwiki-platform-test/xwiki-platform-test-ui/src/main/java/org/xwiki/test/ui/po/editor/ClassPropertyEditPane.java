@@ -76,7 +76,7 @@ public class ClassPropertyEditPane extends BaseElement
      * @param value the value to set
      * @return this
      */
-    protected ClassPropertyEditPane setMetaProperty(String metaPropertyName, String value)
+    public ClassPropertyEditPane setMetaProperty(String metaPropertyName, String value)
     {
         form.setFieldValue(By.id(propertyName + "_" + metaPropertyName), value);
         return this;

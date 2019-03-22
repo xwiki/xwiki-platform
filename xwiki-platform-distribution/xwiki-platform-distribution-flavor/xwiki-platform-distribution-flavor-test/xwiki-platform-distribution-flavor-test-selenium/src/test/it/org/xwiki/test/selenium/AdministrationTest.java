@@ -246,32 +246,6 @@ public class AdministrationTest extends AbstractXWikiTestCase
     }
 
     /*
-     * If a value is specified for linkPrefix, then a link is generated with linkPrefix + prettyName of the property from
-     * the configuration class.
-     * linkPrefix = "http://www.xwiki.org/bin/view/Main/"
-     * property prettyName = "WebHome"
-     * generated link should equal "http://www.xwiki.org/bin/view/Main/WebHome"
-     *
-     * Tests: XWiki.ConfigurableClass
-     */
-    @Test
-    public void testLabelLinkGeneration()
-    {
-        String space = "Main";
-        String page = "TestConfigurable";
-        createConfigurableApplication(space, page, "TestSection3", true);
-        open(space, page, "edit", "editor=object");
-        setFieldValue("XWiki.ConfigurableClass_0_linkPrefix", "TheLinkPrefix");
-        clickEditSaveAndView();
-
-        open("XWiki", "XWikiPreferences", "admin", "editor=globaladmin&section=TestSection3");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixString']");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixBoolean']");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixTextArea']");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixSelect']");
-    }
-
-    /*
      * Fails unless XWiki.ConfigurableClass locks each page on view and unlocks any other configurable page.
      * Also fails if codeToExecute is not being evaluated.
      *

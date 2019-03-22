@@ -102,6 +102,7 @@ public class FormElement extends BaseElement
 
     public void setCheckBox(WebElement checkBoxElement, boolean checked)
     {
+        // TODO: this hack should probably be removed for Selenium 2/3
         int x = 0;
         while (checkBoxElement.isSelected() != checked) {
             checkBoxElement.click();

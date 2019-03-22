@@ -60,4 +60,10 @@ public class AllIT
     class NestedResetPasswordIT extends ResetPasswordIT
     {
     }
+
+    @Nested
+    @DisplayName("ConfigurableClass")
+    class NestedConfigurableClassIT extends ConfigurableClassIT
+    {
+    }
 }

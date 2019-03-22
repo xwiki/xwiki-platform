@@ -45,7 +45,7 @@ public class ResetPasswordCompletePage extends ViewPage
     @FindBy(css = ".xcontent form input[type='submit']")
     private WebElement saveButton;
 
-    @FindBy(xpath = "//.[@class='xcontent']//a[contains(@href, 'login')]")
+    @FindBy(xpath = "//*[@class='xcontent']//a[contains(@href, 'login')]")
     private WebElement loginButton;
 
     /**

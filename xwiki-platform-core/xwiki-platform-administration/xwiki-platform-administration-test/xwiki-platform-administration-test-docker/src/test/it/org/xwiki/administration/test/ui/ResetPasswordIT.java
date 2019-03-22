@@ -113,7 +113,7 @@ public class ResetPasswordIT
 
         // Try to reset the password of a non existent user
         resetPasswordPage.setUserName("SomeUserThatDoesNotExist");
-        resetPasswordPage.clickResetPassword();
+        resetPasswordPage = resetPasswordPage.clickResetPassword();
         assertFalse(resetPasswordPage.isResetPasswordSent());
         assertTrue(resetPasswordPage.getMessage().contains("user does not exist"));
 

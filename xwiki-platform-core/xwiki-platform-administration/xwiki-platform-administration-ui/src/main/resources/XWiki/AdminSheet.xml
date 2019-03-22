@@ -269,7 +269,8 @@
   {{html clean="false"}}
   &lt;div id="$!options.id" class="panel-group $!options.cssClass" role="tablist" aria-multiselectable="true"&gt;
     &lt;div class="panel xform"&gt;
-      &lt;input type="text" class="form-control panel-group-filter" autocomplete="off"
+      &lt;label for="adminsearchmenu" class="hidden"&gt;$services.localization.render('search')&lt;/label&gt;
+      &lt;input type="text" class="form-control panel-group-filter" autocomplete="off" id="adminsearchmenu"
         placeholder="$escapetool.xml($services.localization.render('administration.menu.search.hint'))" /&gt;
     &lt;/div&gt;
     #foreach ($item in $menu)

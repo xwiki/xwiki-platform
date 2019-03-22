@@ -32,7 +32,7 @@
   <artifactId>application-ckeditor-pom</artifactId>
   <packaging>pom</packaging>
   <name>CKEditor Integration Parent POM</name>
-  <version>1.33-SNAPSHOT</version>
+  <version>1.32-SNAPSHOT</version>
   <description>Adds support for editing wiki pages using CKEditor.</description>
   <developers>
     <developer>

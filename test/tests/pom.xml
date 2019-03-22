@@ -33,49 +33,20 @@
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <properties>
-    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
+    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
+      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
+      here. Note that the version needs to be checked when we change the version of selenium-java -->
+    <guava.version>25.0-jre</guava.version>
+    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </properties>
-  <!-- Force recent versions for the ckeditor-ui dependencies so that we don't have 'duplicated' jars in the WAR built by
-    the packager plugin. -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.xwiki.rendering</groupId>
-        <artifactId>xwiki-rendering-macro-html</artifactId>
-        <version>${rendering.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-        <version>${platform.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-sheet-ui</artifactId>
-        <version>${platform.version}</version>
-        <type>xar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>${platform.version}</version>
-        <type>xar</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-ckeditor-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -89,34 +60,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Required to fix conflicts resolution between XWiki & TestContainers -->
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-      <exclusions>
-        <!-- XWiki uses a more recent version of bytebuddy -->
-        <exclusion>
-          <groupId>net.bytebuddy</groupId>
-          <artifactId>byte-buddy</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- selenium-server requires Guava 23.6-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
-      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
-      here. Note that the version needs to be checked when we change the version of selenium-server -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>23.6-jre</version>
-      <exclusions>
-        <!-- Use the version from TestContainers which is newer -->
-        <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
@@ -124,6 +67,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/AllIT.java</include>
+          </includes>
+          <systemProperties>
+            <xwiki.test.ui.dependencies>org.xwiki.contrib:application-ckeditor-ui:xar</xwiki.test.ui.dependencies>
+          </systemProperties>
+        </configuration>
       </plugin>
     </plugins>
   </build>

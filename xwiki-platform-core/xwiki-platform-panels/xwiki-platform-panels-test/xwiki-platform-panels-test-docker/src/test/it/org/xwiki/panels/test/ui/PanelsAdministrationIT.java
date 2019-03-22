@@ -51,11 +51,8 @@ public class PanelsAdministrationIT
         setup.loginAsSuperAdmin();
     }
 
-    /**
-     * Test Panel Wizard
-     */
     @Test
-    public void testPanelsAdmin(TestUtils setup, TestReference testReference)
+    public void verifyPanelWizard(TestUtils setup, TestReference testReference)
     {
         PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
         PageLayoutTabContent pageLayoutTabContent = panelsAdminPage.selectPageLayout();

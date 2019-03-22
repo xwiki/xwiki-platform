@@ -216,7 +216,7 @@ public class LiveTableElement extends BaseElement
     {
         WebElement tdElement = getCell(getRow(rowNumber), columnNumber);
         // First scroll the element into view, if needed, by moving the mouse to the top left corner of the element.
-        new Actions(getDriver()).moveToElement(tdElement, 0, 0).perform();
+        new Actions(getDriver().getWrappedDriver()).moveToElement(tdElement, 0, 0).perform();
         // Find the first A element and click it!
         tdElement.findElement(By.tagName("a")).click();
         return new ViewPage();

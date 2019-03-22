@@ -123,7 +123,7 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
 
         // The drag & drop of the "sortable" plugin of "jquery-ui" is very sensitive so we need to script the
         // moves of the mouse precisely if we don't want to have flickers.
-        Actions actions = new Actions(getDriver());
+        Actions actions = new Actions(getDriver().getWrappedDriver());
         // First we hold the app
         actions.clickAndHold(app);
         // Then we move into the position of the targeted app so jquery-ui can register we want to take its place.
@@ -147,7 +147,7 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
         });
 
         // Now we can release the selection
-        actions = new Actions(getDriver());
+        actions = new Actions(getDriver().getWrappedDriver());
         actions.release();
         actions.perform();
     }

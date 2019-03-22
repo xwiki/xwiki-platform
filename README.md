@@ -35,6 +35,8 @@ You need the following in order to build this extension:
     ## functional test modules.
     mvn org.apache.maven.plugins:maven-release-plugin:2.5:perform -DskipTests -DskipLocalStaging -DautoReleaseAfterClose -Darguments="-DskipTests -DskipLocalStaging -DautoReleaseAfterClose -Dxwiki.enforcer.skip=true" -Pintegration-tests,docker
 
+    ## Close and Release the staging repo on nexus.xwiki.org
+    
     ## Update the documentation page on http://extensions.xwiki.org
     ## Keep the release notes (the list of JIRA issues) only for the 2 most recent releases.
 

@@ -54,4 +54,10 @@ public class AllIT
     class NestedAdministrationIT extends AdministrationIT
     {
     }
+
+    @Nested
+    @DisplayName("Reset Password")
+    class NestedResetPasswordIT extends ResetPasswordIT
+    {
+    }
 }

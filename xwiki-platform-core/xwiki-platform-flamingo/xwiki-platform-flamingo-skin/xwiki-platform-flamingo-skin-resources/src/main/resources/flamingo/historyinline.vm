@@ -88,8 +88,14 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       #set ($version = "xar:$documentExtension.id.id/$documentExtension.id.version")
       <tr class="extension">
         #if ($displayCompare)
-          <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))"><input type="radio" name="rev1" value="$version" #if ($totalVersions == 1) checked="checked" #end/></td>
-          <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))"><input type="radio" name="rev2" value="$version"/></td>
+          <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))">
+            <label class="hidden" for="rev1">$escapetool.xml($services.localization.render('core.viewers.history.from'))</label>
+            <input type="radio" name="rev1" value="$version" #if ($totalVersions == 1) checked="checked" #end/>
+          </td>
+          <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))">
+            <label class="hidden" for="rev2">$escapetool.xml($services.localization.render('core.viewers.history.to'))</label>
+            <input type="radio" name="rev2" value="$version"/>
+          </td>
         #end
         #set ($_versionURL = $tdoc.getURL('viewrev', $escapetool.url({'rev' : $version})))
         <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))" colspan="4">$services.localization.render('core.viewers.history.extension.label', ["<a href='$_versionURL'>", '</a>', "<strong>", $escapetool.xml($documentExtension.name), $escapetool.xml($documentExtension.id.version), '</strong>'])</td>
@@ -111,8 +117,14 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
        <tr class="#if($velocityCount % 2 == 0) even #else odd #end">
     #end
     #if ($displayCompare)
-      <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))"><input type="radio" name="rev1" value="$version" #if ($velocityCount==2) checked="checked" #end/></td>
-      <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))"><input type="radio" name="rev2" value="$version" #if ($velocityCount==1) checked="checked" #end/></td>
+      <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))">
+        <label class="hidden" for="rev1">$escapetool.xml($services.localization.render('core.viewers.history.from'))</label>
+        <input type="radio" name="rev1" value="$version" #if ($velocityCount==2) checked="checked" #end/>
+      </td>
+      <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))">
+        <label class="hidden" for="rev2">$escapetool.xml($services.localization.render('core.viewers.history.to'))</label>
+        <input type="radio" name="rev2" value="$version" #if ($velocityCount==1) checked="checked" #end/>
+      </td>
     #end
     <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))"><a href="$tdoc.getURL('viewrev',"rev=$version")">$version</a></td>
     <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.author'))">$xwiki.getUserName($revinfo.author)</td>

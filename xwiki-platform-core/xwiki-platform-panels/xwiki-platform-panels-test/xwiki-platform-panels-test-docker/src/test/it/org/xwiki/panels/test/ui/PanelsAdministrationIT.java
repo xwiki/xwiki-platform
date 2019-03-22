@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Verify the Panels Administration features.
  *
  * @version $Id$
- * @since 11.2
+ * @since 11.3RC1
  */
 @UITest(browser = Browser.CHROME)
 public class PanelsAdministrationIT

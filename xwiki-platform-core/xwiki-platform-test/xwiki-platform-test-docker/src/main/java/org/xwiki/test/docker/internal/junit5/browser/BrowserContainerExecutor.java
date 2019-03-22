@@ -72,6 +72,8 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
         BrowserWebDriverContainer webDriverContainer = new BrowserWebDriverContainer<>()
+            // Beware when changing the resolution: this might have side effects if the tests are not properly scrolling
+            // or if some elements are hidden in smaller/bigger viewports.
             .withEnv("SCREEN_WIDTH", DEFAULT_WIDTH_RESOLUTION)
             .withEnv("SCREEN_HEIGHT", DEFAULT_HEIGHT_RESOLUTION)
             .withCapabilities(browser.getCapabilities())

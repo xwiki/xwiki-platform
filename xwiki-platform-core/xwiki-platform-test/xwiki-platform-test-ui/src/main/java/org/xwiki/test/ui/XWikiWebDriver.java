@@ -1002,7 +1002,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     /**
      * @return the original {@link RemoteWebDriver} created for selenium tests.
      *          The original driver should be used for custom {@link org.openqa.selenium.interactions.Actions}.
-     * @since 11.2RC1
+     * @since 11.3RC1
      */
     public RemoteWebDriver getWrappedDriver()
     {
@@ -1014,7 +1014,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      * @param source the element to drag
      * @param target the element where to drop
      *
-     * @since 11.2RC1
+     * @since 11.3RC1
      */
     public void dragAndDrop(WebElement source, WebElement target)
     {

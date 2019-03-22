@@ -27,7 +27,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * All UI Tests for the Panels.
  *
  * @version $Id$
- * @since 11.2
+ * @since 11.3RC1
  */
 @UITest
 public class AllIT

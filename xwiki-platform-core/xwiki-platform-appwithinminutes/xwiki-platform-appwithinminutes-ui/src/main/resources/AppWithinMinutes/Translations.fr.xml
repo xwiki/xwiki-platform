@@ -209,7 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Supprimer toutes les ent
 platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
-platform.appwithinminutes.appHomePageMovedWarning=L'application pourrait ne pas fonctionner correctement car elle a été renommée ou déplacée sans mise à jour du code. Merci d'éditer l'application et de suivre les étapes afin de mettre à jour le code.
+platform.appwithinminutes.appHomePageMovedWarning=L'application pourrait ne plus fonctionner correctement car elle a été renommée ou déplacée sans que son code n'ait été mis à jour. Merci de modifier l'application en mettant le code à jour pas à pas.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=L''application {0} et TOUS SES DOCUMENTS vont être détruits. Etes-vous certain de vouloir continuer ?

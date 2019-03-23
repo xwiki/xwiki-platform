@@ -62,7 +62,6 @@
     'children': [
        {'id' : 'Themes', 'perSpace' : true, 'order' : 100},
        {'id' : 'Presentation', 'perSpace' : true, 'order' : 200},
-       {'id' : 'menu.name', 'perSpace' : true, 'order' : 300},
        {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 400}
     ]
   },

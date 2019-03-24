@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.FormElement;
@@ -79,4 +80,9 @@ public class AdministrationSectionPage extends ViewPage
         return new FormElement(form);
     }
 
+    public boolean hasLink(String linkName)
+    {
+        String xPathSelector = String.format("//form/fieldset//a[@href='%s']", linkName);
+        return getDriver().hasElementWithoutWaiting(By.xpath(xPathSelector));
+    }
 }

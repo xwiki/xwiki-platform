@@ -19,8 +19,9 @@
  */
 package org.xwiki.administration.test.ui;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.administration.test.po.AdministrationEditPage;
+import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -38,6 +39,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(servletEngine = ServletEngine.TOMCAT)
 public class ConfigurableClassIT
 {
+    @BeforeEach
+    public void setUp(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+    }
     /*
      * Verify that if a value is specified for the {@code linkPrefix} xproperty, then a link is generated with
      * linkPrefix + prettyName of the property from the configuration class.
@@ -46,22 +52,19 @@ public class ConfigurableClassIT
     public void labelLinkGeneration(TestUtils setup, TestReference testReference)
     {
         // Fixture
-        setup.loginAsSuperAdmin();
         setupConfigurableApplication(setup, testReference,
-            "displayInSection", "TestSection3",
+            "displayInSection", "TestSection",
             "heading", "Some Heading",
             "configureGlobally", "true",
             "configurationClass", setup.serializeReference(testReference),
             "linkPrefix", "TheLinkPrefix");
 
-        // Test
-        AdministrationEditPage administrationEditPage = AdministrationEditPage.gotoPage("TestSection3");
-
-        // Assertions
-        assertTrue(administrationEditPage.hasLink("TheLinkPrefixString"));
-        assertTrue(administrationEditPage.hasLink("TheLinkPrefixBoolean"));
-        assertTrue(administrationEditPage.hasLink("TheLinkPrefixTextArea"));
-        assertTrue(administrationEditPage.hasLink("TheLinkPrefixSelect"));
+        // Check that the links are there and contain the expected values
+        AdministrationSectionPage asp = AdministrationSectionPage.gotoPage("TestSection");
+        assertTrue(asp.hasLink("TheLinkPrefixString"));
+        assertTrue(asp.hasLink("TheLinkPrefixBoolean"));
+        assertTrue(asp.hasLink("TheLinkPrefixTextArea"));
+        assertTrue(asp.hasLink("TheLinkPrefixSelect"));
     }
 
     private void setupConfigurableApplication(TestUtils setup, DocumentReference testReference,

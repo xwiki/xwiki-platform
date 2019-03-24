@@ -62,7 +62,7 @@ public class ConfigurableClassIT
      * Tests: XWiki.ConfigurableClass
      */
     @Test
-    public void testLabelLinkGeneration(TestUtils setup, TestReference testReference)
+    public void labelLinkGeneration(TestUtils setup, TestReference testReference)
     {
         String space = testReference.getLastSpaceReference().getName();
         String page = testReference.getName();
@@ -84,7 +84,7 @@ public class ConfigurableClassIT
      * then adds an object of class configurable and one of it's own class.<br/>
      * Tests: XWiki.ConfigurableClass
      */
-    public void createConfigurableApplication(TestUtils setup, String space, String page, String section,
+    private void createConfigurableApplication(TestUtils setup, String space, String page, String section,
         boolean global)
     {
         // We have to use an existing space because the copy page form doesn't allow entering a new space.

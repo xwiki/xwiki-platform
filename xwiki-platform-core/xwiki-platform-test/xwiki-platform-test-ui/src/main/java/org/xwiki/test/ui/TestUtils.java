@@ -535,6 +535,14 @@ public class TestUtils
         gotoPage(space, page, action, toQueryString(queryParameters));
     }
 
+    /**
+     * @since 11.3RC1
+     */
+    public void gotoPage(EntityReference reference, String action, Object... queryParameters)
+    {
+        gotoPage(reference, action, toQueryString(queryParameters));
+    }
+
     public void gotoPage(String space, String page, String action, Map<String, ?> queryParameters)
     {
         gotoPage(Collections.singletonList(space), page, action, queryParameters);
@@ -1296,6 +1304,22 @@ public class TestUtils
         queryParameters.put("objectPolicy", "updateOrCreate");
 
         gotoPage(spaces, page, "save", queryParameters);
+    }
+
+    /**
+     * @since 11.3RC1
+     */
+    public void addClassProperty(EntityReference reference, String propertyName, String propertyType)
+    {
+        gotoPage(reference, "propadd", "propname", propertyName, "proptype", propertyType);
+    }
+
+    /**
+     * @since 11.3RC1
+     */
+    public void updateClassProperty(EntityReference reference, Object... queryParameters)
+    {
+        gotoPage(reference, "propupdate", queryParameters);
     }
 
     public void addClassProperty(String space, String page, String propertyName, String propertyType)

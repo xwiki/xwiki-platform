@@ -67,8 +67,8 @@ public class FormContainerElement extends BaseElement
             try {
                 setFieldValue(el, valuesByElements.get(el));
             } catch (Exception e) {
-                throw new WebDriverException("Couldn't set field \"" + el.getAttribute("name") + "\" to value \""
-                    + valuesByElements.get(el) + "\"", e);
+                throw new WebDriverException(String.format("Couldn't set field [%s] to value [%s]",
+                    el.getAttribute("name"), valuesByElements.get(el)), e);
             }
         }
     }
@@ -108,8 +108,8 @@ public class FormContainerElement extends BaseElement
         while (checkBoxElement.isSelected() != checked) {
             checkBoxElement.click();
             if (x == 100) {
-                throw new WebDriverException("Unable to set checkbox at " + checkBoxElement.getAttribute("name")
-                    + " to " + checked);
+                throw new WebDriverException(String.format("Unable to set checkbox at [%s] to [%s]",
+                    checkBoxElement.getAttribute("name"), checked));
             }
             x++;
         }
@@ -159,8 +159,8 @@ public class FormContainerElement extends BaseElement
             }
             Map<String, WebElement> optionsByValue = getOptionsByValue();
             if (!optionsByValue.keySet().containsAll(valuesToSelect)) {
-                throw new WebDriverException("Select Element(s): " + optionsByValue.keySet().retainAll(valuesToSelect)
-                    + " not found.");
+                throw new WebDriverException(String.format("Select Element(s) [%s] not found.",
+                    optionsByValue.keySet().retainAll(valuesToSelect)));
             }
             for (String label : valuesToSelect) {
                 optionsByValue.get(label).click();
@@ -181,8 +181,8 @@ public class FormContainerElement extends BaseElement
         {
             Map<String, WebElement> optionsByValue = getOptionsByValue();
             if (!optionsByValue.keySet().containsAll(valuesToUnSelect)) {
-                throw new WebDriverException("Select Element(s) to unselect: "
-                    + optionsByValue.keySet().retainAll(valuesToUnSelect) + " not found.");
+                throw new WebDriverException(String.format("Select Element(s) to unselect [%s] not found.",
+                    optionsByValue.keySet().retainAll(valuesToUnSelect)));
             }
             for (String label : valuesToUnSelect) {
                 if (optionsByValue.get(label).isSelected()) {

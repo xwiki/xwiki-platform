@@ -19,13 +19,11 @@
  */
 package org.xwiki.administration.test.ui;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.administration.test.po.AdministrationEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.CopyPage;
@@ -46,12 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 public class ConfigurableClassIT
 {
-    @BeforeAll
-    public void setup(TestUtils setup)
-    {
-        setup.loginAsSuperAdmin();
-    }
-
     /*
      * If a value is specified for linkPrefix, then a link is generated with linkPrefix + prettyName of the property
      * from the configuration class.
@@ -64,6 +56,8 @@ public class ConfigurableClassIT
     @Test
     public void labelLinkGeneration(TestUtils setup, TestReference testReference)
     {
+        setup.loginAsSuperAdmin();
+
         String space = testReference.getLastSpaceReference().getName();
         String page = testReference.getName();
         createConfigurableApplication(setup, space, page, "TestSection3", true);

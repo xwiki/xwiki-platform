@@ -31,31 +31,32 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 /**
- * Represents a Form.
+ * Represents a container element holding one or several forms and provide utility methods to get/set form data. This
+ * container element can be a FORM element. It can also be some DIV element wrapping several FORM elements.
  * 
  * @version $Id$
  * @since 3.2M3
  */
-public class FormElement extends BaseElement
+public class FormContainerElement extends BaseElement
 {
-    private final WebElement form;
+    private final WebElement formContainer;
 
-    public FormElement(WebElement form)
+    public FormContainerElement(WebElement formContainer)
     {
-        this.form = form;
+        this.formContainer = formContainer;
     }
 
-    protected WebElement getForm()
+    protected WebElement getFormContainer()
     {
-        return this.form;
+        return this.formContainer;
     }
 
     public void fillFieldsByName(Map<String, String> valuesByNames)
     {
-        Map<WebElement, String> valuesByElements = new HashMap<WebElement, String>((int) (valuesByNames.size() / 0.75));
+        Map<WebElement, String> valuesByElements = new HashMap<>((int) (valuesByNames.size() / 0.75));
 
         for (String name : valuesByNames.keySet()) {
-            valuesByElements.put(this.form.findElement(By.name(name)), valuesByNames.get(name));
+            valuesByElements.put(getFormContainer().findElement(By.name(name)), valuesByNames.get(name));
         }
         fillFieldsByElements(valuesByElements);
     }
@@ -74,12 +75,12 @@ public class FormElement extends BaseElement
 
     public String getFieldValue(By findElementBy)
     {
-        return this.form.findElement(findElementBy).getAttribute("value");
+        return getFormContainer().findElement(findElementBy).getAttribute("value");
     }
 
     public void setFieldValue(By findElementBy, String value)
     {
-        setFieldValue(this.form.findElement(findElementBy), value);
+        setFieldValue(getFormContainer().findElement(findElementBy), value);
     }
 
     public void setFieldValue(WebElement fieldElement, String value)
@@ -97,7 +98,7 @@ public class FormElement extends BaseElement
 
     public void setCheckBox(By findElementBy, boolean checked)
     {
-        setCheckBox(form.findElement(findElementBy), checked);
+        setCheckBox(getFormContainer().findElement(findElementBy), checked);
     }
 
     public void setCheckBox(WebElement checkBoxElement, boolean checked)
@@ -116,7 +117,7 @@ public class FormElement extends BaseElement
 
     public SelectElement getSelectElement(By by)
     {
-        return this.new SelectElement(this.form.findElement(by));
+        return this.new SelectElement(getFormContainer().findElement(by));
     }
 
     public class SelectElement extends BaseElement
@@ -144,7 +145,7 @@ public class FormElement extends BaseElement
                 return this.optionsByValue;
             }
             List<WebElement> elements = this.select.findElements(By.tagName("option"));
-            this.optionsByValue = new HashMap<String, WebElement>((int) (elements.size() / 0.75));
+            this.optionsByValue = new HashMap<>((int) (elements.size() / 0.75));
             for (WebElement el : elements) {
                 this.optionsByValue.put(el.getAttribute("value"), el);
             }

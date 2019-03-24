@@ -21,7 +21,7 @@ package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.BaseElement;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
  * Represents the pane used to edit a class property.
@@ -34,7 +34,7 @@ public class ClassPropertyEditPane extends BaseElement
     /**
      * The class editor form.
      */
-    private final FormElement form;
+    private final FormContainerElement form;
 
     /**
      * The edited property.
@@ -47,7 +47,7 @@ public class ClassPropertyEditPane extends BaseElement
      * @param form the class editor form
      * @param propertyName the name of the edited property
      */
-    public ClassPropertyEditPane(FormElement form, String propertyName)
+    public ClassPropertyEditPane(FormContainerElement form, String propertyName)
     {
         this.form = form;
         this.propertyName = propertyName;

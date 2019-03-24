@@ -22,7 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
  * Represents the common actions possible on all Pages when using the "edit" action with the "class" editor.
@@ -47,7 +47,7 @@ public class ClassEditPage extends EditPage
     @FindBy(name = "action_propadd")
     private WebElement propertySubmit;
 
-    private FormElement form;
+    private FormContainerElement form;
 
     /**
      * Go to the passed page in object edit mode.
@@ -89,10 +89,10 @@ public class ClassEditPage extends EditPage
         getDriver().waitUntilElementDisappears(propertyLocator);
     }
 
-    private FormElement getForm()
+    private FormContainerElement getForm()
     {
         if (this.form == null) {
-            this.form = new FormElement(this.propertyForm);
+            this.form = new FormContainerElement(this.propertyForm);
         }
         return this.form;
     }

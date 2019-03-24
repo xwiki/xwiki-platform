@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
  * Represents a DatabaseListClass property form.
@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.FormElement;
  */
 public class DatabaseListClassEditElement extends ClassPropertyEditPane
 {
-    public DatabaseListClassEditElement(FormElement form, String propertyName)
+    public DatabaseListClassEditElement(FormContainerElement form, String propertyName)
     {
         super(form, propertyName);
     }

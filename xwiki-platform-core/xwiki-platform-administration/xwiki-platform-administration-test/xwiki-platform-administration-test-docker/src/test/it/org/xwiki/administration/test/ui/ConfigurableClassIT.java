@@ -38,7 +38,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests related to the ConfigurableClass.
+ * Tests related to the ConfigurableClass feature.
  *
  * @version $Id$
  * @since 11.3RC1
@@ -46,7 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 public class ConfigurableClassIT
 {
-
     @BeforeAll
     public void setup(TestUtils setup)
     {
@@ -54,8 +53,8 @@ public class ConfigurableClassIT
     }
 
     /*
-     * If a value is specified for linkPrefix, then a link is generated with linkPrefix + prettyName of the property from
-     * the configuration class.
+     * If a value is specified for linkPrefix, then a link is generated with linkPrefix + prettyName of the property
+     * from the configuration class.
      * linkPrefix = "http://www.xwiki.org/bin/view/Main/"
      * property prettyName = "WebHome"
      * generated link should equal "http://www.xwiki.org/bin/view/Main/WebHome"
@@ -85,7 +84,8 @@ public class ConfigurableClassIT
      * then adds an object of class configurable and one of it's own class.<br/>
      * Tests: XWiki.ConfigurableClass
      */
-    public void createConfigurableApplication(TestUtils setup, String space, String page, String section, boolean global)
+    public void createConfigurableApplication(TestUtils setup, String space, String page, String section,
+        boolean global)
     {
         // We have to use an existing space because the copy page form doesn't allow entering a new space.
         String storageSpace = "Sandbox";

@@ -50,7 +50,7 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Overall Administration")
+    @DisplayName("Overall Administration UI")
     class NestedAdministrationIT extends AdministrationIT
     {
     }

@@ -68,6 +68,8 @@ public class ConfigurationFilesGenerator
 
     private RepositoryResolver repositoryResolver;
 
+    private PropertiesMerger propertiesMerger = new PropertiesMerger();
+
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param repositoryResolver the resolver to create Maven repositories and sessions
@@ -81,7 +83,7 @@ public class ConfigurationFilesGenerator
     /**
      * @param configurationFileTargetDirectory the location where to generate the config files
      * @param version the XWiki version for which to generate config files (used to get the config resources for the
-     *        right version)
+     * right version)
      * @param resolver the artifact resolver to use (can contain resolved artifacts in cache)
      * @throws Exception if an error occurs during config generation
      */
@@ -120,14 +122,8 @@ public class ConfigurationFilesGenerator
 
     private VelocityContext createVelocityContext()
     {
-        Properties properties = new Properties();
-
-        // Add default properties
-        properties.putAll(getDefaultConfigurationProperties());
-
-        // Add user-specified properties (with possible overrides for default properties)
-        properties.putAll(this.testConfiguration.getProperties());
-
+        Properties properties = this.propertiesMerger.merge(getDefaultConfigurationProperties(),
+            this.testConfiguration.getProperties());
         VelocityContext context = new VelocityContext(properties);
         return context;
     }

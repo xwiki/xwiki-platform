@@ -62,13 +62,8 @@ import static org.junit.Assert.assertTrue;
         ServletEngine.JETTY_STANDALONE
     },
     properties = {
-        // Overridden to add the FileUploadPlugin which is needed by the test to upload some office files to import
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        // Add the FileUploadPlugin which is needed by the test to upload some office files to import
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
     }
 )
 public class OfficeImporterIT

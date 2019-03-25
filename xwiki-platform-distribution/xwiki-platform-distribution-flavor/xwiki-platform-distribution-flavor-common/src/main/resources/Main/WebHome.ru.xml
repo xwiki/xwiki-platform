@@ -69,17 +69,20 @@ XWiki может быть использована как база знаний 
 
  {{box}}Узнайте больше о том, как использовать XWiki из {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
 
-|(((
+(%class="row"%)(((
+(%class="col-xs-12 col-sm-6"%)(((
 = Расширьте свою вики =
 
 Чтобы дополнить возможности и функциональность вики необходимыми //вам// функциями, перейдите к {{velocity}}[[Менеджеру расширений&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}, где вы сможете найти и установить расширения.
 
 Для просмотра более 900 созданных сообществом расширений для XWiki, перейдите в [[Репозиторий расширений&gt;&gt;http://extensions.xwiki.org]].
-)))|(((
+)))
+(%class="col-xs-12 col-sm-6"%)(((
 = Создайте своё приложение =
 
 Выйдите за пределы доступных расширений и определите //структуру// данных на основе //ваших// потребностей, создавайте //ваши// собственные приложения через [[Приложение за несколько минут&gt;&gt;AppWithinMinutes]].
 
 Приложение за несколько минут позаботится о том, чтобы вам и вашим пользователям было легко создавать данные и управлять ими.
+)))
 )))</content>
 </xwikidoc>

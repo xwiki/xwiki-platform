@@ -151,31 +151,7 @@
                   }
                 },
                 "ignore" : [
-                  {
-                    "code": "java.annotation.added",
-                    "old": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
-                    "new": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
-                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({java.util.List.class, org.xwiki.rendering.block.Block.class})",
-                    "justification": "The annotation has been added in box macro but is used in Code Macro. It's not an api breakage."
-                  },
-                  {
-                    "code": "java.annotation.added",
-                    "old": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.rss.RssMacroParameters",
-                    "new": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.rss.RssMacroParameters",
-                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({java.util.List.class, org.xwiki.rendering.block.Block.class})",
-                    "justification": "The annotation has been added in box macro but is used in RSS Macro. It's not an api breakage."
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
-                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
-                    "justification": "Add URL parameters. Not a breakage in this context."
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotificationsCount(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception",
-                    "justification": "Add new API to get the number of notifications. Not a breakage in this context."
-                  }
+                  // Add more ignores below...
                 ]
               }
             }

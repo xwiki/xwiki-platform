@@ -103,8 +103,10 @@ public class LegacyEventSaver
                 saveLegacyEvent(legacyEvent, legacyEvent.getWiki());
             }
 
-            if (configuration.useMainStore()) {
-                // save event into the main database
+            if (configuration.useMainStore()
+                    && !wikiDescriptorManager.isMainWiki(wikiDescriptorManager.getCurrentWikiId())) {
+                // save event into the main database (if the current wiki is not the main one, otherwise we would
+                // duplicate the event
                 saveLegacyEvent(legacyEvent, wikiDescriptorManager.getMainWikiId());
             }
 

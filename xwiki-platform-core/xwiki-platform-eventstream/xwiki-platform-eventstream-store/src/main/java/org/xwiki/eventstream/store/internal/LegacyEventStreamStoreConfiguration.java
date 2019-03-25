@@ -80,11 +80,6 @@ public class LegacyEventStreamStoreConfiguration
      */
     public boolean useMainStore()
     {
-        if (wikiDescriptorManager.isMainWiki(wikiDescriptorManager.getCurrentWikiId())) {
-            // We're in the main database, we don't have to store the data twice.
-            return false;
-        }
-
         return getProperty("usemainstore", true);
     }
 

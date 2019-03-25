@@ -66,4 +66,10 @@ public class AllIT
     class NestedConfigurableClassIT extends ConfigurableClassIT
     {
     }
+
+    @Nested
+    @DisplayName("UsersGroupsRightsManagement")
+    class NestedUsersGroupsRightsManagementsIT extends UsersGroupsRightsManagementIT
+    {
+    }
 }

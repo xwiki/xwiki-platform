@@ -117,6 +117,13 @@ public class EditRightsPane extends BaseElement
         return State.getButtonState(icon);
     }
 
+    public boolean hasEntity(String entityName)
+    {
+        return getDriver().hasElementWithoutWaiting(
+            By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '" + entityName
+            + "')]"));
+    }
+
     public void clickGuestRight(Right right)
     {
         try {

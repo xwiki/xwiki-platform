@@ -35,13 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UITest(properties = {
-    // Overridden to add the RightsManagerPlugin
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
+    // Add the RightsManagerPlugin needed by the test
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
 })
 public class UsersGroupsRightsManagementIT
 {

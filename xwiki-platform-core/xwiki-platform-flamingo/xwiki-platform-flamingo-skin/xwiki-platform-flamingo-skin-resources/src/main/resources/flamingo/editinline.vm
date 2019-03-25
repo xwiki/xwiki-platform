@@ -17,7 +17,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ## Start FORM at start of content area IF editing is allowed.
 ## ----------------------------------------------------------------------------
 #if ($allowDocEdit)
- <form id="inline" method="post" action="$doc.getURL("preview")" class="withLock xform">
+ <form id="inline" method="post" action="$doc.getURL("preview")" class="withLock">
 #end
 #if ($services.parentchild.isParentChildMechanismEnabled())
   <div class="edit-meta-tools">

@@ -46,11 +46,6 @@
     <guava.version>25.0-jre</guava.version>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
     <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
     <dependency>
@@ -70,6 +65,11 @@
           <artifactId>testng</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>

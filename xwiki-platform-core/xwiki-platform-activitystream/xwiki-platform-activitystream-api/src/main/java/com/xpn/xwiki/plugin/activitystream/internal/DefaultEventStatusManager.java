@@ -44,6 +44,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 import com.xpn.xwiki.plugin.activitystream.eventstreambridge.EventConverter;
 import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default implementation of {@link EventStatusManager} which use the Activity Stream storage.
@@ -66,6 +67,9 @@ public class DefaultEventStatusManager implements EventStatusManager
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception
@@ -138,11 +142,13 @@ public class DefaultEventStatusManager implements EventStatusManager
     {
         ActivityEventStatus status = eventConverter.convertEventStatusToActivityStatus(eventStatus);
 
+        boolean savedInMainStore = false;
         if (configuration.useLocalStore()) {
             saveEventStatusInStore(status);
+            savedInMainStore = wikiDescriptorManager.isMainWiki(wikiDescriptorManager.getCurrentWikiId());
         }
 
-        if (configuration.useMainStore()) {
+        if (configuration.useMainStore() && !savedInMainStore) {
             XWikiContext context = contextProvider.get();
             // store event in the main database
             String oriDatabase = context.getWikiId();

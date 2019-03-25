@@ -76,11 +76,6 @@ public class ActivityStreamConfiguration
     {
         XWikiContext context = contextProvider.get();
 
-        if (context.isMainWiki()) {
-            // We're in the main database, we don't have to store the data twice.
-            return false;
-        }
-
         ActivityStreamPlugin plugin =
                 (ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context);
         return Integer.parseInt(plugin.getActivityStreamPreference("usemainstore", "1", context)) == 1;

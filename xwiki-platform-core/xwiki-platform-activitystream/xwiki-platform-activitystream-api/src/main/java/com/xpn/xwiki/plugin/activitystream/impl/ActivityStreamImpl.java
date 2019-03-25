@@ -76,6 +76,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 import com.xpn.xwiki.plugin.activitystream.eventstreambridge.EventConverter;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.Utils;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default implementation for {@link ActivityStream}.
@@ -301,6 +302,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         prepareEvent(event, doc, context);
 
+        boolean isSavedOnMainStore = false;
+
         if (useLocalStore()) {
             // store event in the local database
             XWikiHibernateStore localHibernateStore = context.getWiki().getHibernateStore();
@@ -309,12 +312,13 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 Session session = localHibernateStore.getSession(context);
                 session.save(event);
                 localHibernateStore.endTransaction(context, true);
+                isSavedOnMainStore = context.isMainWiki();
             } catch (XWikiException e) {
                 localHibernateStore.endTransaction(context, false);
             }
         }
 
-        if (useMainStore()) {
+        if (useMainStore() && !isSavedOnMainStore) {
             // store event in the main database
             String oriDatabase = context.getWikiId();
             context.setWikiId(context.getMainXWiki());
@@ -490,8 +494,19 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         boolean bTransaction = true;
         ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
         String oriDatabase = context.getWikiId();
+        boolean isDeletedOnMainStore = false;
 
-        if (useLocalStore()) {
+        // The wiki concerned by the event might not exist anymore, this might even be the reason why we are deleting
+        // the event. So we need to check if the wiki exists in order to know if we should clean the activity from
+        // its storage or not.
+        boolean doesWikiExist;
+        try {
+            doesWikiExist = Utils.getComponent(WikiDescriptorManager.class).exists(event.getWiki());
+        } catch (Exception e) {
+            throw new ActivityStreamException(new XWikiException("Failed to delete an activity", e));
+        }
+
+        if (useLocalStore() && doesWikiExist) {
             XWikiHibernateStore hibstore;
 
             // delete event from the local database
@@ -516,6 +531,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     hibstore.endTransaction(context, true);
                 }
 
+                isDeletedOnMainStore = context.isMainWiki(event.getWiki());
+
             } catch (XWikiException e) {
                 throw new ActivityStreamException();
             } finally {
@@ -532,7 +549,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
         }
 
-        if (useMainStore()) {
+        if (useMainStore() && !isDeletedOnMainStore) {
             // delete event from the main database
             context.setWikiId(context.getMainXWiki());
             XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();

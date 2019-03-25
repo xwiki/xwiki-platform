@@ -307,7 +307,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     
     self.doLoad = function(params, untilDate, promise) {
       var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
-      $.ajax(restURL, {cache: false, data: params}).done(function (data, textStatus, jqXHR) {
+      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data, textStatus, jqXHR) {
         switch (jqXHR.status) {
             case 200:
               // 200 means that the search is done, we displayer the received notifications

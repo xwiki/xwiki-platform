@@ -137,14 +137,16 @@ public class LegacyEventStatusManager implements EventStatusManager
     {
         LegacyEventStatus status = eventConverter.convertEventStatusToLegacyActivityStatus(eventStatus);
 
+        boolean isSavedOnMainStore = false;
+
         if (configuration.useLocalStore()) {
             saveEventStatusInStore(status);
+            isSavedOnMainStore = wikiDescriptorManager.isMainWiki(eventStatus.getEvent().getWiki().getName());
         }
 
-        if (configuration.useMainStore()
-                && !wikiDescriptorManager.isMainWiki(wikiDescriptorManager.getCurrentWikiId())) {
-            // save event into the main database (if the current wiki is not the main one, otherwise we would
-            // duplicate the event status
+        if (configuration.useMainStore() && !isSavedOnMainStore) {
+            // save event into the main database (if the event was not already be recorded on the main store,
+            // otherwise we would duplicate the event)
             XWikiContext context = contextProvider.get();
             // store event in the main database
             String oriDatabase = context.getWikiId();

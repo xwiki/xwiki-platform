@@ -74,16 +74,18 @@ public class LegacyEventDeleter
     {
         LegacyEvent legacyEvent = eventConverter.convertEventToLegacyActivity(event);
 
-        if (configuration.useLocalStore()) {
-            // delete event from the database where it is stored
-            try {
+        boolean hasBeenDeletedOnMainStore = false;
+        try {
+            if (configuration.useLocalStore() && wikiDescriptorManager.exists(legacyEvent.getWiki())) {
+                // delete event from the database where it is stored
                 deleteLegacyEvent(legacyEvent, legacyEvent.getWiki());
-            } catch (Exception e) {
-                logger.error("Failed to delete the event [%s] in the local store.", event.getId(), e);
+                hasBeenDeletedOnMainStore = wikiDescriptorManager.isMainWiki(legacyEvent.getWiki());
             }
+        } catch (Exception e) {
+            logger.error("Failed to delete the event [%s] in the local store.", event.getId(), e);
         }
 
-        if (configuration.useMainStore()) {
+        if (configuration.useMainStore() && !hasBeenDeletedOnMainStore) {
             // delete event from the main database
             try {
                 deleteLegacyEvent(legacyEvent, wikiDescriptorManager.getMainWikiId());

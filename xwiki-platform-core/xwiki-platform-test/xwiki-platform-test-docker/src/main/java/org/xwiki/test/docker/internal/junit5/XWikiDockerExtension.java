@@ -191,7 +191,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             VncRecordingContainer vnc = loadVNC(extensionContext);
             // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the
             // test result status... See https://github.com/junit-team/junit5/issues/542
-            File recordingDir = new File(testConfiguration.getOutputDirectory());
+            File recordingDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
             File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
                 extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
             vnc.saveRecordingToFile(recordingFile);

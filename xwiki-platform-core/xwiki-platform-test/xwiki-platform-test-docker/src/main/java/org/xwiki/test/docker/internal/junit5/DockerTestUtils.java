@@ -150,7 +150,7 @@ public final class DockerTestUtils
         try {
             File sourceFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File screenshotFile;
-            File screenshotDir = new File(testConfiguration.getOutputDirectory());
+            File screenshotDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
             screenshotDir.mkdirs();
             screenshotFile = new File(screenshotDir, String.format("%s-%s.png", testSimpleClass, testName));
             FileUtils.copyFile(sourceFile, screenshotFile);
@@ -177,5 +177,14 @@ public final class DockerTestUtils
         ch.qos.logback.classic.Logger logger =
             (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggingContextName);
         logger.setLevel(loggingLevel);
+    }
+
+    /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @return the directory where screenshots and video should be saved
+     */
+    public static File getScreenshotsDirectory(TestConfiguration testConfiguration)
+    {
+        return new File(String.format("%s/screenshots", testConfiguration.getOutputDirectory()));
     }
 }

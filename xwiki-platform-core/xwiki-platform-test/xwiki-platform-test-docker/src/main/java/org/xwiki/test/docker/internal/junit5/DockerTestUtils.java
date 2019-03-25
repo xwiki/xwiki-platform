@@ -185,6 +185,8 @@ public final class DockerTestUtils
      */
     public static File getScreenshotsDirectory(TestConfiguration testConfiguration)
     {
-        return new File(String.format("%s/screenshots", testConfiguration.getOutputDirectory()));
+        File directory = new File(String.format("%s/screenshots", testConfiguration.getOutputDirectory()));
+        directory.mkdirs();
+        return directory;
     }
 }

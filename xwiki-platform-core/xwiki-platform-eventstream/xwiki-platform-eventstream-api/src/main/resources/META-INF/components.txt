@@ -1,3 +1,5 @@
 org.xwiki.eventstream.internal.DefaultEventFactory
 org.xwiki.eventstream.internal.DefaultRecordableEventDescriptorManager
+org.xwiki.eventstream.internal.EventStreamWikiCleanerJob
+org.xwiki.eventstream.internal.WikiDeletedListener
 org.xwiki.eventstream.script.EventStreamScriptService

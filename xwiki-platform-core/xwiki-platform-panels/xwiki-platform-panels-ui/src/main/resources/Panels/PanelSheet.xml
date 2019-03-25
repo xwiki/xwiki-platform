@@ -53,14 +53,21 @@
 #set ($obj = $doc.getObject('Panels.PanelClass'))
 #if ($obj)
   #set($class = $obj.xWikiClass)
-  #displayPanelProperty($obj 'name')
-  #displayPanelProperty($obj 'type')
-  #displayPanelProperty($obj 'category')
-  #displayPanelProperty($obj 'description')
-  #displayPanelProperty($obj 'content')
-  #displayPanelProperty($obj 'async_enabled')
-  #displayPanelProperty($obj 'async_cached')
-  #displayPanelProperty($obj 'async_context')
+  ## Enclose in .xform class div when editing
+  #if ($xcontext.action == 'edit')
+    {{html clean=false}}&lt;div class='xform'&gt;{{/html}}
+  #end
+    #displayPanelProperty($obj 'name')
+    #displayPanelProperty($obj 'type')
+    #displayPanelProperty($obj 'category')
+    #displayPanelProperty($obj 'description')
+    #displayPanelProperty($obj 'content')
+    #displayPanelProperty($obj 'async_enabled')
+    #displayPanelProperty($obj 'async_cached')
+    #displayPanelProperty($obj 'async_context')
+  #if ($xcontext.action == 'edit')
+    {{html clean=false}}&lt;/div&gt;{{/html}}
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

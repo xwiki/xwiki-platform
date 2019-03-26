@@ -46,7 +46,7 @@
 
 #macro (helpActionCard $data)
   &lt;div class="well"&gt;
-    &lt;h3&gt;$escapetool.xml($data.title)&lt;/h3&gt;
+    &lt;h2&gt;$escapetool.xml($data.title)&lt;/h2&gt;
     &lt;div class="row"&gt;
       &lt;div class="col-xs-12 col-md-7"&gt;
         &lt;p&gt;$data.description&lt;/p&gt;
@@ -82,7 +82,7 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="${id}ModalLabel"&gt;$!escapetool.xml($title)&lt;/h4&gt;
+          &lt;span class="modal-title" id="${id}ModalLabel"&gt;$!escapetool.xml($title)&lt;/span&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           &lt;video controls autoplay&gt;
@@ -138,14 +138,14 @@
     #set ($url = $documentationURL)
   #end
   &lt;div class="well"&gt;
-    &lt;h6&gt;
+    &lt;div&gt;
       &lt;a href="$!url"&gt;
         #if ($data.icon)
           &lt;span class="icon $data.icon"&gt;&lt;/span&gt;
         #end
         $escapetool.xml($data.title)
       &lt;/a&gt;
-    &lt;/h6&gt;
+    &lt;/div&gt;
     #if ($data.description)
       &lt;p class="noitems"&gt;
         $data.description

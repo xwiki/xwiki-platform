@@ -129,7 +129,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;h3 id="HExamples"&gt;Examples&lt;/h3&gt;
+&lt;h2 id="HExamples"&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Need help or confused with some of our applications? Check out their documentation and find out more about their functionality.&lt;/p&gt;
 &lt;div class="row"&gt;
   #foreach ($card in $exampleCards)

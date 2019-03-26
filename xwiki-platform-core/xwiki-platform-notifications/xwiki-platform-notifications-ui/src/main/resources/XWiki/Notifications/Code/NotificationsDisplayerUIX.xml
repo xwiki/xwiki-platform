@@ -293,7 +293,7 @@
     if (asyncId) {
       params.asyncId = asyncId;
     }
-    $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data, textStatus, jqXHR) {
+    $.ajax(restURL, {cache: false, data: params}).done(function (data, textStatus, jqXHR) {
       switch (jqXHR.status) {
           case 200:
             // 200 means that the search is done, we displayer the count notifications

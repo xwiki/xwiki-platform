@@ -38,11 +38,7 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro(displayPanelProperty $obj $propName)
-  ; #if ($xcontext.action == 'inline')
-    {{html}}&lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$services.localization.render("${class.getName()}_${propName}")&lt;/label&gt;{{/html}}
-  #else
-    $services.localization.render("${class.getName()}_${propName}")
-  #end
+  ; &lt;label#if ($xcontext.action == 'edit') for="${class.getName()}_${obj.number}_${propName}"#end&gt;$services.localization.render("${class.getName()}_${propName}")&lt;/label&gt;
   : $doc.display($propName, $obj)
 #end
 
@@ -53,10 +49,9 @@
 #set ($obj = $doc.getObject('Panels.PanelClass'))
 #if ($obj)
   #set($class = $obj.xWikiClass)
-  ## Enclose in .xform class div when editing
-  #if ($xcontext.action == 'edit')
-    {{html clean=false}}&lt;div class='xform'&gt;{{/html}}
-  #end
+  {{html wiki="true"}}
+  (% class="xform" %)
+  (((
     #displayPanelProperty($obj 'name')
     #displayPanelProperty($obj 'type')
     #displayPanelProperty($obj 'category')
@@ -65,9 +60,8 @@
     #displayPanelProperty($obj 'async_enabled')
     #displayPanelProperty($obj 'async_cached')
     #displayPanelProperty($obj 'async_context')
-  #if ($xcontext.action == 'edit')
-    {{html clean=false}}&lt;/div&gt;{{/html}}
-  #end
+  )))
+  {{/html}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

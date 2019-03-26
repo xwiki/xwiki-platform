@@ -105,7 +105,7 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.9.5.3</version>
+        <version>0.9.5.4</version>
       </dependency>
       <!-- Jython engine -->
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->

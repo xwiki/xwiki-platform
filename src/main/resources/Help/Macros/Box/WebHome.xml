@@ -54,7 +54,7 @@ There are several specialised box macros:
 == Box Macro ==
 
 {{example}}
-{{box title="Title of the box" width="30%"}}
+{{box title="Title of the box"}}
 This is a box message
 {{/box}}
 {{/example}}

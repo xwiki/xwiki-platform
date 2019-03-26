@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.3RC1
  */
-@UITest(servletEngine = ServletEngine.TOMCAT)
+@UITest
 public class ConfigurableClassIT
 {
     @BeforeEach

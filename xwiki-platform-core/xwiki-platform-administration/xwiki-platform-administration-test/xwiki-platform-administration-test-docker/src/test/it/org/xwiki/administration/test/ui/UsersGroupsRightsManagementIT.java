@@ -24,10 +24,8 @@ import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.GroupsPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.EditRightsPane;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -615,6 +615,18 @@ public class HTML5DutchWebGuidelinesValidatorTest
         setValidatorDocument("<body><iframe/></body>");
         this.validator.validateRpd12s1();
         assertFalse(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><iframe title='an youtube video iframe'/></body>");
+        this.validator.validateRpd12s1();
+        assertFalse(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><iframe role='an youtube video iframe'/></body>");
+        this.validator.validateRpd12s1();
+        assertFalse(isValid(this.validator), getErrors(this.validator));
+
+        setValidatorDocument("<body><iframe title='an youtube video iframe' role='video tutorial'/></body>");
+        this.validator.validateRpd12s1();
+        assertTrue(isValid(this.validator), getErrors(this.validator));
     }
 
     @Test

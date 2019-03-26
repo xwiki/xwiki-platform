@@ -44,7 +44,7 @@
 ## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
 ## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
 #set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" allowfullscreen&gt;&lt;/$iframe&gt;
+&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="YouTube video of XWiki" allowfullscreen&gt;&lt;/$iframe&gt;
 {{/html}}
 {{/velocity}}
 {{/box}}

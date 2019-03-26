@@ -164,7 +164,7 @@
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title" id="renameAppModal-label"&gt;Rename Application&lt;/h4&gt;
+          &lt;span class="modal-title" id="renameAppModal-label"&gt;Rename Application&lt;/span&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           #renameAppModalBody

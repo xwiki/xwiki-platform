@@ -7,6 +7,9 @@
   position: relative;
   text-align: center;
   white-space: nowrap;
+  /* Those width/height values can be overridden by the inline styling added with the macro parameters */
+  width: 620px;
+  height: 349px;
 }
 
 .xGallery:before {

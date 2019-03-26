@@ -107,16 +107,10 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
             if (!StringUtils.isEmpty(parameters.getWidth())) {
                 // Non-empty width value. The empty value means "no explicit width".
                 inlineStyle.append("width: ").append(parameters.getWidth()).append(';');
-            } else if (parameters.getWidth() == null) {
-                // Default width when none is specified.
-                inlineStyle.append("width: 620px;");
             }
             if (!StringUtils.isEmpty(parameters.getHeight())) {
                 // Non-empty height value. The empty value means "no explicit height".
                 inlineStyle.append("height: ").append(parameters.getHeight()).append(';');
-            } else if (parameters.getHeight() == null) {
-                // Default height when none is specified (16:9 aspect ratio).
-                inlineStyle.append("height: 349px;");
             }
 
             Map<String, String> groupParameters = new HashMap<>();

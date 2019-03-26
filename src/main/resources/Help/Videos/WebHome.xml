@@ -96,7 +96,7 @@
 
 #macro (helpVideoCard $data)
   &lt;div class="videoCard"&gt;
-    &lt;iframe src="$data.url" allowfullscreen&gt;&lt;/iframe&gt;  
+    &lt;iframe src="$data.url" allowfullscreen title="$escapetool.xml($data.title)" role="Video tutorial" &gt;&lt;/iframe&gt;
     &lt;div class="videoCard-body"&gt;
       &lt;div class="videoCard-title"&gt;
         $escapetool.xml($data.title)

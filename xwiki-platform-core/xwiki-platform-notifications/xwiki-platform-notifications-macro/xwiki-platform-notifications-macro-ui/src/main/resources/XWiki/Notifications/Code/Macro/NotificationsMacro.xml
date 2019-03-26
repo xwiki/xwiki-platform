@@ -870,7 +870,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   #set ($rssURL = "${rssURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
   #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($xcontext.macro.params.tags)")
   #set ($rssURL = "${rssURL}&amp;currentWiki=$!escapetool.url($services.wiki.currentWikiId)")
-  &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" target="_blank"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
+  &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" rel="nofollow external"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
 #end
 &lt;/div&gt;
 {{/html}}

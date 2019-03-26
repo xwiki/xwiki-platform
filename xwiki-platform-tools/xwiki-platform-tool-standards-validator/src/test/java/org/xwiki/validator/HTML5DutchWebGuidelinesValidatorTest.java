@@ -21,8 +21,10 @@ package org.xwiki.validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.validator.ValidationError.Type;
@@ -56,13 +58,12 @@ public class HTML5DutchWebGuidelinesValidatorTest
 
     private String getErrors(HTML5DutchWebGuidelinesValidator validator)
     {
-        StringBuffer buffer = new StringBuffer();
-
+        List<String> errors = new ArrayList<>(validator.getErrors().size());
         for (ValidationError error : validator.getErrors()) {
-            buffer.append(error + "\n");
+            errors.add(error.toString());
         }
 
-        return buffer.toString();
+        return StringUtils.join(errors, '\n');
     }
 
     private boolean isValid(HTML5DutchWebGuidelinesValidator validator)
@@ -333,7 +334,8 @@ public class HTML5DutchWebGuidelinesValidatorTest
     {
         setValidatorDocument("<body><p><sub>sub</sub></p></body>");
         this.validator.validateRpd3s9();
-        assertFalse(isValid(this.validator), getErrors(this.validator));
+        assertEquals("WARNING: The use of <sub> is not recommended.", getErrors(validator));
+        assertTrue(isValid(this.validator));
     }
 
     @Test
@@ -341,7 +343,8 @@ public class HTML5DutchWebGuidelinesValidatorTest
     {
         setValidatorDocument("<body><p><sup>sup</sup></p></body>");
         this.validator.validateRpd3s9();
-        assertFalse(isValid(this.validator), getErrors(this.validator));
+        assertEquals("WARNING: The use of <sup> is not recommended.", getErrors(validator));
+        assertTrue(isValid(this.validator));
     }
 
     // RPD 3s11

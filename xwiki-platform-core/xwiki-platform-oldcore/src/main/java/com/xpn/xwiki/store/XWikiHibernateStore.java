@@ -50,6 +50,7 @@ import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -328,12 +329,29 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                 stmt.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
             } else if (DatabaseProduct.MYSQL == databaseProduct) {
-                // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
-                if (context.getWiki().getEncoding().equals("UTF-8")) {
-                    stmt.execute("create database " + escapedSchema + " CHARACTER SET utf8 COLLATE utf8_bin");
-                } else {
-                    stmt.execute("create database " + escapedSchema);
+                StringBuilder statementBuilder = new StringBuilder("create database " + escapedSchema);
+
+                String charset = "utf8mb4";
+                String collation = "utf8mb4_bin";
+
+                // Get main wiki encoding
+                if (!context.isMainWiki(wikiName)) {
+                    SQLQuery selectQuery = session.createSQLQuery(
+                        "select DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME from INFORMATION_SCHEMA.SCHEMATA"
+                            + " where SCHEMA_NAME='" + getSchemaFromWikiName(context.getMainXWiki(), context) + "'");
+                    Object[] result = (Object[]) selectQuery.uniqueResult();
+                    if (result != null) {
+                        charset = (String) result[0];
+                        collation = (String) result[1];
+                    }
                 }
+
+                statementBuilder.append(" CHARACTER SET ");
+                statementBuilder.append(charset);
+                statementBuilder.append(" COLLATE ");
+                statementBuilder.append(collation);
+
+                stmt.execute(statementBuilder.toString());
             } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
                 if (isInSchemaMode()) {
                     stmt.execute("CREATE SCHEMA " + escapedSchema);
